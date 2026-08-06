@@ -7,6 +7,9 @@ name = "terralab3d-core"
 version = "0.1.0"
 description = "Scientific, application and scene contracts for TerraLab3D"
 requires-python = ">=3.12"
+dependencies = [
+    "aiohttp>=3.9",
+]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

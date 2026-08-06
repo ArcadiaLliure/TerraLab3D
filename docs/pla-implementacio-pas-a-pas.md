@@ -123,21 +123,21 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 
 ### Tasques
 
-- [ ] Definir l’entrypoint oficial `python -m terralab3d` i una única seqüència d’arrencada.
-- [ ] Escollir i implementar un host d’escriptori concret per al frontend Three.js sense crear dues rutes permanents.
-- [ ] Arrencar el backend Python, el frontend i el bridge amb ports locals assignats de manera segura.
-- [ ] Implementar un handshake tipat amb `frontend_ready`, versió de protocol, capacitats i identificador de sessió.
-- [ ] Crear `ThreeSceneHost` amb `Scene`, `PerspectiveCamera`, `WebGLRenderer` i un únic canvas.
-- [ ] Definir la convenció de món: eix vertical, nord, est, azimut, altitud i sentit de rotació.
-- [ ] Mostrar un horitzó tècnic circular, punts N/E/S/O, zenit i una primitiva de diagnòstic.
-- [ ] Implementar pan/orbit, zoom per FOV, límits verticals, teclat i redimensionament.
-- [ ] Mantenir el moviment i el render de càmera completament locals a TypeScript.
-- [ ] Publicar `camera_changed` a Python només al final del gest o amb throttling/coalescing.
-- [ ] Permetre que Python enviï `set_camera_pose` i `focus_direction` amb transició visual.
-- [ ] Implementar `viewport_resized`, `bridge_error`, `shutdown_requested` i `shutdown_complete`.
-- [ ] Gestionar desconnexió, reconexió controlada i missatge d’error visible en comptes d’una pantalla negra.
-- [ ] Alliberar listeners, timers, sockets, renderer, geometries i materials en tancar.
-- [ ] Afegir una pantalla de diagnòstic mínima amb estat del bridge, FPS i generació de sessió.
+- [x] Definir l’entrypoint oficial `python -m terralab3d` i una única seqüència d’arrencada.
+- [x] Escollir i implementar un host d’escriptori concret per al frontend Three.js sense crear dues rutes permanents.
+- [x] Arrencar el backend Python, el frontend i el bridge amb ports locals assignats de manera segura.
+- [x] Implementar un handshake tipat amb `frontend_ready`, versió de protocol, capacitats i identificador de sessió.
+- [x] Crear `ThreeSceneHost` amb `Scene`, `PerspectiveCamera`, `WebGLRenderer` i un únic canvas.
+- [x] Definir la convenció de món: eix vertical, nord, est, azimut, altitud i sentit de rotació.
+- [x] Mostrar un horitzó tècnic circular, punts N/E/S/O, zenit i una primitiva de diagnòstic.
+- [x] Implementar pan/orbit, zoom per FOV, límits verticals, teclat i redimensionament.
+- [x] Mantenir el moviment i el render de càmera completament locals a TypeScript.
+- [x] Publicar `camera_changed` a Python només al final del gest o amb throttling/coalescing.
+- [x] Permetre que Python enviï `set_camera_pose` i `focus_direction` amb transició visual.
+- [x] Implementar `viewport_resized`, `bridge_error`, `shutdown_requested` i `shutdown_complete`.
+- [x] Gestionar desconnexió, reconexió controlada i missatge d’error visible en comptes d’una pantalla negra.
+- [x] Alliberar listeners, timers, sockets, renderer, geometries i materials en tancar.
+- [x] Afegir una pantalla de diagnòstic mínima amb estat del bridge, FPS i generació de sessió.
 
 ### Criteri de sortida
 
@@ -145,11 +145,11 @@ L’aplicació s’obre des de Python, la càmera es mou i fa zoom amb fluïdesa
 
 ### Evidència obligatòria
 
-- [ ] Vídeo o captura de l’arrencada, navegació, focus des de Python, resize i tancament.
-- [ ] Prova d’integració del handshake i dels missatges de càmera.
-- [ ] Prova de lifecycle amb arrencada-tancament-arrencada.
-- [ ] Mètriques de frame P50/P95 en l’escena tècnica.
-- [ ] Comptador que demostri zero round-trips Python per frame de càmera.
+- [x] Vídeo o captura de l’arrencada, navegació, focus des de Python, resize i tancament.
+- [x] Prova d’integració del handshake i dels missatges de càmera.
+- [x] Prova de lifecycle amb arrencada-tancament-arrencada.
+- [x] Mètriques de frame P50/P95 en l’escena tècnica.
+- [x] Comptador que demostri zero round-trips Python per frame de càmera.
 
 ### Fora d’abast del pas
 
@@ -1303,3 +1303,5 @@ Abans d’executar qualsevol pas:
 9. Utilitza la skill terralab-manel-style per a escriure el codi a implementar, per la propera execució hauries d'utilitzar la skill 'py-dev' per a continuar amb la feina. L'ús d'aquesta darrera es farà de forma intermitent, quan necessiti o quan li indiqui.
 10. El rendiment és una prioritat màxima, però sense sacrificar aspecte visual i funcionalitats.
 11. Els noms d'arxius, mètodes, variables i comentaris sempre en català.
+12. La gestió i captura d'errors és important. Error amb informació limitada que no reveli l'estructura interna del projecte o codi font (prohibit stacktrace) per a l'usuari, però sí detallat al log.
+13. En cada iteració, és obligatori que marquis a pla-implementacio-pas-a-pas.md els checkbox completats.

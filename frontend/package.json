@@ -4,12 +4,15 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "build": "esbuild src/main.ts --bundle --format=esm --outfile=dist/bundle.js --sourcemap",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "three": "^0.179.0"
   },
   "devDependencies": {
+    "@types/three": "^0.179.0",
+    "esbuild": "^0.25.0",
     "typescript": "^5.8.3"
   }
 }
