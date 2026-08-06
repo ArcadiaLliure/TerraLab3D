@@ -1,0 +1,13 @@
+"""Contractes de servei purs per a la capacitat recursos."""
+
+
+from typing import Protocol
+from terralab3d.domain.identifiers import ResourceId
+from .models import DatasetState
+
+class ResourceLifecycleModel(Protocol):
+    """Aplica transicions tipades de cicle de vida a datasets i recursos."""
+    def queued(self, state: DatasetState) -> DatasetState: ...
+    def loading(self, state: DatasetState, progress_fraction: float | None) -> DatasetState: ...
+    def ready(self, state: DatasetState, version: int) -> DatasetState: ...
+    def failed(self, state: DatasetState, message: str) -> DatasetState: ...

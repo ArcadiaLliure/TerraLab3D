@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terralab3d.local/schema/bridge-message.schema.json",
+  "title": "Missatge del bridge TerraLab3D",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "messageId",
+    "messageType",
+    "payload"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "messageId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "messageType": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sceneGeneration": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

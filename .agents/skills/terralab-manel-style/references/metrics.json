@@ -1,0 +1,20 @@
+{
+  "manual_sample_files": 64,
+  "classes": 41,
+  "interfaces": 23,
+  "service_implementation_pairs": 7,
+  "methods_analyzed": 212,
+  "median_method_lines": 8,
+  "p90_method_lines": 21,
+  "strong_patterns": [
+    "responsibility_based_layers",
+    "capability_oriented_services",
+    "explicit_contracts_at_boundaries",
+    "linear_use_case_orchestration",
+    "domain_vocabulary",
+    "externalized_configuration",
+    "business_error_translation",
+    "functional_traceability",
+    "feature_first_then_refactor"
+  ]
+}

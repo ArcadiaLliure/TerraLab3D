@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terralab3d.local/schema/resource-descriptor.schema.json",
+  "title": "SceneResourceDescriptor",
+  "type": "object",
+  "required": [
+    "resourceId",
+    "version",
+    "kind",
+    "lifetime",
+    "contentKey",
+    "byteLength"
+  ],
+  "properties": {
+    "resourceId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "kind": {
+      "enum": [
+        "buffer",
+        "texture_2d",
+        "texture_cube",
+        "font_atlas"
+      ]
+    },
+    "lifetime": {
+      "enum": [
+        "static",
+        "session",
+        "transient"
+      ]
+    },
+    "contentKey": {
+      "type": "string",
+      "minLength": 1
+    },
+    "byteLength": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false
+}

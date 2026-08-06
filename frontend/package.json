@@ -1,0 +1,15 @@
+{
+  "name": "@terralab3d/frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "three": "^0.179.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

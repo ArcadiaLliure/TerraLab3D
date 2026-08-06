@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terralab3d.local/schema/scene-delta.schema.json",
+  "title": "Delta d’escena TerraLab3D",
+  "type": "object",
+  "required": [
+    "baseGeneration",
+    "generation",
+    "operations"
+  ],
+  "properties": {
+    "baseGeneration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/operation"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "operation": {
+      "type": "object",
+      "required": [
+        "op"
+      ],
+      "properties": {
+        "op": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

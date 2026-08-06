@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terralab3d.local/schema/scene-component.schema.json",
+  "title": "Component tipat de l’escena TerraLab3D",
+  "type": "object",
+  "required": [
+    "componentType",
+    "payloadVersion",
+    "payload"
+  ],
+  "properties": {
+    "componentType": {
+      "type": "string",
+      "enum": [
+        "camera",
+        "celestial_sphere",
+        "sky_uniform",
+        "star_field",
+        "star_trails",
+        "galactic_dome",
+        "deep_sky_field",
+        "horizon",
+        "terrain_tile",
+        "weather",
+        "scope",
+        "measurements",
+        "constellations",
+        "pickable"
+      ]
+    },
+    "payloadVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}
