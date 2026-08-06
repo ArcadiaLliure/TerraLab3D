@@ -15,6 +15,9 @@ import { RenderLoopImpl } from "./view/three/RenderLoopImpl";
 import { ThreeSceneHostImpl } from "./view/three/ThreeSceneHostImpl";
 import { DiagnosticsOverlay } from "./view/ui/DiagnosticsOverlay";
 
+import { LocationPanel } from "./view/ui/panels/LocationPanel";
+import { LocationHUD } from "./view/ui/panels/LocationHUD";
+
 // ─── Bootstrap ───────────────────────────────────────────────────────
 
 function main(): void {
@@ -30,11 +33,18 @@ function main(): void {
   const cameraRig = new CameraRigImpl(sceneHost.camera);
   const renderLoop = new RenderLoopImpl();
   const diagnostics = new DiagnosticsOverlay();
+  
+  const locationPanel = new LocationPanel((lat, lon, height) => {
+    bridge.sendSetObserverLocation(lat, lon, height);
+  });
+  const locationHUD = new LocationHUD();
 
   // 2. Mount scene + UI
   sceneHost.mount(container);
   diagnostics.mount(container);
-  cameraRig.attach(container);
+  locationPanel.mount(container);
+  locationHUD.mount(container);
+  cameraRig.attach(sceneHost.renderer.domElement);
 
   // Initial resize
   const rect = container.getBoundingClientRect();
@@ -68,11 +78,22 @@ function main(): void {
         f.transitionMs ?? 600,
       );
     },
+    onObserverLocationChanged(lat, lon, elevation, effectiveHeight, elevationSource) {
+      locationPanel.updateInputs(lat, lon);
+      locationPanel.notifySuccess();
+      locationHUD.updateHUD(lat, lon, elevation, effectiveHeight, elevationSource);
+    },
+    onLocationError(msg) {
+      locationPanel.notifyError();
+      alert("Error d'ubicació: " + msg);
+    },
     onShutdownRequested() {
       renderLoop.stop();
       cameraRig.detach();
       sceneHost.dispose();
       diagnostics.dispose();
+      locationPanel.dispose();
+      locationHUD.dispose();
       bridge.dispose();
     },
   };

@@ -1,12 +1,12 @@
-"""WebSocket bridge between the Python backend and the Three.js frontend.
+"""Pont WebSocket entre el backend en Python i el frontend Three.js.
 
-Responsibilities:
-  - Manage the WebSocket lifecycle for a single connected client.
-  - Perform the typed handshake (``frontend_ready`` → ``handshake_ack``).
-  - Receive ``camera_changed`` and ``viewport_resized`` from the frontend.
-  - Send ``set_camera_pose``, ``focus_direction``, and ``shutdown_requested``
-    to the frontend.
-  - Coordinate clean shutdown (``shutdown_requested`` → ``shutdown_complete``).
+Responsabilitats:
+  - Gestionar el cicle de vida de la connexió WebSocket per a un únic client connectat.
+  - Realitzar el dóna-m'hi-l'anotació tipat (``frontend_ready`` → ``handshake_ack``).
+  - Rebre esdeveniments ``camera_changed`` i ``viewport_resized`` del frontend.
+  - Enviar ordres ``set_camera_pose``, ``focus_direction`` i ``shutdown_requested``
+    cap al frontend.
+  - Coordinar un tancament net (``shutdown_requested`` → ``shutdown_complete``).
 """
 
 from __future__ import annotations
@@ -23,12 +23,12 @@ log = logging.getLogger("terralab3d.bridge")
 
 PROTOCOL_VERSION = 1
 
-# Type alias for bridge message handlers
+# Àlies de tipus per als manegadors de missatges del pont
 MessageHandler = Callable[[dict[str, Any]], Awaitable[None] | None]
 
 
 class WebSocketBridge:
-    """Server-side half of the Python ↔ Three.js bridge."""
+    """Meitat del servidor del pont Python ↔ Three.js."""
 
     def __init__(self) -> None:
         self._ws: aiohttp.web.WebSocketResponse | None = None
@@ -47,22 +47,22 @@ class WebSocketBridge:
 
     @property
     def shutdown_event(self) -> asyncio.Event:
-        """Set when the frontend sends ``shutdown_complete``."""
+        """S'activa quan el frontend envia ``shutdown_complete``."""
         return self._shutdown_event
 
     def on(self, msg_type: str, handler: MessageHandler) -> None:
-        """Register a handler for a specific message type."""
+        """Registra un manegador per a un tipus de missatge específic."""
         self._handlers.setdefault(msg_type, []).append(handler)
 
     async def handle_websocket(
         self, request: aiohttp.web.Request,
     ) -> aiohttp.web.WebSocketResponse:
-        """Handle a new WebSocket connection (one at a time)."""
+        """Gestiona una nova connexió WebSocket (una a la vegada)."""
         ws = aiohttp.web.WebSocketResponse(heartbeat=10)
         await ws.prepare(request)
-        log.info("WebSocket connected")
+        log.info("WebSocket connectat")
 
-        # Only one client at a time
+        # Només un client a la vegada
         if self._ws is not None and not self._ws.closed:
             await self._ws.close()
 
@@ -76,7 +76,7 @@ class WebSocketBridge:
                     try:
                         data = json.loads(msg.data)
                     except json.JSONDecodeError:
-                        log.warning("Invalid JSON from frontend: %s", msg.data[:200])
+                        log.warning("JSON no vàlid des del frontend: %s", msg.data[:200])
                         continue
                     await self._dispatch(data)
                 elif msg.type in (
@@ -86,18 +86,18 @@ class WebSocketBridge:
                 ):
                     break
         except Exception:
-            log.exception("WebSocket error")
+            log.exception("Error a WebSocket")
         finally:
             self._connected = False
             self._ws = None
-            log.info("WebSocket disconnected")
-            # Signal shutdown on disconnect (browser closed)
+            log.info("WebSocket desconnectat")
+            # Senyalitza el tancament en desconnectar (navegador tancat)
             self._shutdown_event.set()
 
         return ws
 
     async def send(self, msg: dict[str, Any]) -> None:
-        """Send a JSON message to the connected frontend."""
+        """Envia un missatge JSON al frontend connectat."""
         if self._ws and not self._ws.closed:
             await self._ws.send_json(msg)
 
@@ -131,36 +131,59 @@ class WebSocketBridge:
             payload["transitionMs"] = transition_ms
         await self.send(payload)
 
+    async def send_observer_location_changed(
+        self,
+        lat: float, lon: float, elevation: float, effective_height: float, source: str
+    ) -> None:
+        await self.send({
+            "type": "observer_location_changed",
+            "lat": lat,
+            "lon": lon,
+            "elevation": elevation,
+            "effectiveHeight": effective_height,
+            "elevationSource": source,
+        })
+
+    async def send_location_error(self, message: str) -> None:
+        await self.send({
+            "type": "location_error",
+            "message": message,
+        })
+
     async def request_shutdown(self) -> None:
-        """Ask the frontend to clean up and confirm with shutdown_complete."""
+        """Demana al frontend que netegi recursos i confirmi amb shutdown_complete."""
         await self.send({"type": "shutdown_requested"})
 
-    # ─── Private ──────────────────────────────────────────────────────
+    # ─── Privat ──────────────────────────────────────────────────────
 
     async def _dispatch(self, data: dict[str, Any]) -> None:
         msg_type = data.get("type")
+        log.info("S'ha rebut missatge de tipus: %s", msg_type)
         if not isinstance(msg_type, str):
-            log.warning("Message without type: %s", data)
+            log.warning("Missatge sense tipus: %s", data)
             return
 
         if msg_type == "frontend_ready":
             await self._handle_handshake(data)
         elif msg_type == "shutdown_complete":
-            log.info("Frontend confirmed shutdown")
+            log.info("El frontend ha confirmat el tancament")
             self._shutdown_event.set()
-        else:
-            handlers = self._handlers.get(msg_type, [])
-            for handler in handlers:
-                result = handler(data)
-                if asyncio.iscoroutine(result):
-                    await result
+        
+        handlers = self._handlers.get(msg_type, [])
+        for handler in handlers:
+            result = handler(data)
+            if asyncio.iscoroutine(result):
+                await result
 
     async def _handle_handshake(self, _data: dict[str, Any]) -> None:
         self._connected = True
-        log.info("Handshake completed — session %s", self._session_id)
+        log.info("Handshake completat — sessió %s", self._session_id)
         await self.send({
             "type": "handshake_ack",
             "sessionId": self._session_id,
             "protocolVersion": PROTOCOL_VERSION,
             "capabilities": ["camera", "viewport", "shutdown"],
         })
+
+
+

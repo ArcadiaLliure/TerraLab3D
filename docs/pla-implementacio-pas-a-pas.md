@@ -1,5 +1,9 @@
 # Pla d’implementació funcional pas a pas fins a la paritat amb TerraLab
 
+Els noms d'arxius, mètodes, variables i comentaris sempre en català. Els comentaris han d'anar sempre en català. Hi ha variables i classes de "convencions" que sí que han d'estar en anglès, sinó seria estrany. El negoci propi sí que ha d'estar en català, esclareixo.
+
+Reprodueix la mateixa UI i look and feel que E:\Desarrollo\TerraLab. Crec que l'arxiu de la UI és widget_controls_builder.py.
+
 ## Finalitat
 
 Aquest pla converteix l’esquelet de TerraLab3D en una aplicació científica tridimensional completa, mantenint una separació estricta entre domini científic, aplicació, infraestructura, escena neutral i adaptador Three.js.
@@ -174,18 +178,18 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 
 ### Tasques
 
-- [ ] Implementar el model immutable d’ubicació geodèsica amb unitats i rangs explícits.
-- [ ] Implementar la comanda `SetObserverLocation` i el cas d’ús de reubicació.
-- [ ] Crear un panell funcional amb latitud, longitud, alçada addicional i acció de reubicar.
-- [ ] Validar latitud [-90, 90], longitud normalitzada i valors finits.
-- [ ] Mostrar l’altitud del terreny com a pendent fins que existeixi el port DEM, sense inventar-la.
-- [ ] Calcular l’alçada efectiva com elevació coneguda més offset de l’observador.
-- [ ] Orientar el marc local Three.js perquè nord, est, sud i oest coincideixin amb la convenció astronòmica.
-- [ ] Mostrar un HUD discret amb coordenades, alçada efectiva i font de l’elevació.
-- [ ] Persistir temporalment l’estat de sessió dins del backend, sense afegir encara persistència en disc.
-- [ ] Fer que canviar ubicació publiqui un delta petit, no una reconstrucció del host.
-- [ ] Definir un error visible per coordenades invàlides o elevació no disponible.
-- [ ] Caracteritzar els valors per defecte i el comportament de reubicació de TerraLab.
+- [x] Implementar el model immutable d’ubicació geodèsica amb unitats i rangs explícits.
+- [x] Implementar la comanda `SetObserverLocation` i el cas d’ús de reubicació.
+- [x] Crear un panell funcional amb latitud, longitud, alçada addicional i acció de reubicar.
+- [x] Validar latitud [-90, 90], longitud normalitzada i valors finits.
+- [x] Mostrar l’altitud del terreny com a pendent fins que existeixi el port DEM, sense inventar-la.
+- [x] Calcular l’alçada efectiva com elevació coneguda més offset de l’observador.
+- [x] Orientar el marc local Three.js perquè nord, est, sud i oest coincideixin amb la convenció astronòmica.
+- [x] Mostrar un HUD discret amb coordenades, alçada efectiva i font de l’elevació.
+- [x] Persistir temporalment l’estat de sessió dins del backend, sense afegir encara persistència en disc.
+- [x] Fer que canviar ubicació publiqui un delta petit, no una reconstrucció del host.
+- [x] Definir un error visible per coordenades invàlides o elevació no disponible.
+- [x] Caracteritzar els valors per defecte i el comportament de reubicació de TerraLab.
 
 ### Criteri de sortida
 
@@ -193,10 +197,10 @@ L’usuari pot canviar d’ubicació, veure les coordenades i l’alçada efecti
 
 ### Evidència obligatòria
 
-- [ ] Proves de validació i normalització geogràfica.
-- [ ] Prova d’integració UI → Python → delta → escena.
-- [ ] Comprovació manual amb almenys tres ubicacions i hemisferis diferents.
-- [ ] Registre del nombre de bytes enviats en una reubicació.
+- [x] Proves de validació i normalització geogràfica.
+- [x] Prova d’integració UI → Python → delta → escena.
+- [x] Comprovació manual amb almenys tres ubicacions i hemisferis diferents.
+- [x] Registre del nombre de bytes enviats en una reubicació.
 
 ### Fora d’abast del pas
 
@@ -1302,6 +1306,7 @@ Abans d’executar qualsevol pas:
 8. No comencis el pas següent.
 9. Utilitza la skill terralab-manel-style per a escriure el codi a implementar, per la propera execució hauries d'utilitzar la skill 'py-dev' per a continuar amb la feina. L'ús d'aquesta darrera es farà de forma intermitent, quan necessiti o quan li indiqui.
 10. El rendiment és una prioritat màxima, però sense sacrificar aspecte visual i funcionalitats.
-11. Els noms d'arxius, mètodes, variables i comentaris sempre en català.
+11. Els noms d'arxius, mètodes, variables i comentaris sempre en català. Els comentaris han d'anar sempre en català. Hi ha variables i classes de "convencions" que sí que han d'estar en anglès, sinó seria estrany. El negoci propi sí que ha d'estar en català, esclareixo.
 12. La gestió i captura d'errors és important. Error amb informació limitada que no reveli l'estructura interna del projecte o codi font (prohibit stacktrace) per a l'usuari, però sí detallat al log.
 13. En cada iteració, és obligatori que marquis a pla-implementacio-pas-a-pas.md els checkbox completats.
+14. Cada vegada que s'instal·li una nova dependència, documentar-la a requirements.txt sense duplicar-la i classificant-la amb comentaris de perquè és necessària, en quin apartat s'utilitza.

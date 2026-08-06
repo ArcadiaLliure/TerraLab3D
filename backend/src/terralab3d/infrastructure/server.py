@@ -1,7 +1,7 @@
-"""HTTP + WebSocket server for TerraLab3D.
+"""Servidor HTTP + WebSocket per a TerraLab3D.
 
-Serves the compiled frontend as static files and exposes a ``/ws``
-endpoint for the bidirectional Python ↔ Three.js bridge.
+Serveix el frontend compilat com a fitxers estàtics i exposa un punt final ``/ws``
+per al pont bidireccional Python ↔ Three.js.
 """
 
 from __future__ import annotations
@@ -19,7 +19,7 @@ log = logging.getLogger("terralab3d.server")
 
 
 class TerraLabServer:
-    """Asyncio-based HTTP/WebSocket server for TerraLab3D."""
+    """Servidor HTTP/WebSocket basat en asyncio per a TerraLab3D."""
 
     def __init__(
         self,
@@ -47,7 +47,7 @@ class TerraLabServer:
         return self._actual_port
 
     async def start(self) -> str:
-        """Start the server and return the base URL."""
+        """Inicia el servidor i retorna l'URL base."""
         self._app = aiohttp.web.Application()
         self._app.router.add_get("/ws", self._bridge.handle_websocket)
         self._app.router.add_get("/", self._serve_index)
@@ -57,7 +57,7 @@ class TerraLabServer:
 
         self._runner = aiohttp.web.AppRunner(
             self._app,
-            access_log=None,  # suppress noisy access logs
+            access_log=None,  # suprimeix els registres d'accés sorollosos
         )
         await self._runner.setup()
 
@@ -66,25 +66,28 @@ class TerraLabServer:
         )
         await self._site.start()
 
-        # Resolve actual port (when port=0, OS assigns one)
+        # Resol el port real (quan port=0, el SO n'assigna un)
         for sock in self._site._server.sockets:  # type: ignore[union-attr]
             addr = sock.getsockname()
             self._actual_port = addr[1]
             break
 
-        log.info("Server listening on %s", self.url)
+        log.info("Servidor escoltant a %s", self.url)
         return self.url
 
     async def stop(self) -> None:
-        """Gracefully shut down the server."""
+        """Atura el servidor de manera ordenada."""
         if self._site:
             await self._site.stop()
         if self._runner:
             await self._runner.cleanup()
-        log.info("Server stopped")
+        log.info("Servidor aturat")
 
     async def _serve_index(
         self, request: aiohttp.web.Request,
     ) -> aiohttp.web.FileResponse:
-        """Serve index.html for the root path."""
+        """Serveix index.html per a la ruta arrel."""
         return aiohttp.web.FileResponse(self._dist_dir / "index.html")
+
+
+

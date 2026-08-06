@@ -1,8 +1,8 @@
-"""Invoke esbuild to bundle the TypeScript frontend into a single JS file.
+"""Invoqueu esbuild per empaquetar el frontend TypeScript en un sol fitxer JS.
 
-The bundler is a build-time utility: it runs npx esbuild exactly once when
-``python -m terralab3d`` starts.  The output is written to
-``frontend/dist/bundle.js`` and served as a static file by aiohttp.
+L'empaquetador és una utilitat de construcció: s'executa npx esbuild exactament
+una vegada quan s'inicia ``python -m terralab3d``. La sortida s'escriu a
+``frontend/dist/bundle.js`` i se serveix com a fitxer estàtic mitjançant aiohttp.
 """
 
 from __future__ import annotations
@@ -18,27 +18,27 @@ _ENTRY = _FRONTEND_DIR / "src" / "main.ts"
 
 
 def _find_npx() -> str:
-    """Locate npx, checking common Windows paths if it isn't on PATH."""
+    """Localitza npx, comprovant les rutes habituals de Windows si no és al PATH."""
     npx = shutil.which("npx")
     if npx:
         return npx
-    # Fallback: standard Windows install location
+    # Alternativa: ubicació d'instal·lació estàndard a Windows
     candidate = Path(r"C:\Program Files\nodejs\npx.cmd")
     if candidate.exists():
         return str(candidate)
     raise FileNotFoundError(
-        "npx not found.  Install Node.js or add it to PATH."
+        "No s'ha trobat npx. Instal·leu Node.js o afegiu-lo al PATH."
     )
 
 
 def bundle_frontend(*, force: bool = False) -> Path:
-    """Bundle ``frontend/src/main.ts`` → ``frontend/dist/bundle.js``.
+    """Empaqueta ``frontend/src/main.ts`` → ``frontend/dist/bundle.js``.
 
-    Returns the path to the dist directory.
+    Retorna la ruta al directori dist.
     """
     bundle_path = _DIST_DIR / "bundle.js"
 
-    # Skip if already built and source hasn't changed (unless forced)
+    # Omet si ja s'ha compilat i el codi font no ha canviat (tret que es forci)
     if not force and bundle_path.exists():
         src_mtime = max(
             f.stat().st_mtime
@@ -49,7 +49,7 @@ def bundle_frontend(*, force: bool = False) -> Path:
 
     _DIST_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Copy index.html to dist
+    # Copia index.html a dist
     index_src = _FRONTEND_DIR / "index.html"
     index_dst = _DIST_DIR / "index.html"
     if index_src.exists():
@@ -67,7 +67,7 @@ def bundle_frontend(*, force: bool = False) -> Path:
         "--platform=browser",
     ]
 
-    print(f"[bundler] Building frontend: {' '.join(cmd)}")
+    print(f"[bundler] Construint el frontend: {' '.join(cmd)}")
     result = subprocess.run(
         cmd,
         cwd=str(_FRONTEND_DIR),
@@ -80,13 +80,15 @@ def bundle_frontend(*, force: bool = False) -> Path:
     if result.returncode != 0:
         print(result.stderr, file=sys.stderr)
         raise RuntimeError(
-            f"esbuild failed (exit {result.returncode}):\n{result.stderr}"
+            f"esbuild ha fallat (exit {result.returncode}):\n{result.stderr}"
         )
 
     if result.stderr:
-        # esbuild writes warnings to stderr even on success
+        # esbuild escriu avisos a stderr fins i tot en èxit
         print(result.stderr, end="")
 
     size_kb = bundle_path.stat().st_size / 1024
     print(f"[bundler] OK -> {bundle_path}  ({size_kb:.0f} KB)")
     return _DIST_DIR
+
+

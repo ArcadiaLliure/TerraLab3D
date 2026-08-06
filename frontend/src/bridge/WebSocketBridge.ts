@@ -15,6 +15,7 @@ import type {
   FrontendMessage,
   HandshakeAckMessage,
   ViewportResizedMessage,
+  SetObserverLocationMessage,
 } from "../contracts/bridge_messages";
 
 export type BridgeState = "connecting" | "connected" | "disconnected" | "error";
@@ -41,6 +42,8 @@ export interface BackendMessageListener {
   onSetCameraPose?(pose: CameraPoseFromBackend): void;
   onFocusDirection?(focus: FocusFromBackend): void;
   onShutdownRequested?(): void;
+  onObserverLocationChanged?(lat: number, lon: number, elevation: number, effectiveHeight: number, elevationSource: string): void;
+  onLocationError?(message: string): void;
 }
 
 export class WebSocketBridge {
@@ -139,6 +142,16 @@ export class WebSocketBridge {
     this.sendMessage(msg);
   }
 
+  sendSetObserverLocation(lat: number, lon: number, extraHeight: number): void {
+    const msg: SetObserverLocationMessage = {
+      type: "set_observer_location",
+      lat,
+      lon,
+      extraHeight,
+    };
+    this.sendMessage(msg);
+  }
+
   dispose(): void {
     this._disposed = true;
     if (this.reconnectTimer !== null) {
@@ -191,6 +204,22 @@ export class WebSocketBridge {
       case "shutdown_requested":
         for (const l of this.messageListeners) {
           l.onShutdownRequested?.();
+        }
+        break;
+      case "observer_location_changed":
+        for (const l of this.messageListeners) {
+          l.onObserverLocationChanged?.(
+            msg.lat,
+            msg.lon,
+            msg.elevation,
+            msg.effectiveHeight,
+            msg.elevationSource,
+          );
+        }
+        break;
+      case "location_error":
+        for (const l of this.messageListeners) {
+          l.onLocationError?.(msg.message);
         }
         break;
     }

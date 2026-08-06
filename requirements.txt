@@ -1,0 +1,6 @@
+# ==============================================================================
+# Dependències del Servidor i Servidor Web (Infraestructura / Comunicació)
+# ==============================================================================
+# aiohttp: Servidor HTTP asíncron i servidor WebSocket per a la comunicació
+# entre el backend en Python i el frontend Three.js / Web.
+aiohttp>=3.9

@@ -36,12 +36,20 @@ export interface BridgeErrorMessage {
   readonly message: string;
 }
 
+export interface SetObserverLocationMessage {
+  readonly type: "set_observer_location";
+  readonly lat: number;
+  readonly lon: number;
+  readonly extraHeight: number;
+}
+
 export type FrontendMessage =
   | FrontendReadyMessage
   | CameraChangedMessage
   | ViewportResizedMessage
   | ShutdownCompleteMessage
-  | BridgeErrorMessage;
+  | BridgeErrorMessage
+  | SetObserverLocationMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -72,11 +80,27 @@ export interface ShutdownRequestedMessage {
   readonly type: "shutdown_requested";
 }
 
+export interface ObserverLocationChangedMessage {
+  readonly type: "observer_location_changed";
+  readonly lat: number;
+  readonly lon: number;
+  readonly elevation: number;
+  readonly effectiveHeight: number;
+  readonly elevationSource: string;
+}
+
+export interface LocationErrorMessage {
+  readonly type: "location_error";
+  readonly message: string;
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
   | FocusDirectionMessage
-  | ShutdownRequestedMessage;
+  | ShutdownRequestedMessage
+  | ObserverLocationChangedMessage
+  | LocationErrorMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 
