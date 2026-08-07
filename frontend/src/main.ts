@@ -3,6 +3,7 @@
  *
  * Wires together:
  *   WebSocketBridge → CameraRigImpl → ThreeSceneHostImpl → RenderLoopImpl
+ *   NavigationWorld → TerrainSampler → GroundFollower → CameraRigImpl
  *   DiagnosticsOverlay for bridge status / FPS / session
  *
  * This module is the single bundle entry point compiled by esbuild.
@@ -14,6 +15,8 @@ import { CameraRigImpl } from "./view/three/CameraRigImpl";
 import { RenderLoopImpl } from "./view/three/RenderLoopImpl";
 import { ThreeSceneHostImpl } from "./view/three/ThreeSceneHostImpl";
 import { DiagnosticsOverlay } from "./view/ui/DiagnosticsOverlay";
+import { NavigationWorld } from "./view/three/terrain/NavigationWorld";
+import { GroundFollower } from "./view/three/terrain/GroundFollower";
 
 import { LocationPage } from "./view/ui/drawer_pages/LocationPage";
 import { SkyPage } from "./view/ui/drawer_pages/SkyPage";
@@ -38,7 +41,11 @@ function main(): void {
   const cameraRig = new CameraRigImpl(sceneHost.camera);
   const renderLoop = new RenderLoopImpl();
   const diagnostics = new DiagnosticsOverlay();
-  
+
+  // Phase 3.5: Navigation world and terrain
+  const navigationWorld = new NavigationWorld();
+  const groundFollower = new GroundFollower();
+
   const shell = new Shell({
     onSetRealtime: (enabled) => bridge.sendSetRealtimeMode(enabled),
   });
@@ -49,6 +56,8 @@ function main(): void {
     onSetRealtime: (enabled) => bridge.sendSetRealtimeMode(enabled),
     onOffsetDay: (offsetDays) => bridge.sendRequestOffsetDay(offsetDays),
     onSetDate: (dateIso) => bridge.sendSetSimulationTime(dateIso),
+    onToggleNavigationMode: () => cameraRig.toggleNavigationMode(),
+    onResetToOrigin: () => cameraRig.resetToOrigin(),
   });
   const locContainer = shell.getPageContainer("location");
   if (locContainer) locationPage.mount(locContainer);
@@ -64,7 +73,7 @@ function main(): void {
   const toolsPage = new ToolsPage();
   const toolsContainer = shell.getPageContainer("tools");
   if (toolsContainer) toolsPage.mount(toolsContainer);
-  
+
   const timeBar = new TimeBar(bridge);
   timeBar.mount(shell.getTimelineContainer());
 
@@ -81,7 +90,26 @@ function main(): void {
   const rect = canvasContainer.getBoundingClientRect();
   cameraRig.resize(rect.width, rect.height);
 
-  // 3. Bridge ↔ Camera wiring
+  // 3. Phase 3.5: Prepare navigation world and wire terrain dependencies
+  navigationWorld.prepare(sceneHost.getWorldRoot());
+  const terrainSampler = navigationWorld.getTerrainSampler();
+  cameraRig.setTerrainDependencies(terrainSampler, groundFollower);
+
+  // Ground the camera at origin after terrain is ready
+  cameraRig.resetToOrigin();
+
+  // Wire navigation mode changes to UI and bridge
+  cameraRig.onNavigationModeChanged((mode) => {
+    locationPage.syncNavigationMode(mode);
+    bridge.sendNavigationModeChanged(mode);
+  });
+
+  // Wire navigation pose updates (coalesced, not per-frame)
+  cameraRig.onNavigationPoseChanged((pose, motion) => {
+    bridge.sendCameraPoseChanged(pose, motion.speedMps);
+  });
+
+  // 4. Bridge ↔ Camera wiring
   cameraRig.onPoseChanged((pose) => {
     bridge.sendCameraChanged(
       pose.azimuthDeg,
@@ -127,6 +155,7 @@ function main(): void {
     onShutdownRequested() {
       renderLoop.stop();
       cameraRig.detach();
+      navigationWorld.dispose();
       sceneHost.dispose();
       diagnostics.dispose();
       locationPage.dispose();
@@ -140,7 +169,7 @@ function main(): void {
 
   bridge.addMessageListener(backendListener);
 
-  // 4. Bridge state → diagnostics
+  // 5. Bridge state → diagnostics
   bridge.addStateListener(diagnostics);
   bridge.addStateListener({
     onBridgeStateChanged(state) {
@@ -150,9 +179,12 @@ function main(): void {
     },
   });
 
-  // 5. Render loop
+  // 6. Render loop with deltaTime for navigation
   let fpsUpdateAccum = 0;
+  let hudUpdateAccum = 0;
   renderLoop.start((timestampMs: number) => {
+    // Phase 3.5: Update navigation physics
+    cameraRig.updateNavigation(timestampMs);
     cameraRig.updateMatrices();
     sceneHost.render(timestampMs);
 
@@ -162,9 +194,23 @@ function main(): void {
       fpsUpdateAccum = 0;
       diagnostics.updateFps(renderLoop.fps);
     }
+
+    // Update HUD at ~4 Hz (not every frame)
+    hudUpdateAccum += 1;
+    if (hudUpdateAccum >= 8) {
+      hudUpdateAccum = 0;
+      const navPose = cameraRig.getNavigationPose();
+      const motionState = cameraRig.getMotionState();
+      locationHUD.updateCameraHUD(navPose, motionState);
+      locationPage.updateNavigationState(
+        navPose,
+        motionState,
+        navigationWorld.envelope.readiness,
+      );
+    }
   });
 
-  // 6. Resize handling
+  // 7. Resize handling
   const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
@@ -177,14 +223,15 @@ function main(): void {
   });
   resizeObserver.observe(canvasContainer);
 
-  // 7. Connect bridge (last step — everything is wired)
+  // 8. Connect bridge (last step — everything is wired)
   bridge.connect();
 
-  // 8. Before-unload cleanup
+  // 9. Before-unload cleanup
   window.addEventListener("beforeunload", () => {
     resizeObserver.disconnect();
     renderLoop.stop();
     cameraRig.detach();
+    navigationWorld.dispose();
     sceneHost.dispose();
     diagnostics.dispose();
     bridge.dispose();

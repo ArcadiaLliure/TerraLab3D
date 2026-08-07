@@ -1,18 +1,24 @@
 /**
- * Concrete Three.js scene host with technical horizon and cardinal points.
+ * Concrete Three.js scene host with celestialRoot / worldRoot / overlayRoot
+ * separation for correct parallax behaviour (Phase 3.5).
  *
  * World conventions:
  *   Y = up (Three.js native)
  *   North = -Z,  East = +X,  South = +Z,  West = -X
  *
- * Creates:
- *   - Scene with dark background (#02040a)
- *   - PerspectiveCamera (managed by CameraRigImpl)
- *   - WebGLRenderer with antialias, device pixel ratio
- *   - Technical horizon ring at Y=0
- *   - Cardinal labels (N, E, S, W) as CSS-styled DOM elements
- *   - Zenith marker
- *   - Diagnostic wireframe sphere
+ * Scene tree:
+ *   scene
+ *   ├── celestialRoot  (recentred to camera position → no translational parallax)
+ *   │   ├── diagnosticSphere
+ *   │   ├── altitudeCircles
+ *   │   ├── zenithMarker
+ *   │   └── celestialSphere (meridians, rotates with LST)
+ *   ├── worldRoot      (stays at origin → real parallax for terrain/objects)
+ *   │   ├── terrain     (from NavigationWorld)
+ *   │   ├── horizon
+ *   │   ├── ground
+ *   │   └── localReferenceObjects (from NavigationWorld)
+ *   └── cameraRig / camera (managed by CameraRigImpl)
  */
 
 import * as THREE from "three";
@@ -32,6 +38,10 @@ export class ThreeSceneHostImpl {
   readonly camera: THREE.PerspectiveCamera;
   readonly renderer: THREE.WebGLRenderer;
 
+  // ─── Scene tree roots ──────────────────────────────────────────────
+  private readonly celestialRoot: THREE.Group;
+  private readonly worldRoot: THREE.Group;
+
   private container: HTMLElement | null = null;
   private readonly horizonLine: THREE.LineLoop;
   private readonly zenithMarker: THREE.Mesh;
@@ -48,8 +58,17 @@ export class ThreeSceneHostImpl {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(BACKGROUND_COLOR);
 
+    // ─── Scene tree roots ────────────────────────────────────────────
+    this.celestialRoot = new THREE.Group();
+    this.celestialRoot.name = "celestialRoot";
+    this.scene.add(this.celestialRoot);
+
+    this.worldRoot = new THREE.Group();
+    this.worldRoot.name = "worldRoot";
+    this.scene.add(this.worldRoot);
+
     // Camera (initial values; CameraRigImpl manages pose)
-    this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1000);
+    this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 2000);
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -60,7 +79,7 @@ export class ThreeSceneHostImpl {
     this.labelContainer.style.cssText =
       "position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;";
 
-    // ─── Horizon ring ────────────────────────────────────────────────
+    // ─── Horizon ring (worldRoot — shows parallax) ───────────────────
     const horizonGeo = new THREE.BufferGeometry();
     const horizonVerts = new Float32Array((HORIZON_SEGMENTS + 1) * 3);
     for (let i = 0; i <= HORIZON_SEGMENTS; i++) {
@@ -69,18 +88,12 @@ export class ThreeSceneHostImpl {
       horizonVerts[i * 3 + 1] = 0;
       horizonVerts[i * 3 + 2] = Math.cos(theta) * HORIZON_RADIUS;
     }
-    horizonGeo.setAttribute(
-      "position",
-      new THREE.BufferAttribute(horizonVerts, 3),
-    );
-    const horizonMat = new THREE.LineBasicMaterial({
-      color: 0x445566,
-      linewidth: 1,
-    });
+    horizonGeo.setAttribute("position", new THREE.BufferAttribute(horizonVerts, 3));
+    const horizonMat = new THREE.LineBasicMaterial({ color: 0x445566, linewidth: 1 });
     this.horizonLine = new THREE.LineLoop(horizonGeo, horizonMat);
-    this.scene.add(this.horizonLine);
+    this.worldRoot.add(this.horizonLine);
 
-    // ─── Ground plane (subtle grid below horizon) ────────────────────
+    // ─── Ground plane (worldRoot) ────────────────────────────────────
     const groundGeo = new THREE.CircleGeometry(HORIZON_RADIUS, 64);
     const groundMat = new THREE.MeshBasicMaterial({
       color: 0x0a1520,
@@ -91,16 +104,16 @@ export class ThreeSceneHostImpl {
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.01;
-    this.scene.add(ground);
+    this.worldRoot.add(ground);
 
-    // ─── Zenith marker ───────────────────────────────────────────────
+    // ─── Zenith marker (celestialRoot — no parallax) ─────────────────
     const zenithGeo = new THREE.SphereGeometry(0.5, 12, 8);
     const zenithMat = new THREE.MeshBasicMaterial({ color: 0xf1cd88 });
     this.zenithMarker = new THREE.Mesh(zenithGeo, zenithMat);
     this.zenithMarker.position.set(0, HORIZON_RADIUS * 0.95, 0);
-    this.scene.add(this.zenithMarker);
+    this.celestialRoot.add(this.zenithMarker);
 
-    // ─── Diagnostic wireframe sphere ─────────────────────────────────
+    // ─── Diagnostic wireframe sphere (celestialRoot) ─────────────────
     const diagGeo = new THREE.SphereGeometry(HORIZON_RADIUS * 0.98, 24, 16);
     const diagEdges = new THREE.EdgesGeometry(diagGeo);
     const diagMat = new THREE.LineBasicMaterial({
@@ -109,31 +122,46 @@ export class ThreeSceneHostImpl {
       opacity: 0.15,
     });
     this.diagnosticSphere = new THREE.LineSegments(diagEdges, diagMat);
-    this.scene.add(this.diagnosticSphere);
+    this.celestialRoot.add(this.diagnosticSphere);
 
-    // ─── Altitude circles (30° and 60°) ──────────────────────────────
+    // ─── Altitude circles (celestialRoot) ────────────────────────────
     this.addAltitudeCircle(30, 0x334455, 0.3);
     this.addAltitudeCircle(60, 0x334455, 0.3);
 
-    // ─── Celestial Sphere (Equatorial Reference) ─────────────────────
+    // ─── Celestial Sphere (celestialRoot — rotates with LST) ─────────
     this.celestialSphere = new THREE.Group();
-    this.scene.add(this.celestialSphere);
-    
-    // Add some reference meridians to the celestial sphere to see it rotate
-    const meridianMat = new THREE.LineBasicMaterial({ color: 0x556677, transparent: true, opacity: 0.2 });
+    this.celestialRoot.add(this.celestialSphere);
+
+    const meridianMat = new THREE.LineBasicMaterial({
+      color: 0x556677,
+      transparent: true,
+      opacity: 0.2,
+    });
     for (let i = 0; i < 12; i++) {
-        const angle = (i / 12) * Math.PI;
-        const geo = new THREE.BufferGeometry();
-        const verts = new Float32Array((HORIZON_SEGMENTS + 1) * 3);
-        for (let j = 0; j <= HORIZON_SEGMENTS; j++) {
-            const theta = (j / HORIZON_SEGMENTS) * Math.PI * 2;
-            verts[j * 3] = Math.cos(theta) * HORIZON_RADIUS * Math.cos(angle);
-            verts[j * 3 + 1] = Math.sin(theta) * HORIZON_RADIUS;
-            verts[j * 3 + 2] = Math.cos(theta) * HORIZON_RADIUS * Math.sin(angle);
-        }
-        geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
-        this.celestialSphere.add(new THREE.LineLoop(geo, meridianMat));
+      const angle = (i / 12) * Math.PI;
+      const geo = new THREE.BufferGeometry();
+      const verts = new Float32Array((HORIZON_SEGMENTS + 1) * 3);
+      for (let j = 0; j <= HORIZON_SEGMENTS; j++) {
+        const theta = (j / HORIZON_SEGMENTS) * Math.PI * 2;
+        verts[j * 3] = Math.cos(theta) * HORIZON_RADIUS * Math.cos(angle);
+        verts[j * 3 + 1] = Math.sin(theta) * HORIZON_RADIUS;
+        verts[j * 3 + 2] = Math.cos(theta) * HORIZON_RADIUS * Math.sin(angle);
+      }
+      geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+      this.celestialSphere.add(new THREE.LineLoop(geo, meridianMat));
     }
+  }
+
+  // ─── Public access to roots ────────────────────────────────────────
+
+  /** World root for terrain, objects, navigation bounds (shows parallax). */
+  getWorldRoot(): THREE.Group {
+    return this.worldRoot;
+  }
+
+  /** Celestial root for sky objects (no translational parallax). */
+  getCelestialRoot(): THREE.Group {
+    return this.celestialRoot;
   }
 
   mount(container: HTMLElement): void {
@@ -149,11 +177,11 @@ export class ThreeSceneHostImpl {
     this.createCardinalLabel("S", 0, 0, LABEL_DISTANCE, "#88bbff");
     this.createCardinalLabel("W", -LABEL_DISTANCE, 0, 0, "#88bbff");
 
-    // Cardinal tick lines on the horizon
-    this.addCardinalTick(0, -1); // North (-Z)
-    this.addCardinalTick(1, 0); // East (+X)
-    this.addCardinalTick(0, 1); // South (+Z)
-    this.addCardinalTick(-1, 0); // West (-X)
+    // Cardinal tick lines on the horizon (worldRoot)
+    this.addCardinalTick(0, -1);
+    this.addCardinalTick(1, 0);
+    this.addCardinalTick(0, 1);
+    this.addCardinalTick(-1, 0);
   }
 
   resize(widthPx: number, heightPx: number): void {
@@ -163,18 +191,20 @@ export class ThreeSceneHostImpl {
 
   render(timestampMs: number): void {
     if (this.disposed) return;
-    
-    // Simple interpolation for smooth celestial rotation
+
+    // ─── Celestial rotation ──────────────────────────────────────────
     const diff = this.targetLstRad - this.currentLstRad;
-    // Normalize diff to -PI, PI
     let shortest = diff % (Math.PI * 2);
     if (shortest > Math.PI) shortest -= Math.PI * 2;
     if (shortest < -Math.PI) shortest += Math.PI * 2;
-    
-    this.currentLstRad += shortest * 0.1; // lerp
-    // Rotate the celestial sphere (simple Y rotation for visual effect)
-    // A true equatorial mount would tilt by the observer's latitude.
+    this.currentLstRad += shortest * 0.1;
     this.celestialSphere.rotation.y = -this.currentLstRad;
+
+    // ─── Recentre celestialRoot to camera position ───────────────────
+    // This eliminates translational parallax for sky objects.
+    // The celestial root moves with the camera so distant objects
+    // (stars, grid, zenith) appear at infinite distance.
+    this.celestialRoot.position.copy(this.camera.position);
 
     this.updateCardinalLabels();
     this.renderer.render(this.scene, this.camera);
@@ -188,15 +218,17 @@ export class ThreeSceneHostImpl {
     if (this.disposed) return;
     this.disposed = true;
 
-    // Remove cardinal labels
     for (const label of this.cardinalLabels) {
       label.element.remove();
     }
     this.cardinalLabels.length = 0;
 
-    // Dispose Three.js objects
     this.scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments || obj instanceof THREE.LineLoop) {
+      if (
+        obj instanceof THREE.Mesh ||
+        obj instanceof THREE.LineSegments ||
+        obj instanceof THREE.LineLoop
+      ) {
         obj.geometry.dispose();
         if (Array.isArray(obj.material)) {
           obj.material.forEach((m) => m.dispose());
@@ -213,11 +245,7 @@ export class ThreeSceneHostImpl {
 
   // ─── Private ───────────────────────────────────────────────────────
 
-  private addAltitudeCircle(
-    altDeg: number,
-    color: number,
-    opacity: number,
-  ): void {
+  private addAltitudeCircle(altDeg: number, color: number, opacity: number): void {
     const r = HORIZON_RADIUS * Math.cos((altDeg * Math.PI) / 180);
     const y = HORIZON_RADIUS * Math.sin((altDeg * Math.PI) / 180);
     const geo = new THREE.BufferGeometry();
@@ -229,13 +257,9 @@ export class ThreeSceneHostImpl {
       verts[i * 3 + 2] = Math.cos(theta) * r;
     }
     geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
-    const mat = new THREE.LineBasicMaterial({
-      color,
-      transparent: true,
-      opacity,
-    });
+    const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity });
     const line = new THREE.LineLoop(geo, mat);
-    this.scene.add(line);
+    this.celestialRoot.add(line);
   }
 
   private addCardinalTick(x: number, z: number): void {
@@ -243,26 +267,16 @@ export class ThreeSceneHostImpl {
     const outer = HORIZON_RADIUS * 1.04;
     const geo = new THREE.BufferGeometry();
     const verts = new Float32Array([
-      x * inner,
-      0,
-      z * inner,
-      x * outer,
-      0,
-      z * outer,
+      x * inner, 0, z * inner,
+      x * outer, 0, z * outer,
     ]);
     geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
     const mat = new THREE.LineBasicMaterial({ color: 0xf1cd88 });
     const line = new THREE.LineSegments(geo, mat);
-    this.scene.add(line);
+    this.worldRoot.add(line);
   }
 
-  private createCardinalLabel(
-    text: string,
-    x: number,
-    y: number,
-    z: number,
-    color: string,
-  ): void {
+  private createCardinalLabel(text: string, x: number, y: number, z: number, color: string): void {
     const el = document.createElement("div");
     el.textContent = text;
     el.style.cssText = `
@@ -295,7 +309,6 @@ export class ThreeSceneHostImpl {
       this._projVec.copy(label.worldPos);
       this._projVec.project(this.camera);
 
-      // Behind the camera?
       if (this._projVec.z > 1) {
         label.element.style.display = "none";
         continue;

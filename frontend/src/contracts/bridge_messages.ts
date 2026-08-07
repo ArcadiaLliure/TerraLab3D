@@ -43,13 +43,54 @@ export interface SetObserverLocationMessage {
   readonly extraHeight: number;
 }
 
+// ─── Navigation messages (Phase 3.5) ─────────────────────────────────
+
+export interface NavigationModeChangedMessage {
+  readonly type: "navigation_mode_changed";
+  readonly mode: "walk" | "flight";
+}
+
+export interface CameraPoseChangedMessage {
+  readonly type: "camera_pose_changed";
+  readonly positionEastM: number;
+  readonly positionUpM: number;
+  readonly positionNorthM: number;
+  readonly azimuthDeg: number;
+  readonly altitudeDeg: number;
+  readonly rollDeg: number;
+  readonly fovDeg: number;
+  readonly navigationMode: "walk" | "flight";
+  readonly speedMps: number;
+}
+
+export interface CameraMotionStartedMessage {
+  readonly type: "camera_motion_started";
+  readonly mode: "walk" | "flight";
+}
+
+export interface CameraMotionStoppedMessage {
+  readonly type: "camera_motion_stopped";
+  readonly positionEastM: number;
+  readonly positionUpM: number;
+  readonly positionNorthM: number;
+}
+
+export interface CameraResetCompletedMessage {
+  readonly type: "camera_reset_completed";
+}
+
 export type FrontendMessage =
   | FrontendReadyMessage
   | CameraChangedMessage
   | ViewportResizedMessage
   | ShutdownCompleteMessage
   | BridgeErrorMessage
-  | SetObserverLocationMessage;
+  | SetObserverLocationMessage
+  | NavigationModeChangedMessage
+  | CameraPoseChangedMessage
+  | CameraMotionStartedMessage
+  | CameraMotionStoppedMessage
+  | CameraResetCompletedMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 

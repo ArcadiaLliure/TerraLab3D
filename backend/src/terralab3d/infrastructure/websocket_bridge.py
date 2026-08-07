@@ -179,7 +179,7 @@ class WebSocketBridge:
             log.warning("Missatge sense tipus: %s", data)
             return
 
-        if msg_type not in ("camera_changed", "set_simulation_time"):
+        if msg_type not in ("camera_changed", "set_simulation_time", "camera_pose_changed"):
             log.info("S'ha rebut missatge de tipus: %s", msg_type)
         else:
             log.debug("S'ha rebut missatge de tipus: %s", msg_type)

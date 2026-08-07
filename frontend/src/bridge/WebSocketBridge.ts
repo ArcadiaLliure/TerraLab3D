@@ -16,7 +16,13 @@ import type {
   HandshakeAckMessage,
   ViewportResizedMessage,
   SetObserverLocationMessage,
+  NavigationModeChangedMessage,
+  CameraPoseChangedMessage,
+  CameraMotionStartedMessage,
+  CameraMotionStoppedMessage,
+  CameraResetCompletedMessage,
 } from "../contracts/bridge_messages";
+import type { NavigationCameraPose, MotionState } from "../contracts/navigation";
 
 export type BridgeState = "connecting" | "connected" | "disconnected" | "error";
 
@@ -272,6 +278,49 @@ export class WebSocketBridge {
       type: "request_offset_day",
       offsetDays
     } as any);
+  }
+
+  // ─── Navigation messages (Phase 3.5) ────────────────────────────
+
+  public sendNavigationModeChanged(mode: "walk" | "flight"): void {
+    const msg: NavigationModeChangedMessage = { type: "navigation_mode_changed", mode };
+    this.sendMessage(msg);
+  }
+
+  public sendCameraPoseChanged(pose: NavigationCameraPose, speedMps: number): void {
+    const msg: CameraPoseChangedMessage = {
+      type: "camera_pose_changed",
+      positionEastM: pose.positionEastM,
+      positionUpM: pose.positionUpM,
+      positionNorthM: pose.positionNorthM,
+      azimuthDeg: pose.azimuthDeg,
+      altitudeDeg: pose.altitudeDeg,
+      rollDeg: pose.rollDeg,
+      fovDeg: pose.fovDeg,
+      navigationMode: pose.navigationMode,
+      speedMps,
+    };
+    this.sendMessage(msg);
+  }
+
+  public sendCameraMotionStarted(mode: "walk" | "flight"): void {
+    const msg: CameraMotionStartedMessage = { type: "camera_motion_started", mode };
+    this.sendMessage(msg);
+  }
+
+  public sendCameraMotionStopped(eastM: number, upM: number, northM: number): void {
+    const msg: CameraMotionStoppedMessage = {
+      type: "camera_motion_stopped",
+      positionEastM: eastM,
+      positionUpM: upM,
+      positionNorthM: northM,
+    };
+    this.sendMessage(msg);
+  }
+
+  public sendCameraResetCompleted(): void {
+    const msg: CameraResetCompletedMessage = { type: "camera_reset_completed" };
+    this.sendMessage(msg);
   }
 
   private sendMessage(msg: FrontendMessage): void {
