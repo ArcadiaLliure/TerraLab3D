@@ -35,6 +35,7 @@ export class LocationHUD {
   private observerSection: HTMLDivElement;
   private viewSection: HTMLDivElement;
   private cameraSection: HTMLDivElement;
+  private readonly starContainer: HTMLDivElement;
   private hudVisible = true;
 
   constructor() {
@@ -77,6 +78,15 @@ export class LocationHUD {
     // Camera local section
     this.cameraSection = document.createElement("div");
     this.element.appendChild(this.cameraSection);
+
+    this.starContainer = document.createElement("div");
+    this.starContainer.style.cssText = `
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.2);
+      display: none;
+    `;
+    this.element.appendChild(this.starContainer);
 
     this.updateHUD(0, 0, 0, 0, "No disponible");
     this.updateCameraHUD({
@@ -173,6 +183,29 @@ export class LocationHUD {
   public setVisible(visible: boolean): void {
     this.hudVisible = visible;
     this.element.style.display = visible ? "flex" : "none";
+  }
+
+  public setSelectedStar(star: any | null): void {
+    if (!star) {
+      this.starContainer.style.display = "none";
+      this.starContainer.innerHTML = "";
+      return;
+    }
+    
+    this.starContainer.style.display = "block";
+    
+    let bpRpText = "N/A";
+    if (star.bpRp !== null && star.bpRp !== undefined) {
+      bpRpText = star.bpRp.toFixed(2);
+    }
+    
+    this.starContainer.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Estrella seleccionada</div>
+      <div>ID: ${star.sourceId}</div>
+      <div>RA: ${star.raDeg.toFixed(4)}° &nbsp; Dec: ${star.decDeg.toFixed(4)}°</div>
+      <div>Mag: ${star.magnitude.toFixed(2)} &nbsp; BP-RP: ${bpRpText}</div>
+      <div style="opacity: 0.7; font-size: 11px;">Font: ${star.sourceRole}</div>
+    `;
   }
 
   public mount(container: HTMLElement): void {

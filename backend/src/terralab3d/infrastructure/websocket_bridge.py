@@ -141,6 +141,27 @@ class WebSocketBridge:
         """
         await self.send(transform)
 
+    async def send_star_pick_resolved(
+        self,
+        request_id: str,
+        generation: int,
+        status: str,
+        star_data: dict[str, Any] | None = None,
+    ) -> None:
+        """Envia la resolució d'un pick estel·lar al frontend (Pas 6).
+
+        source_id es serialitza com string decimal per preservar int64.
+        """
+        payload: dict[str, Any] = {
+            "type": "star_pick_resolved",
+            "requestId": request_id,
+            "generation": generation,
+            "status": status,
+        }
+        if star_data is not None:
+            payload["star"] = star_data
+        await self.send(payload)
+
     async def send_set_camera_pose(
         self,
         az: float, alt: float, fov: float, roll: float = 0.0,

@@ -46,6 +46,11 @@ from terralab3d.infrastructure.adapters.star_catalog_adapter import (
     create_star_catalog_adapter,
 )
 
+# Import condicional per evitar circular — el resolver s'injecta via set_pick_resolver
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from terralab3d.application.star_pick_resolver import StarPickResolver
+
 log = logging.getLogger("terralab3d.stars")
 
 # Tipus de callback per publicar recursos
@@ -80,6 +85,10 @@ class StarCoordinator:
         self._resources: dict[str, StarResourceDescriptor] = {}
         self._resource_version: int = 0
 
+        # Batches retinguts per al picking O(1) (Pas 6)
+        self._batches: dict[str, StarBatch] = {}
+        self._pick_resolver: StarPickResolver | None = None
+
         # Estat
         self._general_star_count = 0
         self._fallback_star_count = 0
@@ -102,6 +111,10 @@ class StarCoordinator:
         self._resource_publisher = resource_publisher
         self._status_publisher = status_publisher
         self._transform_publisher = transform_publisher
+
+    def set_pick_resolver(self, resolver: StarPickResolver) -> None:
+        """Connecta el resolutor de picks (Pas 6)."""
+        self._pick_resolver = resolver
 
     async def start(self) -> None:
         """Inicia la càrrega del catàleg. Seqüència:
@@ -185,6 +198,9 @@ class StarCoordinator:
         self._disposed = True
         self._adapter.close()
         self._resources.clear()
+        self._batches.clear()
+        if self._pick_resolver:
+            self._pick_resolver.shutdown()
         log.info("MGP: [StarCoordinator] [shutdown] [Coordinador tancat]")
 
     # ─── Private ──────────────────────────────────────────────────────
@@ -315,6 +331,16 @@ class StarCoordinator:
             content_hash=content_hash,
         )
         self._resources[resource_id] = descriptor
+
+        # Retenir batch per al picking (Pas 6)
+        self._batches[resource_id] = batch
+        if self._pick_resolver:
+            self._pick_resolver.register(
+                resource_id=resource_id,
+                version=version,
+                role=role.value,
+                batch=batch,
+            )
 
         # Publicar
         if self._resource_publisher:

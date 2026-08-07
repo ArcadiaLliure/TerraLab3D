@@ -103,14 +103,53 @@ async def run() -> int:
             await bridge.send_location_error(str(e))
             log.warning("Error a l'actualitzar la ubicació: %s", e)
 
-    # ── 3.1. Lògica d'Estrelles (Fase 5) ─────────────────────────────
+    # ── 3.1. Lògica d'Estrelles (Fase 5 i Pas 6) ─────────────────────
     from terralab3d.application.star_coordinator import StarCoordinator
+    from terralab3d.application.star_pick_resolver import StarPickResolver
+    from terralab3d.domain.stars.star_pick_models import StarPickRequest
+    
+    star_pick_resolver = StarPickResolver()
     star_coordinator = StarCoordinator()
+    star_coordinator.set_pick_resolver(star_pick_resolver)
     star_coordinator.set_publishers(
         resource_publisher=bridge.send_binary_resource,
         status_publisher=bridge.send_star_catalog_status,
         transform_publisher=bridge.send_celestial_frame_transform,
     )
+
+    async def _handle_resolve_star_pick(data: dict[str, Any]) -> None:
+        try:
+            req = StarPickRequest(
+                request_id=data["requestId"],
+                generation=int(data["generation"]),
+                resource_id=data["resourceId"],
+                resource_version=data["resourceVersion"],
+                catalog_index=int(data["catalogIndex"]),
+                purpose=data["purpose"],
+            )
+            resp = star_pick_resolver.resolve(req)
+            star_dict = None
+            if resp.resolved:
+                star_dict = {
+                    "kind": "star",
+                    "resourceId": resp.resolved.resource_id,
+                    "resourceVersion": resp.resolved.version,
+                    "catalogIndex": resp.resolved.catalog_index,
+                    "sourceId": str(resp.resolved.source_id),
+                    "raDeg": resp.resolved.ra_deg,
+                    "decDeg": resp.resolved.dec_deg,
+                    "magnitude": resp.resolved.magnitude,
+                    "bpRp": resp.resolved.bp_rp,
+                    "sourceRole": resp.resolved.source_role,
+                }
+            await bridge.send_star_pick_resolved(
+                request_id=resp.request_id,
+                generation=resp.generation,
+                status=resp.status,
+                star_data=star_dict,
+            )
+        except Exception as e:
+            log.error("MGP: [__main__] [Error resolvent pick: %s]", e)
 
     async def _on_frontend_ready(data: dict[str, Any]) -> None:
         # Quan el frontend es connecta, enviem la ubicació inicial, iniciem estrelles, etc.
@@ -121,6 +160,7 @@ async def run() -> int:
 
     bridge.on("set_observer_location", _handle_set_location)
     bridge.on("frontend_ready", _on_frontend_ready)
+    bridge.on("resolve_star_pick", _handle_resolve_star_pick)
 
     # ── 3.2. Lògica de Temps (Fase 3) ────────────────────────────────
     engine = AstronomicalEngine()

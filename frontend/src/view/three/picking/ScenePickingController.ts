@@ -1,0 +1,302 @@
+/**
+ * ScenePickingController — orquestrador de picking a l'escena.
+ *
+ * Responsabilitats:
+ * - Connecta PointerGestureRouter amb StarPickProvider
+ * - Gestiona hover (debounce, coalescing)
+ * - Gestiona selecció (click → resolve backend)
+ * - Selection marker reproyectat cada frame
+ * - Latest-wins per purpose (hover / select)
+ * - Escape neteja selecció
+ * - Layer visibility check
+ * - Lifecycle complet (start/stop/dispose idempotents)
+ */
+
+import type { StarPickHit, StarPickRef, ResolvedStar, StarPickResolvedMessage } from "../../../contracts/star_picking_contracts";
+import { PointerGestureRouter } from "./PointerGestureRouter";
+import { StarPickProvider } from "./StarPickProvider";
+import { SelectionMarker } from "./SelectionMarker";
+
+const LOG_PREFIX = "MGP: [ScenePickingController]";
+
+export type ResolveCallback = (
+  requestId: string,
+  generation: number,
+  resourceId: string,
+  resourceVersion: string,
+  catalogIndex: number,
+  purpose: "select" | "hover",
+) => void;
+
+export type SelectionChangedCallback = (resolved: ResolvedStar | null) => void;
+
+export interface ScenePickingControllerDeps {
+  gestureRouter: PointerGestureRouter;
+  pickProvider: StarPickProvider;
+  resolveCallback: ResolveCallback;
+  selectionChangedCallback?: SelectionChangedCallback;
+}
+
+const HOVER_DEBOUNCE_MS = 150;
+
+export class ScenePickingController {
+  private readonly deps: ScenePickingControllerDeps;
+  private readonly selectionMarker: SelectionMarker;
+
+  // ─── Selection state ───────────────────────────────────────────────
+  private selectedHit: StarPickHit | null = null;
+  private selectedRef: StarPickRef | null = null;
+  private resolvedStar: ResolvedStar | null = null;
+
+  // ─── Hover state ───────────────────────────────────────────────────
+  private hoverHit: StarPickHit | null = null;
+  private hoverRef: StarPickRef | null = null;
+  private hoverDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // ─── Generations (latest-wins) ─────────────────────────────────────
+  private selectGeneration = 0;
+  private hoverGeneration = 0;
+
+  // ─── Request ID counter ────────────────────────────────────────────
+  private requestIdCounter = 0;
+
+  // ─── Lifecycle ─────────────────────────────────────────────────────
+  private started = false;
+  private disposed = false;
+
+  // ─── Escape handler ────────────────────────────────────────────────
+  private readonly onKeyDownBound: (e: KeyboardEvent) => void;
+
+  constructor(deps: ScenePickingControllerDeps) {
+    this.deps = deps;
+    this.selectionMarker = new SelectionMarker();
+
+    // Wire gesture router
+    deps.gestureRouter.onTap((x, y) => this.handleTap(x, y));
+    deps.gestureRouter.onHover((x, y) => this.handleHover(x, y));
+    deps.gestureRouter.onHoverClear(() => this.clearHover());
+
+    // Escape handler
+    this.onKeyDownBound = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        this.clearSelection();
+        this.clearHover();
+      }
+    };
+  }
+
+  /** Munta el marker al container del canvas. */
+  mount(container: HTMLElement): void {
+    this.selectionMarker.mount(container);
+    window.addEventListener("keydown", this.onKeyDownBound);
+    this.started = true;
+  }
+
+  /**
+   * Reproyecta el marker de selecció. Cridar des del render loop.
+   */
+  updateMarker(): void {
+    if (!this.selectedRef || !this.started) {
+      return;
+    }
+
+    const pos = this.deps.pickProvider.reprojectRef(this.selectedRef);
+    if (pos) {
+      this.selectionMarker.update(pos.x, pos.y);
+    } else {
+      this.selectionMarker.hide();
+    }
+  }
+
+  /**
+   * Processa una resposta resolve del backend.
+   */
+  handleResolveResponse(msg: StarPickResolvedMessage): void {
+    if (this.disposed) return;
+
+    const purpose = msg.requestId.startsWith("sel:") ? "select" : "hover";
+    const expectedGen = purpose === "select"
+      ? this.selectGeneration
+      : this.hoverGeneration;
+
+    // Latest-wins: descartar stale
+    if (msg.generation < expectedGen) {
+      return;
+    }
+
+    if (msg.status !== "ok" || !msg.star) {
+      if (msg.status === "stale" || msg.status === "missing") {
+        console.log(`${LOG_PREFIX} [handleResolveResponse] [${purpose} ${msg.status}]`);
+      }
+      if (msg.status === "invalid") {
+        console.warn(`${LOG_PREFIX} [handleResolveResponse] [${purpose} invalid: requestId=${msg.requestId}]`);
+      }
+      return;
+    }
+
+    if (purpose === "select") {
+      this.resolvedStar = msg.star;
+      this.deps.selectionChangedCallback?.(msg.star);
+      console.log(
+        `${LOG_PREFIX} [handleResolveResponse] [Select resolved: sourceId=${msg.star.sourceId} RA=${msg.star.raDeg.toFixed(4)} Dec=${msg.star.decDeg.toFixed(4)} G=${msg.star.magnitude.toFixed(2)}]`,
+      );
+    }
+    // Hover resolves es podrien usar per tooltip — per ara no fem res extra
+  }
+
+  /** Retorna l'estrella resolta seleccionada. */
+  getResolvedSelection(): ResolvedStar | null {
+    return this.resolvedStar;
+  }
+
+  /** Retorna el hit local de la selecció. */
+  getSelectedHit(): StarPickHit | null {
+    return this.selectedHit;
+  }
+
+  /** Retorna el hit local del hover. */
+  getHoverHit(): StarPickHit | null {
+    return this.hoverHit;
+  }
+
+  /** Neteja la selecció. */
+  clearSelection(): void {
+    if (this.selectedHit || this.selectedRef) {
+      this.selectedHit = null;
+      this.selectedRef = null;
+      this.resolvedStar = null;
+      this.selectionMarker.hide();
+      this.deps.selectionChangedCallback?.(null);
+    }
+  }
+
+  /**
+   * Notifica que un recurs ha estat evicted o reemplaçat.
+   * Si la selecció referencia aquest recurs, es neteja.
+   */
+  onResourceEvicted(resourceId: string): void {
+    if (this.selectedRef && this.selectedRef.resourceId === resourceId) {
+      console.log(`${LOG_PREFIX} [onResourceEvicted] [Selecció invalidada: ${resourceId}]`);
+      this.clearSelection();
+    }
+    if (this.hoverRef && this.hoverRef.resourceId === resourceId) {
+      this.clearHover();
+    }
+  }
+
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.started = false;
+
+    window.removeEventListener("keydown", this.onKeyDownBound);
+
+    if (this.hoverDebounceTimer) {
+      clearTimeout(this.hoverDebounceTimer);
+      this.hoverDebounceTimer = null;
+    }
+
+    this.selectionMarker.dispose();
+    this.selectedHit = null;
+    this.selectedRef = null;
+    this.resolvedStar = null;
+    this.hoverHit = null;
+    this.hoverRef = null;
+  }
+
+  // ─── Private ──────────────────────────────────────────────────────
+
+  private handleTap(clientX: number, clientY: number): void {
+    const hit = this.deps.pickProvider.pick(clientX, clientY);
+
+    if (hit) {
+      this.selectedHit = hit;
+      this.selectedRef = hit.ref;
+      this.resolvedStar = null; // Pending resolve
+
+      // Mostrar marker immediatament
+      this.selectionMarker.update(hit.screenXCssPx, hit.screenYCssPx);
+
+      // Enviar resolve al backend
+      this.selectGeneration++;
+      this.requestIdCounter++;
+      const reqId = `sel:${this.requestIdCounter}`;
+
+      this.deps.resolveCallback(
+        reqId,
+        this.selectGeneration,
+        hit.ref.resourceId,
+        hit.ref.resourceVersion,
+        hit.ref.catalogIndex,
+        "select",
+      );
+
+      console.log(
+        `${LOG_PREFIX} [handleTap] [Hit: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px mag=${hit.magnitude.toFixed(2)}]`,
+      );
+    } else {
+      // Click a buit → clear selection
+      this.clearSelection();
+    }
+  }
+
+  private handleHover(clientX: number, clientY: number): void {
+    const hit = this.deps.pickProvider.pick(clientX, clientY);
+
+    if (!hit) {
+      this.clearHover();
+      return;
+    }
+
+    // Si és el mateix hover que abans, no fer res
+    if (
+      this.hoverRef &&
+      this.hoverRef.resourceId === hit.ref.resourceId &&
+      this.hoverRef.resourceVersion === hit.ref.resourceVersion &&
+      this.hoverRef.catalogIndex === hit.ref.catalogIndex
+    ) {
+      return;
+    }
+
+    this.hoverHit = hit;
+    this.hoverRef = hit.ref;
+
+    // Debounce la resolució backend del hover
+    if (this.hoverDebounceTimer) {
+      clearTimeout(this.hoverDebounceTimer);
+    }
+
+    this.hoverDebounceTimer = setTimeout(() => {
+      this.hoverDebounceTimer = null;
+
+      // Verificar que el hover no ha canviat durant el debounce
+      if (
+        this.hoverRef &&
+        this.hoverRef.resourceId === hit.ref.resourceId &&
+        this.hoverRef.catalogIndex === hit.ref.catalogIndex
+      ) {
+        this.hoverGeneration++;
+        this.requestIdCounter++;
+        const reqId = `hov:${this.requestIdCounter}`;
+
+        this.deps.resolveCallback(
+          reqId,
+          this.hoverGeneration,
+          hit.ref.resourceId,
+          hit.ref.resourceVersion,
+          hit.ref.catalogIndex,
+          "hover",
+        );
+      }
+    }, HOVER_DEBOUNCE_MS);
+  }
+
+  private clearHover(): void {
+    this.hoverHit = null;
+    this.hoverRef = null;
+    if (this.hoverDebounceTimer) {
+      clearTimeout(this.hoverDebounceTimer);
+      this.hoverDebounceTimer = null;
+    }
+  }
+}

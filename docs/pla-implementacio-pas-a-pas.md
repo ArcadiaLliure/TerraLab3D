@@ -1493,25 +1493,59 @@ Les estrelles són reals, suaus i fluides; Gaia/fallback és visible; el catàle
 
 No inclou encara cel físic, contaminació lumínica ni picking final.
 
-## Pas 6 — Cel diürn, nocturn, crepuscle i atmosfera visual contínua
+## Pas 6 — Sistema de picking estel·lar precís
 
 ### Resultat funcional palpable
 
-El fons passa de dia a nit de manera contínua segons la posició solar, sense tiles o baldosas visibles, i atenua les estrelles coherentment.
+Es pot fer clic de manera precisa i determinista sobre una estrella del camp cel·lar (Gaia o fallback). El marker de selecció screen-space segueix l'estrella seleccionada encara que la càmera es mogui, i la informació científica (identitat real de catàleg) es recupera al frontend sense readback de GPU, enviant només l'ID als sistemes rellevants.
 
 ### Fonts TerraLab a consultar
 
-- `TerraLab/render/sky_renderer.py`
-- `TerraLab/runtime/offscreen_renderer.py` — càlculs de fons
-- `TerraLab/ui/time_bar.py` — fases solars de referència
-- `TerraLab/weather/system.py` — paràmetres atmosfèrics actuals
+- `TerraLab/ui/astro_canvas.py` — click vs drag (pointer events), i les diferents generacions de picking.
+- `TerraLab/ui/frame_presenter.py` — dispatch de picking.
 
 ### Objectiu
 
-Completar aquesta vertical funcional de punta a punta, mantenint la separació de responsabilitats i sense anticipar funcionalitats posteriors que no siguin imprescindibles.
+Aconseguir identificació estel·lar interactiva totalment desacoblada de l'estructura en GPU, confiant exclusivament en l'índex per recuperar la identitat al backend.
 
 ### Tasques
 
+- [x] Crear els contractes tipats de picking (`star_picking_contracts.ts`)
+- [x] Definir funcions compartides de mida de punt per calcular hit radius.
+- [x] Extreure `CelestialTransformState` per compartir la matriu entre renderer i picker.
+- [x] Modificar `StarFieldRenderer` per conservar `Uint32Array` canònic de catalogIndex.
+- [x] Implementar `StarSpatialIndex` (cube-sphere hash) per queries de con ràpides.
+- [x] Implementar `PointerGestureRouter` per diferenciar netament click vs drag sense capturar ratolí de més.
+- [x] Implementar `StarPickProvider` per calcular ray, query, refinament i occlusions.
+- [x] Afegir `SelectionMarker` screen-space.
+- [x] Orquestrar-ho tot amb `ScenePickingController` incloent el resolving (latest-wins).
+- [x] Afegir mètodes al pont WebSocket per `resolve_star_pick` i resposta de resolució.
+- [x] Crear `StarPickResolver` al backend (O(1) lookups).
+- [x] Modificar `StarCoordinator` al backend per retenir el batch en memòria per al resolutor.
+- [x] Posar al HUD la informació bàsica (source_id, ra, dec, mag) de la selecció.
+- [x] Preparar tests de Picking.
+
+### Criteri de sortida
+
+Es poden seleccionar estrelles denses del catàleg Gaia i el marker mai es perd en moure la càmera, demostrant un circuit de dades sencer.
+
+### Evidència obligatòria
+
+- [ ] Captura de vídeo fent pan i picking simultani.
+- [ ] Tests superats demostrant que els ids en uint32 sobrepassen els problemes de float32 antics.
+
+### Fora d’abast del pas
+
+No inclou menús contextuals de target o GOTO automàtic.
+
+> **Nota**: El "Pas 6" original (Cel diürn, nocturn, crepuscle i atmosfera visual contínua) s'ha mogut a l'annex per poder donar prioritat a aquest sistema de picking a petició de l'usuari.
+
+## Annex — Cel diürn, nocturn, crepuscle i atmosfera visual contínua (antic Pas 6)
+
+### Resultat funcional palpable
+El fons passa de dia a nit de manera contínua segons la posició solar, sense tiles o baldosas visibles, i atenua les estrelles coherentment.
+
+### Tasques originals
 - [ ] Separar els paràmetres científics del cel de la generació de colors QPainter.
 - [ ] Definir posició solar mínima necessària per al fons, encara que els cossos complets arribin després.
 - [ ] Implementar fases de nit astronòmica, nàutica, civil, alba, posta i dia.
@@ -1524,21 +1558,6 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 - [ ] Evitar que l’atmosfera recreï materials per tick; utilitzar uniforms.
 - [ ] Mostrar al HUD fase del crepuscle i altura solar.
 - [ ] Caracteritzar colors i llindars actuals de TerraLab sense exigir identitat de píxel.
-
-### Criteri de sortida
-
-La transició dia-nit és contínua, no presenta baldosas, les estrelles desapareixen i reapareixen coherentment i el cost per tick es limita a uniforms i paràmetres petits.
-
-### Evidència obligatòria
-
-- [ ] Captures deterministes de dia, posta, crepuscle civil/nàutic/astronòmic i nit.
-- [ ] Assertions de factors de crepuscle i extinció.
-- [ ] Mesura de frame amb timeline en moviment.
-- [ ] Comparació perceptiva documentada amb TerraLab.
-
-### Fora d’abast del pas
-
-No inclou encara contaminació lumínica avançada ni meteorologia completa.
 
 ## Pas 7 — Contaminació lumínica, Bortle i magnitud límit
 

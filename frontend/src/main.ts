@@ -28,6 +28,12 @@ import { LocationHUD } from "./view/ui/panels/LocationHUD";
 import { Shell } from "./view/ui/Shell";
 import { TimeBar } from "./view/ui/components/TimeBar";
 
+// ─── Picking (Pas 6) ─────────────────────────────────────────────────
+import { CelestialTransformState } from "./view/three/CelestialTransformState";
+import { PointerGestureRouter } from "./view/three/picking/PointerGestureRouter";
+import { StarPickProvider } from "./view/three/picking/StarPickProvider";
+import { ScenePickingController } from "./view/three/picking/ScenePickingController";
+
 // ─── Bootstrap ───────────────────────────────────────────────────────
 
 function main(): void {
@@ -92,12 +98,42 @@ function main(): void {
 
   const locationHUD = new LocationHUD();
 
+  // ─── Picking Initialization (Pas 6) ──────────────────────────────
+  const celestialTransformState = new CelestialTransformState();
+  sceneHost.getStarFieldRenderer().setTransformState(celestialTransformState);
+
+  const gestureRouter = new PointerGestureRouter();
+  const pickProvider = new StarPickProvider({
+    camera: sceneHost.camera,
+    transformState: celestialTransformState,
+    renderer: sceneHost.renderer,
+    worldRoot: sceneHost.getWorldRoot(),
+    getStarResources: () => sceneHost.getStarFieldRenderer().getResources(),
+    getMagnitudeLimit: () => sceneHost.getStarFieldRenderer().getMagnitudeLimit(),
+    getPointScale: () => sceneHost.getStarFieldRenderer().getPointScale(),
+    isStarLayerVisible: () => sceneHost.getStarFieldRenderer().visible,
+  });
+
+  const pickingController = new ScenePickingController({
+    gestureRouter,
+    pickProvider,
+    resolveCallback: (reqId, gen, resId, resVer, catIdx, purpose) => {
+      bridge.sendResolveStarPick(reqId, gen, resId, resVer, catIdx, purpose);
+    },
+    selectionChangedCallback: (resolvedStar) => {
+      // Passem a tipus any per evitar problemes temporals d'interfície amb HUD no implementat encara
+      (locationHUD as any).setSelectedStar?.(resolvedStar);
+    },
+  });
+
   // 2. Mount scene + UI
   const canvasContainer = shell.getCanvasContainer();
   sceneHost.mount(canvasContainer);
   diagnostics.mount(canvasContainer);
   locationHUD.mount(canvasContainer);
   cameraRig.attach(sceneHost.renderer.domElement);
+  gestureRouter.attach(sceneHost.renderer.domElement);
+  pickingController.mount(canvasContainer);
 
   // Initial resize
   const rect = canvasContainer.getBoundingClientRect();
@@ -175,9 +211,18 @@ function main(): void {
     },
     onCelestialFrameTransform(generation, matrix3x3) {
       sceneHost.getStarFieldRenderer().updateCelestialTransform(generation, matrix3x3);
+      celestialTransformState.update(generation, matrix3x3 as number[]);
     },
     onStarResourceReady(metadata, bufferPayload) {
       sceneHost.getStarFieldRenderer().registerBinaryResource(metadata, bufferPayload);
+      const resId = metadata.resourceId as string;
+      const entry = sceneHost.getStarFieldRenderer().getResource(resId);
+      if (entry) {
+        pickProvider.buildIndex(resId, entry);
+      }
+    },
+    onStarPickResolved(msg) {
+      pickingController.handleResolveResponse(msg as any);
     },
     onShutdownRequested() {
       renderLoop.stop();
@@ -214,6 +259,9 @@ function main(): void {
     cameraRig.updateNavigation(timestampMs);
     cameraRig.updateMatrices();
     sceneHost.render(timestampMs);
+    
+    // Actualitza el marker de selecció
+    pickingController.updateMarker();
 
     // Update FPS display at ~1 Hz
     fpsUpdateAccum += 1;

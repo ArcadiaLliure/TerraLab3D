@@ -67,6 +67,7 @@ export interface BackendMessageListener {
   }): void;
   onCelestialFrameTransform?(generation: number, matrix3x3: number[]): void;
   onStarResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
+  onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
 }
 
 export class WebSocketBridge {
@@ -221,6 +222,27 @@ export class WebSocketBridge {
     this.messageListeners.clear();
   }
 
+  // ─── Star Picking ──────────────────────────────────────────
+
+  sendResolveStarPick(
+    requestId: string,
+    generation: number,
+    resourceId: string,
+    resourceVersion: string,
+    catalogIndex: number,
+    purpose: "select" | "hover",
+  ): void {
+    this.sendMessage({
+      type: "resolve_star_pick",
+      requestId,
+      generation,
+      resourceId,
+      resourceVersion,
+      catalogIndex,
+      purpose,
+    });
+  }
+
   // ─── Private ────────────────────────────────────────────────────────
 
   private handleBackendMessage(msg: BackendMessage): void {
@@ -295,6 +317,11 @@ export class WebSocketBridge {
             (msg as any).generation,
             [...(msg as any).matrix3x3],
           );
+        }
+        break;
+      case "star_pick_resolved":
+        for (const l of this.messageListeners) {
+          l.onStarPickResolved?.(msg as any);
         }
         break;
     }

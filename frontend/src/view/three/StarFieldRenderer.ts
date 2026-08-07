@@ -7,34 +7,52 @@
  * - S'afegix a `celestialRoot` (recentrat a càmera → zero paral·laxi local).
  * - Aplica la matriu de transformació equatorial→ENU `u_equatorialToENUMatrix` a tots els materials.
  * - Suporta toggles i limits de magnitud sense tocar la GPU.
+ *
+ * Pas 6 additions:
+ * - `StarResourceEntry` ara inclou `version`, `catalogIndices` (Uint32Array canònic),
+ *   `magnitudesArray` i `equatorialPositions` per al picking.
+ * - Metadata tipada via `StarResourceMetadata`.
+ * - Delegació de la matriu de transformació a `CelestialTransformState`.
  */
 
 import * as THREE from "three";
 import { STAR_FRAGMENT_SHADER, STAR_VERTEX_SHADER } from "./shaders/starShader";
+import type { StarResourceMetadata } from "../../contracts/star_picking_contracts";
+import type { CelestialTransformState } from "./CelestialTransformState";
 
 export interface StarResourceEntry {
   readonly resourceId: string;
+  readonly version: string;
   readonly role: string;
   readonly starCount: number;
   readonly points: THREE.Points;
   readonly geometry: THREE.BufferGeometry;
   readonly material: THREE.ShaderMaterial;
+  /** Uint32Array canònic — identitat de picking, NEVER float. */
+  readonly catalogIndices: Uint32Array;
+  /** Float32Array de magnituds — per al càlcul de mida al picker. */
+  readonly magnitudesArray: Float32Array;
+  /** Float32Array[N*3] de posicions equatorials — per al spatial index. */
+  readonly equatorialPositions: Float32Array;
 }
 
 export class StarFieldRenderer {
   private readonly rootGroup = new THREE.Group();
   private readonly resources = new Map<string, StarResourceEntry>();
-  private currentMatrix3x3: number[] = [
-    1, 0, 0,
-    0, 1, 0,
-    0, 0, 1,
-  ];
   private magnitudeLimit = 8.0;
   private pointScale = 1.0;
   private isVisible = true;
 
+  /** Referència compartida a l'estat de transformació celeste (Pas 6). */
+  private transformState: CelestialTransformState | null = null;
+
   constructor() {
     this.rootGroup.name = "starFieldRoot";
+  }
+
+  /** Connecta l'estat de transformació celeste compartit. */
+  public setTransformState(state: CelestialTransformState): void {
+    this.transformState = state;
   }
 
   public attachToParent(parentGroup: THREE.Group): void {
@@ -54,6 +72,14 @@ export class StarFieldRenderer {
     return this.isVisible;
   }
 
+  public getMagnitudeLimit(): number {
+    return this.magnitudeLimit;
+  }
+
+  public getPointScale(): number {
+    return this.pointScale;
+  }
+
   public setMagnitudeLimit(limit: number): void {
     this.magnitudeLimit = limit;
     for (const entry of this.resources.values()) {
@@ -64,7 +90,11 @@ export class StarFieldRenderer {
 
   public updateCelestialTransform(generation: number, matrix3x3: number[]): void {
     if (!matrix3x3 || matrix3x3.length !== 9) return;
-    this.currentMatrix3x3 = [...matrix3x3];
+
+    // Si tenim transformState compartit, delegar-hi l'update
+    if (this.transformState) {
+      this.transformState.update(generation, matrix3x3);
+    }
 
     // Actualitzar la matriu uniform en tots els materials residents
     for (const entry of this.resources.values()) {
@@ -79,19 +109,28 @@ export class StarFieldRenderer {
     }
   }
 
-  public registerBinaryResource(metadata: any, payloadBuffer: ArrayBuffer): void {
+  public registerBinaryResource(metadata: StarResourceMetadata | any, payloadBuffer: ArrayBuffer): void {
     const resourceId = metadata.resourceId as string;
+    const version = (metadata.version ?? "") as string;
     const role = metadata.role as string;
     const starCount = metadata.starCount as number;
     const layout = metadata.bufferLayout;
 
     if (!resourceId || !starCount || !layout) {
-      console.error("[StarFieldRenderer] Metadata binària invàlida:", metadata);
+      console.error("MGP: [StarFieldRenderer] [registerBinaryResource] [Metadata binària invàlida]", metadata);
       return;
     }
 
     // Si ja existia una versió anterior d'aquest recurs, reemplaçar-la netament
     if (this.resources.has(resourceId)) {
+      const existing = this.resources.get(resourceId)!;
+      if (existing.version === version) {
+        // Mateixa versió — registre idempotent, no reupload
+        console.log(
+          `MGP: [StarFieldRenderer] [registerBinaryResource] [Recurs ${resourceId} v${version} ja registrat — idempotent]`,
+        );
+        return;
+      }
       this.disposeResource(resourceId);
     }
 
@@ -115,8 +154,10 @@ export class StarFieldRenderer {
       floatColors[i] = u8Colors[i] / 255.0;
     }
 
-    // Catalog indices: uint32 -> Float32Array (per compatibilitat WebGL1/2)
+    // Catalog indices: conservar Uint32Array canònic per al picking
     const u32Indices = new Uint32Array(payloadBuffer, idxOffset, idxLen / 4);
+
+    // Float32 per a GPU (WebGL attribute) — NOMÉS per render, no per identitat
     const floatIndices = new Float32Array(starCount);
     for (let i = 0; i < u32Indices.length; i++) {
       floatIndices[i] = u32Indices[i];
@@ -129,13 +170,11 @@ export class StarFieldRenderer {
     geometry.setAttribute("color", new THREE.BufferAttribute(floatColors, 3));
     geometry.setAttribute("catalogIndex", new THREE.BufferAttribute(floatIndices, 1));
 
-    // Crear Matriu 3x3 inicial
+    // Crear Matriu 3x3 inicial des de CelestialTransformState o identitat
     const mat3 = new THREE.Matrix3();
-    mat3.set(
-      this.currentMatrix3x3[0], this.currentMatrix3x3[1], this.currentMatrix3x3[2],
-      this.currentMatrix3x3[3], this.currentMatrix3x3[4], this.currentMatrix3x3[5],
-      this.currentMatrix3x3[6], this.currentMatrix3x3[7], this.currentMatrix3x3[8],
-    );
+    if (this.transformState && this.transformState.isValid) {
+      mat3.copy(this.transformState.equatorialToThree);
+    }
 
     // Crear ShaderMaterial
     const material = new THREE.ShaderMaterial({
@@ -160,18 +199,27 @@ export class StarFieldRenderer {
 
     this.rootGroup.add(points);
 
+    // Conservar Uint32Array canònic, magnituds i posicions per al picking
+    const catalogIndicesCopy = new Uint32Array(u32Indices);
+    const magnitudesCopy = new Float32Array(magnitudes);
+    const positionsCopy = new Float32Array(positions);
+
     const entry: StarResourceEntry = {
       resourceId,
+      version,
       role,
       starCount,
       points,
       geometry,
       material,
+      catalogIndices: catalogIndicesCopy,
+      magnitudesArray: magnitudesCopy,
+      equatorialPositions: positionsCopy,
     };
     this.resources.set(resourceId, entry);
 
     console.log(
-      `[StarFieldRenderer] Recurs estel·lar registrat a VRAM: ${resourceId} (${starCount} estrelles, role=${role})`,
+      `MGP: [StarFieldRenderer] [registerBinaryResource] [Recurs registrat a VRAM: ${resourceId} v${version} (${starCount} estrelles, role=${role})]`,
     );
   }
 
@@ -180,6 +228,16 @@ export class StarFieldRenderer {
       entry.material.uniforms.u_devicePixelRatio.value = dpr;
       entry.material.uniformsNeedUpdate = true;
     }
+  }
+
+  /** Retorna tots els recursos registrats (lectura). */
+  public getResources(): ReadonlyMap<string, StarResourceEntry> {
+    return this.resources;
+  }
+
+  /** Retorna un recurs per ID, o undefined. */
+  public getResource(resourceId: string): StarResourceEntry | undefined {
+    return this.resources.get(resourceId);
   }
 
   public disposeResource(resourceId: string): void {

@@ -79,6 +79,18 @@ export interface CameraResetCompletedMessage {
   readonly type: "camera_reset_completed";
 }
 
+// ─── Star Picking messages (Pas 6) ───────────────────────────────────
+
+export interface ResolveStarPickMessage {
+  readonly type: "resolve_star_pick";
+  readonly requestId: string;
+  readonly generation: number;
+  readonly resourceId: string;
+  readonly resourceVersion: string;
+  readonly catalogIndex: number;
+  readonly purpose: "select" | "hover";
+}
+
 export type FrontendMessage =
   | FrontendReadyMessage
   | CameraChangedMessage
@@ -90,7 +102,8 @@ export type FrontendMessage =
   | CameraPoseChangedMessage
   | CameraMotionStartedMessage
   | CameraMotionStoppedMessage
-  | CameraResetCompletedMessage;
+  | CameraResetCompletedMessage
+  | ResolveStarPickMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -151,6 +164,29 @@ export interface CelestialFrameTransformMessage {
   readonly matrix3x3: readonly number[];
 }
 
+// ─── Star Picking resolved (Pas 6) ──────────────────────────────────
+
+export interface StarPickResolvedPayloadStar {
+  readonly kind: "star";
+  readonly resourceId: string;
+  readonly resourceVersion: string;
+  readonly catalogIndex: number;
+  readonly sourceId: string;
+  readonly raDeg: number;
+  readonly decDeg: number;
+  readonly magnitude: number;
+  readonly bpRp: number | null;
+  readonly sourceRole: string;
+}
+
+export interface StarPickResolvedMessage {
+  readonly type: "star_pick_resolved";
+  readonly requestId: string;
+  readonly generation: number;
+  readonly status: "ok" | "stale" | "missing" | "invalid";
+  readonly star?: StarPickResolvedPayloadStar;
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
@@ -160,7 +196,8 @@ export type BackendMessage =
   | LocationErrorMessage
   | SimulationTimeSnapshotMessage
   | StarCatalogStatusMessage
-  | CelestialFrameTransformMessage;
+  | CelestialFrameTransformMessage
+  | StarPickResolvedMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 
