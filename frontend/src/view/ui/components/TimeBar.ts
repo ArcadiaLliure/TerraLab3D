@@ -1,4 +1,4 @@
-import { WebSocketBridge } from "../../bridge/WebSocketBridge";
+import { WebSocketBridge } from "../../../bridge/WebSocketBridge";
 
 export class TimeBar {
   private element: HTMLDivElement;
@@ -128,8 +128,8 @@ export class TimeBar {
       const stepWidth = w / (this.sunAltitudes.length - 1);
       
       for (let i = 0; i < this.sunAltitudes.length - 1; i++) {
-        const alt1 = this.sunAltitudes[i];
-        const alt2 = this.sunAltitudes[i + 1];
+        const alt1 = this.sunAltitudes[i] ?? 0;
+        const alt2 = this.sunAltitudes[i + 1] ?? 0;
         
         // Simple lerp: -18 to +18 mapped to 0..1 for color
         const mapAlt = (alt: number) => {

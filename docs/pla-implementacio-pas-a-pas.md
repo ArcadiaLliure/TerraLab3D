@@ -161,8 +161,6 @@ No inclou encara coordenades astronòmiques, estrelles, cel físic, terreny real
 
 ## Pas 2 — Ubicació geogràfica de l’observador i orientació local
 
-### Resultat funcional palpable
-
 La UI permet introduir latitud, longitud i alçada addicional; l’escena mostra la ubicació activa, orienta correctament els punts cardinals i manté l’estat en canviar la càmera.
 
 ### Fonts TerraLab a consultar
@@ -1415,18 +1413,18 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 
 ### Tasques
 
-- [ ] Definir geometria renderer-neutral per a grid horitzontal i referències principals.
-- [ ] Implementar línies d’azimut, cercles d’altitud, horitzó i marca de zenit.
-- [ ] Implementar etiquetes N/E/S/O i valors angulars amb orientació llegible.
-- [ ] Aplicar densitat adaptativa segons FOV per evitar soroll visual.
-- [ ] Evitar regenerar tota la geometria quan només canvia la càmera.
-- [ ] Implementar culling d’etiquetes i prevenció de solapaments bàsica.
-- [ ] Afegir toggles per grid, brúixola, labels i HUD.
-- [ ] Mostrar azimut, altitud i FOV actuals al HUD.
-- [ ] Fer que les etiquetes mantinguin una mida coherent amb DPR i resize.
-- [ ] Definir una capa overlay separada dels objectes celestes.
-- [ ] Afegir mode de colors purs/diagnòstic per verificar geometria i contrast.
-- [ ] Comparar orientació, densitat i convencions amb TerraLab.
+- [x] Definir geometria renderer-neutral per a grid horitzontal i referències principals.
+- [x] Implementar línies d’azimut, cercles d’altitud, horitzó i marca de zenit.
+- [x] Implementar etiquetes N/E/S/O i valors angulars amb orientació llegible.
+- [x] Aplicar densitat adaptativa segons FOV per evitar soroll visual.
+- [x] Evitar regenerar tota la geometria quan només canvia la càmera.
+- [x] Implementar culling d’etiquetes i prevenció de solapaments bàsica.
+- [x] Afegir toggles per grid, brúixola, labels i HUD.
+- [x] Mostrar azimut, altitud i FOV actuals al HUD.
+- [x] Fer que les etiquetes mantinguin una mida coherent amb DPR i resize.
+- [x] Definir una capa overlay separada dels objectes celestes.
+- [x] Afegir mode de colors purs/diagnòstic per verificar geometria i contrast.
+- [x] Comparar orientació, densitat i convencions amb TerraLab.
 
 ### Criteri de sortida
 
@@ -1434,9 +1432,9 @@ La navegació ja és espacialment comprensible: l’usuari pot orientar-se, lleg
 
 ### Evidència obligatòria
 
-- [ ] Captures amb diferents FOV, DPR i orientacions.
-- [ ] Prova que moure càmera no reconstrueix buffers estàtics del grid.
-- [ ] Proves de convencions angulars i punts cardinals.
+- [x] Captures amb diferents FOV, DPR i orientacions.
+- [x] Prova que moure càmera no reconstrueix buffers estàtics del grid.
+- [x] Proves de convencions angulars i punts cardinals.
 
 ### Fora d’abast del pas
 

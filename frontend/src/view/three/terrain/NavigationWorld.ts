@@ -12,8 +12,8 @@
  */
 
 import * as THREE from "three";
-import type { TerrainSampler } from "../../contracts/TerrainSampler";
-import type { NavigationEnvelope, NavigationReadiness } from "../../contracts/navigation";
+import type { TerrainSampler } from "../../../contracts/TerrainSampler";
+import type { NavigationEnvelope, NavigationReadiness } from "../../../contracts/navigation";
 import { TechnicalTerrainSampler } from "./TechnicalTerrainSampler";
 
 const TERRAIN_SIZE = 500;        // ±500m → 1000×1000m total
@@ -172,15 +172,17 @@ export class NavigationWorld {
     geo.rotateX(-Math.PI / 2);
 
     const positions = geo.attributes.position;
-    const count = positions.count;
+    if (positions) {
+      const count = positions.count;
 
-    for (let i = 0; i < count; i++) {
-      const x = positions.getX(i);
-      const z = positions.getZ(i);
+      for (let i = 0; i < count; i++) {
+        const x = positions.getX(i);
+        const z = positions.getZ(i);
 
-      // Generate interesting topography with multiple octaves
-      const height = this.terrainHeight(x, -z); // -z because Three.js Z is south
-      positions.setY(i, height);
+        // Generate interesting topography with multiple octaves
+        const height = this.terrainHeight(x, -z); // -z because Three.js Z is south
+        positions.setY(i, height);
+      }
     }
 
     geo.computeVertexNormals();
@@ -315,9 +317,12 @@ export class NavigationWorld {
     const verts = new Float32Array((segments + 1) * 3);
     for (let i = 0; i <= segments; i++) {
       const theta = (i / segments) * Math.PI * 2;
-      verts[i * 3] = Math.sin(theta) * BOUNDS_RADIUS;
-      verts[i * 3 + 1] = 0.5; // Slightly above ground
-      verts[i * 3 + 2] = Math.cos(theta) * BOUNDS_RADIUS;
+      const eastM = Math.sin(theta) * BOUNDS_RADIUS;
+      const northM = Math.cos(theta) * BOUNDS_RADIUS;
+      const groundH = this.terrainHeight(eastM, northM);
+      verts[i * 3] = eastM;
+      verts[i * 3 + 1] = groundH + 0.5; // Follows local terrain height + 0.5m
+      verts[i * 3 + 2] = -northM;
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
@@ -328,6 +333,13 @@ export class NavigationWorld {
     });
     this.boundsIndicator = new THREE.LineLoop(geo, mat);
     this.boundsIndicator.name = "navigationBounds";
+    this.boundsIndicator.visible = false;
+  }
+
+  setBoundsVisible(visible: boolean): void {
+    if (this.boundsIndicator) {
+      this.boundsIndicator.visible = visible;
+    }
   }
 
   // ─── Private: Readiness ────────────────────────────────────────────

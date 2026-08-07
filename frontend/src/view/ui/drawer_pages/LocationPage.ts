@@ -7,6 +7,8 @@ export interface LocationPageCallbacks {
   onSetDate: (dateIso: string) => void;
   onToggleNavigationMode?: () => void;
   onResetToOrigin?: () => void;
+  onOverlayToggle?: (key: string, visible: boolean) => void;
+  onHudToggle?: (visible: boolean) => void;
 }
 
 // ─── SVG Icons ───────────────────────────────────────────────────────
@@ -268,6 +270,54 @@ export class LocationPage {
     this.navZoneLabel = this.createInfoLabel(navSection, "Zona: --");
 
     this.element.appendChild(navSection);
+
+    // Separator
+    this.element.appendChild(this.createSeparator());
+
+    // ── 4. Visualització (Phase 4) ──────────────────────────────────
+    const vizSection = document.createElement("div");
+    vizSection.style.cssText = "display: flex; flex-direction: column; gap: 6px;";
+
+    const vizTitle = document.createElement("div");
+    vizTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px;";
+    vizTitle.textContent = "Visualització";
+    vizSection.appendChild(vizTitle);
+
+    const overlayToggles: Array<{ key: string; label: string; checked: boolean }> = [
+      { key: "grid", label: "Grid azimut-altitud", checked: true },
+      { key: "compass", label: "Brúixola (N/E/S/O)", checked: true },
+      { key: "labels", label: "Etiquetes angulars", checked: true },
+      { key: "equator", label: "Equador celeste", checked: true },
+      { key: "bounds", label: "Límits de navegació (vermell)", checked: false },
+      { key: "hud", label: "HUD", checked: true },
+    ];
+
+    for (const toggle of overlayToggles) {
+      const row = document.createElement("label");
+      row.style.cssText = "display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 11px; color: var(--color-text-dim);";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = toggle.checked;
+      checkbox.id = `overlay-toggle-${toggle.key}`;
+      checkbox.style.cssText = "accent-color: var(--color-gold); cursor: pointer;";
+      checkbox.onchange = () => {
+        if (toggle.key === "hud") {
+          this.callbacks.onHudToggle?.(checkbox.checked);
+        } else {
+          this.callbacks.onOverlayToggle?.(toggle.key, checkbox.checked);
+        }
+      };
+
+      const label = document.createElement("span");
+      label.textContent = toggle.label;
+
+      row.appendChild(checkbox);
+      row.appendChild(label);
+      vizSection.appendChild(row);
+    }
+
+    this.element.appendChild(vizSection);
   }
 
   // ─── Public API ────────────────────────────────────────────────────

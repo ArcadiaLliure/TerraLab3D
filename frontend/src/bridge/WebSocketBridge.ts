@@ -165,6 +165,8 @@ export class WebSocketBridge {
     this.sendMessage(msg);
   }
 
+  private shutdownRequested = false;
+
   dispose(): void {
     this._disposed = true;
     if (this.reconnectTimer !== null) {
@@ -172,8 +174,10 @@ export class WebSocketBridge {
       this.reconnectTimer = null;
     }
     if (this.ws) {
-      // Send shutdown_complete before closing if we were asked to shut down
-      this.sendMessage({ type: "shutdown_complete" });
+      // Send shutdown_complete before closing ONLY if the backend explicitly requested shutdown
+      if (this.shutdownRequested) {
+        this.sendMessage({ type: "shutdown_complete" });
+      }
       this.ws.onclose = null;
       this.ws.onerror = null;
       this.ws.onmessage = null;
@@ -215,6 +219,7 @@ export class WebSocketBridge {
         }
         break;
       case "shutdown_requested":
+        this.shutdownRequested = true;
         for (const l of this.messageListeners) {
           l.onShutdownRequested?.();
         }
@@ -238,11 +243,11 @@ export class WebSocketBridge {
       case "simulation_time_snapshot":
         for (const l of this.messageListeners) {
           l.onSimulationTimeSnapshot?.(
-            (msg as any).currentTimeIso,
-            (msg as any).julianDay,
-            (msg as any).lstDeg,
-            (msg as any).sunAltitudes,
-            (msg as any).isRealtime
+            msg.currentTimeIso,
+            msg.julianDay,
+            msg.lstDeg,
+            [...msg.sunAltitudes],
+            msg.isRealtime,
           );
         }
         break;

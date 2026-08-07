@@ -14,10 +14,10 @@
  *   7. Return GroundResolution with pose, grounded, blocked status.
  */
 
-import type { NavigationCameraPose, WalkNavigationSettings } from "../../contracts/navigation";
-import type { TerrainSampler } from "../../contracts/TerrainSampler";
-import type { GroundSample } from "../../contracts/TerrainSampler";
-import type { IGroundFollower, GroundResolution } from "../../contracts/GroundFollower";
+import type { NavigationCameraPose, WalkNavigationSettings } from "../../../contracts/navigation";
+import type { TerrainSampler } from "../../../contracts/TerrainSampler";
+import type { GroundSample } from "../../../contracts/TerrainSampler";
+import type { IGroundFollower, GroundResolution } from "../../../contracts/GroundFollower";
 
 const LOG_PREFIX = "MGP: [GroundFollower]";
 

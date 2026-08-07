@@ -5,6 +5,7 @@
  *   WebSocketBridge → CameraRigImpl → ThreeSceneHostImpl → RenderLoopImpl
  *   NavigationWorld → TerrainSampler → GroundFollower → CameraRigImpl
  *   DiagnosticsOverlay for bridge status / FPS / session
+ *   Phase 4: HorizontalGrid, CelestialLabels, CelestialEquator, AstronomicalHUD
  *
  * This module is the single bundle entry point compiled by esbuild.
  */
@@ -14,6 +15,7 @@ import type { BackendMessageListener } from "./bridge/WebSocketBridge";
 import { CameraRigImpl } from "./view/three/CameraRigImpl";
 import { RenderLoopImpl } from "./view/three/RenderLoopImpl";
 import { ThreeSceneHostImpl } from "./view/three/ThreeSceneHostImpl";
+import type { OverlayVisibility } from "./view/three/ThreeSceneHostImpl";
 import { DiagnosticsOverlay } from "./view/ui/DiagnosticsOverlay";
 import { NavigationWorld } from "./view/three/terrain/NavigationWorld";
 import { GroundFollower } from "./view/three/terrain/GroundFollower";
@@ -58,6 +60,13 @@ function main(): void {
     onSetDate: (dateIso) => bridge.sendSetSimulationTime(dateIso),
     onToggleNavigationMode: () => cameraRig.toggleNavigationMode(),
     onResetToOrigin: () => cameraRig.resetToOrigin(),
+    // Phase 4: Overlay toggles
+    onOverlayToggle: (key, visible) => {
+      sceneHost.setOverlayVisibility(key as keyof OverlayVisibility, visible);
+    },
+    onHudToggle: (visible) => {
+      locationHUD.setVisible(visible);
+    },
   });
   const locContainer = shell.getPageContainer("location");
   if (locContainer) locationPage.mount(locContainer);
@@ -92,6 +101,7 @@ function main(): void {
 
   // 3. Phase 3.5: Prepare navigation world and wire terrain dependencies
   navigationWorld.prepare(sceneHost.getWorldRoot());
+  sceneHost.setNavigationWorld(navigationWorld);
   const terrainSampler = navigationWorld.getTerrainSampler();
   cameraRig.setTerrainDependencies(terrainSampler, groundFollower);
 
@@ -117,6 +127,8 @@ function main(): void {
       pose.horizontalFovDeg,
       pose.rollDeg,
     );
+    // Phase 4: Update FOV for grid LOD switching
+    sceneHost.setCurrentFov(pose.horizontalFovDeg);
   });
 
   const backendListener: BackendMessageListener = {
@@ -141,6 +153,8 @@ function main(): void {
       locationPage.updateInputs(lat, lon);
       locationPage.notifySuccess();
       locationHUD.updateHUD(lat, lon, elevation, effectiveHeight, elevationSource);
+      // Phase 4: Update observer latitude for celestial equator
+      sceneHost.setObserverLatitude(lat);
     },
     onLocationError(msg) {
       locationPage.notifyError();
@@ -195,7 +209,7 @@ function main(): void {
       diagnostics.updateFps(renderLoop.fps);
     }
 
-    // Update HUD at ~4 Hz (not every frame)
+    // Update HUD and labels at ~4 Hz (not every frame)
     hudUpdateAccum += 1;
     if (hudUpdateAccum >= 8) {
       hudUpdateAccum = 0;
@@ -207,6 +221,8 @@ function main(): void {
         motionState,
         navigationWorld.envelope.readiness,
       );
+      // Phase 4: Update celestial labels at ~4 Hz
+      sceneHost.updateLabels();
     }
   });
 

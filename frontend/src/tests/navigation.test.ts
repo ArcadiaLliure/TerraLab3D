@@ -241,7 +241,7 @@ function runTests() {
   // ── Summary ────────────────────────────────────────────────────────
   console.log(`\n=== Test Results: ${passed} passed, ${failed} failed ===`);
   if (failed > 0) {
-    process.exit(1);
+    (globalThis as any).process?.exit?.(1);
   }
 }
 

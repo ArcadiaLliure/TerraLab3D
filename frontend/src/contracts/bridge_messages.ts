@@ -135,13 +135,23 @@ export interface LocationErrorMessage {
   readonly message: string;
 }
 
+export interface SimulationTimeSnapshotMessage {
+  readonly type: "simulation_time_snapshot";
+  readonly currentTimeIso: string;
+  readonly julianDay: number;
+  readonly lstDeg: number;
+  readonly sunAltitudes: readonly number[];
+  readonly isRealtime: boolean;
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
   | FocusDirectionMessage
   | ShutdownRequestedMessage
   | ObserverLocationChangedMessage
-  | LocationErrorMessage;
+  | LocationErrorMessage
+  | SimulationTimeSnapshotMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

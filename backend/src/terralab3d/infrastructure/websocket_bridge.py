@@ -91,8 +91,6 @@ class WebSocketBridge:
             self._connected = False
             self._ws = None
             log.info("WebSocket desconnectat")
-            # Senyalitza el tancament en desconnectar (navegador tancat)
-            self._shutdown_event.set()
 
         return ws
 

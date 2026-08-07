@@ -8,7 +8,7 @@
  */
 
 import * as THREE from "three";
-import type { GroundSample, TerrainSampler } from "../../contracts/TerrainSampler";
+import type { GroundSample, TerrainSampler } from "../../../contracts/TerrainSampler";
 
 const RAD2DEG = 180 / Math.PI;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -49,11 +49,11 @@ export class TechnicalTerrainSampler implements TerrainSampler {
     this.raycaster.far = probeHeight + 100;
 
     const hits = this.raycaster.intersectObject(this.terrainMesh, false);
-    if (hits.length === 0) return null;
+    if (hits.length === 0 || !hits[0]) return null;
 
     const hit = hits[0];
     const face = hit.face;
-    if (!face) return null;
+    if (!face || !hit.point) return null;
 
     // Get world-space normal
     const normalMatrix = new THREE.Matrix3().getNormalMatrix(
