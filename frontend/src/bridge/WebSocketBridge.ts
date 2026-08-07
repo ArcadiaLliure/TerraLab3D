@@ -57,6 +57,16 @@ export interface BackendMessageListener {
     sunAltitudes: number[],
     isRealtime: boolean
   ): void;
+  onStarCatalogStatus?(status: {
+    gaiaAvailability: string;
+    effectiveSource: string;
+    generalStarCount: number;
+    fallbackStarCount: number;
+    deepResidentCount: number;
+    errorMessage?: string;
+  }): void;
+  onCelestialFrameTransform?(generation: number, matrix3x3: number[]): void;
+  onStarResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
 }
 
 export class WebSocketBridge {
@@ -95,6 +105,7 @@ export class WebSocketBridge {
 
     try {
       this.ws = new WebSocket(url);
+      this.ws.binaryType = "arraybuffer";
     } catch {
       this.setState("error", "Failed to create WebSocket");
       return;
@@ -106,8 +117,12 @@ export class WebSocketBridge {
 
     this.ws.onmessage = (event: MessageEvent) => {
       try {
-        const msg = JSON.parse(event.data as string) as BackendMessage;
-        this.handleBackendMessage(msg);
+        if (event.data instanceof ArrayBuffer) {
+          this.handleBinaryMessage(event.data);
+        } else {
+          const msg = JSON.parse(event.data as string) as BackendMessage;
+          this.handleBackendMessage(msg);
+        }
       } catch (err) {
         console.error("[Bridge] Failed to parse message:", err);
       }
@@ -123,6 +138,24 @@ export class WebSocketBridge {
       if (this._disposed) return;
       this.setState("error", "WebSocket error");
     };
+  }
+
+  private handleBinaryMessage(arrayBuffer: ArrayBuffer): void {
+    if (arrayBuffer.byteLength < 4) return;
+    const view = new DataView(arrayBuffer);
+    const headerLen = view.getUint32(0, true);
+    if (arrayBuffer.byteLength < 4 + headerLen) return;
+
+    const headerBytes = new Uint8Array(arrayBuffer, 4, headerLen);
+    const decoder = new TextDecoder("utf-8");
+    const headerJsonStr = decoder.decode(headerBytes);
+    const metadata = JSON.parse(headerJsonStr);
+
+    const payloadBuffer = arrayBuffer.slice(4 + headerLen);
+
+    for (const l of this.messageListeners) {
+      l.onStarResourceReady?.(metadata, payloadBuffer);
+    }
   }
 
   sendCameraChanged(
@@ -248,6 +281,19 @@ export class WebSocketBridge {
             msg.lstDeg,
             [...msg.sunAltitudes],
             msg.isRealtime,
+          );
+        }
+        break;
+      case "star_catalog_status":
+        for (const l of this.messageListeners) {
+          l.onStarCatalogStatus?.(msg as any);
+        }
+        break;
+      case "celestial_frame_transform":
+        for (const l of this.messageListeners) {
+          l.onCelestialFrameTransform?.(
+            (msg as any).generation,
+            [...(msg as any).matrix3x3],
           );
         }
         break;

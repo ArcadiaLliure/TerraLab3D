@@ -103,15 +103,26 @@ async def run() -> int:
             await bridge.send_location_error(str(e))
             log.warning("Error a l'actualitzar la ubicació: %s", e)
 
+    # ── 3.1. Lògica d'Estrelles (Fase 5) ─────────────────────────────
+    from terralab3d.application.star_coordinator import StarCoordinator
+    star_coordinator = StarCoordinator()
+    star_coordinator.set_publishers(
+        resource_publisher=bridge.send_binary_resource,
+        status_publisher=bridge.send_star_catalog_status,
+        transform_publisher=bridge.send_celestial_frame_transform,
+    )
+
     async def _on_frontend_ready(data: dict[str, Any]) -> None:
-        # Quan el frontend es connecta, enviem la ubicació inicial.
+        # Quan el frontend es connecta, enviem la ubicació inicial, iniciem estrelles, etc.
         await broadcast_location()
         await broadcast_time()
+        # Iniciar la càrrega d'estrelles en segon pla (fallback -> gaia general)
+        asyncio.create_task(star_coordinator.start())
 
     bridge.on("set_observer_location", _handle_set_location)
     bridge.on("frontend_ready", _on_frontend_ready)
 
-    # ── 3.1. Lògica de Temps (Fase 3) ────────────────────────────────
+    # ── 3.2. Lògica de Temps (Fase 3) ────────────────────────────────
     engine = AstronomicalEngine()
     
     sim_time_utc = datetime.now(timezone.utc)
@@ -137,6 +148,12 @@ async def run() -> int:
             lst_deg=lst_deg,
             sun_altitudes=sun_alts,
             is_realtime=is_realtime
+        )
+        
+        # Enviar actualització de transformació d'estrelles (LST o latitud han pogut canviar)
+        await star_coordinator.update_celestial_transform(
+            latitude_deg=current_observer.location.latitude_deg,
+            lst_deg=lst_deg,
         )
 
     async def _handle_set_simulation_time(data: dict[str, Any]) -> None:

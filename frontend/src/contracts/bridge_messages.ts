@@ -135,13 +135,20 @@ export interface LocationErrorMessage {
   readonly message: string;
 }
 
-export interface SimulationTimeSnapshotMessage {
-  readonly type: "simulation_time_snapshot";
-  readonly currentTimeIso: string;
-  readonly julianDay: number;
-  readonly lstDeg: number;
-  readonly sunAltitudes: readonly number[];
-  readonly isRealtime: boolean;
+export interface StarCatalogStatusMessage {
+  readonly type: "star_catalog_status";
+  readonly gaiaAvailability: string;
+  readonly effectiveSource: string;
+  readonly generalStarCount: number;
+  readonly fallbackStarCount: number;
+  readonly deepResidentCount: number;
+  readonly errorMessage?: string;
+}
+
+export interface CelestialFrameTransformMessage {
+  readonly type: "celestial_frame_transform";
+  readonly generation: number;
+  readonly matrix3x3: readonly number[];
 }
 
 export type BackendMessage =
@@ -151,7 +158,9 @@ export type BackendMessage =
   | ShutdownRequestedMessage
   | ObserverLocationChangedMessage
   | LocationErrorMessage
-  | SimulationTimeSnapshotMessage;
+  | SimulationTimeSnapshotMessage
+  | StarCatalogStatusMessage
+  | CelestialFrameTransformMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

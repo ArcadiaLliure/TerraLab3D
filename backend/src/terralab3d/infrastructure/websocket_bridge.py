@@ -99,6 +99,48 @@ class WebSocketBridge:
         if self._ws and not self._ws.closed:
             await self._ws.send_json(msg)
 
+    async def send_binary_resource(
+        self,
+        resource_id: str,
+        version: str,
+        metadata: dict[str, Any],
+        buffer: bytes,
+    ) -> None:
+        """Envia un recurs binari al frontend.
+
+        Protocol binari:
+            4 bytes (uint32 LE): longitud del header JSON
+            N bytes: header JSON (UTF-8)
+            resta: payload binari (ArrayBuffer)
+
+        Prohibit Base64. Prohibit JSON massiu.
+        """
+        if not self._ws or self._ws.closed:
+            return
+
+        header_bytes = json.dumps(metadata).encode("utf-8")
+        header_len = len(header_bytes)
+
+        # Construir missatge binari: [4 bytes len][header JSON][payload]
+        import struct
+        message = struct.pack("<I", header_len) + header_bytes + buffer
+        await self._ws.send_bytes(message)
+        log.info(
+            "Recurs binari enviat: %s v%s (%d bytes header + %d bytes payload)",
+            resource_id, version, header_len, len(buffer),
+        )
+
+    async def send_star_catalog_status(self, status: dict[str, Any]) -> None:
+        """Envia l'estat del catàleg estel·lar a la UI."""
+        await self.send(status)
+
+    async def send_celestial_frame_transform(self, transform: dict[str, Any]) -> None:
+        """Envia la transformació equatorial→ENU al frontend.
+
+        Només quan canvia LST/latitud. NO per frame visual.
+        """
+        await self.send(transform)
+
     async def send_set_camera_pose(
         self,
         az: float, alt: float, fov: float, roll: float = 0.0,

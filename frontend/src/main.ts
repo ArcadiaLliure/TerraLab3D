@@ -71,7 +71,11 @@ function main(): void {
   const locContainer = shell.getPageContainer("location");
   if (locContainer) locationPage.mount(locContainer);
 
-  const skyPage = new SkyPage();
+  const skyPage = new SkyPage({
+    onOverlayToggle: (key, visible) => {
+      sceneHost.setOverlayVisibility(key as keyof OverlayVisibility, visible);
+    },
+  });
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
 
@@ -165,6 +169,15 @@ function main(): void {
       locationPage.updateTimeState(currentTimeIso, isRealtime);
       shell.updateRealtimeUI(isRealtime);
       sceneHost.setSiderealTime(lstDeg);
+    },
+    onStarCatalogStatus(status) {
+      skyPage.updateStarCatalogStatus(status);
+    },
+    onCelestialFrameTransform(generation, matrix3x3) {
+      sceneHost.getStarFieldRenderer().updateCelestialTransform(generation, matrix3x3);
+    },
+    onStarResourceReady(metadata, bufferPayload) {
+      sceneHost.getStarFieldRenderer().registerBinaryResource(metadata, bufferPayload);
     },
     onShutdownRequested() {
       renderLoop.stop();

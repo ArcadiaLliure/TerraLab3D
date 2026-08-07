@@ -31,6 +31,7 @@ import * as THREE from "three";
 import { HorizontalGrid } from "./HorizontalGrid";
 import { CelestialLabels } from "./CelestialLabels";
 import { CelestialEquator } from "./CelestialEquator";
+import { StarFieldRenderer } from "./StarFieldRenderer";
 
 const LOG_PREFIX = "MGP: [ThreeSceneHost]";
 
@@ -45,6 +46,7 @@ export interface OverlayVisibility {
   labels: boolean;
   equator: boolean;
   bounds: boolean;
+  stars: boolean;
 }
 
 export class ThreeSceneHostImpl {
@@ -60,6 +62,7 @@ export class ThreeSceneHostImpl {
   private readonly horizontalGrid: HorizontalGrid;
   private readonly celestialLabels: CelestialLabels;
   private readonly celestialEquator: CelestialEquator;
+  private readonly starFieldRenderer: StarFieldRenderer;
 
   // ─── Legacy celestial sphere (meridians that rotate with LST) ──────
   private readonly celestialSphere: THREE.Group;
@@ -80,6 +83,7 @@ export class ThreeSceneHostImpl {
     labels: true,
     equator: true,
     bounds: false,
+    stars: true,
   };
 
   // ─── Metrics ───────────────────────────────────────────────────────
@@ -106,6 +110,10 @@ export class ThreeSceneHostImpl {
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
+
+    // ─── Phase 5: Star Field Renderer ────────────────────────────────
+    this.starFieldRenderer = new StarFieldRenderer();
+    this.starFieldRenderer.attachToParent(this.celestialRoot);
 
     // ─── Phase 4: Horizontal Grid ────────────────────────────────────
     this.horizontalGrid = new HorizontalGrid();
@@ -159,6 +167,11 @@ export class ThreeSceneHostImpl {
     return this.celestialRoot;
   }
 
+  /** Access the persistent star field renderer. */
+  getStarFieldRenderer(): StarFieldRenderer {
+    return this.starFieldRenderer;
+  }
+
   mount(container: HTMLElement): void {
     this.container = container;
     const rect = container.getBoundingClientRect();
@@ -172,6 +185,7 @@ export class ThreeSceneHostImpl {
   resize(widthPx: number, heightPx: number): void {
     this.renderer.setSize(widthPx, heightPx);
     this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.starFieldRenderer.updateViewport(window.devicePixelRatio);
   }
 
   render(timestampMs: number): void {
@@ -249,6 +263,9 @@ export class ThreeSceneHostImpl {
       case "bounds":
         this.navigationWorld?.setBoundsVisible(visible);
         break;
+      case "stars":
+        this.starFieldRenderer.setVisible(visible);
+        break;
     }
 
     console.info(`${LOG_PREFIX} [setOverlayVisibility] [${key}=${visible}]`);
@@ -287,10 +304,11 @@ export class ThreeSceneHostImpl {
     if (this.disposed) return;
     this.disposed = true;
 
-    // Phase 4: Dispose components
+    // Phase 4 & Phase 5: Dispose components
     this.horizontalGrid.dispose();
     this.celestialLabels.dispose();
     this.celestialEquator.dispose();
+    this.starFieldRenderer.dispose();
 
     this.scene.traverse((obj) => {
       if (
