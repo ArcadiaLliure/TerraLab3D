@@ -44,6 +44,13 @@ export interface BackendMessageListener {
   onShutdownRequested?(): void;
   onObserverLocationChanged?(lat: number, lon: number, elevation: number, effectiveHeight: number, elevationSource: string): void;
   onLocationError?(message: string): void;
+  onSimulationTimeSnapshot?(
+    currentTimeIso: string,
+    julianDay: number,
+    lstDeg: number,
+    sunAltitudes: number[],
+    isRealtime: boolean
+  ): void;
 }
 
 export class WebSocketBridge {
@@ -222,7 +229,49 @@ export class WebSocketBridge {
           l.onLocationError?.(msg.message);
         }
         break;
+      case "simulation_time_snapshot":
+        for (const l of this.messageListeners) {
+          l.onSimulationTimeSnapshot?.(
+            (msg as any).currentTimeIso,
+            (msg as any).julianDay,
+            (msg as any).lstDeg,
+            (msg as any).sunAltitudes,
+            (msg as any).isRealtime
+          );
+        }
+        break;
     }
+  }
+
+  public sendSetSimulationTime(currentTimeIso: string): void {
+    this.sendMessage({
+      type: "set_simulation_time",
+      currentTimeIso
+    } as any);
+  }
+
+  public sendSetRealtimeMode(enabled: boolean): void {
+    this.sendMessage({
+      type: "set_realtime_mode",
+      enabled
+    } as any);
+  }
+
+  public sendTimelineDragStarted(): void {
+    this.sendMessage({ type: "timeline_drag_started" } as any);
+  }
+
+  public sendTimelineDragFinished(currentTimeIso?: string): void {
+    const payload: any = { type: "timeline_drag_finished" };
+    if (currentTimeIso) payload.currentTimeIso = currentTimeIso;
+    this.sendMessage(payload);
+  }
+
+  public sendRequestOffsetDay(offsetDays: number): void {
+    this.sendMessage({
+      type: "request_offset_day",
+      offsetDays
+    } as any);
   }
 
   private sendMessage(msg: FrontendMessage): void {

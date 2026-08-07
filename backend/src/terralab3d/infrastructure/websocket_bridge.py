@@ -144,6 +144,23 @@ class WebSocketBridge:
             "elevationSource": source,
         })
 
+    async def send_simulation_time_snapshot(
+        self,
+        current_time_iso: str,
+        julian_day: float,
+        lst_deg: float,
+        sun_altitudes: list[float],
+        is_realtime: bool,
+    ) -> None:
+        await self.send({
+            "type": "simulation_time_snapshot",
+            "currentTimeIso": current_time_iso,
+            "julianDay": julian_day,
+            "lstDeg": lst_deg,
+            "sunAltitudes": sun_altitudes,
+            "isRealtime": is_realtime,
+        })
+
     async def send_location_error(self, message: str) -> None:
         await self.send({
             "type": "location_error",
@@ -158,10 +175,14 @@ class WebSocketBridge:
 
     async def _dispatch(self, data: dict[str, Any]) -> None:
         msg_type = data.get("type")
-        log.info("S'ha rebut missatge de tipus: %s", msg_type)
         if not isinstance(msg_type, str):
             log.warning("Missatge sense tipus: %s", data)
             return
+
+        if msg_type not in ("camera_changed", "set_simulation_time"):
+            log.info("S'ha rebut missatge de tipus: %s", msg_type)
+        else:
+            log.debug("S'ha rebut missatge de tipus: %s", msg_type)
 
         if msg_type == "frontend_ready":
             await self._handle_handshake(data)

@@ -21,6 +21,10 @@ import signal
 import sys
 import webbrowser
 from typing import Any
+from datetime import datetime, timedelta, timezone
+
+from terralab3d.domain.time.engine import AstronomicalEngine
+from terralab3d.domain.time.models import ClockMode, SimulationInstant, ClockState
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,6 +50,9 @@ async def run() -> int:
     # ── 2. Crear pont i servidor ──────────────────────────────────────
     bridge = WebSocketBridge()
     server = TerraLabServer(dist_dir, bridge)
+
+    loop = asyncio.get_running_loop()
+    shutdown_requested = asyncio.Event()
 
     # Registrar manegadors de missatges del pont
     bridge.on("camera_changed", _on_camera_changed)
@@ -99,22 +106,104 @@ async def run() -> int:
     async def _on_frontend_ready(data: dict[str, Any]) -> None:
         # Quan el frontend es connecta, enviem la ubicació inicial.
         await broadcast_location()
+        await broadcast_time()
 
     bridge.on("set_observer_location", _handle_set_location)
     bridge.on("frontend_ready", _on_frontend_ready)
+
+    # ── 3.1. Lògica de Temps (Fase 3) ────────────────────────────────
+    engine = AstronomicalEngine()
+    
+    sim_time_utc = datetime.now(timezone.utc)
+    is_realtime = True
+    time_drag_active = False
+
+    async def broadcast_time() -> None:
+        if not bridge.connected:
+            return
+        # Calculate Astro parameters
+        jd = engine.julian_day(sim_time_utc)
+        lst_deg = engine.local_sidereal_angle_deg(sim_time_utc, current_observer.location.longitude_deg)
+        sun_alts = engine.generate_sun_altitude_samples(
+            sim_time_utc,
+            current_observer.location.latitude_deg,
+            current_observer.location.longitude_deg,
+            steps=96
+        )
+        
+        await bridge.send_simulation_time_snapshot(
+            current_time_iso=sim_time_utc.isoformat(),
+            julian_day=jd,
+            lst_deg=lst_deg,
+            sun_altitudes=sun_alts,
+            is_realtime=is_realtime
+        )
+
+    async def _handle_set_simulation_time(data: dict[str, Any]) -> None:
+        nonlocal sim_time_utc, is_realtime
+        try:
+            iso_str = data.get("currentTimeIso")
+            if iso_str:
+                sim_time_utc = datetime.fromisoformat(iso_str)
+                is_realtime = False
+                await broadcast_time()
+        except ValueError as e:
+            log.warning("Invalid time format: %s", e)
+
+    async def _handle_set_realtime_mode(data: dict[str, Any]) -> None:
+        nonlocal is_realtime, sim_time_utc
+        enabled = bool(data.get("enabled", False))
+        is_realtime = enabled
+        if is_realtime:
+            sim_time_utc = datetime.now(timezone.utc)
+        await broadcast_time()
+
+    async def _handle_timeline_drag_started(data: dict[str, Any]) -> None:
+        nonlocal time_drag_active, is_realtime
+        time_drag_active = True
+        is_realtime = False
+
+    async def _handle_timeline_drag_finished(data: dict[str, Any]) -> None:
+        nonlocal time_drag_active
+        time_drag_active = False
+        # Sync final state
+        if "currentTimeIso" in data:
+            await _handle_set_simulation_time(data)
+
+    async def _handle_request_offset_day(data: dict[str, Any]) -> None:
+        nonlocal sim_time_utc, is_realtime
+        offset = int(data.get("offsetDays", 0))
+        if offset != 0:
+            sim_time_utc += timedelta(days=offset)
+            is_realtime = False
+            await broadcast_time()
+
+    bridge.on("set_simulation_time", _handle_set_simulation_time)
+    bridge.on("set_realtime_mode", _handle_set_realtime_mode)
+    bridge.on("timeline_drag_started", _handle_timeline_drag_started)
+    bridge.on("timeline_drag_finished", _handle_timeline_drag_finished)
+    bridge.on("request_offset_day", _handle_request_offset_day)
+
+    async def clock_ticker() -> None:
+        """S'encarrega d'avançar el temps si està en temps real i publicar l'estat."""
+        nonlocal sim_time_utc
+        while not shutdown_requested.is_set():
+            await asyncio.sleep(1.0)
+            if is_realtime and not time_drag_active:
+                sim_time_utc = datetime.now(timezone.utc)
+                await broadcast_time()
+
+    clock_task = asyncio.create_task(clock_ticker())
 
     # ── 4. Iniciar servidor ───────────────────────────────────────────
     url = await server.start()
     log.info("TerraLab3D a punt a %s", url)
 
     # ── 5. Obrir navegador ────────────────────────────────────────────
-    webbrowser.open(url)
+    asyncio.create_task(asyncio.to_thread(webbrowser.open, url))
 
     # ── 6. Esperar tancament ──────────────────────────────────────────
     # Configurar el manegador de Ctrl-C
-    loop = asyncio.get_running_loop()
-    shutdown_requested = asyncio.Event()
-
     def handle_signal() -> None:
         log.info("Senyal rebut — aturant l'aplicació")
         shutdown_requested.set()
@@ -156,10 +245,12 @@ async def run() -> int:
     # ── 6. Tancament net ──────────────────────────────────────────────
     log.info("Iniciant tancament...")
 
-    # Cancel·lar la tasca de demostració si encara s'executa
+    # Cancel·lar les tasques
     demo_task.cancel()
+    clock_task.cancel()
     try:
         await demo_task
+        await clock_task
     except asyncio.CancelledError:
         pass
 

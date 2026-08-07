@@ -1,0 +1,123 @@
+.shell-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--color-void);
+}
+
+.shell-topbar {
+  height: var(--shell-toolbar-height);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 15px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.shell-topbar-title {
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: var(--font-size-title);
+  letter-spacing: 1px;
+}
+
+.shell-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  position: relative;
+}
+
+.shell-canvas-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  transition: margin-right 0.3s ease;
+}
+
+.shell-drawer {
+  width: var(--shell-drawer-width);
+  background-color: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  transition: transform 0.3s ease;
+}
+
+.shell-drawer.collapsed {
+  transform: translateX(100%);
+  position: absolute;
+  right: var(--shell-rail-width);
+  height: 100%;
+}
+
+.shell-rail {
+  width: var(--shell-rail-width);
+  background-color: var(--color-chrome);
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  gap: 10px;
+  z-index: 20;
+}
+
+.rail-button {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--border-radius-md);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.rail-button:hover {
+  background: var(--button-hover);
+  color: var(--color-text);
+}
+
+.rail-button.active {
+  background: var(--button-checked-bg);
+  color: var(--button-checked-text);
+}
+
+.rail-button svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+.shell-timeline {
+  height: var(--shell-timeline-height);
+  background-color: var(--color-chrome);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* Typography elements for the drawer */
+.drawer-header {
+  padding: 15px;
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.drawer-content {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+}

@@ -1,0 +1,77 @@
+/* Tokens visuals compartits del llenguatge cinematogràfic de TerraLab */
+:root {
+  /* Colors - Paleta Base */
+  --color-void: #02040a;
+  --color-chrome: #050811;
+  --color-surface: #080c16;
+  --color-surface-raised: #0d111c;
+  --color-surface-hover: #151b28;
+  --color-border: #252c3b;
+  --color-border-strong: #3b4559;
+  
+  --color-gold: #d8b26a;
+  --color-gold-bright: #f1cd88;
+  --color-cyan: #4fd8c4;
+  --color-violet: #9184e0;
+  
+  /* Text */
+  --color-text: #f3f5fa;
+  --color-text-dim: #aab1c2;
+  --color-text-muted: #70798d;
+  
+  /* Feedback */
+  --color-success: #79d9b4;
+  --color-warning: #e7bc72;
+  --color-error: #ef8f89;
+  
+  /* Botons Controls */
+  --button-bg: var(--color-surface-raised);
+  --button-border: var(--color-border-strong);
+  --button-hover: var(--color-surface-hover);
+  --button-pressed: var(--color-gold);
+  --button-text: var(--color-text);
+  --button-checked-bg: var(--color-gold);
+  --button-checked-text: var(--color-void);
+  --button-checked-border: var(--color-gold-bright);
+  
+  /* Tipografia */
+  --font-family-base: "Segoe UI", system-ui, sans-serif;
+  --font-family-mono: "Consolas", monospace;
+  --font-size-base: 10px;
+  --font-size-title: 11px;
+  --font-size-dialog: 20px;
+  
+  /* Dimensions Shell */
+  --shell-toolbar-height: 36px;
+  --shell-drawer-width: 258px;
+  --shell-rail-width: 44px;
+  --shell-timeline-height: 34px;
+  
+  /* Vores / Radius */
+  --border-radius-sm: 3px;
+  --border-radius-md: 5px;
+  --border-radius-lg: 7px;
+}
+
+/* Reset / Base CSS */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--color-void);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  user-select: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input, button, select {
+  font-family: inherit;
+  font-size: inherit;
+}

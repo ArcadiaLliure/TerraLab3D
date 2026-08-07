@@ -15,8 +15,13 @@ import { RenderLoopImpl } from "./view/three/RenderLoopImpl";
 import { ThreeSceneHostImpl } from "./view/three/ThreeSceneHostImpl";
 import { DiagnosticsOverlay } from "./view/ui/DiagnosticsOverlay";
 
-import { LocationPanel } from "./view/ui/panels/LocationPanel";
+import { LocationPage } from "./view/ui/drawer_pages/LocationPage";
+import { SkyPage } from "./view/ui/drawer_pages/SkyPage";
+import { EarthPage } from "./view/ui/drawer_pages/EarthPage";
+import { ToolsPage } from "./view/ui/drawer_pages/ToolsPage";
 import { LocationHUD } from "./view/ui/panels/LocationHUD";
+import { Shell } from "./view/ui/Shell";
+import { TimeBar } from "./view/ui/components/TimeBar";
 
 // ─── Bootstrap ───────────────────────────────────────────────────────
 
@@ -34,20 +39,46 @@ function main(): void {
   const renderLoop = new RenderLoopImpl();
   const diagnostics = new DiagnosticsOverlay();
   
-  const locationPanel = new LocationPanel((lat, lon, height) => {
-    bridge.sendSetObserverLocation(lat, lon, height);
+  const shell = new Shell({
+    onSetRealtime: (enabled) => bridge.sendSetRealtimeMode(enabled),
   });
+  shell.mount(container);
+
+  const locationPage = new LocationPage({
+    onRelocate: (lat, lon, height) => bridge.sendSetObserverLocation(lat, lon, height),
+    onSetRealtime: (enabled) => bridge.sendSetRealtimeMode(enabled),
+    onOffsetDay: (offsetDays) => bridge.sendRequestOffsetDay(offsetDays),
+    onSetDate: (dateIso) => bridge.sendSetSimulationTime(dateIso),
+  });
+  const locContainer = shell.getPageContainer("location");
+  if (locContainer) locationPage.mount(locContainer);
+
+  const skyPage = new SkyPage();
+  const skyContainer = shell.getPageContainer("sky");
+  if (skyContainer) skyPage.mount(skyContainer);
+
+  const earthPage = new EarthPage();
+  const earthContainer = shell.getPageContainer("earth");
+  if (earthContainer) earthPage.mount(earthContainer);
+
+  const toolsPage = new ToolsPage();
+  const toolsContainer = shell.getPageContainer("tools");
+  if (toolsContainer) toolsPage.mount(toolsContainer);
+  
+  const timeBar = new TimeBar(bridge);
+  timeBar.mount(shell.getTimelineContainer());
+
   const locationHUD = new LocationHUD();
 
   // 2. Mount scene + UI
-  sceneHost.mount(container);
-  diagnostics.mount(container);
-  locationPanel.mount(container);
-  locationHUD.mount(container);
+  const canvasContainer = shell.getCanvasContainer();
+  sceneHost.mount(canvasContainer);
+  diagnostics.mount(canvasContainer);
+  locationHUD.mount(canvasContainer);
   cameraRig.attach(sceneHost.renderer.domElement);
 
   // Initial resize
-  const rect = container.getBoundingClientRect();
+  const rect = canvasContainer.getBoundingClientRect();
   cameraRig.resize(rect.width, rect.height);
 
   // 3. Bridge ↔ Camera wiring
@@ -79,20 +110,29 @@ function main(): void {
       );
     },
     onObserverLocationChanged(lat, lon, elevation, effectiveHeight, elevationSource) {
-      locationPanel.updateInputs(lat, lon);
-      locationPanel.notifySuccess();
+      locationPage.updateInputs(lat, lon);
+      locationPage.notifySuccess();
       locationHUD.updateHUD(lat, lon, elevation, effectiveHeight, elevationSource);
     },
     onLocationError(msg) {
-      locationPanel.notifyError();
+      locationPage.notifyError();
       alert("Error d'ubicació: " + msg);
+    },
+    onSimulationTimeSnapshot(currentTimeIso, julianDay, lstDeg, sunAltitudes, isRealtime) {
+      timeBar.updateState(currentTimeIso, sunAltitudes, isRealtime);
+      locationPage.updateTimeState(currentTimeIso, isRealtime);
+      shell.updateRealtimeUI(isRealtime);
+      sceneHost.setSiderealTime(lstDeg);
     },
     onShutdownRequested() {
       renderLoop.stop();
       cameraRig.detach();
       sceneHost.dispose();
       diagnostics.dispose();
-      locationPanel.dispose();
+      locationPage.dispose();
+      skyPage.dispose();
+      earthPage.dispose();
+      toolsPage.dispose();
       locationHUD.dispose();
       bridge.dispose();
     },
@@ -135,7 +175,7 @@ function main(): void {
       }
     }
   });
-  resizeObserver.observe(container);
+  resizeObserver.observe(canvasContainer);
 
   // 7. Connect bridge (last step — everything is wired)
   bridge.connect();

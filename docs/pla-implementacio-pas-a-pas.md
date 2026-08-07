@@ -226,19 +226,19 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 
 ### Tasques
 
-- [ ] Definir `SimulationInstant`, mode pausat/temps real/simulat i factor de velocitat.
-- [ ] Implementar comandes de data, hora, dia anterior, dia següent, temps real i velocitat.
-- [ ] Implementar dia julià, segles julians i temps sideral local amb convencions documentades.
-- [ ] Construir una timeline de 24 hores amb marcador arrossegable i feedback immediat.
-- [ ] Mostrar data i hora actuals amb selector de calendari.
-- [ ] Implementar un rellotge autoritatiu Python amb ticks desacoblats del FPS.
-- [ ] Enviar al frontend només temps autoritatiu, angle sideral i paràmetres derivats necessaris.
-- [ ] Interpolar la rotació sideral al frontend entre actualitzacions autoritatives.
-- [ ] Crear una esfera o node de referència amb meridians celestes per visualitzar el moviment.
-- [ ] Fer que arrossegar la timeline sigui fluid amb política latest-wins.
-- [ ] Evitar que un canvi d’un segon recreï càmera, escena o recursos persistents.
-- [ ] Gestionar salts temporals grans sense interpolacions absurdes.
-- [ ] Comparar valors de temps sideral i orientació amb TerraLab en dates representatives.
+- [x] Definir `SimulationInstant`, mode pausat/temps real/simulat i factor de velocitat.
+- [x] Implementar comandes de data, hora, dia anterior, dia següent, temps real i velocitat.
+- [x] Implementar dia julià, segles julians i temps sideral local amb convencions documentades.
+- [x] Construir una timeline de 24 hores amb marcador arrossegable i feedback immediat.
+- [x] Mostrar data i hora actuals amb selector de calendari.
+- [x] Implementar un rellotge autoritatiu Python amb ticks desacoblats del FPS.
+- [x] Enviar al frontend només temps autoritatiu, angle sideral i paràmetres derivats necessaris.
+- [x] Interpolar la rotació sideral al frontend entre actualitzacions autoritatives.
+- [x] Crear una esfera o node de referència amb meridians celestes per visualitzar el moviment.
+- [x] Fer que arrossegar la timeline sigui fluid amb política latest-wins.
+- [x] Evitar que un canvi d’un segon recreï càmera, escena o recursos persistents.
+- [x] Gestionar salts temporals grans sense interpolacions absurdes.
+- [x] Comparar valors de temps sideral i orientació amb TerraLab en dates representatives.
 
 ### Criteri de sortida
 

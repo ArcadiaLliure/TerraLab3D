@@ -38,6 +38,9 @@ export class ThreeSceneHostImpl {
   private readonly diagnosticSphere: THREE.LineSegments;
   private readonly cardinalLabels: CardinalLabel[] = [];
   private readonly labelContainer: HTMLDivElement;
+  private readonly celestialSphere: THREE.Group;
+  private targetLstRad = 0;
+  private currentLstRad = 0;
   private disposed = false;
 
   constructor() {
@@ -111,6 +114,26 @@ export class ThreeSceneHostImpl {
     // ─── Altitude circles (30° and 60°) ──────────────────────────────
     this.addAltitudeCircle(30, 0x334455, 0.3);
     this.addAltitudeCircle(60, 0x334455, 0.3);
+
+    // ─── Celestial Sphere (Equatorial Reference) ─────────────────────
+    this.celestialSphere = new THREE.Group();
+    this.scene.add(this.celestialSphere);
+    
+    // Add some reference meridians to the celestial sphere to see it rotate
+    const meridianMat = new THREE.LineBasicMaterial({ color: 0x556677, transparent: true, opacity: 0.2 });
+    for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI;
+        const geo = new THREE.BufferGeometry();
+        const verts = new Float32Array((HORIZON_SEGMENTS + 1) * 3);
+        for (let j = 0; j <= HORIZON_SEGMENTS; j++) {
+            const theta = (j / HORIZON_SEGMENTS) * Math.PI * 2;
+            verts[j * 3] = Math.cos(theta) * HORIZON_RADIUS * Math.cos(angle);
+            verts[j * 3 + 1] = Math.sin(theta) * HORIZON_RADIUS;
+            verts[j * 3 + 2] = Math.cos(theta) * HORIZON_RADIUS * Math.sin(angle);
+        }
+        geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+        this.celestialSphere.add(new THREE.LineLoop(geo, meridianMat));
+    }
   }
 
   mount(container: HTMLElement): void {
@@ -138,10 +161,27 @@ export class ThreeSceneHostImpl {
     this.renderer.setPixelRatio(window.devicePixelRatio);
   }
 
-  render(_timestampMs: number): void {
+  render(timestampMs: number): void {
     if (this.disposed) return;
+    
+    // Simple interpolation for smooth celestial rotation
+    const diff = this.targetLstRad - this.currentLstRad;
+    // Normalize diff to -PI, PI
+    let shortest = diff % (Math.PI * 2);
+    if (shortest > Math.PI) shortest -= Math.PI * 2;
+    if (shortest < -Math.PI) shortest += Math.PI * 2;
+    
+    this.currentLstRad += shortest * 0.1; // lerp
+    // Rotate the celestial sphere (simple Y rotation for visual effect)
+    // A true equatorial mount would tilt by the observer's latitude.
+    this.celestialSphere.rotation.y = -this.currentLstRad;
+
     this.updateCardinalLabels();
     this.renderer.render(this.scene, this.camera);
+  }
+
+  setSiderealTime(lstDeg: number): void {
+    this.targetLstRad = THREE.MathUtils.degToRad(lstDeg);
   }
 
   dispose(): void {
