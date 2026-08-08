@@ -32,7 +32,7 @@ import {
 const LOG_PREFIX = "MGP: [StarPickProvider]";
 
 /** Radi de l'esfera celeste (ha de coincidir amb u_radius del shader). */
-const SKY_RADIUS = 950.0;
+const SKY_RADIUS = 1000000.0;
 
 /** Prioritat de recursos per al ranking. Menys = més prioritari. */
 const ROLE_PRIORITY: Record<string, number> = {
@@ -221,10 +221,10 @@ export class StarPickProvider {
         // Avaluar altitud i visibilitat fotomètrica real (Pas 7)
         // Altitud: asin(world.y / radius)
         const altitudeDeg = Math.asin(Math.max(-1.0, Math.min(1.0, _worldPos.y))) * (180.0 / Math.PI);
-        const evalResult = StarVisibilityEvaluator.evaluate(mag, altitudeDeg, visibilityState);
+        const evalResult = StarVisibilityEvaluator.evaluate(mag, altitudeDeg, visibilityState, camera.position.y);
         
-        if (!evalResult.visible || _worldPos.y < -0.05) {
-          continue; // Invisible fotomètricament o sota l'horitzó
+        if (!evalResult.visible) {
+          continue; // Invisible fotomètricament
         }
         
         // Reescalar la posició a l'esfera

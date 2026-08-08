@@ -24,6 +24,8 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
   uniform float u_devicePixelRatio;
   uniform float u_radius;
 
+  uniform float u_cameraHeight;
+
   // Uniforms de Visibilitat (Pas 7)
   uniform float u_zenithMagnitudeLimit;
   uniform float u_extinctionCoefficient;
@@ -41,14 +43,23 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
     // Rotació equatorial → ENU/Three.js
     vec3 posWorld = u_equatorialToENUMatrix * position;
 
-    // ── Lògica d'Extinció i Visibilitat (Pas 7) ──
+    // ── Lògica d'Extinció i Visibilitat amb Depressió de l'Horitzó ──
     float h = degrees(asin(clamp(posWorld.y / length(posWorld), -1.0, 1.0)));
-    // Utilitzem abs(h) per a una atmosfera 360º simètrica
-    float h_calc = abs(h);
+    
+    // Calcular depressió de l'horitzó per esfèricitat de la Terra
+    float R_E = 6371000.0;
+    float dip_angle = degrees(acos(R_E / (R_E + max(0.0, u_cameraHeight))));
+    
+    // Altitud efectiva centrada a l'horitzó físic percebut
+    float h_calc = abs(h + dip_angle);
     
     // Kasten-Young Airmass
     float denominator = sin(radians(h_calc)) + 0.50572 * pow(h_calc + 6.07995, -1.6364);
-    float airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
+    float base_airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
+    
+    // Atenuar extinció segons l'escala atmosfèrica
+    float atmosphereScale = exp(-max(0.0, u_cameraHeight) / 8500.0);
+    float airmass = 1.0 + (base_airmass - 1.0) * atmosphereScale;
     
     // Magnitud límit efectiva a aquesta altitud
     float effectiveLimit = u_zenithMagnitudeLimit - u_extinctionCoefficient * (airmass - 1.0) - u_twilightSuppression;

@@ -98,8 +98,8 @@ export interface FlightNavigationSettings {
 
 export const DEFAULT_FLIGHT_SETTINGS: Readonly<FlightNavigationSettings> = {
   minimumSpeedMps: 0,
-  cruiseSpeedMps: 20,
-  maximumSpeedMps: 120,
+  cruiseSpeedMps: 100,
+  maximumSpeedMps: 1000,
   accelerationMps2: 15,
   brakingMps2: 20,
   climbRateMps: 15,
@@ -107,7 +107,7 @@ export const DEFAULT_FLIGHT_SETTINGS: Readonly<FlightNavigationSettings> = {
   maximumPitchDeg: 80,
   maximumRollDeg: 45,
   minimumClearanceM: 2,
-  maximumAltitudeM: 500,
+  maximumAltitudeM: 10000,
   autoLevelRoll: true,
   autoLevelPitch: true,
 };

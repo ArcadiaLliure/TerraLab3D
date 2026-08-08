@@ -23,7 +23,7 @@ const LOG_PREFIX = "MGP: [HorizontalGrid]";
 
 // ─── Constants ───────────────────────────────────────────────────────
 
-const GRID_RADIUS = 500;
+const GRID_RADIUS = 1000000;
 const CIRCLE_SEGMENTS = 128;
 const DEG = Math.PI / 180;
 

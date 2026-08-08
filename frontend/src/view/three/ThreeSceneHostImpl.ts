@@ -104,6 +104,17 @@ export class ThreeSceneHostImpl {
     this.worldRoot.name = "worldRoot";
     this.scene.add(this.worldRoot);
 
+    // ─── Terra Esfèrica Base ─────────────────────────────────────────
+    const R_E = 6371000.0;
+    const earthGeometry = new THREE.SphereGeometry(R_E, 64, 64);
+    const earthMaterial = new THREE.MeshBasicMaterial({ 
+      color: 0x010204, // Un blau molt fosc quasi negre per simular oceà a la nit
+    });
+    const earthSphere = new THREE.Mesh(earthGeometry, earthMaterial);
+    earthSphere.position.set(0, -R_E, 0); // Pol Nord exactament a Y=0
+    earthSphere.name = "virtualEarthSphere";
+    this.worldRoot.add(earthSphere);
+
     // Camera (initial values; CameraRigImpl manages pose)
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 2000000);
 
@@ -201,15 +212,19 @@ export class ThreeSceneHostImpl {
 
     // ─── Recentre celestialRoot to camera position ───────────────────
     // This eliminates translational parallax for sky objects.
+    this.starFieldRenderer.updateCameraHeight(this.camera.position.y);
     this.celestialRoot.position.copy(this.camera.position);
     
-    // Ancorar la línia de l'horitzó al terra (Y=0)
-    this.horizontalGrid.root.position.y = -this.camera.position.y;
+    // ─── Ancorar el grid i les etiquetes a l'horitzó físic percebut ──
+    const R_E = 6371000.0;
+    const cameraH = Math.max(0.0, this.camera.position.y);
+    const dipAngleRad = Math.acos(R_E / (R_E + cameraH));
     
-    // Ampliar dinàmicament el grid segons l'alçada perquè mantingui la dimensió visual
-    const baseHeight = 50.0;
-    const scale = Math.max(1.0, this.camera.position.y / baseHeight);
-    this.horizontalGrid.root.scale.set(scale, scale, scale);
+    // Desplaçar el grid cap avall de manera que la seva línia verda de 0º
+    // quedi visualment alineada amb la curvatura del planeta (dip of the horizon)
+    const gridRadius = 1000000.0; // Ha de coincidir amb GRID_RADIUS
+    this.horizontalGrid.root.position.y = -gridRadius * Math.tan(dipAngleRad);
+    this.horizontalGrid.root.scale.set(1, 1, 1);
     
     this._transformUpdateCount++;
 

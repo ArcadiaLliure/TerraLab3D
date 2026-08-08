@@ -202,7 +202,8 @@ export class StarFieldRenderer {
         u_magnitudeLimit: { value: this.magnitudeLimit },
         u_pointScale: { value: this.pointScale },
         u_devicePixelRatio: { value: window.devicePixelRatio || 1.0 },
-        u_radius: { value: 950.0 }, // Esfera cel·lar recentrada a 950m
+        u_radius: { value: 1000000.0 }, // Esfera cel·lar a l'infinit (1000km)
+        u_cameraHeight: { value: 0.0 },
         // Visibilitat (Pas 7) - valors per defecte o l'últim rebut
         u_zenithMagnitudeLimit: { value: this.currentVisibilityState ? this.currentVisibilityState.zenithMagnitudeLimit : 7.6 },
         u_extinctionCoefficient: { value: this.currentVisibilityState ? this.currentVisibilityState.extinctionCoefficient : 0.25 },
@@ -248,6 +249,13 @@ export class StarFieldRenderer {
   public updateViewport(dpr: number): void {
     for (const entry of this.resources.values()) {
       entry.material.uniforms.u_devicePixelRatio.value = dpr;
+      entry.material.uniformsNeedUpdate = true;
+    }
+  }
+
+  public updateCameraHeight(height: number): void {
+    for (const entry of this.resources.values()) {
+      entry.material.uniforms.u_cameraHeight.value = height;
       entry.material.uniformsNeedUpdate = true;
     }
   }

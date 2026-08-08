@@ -29,13 +29,23 @@ export class StarVisibilityEvaluator {
     magnitude: number,
     altitudeDeg: number,
     state: SkyVisibilityState,
+    cameraHeight: number,
   ): StarVisibilityEvaluation {
-    const hClamp = Math.max(0.0, altitudeDeg);
+    // Calcular depressió de l'horitzó per esfèricitat de la Terra
+    const R_E = 6371000.0;
+    const dip_angle = (Math.acos(R_E / (R_E + Math.max(0.0, cameraHeight)))) * (180.0 / Math.PI);
+
+    // Utilitzem abs() per a una atmosfera 360º simètrica centrada a l'horitzó físic
+    const hClamp = Math.abs(altitudeDeg + dip_angle);
 
     // Kasten-Young Airmass (mateixa fórmula que shader)
     const hRad = hClamp * DEG_TO_RAD;
     const denominator = Math.sin(hRad) + 0.50572 * Math.pow(hClamp + 6.07995, -1.6364);
-    const airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
+    const base_airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
+    
+    // Atenuar extinció segons l'escala atmosfèrica
+    const atmosphereScale = Math.exp(-Math.max(0.0, cameraHeight) / 8500.0);
+    const airmass = 1.0 + (base_airmass - 1.0) * atmosphereScale;
 
     // Límits efectius
     const effectiveLimit =

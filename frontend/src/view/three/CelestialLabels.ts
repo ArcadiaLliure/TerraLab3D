@@ -68,7 +68,7 @@ const COLOR_TICK = "#778899";
 const COLOR_ZENITH = "#f1cd88";
 
 // Sphere radius must match HorizontalGrid
-const LABEL_SPHERE_RADIUS = 500;
+const LABEL_SPHERE_RADIUS = 1000000;
 const DEG = Math.PI / 180;
 
 // ─── Label Definitions ───────────────────────────────────────────────
@@ -236,15 +236,17 @@ export class CelestialLabels {
       const azRad = label.def.azDeg * DEG;
       const altRad = label.def.altDeg * DEG;
       const cosAlt = Math.cos(altRad);
-      // Escala dinàmica idèntica a la del grid perquè quadrin exactament
-      const baseHeight = 50.0;
-      const scale = Math.max(1.0, cameraPositionWorld.y / baseHeight);
-      const currentRadius = LABEL_SPHERE_RADIUS * scale;
+      // Calcular l'enfonsament de l'horitzó per esfèricitat
+      const R_E = 6371000.0;
+      const cameraH = Math.max(0.0, cameraPositionWorld.y);
+      const dipAngleRad = Math.acos(R_E / (R_E + cameraH));
+      
+      const currentRadius = LABEL_SPHERE_RADIUS;
+      const yOffset = -currentRadius * Math.tan(dipAngleRad);
 
-      // World pos = camera position (X, Z) + direction * radius
-      // Associem l'horitzó al terra (Y=0)
+      // World pos = camera position (X, Z) + offset Y + direction * radius
       const worldX = cameraPositionWorld.x + Math.sin(azRad) * cosAlt * currentRadius;
-      const worldY = 0 + Math.sin(altRad) * currentRadius;
+      const worldY = cameraPositionWorld.y + yOffset + Math.sin(altRad) * currentRadius;
       const worldZ = cameraPositionWorld.z + (-Math.cos(azRad) * cosAlt * currentRadius);
 
       this._projVec.set(worldX, worldY, worldZ);
