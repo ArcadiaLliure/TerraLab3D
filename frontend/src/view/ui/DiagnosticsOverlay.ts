@@ -6,6 +6,9 @@
  */
 
 import type { BridgeState, BridgeStateListener } from "../../bridge/WebSocketBridge";
+import type { SolarSystemSnapshot } from "../../contracts/solar_system_contracts";
+import type { SolarSystemRenderMetrics } from "../three/SolarSystemRenderer";
+import type { FrameTimingMetrics } from "../three/RenderLoopImpl";
 
 const STATE_COLORS: Record<BridgeState, string> = {
   connecting: "#f5a623",
@@ -20,6 +23,7 @@ export class DiagnosticsOverlay implements BridgeStateListener {
   private readonly statusText: HTMLSpanElement;
   private readonly fpsText: HTMLSpanElement;
   private readonly sessionText: HTMLSpanElement;
+  private readonly solarSystemText: HTMLSpanElement;
   private readonly errorBanner: HTMLDivElement;
 
   constructor() {
@@ -83,6 +87,15 @@ export class DiagnosticsOverlay implements BridgeStateListener {
     this.sessionText.textContent = "session: --";
     this.root.appendChild(this.sessionText);
 
+    const sep3 = document.createElement("span");
+    sep3.textContent = "│";
+    sep3.style.opacity = "0.3";
+    this.root.appendChild(sep3);
+
+    this.solarSystemText = document.createElement("span");
+    this.solarSystemText.textContent = "ephemeris: --";
+    this.root.appendChild(this.solarSystemText);
+
     // ─── Error banner (center, hidden by default) ────────────────────
     this.errorBanner = document.createElement("div");
     this.errorBanner.id = "bridge-error-banner";
@@ -118,14 +131,29 @@ export class DiagnosticsOverlay implements BridgeStateListener {
     container.appendChild(this.errorBanner);
   }
 
-  updateFps(fps: number): void {
-    this.fpsText.textContent = `${fps} FPS`;
+  updateFps(fps: number, timing?: FrameTimingMetrics): void {
+    this.fpsText.textContent = timing && timing.sampleCount > 0
+      ? `${fps} FPS (${timing.p50Ms.toFixed(1)}/${timing.p95Ms.toFixed(1)} ms)`
+      : `${fps} FPS`;
   }
 
   updateSession(sessionId: string | null): void {
     this.sessionText.textContent = sessionId
       ? `session: ${sessionId.slice(0, 8)}`
       : "session: --";
+  }
+
+  updateSolarSystem(snapshot: SolarSystemSnapshot, metrics: SolarSystemRenderMetrics): void {
+    const moon = snapshot.moon === null
+      ? "moon unavailable"
+      : `moon ${(snapshot.moon.illuminationFraction * 100).toFixed(0)}%`;
+    this.solarSystemText.textContent = [
+      snapshot.source,
+      `g${snapshot.generation}`,
+      `sun ${snapshot.sun.altitudeDeg.toFixed(1)}°`,
+      moon,
+      `${metrics.lastBridgeBytes} B`,
+    ].join(" · ");
   }
 
   // ─── BridgeStateListener ───────────────────────────────────────────

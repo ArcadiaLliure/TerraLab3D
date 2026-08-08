@@ -1,0 +1,130 @@
+"""Latest-wins orchestration for ephemeris snapshots outside the render loop."""
+
+from __future__ import annotations
+
+import asyncio
+import logging
+from collections import deque
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Awaitable, Callable
+
+from terralab3d.application.ports.ephemeris import EphemerisPort
+from terralab3d.domain.solar_system.models import ScientificObserver, SolarSystemSnapshot
+
+SnapshotPublisher = Callable[[SolarSystemSnapshot], Awaitable[int | None]]
+log = logging.getLogger("terralab3d.ephemeris.coordinator")
+
+
+@dataclass(frozen=True, slots=True)
+class _Request:
+    generation: int
+    observer_generation: int
+    utc: datetime
+    observer: ScientificObserver
+
+
+class EphemerisCoordinator:
+    """Maintains exactly one calculation in flight and one latest pending request."""
+
+    def __init__(self, port: EphemerisPort, publisher: SnapshotPublisher) -> None:
+        self._port = port
+        self._publisher = publisher
+        self._generation = 0
+        self._latest_requested_generation = 0
+        self._pending: _Request | None = None
+        self._task: asyncio.Task[None] | None = None
+        self._closed = False
+        self.request_count = 0
+        self.coalesced_count = 0
+        self.stale_count = 0
+        self.bridge_bytes = 0
+        self.last_bridge_bytes = 0
+        self._compute_ms: deque[float] = deque(maxlen=256)
+
+    def request(
+        self,
+        utc: datetime,
+        observer: ScientificObserver,
+        observer_generation: int,
+    ) -> int:
+        if self._closed:
+            raise RuntimeError("EphemerisCoordinator is closed")
+        self._generation += 1
+        self._latest_requested_generation = self._generation
+        request = _Request(self._generation, observer_generation, utc, observer)
+        self.request_count += 1
+        if self._task is not None:
+            if self._pending is not None:
+                self.coalesced_count += 1
+            self._pending = request
+        else:
+            self._pending = request
+            self._task = asyncio.create_task(self._drain(), name="ephemeris-latest-wins")
+        return request.generation
+
+    async def wait_idle(self) -> None:
+        task = self._task
+        if task is not None:
+            await asyncio.shield(task)
+
+    async def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
+        self._pending = None
+        task = self._task
+        if task is not None:
+            await task
+        self._port.close()
+
+    def metrics(self) -> dict[str, float | int]:
+        samples = sorted(self._compute_ms)
+        return {
+            "ephemeris_request_count": self.request_count,
+            "ephemeris_coalesced_count": self.coalesced_count,
+            "ephemeris_stale_count": self.stale_count,
+            "ephemeris_compute_ms_p50": _percentile(samples, 0.50),
+            "ephemeris_compute_ms_p95": _percentile(samples, 0.95),
+            "solar_system_bridge_bytes": self.last_bridge_bytes,
+            "solar_system_bridge_bytes_total": self.bridge_bytes,
+        }
+
+    async def _drain(self) -> None:
+        try:
+            while self._pending is not None and not self._closed:
+                request = self._pending
+                self._pending = None
+                try:
+                    snapshot = await asyncio.to_thread(
+                        self._port.snapshot,
+                        request.utc,
+                        request.observer,
+                    )
+                except Exception:
+                    log.exception("Ephemeris calculation failed for generation %d", request.generation)
+                    continue
+                self._compute_ms.append(snapshot.compute_ms)
+                if self._closed:
+                    break
+                published = snapshot.with_generation(
+                    request.generation,
+                    request.observer_generation,
+                )
+                try:
+                    byte_count = await self._publisher(published)
+                except Exception:
+                    log.exception("Ephemeris publication failed for generation %d", request.generation)
+                    continue
+                if byte_count is not None:
+                    self.last_bridge_bytes = byte_count
+                    self.bridge_bytes += byte_count
+        finally:
+            self._task = None
+
+
+def _percentile(samples: list[float], fraction: float) -> float:
+    if not samples:
+        return 0.0
+    index = round((len(samples) - 1) * fraction)
+    return float(samples[index])

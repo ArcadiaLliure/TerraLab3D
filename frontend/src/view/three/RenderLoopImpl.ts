@@ -4,6 +4,12 @@
 
 import type { RenderLoop } from "./RenderLoop";
 
+export interface FrameTimingMetrics {
+  readonly p50Ms: number;
+  readonly p95Ms: number;
+  readonly sampleCount: number;
+}
+
 export class RenderLoopImpl implements RenderLoop {
   private rafId: number | null = null;
   private continuous = true;
@@ -14,9 +20,19 @@ export class RenderLoopImpl implements RenderLoop {
   private frameCount = 0;
   private lastFpsTimestamp = 0;
   private _fps = 0;
+  private previousFrameTimestamp = 0;
+  private readonly frameTimesMs: number[] = [];
 
   get fps(): number {
     return this._fps;
+  }
+
+  get frameMetrics(): FrameTimingMetrics {
+    return {
+      p50Ms: percentile(this.frameTimesMs, 50),
+      p95Ms: percentile(this.frameTimesMs, 95),
+      sampleCount: this.frameTimesMs.length,
+    };
   }
 
   start(render: (timestampMs: number) => void): void {
@@ -64,6 +80,11 @@ export class RenderLoopImpl implements RenderLoop {
   }
 
   private measureFps(timestamp: number): void {
+    if (this.previousFrameTimestamp > 0) {
+      this.frameTimesMs.push(timestamp - this.previousFrameTimestamp);
+      if (this.frameTimesMs.length > 600) this.frameTimesMs.shift();
+    }
+    this.previousFrameTimestamp = timestamp;
     this.frameCount++;
     const elapsed = timestamp - this.lastFpsTimestamp;
     if (elapsed >= 1000) {
@@ -72,4 +93,11 @@ export class RenderLoopImpl implements RenderLoop {
       this.lastFpsTimestamp = timestamp;
     }
   }
+}
+
+function percentile(samples: readonly number[], percent: number): number {
+  if (samples.length === 0) return 0;
+  const sorted = [...samples].sort((a, b) => a - b);
+  const index = Math.min(Math.floor((percent / 100) * sorted.length), sorted.length - 1);
+  return sorted[index]!;
 }

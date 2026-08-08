@@ -1,74 +1,71 @@
 import * as THREE from "three";
+
 import type { SkyEnvironmentSnapshot } from "../../contracts/sky_environment_contracts";
-import { skyVertexShader, skyFragmentShader } from "./shaders/skyShader";
+import { setThreeFromEnu } from "./celestialCoordinates";
+import { skyFragmentShader, skyVertexShader } from "./shaders/skyShader";
 
 export class AtmosphereRenderer {
   private readonly material: THREE.ShaderMaterial;
   private readonly mesh: THREE.Mesh;
+  private readonly sunDirection = { value: new THREE.Vector3(0, -1, 0) };
+  private readonly sunAltitude = { value: -90.0 };
+  private readonly twilight = { value: 1.0 };
+  private readonly turbidity = { value: 2.5 };
+  private readonly bortle = { value: 4.0 };
+  private readonly artificialBrightness = { value: 0.15 };
+  private readonly atmosphereEnabled = { value: true };
+  private readonly pureColors = { value: false };
+  private disposed = false;
 
   constructor(private readonly parent: THREE.Object3D) {
     this.material = new THREE.ShaderMaterial({
       vertexShader: skyVertexShader,
       fragmentShader: skyFragmentShader,
       uniforms: {
-        u_sunDirectionENU: { value: new THREE.Vector3(0, -1, 0) },
-        u_sunAltitudeDeg: { value: -90.0 },
-        u_twilightFactor: { value: 1.0 },
-        u_turbidity: { value: 2.5 },
-        u_bortleClass: { value: 4.0 },
-        u_artificialBrightness: { value: 0.15 },
-        u_atmosphereEnabled: { value: true },
-        u_pureColors: { value: false },
+        u_sunDirectionENU: this.sunDirection,
+        u_sunAltitudeDeg: this.sunAltitude,
+        u_twilightFactor: this.twilight,
+        u_turbidity: this.turbidity,
+        u_bortleClass: this.bortle,
+        u_artificialBrightness: this.artificialBrightness,
+        u_atmosphereEnabled: this.atmosphereEnabled,
+        u_pureColors: this.pureColors,
       },
       depthWrite: false,
       depthTest: false,
-      transparent: false,
-      side: THREE.BackSide, // Dins del box
+      side: THREE.BackSide,
     });
-
-    // Box gegant, com que estarà al celestialRoot no hi ha parallax
-    const geometry = new THREE.BoxGeometry(2000, 2000, 2000);
-    this.mesh = new THREE.Mesh(geometry, this.material);
-    
-    // Assegurar que es renderitza abans de tot (-1000) i que no fa frustum culling
+    this.mesh = new THREE.Mesh(new THREE.BoxGeometry(2000, 2000, 2000), this.material);
+    this.mesh.name = "atmosphere";
     this.mesh.renderOrder = -1000;
     this.mesh.frustumCulled = false;
-    
-    // Afegim a l'arrel especificada (celestialRoot)
     this.parent.add(this.mesh);
   }
 
-  public updateEnvironment(snapshot: SkyEnvironmentSnapshot): void {
-    const u = this.material.uniforms;
-    
-    const sunDir = snapshot.sunDirectionENU;
-    // Three.js utilitza -Z per al Nord i +Z per al Sud, així que hem d'invertir l'eix Z
-    u.u_sunDirectionENU.value.set(sunDir[0], sunDir[1], -sunDir[2]);
-    u.u_sunAltitudeDeg.value = snapshot.sunAltitudeDeg;
-    u.u_twilightFactor.value = snapshot.twilightFactor;
-    u.u_turbidity.value = snapshot.turbidity;
-    
-    // Light Pollution
+  updateEnvironment(snapshot: SkyEnvironmentSnapshot): void {
+    setThreeFromEnu(this.sunDirection.value, snapshot.sunDirectionENU);
+    this.sunAltitude.value = snapshot.sunAltitudeDeg;
+    this.twilight.value = snapshot.twilightFactor;
+    this.turbidity.value = snapshot.turbidity;
     if (snapshot.lightPollutionEnabled && snapshot.bortleClass !== null) {
-      u.u_bortleClass.value = snapshot.bortleClass;
-      // Per ara calculem l'artificial brightness aquí si no arriba explícit al snapshot.
-      // Opcional: afegir artificial_sky_brightness al snapshot en un futur refactor.
+      this.bortle.value = snapshot.bortleClass;
       const linear = (snapshot.bortleClass - 1.0) / 8.0;
-      u.u_artificialBrightness.value = linear * linear * (3.0 - 2.0 * linear);
+      this.artificialBrightness.value = linear * linear * (3.0 - 2.0 * linear);
     } else {
-      u.u_bortleClass.value = 1.0;
-      u.u_artificialBrightness.value = 0.0;
+      this.bortle.value = 1.0;
+      this.artificialBrightness.value = 0.0;
     }
-    
-    u.u_atmosphereEnabled.value = snapshot.atmosphereEnabled;
+    this.atmosphereEnabled.value = snapshot.atmosphereEnabled;
   }
 
-  public setPureColors(enabled: boolean): void {
-    this.material.uniforms.u_pureColors.value = enabled;
+  setPureColors(enabled: boolean): void {
+    this.pureColors.value = enabled;
   }
 
-  public dispose(): void {
-    this.scene.remove(this.mesh);
+  dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
+    this.parent.remove(this.mesh);
     this.mesh.geometry.dispose();
     this.material.dispose();
   }

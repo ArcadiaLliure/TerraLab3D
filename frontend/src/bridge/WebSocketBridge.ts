@@ -21,8 +21,10 @@ import type {
   CameraMotionStartedMessage,
   CameraMotionStoppedMessage,
   CameraResetCompletedMessage,
+  FrontendPerformanceMetricsMessage,
 } from "../contracts/bridge_messages";
 import type { NavigationCameraPose, MotionState } from "../contracts/navigation";
+import type { SolarSystemSnapshot } from "../contracts/solar_system_contracts";
 
 export type BridgeState = "connecting" | "connected" | "disconnected" | "error";
 
@@ -69,6 +71,7 @@ export interface BackendMessageListener {
   onStarResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
   onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
   onSkyEnvironmentSnapshot?(snapshot: import("../contracts/sky_environment_contracts").SkyEnvironmentSnapshot): void;
+  onSolarSystemSnapshot?(snapshot: SolarSystemSnapshot): void;
 }
 
 export class WebSocketBridge {
@@ -114,7 +117,7 @@ export class WebSocketBridge {
     }
 
     this.ws.onopen = () => {
-      this.sendMessage({ type: "frontend_ready", protocolVersion: 1 });
+      this.sendMessage({ type: "frontend_ready", protocolVersion: 2 });
     };
 
     this.ws.onmessage = (event: MessageEvent) => {
@@ -130,8 +133,12 @@ export class WebSocketBridge {
       }
     };
 
-    this.ws.onclose = () => {
+    this.ws.onclose = (event: CloseEvent) => {
       if (this._disposed) return;
+      if (event.code === 4001) {
+        this.setState("disconnected", "S'ha obert en una altra pestanya");
+        return; // DO NOT reconnect
+      }
       this.setState("disconnected", "Connection closed");
       this.scheduleReconnect();
     };
@@ -350,8 +357,13 @@ export class WebSocketBridge {
           l.onSkyEnvironmentSnapshot?.(msg as any);
         }
         break;
+      case "solar_system_snapshot":
+        for (const l of this.messageListeners) {
+          l.onSolarSystemSnapshot?.(msg);
+        }
+        break;
       default:
-        console.warn("[Bridge] Unknown message type:", msg.type);
+        console.warn("[Bridge] Unknown message payload");
     }
   }
 
@@ -359,23 +371,38 @@ export class WebSocketBridge {
     this.sendMessage({
       type: "set_simulation_time",
       currentTimeIso,
-    } as any);
+    });
   }
 
   public sendSetRealtimeMode(enabled: boolean): void {
     this.sendMessage({
       type: "set_realtime_mode",
       enabled
-    } as any);
+    });
+  }
+
+  public sendSetTimePlaying(enabled: boolean): void {
+    this.sendMessage({
+      type: "set_time_playing",
+      enabled
+    });
+  }
+
+  public sendSetTimeRate(rate: number): void {
+    this.sendMessage({
+      type: "set_time_rate",
+      rate
+    });
   }
 
   public sendTimelineDragStarted(): void {
-    this.sendMessage({ type: "timeline_drag_started" } as any);
+    this.sendMessage({ type: "timeline_drag_started" });
   }
 
   public sendTimelineDragFinished(currentTimeIso?: string): void {
-    const payload: any = { type: "timeline_drag_finished" };
-    if (currentTimeIso) payload.currentTimeIso = currentTimeIso;
+    const payload: import("../contracts/bridge_messages").TimelineDragFinishedMessage = currentTimeIso
+      ? { type: "timeline_drag_finished", currentTimeIso }
+      : { type: "timeline_drag_finished" };
     this.sendMessage(payload);
   }
 
@@ -383,7 +410,7 @@ export class WebSocketBridge {
     this.sendMessage({
       type: "request_offset_day",
       offsetDays
-    } as any);
+    });
   }
 
   // ─── Navigation messages (Phase 3.5) ────────────────────────────
@@ -427,6 +454,12 @@ export class WebSocketBridge {
   public sendCameraResetCompleted(): void {
     const msg: CameraResetCompletedMessage = { type: "camera_reset_completed" };
     this.sendMessage(msg);
+  }
+
+  public sendPerformanceMetrics(
+    metrics: Omit<FrontendPerformanceMetricsMessage, "type">,
+  ): void {
+    this.sendMessage({ type: "frontend_performance_metrics", ...metrics });
   }
 
   private sendMessage(msg: FrontendMessage): void {

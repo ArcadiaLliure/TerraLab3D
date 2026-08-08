@@ -15,6 +15,7 @@ export interface SkyVisibilityState {
 
 export interface SkyEnvironmentSnapshot {
   readonly generation: number;
+  readonly solarSystemGeneration: number;
   
   // Solar / Twilight
   readonly sunAltitudeDeg: number;

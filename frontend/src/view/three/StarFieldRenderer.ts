@@ -44,7 +44,7 @@ export class StarFieldRenderer {
   private pointScale = 1.0;
   private isVisible = true;
 
-  /** Referència compartida a l'estat de transformació  // Visibilitat i temps
+  /** Shared celestial transform and visibility state. */
   private transformState: CelestialTransformState | null = null;
   private currentVisibilityState: SkyVisibilityState | null = null;
 
@@ -87,7 +87,7 @@ export class StarFieldRenderer {
     // Ara aquest límit actua com a "límit dur" (hard cutoff)
     // El límit efectiu (LP + extinció) es controla via u_zenithMagnitudeLimit
     for (const entry of this.resources.values()) {
-      entry.material.uniforms.u_magnitudeLimit.value = limit;
+      uniform<number>(entry.material, "u_magnitudeLimit").value = limit;
       entry.material.uniformsNeedUpdate = true;
     }
   }
@@ -96,11 +96,10 @@ export class StarFieldRenderer {
   public updateVisibilityUniforms(state: SkyVisibilityState): void {
     this.currentVisibilityState = state;
     for (const entry of this.resources.values()) {
-      const u = entry.material.uniforms;
-      u.u_zenithMagnitudeLimit.value = state.zenithMagnitudeLimit;
-      u.u_extinctionCoefficient.value = state.extinctionCoefficient;
-      u.u_twilightSuppression.value = state.twilightSuppression;
-      u.u_fadeWidthMag.value = state.fadeWidthMag;
+      uniform<number>(entry.material, "u_zenithMagnitudeLimit").value = state.zenithMagnitudeLimit;
+      uniform<number>(entry.material, "u_extinctionCoefficient").value = state.extinctionCoefficient;
+      uniform<number>(entry.material, "u_twilightSuppression").value = state.twilightSuppression;
+      uniform<number>(entry.material, "u_fadeWidthMag").value = state.fadeWidthMag;
       entry.material.uniformsNeedUpdate = true;
     }
   }
@@ -111,16 +110,33 @@ export class StarFieldRenderer {
     // Si tenim transformState compartit, delegar-hi l'update
     if (this.transformState) {
       this.transformState.update(generation, matrix3x3);
+    } else {
+      // Si no tenim transformState compartit, fer-ho manualment (només usat en tests)
+      for (const entry of this.resources.values()) {
+        const mat3 = uniform<THREE.Matrix3>(entry.material, "u_equatorialToENUMatrix").value;
+        const matrix = matrix3x3 as [number, number, number, number, number, number, number, number, number];
+        mat3.set(
+          matrix[0], matrix[1], matrix[2],
+          matrix[3], matrix[4], matrix[5],
+          matrix[6], matrix[7], matrix[8],
+        );
+        entry.material.uniformsNeedUpdate = true;
+      }
     }
+  }
 
-    // Actualitzar la matriu uniform en tots els materials residents
+  public interpolate(timestampMs: number): void {
+    if (!this.transformState || !this.transformState.isValid) return;
+
+    this.transformState.interpolate(timestampMs);
+
+    const mArray = this.transformState.getMatrix3x3Array();
     for (const entry of this.resources.values()) {
-      const mat3 = entry.material.uniforms.u_equatorialToENUMatrix.value as THREE.Matrix3;
-      // Matrix3.set pren els 9 elements row-major
+      const mat3 = uniform<THREE.Matrix3>(entry.material, "u_equatorialToENUMatrix").value;
       mat3.set(
-        matrix3x3[0], matrix3x3[1], matrix3x3[2],
-        matrix3x3[3], matrix3x3[4], matrix3x3[5],
-        matrix3x3[6], matrix3x3[7], matrix3x3[8],
+        mArray[0], mArray[1], mArray[2],
+        mArray[3], mArray[4], mArray[5],
+        mArray[6], mArray[7], mArray[8],
       );
       entry.material.uniformsNeedUpdate = true;
     }
@@ -168,7 +184,7 @@ export class StarFieldRenderer {
     const u8Colors = new Uint8Array(payloadBuffer, colOffset, colLen);
     const floatColors = new Float32Array(starCount * 3);
     for (let i = 0; i < u8Colors.length; i++) {
-      floatColors[i] = u8Colors[i] / 255.0;
+      floatColors[i] = u8Colors[i]! / 255.0;
     }
 
     // Catalog indices: conservar Uint32Array canònic per al picking
@@ -177,7 +193,7 @@ export class StarFieldRenderer {
     // Float32 per a GPU (WebGL attribute) — NOMÉS per render, no per identitat
     const floatIndices = new Float32Array(starCount);
     for (let i = 0; i < u32Indices.length; i++) {
-      floatIndices[i] = u32Indices[i];
+      floatIndices[i] = u32Indices[i]!;
     }
 
     // Crear BufferGeometry
@@ -248,14 +264,14 @@ export class StarFieldRenderer {
 
   public updateViewport(dpr: number): void {
     for (const entry of this.resources.values()) {
-      entry.material.uniforms.u_devicePixelRatio.value = dpr;
+      uniform<number>(entry.material, "u_devicePixelRatio").value = dpr;
       entry.material.uniformsNeedUpdate = true;
     }
   }
 
   public updateCameraHeight(height: number): void {
     for (const entry of this.resources.values()) {
-      entry.material.uniforms.u_cameraHeight.value = height;
+      uniform<number>(entry.material, "u_cameraHeight").value = height;
       entry.material.uniformsNeedUpdate = true;
     }
   }
@@ -286,4 +302,10 @@ export class StarFieldRenderer {
     }
     this.rootGroup.removeFromParent();
   }
+}
+
+function uniform<T>(material: THREE.ShaderMaterial, name: string): THREE.IUniform<T> {
+  const value = material.uniforms[name];
+  if (value === undefined) throw new Error(`Missing star shader uniform: ${name}`);
+  return value as THREE.IUniform<T>;
 }

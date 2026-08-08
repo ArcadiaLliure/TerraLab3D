@@ -1,8 +1,23 @@
-"""Port d’accés a efemèrides."""
+"""Boundary for authoritative, renderer-neutral ephemerides."""
+
 from datetime import datetime
-from typing import Protocol, Sequence
-from terralab3d.domain.observer.models import ObserverProfile
-from terralab3d.domain.solar_system.models import ApparentBodyState
+from typing import Protocol
+
+from terralab3d.domain.solar_system.models import (
+    EphemerisMetadata,
+    ScientificObserver,
+    SolarSystemSnapshot,
+)
+
 
 class EphemerisPort(Protocol):
-    def apparent_bodies(self, instant_utc: datetime, observer: ObserverProfile) -> Sequence[ApparentBodyState]: ...
+    @property
+    def metadata(self) -> EphemerisMetadata: ...
+
+    def snapshot(
+        self,
+        utc: datetime,
+        observer: ScientificObserver,
+    ) -> SolarSystemSnapshot: ...
+
+    def close(self) -> None: ...

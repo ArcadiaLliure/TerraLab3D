@@ -9,6 +9,8 @@ description = "Scientific, application and scene contracts for TerraLab3D"
 requires-python = ">=3.12"
 dependencies = [
     "aiohttp>=3.9",
+    "skyfield==1.55",
+    "skyfield-data==7.0.0",
 ]
 
 [tool.setuptools]

@@ -2,7 +2,8 @@
   "name": "terralab3d-workspace",
   "private": true,
   "scripts": {
-    "typecheck": "tsc -p frontend/tsconfig.json --noEmit",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "test": "python -m pytest backend/tests -q && npm --prefix frontend test",
     "validate": "python tools/validate_skeleton.py && npm run typecheck"
   }
 }

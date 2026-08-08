@@ -6,13 +6,14 @@
  *
  * Garanties:
  * - Generació monotònica creixent (rebutja regressions)
- * - Inversa calculada una vegada quan canvia la transformació
- * - Thread-safe pel single-thread de JS
+ * - Interpola suaument la rotació via SLERP per evitar "trompicones" a salts de 100ms
+ * - Inversa calculada dinàmicament a cada frame per al picking
  */
 
 import * as THREE from "three";
 
 const LOG_PREFIX = "MGP: [CelestialTransformState]";
+const INTERPOLATION_MS = 1000;
 
 export class CelestialTransformState {
   private _generation = 0;
@@ -20,31 +21,27 @@ export class CelestialTransformState {
   private readonly _threeToEquatorial = new THREE.Matrix3();
   private _valid = false;
 
-  /** Generació actual de la transformació. */
+  private _fromQuat = new THREE.Quaternion();
+  private _toQuat = new THREE.Quaternion();
+  private _visualQuat = new THREE.Quaternion();
+  private _interpolationStartedMs = 0;
+
   get generation(): number {
     return this._generation;
   }
 
-  /** Matriu 3×3 equatorial→Three.js (lectura directa, no copiar). */
   get equatorialToThree(): THREE.Matrix3 {
     return this._equatorialToThree;
   }
 
-  /** Matriu 3×3 Three.js→equatorial (inversa). */
   get threeToEquatorial(): THREE.Matrix3 {
     return this._threeToEquatorial;
   }
 
-  /** Si la transformació ha estat inicialitzada almenys una vegada. */
   get isValid(): boolean {
     return this._valid;
   }
 
-  /**
-   * Actualitza la transformació. Rebutja generacions <= a la current.
-   *
-   * @returns true si s'ha acceptat, false si stale/regressió.
-   */
   update(generation: number, matrix3x3: number[]): boolean {
     if (!matrix3x3 || matrix3x3.length !== 9) {
       return false;
@@ -56,27 +53,60 @@ export class CelestialTransformState {
 
     this._generation = generation;
 
-    // Aplicar la matriu (row-major)
-    this._equatorialToThree.set(
-      matrix3x3[0], matrix3x3[1], matrix3x3[2],
-      matrix3x3[3], matrix3x3[4], matrix3x3[5],
-      matrix3x3[6], matrix3x3[7], matrix3x3[8],
+    // Converteix la matriu 3x3 rebuda (row-major) a Quaternion
+    const m = matrix3x3 as [number, number, number, number, number, number, number, number, number];
+    const mat4 = new THREE.Matrix4().set(
+      m[0], m[1], m[2], 0,
+      m[3], m[4], m[5], 0,
+      m[6], m[7], m[8], 0,
+       0,    0,    0,   1
     );
+    const newQuat = new THREE.Quaternion().setFromRotationMatrix(mat4);
 
-    // Calcular la inversa
-    this._threeToEquatorial.copy(this._equatorialToThree).invert();
+    if (!this._valid) {
+      this._fromQuat.copy(newQuat);
+      this._toQuat.copy(newQuat);
+      this._visualQuat.copy(newQuat);
+      this._updateMatrices(this._visualQuat);
+      this._valid = true;
+    } else {
+      // Inicia una nova interpolació des de l'estat *actual visualitzat* cap al nou objectiu
+      this._fromQuat.copy(this._visualQuat);
+      this._toQuat.copy(newQuat);
+      this._interpolationStartedMs = performance.now();
+    }
 
-    this._valid = true;
     return true;
   }
 
-  /**
-   * Retorna els 9 elements row-major de la matriu equatorial→Three.js
-   * com a array pur per passar al shader uniforms.
-   */
+  interpolate(timestampMs: number): void {
+    if (!this._valid) return;
+
+    if (this._visualQuat.equals(this._toQuat)) return;
+
+    const elapsed = timestampMs - this._interpolationStartedMs;
+    const t = Math.min(1.0, Math.max(0.0, elapsed / INTERPOLATION_MS));
+
+    // SLERP des de l'estat d'inici cap a l'objectiu
+    this._visualQuat.copy(this._fromQuat).slerp(this._toQuat, t);
+    
+    this._updateMatrices(this._visualQuat);
+  }
+
+  private _updateMatrices(q: THREE.Quaternion): void {
+    const mat4 = new THREE.Matrix4().makeRotationFromQuaternion(q);
+    const e = mat4.elements;
+    // THREE.Matrix4.elements és column-major, igual que Matrix3
+    this._equatorialToThree.set(
+      e[0], e[4], e[8],
+      e[1], e[5], e[9],
+      e[2], e[6], e[10]
+    );
+    this._threeToEquatorial.copy(this._equatorialToThree).invert();
+  }
+
   getMatrix3x3Array(): number[] {
     const e = this._equatorialToThree.elements;
-    // THREE.Matrix3.elements és column-major, convertir a row-major
     return [
       e[0], e[3], e[6],
       e[1], e[4], e[7],

@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "esbuild src/main.ts --bundle --format=esm --outfile=dist/bundle.js --sourcemap",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:build": "esbuild src/tests/grid.test.ts src/tests/navigation.test.ts src/tests/solar_system.test.ts --bundle --platform=node --format=esm --outdir=.test-dist",
+    "test": "npm run test:build && node .test-dist/grid.test.js && node .test-dist/navigation.test.js && node .test-dist/solar_system.test.js"
   },
   "dependencies": {
     "three": "^0.179.0"

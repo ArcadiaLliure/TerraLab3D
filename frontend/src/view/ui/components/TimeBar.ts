@@ -1,6 +1,8 @@
 import { WebSocketBridge } from "../../../bridge/WebSocketBridge";
 
 export class TimeBar {
+  private container: HTMLDivElement;
+  private playPauseBtn: HTMLButtonElement;
   private element: HTMLDivElement;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -9,6 +11,7 @@ export class TimeBar {
   private currentTime = new Date();
   private sunAltitudes: number[] = [];
   private isRealtime = true;
+  private isTimePlaying = true;
   
   private isDragging = false;
   private bridge: WebSocketBridge;
@@ -16,10 +19,39 @@ export class TimeBar {
   constructor(bridge: WebSocketBridge) {
     this.bridge = bridge;
     
+    this.container = document.createElement("div");
+    this.container.style.cssText = `
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+    `;
+    
+    this.playPauseBtn = document.createElement("button");
+    this.playPauseBtn.style.cssText = `
+      flex: 0 0 40px;
+      background: var(--color-surface);
+      border: none;
+      border-right: 1px solid var(--color-border);
+      color: var(--color-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    `;
+    this.playPauseBtn.innerHTML = "⏸";
+    this.playPauseBtn.addEventListener("click", () => {
+      this.isTimePlaying = !this.isTimePlaying;
+      this.bridge.sendSetTimePlaying(this.isTimePlaying);
+      this.updatePlayPauseIcon();
+    });
+    
     this.element = document.createElement("div");
     this.element.style.cssText = `
+      flex: 1 1 auto;
       position: relative;
-      width: 100%;
       height: 100%;
       background: var(--color-chrome);
       user-select: none;
@@ -51,6 +83,9 @@ export class TimeBar {
     this.element.appendChild(this.canvas);
     this.element.appendChild(this.timeLabel);
     
+    this.container.appendChild(this.playPauseBtn);
+    this.container.appendChild(this.element);
+    
     // Bind events
     this.element.addEventListener("mousedown", this.onMouseDown.bind(this));
     window.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -61,11 +96,22 @@ export class TimeBar {
     ro.observe(this.element);
   }
   
+  private updatePlayPauseIcon() {
+    this.playPauseBtn.innerHTML = this.isTimePlaying ? "⏸" : "▶";
+    this.playPauseBtn.title = this.isTimePlaying ? "Pausar temps (quan simulat)" : "Avançar temps (quan simulat)";
+  }
+  
   public updateState(isoStr: string, sunAltitudes: number[], isRealtime: boolean) {
     if (this.isDragging) return; // Prevent jitter from backend updates while dragging
     this.currentTime = new Date(isoStr);
     this.sunAltitudes = sunAltitudes;
-    this.isRealtime = isRealtime;
+    if (this.isRealtime !== isRealtime) {
+      this.isRealtime = isRealtime;
+      if (isRealtime) {
+         this.isTimePlaying = true;
+         this.updatePlayPauseIcon();
+      }
+    }
     this.draw();
   }
   
@@ -171,7 +217,8 @@ export class TimeBar {
     // Formatter
     const hh = this.currentTime.getUTCHours().toString().padStart(2, '0');
     const mm = this.currentTime.getUTCMinutes().toString().padStart(2, '0');
-    this.timeLabel.textContent = `${hh}:${mm} UTC ${this.isRealtime ? '(Real)' : '(Simulat)'}`;
+    const ss = this.currentTime.getUTCSeconds().toString().padStart(2, '0');
+    this.timeLabel.textContent = `${hh}:${mm}:${ss} UTC ${this.isRealtime ? '(Real)' : '(Simulat)'}`;
   }
   
   private getColor(val: number): string {
@@ -183,7 +230,7 @@ export class TimeBar {
   }
   
   public mount(container: HTMLElement) {
-    container.appendChild(this.element);
+    container.appendChild(this.container);
     this.draw();
   }
 }

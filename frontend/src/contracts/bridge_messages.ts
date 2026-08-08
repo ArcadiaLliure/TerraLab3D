@@ -5,6 +5,7 @@
  */
 
 import type { SkyEnvironmentSnapshot } from "./sky_environment_contracts";
+import type { SolarSystemSnapshot } from "./solar_system_contracts";
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
@@ -43,6 +44,35 @@ export interface SetObserverLocationMessage {
   readonly lat: number;
   readonly lon: number;
   readonly extraHeight: number;
+}
+
+export interface SetSimulationTimeMessage {
+  readonly type: "set_simulation_time";
+  readonly currentTimeIso: string;
+}
+
+export interface SetRealtimeModeMessage {
+  readonly type: "set_realtime_mode";
+  readonly enabled: boolean;
+}
+
+export interface SetTimePlayingMessage {
+  readonly type: "set_time_playing";
+  readonly enabled: boolean;
+}
+
+export interface TimelineDragStartedMessage {
+  readonly type: "timeline_drag_started";
+}
+
+export interface TimelineDragFinishedMessage {
+  readonly type: "timeline_drag_finished";
+  readonly currentTimeIso?: string;
+}
+
+export interface RequestOffsetDayMessage {
+  readonly type: "request_offset_day";
+  readonly offsetDays: number;
 }
 
 // ─── Navigation messages (Phase 3.5) ─────────────────────────────────
@@ -120,6 +150,18 @@ export interface SetManualMagnitudeLimitMessage {
   readonly magnitudeLimit: number;
 }
 
+export interface FrontendPerformanceMetricsMessage {
+  readonly type: "frontend_performance_metrics";
+  readonly frameMsP50: number;
+  readonly frameMsP95: number;
+  readonly frameSampleCount: number;
+  readonly solarSystemEntityBuildCount: number;
+  readonly solarSystemMaterialBuildCount: number;
+  readonly solarSystemSnapshotApplyCount: number;
+  readonly solarSystemStaleSnapshotCount: number;
+  readonly solarSystemBridgeBytes: number;
+}
+
 export type FrontendMessage =
   | FrontendReadyMessage
   | CameraChangedMessage
@@ -127,6 +169,12 @@ export type FrontendMessage =
   | ShutdownCompleteMessage
   | BridgeErrorMessage
   | SetObserverLocationMessage
+  | SetSimulationTimeMessage
+  | SetRealtimeModeMessage
+  | SetTimePlayingMessage
+  | TimelineDragStartedMessage
+  | TimelineDragFinishedMessage
+  | RequestOffsetDayMessage
   | NavigationModeChangedMessage
   | CameraPoseChangedMessage
   | CameraMotionStartedMessage
@@ -137,7 +185,8 @@ export type FrontendMessage =
   | SetLightPollutionEnabledMessage
   | SetLightPollutionModeMessage
   | SetBortleClassMessage
-  | SetManualMagnitudeLimitMessage;
+  | SetManualMagnitudeLimitMessage
+  | FrontendPerformanceMetricsMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -175,6 +224,15 @@ export interface ObserverLocationChangedMessage {
   readonly elevation: number;
   readonly effectiveHeight: number;
   readonly elevationSource: string;
+}
+
+export interface SimulationTimeSnapshotMessage {
+  readonly type: "simulation_time_snapshot";
+  readonly currentTimeIso: string;
+  readonly julianDay: number;
+  readonly lstDeg: number;
+  readonly sunAltitudes: readonly number[];
+  readonly isRealtime: boolean;
 }
 
 export interface LocationErrorMessage {
@@ -227,6 +285,10 @@ export interface SkyEnvironmentSnapshotMessage extends SkyEnvironmentSnapshot {
   readonly type: "sky_environment_snapshot";
 }
 
+export interface SolarSystemSnapshotMessage extends SolarSystemSnapshot {
+  readonly type: "solar_system_snapshot";
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
@@ -238,7 +300,8 @@ export type BackendMessage =
   | StarCatalogStatusMessage
   | CelestialFrameTransformMessage
   | StarPickResolvedMessage
-  | SkyEnvironmentSnapshotMessage;
+  | SkyEnvironmentSnapshotMessage
+  | SolarSystemSnapshotMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

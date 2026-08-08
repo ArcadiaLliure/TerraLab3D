@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import signal
 import sys
 import webbrowser
@@ -27,6 +28,9 @@ from terralab3d.domain.time.engine import AstronomicalEngine
 from terralab3d.domain.time.models import ClockMode, SimulationInstant, ClockState
 from terralab3d.domain.sky_background.sky_environment import SkyEnvironmentComposer
 from terralab3d.domain.light_pollution.models import LightPollutionMode
+from terralab3d.domain.solar_system.models import ScientificObserver, SolarSystemSnapshot
+from terralab3d.application.ephemeris_coordinator import EphemerisCoordinator
+from terralab3d.infrastructure.adapters.ephemeris.adapter import SkyfieldEphemerisAdapter
 
 logging.basicConfig(
     level=logging.INFO,
@@ -60,6 +64,7 @@ async def run() -> int:
     bridge.on("camera_changed", _on_camera_changed)
     bridge.on("viewport_resized", _on_viewport_resized)
     bridge.on("bridge_error", _on_bridge_error)
+    bridge.on("frontend_performance_metrics", _on_frontend_performance_metrics)
 
     # ── 3. Lògica d'Ubicació (Fase 2) ─────────────────────────────────
     from terralab3d.domain.observer.models import GeoLocation, ObserverProfile
@@ -70,6 +75,7 @@ async def run() -> int:
         location=GeoLocation(latitude_deg=41.189795, longitude_deg=1.210058),
         height_offset_m=0.0
     )
+    observer_generation = 1
 
     async def broadcast_location() -> None:
         await bridge.send_observer_location_changed(
@@ -81,7 +87,7 @@ async def run() -> int:
         )
 
     async def _handle_set_location(data: dict[str, Any]) -> None:
-        nonlocal current_observer
+        nonlocal current_observer, observer_generation
         try:
             lat = float(data.get("lat", 0.0))
             lon = float(data.get("lon", 0.0))
@@ -93,8 +99,9 @@ async def run() -> int:
                 location=loc,
                 height_offset_m=height
             )
-            
+            observer_generation += 1
             await broadcast_location()
+            await broadcast_time()
             log.info(
                 "Ubicació de l'observador actualitzada a: %.4f, %.4f (alt: %.1f)",
                 current_observer.location.latitude_deg,
@@ -170,10 +177,48 @@ async def run() -> int:
     # ── 3.2. Lògica de Temps (Fase 3) i Cel (Fase 7) ─────────────────
     engine = AstronomicalEngine()
     sky_composer = SkyEnvironmentComposer()
-    
     sim_time_utc = datetime.now(timezone.utc)
     is_realtime = True
+    is_time_playing = True
+    time_rate = 1.0
     time_drag_active = False
+    latest_solar_system: SolarSystemSnapshot | None = None
+
+    async def publish_solar_system(snapshot: SolarSystemSnapshot) -> int:
+        """Publish one coherent Sun to both the body renderer and atmosphere."""
+        nonlocal latest_solar_system
+        latest_solar_system = snapshot
+        byte_count = await bridge.send_solar_system_snapshot(snapshot)
+        await bridge.send_sky_environment_snapshot(
+            sky_composer.compose(snapshot.sun, snapshot.generation)
+        )
+        return byte_count
+
+    ephemeris_adapter = SkyfieldEphemerisAdapter()
+    ephemeris_coordinator = EphemerisCoordinator(ephemeris_adapter, publish_solar_system)
+    metadata = ephemeris_adapter.metadata
+    log.info(
+        "Efemèride: kernel=%s skyfield=%s sha256=%s",
+        metadata.kernel_name or "fallback",
+        metadata.skyfield_version or "unavailable",
+        metadata.kernel_sha256 or "unavailable",
+    )
+
+    def scientific_observer() -> ScientificObserver:
+        return ScientificObserver(
+            latitude_deg=current_observer.location.latitude_deg,
+            longitude_deg=current_observer.location.longitude_deg,
+            elevation_m=current_observer.effective_height_m,
+        )
+
+    async def broadcast_sky_environment() -> None:
+        if bridge.connected and latest_solar_system is not None:
+            await bridge.send_sky_environment_snapshot(
+                sky_composer.compose(
+                    latest_solar_system.sun,
+                    latest_solar_system.generation,
+                )
+            )
 
     async def broadcast_time() -> None:
         if not bridge.connected:
@@ -197,21 +242,15 @@ async def run() -> int:
         )
         
         # Generar i enviar l'estat del cel (Pas 7)
-        hour = sim_time_utc.hour + sim_time_utc.minute / 60.0 + sim_time_utc.second / 3600.0
-        snapshot = sky_composer.compose(
-            sim_time_utc.year,
-            sim_time_utc.month,
-            sim_time_utc.day,
-            hour,
-            current_observer.location.latitude_deg,
-            current_observer.location.longitude_deg,
-        )
-        await bridge.send_sky_environment_snapshot(snapshot)
-        
         # Enviar actualització de transformació d'estrelles (LST o latitud han pogut canviar)
         await star_coordinator.update_celestial_transform(
             latitude_deg=current_observer.location.latitude_deg,
             lst_deg=lst_deg,
+        )
+        ephemeris_coordinator.request(
+            sim_time_utc,
+            scientific_observer(),
+            observer_generation,
         )
 
     async def _handle_set_simulation_time(data: dict[str, Any]) -> None:
@@ -220,6 +259,10 @@ async def run() -> int:
             iso_str = data.get("currentTimeIso")
             if iso_str:
                 sim_time_utc = datetime.fromisoformat(iso_str)
+                if sim_time_utc.tzinfo is None:
+                    sim_time_utc = sim_time_utc.replace(tzinfo=timezone.utc)
+                else:
+                    sim_time_utc = sim_time_utc.astimezone(timezone.utc)
                 is_realtime = False
                 await broadcast_time()
         except ValueError as e:
@@ -253,20 +296,30 @@ async def run() -> int:
             is_realtime = False
             await broadcast_time()
 
+    async def _handle_set_time_playing(data: dict[str, Any]) -> None:
+        nonlocal is_time_playing
+        is_time_playing = bool(data.get("enabled", True))
+
+    async def _handle_set_time_rate(data: dict[str, Any]) -> None:
+        nonlocal time_rate
+        time_rate = float(data.get("rate", 1.0))
+        
     bridge.on("set_simulation_time", _handle_set_simulation_time)
     bridge.on("set_realtime_mode", _handle_set_realtime_mode)
     bridge.on("timeline_drag_started", _handle_timeline_drag_started)
     bridge.on("timeline_drag_finished", _handle_timeline_drag_finished)
     bridge.on("request_offset_day", _handle_request_offset_day)
+    bridge.on("set_time_playing", _handle_set_time_playing)
+    bridge.on("set_time_rate", _handle_set_time_rate)
 
     # ── 3.3. Handlers de UI per a Cel i Atmosfera (Fase 7) ───────────
     async def _handle_set_atmosphere_enabled(data: dict[str, Any]) -> None:
         sky_composer.atmosphere_enabled = bool(data.get("enabled", True))
-        await broadcast_time()
+        await broadcast_sky_environment()
 
     async def _handle_set_light_pollution_enabled(data: dict[str, Any]) -> None:
         sky_composer.light_pollution_enabled = bool(data.get("enabled", True))
-        await broadcast_time()
+        await broadcast_sky_environment()
 
     async def _handle_set_light_pollution_mode(data: dict[str, Any]) -> None:
         mode_str = data.get("mode", "bortle")
@@ -274,15 +327,15 @@ async def run() -> int:
             sky_composer.light_pollution_mode = LightPollutionMode(mode_str)
         except ValueError:
             pass
-        await broadcast_time()
+        await broadcast_sky_environment()
 
     async def _handle_set_bortle_class(data: dict[str, Any]) -> None:
         sky_composer.bortle_value = float(data.get("bortleClass", 4.0))
-        await broadcast_time()
+        await broadcast_sky_environment()
 
     async def _handle_set_manual_magnitude_limit(data: dict[str, Any]) -> None:
         sky_composer.magnitude_limit = float(data.get("magnitudeLimit", 6.0))
-        await broadcast_time()
+        await broadcast_sky_environment()
 
     bridge.on("set_atmosphere_enabled", _handle_set_atmosphere_enabled)
     bridge.on("set_light_pollution_enabled", _handle_set_light_pollution_enabled)
@@ -293,11 +346,16 @@ async def run() -> int:
     async def clock_ticker() -> None:
         """S'encarrega d'avançar el temps si està en temps real i publicar l'estat."""
         nonlocal sim_time_utc
+        tick_interval = 1.0  # 1-second refresh rate
         while not shutdown_requested.is_set():
-            await asyncio.sleep(1.0)
-            if is_realtime and not time_drag_active:
-                sim_time_utc = datetime.now(timezone.utc)
-                await broadcast_time()
+            await asyncio.sleep(tick_interval)
+            if not time_drag_active:
+                if is_realtime:
+                    sim_time_utc = datetime.now(timezone.utc)
+                    await broadcast_time()
+                elif is_time_playing:
+                    sim_time_utc += timedelta(seconds=tick_interval * time_rate)
+                    await broadcast_time()
 
     clock_task = asyncio.create_task(clock_ticker())
 
@@ -306,7 +364,8 @@ async def run() -> int:
     log.info("TerraLab3D a punt a %s", url)
 
     # ── 5. Obrir navegador ────────────────────────────────────────────
-    asyncio.create_task(asyncio.to_thread(webbrowser.open, url))
+    if os.getenv("TERRALAB3D_NO_BROWSER") != "1":
+        asyncio.create_task(asyncio.to_thread(webbrowser.open, url))
 
     # ── 6. Esperar tancament ──────────────────────────────────────────
     # Configurar el manegador de Ctrl-C
@@ -361,6 +420,9 @@ async def run() -> int:
         pass
 
     # Demanar al frontend que netegi (si encara està connectat)
+    await ephemeris_coordinator.close()
+    log.info("Mètriques d'efemèrides: %s", ephemeris_coordinator.metrics())
+
     if bridge.connected:
         await bridge.request_shutdown()
         try:
@@ -394,6 +456,21 @@ async def _on_viewport_resized(data: dict[str, Any]) -> None:
     )
 
 
+async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
+    log.info(
+        "Frontend metrics: frame_ms_p50=%.2f frame_ms_p95=%.2f samples=%d "
+        "entities=%d materials=%d snapshots=%d stale=%d bridge_bytes=%d",
+        data.get("frameMsP50", 0.0),
+        data.get("frameMsP95", 0.0),
+        data.get("frameSampleCount", 0),
+        data.get("solarSystemEntityBuildCount", 0),
+        data.get("solarSystemMaterialBuildCount", 0),
+        data.get("solarSystemSnapshotApplyCount", 0),
+        data.get("solarSystemStaleSnapshotCount", 0),
+        data.get("solarSystemBridgeBytes", 0),
+    )
+
+
 async def _on_bridge_error(data: dict[str, Any]) -> None:
     log.error(
         "Error de pont des del frontend: [%s] %s",
@@ -412,6 +489,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-
-
-

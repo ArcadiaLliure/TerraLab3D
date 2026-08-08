@@ -35,7 +35,7 @@ import {
 import { CameraVisualSmoother } from "./CameraVisualSmoother";
 
 const DEG = Math.PI / 180;
-const MIN_FOV = 1;
+const MIN_FOV = 0.001;
 const MAX_FOV = 120;
 const MIN_ALT = -90;
 const MAX_ALT = 90;
@@ -590,7 +590,8 @@ export class CameraRigImpl implements CameraRig {
     const dy = e.clientY - this.lastY;
     this.lastX = e.clientX;
     this.lastY = e.clientY;
-    this.orbit(-dx * ORBIT_SPEED, dy * ORBIT_SPEED);
+    const fovScale = this.hFovDeg / 60;
+    this.orbit(-dx * ORBIT_SPEED * fovScale, dy * ORBIT_SPEED * fovScale);
   }
 
   private onPointerUp(e: PointerEvent): void {
@@ -642,11 +643,12 @@ export class CameraRigImpl implements CameraRig {
     }
 
     // Original arrow/zoom keys
+    const fovScale = this.hFovDeg / 60;
     switch (e.key) {
-      case "ArrowLeft": this.orbit(KEY_STEP, 0); break;
-      case "ArrowRight": this.orbit(-KEY_STEP, 0); break;
-      case "ArrowUp": this.orbit(0, KEY_STEP); break;
-      case "ArrowDown": this.orbit(0, -KEY_STEP); break;
+      case "ArrowLeft": this.orbit(KEY_STEP * fovScale, 0); break;
+      case "ArrowRight": this.orbit(-KEY_STEP * fovScale, 0); break;
+      case "ArrowUp": this.orbit(0, KEY_STEP * fovScale); break;
+      case "ArrowDown": this.orbit(0, -KEY_STEP * fovScale); break;
       case "+": case "=": this.zoomTo(this.hFovDeg / ZOOM_STEP); break;
       case "-": this.zoomTo(this.hFovDeg * ZOOM_STEP); break;
       default: return;

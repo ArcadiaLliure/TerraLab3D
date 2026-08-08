@@ -36,6 +36,8 @@ class WebSocketBridge:
         self._connected = False
         self._handlers: dict[str, list[MessageHandler]] = {}
         self._shutdown_event = asyncio.Event()
+        self._binary_bytes_sent = 0
+        self._solar_system_bridge_bytes = 0
 
     @property
     def connected(self) -> bool:
@@ -50,6 +52,14 @@ class WebSocketBridge:
         """S'activa quan el frontend envia ``shutdown_complete``."""
         return self._shutdown_event
 
+    @property
+    def binary_bytes_sent(self) -> int:
+        return self._binary_bytes_sent
+
+    @property
+    def solar_system_bridge_bytes(self) -> int:
+        return self._solar_system_bridge_bytes
+
     def on(self, msg_type: str, handler: MessageHandler) -> None:
         """Registra un manegador per a un tipus de missatge específic."""
         self._handlers.setdefault(msg_type, []).append(handler)
@@ -62,13 +72,34 @@ class WebSocketBridge:
         await ws.prepare(request)
         log.info("WebSocket connectat")
 
+        # Llegim el primer missatge (ha de ser frontend_ready) per validar la versió
+        msg = await ws.receive()
+        if msg.type == aiohttp.WSMsgType.TEXT:
+            try:
+                data = json.loads(msg.data)
+                if data.get("type") == "frontend_ready":
+                    if data.get("protocolVersion", 1) < 2:
+                        log.warning("Connexió rebutjada: protocol_version antiga (pestanya zombie)")
+                        await ws.close(code=4001, message=b"Old protocol version")
+                        return ws
+            except json.JSONDecodeError:
+                pass
+
         # Només un client a la vegada
         if self._ws is not None and not self._ws.closed:
-            await self._ws.close()
+            await self._ws.close(code=4001, message=b"Replaced by new connection")
 
         self._ws = ws
         self._connected = False
         self._session_id = uuid.uuid4().hex[:16]
+
+        # Despatxa el primer missatge llegit
+        if msg.type == aiohttp.WSMsgType.TEXT:
+            try:
+                data = json.loads(msg.data)
+                await self._dispatch(data)
+            except Exception:
+                pass
 
         try:
             async for msg in ws:
@@ -89,7 +120,8 @@ class WebSocketBridge:
             log.exception("Error a WebSocket")
         finally:
             self._connected = False
-            self._ws = None
+            if self._ws is ws:
+                self._ws = None
             log.info("WebSocket desconnectat")
 
         return ws
@@ -125,6 +157,7 @@ class WebSocketBridge:
         import struct
         message = struct.pack("<I", header_len) + header_bytes + buffer
         await self._ws.send_bytes(message)
+        self._binary_bytes_sent += len(message)
         log.info(
             "Recurs binari enviat: %s v%s (%d bytes header + %d bytes payload)",
             resource_id, version, header_len, len(buffer),
@@ -228,6 +261,15 @@ class WebSocketBridge:
         payload["type"] = "sky_environment_snapshot"
         await self.send(payload)
 
+    async def send_solar_system_snapshot(self, snapshot: Any) -> int:
+        """Send the compact Step 8 DTO and return its UTF-8 JSON size."""
+        payload = snapshot.to_dict()
+        payload["type"] = "solar_system_snapshot"
+        byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+        self._solar_system_bridge_bytes = byte_count
+        await self.send(payload)
+        return byte_count
+
     async def send_location_error(self, message: str) -> None:
         await self.send({
             "type": "location_error",
@@ -272,6 +314,5 @@ class WebSocketBridge:
             "protocolVersion": PROTOCOL_VERSION,
             "capabilities": ["camera", "viewport", "shutdown"],
         })
-
 
 

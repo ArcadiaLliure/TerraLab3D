@@ -1,4 +1,5 @@
 import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
+import type { SolarSystemSnapshot } from "../../../contracts/solar_system_contracts";
 
 export interface SkyPageOptions {
   onStarLayerToggled?: (visible: boolean) => void;
@@ -8,6 +9,10 @@ export interface SkyPageOptions {
   onBortleClassChanged?: (bortle: number) => void;
   onMagnitudeLimitChanged?: (mag: number) => void;
   onPureColorsToggled?: (pure: boolean) => void;
+  onSolarSystemVisibilityChanged?: (
+    part: "system" | "sun" | "moon" | "planets",
+    visible: boolean,
+  ) => void;
 }
 
 export class SkyPage {
@@ -15,23 +20,24 @@ export class SkyPage {
   private options: SkyPageOptions;
   
   // Elements UI que s'actualitzen dinàmicament
-  private starSourceLabel: HTMLSpanElement;
-  private starCountLabel: HTMLSpanElement;
-  private starsToggleBtn: HTMLButtonElement;
+  private starSourceLabel!: HTMLSpanElement;
+  private starCountLabel!: HTMLSpanElement;
+  private starsToggleBtn!: HTMLButtonElement;
   private starsVisible = true;
   
-  private atmoToggleBtn: HTMLButtonElement;
-  private pureColorsToggleBtn: HTMLButtonElement;
+  private atmoToggleBtn!: HTMLButtonElement;
+  private pureColorsToggleBtn!: HTMLButtonElement;
   
-  private lpToggleBtn: HTMLButtonElement;
-  private lpModeSelect: HTMLSelectElement;
-  private lpBortleInput: HTMLInputElement;
-  private lpMagInput: HTMLInputElement;
-  private lpBortleValue: HTMLSpanElement;
-  private lpMagValue: HTMLSpanElement;
-  private lpSourceLabel: HTMLDivElement;
-  private bortleContainer: HTMLDivElement;
-  private magContainer: HTMLDivElement;
+  private lpToggleBtn!: HTMLButtonElement;
+  private lpModeSelect!: HTMLSelectElement;
+  private lpBortleInput!: HTMLInputElement;
+  private lpMagInput!: HTMLInputElement;
+  private lpBortleValue!: HTMLSpanElement;
+  private lpMagValue!: HTMLSpanElement;
+  private lpSourceLabel!: HTMLDivElement;
+  private bortleContainer!: HTMLDivElement;
+  private magContainer!: HTMLDivElement;
+  private solarStatusLabel!: HTMLDivElement;
 
   constructor(options: SkyPageOptions = {}) {
     this.options = options;
@@ -49,9 +55,37 @@ export class SkyPage {
     desc.textContent = "Paràmetres de visualització de la volta celeste, atmosfera i contaminació lumínica.";
     this.element.appendChild(desc);
 
+    this.buildSolarSystemGroup();
     this.buildAtmoGroup();
     this.buildLightPollutionGroup();
     this.buildStarGroup();
+  }
+
+  private buildSolarSystemGroup(): void {
+    const [group, titleRow] = this.createGroup("Sistema solar");
+    titleRow.appendChild(this.createToggleButton("Visible", "Ocult", true, (visible) => {
+      this.options.onSolarSystemVisibilityChanged?.("system", visible);
+    }));
+    const labels: ReadonlyArray<["sun" | "moon" | "planets", string]> = [
+      ["sun", "Sol"],
+      ["moon", "Lluna"],
+      ["planets", "Planetes"],
+    ];
+    for (const [part, label] of labels) {
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:10px;";
+      const text = document.createElement("span");
+      text.textContent = label;
+      row.append(text, this.createToggleButton("Visible", "Ocult", true, (visible) => {
+        this.options.onSolarSystemVisibilityChanged?.(part, visible);
+      }));
+      group.appendChild(row);
+    }
+    this.solarStatusLabel = document.createElement("div");
+    this.solarStatusLabel.style.cssText = "font-size:9px;color:var(--color-text-muted);line-height:1.4;";
+    this.solarStatusLabel.textContent = "Efemèride: carregant…";
+    group.appendChild(this.solarStatusLabel);
+    this.element.appendChild(group);
   }
 
   private createGroup(titleText: string): [HTMLDivElement, HTMLDivElement] {
@@ -275,6 +309,20 @@ export class SkyPage {
       info = `Magnitud zenital efectiva: ${snapshot.visibility.zenithMagnitudeLimit.toFixed(1)}`;
     }
     this.lpSourceLabel.textContent = info;
+  }
+
+  public updateSolarSystem(snapshot: SolarSystemSnapshot): void {
+    const moon = snapshot.moon;
+    const source = snapshot.source === "DE421" ? "DE421" : "fallback";
+    const moonState = moon === null
+      ? "Lluna unavailable"
+      : `Lluna ${(moon.illuminationFraction * 100).toFixed(0)}%`;
+    this.solarStatusLabel.textContent = [
+      `Efemèride: ${source}`,
+      `Sol ${snapshot.sun.altitudeDeg.toFixed(1)}°`,
+      moonState,
+      `${snapshot.planets.length} planetes`,
+    ].join(" · ");
   }
 
   public updateStarCatalogStatus(status: {

@@ -4,3 +4,5 @@
 # aiohttp: Servidor HTTP asíncron i servidor WebSocket per a la comunicació
 # entre el backend en Python i el frontend Three.js / Web.
 aiohttp>=3.9
+skyfield==1.55
+skyfield-data==7.0.0

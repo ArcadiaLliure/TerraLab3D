@@ -150,7 +150,14 @@ export class LocationHUD {
       ? `${viewAz.toFixed(1)}° (${azimuthToCardinal(viewAz)})`
       : "—";
     const altText = `${pose.altitudeDeg.toFixed(1)}°`;
-    const fovText = `${pose.fovDeg.toFixed(1)}°`;
+    const fovVal = pose.fovDeg;
+    const fovText = fovVal >= 10
+      ? `${fovVal.toFixed(1)}°`
+      : fovVal >= 1
+      ? `${fovVal.toFixed(2)}°`
+      : fovVal >= 0.01
+      ? `${fovVal.toFixed(3)}°`
+      : `${fovVal.toFixed(4)}°`;
 
     let viewHtml = `
     <div style="font-weight: 600; color: #88ccff; margin-bottom: 2px;">

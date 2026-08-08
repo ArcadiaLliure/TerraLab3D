@@ -1,0 +1,20 @@
+{
+  "source": "NASA/JPL Horizons API 1.2",
+  "utc": "2024-01-01T00:00:00Z",
+  "observer": {
+    "latitude_deg": 41.189795,
+    "longitude_deg": 1.210058,
+    "elevation_m": 0.0
+  },
+  "bodies": {
+    "sun": {"ra_deg": 280.9208934, "dec_deg": -23.059231392, "azimuth_deg": 1.302254346, "altitude_deg": -71.865669287, "apparent_magnitude": -26.779, "distance_au": 0.98335878458106, "phase_angle_deg": 0.0},
+    "moon": {"ra_deg": 159.712183747, "dec_deg": 12.124719089, "azimuth_deg": 102.189335652, "altitude_deg": 31.626601709, "apparent_magnitude": -11.148, "distance_au": 0.00268222059179, "phase_angle_deg": 56.6129},
+    "mercury": {"ra_deg": 261.787541265, "dec_deg": -20.154802908, "azimuth_deg": 44.217986643, "altitude_deg": -63.193664841, "apparent_magnitude": 0.508, "distance_au": 0.77758346001304, "phase_angle_deg": 117.4022},
+    "venus": {"ra_deg": 240.951565545, "dec_deg": -18.770161554, "azimuth_deg": 69.242550312, "altitude_deg": -48.975580343, "apparent_magnitude": -4.039, "distance_au": 1.18193947709837, "phase_angle_deg": 56.136},
+    "mars": {"ra_deg": 267.054552872, "dec_deg": -23.961686359, "azimuth_deg": 39.135920961, "altitude_deg": -69.036057563, "apparent_magnitude": 1.418, "distance_au": 2.42384654860371, "phase_angle_deg": 8.4222},
+    "jupiter": {"ra_deg": 33.685125393, "dec_deg": 12.263675402, "azimuth_deg": 264.653819782, "altitude_deg": 24.78428687, "apparent_magnitude": -2.589, "distance_au": 4.48148581406938, "phase_angle_deg": 10.2486},
+    "saturn": {"ra_deg": 335.778084436, "dec_deg": -11.839225375, "azimuth_deg": 285.494394374, "altitude_deg": -34.311096098, "apparent_magnitude": 0.955, "distance_au": 10.2947247167564, "phase_angle_deg": 4.6409},
+    "uranus": {"ra_deg": 47.019660829, "dec_deg": 17.279323413, "azimuth_deg": 259.552814506, "altitude_deg": 37.915637656, "apparent_magnitude": 5.691, "distance_au": 18.9753886558709, "phase_angle_deg": 2.2174},
+    "neptune": {"ra_deg": 355.971875231, "dec_deg": -3.092282608, "azimuth_deg": 277.919066405, "altitude_deg": -13.588153906, "apparent_magnitude": 7.775, "distance_au": 30.1425727029342, "phase_angle_deg": 1.821}
+  }
+}

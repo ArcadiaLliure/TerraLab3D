@@ -32,6 +32,8 @@ import { HorizontalGrid } from "./HorizontalGrid";
 import { CelestialLabels } from "./CelestialLabels";
 import { CelestialEquator } from "./CelestialEquator";
 import { StarFieldRenderer } from "./StarFieldRenderer";
+import { SolarSystemRenderer } from "./SolarSystemRenderer";
+import { SolarSystemLabels } from "./SolarSystemLabels";
 
 const LOG_PREFIX = "MGP: [ThreeSceneHost]";
 
@@ -63,6 +65,8 @@ export class ThreeSceneHostImpl {
   private readonly celestialLabels: CelestialLabels;
   private readonly celestialEquator: CelestialEquator;
   private readonly starFieldRenderer: StarFieldRenderer;
+  private readonly solarSystemRenderer: SolarSystemRenderer;
+  private readonly solarSystemLabels: SolarSystemLabels;
 
   // ─── Legacy celestial sphere (meridians that rotate with LST) ──────
   private readonly celestialSphere: THREE.Group;
@@ -125,6 +129,8 @@ export class ThreeSceneHostImpl {
     // ─── Phase 5: Star Field Renderer ────────────────────────────────
     this.starFieldRenderer = new StarFieldRenderer();
     this.starFieldRenderer.attachToParent(this.celestialRoot);
+    this.solarSystemRenderer = new SolarSystemRenderer(this.celestialRoot);
+    this.solarSystemLabels = new SolarSystemLabels(this.solarSystemRenderer);
 
     // ─── Phase 4: Horizontal Grid ────────────────────────────────────
     this.horizontalGrid = new HorizontalGrid();
@@ -183,6 +189,10 @@ export class ThreeSceneHostImpl {
     return this.starFieldRenderer;
   }
 
+  getSolarSystemRenderer(): SolarSystemRenderer {
+    return this.solarSystemRenderer;
+  }
+
   mount(container: HTMLElement): void {
     this.container = container;
     const rect = container.getBoundingClientRect();
@@ -191,6 +201,7 @@ export class ThreeSceneHostImpl {
 
     // Phase 4: Mount celestial labels
     this.celestialLabels.mount(container);
+    this.solarSystemLabels.mount(container);
   }
 
   resize(widthPx: number, heightPx: number): void {
@@ -201,6 +212,9 @@ export class ThreeSceneHostImpl {
 
   render(timestampMs: number): void {
     if (this.disposed) return;
+
+    this.solarSystemRenderer.update(timestampMs);
+    this.starFieldRenderer.interpolate(timestampMs);
 
     // ─── Celestial rotation (legacy LST sphere) ──────────────────────
     const diff = this.targetLstRad - this.currentLstRad;
@@ -244,6 +258,7 @@ export class ThreeSceneHostImpl {
   updateLabels(): void {
     if (this.disposed) return;
     this.celestialLabels.update(this.camera, this.camera.position);
+    this.solarSystemLabels.update(this.camera);
   }
 
   setSiderealTime(lstDeg: number): void {
@@ -331,8 +346,10 @@ export class ThreeSceneHostImpl {
     // Phase 4 & Phase 5: Dispose components
     this.horizontalGrid.dispose();
     this.celestialLabels.dispose();
+    this.solarSystemLabels.dispose();
     this.celestialEquator.dispose();
     this.starFieldRenderer.dispose();
+    this.solarSystemRenderer.dispose();
 
     this.scene.traverse((obj) => {
       if (

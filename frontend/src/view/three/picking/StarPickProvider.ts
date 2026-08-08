@@ -205,6 +205,7 @@ export class StarPickProvider {
       // 6. Refinament screen-space per cada candidat
       for (const starIdx of rawCandidates) {
         const mag = entry.magnitudesArray[starIdx];
+        if (mag === undefined) continue;
 
         // Rebutjar per magnitud (límit dur del catàleg)
         if (mag > magnitudeLimit) continue;
@@ -213,6 +214,8 @@ export class StarPickProvider {
         const eqX = entry.equatorialPositions[starIdx * 3];
         const eqY = entry.equatorialPositions[starIdx * 3 + 1];
         const eqZ = entry.equatorialPositions[starIdx * 3 + 2];
+        const catalogIndex = entry.catalogIndices[starIdx];
+        if (catalogIndex === undefined || eqX === undefined || eqY === undefined || eqZ === undefined) continue;
 
         // Transformar a Three.js via matriu actual
         _worldPos.set(eqX, eqY, eqZ);
@@ -265,7 +268,7 @@ export class StarPickProvider {
           ref: {
             resourceId: resId,
             resourceVersion: entry.version,
-            catalogIndex: entry.catalogIndices[starIdx],
+            catalogIndex,
           },
           screenDistCssPx: dist,
           visualRadiusCssPx: visualRadius,
@@ -316,7 +319,7 @@ export class StarPickProvider {
       return a.ref.catalogIndex - b.ref.catalogIndex;
     });
 
-    const winner = candidates[0];
+    const winner = candidates[0]!;
     this._hitCount++;
     const elapsed = performance.now() - t0;
     this._queryTimesMs.push(elapsed);
@@ -356,6 +359,7 @@ export class StarPickProvider {
     const eqX = entry.equatorialPositions[idx * 3];
     const eqY = entry.equatorialPositions[idx * 3 + 1];
     const eqZ = entry.equatorialPositions[idx * 3 + 2];
+    if (eqX === undefined || eqY === undefined || eqZ === undefined) return null;
 
     _worldPos.set(eqX, eqY, eqZ);
     _worldPos.applyMatrix3(this.deps.transformState.equatorialToThree);
@@ -464,6 +468,7 @@ export class StarPickProvider {
     const occlusionRaycaster = new THREE.Raycaster();
     for (let i = candidates.length - 1; i >= 0; i--) {
       const c = candidates[i];
+      if (c === undefined) continue;
 
       // Reconstruir la posició visual de l'estrella
       const entry = this.deps.getStarResources().get(c.ref.resourceId);
@@ -475,6 +480,10 @@ export class StarPickProvider {
       const eqX = entry.equatorialPositions[idx * 3];
       const eqY = entry.equatorialPositions[idx * 3 + 1];
       const eqZ = entry.equatorialPositions[idx * 3 + 2];
+      if (eqX === undefined || eqY === undefined || eqZ === undefined) {
+        candidates.splice(i, 1);
+        continue;
+      }
 
       _worldPos.set(eqX, eqY, eqZ);
       _worldPos.applyMatrix3(this.deps.transformState.equatorialToThree);
@@ -487,7 +496,7 @@ export class StarPickProvider {
       occlusionRaycaster.far = SKY_RADIUS + 100;
 
       const hits = occlusionRaycaster.intersectObjects(occluders, true);
-      if (hits.length > 0 && hits[0].distance < SKY_RADIUS) {
+      if (hits[0]?.distance !== undefined && hits[0].distance < SKY_RADIUS) {
         // L'estrella està darrere d'un objecte opac
         candidates.splice(i, 1);
       }
@@ -521,5 +530,5 @@ function percentile(arr: number[], p: number): number {
   if (arr.length === 0) return 0;
   const sorted = [...arr].sort((a, b) => a - b);
   const idx = Math.floor((p / 100) * sorted.length);
-  return sorted[Math.min(idx, sorted.length - 1)];
+  return sorted[Math.min(idx, sorted.length - 1)]!;
 }

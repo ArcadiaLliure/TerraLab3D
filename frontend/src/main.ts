@@ -38,14 +38,16 @@ import { ScenePickingController } from "./view/three/picking/ScenePickingControl
 // ─── Bootstrap ───────────────────────────────────────────────────────
 
 function main(): void {
+  console.info(`[TerraLab3D] main() iniciat a ${new Date().toISOString()}`);
   const container = document.getElementById("scene-container");
   if (!container) {
     console.error("[TerraLab3D] #scene-container not found");
     return;
   }
 
-  // 1. Create subsystems
+  // 1. Create subsystems and connect bridge immediately (parallel with 3D/UI setup)
   const bridge = new WebSocketBridge();
+  bridge.connect();
   const sceneHost = new ThreeSceneHostImpl();
   const cameraRig = new CameraRigImpl(sceneHost.camera);
   const renderLoop = new RenderLoopImpl();
@@ -61,7 +63,7 @@ function main(): void {
   shell.mount(container);
 
   // 1.5. Sky environment
-  const atmosphereRenderer = new AtmosphereRenderer(sceneHost.getCelestialRoot() as THREE.Group);
+  const atmosphereRenderer = new AtmosphereRenderer(sceneHost.getCelestialRoot());
   // Default to true, SkyPage will manage this later
   atmosphereRenderer.setPureColors(false);
 
@@ -85,9 +87,6 @@ function main(): void {
   if (locContainer) locationPage.mount(locContainer);
 
   const skyPage = new SkyPage({
-    onOverlayToggle: (key, visible) => {
-      sceneHost.setOverlayVisibility(key as keyof OverlayVisibility, visible);
-    },
     onStarLayerToggled: (visible) => sceneHost.getStarFieldRenderer().setVisible(visible),
     onAtmosphereToggled: (enabled) => bridge.sendSetAtmosphereEnabled(enabled),
     onLightPollutionToggled: (enabled) => bridge.sendSetLightPollutionEnabled(enabled),
@@ -95,6 +94,9 @@ function main(): void {
     onBortleClassChanged: (bortle) => bridge.sendSetBortleClass(bortle),
     onMagnitudeLimitChanged: (mag) => bridge.sendSetManualMagnitudeLimit(mag),
     onPureColorsToggled: (pure) => atmosphereRenderer.setPureColors(pure),
+    onSolarSystemVisibilityChanged: (part, visible) => {
+      sceneHost.getSolarSystemRenderer().setVisibility(part, visible);
+    },
   });
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
@@ -245,15 +247,23 @@ function main(): void {
     onSkyEnvironmentSnapshot(snapshot) {
       currentSkyVisibilityState = snapshot.visibility;
       atmosphereRenderer.updateEnvironment(snapshot);
+      sceneHost.getSolarSystemRenderer().updateEnvironment(snapshot);
       sceneHost.getStarFieldRenderer().updateVisibilityUniforms(snapshot.visibility);
       // Passem qualsevol nova UI d'aquí a una funció que pugui actualizar LocationHUD o SkyPage
       (locationHUD as any).updateSkyEnvironment?.(snapshot);
       (skyPage as any).updateSkyEnvironment?.(snapshot);
     },
+    onSolarSystemSnapshot(snapshot) {
+      const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
+      sceneHost.getSolarSystemRenderer().updateSnapshot(snapshot, bridgeBytes);
+      skyPage.updateSolarSystem(snapshot);
+      diagnostics.updateSolarSystem(snapshot, sceneHost.getSolarSystemRenderer().metrics());
+    },
     onShutdownRequested() {
       renderLoop.stop();
       cameraRig.detach();
       navigationWorld.dispose();
+      atmosphereRenderer.dispose();
       sceneHost.dispose();
       diagnostics.dispose();
       locationPage.dispose();
@@ -279,6 +289,7 @@ function main(): void {
 
   // 6. Render loop with deltaTime for navigation
   let fpsUpdateAccum = 0;
+  let performanceUpdateAccum = 0;
   let hudUpdateAccum = 0;
   renderLoop.start((timestampMs: number) => {
     // Phase 3.5: Update navigation physics
@@ -293,10 +304,30 @@ function main(): void {
     fpsUpdateAccum += 1;
     if (fpsUpdateAccum >= 30) {
       fpsUpdateAccum = 0;
-      diagnostics.updateFps(renderLoop.fps);
+      diagnostics.updateFps(renderLoop.fps, renderLoop.frameMetrics);
     }
 
-    // Update HUD and labels at ~4 Hz (not every frame)
+    performanceUpdateAccum += 1;
+    if (performanceUpdateAccum >= 300) {
+      performanceUpdateAccum = 0;
+      const frames = renderLoop.frameMetrics;
+      const solar = sceneHost.getSolarSystemRenderer().metrics();
+      bridge.sendPerformanceMetrics({
+        frameMsP50: frames.p50Ms,
+        frameMsP95: frames.p95Ms,
+        frameSampleCount: frames.sampleCount,
+        solarSystemEntityBuildCount: solar.entityBuildCount,
+        solarSystemMaterialBuildCount: solar.materialBuildCount,
+        solarSystemSnapshotApplyCount: solar.snapshotApplyCount,
+        solarSystemStaleSnapshotCount: solar.staleSnapshotCount,
+        solarSystemBridgeBytes: solar.lastBridgeBytes,
+      });
+    }
+
+    // Phase 4: Update celestial labels EVERY frame to eliminate lag when panning
+    sceneHost.updateLabels();
+
+    // Update HUD at ~4 Hz (not every frame)
     hudUpdateAccum += 1;
     if (hudUpdateAccum >= 8) {
       hudUpdateAccum = 0;
@@ -308,8 +339,6 @@ function main(): void {
         motionState,
         navigationWorld.envelope.readiness,
       );
-      // Phase 4: Update celestial labels at ~4 Hz
-      sceneHost.updateLabels();
     }
   });
 
@@ -326,15 +355,13 @@ function main(): void {
   });
   resizeObserver.observe(canvasContainer);
 
-  // 8. Connect bridge (last step — everything is wired)
-  bridge.connect();
-
   // 9. Before-unload cleanup
   window.addEventListener("beforeunload", () => {
     resizeObserver.disconnect();
     renderLoop.stop();
     cameraRig.detach();
     navigationWorld.dispose();
+    atmosphereRenderer.dispose();
     sceneHost.dispose();
     diagnostics.dispose();
     bridge.dispose();

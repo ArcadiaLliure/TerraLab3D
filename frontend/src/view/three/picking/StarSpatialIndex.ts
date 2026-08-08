@@ -43,6 +43,9 @@ export class StarSpatialIndex {
    * Construeix l'índex a partir de posicions equatorials unitàries [N×3].
    */
   build(equatorialPositions: Float32Array): void {
+    if (equatorialPositions.length % 3 !== 0) {
+      throw new Error("equatorialPositions length must be a multiple of 3");
+    }
     const t0 = performance.now();
     this.positions = equatorialPositions;
     this.starCount = equatorialPositions.length / 3;
@@ -73,20 +76,21 @@ export class StarSpatialIndex {
     }
 
     for (let i = 0; i < this.starCount; i++) {
-      const x = equatorialPositions[i * 3];
-      const y = equatorialPositions[i * 3 + 1];
-      const z = equatorialPositions[i * 3 + 2];
+      const x = equatorialPositions[i * 3]!;
+      const y = equatorialPositions[i * 3 + 1]!;
+      const z = equatorialPositions[i * 3 + 2]!;
 
       const binIdx = this.vectorToBin(x, y, z);
-      binLists[binIdx].push(i);
+      binLists[binIdx]!.push(i);
     }
 
     // Convertir a TypedArrays compactes
     this.bins = new Array(TOTAL_BINS);
     let totalBytes = 0;
     for (let i = 0; i < TOTAL_BINS; i++) {
-      this.bins[i] = new Int32Array(binLists[i]);
-      totalBytes += this.bins[i].byteLength;
+      const bin = new Int32Array(binLists[i]!);
+      this.bins[i] = bin;
+      totalBytes += bin.byteLength;
     }
 
     const buildMs = performance.now() - t0;
@@ -125,9 +129,9 @@ export class StarSpatialIndex {
     if (this.usesLinearScan) {
       // Linear scan directe
       for (let i = 0; i < this.starCount; i++) {
-        const px = positions[i * 3];
-        const py = positions[i * 3 + 1];
-        const pz = positions[i * 3 + 2];
+        const px = positions[i * 3]!;
+        const py = positions[i * 3 + 1]!;
+        const pz = positions[i * 3 + 2]!;
         const dot = px * dirX + py * dirY + pz * dirZ;
         if (dot >= cosThreshold) {
           result.push(i);
@@ -144,11 +148,12 @@ export class StarSpatialIndex {
 
     for (const binIdx of binsToCheck) {
       const bin = this.bins[binIdx];
+      if (bin === undefined) continue;
       for (let j = 0; j < bin.length; j++) {
-        const i = bin[j];
-        const px = positions[i * 3];
-        const py = positions[i * 3 + 1];
-        const pz = positions[i * 3 + 2];
+        const i = bin[j]!;
+        const px = positions[i * 3]!;
+        const py = positions[i * 3 + 1]!;
+        const pz = positions[i * 3 + 2]!;
         const dot = px * dirX + py * dirY + pz * dirZ;
         if (dot >= cosThreshold) {
           result.push(i);

@@ -10,6 +10,7 @@ import asyncio
 import logging
 from pathlib import Path
 from typing import Any
+from datetime import datetime
 
 import aiohttp.web
 
@@ -27,7 +28,7 @@ class TerraLabServer:
         bridge: WebSocketBridge,
         *,
         host: str = "127.0.0.1",
-        port: int = 0,
+        port: int = 14398,
     ) -> None:
         self._dist_dir = dist_dir
         self._bridge = bridge
@@ -61,10 +62,17 @@ class TerraLabServer:
         )
         await self._runner.setup()
 
-        self._site = aiohttp.web.TCPSite(
-            self._runner, self._host, self._port,
-        )
-        await self._site.start()
+        try:
+            self._site = aiohttp.web.TCPSite(
+                self._runner, self._host, self._port, reuse_address=True,
+            )
+            await self._site.start()
+        except OSError:
+            # Si el port està ocupat, recaure en port dinàmic del SO (port=0)
+            self._site = aiohttp.web.TCPSite(
+                self._runner, self._host, 0, reuse_address=True,
+            )
+            await self._site.start()
 
         # Resol el port real (quan port=0, el SO n'assigna un)
         for sock in self._site._server.sockets:  # type: ignore[union-attr]
@@ -88,6 +96,3 @@ class TerraLabServer:
     ) -> aiohttp.web.FileResponse:
         """Serveix index.html per a la ruta arrel."""
         return aiohttp.web.FileResponse(self._dist_dir / "index.html")
-
-
-
