@@ -86,7 +86,7 @@ Aquestes activitats no són passos separats. S’executen dins de cada vertical 
 | 4 | Fons del cel | 6 |
 | 5 | Estrelles i Gaia | 5 |
 | 6 | Traces circumpolars | 14 |
-| 7 | Sistema solar | 8, 9 |
+| 7 | Sistema solar | 8, 8.5, 8.6, 9 |
 | 8 | Via Làctia i pols Planck | 10 |
 | 9 | Cel profund NGC/IC | 11 |
 | 10 | Cerca astronòmica | 12 |
@@ -1665,7 +1665,7 @@ Els cossos apareixen i es mouen correctament amb temps i ubicació; les fases i 
 
 ### Fora d’abast del pas
 
-Eclipsis, contactes i trajectòries detallades arriben al pas següent.
+La superfície lunar especialitzada arriba al Pas 8.5; planetes texturitzats, orientació física, anells i satèl·lits naturals arriben al Pas 8.6; eclipsis, contactes i trajectòries topocèntriques detallades arriben al Pas 9.
 
 ## Pas 8.5 — Superfície lunar LRO/LOLA, orientació física i libració real
 
@@ -2253,6 +2253,7 @@ El Pas 8.5 no es considera complet fins que:
 - [ ] el fallback és explícit;
 - [ ] les proves científiques, visuals, de lifecycle i rendiment passen;
 - [ ] els Passos 1–8 continuen funcionant;
+- [ ] el Pas 8.6 encara no s’ha començat;
 - [ ] el Pas 9 encara no s’ha començat.
 
 ### Evidència obligatòria
@@ -2304,9 +2305,2385 @@ La regla final del Pas 8.5 és:
 
 ```text
 LRO/LOLA defineix la superfície;
-JPL/Skyfield defineix l’orientació;
+JPL/NAIF, a través de l’adaptador científic compatible (Skyfield/SPICE), defineix l’orientació;
 l’efemèride del Pas 8 defineix la geometria Sol–Lluna–observador;
 Three.js només representa aquest estat amb recursos persistents.
+```
+
+## Pas 8.6 — Planetes texturitzats, orientació física, anells i tots els satèl·lits naturals planetaris
+
+### Resultat funcional palpable
+
+El Sistema Solar deixa de representar els planetes com a discos o esferes genèriques i passa a disposar d’una representació 3D persistent i físicament orientada dels planetes, els anells de Saturn i els satèl·lits naturals planetaris coneguts amb efemèride disponible.
+
+En completar aquest pas:
+
+- Mercuri, Venus, Mart, Júpiter, Saturn, Urà i Neptú utilitzen les textures planetàries locals ja disponibles;
+- la Terra no es representa com a planeta visible des de l’observador terrestre, però continua existint com a cos científic i origen de l’observador;
+- Plutó i el seu sistema de satèl·lits s’admeten dins del mateix model genèric de cossos, encara que no es presenti com a planeta;
+- cada planeta té radi/forma, eix de rotació, orientació body-fixed i rotació compatibles amb el millor model carregat;
+- l’aspecte il·luminat de cada planeta prové de la direcció física cap al Sol, no d’una fase pintada dins de la textura;
+- Saturn presenta anells persistents orientats pel seu **pla equatorial real**;
+- la inclinació aparent dels anells no es calcula com una rotació visual independent: emergeix de la geometria observador–Saturn–pla equatorial;
+- les llunes es posicionen a partir d’efemèrides JPL/NAIF SPK i no d’el·lipses keplerianes simplificades;
+- les òrbites planetocèntriques es poden mostrar com a geometries persistents mostrejades de l’efemèride;
+- la informació d’orientació, forma, radi, textura i qualitat física és explícita per cos;
+- un satèl·lit sense textura o sense model d’orientació continua apareixent a la posició correcta, sense inventar dades;
+- el sistema és data-driven: afegir una lluna nova al catàleg o als kernels no requereix crear un renderer específic;
+- la càmera local continua sense provocar cap recàlcul científic ni cap round-trip Python per frame.
+
+### Abast exacte de “totes les llunes”
+
+Per al criteri de completitud d’aquest pas, el catàleg canònic mínim és el de **Planetary Satellites** de JPL Solar System Dynamics.
+
+Snapshot de referència a validar en iniciar la implementació:
+
+```text
+JPL SSD — 2026-07-09
+Planetary Satellites total = 461
+
+Terra      1
+Mart       2
+Júpiter  115
+Saturn   293
+Urà       29
+Neptú     16
+Plutó      5
+---------
+Total    461
+```
+
+Mercuri i Venus no tenen satèl·lits planetaris coneguts.
+
+Aquest nombre **no s’ha de hardcodejar com una constant eterna**. Serveix com a fixture de cobertura del snapshot de dades utilitzat per desenvolupar aquest pas. El catàleg local ha de quedar versionat i actualitzable.
+
+La Lluna terrestre ja queda especialitzada al Pas 8.5 i no s’ha de duplicar. El sistema genèric d’aquest pas, però, l’ha de reconèixer com el mateix concepte de `NaturalSatellite`/satèl·lit natural a nivell de domini.
+
+Els satèl·lits de cossos menors —asteroides, TNO, Eris, Haumea, Makemake i sistemes similars— han de ser compatibles amb el model de domini genèric i amb un futur adaptador JPL Small-Body/Horizons, però **no poden degradar ni bloquejar la cobertura completa dels 461 planetary satellites** d’aquest pas.
+
+### Fonts internes obligatòries
+
+#### TerraLab3D `main`
+
+Abans d’implementar, revisar l’estat real de `main` després dels Passos 8 i 8.5. Preval el codi real sobre els noms conceptuals d’aquest document.
+
+Revisar especialment:
+
+- `EphemerisPort` o contracte equivalent creat al Pas 8;
+- l’adaptador real d’efemèrides;
+- `SolarSystemSnapshot` o estat equivalent;
+- model de Sol, Lluna i planetes;
+- renderer persistent de la Lluna creat/refinat al Pas 8.5;
+- pipeline d’il·luminació Sol → cos;
+- conversió ICRF/J2000 → ENU → Three.js;
+- convenció d’eixos i quaternions;
+- `celestialRoot`;
+- bridge binari existent;
+- sistema de recursos i manifests;																																																																																																																																																																																	
+- UI `Cel → Sistema solar`;
+- lifecycle de textures/materials/geometries;
+- sistema de picking i labels existent.
+
+No crear una segona autoritat de temps, observador, Sol o efemèrides.
+
+#### TerraLab, només com a referència funcional
+
+Consultar en mode lectura:
+
+- `TerraLab/astro/engine.py`;
+- `TerraLab/astro/ephemeris_coordinator.py`;
+- `TerraLab/runtime/offscreen_renderer.py`;
+- `TerraLab/data/layer_manager.py`;
+- qualsevol suport real de planetes, satèl·lits, fases, magnituds i textures que existeixi al checkout;
+- tests d’efemèrides i sistema solar.
+
+No copiar una representació 2D si entra en conflicte amb el model 3D persistent.
+
+### Textures planetàries locals ja disponibles
+
+La font visual planetària principal ja existeix fora del workspace.
+
+Ruta lògica de runtime:
+
+```text
+[data_root]\sky\solar-system\planets
+```
+
+Ruta actual de desenvolupament:
+
+```text
+I:\TerraLab\data\sky\solar-system\planets
+```
+
+Regles obligatòries:
+
+- [ ] Resoldre `data_root` des de `data_location.json`; **no hardcodejar `I:`** dins del codi de producció.
+- [ ] Utilitzar `I:\TerraLab\data\sky\solar-system\planets` només com a ruta resolta de l’entorn de desenvolupament actual.
+- [ ] Inspeccionar els fitxers reals de la carpeta abans de programar mappings.
+- [ ] No assumir noms de fitxer que no existeixin.
+- [ ] No redescargar textures que ja són presents.
+- [ ] No copiar textures al workspace.
+- [ ] No transportar textures pel bridge.
+- [ ] No convertir textures a Base64.
+- [ ] Preservar i documentar qualsevol fitxer de crèdits, llicència o metadades que ja acompanyi els assets.
+- [ ] Generar un manifest local derivat dels fitxers reals, no una llista escrita a cegues.
+
+Manifest conceptual mínim:
+
+```text
+bodyId
+naifId
+bodyName
+sourceFile
+resolvedPath
+sha256
+width
+height
+format
+colorSpace
+projection
+centralMeridianDeg
+uvFlipX
+uvFlipY
+uvRotationDeg
+textureQuality
+credits
+license
+```
+
+Qualsevol `uvFlip*`, `uvRotationDeg` o offset fix ha de descriure **la convenció del dataset**, no corregir l’orientació astronòmica d’una data concreta.
+
+### Fonts científiques externes obligatòries
+
+#### NASA/JPL NAIF — Generic Kernels
+
+Font arrel:
+
+`https://naif.jpl.nasa.gov/pub/naif/generic_kernels/`
+
+Els tipus de kernel tenen responsabilitats separades:
+
+```text
+SPK  → posició i velocitat
+PCK  → constants planetàries, forma i orientació IAU
+LSK  → UTC ↔ ET/TDB i leap seconds
+FK   → frames addicionals quan siguin necessaris
+DSK  → forma irregular d’alta fidelitat quan existeixi i s’adopti explícitament
+```
+
+No barrejar aquestes responsabilitats dins del renderer.
+
+#### PCK genèric
+
+Font preferent inicial:
+
+`https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc`
+
+`pck00011.tpc` conté models IAU/WGCCRE de rotació i radi per nombrosos planetes i satèl·lits.
+
+Per a un cos amb model disponible, la informació rellevant és conceptualment:
+
+```text
+BODY<id>_POLE_RA
+BODY<id>_POLE_DEC
+BODY<id>_PM
+BODY<id>_NUT_PREC_*
+BODY<id>_RADII
+```
+
+No reimplementar manualment aquestes fórmules si la llibreria SPICE pot proporcionar directament la transformació del frame body-fixed.
+
+#### SPK de satèl·lits
+
+Directori canònic:
+
+`https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/`
+
+Inventari i cobertura:
+
+`https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/aa_summaries.txt`
+
+NAIF distribueix un o diversos SPK per sistema planetari. No existeix l’obligació que un únic fitxer contingui totes les llunes d’un planeta.
+
+Famílies a descobrir dinàmicament:
+
+```text
+mar*.bsp
+jup*.bsp
+sat*.bsp
+ura*.bsp
+nep*.bsp
+plu*.bsp
+```
+
+Exemples existents en el snapshot 2026, **no llista hardcodejada de producció**:
+
+```text
+Mart
+  mar099.bsp
+  mar099s.bsp
+
+Júpiter
+  jup365.bsp
+  jup347.bsp
+  jup348.bsp
+  jup349.bsp
+
+Saturn
+  sat393_daphnis.bsp
+  sat415.bsp
+  sat441.bsp
+  sat455.bsp
+  sat456.bsp
+  sat457.bsp
+  sat459.bsp
+  sat480.bsp
+
+Urà
+  ura184_part-*.bsp
+  i altres kernels de cobertura específica quan pertoqui
+
+Neptú
+  nep097.bsp
+  nep098_part-*.bsp
+  nep104.bsp
+  nep105.bsp
+  i kernels XL quan siguin necessaris per cobertura especial
+
+Plutó
+  plu060.bsp
+```
+
+La Lluna terrestre és una excepció: la seva efemèride forma part dels SPK planetaris `de*.bsp`, no del directori `spk/satellites`.
+
+#### LSK
+
+Utilitzar un leap-seconds kernel compatible amb l’stack SPICE. En el snapshot 2026, `naif0012.tls` continua vigent.
+
+No duplicar la conversió UTC → ET/TDB amb una fórmula casolana si SPICE ja és l’autoritat temporal per als kernels.
+
+#### JPL Solar System Dynamics
+
+Catàleg de satèl·lits:
+
+`https://ssd.jpl.nasa.gov/sats/`
+
+Paràmetres físics:
+
+`https://ssd.jpl.nasa.gov/sats/phys_par/`
+
+Circumstàncies i inventari reconegut:
+
+`https://ssd.jpl.nasa.gov/sats/discovery.html`
+
+Els paràmetres físics poden incloure radi, GM, densitat i referències, però **no tots els satèl·lits disposen del mateix nivell de caracterització**.
+
+### Decisió arquitectònica #1 — Una sola autoritat científica
+
+El Pas 8 ja ha creat o adaptat una autoritat d’efemèrides. Aquest pas l’estén; no en crea una de paral·lela.
+
+Si l’adaptador existent és Skyfield i pot carregar de manera robusta els SPK/PCK requerits:
+
+```text
+EphemerisPort existent
+→ extensió de l’adaptador existent
+```
+
+Si la cobertura completa requereix SPICE/SpiceyPy:
+
+```text
+EphemerisPort existent
+BodyOrientationPort
+        ↑
+SpiceEphemerisAdapter / SpiceOrientationAdapter
+```
+
+Però el domini no pot importar `spiceypy`, Skyfield ni Three.js.
+
+Regla:
+
+```text
+una data
++ un observador científic
++ un conjunt de kernels
+→ un únic estat científic coherent
+```
+
+No és acceptable:
+
+```text
+Skyfield calcula planetes
++
+SPICE calcula llunes
++
+fórmules manuals calculen Saturn
+```
+
+si no existeix una capa explícita que garanteixi que temps, frame, aberració i convencions són compatibles.
+
+### Decisió arquitectònica #2 — Model genèric de cos
+
+No crear:
+
+```text
+MercuryRenderer
+VenusRenderer
+MarsRenderer
+JupiterRenderer
+TitanRenderer
+IoRenderer
+...
+```
+
+Crear un model genèric equivalent conceptualment a:
+
+```python
+class TipusCosSistemaSolar(Enum):
+    ESTRELLA = ...
+    PLANETA = ...
+    PLANETA_NAN = ...
+    SATELLIT_NATURAL = ...
+
+class QualitatModelFisic(Enum):
+    MISSIO_ALTA_PRECISIO = ...
+    IAU_PCK = ...
+    RADI_MESURAT = ...
+    RADI_ESTIMAT = ...
+    POSICIO_SOLAMENT = ...
+    NO_DISPONIBLE = ...
+
+@dataclass(frozen=True)
+class DefinicioCosSistemaSolar:
+    id: str
+    naif_id: int
+    nom: str
+    tipus: TipusCosSistemaSolar
+    parent_naif_id: int | None
+    frame_body_fixed: str | None
+    radii_km: tuple[float, float, float] | None
+    textura: str | None
+    qualitat_textura: str
+    qualitat_orientacio: QualitatModelFisic
+    qualitat_forma: QualitatModelFisic
+```
+
+Els noms definitius han de respectar l’arquitectura real del repositori i la norma general de català del projecte.
+
+### Decisió arquitectònica #3 — Estat científic separat de l’estat visual
+
+Estat científic mínim per cos:
+
+```text
+bodyId
+naifId
+parentNaifId
+instantET
+referenceFrame
+positionICRFKm
+velocityICRFKmS
+distanceObserverKm
+directionENU
+angularRadiusRad
+phaseAngleRad
+illuminatedFraction
+bodyFixedFrame
+bodyToICRFQuaternion
+bodyToENUQuaternion
+radiiKm
+orientationQuality
+shapeQuality
+ephemerisQuality
+```
+
+Estat visual:
+
+```text
+visible
+renderScale
+textureResourceId
+materialVariant
+lod
+labelVisible
+orbitVisible
+pickingEnabled
+```
+
+El renderer no pot calcular RA/Dec del pol, inclinacions orbitals, elements keplerians o temps SPICE.
+
+### Posicions dels satèl·lits
+
+La font de posició és l’SPK.
+
+Flux científic preferent:
+
+```text
+UTC
+→ ET/TDB
+→ SPK
+→ estat del satèl·lit en J2000/ICRF
+→ composició amb el sistema planetari
+→ correccions observacionals compatibles amb el Pas 8
+→ transformació topocèntrica de ScientificObserver
+→ ENU
+→ direcció celestial
+→ estat renderer-neutral
+```
+
+La relació pare-fill és científica:
+
+```text
+Titan.parent = Saturn
+Io.parent = Jupiter
+Triton.parent = Neptune
+```
+
+però **no obliga** que el node Three.js de la lluna sigui fill directe del node traduït del planeta. Si `celestialRoot` representa direccions a distància virtual, l’arbre de render ha de respectar aquesta convenció i no introduir errors de paral·laxi per una jerarquia inadequada.
+
+### Aberració i light-time
+
+La política d’aberració ha de ser única per a planetes i satèl·lits.
+
+- [ ] Caracteritzar què utilitza el Pas 8.
+- [ ] Utilitzar la mateixa semàntica per als satèl·lits.
+- [ ] Documentar si l’estat és geomètric, `LT`, `LT+S`, `CN` o equivalent.
+- [ ] No comparar fixtures generades amb polítiques diferents.
+- [ ] No deixar que el frontend apliqui correccions addicionals.
+
+### Orientació física dels planetes i llunes
+
+Per als cossos amb frame IAU/PCK disponible, obtenir la transformació completa body-fixed → J2000/ICRF mitjançant la infraestructura científica.
+
+Flux:
+
+```text
+instant ET
++ PCK/FK/BPC carregats
+→ IAU_<BODY> o frame body-fixed compatible
+→ matriu/quaternion body-fixed → J2000
+→ J2000 → ENU observador
+→ ENU → Three.js
+→ bodyRoot.quaternion
+```
+
+Preferir operacions SPICE equivalents a `pxform()`/`sxform()` a reconstruir manualment RA, DEC i W.
+
+La representació visual pot reutilitzar la mateixa estructura creada per a la Lluna al Pas 8.5:
+
+```text
+bodyRoot
+├── orientationRoot
+│   ├── surfaceMesh
+│   └── ringSystem?     # quan pertoqui
+└── label/picking auxiliars fora de la rotació de superfície si cal
+```
+
+No duplicar el pipeline lunar; extreure’n la part genèrica.
+
+### Cossos sense model d’orientació
+
+No totes les llunes disposen de model IAU fiable.
+
+Cas de prova obligatori: **Hyperion**. El PCK genèric indica que no disposa d’un model d’orientació predictible a llarg termini perquè la seva rotació és caòtica.
+
+Política:
+
+```text
+SPK disponible + orientació absent
+→ posició correcta
+→ mida coneguda/estimada si existeix
+→ superfície neutra
+→ orientationQuality = unavailable
+→ no inventar rotació síncrona
+```
+
+No és acceptable aplicar automàticament “tidal lock” a totes les llunes.
+
+### Forma i mida
+
+Prioritat:
+
+```text
+1. shape model/DSK de missió adoptat explícitament
+2. radii triaxials PCK
+3. radi mesurat JPL
+4. radi estimat documentat
+5. punt/sprite unresolved si no existeix mida fiable
+```
+
+Per a un PCK triaxial:
+
+```text
+radii = (a, b, c)
+```
+
+Three.js ha de poder representar un el·lipsoide escalant una geometria base persistent.
+
+No forçar una esfera quan `a`, `b` i `c` coneguts són significativament diferents i el cos té mida aparent suficient perquè importi.
+
+### Reutilització del renderer lunar
+
+Extreure del Pas 8.5 només allò que sigui realment genèric:
+
+- [ ] càrrega persistent de textura;
+- [ ] manifest i hash;
+- [ ] geometria esfèrica/el·lipsoïdal reutilitzable;
+- [ ] material il·luminat pel Sol;
+- [ ] separació `bodyRoot` / `surfaceMesh`;
+- [ ] aplicació de quaternion científic;
+- [ ] gestió de LOD;
+- [ ] lifecycle i `dispose`;
+- [ ] counters de reconstrucció;
+- [ ] picking;
+- [ ] labels.
+
+Mantenir específic de la Lluna:
+
+- LRO/LOLA;
+- libració i mètriques lunars especialitzades;
+- `subEarth*`/`subObserver*` lunars si no són generalitzats amb sentit;
+- recursos del Moon Kit.
+
+No fer herència artificial només per compartir codi. Preferir composició de recursos i components visuals.
+
+### Textures planetàries
+
+Per cada planeta amb textura disponible:
+
+```text
+texture manifest
++ forma física
++ orientació body-fixed
++ direcció al Sol
+→ material planetari
+```
+
+Requisits:
+
+- [ ] Utilitzar textura global neutra; no una captura amb fase pre-renderitzada.
+- [ ] Aplicar `colorSpace` correcte.
+- [ ] Generar mipmaps quan pertoqui.
+- [ ] No pujar la textura més d’una vegada per versió/recurs.
+- [ ] No recrear material per tick.
+- [ ] Separar transformació UV fixa del dataset de l’orientació científica.
+- [ ] Documentar el meridià central i sentit de longitud del dataset quan es conegui.
+- [ ] Validar visualment trets reconeixibles quan sigui possible.
+- [ ] No afirmar fidelitat temporal de núvols/taques si la textura és estàtica.
+
+Per Júpiter, Saturn, Urà i Neptú, una textura estàtica representa aparença visual de referència, no meteorologia epoch-correct. Aquesta limitació s’ha de documentar.
+
+### Il·luminació planetària
+
+La fase ha de provenir de geometria física.
+
+```text
+normal superfície
++ direcció cos → Sol
++ direcció cos → observador
+→ il·luminació
+→ terminador
+→ fase aparent
+```
+
+No utilitzar:
+
+```text
+planetTexture_phase_25.png
+planetTexture_phase_50.png
+```
+
+No duplicar el Sol. Reutilitzar el mateix vector/direcció solar autoritativa del Pas 8/8.5.
+
+### Saturn — orientació física
+
+Saturn és un cas especial visual, no científicament excepcional.
+
+El PCK proporciona el frame/orientació del cos. El pla equatorial és perpendicular al vector del pol nord de Saturn.
+
+Conceptualment:
+
+```text
+p = pol nord de Saturn
+pla equatorial = pla amb normal p
+pla dels anells ≈ pla equatorial
+```
+
+Els anells s’han d’orientar a partir del mateix `bodyToICRFQuaternion` de Saturn.
+
+No implementar:
+
+```text
+rings.rotation.x = angleVisualAnells(data)
+```
+
+Implementar:
+
+```text
+Saturn orientationRoot
+├── planetSurface
+└── ringSystem
+```
+
+El `ringSystem` està fix respecte del pla equatorial de Saturn; l’obertura aparent canvia perquè canvia la geometria observador–Saturn.
+
+### Saturn — diagnòstic de l’obertura dels anells
+
+Es pot calcular un valor diagnòstic `B` sense utilitzar-lo per orientar els anells:
+
+```text
+B = asin(dot(n_ring, direction_saturn_to_observer))
+```
+
+On:
+
+```text
+B = 0°   → anells de cantell
+B > 0    → es veu una cara del pla
+B < 0    → es veu la cara oposada
+```
+
+Aquest valor és útil per tests, HUD de diagnòstic i comparacions externes, però **no és l’autoritat de rotació del mesh**.
+
+### Saturn — geometria dels anells
+
+Font de dimensions a documentar:
+
+`https://nssdc.gsfc.nasa.gov/planetary/factsheet/satringfact.html`
+
+La representació mínima fidedigna ha d’incloure:
+
+- anell C;
+- anell B;
+- divisió de Cassini;
+- anell A;
+- opcionalment D/F/G/E segons LOD i qualitat visual.
+
+No és necessari modelar partícules individuals.
+
+Geometria recomanada:
+
+```text
+RingGeometry / BufferGeometry annular persistent
++ coordenada radial normalitzada
++ mapa d’opacitat/color radial
++ material de doble cara amb il·luminació/transmissió controlada
+```
+
+Si la carpeta de textures planetàries conté una textura o alpha real dels anells:
+
+- [ ] detectar-la al manifest;
+- [ ] documentar-ne procedència i mapping;
+- [ ] utilitzar-la sense duplicar-la al workspace.
+
+Si no existeix:
+
+- [ ] implementar un fallback radial procedimental clarament identificat com a aproximació visual;
+- [ ] conservar dimensions i orientació físiques;
+- [ ] no inventar estructura fina de Cassini/Cassini Division més enllà del model documentat.
+
+### Saturn — oclusió correcta planeta/anells
+
+Requisits visuals:
+
+- [ ] la meitat posterior dels anells queda ocultada pel planeta quan geomètricament correspon;
+- [ ] la meitat anterior passa davant del disc;
+- [ ] el depth buffer decideix la intersecció, no una màscara 2D manual;
+- [ ] els anells poden mostrar cara il·luminada i no il·luminada de manera diferenciada si el material ho suporta;
+- [ ] el canvi de signe de `B` no provoca un flip artificial de textura;
+- [ ] no hi ha z-fighting al pla equatorial;
+- [ ] els anells continuen correctes amb resize, FOV i roll de càmera.
+
+### Altres sistemes d’anells
+
+Júpiter, Urà i Neptú també tenen sistemes d’anells.
+
+Aquest pas ha de deixar el contracte `RingSystem` genèric i evitar que Saturn sigui una excepció arquitectònica.
+
+Abast mínim:
+
+- Saturn: render complet del sistema principal d’anells.
+- Júpiter/Urà/Neptú: suport estructural i render opcional si existeixen recursos/dades suficients en el projecte; no inventar una textura.
+
+La manca de recursos visuals dels anells febles no pot impedir l’orientació correcta del planeta.
+
+### Catàleg de satèl·lits
+
+Crear un procés reproduïble de construcció del catàleg, no 461 entrades manuals.
+
+Flux:
+
+```text
+JPL satellite catalogue snapshot
++ aa_summaries.txt
++ kernels instal·lats
++ PCK/physical parameters
+→ satellite_catalog.json/bin
+→ validació de cobertura
+```
+
+Camps mínims:
+
+```text
+catalogVersion
+catalogDate
+naifId
+name
+provisionalDesignation
+parentNaifId
+parentName
+spkKernelIds
+spkCoverageStartET
+spkCoverageEndET
+bodyFixedFrame
+hasOrientationModel
+orientationSource
+radiiKm
+meanRadiusKm
+physicalParameterSource
+textureResourceId
+textureQuality
+shapeQuality
+ephemerisQuality
+```
+
+No generar un nom fictici per a satèl·lits que només tenen designació provisional.
+
+### Descobriment i manifest de kernels
+
+Crear un `KernelManifest` versionat.
+
+No confiar en “carrega aquests 10 fitxers per sempre”.
+
+El manifest ha de saber:
+
+```text
+kernelId
+fileName
+kernelType
+sourceUrl
+sha256
+coverage
+bodyIds
+priority
+compatibleEphemerisFamily
+installed
+```
+
+La selecció de kernels ha de resoldre cobertura per cos i data.
+
+Si dos kernels cobreixen el mateix cos:
+
+- [ ] definir precedència explícita;
+- [ ] evitar que l’ordre accidental de `furnsh()` decideixi silenciosament;
+- [ ] registrar quin kernel ha guanyat;
+- [ ] provar el resultat.
+
+### Gestió de kernels com a dades externes
+
+Els SPK/PCK/LSK grans no han de viure al repositori Git.
+
+Ruta lògica recomanada sota el `data_root`:
+
+```text
+[data_root]\sky\solar-system\kernels\
+├── lsk\
+├── pck\
+├── spk\
+│   ├── planets\
+│   └── satellites\
+└── manifests\
+```
+
+Ruta de desenvolupament resultant:
+
+```text
+I:\TerraLab\data\sky\solar-system\kernels\...
+```
+
+Aquest pas ha de reutilitzar el gestor de dades/capes existent per instal·lar i verificar kernels, però no ha de copiar-los al workspace.
+
+Requisits:
+
+- [ ] descàrrega explícita iniciada per l’usuari o pel gestor de dades segons la política existent;
+- [ ] checksum;
+- [ ] versió;
+- [ ] rang temporal;
+- [ ] provenance;
+- [ ] retry idempotent;
+- [ ] no descàrrega silenciosa dins del render loop;
+- [ ] no accés a Internet necessari durant una sessió normal si els kernels ja són instal·lats.
+
+### Política de cobertura temporal
+
+Cada SPK té un interval vàlid.
+
+Per cos i instant:
+
+```text
+IN_RANGE
+OUT_OF_RANGE
+NO_KERNEL
+AMBIGUOUS_KERNEL
+ERROR
+```
+
+No extrapolar silenciosament un SPK fora del seu rang.
+
+Fallback:
+
+```text
+planetary satellite without valid SPK at instant
+→ no inventar posició
+→ cos unavailable per aquell instant
+→ mostrar estat de cobertura
+→ conservar la resta del sistema
+```
+
+Si existeix una efemèride alternativa autoritzada, utilitzar-la només si està declarada al manifest i validada.
+
+### Elements orbitals
+
+Els elements orbitals JPL poden conservar-se com a metadades:
+
+```text
+a
+e
+i
+Ω
+ω
+M
+period
+referencePlane
+referenceEpoch
+```
+
+Però la posició runtime **no** s’ha de reconstruir a partir d’aquests elements si hi ha SPK.
+
+Regla:
+
+```text
+SPK posiciona;
+elements orbitals descriuen.
+```
+
+Els elements són útils per:
+
+- HUD;
+- inspecció;
+- classificació;
+- estadístiques;
+- interval inicial de mostreig d’òrbita;
+- fallback només si algun futur requeriment ho autoritza explícitament.
+
+### Òrbites de satèl·lits — semàntica
+
+Aquest pas introdueix **òrbites planetocèntriques de context**, no les trajectòries topocèntriques temporals del Pas 9.
+
+Diferència:
+
+```text
+Pas 8.6
+→ “quina és la geometria de l’òrbita d’aquesta lluna al voltant del seu pare?”
+
+Pas 9
+→ “per on es veurà moure aquest cos al cel de l’observador durant un interval?”
+```
+
+No barrejar-les.
+
+### Òrbites de satèl·lits — generació
+
+No dibuixar una el·lipse kepleriana ideal com a font principal.
+
+Mostrejar l’SPK:
+
+```text
+satellite
++ parent
++ [t0, t1]
++ sampleCount
+→ state(t0)...state(tN)
+→ vectors planetocèntrics
+→ orbit buffer
+```
+
+L’interval pot ser:
+
+- un període orbital si existeix un període fiable;
+- un interval configurable al voltant de l’època;
+- un interval limitat pel coverage de l’SPK.
+
+Per òrbites irregulars/pertorbades, la corba **no té obligació de tancar exactament**.
+
+Metadades de la geometria:
+
+```text
+bodyId
+parentId
+t0ET
+t1ET
+sampleCount
+frame
+kernelGeneration
+orbitGeneration
+```
+
+### Òrbites — persistència i rendiment
+
+Python calcula/mostreja; Three.js conserva.
+
+```text
+Python
+→ orbit points binaris
+→ bridge una vegada per generació
+→ THREE.BufferGeometry
+→ GPU resident
+```
+
+No enviar 461 òrbites a cada tick.
+
+Regenerar només quan canvia alguna dependència real:
+
+```text
+kernelGeneration
+interval
+samplingPolicy
+body selection / system selection
+```
+
+No regenerar per:
+
+- càmera;
+- pan;
+- zoom;
+- FOV;
+- resize;
+- walk/flight;
+- canvi d’un segon si l’interval de l’òrbita no ha canviat.
+
+### LOD de satèl·lits
+
+“Tots disponibles” no significa “461 meshes d’alta resolució i 461 labels sempre visibles”.
+
+Política de representació:
+
+```text
+LOD 0 — unresolved point/sprite
+LOD 1 — disc/esfera simple
+LOD 2 — esfera/el·lipsoide amb material físic
+LOD 3 — textura disponible
+LOD 4 — shape model/normal map de missió si existeix
+```
+
+La selecció de LOD pot dependre de:
+
+- mida angular;
+- FOV;
+- cos seleccionat;
+- mode d’inspecció;
+- pressupost GPU;
+- qualitat física disponible.
+
+La ciència no canvia amb el LOD.
+
+### Política de textura dels satèl·lits
+
+No existeix textura global fiable per a totes les llunes.
+
+Prioritat:
+
+```text
+1. textura científica/mission-derived local amb llicència/procedència
+2. albedo/color de referència documentat
+3. material neutre sense textura
+4. punt unresolved
+```
+
+No utilitzar una textura genèrica “rock.jpg” per a centenars de llunes i presentar-la com a fidel.
+
+Per a satèl·lits majors amb recursos fiables disponibles en el projecte —Io, Europa, Ganimedes, Cal·listo, Tità, Tritó, etc.— el mateix pipeline de recursos ha de permetre incorporar textures posteriorment sense canviar la ciència ni el renderer genèric.
+
+### Qualitat científica explícita
+
+Per cada cos:
+
+```text
+ephemerisQuality
+orientationQuality
+shapeQuality
+textureQuality
+```
+
+Valors conceptuals:
+
+```text
+HIGH_PRECISION
+IAU_MODEL
+MEASURED
+ESTIMATED
+VISUAL_REFERENCE
+UNAVAILABLE
+OUT_OF_RANGE
+```
+
+La UI de diagnòstic i els logs han de poder explicar per què un cos es veu com una esfera neutra o no rota.
+
+### Sistema de coordenades i escala
+
+No introduir quilòmetres astronòmics directament a `worldRoot` en metres locals.
+
+Separar:
+
+```text
+worldRoot
+→ metres locals de terreny/càmera
+
+celestialRoot
+→ direccions/escala celestial
+```
+
+Els satèl·lits han de conservar la seva separació angular real respecte del planeta vista per `ScientificObserver`.
+
+No utilitzar una escala visual arbitrària que faci que Io aparegui més separat de Júpiter del que correspon sense marcar-ho com a mode ampliat.
+
+Si s’afegeix un mode d’exageració visual per fer visibles llunes minúscules:
+
+- [ ] ha de ser opcional;
+- [ ] ha de ser explícit;
+- [ ] no ha d’alterar el picking científic;
+- [ ] el mode fidedigne 1:1 ha de continuar disponible.
+
+### Mida aparent
+
+Per cossos resolubles:
+
+```text
+angularRadius = atan2(physicalRadius, observerDistance)
+```
+
+Per el·lipsoides, la silueta pot aproximar-se amb els radii triaxials i l’orientació quan la mida angular ho justifiqui.
+
+No establir un mínim de píxels científicament fals. Si cal un mínim visual per picking, separar:
+
+```text
+renderedBodySize
+pickingHitArea
+```
+
+### Magnitud i visibilitat
+
+Reutilitzar el model del Pas 8 quan existeixi.
+
+Per satèl·lits sense model fotomètric fiable:
+
+- no inventar magnitud;
+- utilitzar `magnitude = null`;
+- permetre visibilitat per selecció/LOD si l’usuari activa el sistema;
+- diferenciar “no visible físicament a simple vista” de “no carregat”.
+
+### UI
+
+Integrar dins de la jerarquia existent:
+
+```text
+Cel
+└── Sistema solar
+    ├── Sol
+    ├── Lluna
+    │   └── Superfície LRO/LOLA
+    ├── Planetes
+    │   ├── Textures
+    │   └── Orientació física
+    ├── Anells planetaris
+    │   └── Saturn
+    └── Satèl·lits naturals
+        ├── Tots
+        ├── Mart
+        ├── Júpiter
+        ├── Saturn
+        ├── Urà
+        ├── Neptú
+        ├── Plutó
+        ├── Òrbites
+        └── Etiquetes
+```
+
+No crear un panell flotant nou.
+
+Controls mínims:
+
+- [ ] toggle general de satèl·lits;
+- [ ] toggle per sistema planetari;
+- [ ] toggle d’òrbites;
+- [ ] toggle d’etiquetes;
+- [ ] toggle d’anells planetaris;
+- [ ] selector de nivell de detall `Auto / Fidedigne / Diagnòstic` si l’arquitectura UI ho admet;
+- [ ] estat de kernels instal·lats;
+- [ ] estat de cobertura de la data seleccionada;
+- [ ] recompte `catalogats / amb efemèride / visibles / renderitzats`.
+
+No mostrar 461 checkboxes individuals per defecte.
+
+### Picking i inspecció
+
+Els planetes i satèl·lits han de ser seleccionables amb el sistema de picking existent.
+
+Informació d’inspecció mínima:
+
+```text
+nom
+NAIF ID
+tipus
+pare
+RA/Dec o Az/Alt
+separació respecte del planeta pare
+distància a l’observador
+radi/diàmetre
+mida angular
+fase si aplica
+kernel SPK actiu
+coverage
+frame d’orientació
+qualitat d’orientació
+qualitat de forma
+textura/font visual
+```
+
+Si hi ha elements orbitals descriptius:
+
+```text
+semieix major
+excentricitat
+inclinació
+període
+pla de referència
+```
+
+### Bridge
+
+No enviar objectes JSON gegants per tick.
+
+Contractes conceptuals:
+
+```text
+solar_system_catalog_manifest
+solar_system_resource_manifest
+solar_system_state_delta
+body_orientation_delta
+orbit_geometry_ready
+orbit_geometry_binary
+kernel_status_changed
+```
+
+Separar:
+
+```text
+catàleg estàtic       → una vegada per generació
+estat dinàmic         → deltes petits
+òrbites               → binari per generació
+textures              → URL/path local gestionat pel frontend, mai bridge bytes
+```
+
+Per tick ordinari, enviar només els cossos que realment necessitin actualització segons la política temporal.
+
+### Política temporal
+
+No totes les propietats s’actualitzen a la mateixa freqüència.
+
+```text
+camera frame
+→ frontend only
+
+clock interpolation
+→ frontend
+
+authoritative celestial state
+→ tick científic Python
+
+body orientation
+→ tick científic o quan la tolerància angular ho exigeixi
+
+orbit geometry
+→ només canvi de generació
+
+texture
+→ només canvi de recurs
+```
+
+No consultar SPICE 461 × 60 vegades per segon.
+
+### Batch científic
+
+L’adaptador d’efemèrides ha de poder resoldre lots.
+
+Preferir:
+
+```text
+get_states(body_ids, et, observer)
+```
+
+a:
+
+```text
+for body in 461:
+    bridge_request(body)
+```
+
+SPICE viu a Python i pot fer les consultes necessàries dins d’una operació de domini/aplicació. El frontend mai fa polling per cos.
+
+### Cache
+
+Caches separades:
+
+```text
+kernel cache
+catalog cache
+body constants cache
+orientation frame cache
+orbit sample cache
+texture resource cache
+```
+
+Claus mínimes d’òrbita:
+
+```text
+bodyId
+kernelGeneration
+t0ET
+t1ET
+sampleCount
+frame
+```
+
+Claus mínimes d’orientació:
+
+```text
+bodyId
+kernelGeneration
+instant bucket/tolerance
+```
+
+No cachejar silenciosament fora del rang de cobertura.
+
+### Lifecycle SPICE
+
+La càrrega de kernels ha de ser idempotent.
+
+Requisits:
+
+- [ ] carregar cada kernel una sola vegada per lifecycle;
+- [ ] registrar la generació activa;
+- [ ] descarregar/netejar de manera controlada en shutdown si l’adaptador ho requereix;
+- [ ] evitar `furnsh()` repetit per tick;
+- [ ] evitar estat global no controlat en tests;
+- [ ] permetre tests amb un kernel set aïllat;
+- [ ] serialitzar l’accés si la llibreria/estratègia triada ho necessita;
+- [ ] no fer que Three.js conegui el kernel pool.
+
+### Logging MGP
+
+Format existent:
+
+```text
+MGP: [ARXIU] [MÈTODE] [MISSATGE]
+```
+
+Exemples:
+
+```text
+MGP: [KernelManager.py] [load] [Kernel carregat type=SPK file=sat441.bsp generation=3]
+MGP: [SatelliteCatalog.py] [build] [Catàleg validat total=461 covered=461 snapshot=2026-07-09]
+MGP: [BodyOrientationService.py] [resolve] [Orientació unavailable body=HYPERION source=pck00011]
+MGP: [OrbitSampler.py] [sample] [Òrbita mostrejada body=TITAN samples=512 interval_days=15.945]
+MGP: [PlanetTextureRegistry.ts] [load] [Textura carregada body=SATURN resource=...]
+MGP: [SaturnRingRenderer.ts] [init] [Anells persistents creats]
+```
+
+No registrar:
+
+- cada frame;
+- cada satèl·lit a cada tick correcte;
+- cada lookup de cache;
+- cada actualització de transform;
+- cada sample d’òrbita individual.
+
+### Tasques — caracterització prèvia
+
+- [ ] Revisar el resultat real dels Passos 8 i 8.5.
+- [ ] Identificar exactament quina llibreria calcula ara les efemèrides.
+- [ ] Identificar el frame autoritatiu actual.
+- [ ] Identificar la política d’aberració actual.
+- [ ] Identificar la conversió topocèntrica actual.
+- [ ] Identificar el renderer lunar reutilitzable.
+- [ ] Enumerar `I:\TerraLab\data\sky\solar-system\planets`.
+- [ ] Generar inventari de textures reals amb hash i dimensions.
+- [ ] Detectar si existeix asset d’anells de Saturn.
+- [ ] Comprovar l’estat del gestor de dades per kernels.
+- [ ] Comparar amb TerraLab només per comportament existent.
+
+### Tasques — infraestructura SPICE/efemèrides
+
+- [ ] Afegir/estendre l’adaptador per carregar SPK de satèl·lits.
+- [ ] Afegir PCK `pck00011.tpc` o equivalent compatible.
+- [ ] Afegir LSK actual.
+- [ ] Definir manifest de kernels.
+- [ ] Verificar SHA-256.
+- [ ] Parsejar/inventariar `aa_summaries.txt` o generar equivalent local reproduïble.
+- [ ] Resoldre cobertura per NAIF ID i instant.
+- [ ] Implementar batch de posicions i velocitats.
+- [ ] Implementar transformacions body-fixed quan existeixin.
+- [ ] Exposar qualitat/fallback sense filtrar tipus SPICE al domini.
+
+### Tasques — catàleg complet
+
+- [ ] Construir snapshot versionat dels 461 planetary satellites.
+- [ ] Validar el recompte total.
+- [ ] Validar recompte per sistema.
+- [ ] Mapar NAIF ID ↔ nom/designació ↔ pare.
+- [ ] Mapar cada cos als SPK que el cobreixen.
+- [ ] Detectar cos sense SPK i generar report, no ometre’l silenciosament.
+- [ ] Incorporar paràmetres físics disponibles.
+- [ ] Incorporar frame d’orientació disponible.
+- [ ] Marcar orientació absent.
+- [ ] No inventar radi, textura ni rotació.
+
+### Tasques — renderer planetari genèric
+
+- [ ] Extreure components reutilitzables del renderer lunar.
+- [ ] Crear geometria base compartida o cachejada.
+- [ ] Suportar esfera i el·lipsoide.
+- [ ] Carregar textura local per manifest.
+- [ ] Aplicar quaternion científic.
+- [ ] Aplicar il·luminació solar física.
+- [ ] Aplicar LOD.
+- [ ] Integrar picking.
+- [ ] Integrar labels.
+- [ ] Implementar `dispose` idempotent.
+
+### Tasques — planetes
+
+- [ ] Mercuri texturitzat i orientat.
+- [ ] Venus texturitzat i orientat.
+- [ ] Mart texturitzat i orientat.
+- [ ] Júpiter texturitzat i orientat.
+- [ ] Saturn texturitzat i orientat.
+- [ ] Urà texturitzat i orientat.
+- [ ] Neptú texturitzat i orientat.
+- [ ] Plutó suportat pel model genèric si existeix recurs visual.
+- [ ] Validar sentit de rotació, inclosos cossos retrògrads.
+- [ ] No codificar “obliquity = X” al renderer si el frame PCK ja ho resol.
+
+### Tasques — Saturn
+
+- [ ] Obtenir orientació de Saturn del frame/PCK.
+- [ ] Derivar el pla equatorial de la transformació física.
+- [ ] Crear `ringSystem` persistent.
+- [ ] Orientar-lo amb Saturn, no amb un angle visual manual.
+- [ ] Implementar dimensions radials documentades.
+- [ ] Implementar A/B/C + Cassini com a mínim.
+- [ ] Utilitzar textura/alpha local si existeix i és adequada.
+- [ ] Implementar fallback radial si no existeix.
+- [ ] Validar depth/oclusió davant/darrere del planeta.
+- [ ] Calcular `B` només com a diagnòstic.
+- [ ] Provar dates amb anells molt oberts i propers al cantell.
+
+### Tasques — satèl·lits naturals
+
+- [ ] Crear tots els satèl·lits com a entitats data-driven.
+- [ ] Resoldre la seva posició SPK.
+- [ ] Convertir a topocèntric amb el mateix pipeline del Pas 8.
+- [ ] Aplicar mida angular quan el radi és conegut.
+- [ ] Aplicar orientació quan el PCK/frame existeix.
+- [ ] Marcar `orientationUnavailable` quan no existeix.
+- [ ] No assumir rotació síncrona.
+- [ ] Implementar material neutre per cossos sense textura.
+- [ ] Implementar LOD per satèl·lits unresolved.
+- [ ] Fer-los seleccionables.
+- [ ] Permetre activar/desactivar per sistema planetari.
+
+### Tasques — òrbites
+
+- [ ] Implementar `OrbitSampler` o equivalent a Python.
+- [ ] Mostrejar SPK respecte del pare.
+- [ ] Seleccionar interval coherent amb període/cobertura.
+- [ ] Fer sample count adaptatiu segons curvatura/període/LOD si és necessari.
+- [ ] Generar buffers binaris.
+- [ ] Crear `THREE.BufferGeometry` persistent.
+- [ ] Versionar per `orbitGeneration`.
+- [ ] No regenerar per tick.
+- [ ] No confondre òrbita planetocèntrica amb trajectòria topocèntrica del Pas 9.
+
+### Tasques — UI i diagnòstic
+
+- [ ] Integrar controls al calaix `Cel` existent.
+- [ ] Afegir recompte de satèl·lits disponibles.
+- [ ] Afegir estat de kernels.
+- [ ] Afegir estat de coverage temporal.
+- [ ] Afegir toggle d’òrbites.
+- [ ] Afegir toggle d’anells.
+- [ ] Afegir filtre per sistema planetari.
+- [ ] Mostrar qualitat científica del cos seleccionat.
+- [ ] No crear 461 controls individuals permanents.
+
+### Proves obligatòries — catàleg i kernels
+
+- [ ] Snapshot de catàleg total = 461 per al dataset 2026-07-09.
+- [ ] Terra = 1.
+- [ ] Mart = 2.
+- [ ] Júpiter = 115.
+- [ ] Saturn = 293.
+- [ ] Urà = 29.
+- [ ] Neptú = 16.
+- [ ] Plutó = 5.
+- [ ] Cap duplicat de NAIF ID.
+- [ ] Cap satèl·lit desapareix silenciosament si falta kernel.
+- [ ] Tots els kernels del manifest passen checksum.
+- [ ] Coverage start/end es respecta.
+- [ ] Precedència de kernels duplicats és determinista.
+
+### Proves obligatòries — efemèrides
+
+Fixtures mínimes representatives:
+
+```text
+Moon
+Phobos
+Deimos
+Io
+Europa
+Ganymede
+Callisto
+Titan
+Enceladus
+Iapetus
+Phoebe
+Miranda
+Titania
+Oberon
+Triton
+Nereid
+Charon
+Nix
+Hydra
+```
+
+Per cada fixture:
+
+- [ ] posició J2000/ICRF dins tolerància;
+- [ ] distància respecte del pare;
+- [ ] separació angular vista des de l’observador;
+- [ ] continuïtat temporal;
+- [ ] canvi d’un segon no recrea recursos;
+- [ ] data fora de coverage falla explícitament.
+
+Afegir fixtures d’irregulars de Júpiter i Saturn per evitar que només funcioni el cas de les llunes grans.
+
+### Proves obligatòries — orientació
+
+- [ ] Saturn: pol/equador compatible amb PCK.
+- [ ] Urà: orientació retrògrada correcta.
+- [ ] Io: orientació body-fixed disponible.
+- [ ] Europa: orientació body-fixed disponible.
+- [ ] Tità: orientació body-fixed disponible.
+- [ ] Febe: orientació body-fixed disponible quan el PCK la proporciona.
+- [ ] Hiperió: no inventa orientació.
+- [ ] `camera roll` no recalcula el cos.
+- [ ] walk/flight amb temps pausat = 0 requests científics nous.
+- [ ] resize/FOV = 0 requests d’orientació.
+
+### Proves obligatòries — mapping de textures
+
+Per cada textura planetària local:
+
+- [ ] hash estable;
+- [ ] càrrega única;
+- [ ] absència de Base64;
+- [ ] absència de bridge bytes de textura;
+- [ ] mapping UV documentat;
+- [ ] no hi ha offset dependent de data;
+- [ ] orientationRoot rota el cos sense modificar UV;
+- [ ] canvi de temps no recarrega textura.
+
+### Proves obligatòries — Saturn i anells
+
+- [ ] Ring plane perpendicular al pol de Saturn dins tolerància numèrica.
+- [ ] `B` calculat per diagnòstic coincideix amb la geometria.
+- [ ] Quan `B ≈ 0`, els anells es veuen de cantell.
+- [ ] En canviar de signe `B`, es veu la cara oposada sense flip artificial.
+- [ ] A/B/C i Cassini mantenen proporcions radials.
+- [ ] Planeta oculta correctament la part posterior.
+- [ ] Part anterior oculta correctament el disc quan correspon.
+- [ ] Sense z-fighting.
+- [ ] Textura dels anells carregada una vegada si existeix.
+- [ ] `ring_geometry_build_count` estable.
+- [ ] `ring_material_build_count` estable.
+
+### Proves obligatòries — òrbites
+
+- [ ] Òrbita de Fobos mostrejada des de SPK.
+- [ ] Òrbites galileanes mostrejades des de SPK.
+- [ ] Òrbita de Tità mostrejada des de SPK.
+- [ ] Òrbita de Tritó reflecteix orientació retrògrada.
+- [ ] Òrbita irregular no es força a tancar.
+- [ ] Canvi de càmera = 0 regeneracions.
+- [ ] Canvi d’un segon = 0 regeneracions si l’interval no canvia.
+- [ ] Canvi d’interval = nova `orbitGeneration`.
+- [ ] Buffer vell es disposa després de substituir-lo.
+
+### Proves visuals
+
+- [ ] Mercuri, Venus i Mart amb terminador coherent.
+- [ ] Júpiter amb orientació de textura coherent.
+- [ ] Saturn amb anells físicament inclinats.
+- [ ] Urà amb eix extrem correctament representat.
+- [ ] Neptú orientat correctament.
+- [ ] Io/Europa/Ganimedes/Cal·listo a posicions relatives plausibles i validades.
+- [ ] Tità visible al voltant de Saturn quan el FOV ho permet.
+- [ ] Llunes petites passen a sprite/punt sense desaparèixer del catàleg.
+- [ ] Sistema planetari amb òrbites activades sense saturació de labels.
+- [ ] Mateix instant des de dos observadors: diferència topocèntrica coherent.
+- [ ] Rotar la càmera no canvia l’estat científic.
+
+### Rendiment
+
+Mesurar amb:
+
+- planetes activats;
+- Saturn i anells;
+- sistema de Júpiter;
+- sistema de Saturn amb totes les llunes disponibles;
+- tots els satèl·lits catalogats però amb LOD/culling normal;
+- òrbites d’un sistema activades.
+
+Mètriques obligatòries:
+
+```text
+solar_body_geometry_build_count
+solar_body_material_build_count
+planet_texture_load_count
+planet_texture_upload_bytes
+satellite_catalog_count
+satellite_state_count_per_tick
+spice_query_duration_ms
+orientation_batch_duration_ms
+orbit_sampling_duration_ms
+orbit_geometry_build_count
+orbit_bridge_bytes
+solar_system_bridge_bytes_per_tick
+GPU memory estimate
+frame P50/P95
+```
+
+Criteris:
+
+- [ ] 0 textures enviades pel bridge.
+- [ ] 0 kernels enviats pel bridge.
+- [ ] 0 reconstruccions de geometria planetària per tick.
+- [ ] 0 reconstruccions d’anells per tick.
+- [ ] 0 regeneracions d’òrbita per frame.
+- [ ] 0 calls Python per frame de càmera.
+- [ ] memòria estable durant timeline prolongada.
+- [ ] cap bucle de 461 cossos a 60 Hz al frontend si els cossos no necessiten actualització visual.
+
+### Criteri de sortida
+
+El Pas 8.6 no es considera complet fins que:
+
+- [ ] les textures existents de `I:\TerraLab\data\sky\solar-system\planets` s’utilitzen a través de `data_location.json`, sense hardcodejar la unitat;
+- [ ] els planetes reutilitzen el pipeline genèric extret de la Lluna sempre que sigui aplicable;
+- [ ] els planetes tenen orientació física derivada del model científic, no rotations visuals manuals;
+- [ ] Saturn té anells persistents alineats amb el seu equador real;
+- [ ] la inclinació aparent dels anells emergeix de la geometria;
+- [ ] el catàleg del snapshot cobreix 461 planetary satellites;
+- [ ] tots els satèl·lits amb SPK vàlid poden obtenir posició;
+- [ ] cap absència de kernel/orientació/textura queda amagada;
+- [ ] els satèl·lits sense orientació coneguda no reben rotació inventada;
+- [ ] les òrbites es deriven de mostres SPK i no d’el·lipses ideals com a autoritat;
+- [ ] les òrbites romanen persistents a GPU;
+- [ ] els elements orbitals són metadades, no el motor de posició;
+- [ ] la ciència continua íntegrament a Python;
+- [ ] Three.js només representa estat científic + recursos visuals;
+- [ ] el bridge envia deltes petits i buffers d’òrbita només per generació;
+- [ ] la càmera local no recalcula planetes ni llunes;
+- [ ] el sistema és data-driven i no conté centenars de classes específiques;
+- [ ] lifecycle i `dispose` són idempotents;
+- [ ] totes les proves científiques, visuals i de rendiment passen;
+- [ ] els Passos 1–8.5 continuen funcionant;
+- [ ] el Pas 9 encara no s’ha començat.
+
+### Evidència obligatòria
+
+- [ ] Manifest de textures planetàries real de la carpeta de dades.
+- [ ] Hash de totes les textures utilitzades.
+- [ ] Manifest de kernels amb URL, hash i coverage.
+- [ ] Snapshot versionat del catàleg JPL.
+- [ ] Report de cobertura `catalogats / amb SPK / amb orientació / amb radi / amb textura`.
+- [ ] Prova numèrica del pol/equador de Saturn.
+- [ ] Prova numèrica de `B` dels anells en diverses dates.
+- [ ] Captures de Saturn amb anells oberts i propers al cantell.
+- [ ] Captures dels sistemes de Júpiter, Saturn, Urà i Neptú amb llunes.
+- [ ] Captura de Plutó + Caront/Nix/Hidra/Quèrberos/Estix quan el FOV/mode d’inspecció ho permeti.
+- [ ] Vídeo de timeline amb moviment continu de llunes sense reconstrucció de recursos.
+- [ ] Vídeo activant/desactivant òrbites.
+- [ ] Fixture d’Hiperió demostrant fallback honest d’orientació.
+- [ ] Prova de data fora de coverage.
+- [ ] Prova que canviar FOV/resize/camera roll no fa queries SPICE.
+- [ ] Prova que caminar/volar no fa queries SPICE amb temps pausat.
+- [ ] Mètriques P50/P95.
+- [ ] Mètriques de bytes del bridge.
+- [ ] Mètriques de memòria GPU.
+- [ ] Prova d’arrencada → tancament → arrencada sense kernels/textures/geometries duplicats.
+
+### Fora d’abast del pas
+
+Aquest pas no implementa encara:
+
+- eclipsis i contactes;
+- ocultacions entre cossos;
+- trajectòries topocèntriques temporals del Pas 9;
+- atmosfera meteorològica temporal de Júpiter/Saturn;
+- núvols 3D volumètrics planetaris;
+- ombres topogràfiques d’alta resolució sobre totes les llunes;
+- DSK d’alta resolució per centenars de cossos;
+- textures científiques d’alta resolució per a totes les llunes quan no existeixen;
+- satèl·lits artificials;
+- navegació física sobre altres planetes;
+- tots els sistemes binaris de small bodies com a criteri de tancament.
+
+Aquests elements no poden justificar dades inventades dins del Pas 8.6.
+
+### Regla final del Pas 8.6
+
+```text
+SPK decideix on és el cos;
+PCK/FK/BPC decideix com està orientat quan existeix model;
+JPL physical parameters decideixen mida/forma quan existeixen dades;
+els recursos locals decideixen l’aspecte visual disponible;
+Three.js manté geometria/materials/textures persistents;
+la càmera només projecta l’estat resultant.
+```
+
+Per Saturn:
+
+```text
+orientació de Saturn
+→ pol nord
+→ pla equatorial
+→ pla dels anells
+→ projecció de càmera
+→ inclinació aparent correcta
+```
+
+Mai:
+
+```text
+angle aparent dels anells
+→ rotació manual del mesh
+```
+
+## Pas 8.7 — Il·luminació física de l’escena: Sol, Lluna, cel i materials PBR
+
+### Resultat funcional palpable
+
+L’escena deixa d’utilitzar una il·luminació genèrica o desconnectada de l’estat astronòmic. El terreny tècnic, els objectes locals i qualsevol superfície 3D compatible reaccionen de manera contínua a la posició real del Sol, a la llum lunar i a la contribució difusa del cel.
+
+En moure la timeline:
+
+- el Sol il·lumina el món des de la direcció topocèntrica autoritativa del Pas 8;
+- la llum directa solar varia de forma coherent amb l’altura solar i l’estat atmosfèric del Pas 7;
+- la Lluna pot aportar llum nocturna des de la seva direcció topocèntrica real;
+- la llum lunar queda modulada per fase, distància, altura i qualitat del model disponible;
+- el cel aporta una component difusa diferenciada de la llum directa;
+- el terreny i els objectes mostren volum, normals, rugositat i ombres coherents;
+- dia, crepuscle i nit transicionen sense salts d’intensitat ni canvis artificials de material;
+- caminar o volar canvia el punt de vista i les ombres locals, però no recalcula efemèrides, atmosfera o fotometria científica;
+- cap geometria, textura o material persistent es recrea per tick.
+
+Aquest pas converteix el sistema d’il·luminació en un consumidor de l’estat científic existent. **Three.js no esdevé l’autoritat astronòmica ni atmosfèrica.**
+
+### Fonts a consultar
+
+#### TerraLab3D `main`
+
+Revisar l’estat real del repositori abans d’implementar, especialment:
+
+- `backend/src/terralab3d/domain/sky_background/sky_environment.py`
+- implementació final del `SkyEnvironmentSnapshot` o equivalent del Pas 7;
+- implementació final del `SolarSystemSnapshot` o equivalent del Pas 8;
+- estat final d’orientació i il·luminació lunar del Pas 8.5;
+- `backend/src/terralab3d/infrastructure/websocket_bridge.py`
+- `frontend/src/contracts/bridge_messages.ts`
+- `frontend/src/view/three/ThreeSceneHostImpl.ts`
+- `frontend/src/view/three/AtmosphereRenderer.ts`
+- renderer del sistema solar;
+- renderer lunar;
+- materials i geometries del terreny tècnic;
+- render loop, lifecycle, diagnòstic i comptadors GPU existents;
+- convenció ENU → Three.js real de `main`.
+
+No pressuposis els noms exactes dels símbols creats als Passos 7, 8 i 8.5. Preval sempre el codi real de `main`.
+
+#### TerraLab, només com a referència funcional
+
+Consultar només per caracteritzar comportament, fórmules o decisions visuals reutilitzables:
+
+- `TerraLab/render/sky_renderer.py`
+- `TerraLab/astro/engine.py`
+- `TerraLab/astro/ephemeris_coordinator.py`
+- `TerraLab/runtime/offscreen_renderer.py`
+- `TerraLab/widgets/physical_math.py`
+- proves relacionades amb Sol, Lluna, atmosfera, crepuscle i render si existeixen.
+
+No copiar una il·luminació 2D o una composició QPainter si entra en conflicte amb el model 3D persistent.
+
+#### Fonts externes obligatòries
+
+**Three.js — DirectionalLight**
+
+`https://threejs.org/docs/pages/DirectionalLight.html`
+
+S’utilitza com a implementació renderer-side de fonts pràcticament infinites amb raigs paral·lels. És l’adaptació adequada per a la llum directa del Sol i, a l’escala local de TerraLab3D, també per a la llum directa de la Lluna.
+
+**Three.js — Lights manual**
+
+`https://threejs.org/manual/en/lights.html`
+
+Utilitzar-la per caracteritzar les limitacions de `AmbientLight` i `HemisphereLight`. `AmbientLight` no ha de ser el model principal del cel. `HemisphereLight` es pot utilitzar com a implementació inicial o fallback de la component difusa, però no com a model científic.
+
+**Three.js — MeshStandardMaterial**
+
+`https://threejs.org/docs/pages/MeshStandardMaterial.html`
+
+Material PBR base preferent per a terreny i superfícies opaques ordinàries.
+
+**Three.js — MeshPhysicalMaterial**
+
+`https://threejs.org/docs/pages/MeshPhysicalMaterial.html`
+
+Només s’ha d’utilitzar quan una superfície necessiti propietats avançades que justifiquin el seu cost addicional. No convertir-lo en material universal per defecte.
+
+**Three.js — WebGLRenderer**
+
+`https://threejs.org/docs/pages/WebGLRenderer.html`
+
+Consultar configuració actual de color space, tone mapping, shadow maps, capacitats, `renderer.info` i lifecycle.
+
+**Three.js — LightShadow / DirectionalLightShadow**
+
+`https://threejs.org/docs/pages/LightShadow.html`
+
+`https://threejs.org/docs/pages/DirectionalLightShadow.html`
+
+Utilitzar per implementar ombres locals controlades, mesurables i amb lifecycle explícit.
+
+### Objectiu
+
+Crear una vertical d’il·luminació persistent que transformi l’estat científic ja calculat pels Passos 7, 8, 8.5 i 8.6 en paràmetres de renderització Three.js, sense duplicar efemèrides, atmosfera ni geometria científica al frontend.
+
+La separació obligatòria és:
+
+```text
+Pas 7 — atmosfera i cel
+        │
+Pas 8 — Sol i Lluna topocèntrics
+        │
+Pas 8.5 — geometria Sol–Lluna i orientació lunar
+        │
+        ▼
+Pas 8.6 — textura planetes + satel·lits
+        │
+        ▼
+LightingEnvironmentComposer
+        │
+        ▼
+LightingEnvironmentSnapshot
+        │
+        ▼
+Bridge
+        │
+        ▼
+Three.js Lighting Adapter
+├── SunDirectionalLight
+├── MoonDirectionalLight
+├── DiffuseSkyLighting
+├── ShadowController
+└── PBRMaterialPolicy
+```
+
+La regla arquitectònica central és:
+
+```text
+Python determina QUINA llum física/astronòmica existeix i d’on prové.
+Three.js determina COM aquesta llum es representa eficientment a la GPU.
+```
+
+### Regles d’autoritat
+
+- [ ] La direcció del Sol prové exclusivament de l’estat autoritatiu del Pas 8.
+- [ ] La direcció de la Lluna prové exclusivament de l’estat autoritatiu del Pas 8.
+- [ ] La fase lunar no es recalcula dins del renderer.
+- [ ] L’altura solar no es recalcula dins del renderer.
+- [ ] L’altura lunar no es recalcula dins del renderer.
+- [ ] L’atenuació o transmittància atmosfèrica reutilitza el Pas 7; no es crea un segon model de cel dins del sistema de llums.
+- [ ] El frontend pot interpolar valors entre snapshots autoritatius, però no crear una segona efemèride.
+- [ ] Els shaders poden avaluar BRDF, normals, ombres i combinació de llum, però no calcular efemèrides ni decisions científiques.
+- [ ] Els valors visuals no calibrats físicament s’han de marcar com a `visual` o `approximate`; no s’han de presentar com a lux, irradiància o fotometria científica si no existeix un model validat.
+- [ ] La translació de la càmera no modifica l’estat científic de la il·luminació.
+- [ ] El roll de càmera no modifica la direcció científica del Sol o la Lluna.
+
+### Estat d’il·luminació neutral
+
+Crear un contracte renderer-neutral equivalent conceptualment a:
+
+```ts
+interface DirectionENU {
+  east: number;
+  up: number;
+  north: number;
+}
+
+interface DirectLightState {
+  enabled: boolean;
+  directionToSourceENU: DirectionENU;
+  altitudeDeg: number;
+  colorLinear: [number, number, number];
+  intensity: number;
+  intensityKind: "physical" | "relative" | "visual";
+  quality: "scientific" | "approximate" | "fallback" | "unavailable";
+}
+
+interface DiffuseSkyLightState {
+  enabled: boolean;
+  zenithColorLinear: [number, number, number];
+  horizonColorLinear: [number, number, number];
+  groundColorLinear: [number, number, number];
+  intensity: number;
+  quality: "scientific" | "approximate" | "fallback";
+}
+
+interface LightingEnvironmentSnapshot {
+  generation: number;
+  timestampUtc: string;
+  sun: DirectLightState;
+  moon: DirectLightState;
+  skyDiffuse: DiffuseSkyLightState;
+  exposureHint?: number;
+  sourceSkyGeneration: number;
+  sourceSolarSystemGeneration: number;
+}
+```
+
+Els noms exactes s’han d’adaptar als contractes reals existents. No crear un segon `SkyEnvironmentSnapshot` o `SolarSystemSnapshot` duplicat.
+
+### Tasques
+
+#### Composició de l’estat d’il·luminació
+
+- [ ] Crear una única responsabilitat d’aplicació o domini, conceptualment `LightingEnvironmentComposer`.
+- [ ] Consumir l’estat del Pas 7 i el Pas 8 en lloc de recalcular-los.
+- [ ] Incorporar del Pas 8.5 només els paràmetres lunars necessaris per a la il·luminació.
+- [ ] Produir un snapshot petit, immutable, tipat i versionat.
+- [ ] Normalitzar i validar tots els vectors ENU.
+- [ ] Rebutjar NaN, infinits, vectors degenerats i intensitats negatives.
+- [ ] Propagar `generation` i qualitat de les fonts d’origen.
+- [ ] Aplicar latest-wins davant canvis ràpids de timeline.
+- [ ] No bloquejar el render si una component de llum queda unavailable.
+
+#### Llum directa solar
+
+Implementació Three.js preferent:
+
+```text
+Scientific Sun direction
+        ↓
+LightingEnvironmentSnapshot.sun
+        ↓
+ENU → Three.js
+        ↓
+THREE.DirectionalLight
+```
+
+- [ ] Utilitzar una única `DirectionalLight` solar persistent.
+- [ ] No crear ni destruir la llum solar per tick.
+- [ ] Actualitzar direcció, color i intensitat sobre l’objecte existent.
+- [ ] Recordar que `DirectionalLight` utilitza `position` + `target`; no confiar en `rotation` com a mecanisme de direcció.
+- [ ] Centralitzar la conversió `directionToSourceENU` → direcció efectiva del `DirectionalLight`.
+- [ ] Fer que la llum solar sigui nul·la o inactiva quan el model autoritatiu determini que no hi ha llum directa sobre el món local.
+- [ ] Reutilitzar l’atenuació/color atmosfèrics del Pas 7 quan estiguin disponibles.
+- [ ] Evitar un canvi cromàtic manual duplicat per alba o posta si el Pas 7 ja en determina l’estat.
+- [ ] Fer transicions contínues durant sortida, posta i crepuscles.
+- [ ] Permetre ombres solars segons la política de qualitat definida en aquest pas.
+
+La posició artificial utilitzada internament per orientar `DirectionalLight` no té significat astronòmic. La dada científica és el vector de direcció.
+
+#### Llum directa lunar
+
+Implementació Three.js preferent:
+
+```text
+Scientific Moon direction + phase + distance
+        ↓
+LightingEnvironmentSnapshot.moon
+        ↓
+ENU → Three.js
+        ↓
+THREE.DirectionalLight
+```
+
+- [ ] Utilitzar una única `DirectionalLight` lunar persistent.
+- [ ] No representar la llum lunar amb `PointLight`.
+- [ ] Reutilitzar posició, fase i distància del Pas 8.
+- [ ] Reutilitzar la geometria Sol–Lluna disponible després del Pas 8.5.
+- [ ] Atenuar o anul·lar la component directa quan la Lluna no és visible des de l’observador, segons el model definit.
+- [ ] Fer que Lluna nova, quart i plena no produeixin la mateixa intensitat.
+- [ ] Fer que la variació sigui contínua amb la timeline.
+- [ ] No utilitzar una constant arbitrària presentada com a fotometria científica.
+- [ ] Si només existeix una aproximació visual, marcar `intensityKind = visual` i `quality = approximate/fallback`.
+- [ ] No confondre l’autoil·luminació visual del disc lunar amb la llum que la Lluna aporta al terreny.
+- [ ] Permetre desactivar les ombres lunars si el cost no justifica el resultat.
+
+#### Component difusa del cel
+
+`AmbientLight` no ha de ser el model principal de la llum del cel perquè no té direcció ni distingeix orientació de les superfícies.
+
+Crear una abstracció renderer-side equivalent a:
+
+```ts
+interface DiffuseSkyLightingAdapter {
+  apply(state: DiffuseSkyLightState): void;
+  setEnabled(enabled: boolean): void;
+  dispose(): void;
+}
+```
+
+Implementació inicial acceptable:
+
+```text
+DiffuseSkyLightState
+        ↓
+HemisphereLight
+```
+
+sempre que quedi documentada com una aproximació visual.
+
+- [ ] Utilitzar `HemisphereLight` com a primera implementació si proporciona prou qualitat i rendiment.
+- [ ] Reservar la possibilitat de substituir-la per environment lighting, spherical harmonics o una tècnica equivalent sense canviar el domini.
+- [ ] Reutilitzar colors i estat atmosfèric del Pas 7.
+- [ ] Diferenciar contribució de zenit/hemisferi superior i terra/hemisferi inferior quan el model disponible ho permeti.
+- [ ] Evitar que la component difusa mantingui el terreny artificialment brillant durant una nit fosca.
+- [ ] Evitar que `AmbientLight` s’utilitzi per “arreglar” materials o ombres mal calibrades.
+- [ ] Si s’utilitza `AmbientLight` temporalment en fallback, registrar-ho i mantenir una intensitat explícita i limitada.
+
+#### Contaminació lumínica
+
+La contaminació lumínica del Pas 7 **no** s’ha de convertir en milers de `PointLight` o `SpotLight` ficticis.
+
+- [ ] Mantenir Bortle/SQM i skyglow dins del model atmosfèric/visibilitat corresponent.
+- [ ] No crear fonts locals artificials sense dades espacials reals que les justifiquin.
+- [ ] Reservar `PointLight`, `SpotLight` i `RectAreaLight` per a futurs objectes locals emissius identificables, no per simular globalment la contaminació lumínica.
+- [ ] No augmentar la llum del terreny nocturn només perquè augmenti Bortle si no hi ha un model definit que relacioni ambdues magnituds.
+
+#### Materials PBR
+
+Definir una política explícita de materials per al món local.
+
+```text
+worldRoot
+└── renderables
+    └── PBRMaterialPolicy
+        ├── albedo
+        ├── roughness
+        ├── metalness
+        ├── normal
+        ├── ambient occlusion
+        └── emissive, només quan sigui realment emissiu
+```
+
+- [ ] Utilitzar `MeshStandardMaterial` com a material PBR base preferent per a superfícies opaques ordinàries.
+- [ ] Utilitzar `MeshPhysicalMaterial` només quan propietats com clearcoat, transmission, sheen o altres extensions siguin necessàries.
+- [ ] No pagar el cost de `MeshPhysicalMaterial` en tot el terreny sense justificació.
+- [ ] Per terreny natural, utilitzar `metalness = 0` com a valor base excepte quan una capa real indiqui una altra cosa.
+- [ ] Definir `roughness` de manera explícita i no utilitzar el valor només per compensar una llum mal calibrada.
+- [ ] Tractar albedo/color com a dada de color i normals/roughness/metalness/AO com a dades no-color.
+- [ ] Reutilitzar materials i textures persistents.
+- [ ] Actualitzar uniforms o propietats petites; no reconstruir materials quan canvia el Sol.
+- [ ] Preparar la política perquè els Passos 16 i 17 puguin connectar DEM, ortofoto i superfície sense reescriure el motor d’il·luminació.
+- [ ] No incorporar propietats de material científicament inventades quan el dataset no les proporciona; els defaults visuals han d’estar documentats com a tals.
+
+#### Color management i tone mapping
+
+- [ ] Revisar la versió de Three.js real instal·lada abans de tocar configuració de color.
+- [ ] Mantenir una única política global de color space.
+- [ ] Utilitzar `renderer.outputColorSpace` de manera explícita i coherent amb els assets.
+- [ ] Etiquetar correctament textures d’albedo/color i textures de dades.
+- [ ] Definir explícitament la política de tone mapping en lloc de dependre accidentalment del default de la versió.
+- [ ] Definir una exposició base i documentar qualsevol canvi dinàmic.
+- [ ] No implementar autoexposure agressiu que oculti errors de llum o alteri la visibilitat astronòmica sense control.
+- [ ] Si s’utilitza exposició dinàmica, separar `exposureHint` científic/ambiental del suavitzat visual renderer-side.
+- [ ] Evitar double gamma, textures rentades o normals interpretades en sRGB.
+- [ ] Verificar que captures diürnes, crepusculars i nocturnes mantenen rang tonal usable.
+
+#### Ombres
+
+Les ombres són una responsabilitat de renderització, no un nou càlcul astronòmic.
+
+Crear una política equivalent a:
+
+```ts
+type ShadowQuality = "off" | "low" | "medium" | "high";
+
+interface ShadowPolicy {
+  quality: ShadowQuality;
+  sunEnabled: boolean;
+  moonEnabled: boolean;
+  localRadiusM: number;
+}
+```
+
+- [ ] Activar shadow maps només quan la qualitat ho requereixi.
+- [ ] Prioritzar ombres solars.
+- [ ] Fer opcionals les ombres lunars.
+- [ ] Ajustar la càmera d’ombra a una zona local útil, no a centenars de quilòmetres indiscriminadament.
+- [ ] Actualitzar la càmera d’ombra quan la càmera visual es desplaça prou o quan canvia significativament la direcció de la llum.
+- [ ] Evitar reconstruir shadow maps, materials o llums per un simple canvi de FOV si no és necessari.
+- [ ] Evitar shadow acne i peter-panning amb `bias`/`normalBias` mesurats i documentats, no amb valors enormes.
+- [ ] Mesurar el cost de cada qualitat de shadow map.
+- [ ] Permetre `shadowMap.autoUpdate = false` o política equivalent quan l’escena i la llum estan estàtiques i sigui segur reutilitzar el mapa.
+- [ ] Invalidar explícitament l’ombra quan la direcció solar/lunar o la geometria visible ho requereixi.
+- [ ] Evitar shimmering greu durant translació mitjançant estabilització de la càmera d’ombra si és necessària.
+- [ ] No intentar resoldre en aquest pas ombres planetàries, eclipsis o self-shadowing topogràfic lunar detallat.
+
+#### Arbre de l’escena
+
+Afegir una responsabilitat explícita d’il·luminació sense desfer l’arbre existent:
+
+```text
+scene
+├── celestialRoot
+├── worldRoot
+├── lightingRoot
+│   ├── sunDirectionalLight
+│   ├── moonDirectionalLight
+│   └── diffuseSkyLight
+├── overlayRoot
+└── cameraRig
+```
+
+- [ ] `lightingRoot` no conté dades científiques autoritatives; només objectes de render.
+- [ ] La translació local de la càmera no altera les direccions astronòmiques.
+- [ ] Si cal reposicionar `DirectionalLight.position` i `target` per mantenir precisió o ombres locals, conservar exactament la direcció científica.
+- [ ] No adjuntar la llum solar o lunar a la càmera com si fossin un headlight.
+- [ ] No crear una escena separada només per a la il·luminació.
+- [ ] No crear un segon render loop.
+
+#### Renderer persistent i actualització per tick
+
+- [ ] Crear les llums una sola vegada durant inicialització.
+- [ ] Crear els materials del terreny tècnic una sola vegada, excepte canvis explícits de recurs o configuració.
+- [ ] Aplicar snapshots nous actualitzant valors petits.
+- [ ] Interpolar direcció i intensitat al frontend entre ticks normals quan millori la continuïtat visual.
+- [ ] Utilitzar interpolació angular robusta; no interpolar vectors degenerats.
+- [ ] Davant salts temporals grans, aplicar l’estat nou sense una transició llarga a través d’un cel físicament incorrecte.
+- [ ] No interpolar a través del canvi dia/nit de manera que la llum solar continuï activa sota l’horitzó.
+- [ ] Fer `dispose()` de materials, textures auxiliars, shadow maps i recursos creats pel sistema en shutdown.
+- [ ] Fer idempotents `start`, `apply`, `setQuality` i `dispose`.
+
+#### Bridge
+
+Enviar només l’estat compacte necessari.
+
+Exemple conceptual:
+
+```text
+lighting_environment_snapshot
+├── generation
+├── timestamp_utc
+├── sun
+│   ├── enabled
+│   ├── direction_enu
+│   ├── color_linear
+│   ├── intensity
+│   ├── intensity_kind
+│   └── quality
+├── moon
+│   ├── enabled
+│   ├── direction_enu
+│   ├── color_linear
+│   ├── intensity
+│   ├── intensity_kind
+│   └── quality
+└── sky_diffuse
+    ├── enabled
+    ├── zenith_color_linear
+    ├── horizon_color_linear
+    ├── ground_color_linear
+    ├── intensity
+    └── quality
+```
+
+- [ ] No enviar textures, cubemaps, shadow maps, geometries o materials pel bridge.
+- [ ] No duplicar dins del missatge totes les dades del Pas 7 i Pas 8 si només cal un subconjunt derivat.
+- [ ] Mantenir `generation`, correlació i descart stale.
+- [ ] Coalescing durant arrossegament ràpid de timeline.
+- [ ] Zero missatges d’il·luminació per frame.
+- [ ] Camera pan/orbit/roll → zero missatges científics d’il·luminació.
+- [ ] Walk/flight amb temps pausat → zero missatges científics d’il·luminació.
+- [ ] Canvi de qualitat d’ombres → operació local al frontend sempre que no requereixi dades noves.
+
+#### Integració amb el terreny tècnic i futurs Passos 16–17
+
+En aquest pas encara no s’ha d’anticipar el DEM final, però la il·luminació ha de quedar demostrada sobre una geometria local amb volum, normals i materials PBR.
+
+- [ ] Aplicar la il·luminació al terreny tècnic persistent disponible.
+- [ ] Incloure com a mínim pendents, plans i objectes amb normals diferents per validar la resposta lumínica.
+- [ ] Verificar ombres amb desnivells reals de la malla tècnica.
+- [ ] No implementar encara el pipeline DEM final.
+- [ ] Definir els punts d’extensió perquè el Pas 16 substitueixi la geometria tècnica per topografia real sense canviar `LightingEnvironmentComposer`.
+- [ ] Definir els punts d’extensió perquè el Pas 17 connecti albedo/ortofoto/cobertura a `PBRMaterialPolicy` sense canviar l’efemèride ni les llums.
+- [ ] No vincular materials PBR a una font concreta de dades.
+
+#### UI i diagnòstic
+
+No afegir un panell flotant nou.
+
+Integrar controls només on encaixin amb la UI existent, preferentment a diagnòstic o a la configuració visual:
+
+- [ ] toggle general d’il·luminació física només si és necessari per diagnòstic/comparació;
+- [ ] qualitat d’ombres `off/low/medium/high`;
+- [ ] indicador de font solar: `scientific/approximate/unavailable`;
+- [ ] indicador de font lunar: `scientific/approximate/fallback/unavailable`;
+- [ ] indicador de component difusa;
+- [ ] mostrar en diagnòstic direcció solar i lunar ENU;
+- [ ] mostrar intensitat i `intensityKind` sense etiquetar-la com a lux si no ho és;
+- [ ] mostrar recompte de shadow-map updates;
+- [ ] mostrar draw calls i memòria només en diagnòstic;
+- [ ] no exposar sliders arbitraris de “força del Sol” o “força de la Lluna” en la UI normal si trenquen l’autoritat científica.
+
+#### Logging MGP
+
+Respectar el format existent:
+
+```text
+MGP: [ARXIU] [MÈTODE] [MISSATGE]
+```
+
+Registrar només esdeveniments útils:
+
+```text
+MGP: [LightingEnvironmentComposer.py] [compose] [Snapshot generation=42 sun=scientific moon=approximate sky=scientific]
+MGP: [SceneLightingController.ts] [apply] [Il·luminació aplicada generation=42]
+MGP: [ShadowController.ts] [setQuality] [Qualitat canviada previous=medium current=high]
+MGP: [ShadowController.ts] [invalidateSunShadow] [Shadow solar invalidada reason=sun_direction_changed]
+MGP: [SceneLightingController.ts] [fallback] [Llum lunar unavailable; es manté cel difús]
+```
+
+No registrar:
+
+- cada frame;
+- cada interpolació;
+- cada canvi subpixel de shadow camera;
+- cada material processat;
+- cada actualització normal de uniforms.
+
+### Fallback honest
+
+Si el Pas 7 no proporciona component difusa suficient:
+
+```text
+llum solar directa  → disponible si Pas 8 està disponible
+llum lunar directa  → disponible segons qualitat del model
+llum difusa del cel → fallback visual explícit
+```
+
+Si falla l’efemèride solar:
+
+```text
+sunDirectionalLight → disabled
+atmosfera Pas 7      → conservar si pot operar honestament
+llum lunar           → conservar si és independent i vàlida
+status               → partial
+```
+
+Si falla l’estat lunar:
+
+```text
+llum solar           → disponible
+llum difusa          → disponible
+llum lunar directa   → unavailable
+```
+
+Si les shadow maps no són suportades o excedeixen el pressupost:
+
+```text
+il·luminació PBR → disponible
+ombres          → off/fallback
+status          → usable
+```
+
+No convertir un fallback visual en una dada científica falsa.
+
+### Proves obligatòries
+
+#### Autoritat científica i contractes
+
+- [ ] Mateixa UTC + mateixa ubicació → mateixa direcció solar independentment de la càmera.
+- [ ] Mateixa UTC + mateixa ubicació → mateixa direcció lunar independentment de la càmera.
+- [ ] Pan/orbit → zero recomputacions d’efemèrides.
+- [ ] Walk/flight amb temps pausat → zero recomputacions d’efemèrides i atmosfera.
+- [ ] Roll de càmera → no modifica vectors ENU del snapshot.
+- [ ] Canvi d’un segon → no recrea llums ni materials.
+- [ ] Salt temporal gran → no deixa una interpolació llarga entre estats incompatibles.
+- [ ] Snapshot rebutja NaN, infinits i vectors degenerats.
+- [ ] `generation` stale és descartada.
+- [ ] No hi ha càlcul de fase lunar al frontend.
+- [ ] No hi ha càlcul de posició solar al shader.
+
+#### Llum solar
+
+- [ ] Sol alt → ombres curtes i direcció coherent.
+- [ ] Sol baix → ombres llargues i direcció coherent.
+- [ ] Sortida de Sol → transició contínua.
+- [ ] Posta de Sol → transició contínua.
+- [ ] Sol sota horitzó → absència de llum directa solar segons el model.
+- [ ] La direcció del `DirectionalLight` coincideix amb el vector científic després de la conversió ENU → Three.js.
+- [ ] Canviar la posició local de càmera no canvia la direcció solar.
+
+#### Llum lunar
+
+- [ ] Lluna plena sobre l’horitzó → contribució nocturna visible si el model la proporciona.
+- [ ] Lluna nova → contribució directa fortament reduïda o nul·la segons el model.
+- [ ] Quart → intensitat diferent de plena i nova.
+- [ ] Lluna sota horitzó → component directa anul·lada segons el model.
+- [ ] La direcció lunar coincideix amb l’efemèride del Pas 8.
+- [ ] La llum sobre el terreny i el costat il·luminat del disc lunar són geomètricament compatibles amb el mateix Sol científic.
+
+#### Component difusa
+
+- [ ] Dia → superfícies en ombra conserven una contribució difusa coherent.
+- [ ] Crepuscle → transició contínua de la component difusa.
+- [ ] Nit fosca → no existeix un ambient artificialment elevat.
+- [ ] Canvi Bortle no crea automàticament llum directa local fictícia.
+- [ ] `AmbientLight` no és necessari per ocultar errors de normals o PBR.
+- [ ] Si s’utilitza `HemisphereLight`, la implementació queda marcada com a aproximació renderer-side.
+
+#### Materials PBR
+
+- [ ] Pla horitzontal, pendent nord, pendent sud i superfície vertical responen de manera diferent a la mateixa llum.
+- [ ] `metalness = 0` per al terreny tècnic base.
+- [ ] Roughness produeix resposta especular coherent sense alterar l’albedo.
+- [ ] Normal map, si existeix, modifica la resposta local però no la geometria.
+- [ ] Textures de dades no s’interpreten com a sRGB.
+- [ ] Cap material es reconstrueix per tick.
+- [ ] `MeshPhysicalMaterial` no s’utilitza on `MeshStandardMaterial` és suficient.
+
+#### Ombres
+
+- [ ] Shadow quality `off` elimina el cost de shadow rendering.
+- [ ] `low/medium/high` produeixen costos i resolucions documentats.
+- [ ] Shadow solar segueix la direcció del Sol.
+- [ ] Translació local actualitza la regió d’ombra sense alterar la direcció científica.
+- [ ] No hi ha shadow acne greu en terreny pla o pendent.
+- [ ] No hi ha peter-panning greu.
+- [ ] No hi ha shimmering inacceptable en moviment continu.
+- [ ] Shadow map no s’actualitza si càmera, geometria i llum continuen dins la política de reutilització.
+- [ ] Moon shadow off no desactiva la llum lunar.
+
+#### Persistència i rendiment
+
+- [ ] `sun_light_build_count = 1` després de la inicialització normal.
+- [ ] `moon_light_build_count = 1` després de la inicialització normal.
+- [ ] `diffuse_light_build_count = 1` per implementació activa.
+- [ ] `pbr_material_build_count` estable durant timeline.
+- [ ] `lighting_bridge_asset_bytes = 0`.
+- [ ] Zero textures, geometries o materials enviats pel bridge.
+- [ ] Zero missatges científics per frame.
+- [ ] Mesura P50/P95 amb shadows off.
+- [ ] Mesura P50/P95 amb shadows medium.
+- [ ] Mesura P50/P95 amb shadows high.
+- [ ] Mesura de GPU memory abans i després d’activar shadow maps.
+- [ ] Timeline accelerada no produeix creixement continu de memòria.
+- [ ] Walk/flight prolongat no produeix reconstrucció de recursos.
+- [ ] Shutdown allibera shadow maps i recursos propis.
+- [ ] Arrencada → tancament → arrencada no duplica llums ni listeners.
+
+### Criteri de sortida
+
+El Pas 8.7 no es considera complet fins que:
+
+- [ ] existeix una única font autoritativa per a la direcció solar;
+- [ ] existeix una única font autoritativa per a la direcció lunar;
+- [ ] `DirectionalLight` solar representa el Sol sense recalcular-lo;
+- [ ] `DirectionalLight` lunar representa la Lluna sense recalcular-la;
+- [ ] la component difusa del cel consumeix l’estat atmosfèric del Pas 7;
+- [ ] `AmbientLight` no és la base del sistema d’il·luminació;
+- [ ] `HemisphereLight`, si s’utilitza, queda encapsulada com a implementació/fallback substituïble;
+- [ ] el terreny tècnic utilitza materials PBR coherents;
+- [ ] `MeshStandardMaterial` és el default i `MeshPhysicalMaterial` només s’utilitza quan aporta una propietat necessària;
+- [ ] color space i tone mapping són explícits i verificats;
+- [ ] la timeline modifica llums mitjançant estat petit, no recreant recursos;
+- [ ] caminar, volar, fer pan, zoom o roll no recalcula la ciència de la llum;
+- [ ] les ombres solars funcionen segons una política de qualitat mesurada;
+- [ ] les ombres lunars són opcionals i no condicionen la disponibilitat de la llum lunar;
+- [ ] Bortle/SQM no es simulen amb fonts locals fictícies;
+- [ ] els Passos 16 i 17 poden substituir geometria i materials sense reescriure l’autoritat d’il·luminació;
+- [ ] no existeixen missatges de bridge per frame;
+- [ ] no es recreen llums, materials, geometries o textures per tick;
+- [ ] els fallbacks són explícits;
+- [ ] lifecycle i `dispose` són verificables;
+- [ ] totes les proves passen;
+- [ ] els Passos 1–8.5 continuen funcionant;
+- [ ] el Pas 9 encara no s’ha començat.
+
+### Evidència obligatòria
+
+- [ ] Captura amb Sol alt mostrant volum i ombres del terreny tècnic.
+- [ ] Captura amb Sol baix mostrant ombres llargues coherents.
+- [ ] Vídeo curt de posta o sortida mitjançant timeline sense salts lumínics.
+- [ ] Captura nocturna amb Lluna plena i contribució lunar visible quan el model ho permeti.
+- [ ] Captura equivalent amb Lluna nova demostrant la diferència.
+- [ ] Captura de nit fosca sense ambient artificial excessiu.
+- [ ] Comparació `shadows off/medium/high`.
+- [ ] Prova que pan/orbit/walk/flight no genera requests científics d’il·luminació.
+- [ ] Prova que `sun_light_build_count` i `moon_light_build_count` es mantenen estables.
+- [ ] Prova que els materials no es reconstrueixen durant timeline.
+- [ ] Traça de bridge demostrant zero assets i zero missatges per frame.
+- [ ] Mètriques P50/P95 per cada qualitat d’ombres suportada.
+- [ ] Mètriques de memòria GPU.
+- [ ] Traça MGP d’inicialització, canvi de qualitat, fallback i shutdown.
+- [ ] Prova de color management amb albedo i normal map.
+- [ ] Prova de shutdown i reinici.
+
+### Fora d’abast del pas
+
+Aquest pas no implementa:
+
+- DEM final dels Passos 15–16;
+- ortofoto o superfície final del Pas 17;
+- global illumination completa;
+- path tracing;
+- ray tracing físic complet;
+- scattering atmosfèric volumètric nou si el Pas 7 ja proporciona el model necessari;
+- autoexposure fotogràfic complet del Pas 20;
+- HDR fotogràfic del pipeline instrumental;
+- milers de llums urbanes artificials;
+- dades GIS de fanals;
+- eclipsis solars o lunars;
+- ombres d’eclipsi;
+- self-shadowing topogràfic lunar d’alta resolució;
+- ombres de cràters calculades científicament a escala lunar;
+- reflexions especulars avançades de masses d’aigua finals;
+- meteorologia volumètrica del Pas 18.
+
+Aquests elements no poden retardar ni contaminar el Pas 9.
+
+La regla final del Pas 8.7 és:
+
+```text
+Pas 7 defineix l’entorn atmosfèric;
+Pas 8 defineix on són el Sol i la Lluna;
+Pas 8.5 manté coherent la geometria i orientació lunar;
+LightingEnvironmentComposer deriva un estat d’il·luminació petit i autoritatiu;
+Three.js el representa amb llums persistents, materials PBR i ombres;
+la càmera només observa el resultat.
 ```
 
 ## Pas 9 — Eclipsis, ocultacions, separacions i trajectòries
@@ -2333,7 +4710,7 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 - [ ] Implementar cerca de màxim i contactes dins d’un interval.
 - [ ] Representar l’ombra, penombra o superposició amb geometria/materials adequats.
 - [ ] Mostrar estat de l’esdeveniment i temps fins al contacte al HUD.
-- [ ] Implementar trajectòries opcionals de Sol, Lluna i planetes en un interval.
+- [ ] Implementar trajectòries opcionals de Sol, Lluna, planetes i satèl·lits naturals seleccionats en un interval.
 - [ ] Versionar la geometria de trajectòria i actualitzar-la només quan canvia l’interval.
 - [ ] Gestionar esdeveniments no visibles des de la ubicació actual.
 - [ ] Afegir toleràncies temporals i angulars explícites.
