@@ -5,13 +5,16 @@
  */
 
 import type { SkyEnvironmentSnapshot } from "./sky_environment_contracts";
-import type { SolarSystemSnapshot } from "./solar_system_contracts";
+import type {
+  MoonSurfaceResourceDescriptor,
+  SolarSystemSnapshot,
+} from "./solar_system_contracts";
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
 export interface FrontendReadyMessage {
   readonly type: "frontend_ready";
-  readonly protocolVersion: 1;
+  readonly protocolVersion: 2;
 }
 
 export interface CameraChangedMessage {
@@ -160,6 +163,17 @@ export interface FrontendPerformanceMetricsMessage {
   readonly solarSystemSnapshotApplyCount: number;
   readonly solarSystemStaleSnapshotCount: number;
   readonly solarSystemBridgeBytes: number;
+  readonly moonGeometryBuildCount: number;
+  readonly moonMaterialBuildCount: number;
+  readonly moonAlbedoTextureLoadCount: number;
+  readonly moonNormalTextureLoadCount: number;
+  readonly moonTextureUploadBytes: number;
+  readonly moonBridgeTextureBytes: 0;
+}
+
+export interface SetTimeRateMessage {
+  readonly type: "set_time_rate";
+  readonly rate: number;
 }
 
 export type FrontendMessage =
@@ -172,6 +186,7 @@ export type FrontendMessage =
   | SetSimulationTimeMessage
   | SetRealtimeModeMessage
   | SetTimePlayingMessage
+  | SetTimeRateMessage
   | TimelineDragStartedMessage
   | TimelineDragFinishedMessage
   | RequestOffsetDayMessage
@@ -193,7 +208,7 @@ export type FrontendMessage =
 export interface HandshakeAckMessage {
   readonly type: "handshake_ack";
   readonly sessionId: string;
-  readonly protocolVersion: 1;
+  readonly protocolVersion: 2;
   readonly capabilities: readonly string[];
 }
 
@@ -289,6 +304,10 @@ export interface SolarSystemSnapshotMessage extends SolarSystemSnapshot {
   readonly type: "solar_system_snapshot";
 }
 
+export interface MoonSurfaceResourceMessage extends MoonSurfaceResourceDescriptor {
+  readonly type: "moon_surface_resource";
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
@@ -301,7 +320,8 @@ export type BackendMessage =
   | CelestialFrameTransformMessage
   | StarPickResolvedMessage
   | SkyEnvironmentSnapshotMessage
-  | SolarSystemSnapshotMessage;
+  | SolarSystemSnapshotMessage
+  | MoonSurfaceResourceMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

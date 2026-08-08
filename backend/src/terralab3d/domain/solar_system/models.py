@@ -22,6 +22,12 @@ class EphemerisQuality(str, Enum):
     FALLBACK = "fallback"
 
 
+class LunarOrientationQuality(str, Enum):
+    PRECISE = "precise"
+    UNAVAILABLE = "unavailable"
+    OUT_OF_RANGE = "out_of_range"
+
+
 @dataclass(frozen=True, slots=True)
 class ScientificObserver:
     """Observer inputs that affect ephemerides; camera motion is excluded."""
@@ -29,6 +35,60 @@ class ScientificObserver:
     latitude_deg: float
     longitude_deg: float
     elevation_m: float
+
+
+@dataclass(frozen=True, slots=True)
+class LunarOrientationState:
+    """Complete body-fixed Moon orientation expressed in the observer ENU frame.
+
+    ``body_to_enu_quaternion`` uses the renderer-neutral ``(x, y, z, w)``
+    convention and maps lunar body axes into right-handed East/North/Up.
+    Direction tuples retain TerraLab3D's established East/Up/North wire order.
+    Longitudes are east-positive in ``[-180, 180)``.
+    """
+
+    frame: str
+    source: str
+    quality: LunarOrientationQuality
+    body_to_enu_quaternion: tuple[float, float, float, float] | None
+    libration_longitude_deg: float | None
+    libration_latitude_deg: float | None
+    sub_earth_longitude_deg: float | None
+    sub_earth_latitude_deg: float | None
+    sub_observer_longitude_deg: float | None
+    sub_observer_latitude_deg: float | None
+    north_pole_position_angle_deg: float | None
+    bright_limb_position_angle_deg: float | None
+    moon_to_sun_direction_enu: tuple[float, float, float] | None
+    compute_ms: float
+    detail: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "frame": self.frame,
+            "source": self.source,
+            "quality": self.quality.value,
+            "bodyToENUQuaternion": (
+                list(self.body_to_enu_quaternion)
+                if self.body_to_enu_quaternion is not None
+                else None
+            ),
+            "librationLongitudeDeg": self.libration_longitude_deg,
+            "librationLatitudeDeg": self.libration_latitude_deg,
+            "subEarthLongitudeDeg": self.sub_earth_longitude_deg,
+            "subEarthLatitudeDeg": self.sub_earth_latitude_deg,
+            "subObserverLongitudeDeg": self.sub_observer_longitude_deg,
+            "subObserverLatitudeDeg": self.sub_observer_latitude_deg,
+            "northPolePositionAngleDeg": self.north_pole_position_angle_deg,
+            "brightLimbPositionAngleDeg": self.bright_limb_position_angle_deg,
+            "moonToSunDirectionENU": (
+                list(self.moon_to_sun_direction_enu)
+                if self.moon_to_sun_direction_enu is not None
+                else None
+            ),
+            "computeMs": self.compute_ms,
+            "detail": self.detail,
+        }
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,6 +106,7 @@ class ApparentBodyState:
     source: str
     quality: EphemerisQuality
     bright_limb_position_angle_deg: float | None = None
+    orientation: LunarOrientationState | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -63,6 +124,7 @@ class ApparentBodyState:
             "phaseAngleDeg": self.phase_angle_deg,
             "apparentMagnitude": self.apparent_magnitude,
             "brightLimbPositionAngleDeg": self.bright_limb_position_angle_deg,
+            "orientation": self.orientation.to_dict() if self.orientation is not None else None,
             "source": self.source,
             "quality": self.quality.value,
         }
@@ -112,3 +174,8 @@ class EphemerisMetadata:
     range_start_utc: str | None
     range_end_utc: str | None
     skyfield_version: str | None
+    lunar_orientation_frame: str | None = None
+    lunar_frame_kernel_sha256: str | None = None
+    lunar_orientation_kernel_sha256: str | None = None
+    lunar_orientation_range_start_utc: str | None = None
+    lunar_orientation_range_end_utc: str | None = None

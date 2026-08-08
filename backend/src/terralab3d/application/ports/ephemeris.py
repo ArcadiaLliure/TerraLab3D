@@ -14,6 +14,9 @@ class EphemerisPort(Protocol):
     @property
     def metadata(self) -> EphemerisMetadata: ...
 
+    @property
+    def lunar_orientation_kernel_load_count(self) -> int: ...
+
     def snapshot(
         self,
         utc: datetime,

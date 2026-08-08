@@ -19,6 +19,7 @@ import * as THREE from "three";
 import { STAR_FRAGMENT_SHADER, STAR_VERTEX_SHADER } from "./shaders/starShader";
 import type { StarResourceMetadata } from "../../contracts/star_picking_contracts";
 import type { SkyVisibilityState } from "../../contracts/sky_environment_contracts";
+import { DEFAULT_SKY_VISIBILITY } from "../../contracts/sky_visibility_defaults";
 import type { CelestialTransformState } from "./CelestialTransformState";
 
 export interface StarResourceEntry {
@@ -134,9 +135,9 @@ export class StarFieldRenderer {
     for (const entry of this.resources.values()) {
       const mat3 = uniform<THREE.Matrix3>(entry.material, "u_equatorialToENUMatrix").value;
       mat3.set(
-        mArray[0], mArray[1], mArray[2],
-        mArray[3], mArray[4], mArray[5],
-        mArray[6], mArray[7], mArray[8],
+        mArray[0]!, mArray[1]!, mArray[2]!,
+        mArray[3]!, mArray[4]!, mArray[5]!,
+        mArray[6]!, mArray[7]!, mArray[8]!,
       );
       entry.material.uniformsNeedUpdate = true;
     }
@@ -221,10 +222,10 @@ export class StarFieldRenderer {
         u_radius: { value: 1000000.0 }, // Esfera cel·lar a l'infinit (1000km)
         u_cameraHeight: { value: 0.0 },
         // Visibilitat (Pas 7) - valors per defecte o l'últim rebut
-        u_zenithMagnitudeLimit: { value: this.currentVisibilityState ? this.currentVisibilityState.zenithMagnitudeLimit : 7.6 },
-        u_extinctionCoefficient: { value: this.currentVisibilityState ? this.currentVisibilityState.extinctionCoefficient : 0.25 },
-        u_twilightSuppression: { value: this.currentVisibilityState ? this.currentVisibilityState.twilightSuppression : 0.0 },
-        u_fadeWidthMag: { value: this.currentVisibilityState ? this.currentVisibilityState.fadeWidthMag : 0.75 },
+        u_zenithMagnitudeLimit: { value: this.currentVisibilityState?.zenithMagnitudeLimit ?? DEFAULT_SKY_VISIBILITY.zenithMagnitudeLimit },
+        u_extinctionCoefficient: { value: this.currentVisibilityState?.extinctionCoefficient ?? DEFAULT_SKY_VISIBILITY.extinctionCoefficient },
+        u_twilightSuppression: { value: this.currentVisibilityState?.twilightSuppression ?? DEFAULT_SKY_VISIBILITY.twilightSuppression },
+        u_fadeWidthMag: { value: this.currentVisibilityState?.fadeWidthMag ?? DEFAULT_SKY_VISIBILITY.fadeWidthMag },
       },
       transparent: true,
       depthWrite: false,

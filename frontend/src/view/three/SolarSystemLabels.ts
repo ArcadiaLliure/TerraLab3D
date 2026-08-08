@@ -74,13 +74,13 @@ export class SolarSystemLabels {
     const bodies: LabelableBodyId[] = ["moon", ...PLANET_IDS];
     for (const id of bodies) {
       const label = this.labels.get(id)!;
-      const object = this.solarSystemRenderer.getBodyObject(id);
+      const object = this.solarSystemRenderer.getLabelAnchor(id);
       const state = object?.userData.apparentState as SolarSystemBodyState | undefined;
       const isVisible = id === "moon" 
         ? (object !== undefined && object.visible && state !== undefined)
         : this.solarSystemRenderer.isPlanetLabelVisible(id);
         
-      if (!isVisible) {
+      if (!isVisible || object === undefined || state === undefined) {
         this.hide(label);
         continue;
       }

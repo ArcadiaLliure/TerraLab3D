@@ -21,7 +21,15 @@ from terralab3d.domain.solar_system.calculations import (
     analytical_sun_state,
     angular_radius_deg,
     bright_limb_position_angle_deg,
+    ecef_to_enu_rotation,
+    matrix3_apply,
+    matrix3_multiply,
+    matrix3_transpose,
     moon_apparent_magnitude,
+    north_pole_position_angle_deg,
+    normalize_vector,
+    rotation_matrix_to_quaternion,
+    signed_longitude_deg,
     sun_apparent_magnitude,
 )
 from terralab3d.domain.solar_system.models import (
@@ -29,6 +37,8 @@ from terralab3d.domain.solar_system.models import (
     BodyKind,
     EphemerisMetadata,
     EphemerisQuality,
+    LunarOrientationQuality,
+    LunarOrientationState,
     ScientificObserver,
     SolarSystemSnapshot,
 )
@@ -37,7 +47,13 @@ from terralab3d.infrastructure.app_paths import resolve_data_root
 log = logging.getLogger("terralab3d.ephemeris")
 
 EPHEMERIS_PATH_ENV = "TERRALAB3D_EPHEMERIS_PATH"
+LUNAR_ORIENTATION_DIR_ENV = "TERRALAB3D_LUNAR_ORIENTATION_DIR"
 KERNEL_NAME = "de421.bsp"
+LUNAR_FRAME_NAME = "MOON_ME_DE421"
+LUNAR_FRAME_KERNEL_NAME = "moon_080317.tf"
+LUNAR_ORIENTATION_KERNEL_NAME = "moon_pa_de421_1900-2050.bpc"
+LUNAR_ORIENTATION_RANGE_START = datetime(1900, 1, 1, tzinfo=timezone.utc)
+LUNAR_ORIENTATION_RANGE_END = datetime(2051, 1, 1, tzinfo=timezone.utc)
 BODY_SPECS = (
     ("mercury", "mercury", 2_439.7),
     ("venus", "venus", 6_051.8),
@@ -58,8 +74,14 @@ class SkyfieldEphemerisAdapter:
         self._timescale: Any | None = None
         self._wgs84: Any | None = None
         self._planetary_magnitude: Any | None = None
+        self._itrs: Any | None = None
+        self._planetary_constants: Any | None = None
+        self._lunar_orientation_frame: Any | None = None
+        self._lunar_orientation_binary_file: Any | None = None
         self._range_jd: tuple[float, float] | None = None
         self._unavailable_detail: str | None = None
+        self._orientation_unavailable_detail: str | None = None
+        self._lunar_orientation_kernel_load_count = 0
         self._metadata = EphemerisMetadata(None, None, None, None, None, None)
         self.open()
 
@@ -67,11 +89,16 @@ class SkyfieldEphemerisAdapter:
     def metadata(self) -> EphemerisMetadata:
         return self._metadata
 
+    @property
+    def lunar_orientation_kernel_load_count(self) -> int:
+        return self._lunar_orientation_kernel_load_count
+
     def open(self) -> None:
         if self._ephemeris is not None:
             return
         try:
             from skyfield.api import load, load_file, wgs84
+            from skyfield.framelib import itrs
             from skyfield.magnitudelib import planetary_magnitude
 
             kernel_path = self._resolve_kernel_path()
@@ -82,6 +109,7 @@ class SkyfieldEphemerisAdapter:
             self._timescale = load.timescale(builtin=True)
             self._ephemeris = load_file(str(kernel_path))
             self._wgs84 = wgs84
+            self._itrs = itrs
             self._planetary_magnitude = planetary_magnitude
 
             segment = self._ephemeris.segments[0].spk_segment
@@ -96,6 +124,7 @@ class SkyfieldEphemerisAdapter:
                 skyfield_version=version("skyfield"),
             )
             self._unavailable_detail = None
+            self._open_lunar_orientation()
             log.info(
                 "DE421 loaded once: %s sha256=%s range=%s..%s",
                 kernel_path,
@@ -139,7 +168,13 @@ class SkyfieldEphemerisAdapter:
         self._ephemeris = None
         self._timescale = None
         self._wgs84 = None
+        self._itrs = None
         self._planetary_magnitude = None
+        self._planetary_constants = None
+        self._lunar_orientation_frame = None
+        if self._lunar_orientation_binary_file is not None:
+            self._lunar_orientation_binary_file.close()
+        self._lunar_orientation_binary_file = None
 
     def _resolve_kernel_path(self) -> Path | None:
         if self._requested_kernel_path is not None:
@@ -164,6 +199,64 @@ class SkyfieldEphemerisAdapter:
             return packaged.resolve() if packaged.is_file() else None
         except ImportError:
             return None
+
+    def _open_lunar_orientation(self) -> None:
+        if self._lunar_orientation_frame is not None:
+            return
+        try:
+            from skyfield.api import PlanetaryConstants
+
+            frame_path, orientation_path = self._resolve_lunar_orientation_paths()
+            constants = PlanetaryConstants()
+            constants.read_text(frame_path.open("rb"))
+            binary_file = orientation_path.open("rb")
+            try:
+                constants.read_binary(binary_file)
+                frame = constants.build_frame_named(LUNAR_FRAME_NAME)
+            except Exception:
+                binary_file.close()
+                raise
+
+            self._planetary_constants = constants
+            self._lunar_orientation_binary_file = binary_file
+            self._lunar_orientation_frame = frame
+            self._lunar_orientation_kernel_load_count += 1
+            self._orientation_unavailable_detail = None
+            self._metadata = replace(
+                self._metadata,
+                lunar_orientation_frame=LUNAR_FRAME_NAME,
+                lunar_frame_kernel_sha256=_sha256(frame_path),
+                lunar_orientation_kernel_sha256=_sha256(orientation_path),
+                lunar_orientation_range_start_utc="1900-01-01",
+                lunar_orientation_range_end_utc="2050-12-31",
+            )
+            log.info(
+                "Lunar orientation loaded once: frame=%s kernels=%s,%s",
+                LUNAR_FRAME_NAME,
+                frame_path,
+                orientation_path,
+            )
+        except Exception as exc:
+            # Infrastructure boundary: a malformed optional orientation layer
+            # must not take down the authoritative Step 8 position/phase path.
+            self._orientation_unavailable_detail = str(exc)
+            self._planetary_constants = None
+            self._lunar_orientation_frame = None
+            log.warning("Lunar orientation unavailable; retaining the Step 8 Moon: %s", exc)
+
+    def _resolve_lunar_orientation_paths(self) -> tuple[Path, Path]:
+        configured = os.getenv(LUNAR_ORIENTATION_DIR_ENV, "").strip()
+        orientation_dir = (
+            Path(configured).expanduser().resolve(strict=False)
+            if configured
+            else resolve_data_root() / "data" / "sky" / "moon" / "orientation"
+        )
+        frame_path = orientation_dir / LUNAR_FRAME_KERNEL_NAME
+        orientation_path = orientation_dir / LUNAR_ORIENTATION_KERNEL_NAME
+        missing = [str(path) for path in (frame_path, orientation_path) if not path.is_file()]
+        if missing:
+            raise FileNotFoundError("Missing local lunar orientation kernel(s): " + ", ".join(missing))
+        return frame_path.resolve(), orientation_path.resolve()
 
     def _skyfield_snapshot(
         self,
@@ -197,6 +290,19 @@ class SkyfieldEphemerisAdapter:
                 sun_state.equatorial.declination_deg,
             ),
         )
+        moon_state = replace(
+            moon_state,
+            orientation=self._lunar_orientation(
+                instant,
+                observer,
+                time_point,
+                earth,
+                location,
+                moon,
+                sun,
+                moon_state.bright_limb_position_angle_deg,
+            ),
+        )
         planets = tuple(
             self._body_state(
                 body_id,
@@ -219,6 +325,129 @@ class SkyfieldEphemerisAdapter:
             moon=moon_state,
             planets=planets,
             compute_ms=(time.perf_counter() - started) * 1000.0,
+        )
+
+    def _lunar_orientation(
+        self,
+        instant: datetime,
+        observer: ScientificObserver,
+        time_point: Any,
+        earth: Any,
+        location: Any,
+        moon: Any,
+        sun: Any,
+        bright_limb_position_angle: float | None,
+    ) -> LunarOrientationState:
+        started = time.perf_counter()
+        if self._lunar_orientation_frame is None or self._itrs is None:
+            return self._unavailable_lunar_orientation(
+                LunarOrientationQuality.UNAVAILABLE,
+                started,
+                self._orientation_unavailable_detail,
+                bright_limb_position_angle,
+            )
+        if not LUNAR_ORIENTATION_RANGE_START <= instant < LUNAR_ORIENTATION_RANGE_END:
+            return self._unavailable_lunar_orientation(
+                LunarOrientationQuality.OUT_OF_RANGE,
+                started,
+                (
+                    f"UTC {instant.isoformat()} lies outside lunar orientation range "
+                    "1900-01-01..2050-12-31"
+                ),
+                bright_limb_position_angle,
+            )
+
+        try:
+            body_to_icrf = matrix3_transpose(_matrix3(self._lunar_orientation_frame.rotation_at(time_point)))
+            icrf_to_itrs = _matrix3(self._itrs.rotation_at(time_point))
+            itrs_to_enu = ecef_to_enu_rotation(observer.latitude_deg, observer.longitude_deg)
+            body_to_enu = matrix3_multiply(
+                itrs_to_enu,
+                matrix3_multiply(icrf_to_itrs, body_to_icrf),
+            )
+
+            sub_earth_lat, sub_earth_lon, _ = (earth - moon).at(time_point).frame_latlon(
+                self._lunar_orientation_frame
+            )
+            observer_position = earth + location
+            sub_observer_lat, sub_observer_lon, _ = (
+                observer_position - moon
+            ).at(time_point).frame_latlon(self._lunar_orientation_frame)
+
+            moon_to_sun_icrf = normalize_vector(
+                _vector3((sun - moon).at(time_point).position.km)
+            )
+            moon_to_sun_enu_axes = normalize_vector(
+                matrix3_apply(itrs_to_enu, matrix3_apply(icrf_to_itrs, moon_to_sun_icrf))
+            )
+            moon_to_sun_eun = (
+                moon_to_sun_enu_axes[0],
+                moon_to_sun_enu_axes[2],
+                moon_to_sun_enu_axes[1],
+            )
+            observer_to_moon_icrf = normalize_vector(
+                _vector3((moon - observer_position).at(time_point).position.km)
+            )
+            lunar_north_icrf = normalize_vector(matrix3_apply(body_to_icrf, (0.0, 0.0, 1.0)))
+            celestial_north_icrf = normalize_vector(
+                matrix3_apply(matrix3_transpose(_matrix3(time_point.M)), (0.0, 0.0, 1.0))
+            )
+
+            sub_earth_longitude = signed_longitude_deg(float(sub_earth_lon.degrees))
+            sub_earth_latitude = float(sub_earth_lat.degrees)
+            return LunarOrientationState(
+                frame=LUNAR_FRAME_NAME,
+                source="JPL DE421 + NAIF lunar PCK",
+                quality=LunarOrientationQuality.PRECISE,
+                body_to_enu_quaternion=rotation_matrix_to_quaternion(body_to_enu),
+                libration_longitude_deg=sub_earth_longitude,
+                libration_latitude_deg=sub_earth_latitude,
+                sub_earth_longitude_deg=sub_earth_longitude,
+                sub_earth_latitude_deg=sub_earth_latitude,
+                sub_observer_longitude_deg=signed_longitude_deg(float(sub_observer_lon.degrees)),
+                sub_observer_latitude_deg=float(sub_observer_lat.degrees),
+                north_pole_position_angle_deg=north_pole_position_angle_deg(
+                    observer_to_moon_icrf,
+                    lunar_north_icrf,
+                    celestial_north_icrf,
+                ),
+                bright_limb_position_angle_deg=bright_limb_position_angle,
+                moon_to_sun_direction_enu=moon_to_sun_eun,
+                compute_ms=(time.perf_counter() - started) * 1000.0,
+            )
+        except Exception as exc:
+            # Keep the Step 8 Moon alive if Skyfield rejects only orientation.
+            log.warning("Lunar orientation calculation failed: %s", exc)
+            return self._unavailable_lunar_orientation(
+                LunarOrientationQuality.UNAVAILABLE,
+                started,
+                str(exc),
+                bright_limb_position_angle,
+            )
+
+    @staticmethod
+    def _unavailable_lunar_orientation(
+        quality: LunarOrientationQuality,
+        started: float,
+        detail: str | None,
+        bright_limb_position_angle: float | None,
+    ) -> LunarOrientationState:
+        return LunarOrientationState(
+            frame=LUNAR_FRAME_NAME,
+            source="NAIF lunar orientation kernels",
+            quality=quality,
+            body_to_enu_quaternion=None,
+            libration_longitude_deg=None,
+            libration_latitude_deg=None,
+            sub_earth_longitude_deg=None,
+            sub_earth_latitude_deg=None,
+            sub_observer_longitude_deg=None,
+            sub_observer_latitude_deg=None,
+            north_pole_position_angle_deg=None,
+            bright_limb_position_angle_deg=bright_limb_position_angle,
+            moon_to_sun_direction_enu=None,
+            compute_ms=(time.perf_counter() - started) * 1000.0,
+            detail=detail,
         )
 
     def _body_state(
@@ -308,3 +537,18 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _matrix3(value: Any) -> tuple[
+    tuple[float, float, float],
+    tuple[float, float, float],
+    tuple[float, float, float],
+]:
+    return tuple(
+        tuple(float(value[row][column]) for column in range(3))
+        for row in range(3)
+    )  # type: ignore[return-value]
+
+
+def _vector3(value: Any) -> tuple[float, float, float]:
+    return float(value[0]), float(value[1]), float(value[2])

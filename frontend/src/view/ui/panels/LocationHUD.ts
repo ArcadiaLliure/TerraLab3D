@@ -1,5 +1,7 @@
 import type { NavigationCameraPose, MotionState, NavigationMode } from "../../../contracts/navigation";
 import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
+import type { ResolvedStar } from "../../../contracts/star_picking_contracts";
+import type { SolarSystemPickHit } from "../../three/picking/SolarSystemPickProvider";
 
 const DEG = Math.PI / 180;
 
@@ -201,7 +203,17 @@ export class LocationHUD {
     this.element.style.display = visible ? "flex" : "none";
   }
 
-  public setSelectedStar(star: any | null): void {
+  public setSelectedCelestial(selection: ResolvedStar | SolarSystemPickHit | null): void {
+    if (selection === null) {
+      this.setSelectedStar(null);
+    } else if (selection.kind === "star") {
+      this.setSelectedStar(selection);
+    } else {
+      this.setSelectedSolarBody(selection);
+    }
+  }
+
+  public setSelectedStar(star: ResolvedStar | null): void {
     if (!star) {
       this.starContainer.style.display = "none";
       this.starContainer.innerHTML = "";
@@ -221,6 +233,29 @@ export class LocationHUD {
       <div>RA: ${star.raDeg.toFixed(4)}° &nbsp; Dec: ${star.decDeg.toFixed(4)}°</div>
       <div>Mag: ${star.magnitude.toFixed(2)} &nbsp; BP-RP: ${bpRpText}</div>
       <div style="opacity: 0.7; font-size: 11px;">Font: ${star.sourceRole}</div>
+    `;
+  }
+
+  private setSelectedSolarBody(hit: SolarSystemPickHit): void {
+    const labels: Record<SolarSystemPickHit["bodyId"], string> = {
+      sun: "Sol",
+      moon: "Lluna",
+      mercury: "Mercuri",
+      venus: "Venus",
+      mars: "Mart",
+      jupiter: "Júpiter",
+      saturn: "Saturn",
+      uranus: "Urà",
+      neptune: "Neptú",
+    };
+    const state = hit.state;
+    this.starContainer.style.display = "block";
+    this.starContainer.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cos celeste seleccionat</div>
+      <div>${labels[hit.bodyId]}</div>
+      <div>Alt: ${state.altitudeDeg.toFixed(2)}° &nbsp; Az: ${state.azimuthDeg.toFixed(2)}°</div>
+      <div>Mag: ${state.apparentMagnitude.toFixed(2)} &nbsp; Il·luminació: ${(state.illuminationFraction * 100).toFixed(0)}%</div>
+      <div style="opacity: 0.7; font-size: 11px;">${state.source} · ${state.quality}</div>
     `;
   }
 

@@ -41,6 +41,7 @@ class EphemerisCoordinator:
         self.bridge_bytes = 0
         self.last_bridge_bytes = 0
         self._compute_ms: deque[float] = deque(maxlen=256)
+        self._lunar_orientation_compute_ms: deque[float] = deque(maxlen=256)
 
     def request(
         self,
@@ -86,6 +87,15 @@ class EphemerisCoordinator:
             "ephemeris_stale_count": self.stale_count,
             "ephemeris_compute_ms_p50": _percentile(samples, 0.50),
             "ephemeris_compute_ms_p95": _percentile(samples, 0.95),
+            "lunar_orientation_compute_ms_p50": _percentile(
+                sorted(self._lunar_orientation_compute_ms), 0.50
+            ),
+            "lunar_orientation_compute_ms_p95": _percentile(
+                sorted(self._lunar_orientation_compute_ms), 0.95
+            ),
+            "moon_kernel_load_count": getattr(
+                self._port, "lunar_orientation_kernel_load_count", 0
+            ),
             "solar_system_bridge_bytes": self.last_bridge_bytes,
             "solar_system_bridge_bytes_total": self.bridge_bytes,
         }
@@ -105,6 +115,8 @@ class EphemerisCoordinator:
                     log.exception("Ephemeris calculation failed for generation %d", request.generation)
                     continue
                 self._compute_ms.append(snapshot.compute_ms)
+                if snapshot.moon is not None and snapshot.moon.orientation is not None:
+                    self._lunar_orientation_compute_ms.append(snapshot.moon.orientation.compute_ms)
                 if self._closed:
                     break
                 published = snapshot.with_generation(

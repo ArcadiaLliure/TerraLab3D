@@ -45,17 +45,21 @@ async def run() -> int:
     from terralab3d.infrastructure.bundler import bundle_frontend
     from terralab3d.infrastructure.server import TerraLabServer
     from terralab3d.infrastructure.websocket_bridge import WebSocketBridge
+    from terralab3d.infrastructure.adapters.file_assets.moon_surface import ManagedMoonSurfaceAssets
+    from terralab3d.infrastructure.app_paths import seed_solar_system_planet_assets
 
-    # ── 1. Compilar frontend ──────────────────────────────────────────
+    # ── 1. Compilar frontend i inicialitzar assets de dades ───────────
     try:
         dist_dir = bundle_frontend()
+        seed_solar_system_planet_assets()
     except Exception as exc:
         log.error("La meva construcció del frontend ha fallat: %s", exc)
         return 1
 
     # ── 2. Crear pont i servidor ──────────────────────────────────────
     bridge = WebSocketBridge()
-    server = TerraLabServer(dist_dir, bridge)
+    moon_surface_assets = ManagedMoonSurfaceAssets()
+    server = TerraLabServer(dist_dir, bridge, moon_surface_assets)
 
     loop = asyncio.get_running_loop()
     shutdown_requested = asyncio.Event()
@@ -163,6 +167,7 @@ async def run() -> int:
     async def _on_frontend_ready(data: dict[str, Any]) -> None:
         # Quan el frontend es connecta, enviem la ubicació inicial, iniciem estrelles, etc.
         await broadcast_location()
+        await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
         await broadcast_time()
         # Iniciar la càrrega d'estrelles o re-enviar les existents si ja estan carregades (re-connexió F5)
         if not star_coordinator._started:
@@ -468,6 +473,16 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("solarSystemSnapshotApplyCount", 0),
         data.get("solarSystemStaleSnapshotCount", 0),
         data.get("solarSystemBridgeBytes", 0),
+    )
+    log.info(
+        "Moon metrics: geometry=%d material=%d albedo_loads=%d normal_loads=%d "
+        "texture_upload_bytes=%d bridge_texture_bytes=%d",
+        data.get("moonGeometryBuildCount", 0),
+        data.get("moonMaterialBuildCount", 0),
+        data.get("moonAlbedoTextureLoadCount", 0),
+        data.get("moonNormalTextureLoadCount", 0),
+        data.get("moonTextureUploadBytes", 0),
+        data.get("moonBridgeTextureBytes", 0),
     )
 
 

@@ -187,11 +187,11 @@ export class NavigationWorld {
 
     geo.computeVertexNormals();
 
-    const mat = new THREE.MeshStandardMaterial({
+    // The celestial renderer owns its Sun light.  A scene-level ambient or
+    // directional light also illuminates the Moon and breaks its calculated
+    // phase, so the local navigation terrain intentionally stays unlit.
+    const mat = new THREE.MeshBasicMaterial({
       color: 0x1a2a20,
-      roughness: 0.9,
-      metalness: 0.0,
-      flatShading: true,
       side: THREE.DoubleSide,
     });
 
@@ -199,14 +199,7 @@ export class NavigationWorld {
     this.terrainMesh.name = "technical_terrain_mesh";
     this.terrainMesh.receiveShadow = true;
 
-    // Simple ambient + directional light for the terrain
-    const ambient = new THREE.AmbientLight(0x334455, 0.6);
-    const directional = new THREE.DirectionalLight(0xffeedd, 0.8);
-    directional.position.set(100, 200, -100);
-
     this.terrainGroup.add(this.terrainMesh);
-    this.terrainGroup.add(ambient);
-    this.terrainGroup.add(directional);
   }
 
   /**
@@ -251,15 +244,11 @@ export class NavigationWorld {
   // ─── Private: Reference Objects ────────────────────────────────────
 
   private buildReferenceObjects(): void {
-    const cubeMat = new THREE.MeshStandardMaterial({
+    const cubeMat = new THREE.MeshBasicMaterial({
       color: 0x4488aa,
-      roughness: 0.4,
-      metalness: 0.2,
     });
-    const columnMat = new THREE.MeshStandardMaterial({
+    const columnMat = new THREE.MeshBasicMaterial({
       color: 0xcc8844,
-      roughness: 0.6,
-      metalness: 0.1,
     });
 
     // Near objects (10–30m)

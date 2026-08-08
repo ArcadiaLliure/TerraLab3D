@@ -49,11 +49,15 @@ def bundle_frontend(*, force: bool = False) -> Path:
 
     _DIST_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Copia index.html a dist
+    # Copia index.html i recursos públics a dist
     index_src = _FRONTEND_DIR / "index.html"
     index_dst = _DIST_DIR / "index.html"
     if index_src.exists():
         shutil.copy2(index_src, index_dst)
+
+    public_src = _FRONTEND_DIR / "public"
+    if public_src.exists():
+        shutil.copytree(public_src, _DIST_DIR, dirs_exist_ok=True)
 
     npx = _find_npx()
     cmd = [

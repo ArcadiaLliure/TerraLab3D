@@ -319,3 +319,8 @@ TerraLab3D està orientat a:
 TerraLab3D es troba en desenvolupament actiu.
 
 L’objectiu és reunir en una mateixa escena interactiva el territori, l’horitzó, el cel astronòmic i les condicions reals d’observació, mantenint una correspondència funcional amb TerraLab i ampliant-ne l’experiència d’exploració tridimensional.
+
+## Crèdits i Llicències
+
+* **Textures dels planetes del Sistema Solar**: Les textures utilitzades per als planetes estan basades en dades d'elevació i imatges públiques de la NASA (misions MESSENGER, Viking, Cassini i Telescopi Espacial Hubble) ajustades per [Solar System Scope](https://www.solarsystemscope.com/textures/). Distribudes sota la llicència **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+

@@ -12,10 +12,11 @@
  * - Lifecycle complet (start/stop/dispose idempotents)
  */
 
-import type { StarPickHit, StarPickRef, ResolvedStar, StarPickResolvedMessage } from "../../../contracts/star_picking_contracts";
+import type { StarPickRef, ResolvedStar, StarPickResolvedMessage } from "../../../contracts/star_picking_contracts";
 import { PointerGestureRouter } from "./PointerGestureRouter";
-import { StarPickProvider } from "./StarPickProvider";
+import { CelestialPickProvider, type CelestialPickHit } from "./CelestialPickProvider";
 import { SelectionMarker } from "./SelectionMarker";
+import type { SolarSystemPickHit } from "./SolarSystemPickProvider";
 
 const LOG_PREFIX = "MGP: [ScenePickingController]";
 
@@ -28,11 +29,12 @@ export type ResolveCallback = (
   purpose: "select" | "hover",
 ) => void;
 
-export type SelectionChangedCallback = (resolved: ResolvedStar | null) => void;
+export type SelectedCelestial = ResolvedStar | SolarSystemPickHit;
+export type SelectionChangedCallback = (selection: SelectedCelestial | null) => void;
 
 export interface ScenePickingControllerDeps {
   gestureRouter: PointerGestureRouter;
-  pickProvider: StarPickProvider;
+  pickProvider: CelestialPickProvider;
   resolveCallback: ResolveCallback;
   selectionChangedCallback?: SelectionChangedCallback;
 }
@@ -44,12 +46,12 @@ export class ScenePickingController {
   private readonly selectionMarker: SelectionMarker;
 
   // ─── Selection state ───────────────────────────────────────────────
-  private selectedHit: StarPickHit | null = null;
+  private selectedHit: CelestialPickHit | null = null;
   private selectedRef: StarPickRef | null = null;
   private resolvedStar: ResolvedStar | null = null;
 
   // ─── Hover state ───────────────────────────────────────────────────
-  private hoverHit: StarPickHit | null = null;
+  private hoverHit: CelestialPickHit | null = null;
   private hoverRef: StarPickRef | null = null;
   private hoverDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -96,13 +98,13 @@ export class ScenePickingController {
    * Reproyecta el marker de selecció. Cridar des del render loop.
    */
   updateMarker(): void {
-    if (!this.selectedRef || !this.started) {
+    if (!this.selectedHit || !this.started) {
       return;
     }
 
-    const pos = this.deps.pickProvider.reprojectRef(this.selectedRef);
+    const pos = this.deps.pickProvider.reproject(this.selectedHit);
     if (pos) {
-      this.selectionMarker.update(pos.x, pos.y);
+      this.selectionMarker.update(pos.x, pos.y, pos.visualRadiusCssPx);
     } else {
       this.selectionMarker.hide();
     }
@@ -135,6 +137,13 @@ export class ScenePickingController {
     }
 
     if (purpose === "select") {
+      if (
+        this.selectedHit?.kind !== "star"
+        || this.selectedRef === null
+        || this.selectedRef.resourceId !== msg.star.resourceId
+        || this.selectedRef.resourceVersion !== msg.star.resourceVersion
+        || this.selectedRef.catalogIndex !== msg.star.catalogIndex
+      ) return;
       this.resolvedStar = msg.star;
       this.deps.selectionChangedCallback?.(msg.star);
       console.log(
@@ -150,12 +159,12 @@ export class ScenePickingController {
   }
 
   /** Retorna el hit local de la selecció. */
-  getSelectedHit(): StarPickHit | null {
+  getSelectedHit(): CelestialPickHit | null {
     return this.selectedHit;
   }
 
   /** Retorna el hit local del hover. */
-  getHoverHit(): StarPickHit | null {
+  getHoverHit(): CelestialPickHit | null {
     return this.hoverHit;
   }
 
@@ -175,11 +184,11 @@ export class ScenePickingController {
    * Si la selecció referencia aquest recurs, es neteja.
    */
   onResourceEvicted(resourceId: string): void {
-    if (this.selectedRef && this.selectedRef.resourceId === resourceId) {
+    if (this.selectedHit?.kind === "star" && this.selectedHit.ref.resourceId === resourceId) {
       console.log(`${LOG_PREFIX} [onResourceEvicted] [Selecció invalidada: ${resourceId}]`);
       this.clearSelection();
     }
-    if (this.hoverRef && this.hoverRef.resourceId === resourceId) {
+    if (this.hoverHit?.kind === "star" && this.hoverHit.ref.resourceId === resourceId) {
       this.clearHover();
     }
   }
@@ -211,29 +220,39 @@ export class ScenePickingController {
 
     if (hit) {
       this.selectedHit = hit;
-      this.selectedRef = hit.ref;
-      this.resolvedStar = null; // Pending resolve
+      this.selectedRef = hit.kind === "star" ? hit.ref : null;
+      this.resolvedStar = null;
 
       // Mostrar marker immediatament
-      this.selectionMarker.update(hit.screenXCssPx, hit.screenYCssPx);
-
-      // Enviar resolve al backend
-      this.selectGeneration++;
-      this.requestIdCounter++;
-      const reqId = `sel:${this.requestIdCounter}`;
-
-      this.deps.resolveCallback(
-        reqId,
-        this.selectGeneration,
-        hit.ref.resourceId,
-        hit.ref.resourceVersion,
-        hit.ref.catalogIndex,
-        "select",
+      this.selectionMarker.update(
+        hit.screenXCssPx,
+        hit.screenYCssPx,
+        hit.visualRadiusCssPx,
       );
 
-      console.log(
-        `${LOG_PREFIX} [handleTap] [Hit: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px mag=${hit.magnitude.toFixed(2)}]`,
-      );
+      if (hit.kind === "star") {
+        // Stars need their catalogue data resolved by the backend.
+        this.selectGeneration++;
+        this.requestIdCounter++;
+        const reqId = `sel:${this.requestIdCounter}`;
+        this.deps.resolveCallback(
+          reqId,
+          this.selectGeneration,
+          hit.ref.resourceId,
+          hit.ref.resourceVersion,
+          hit.ref.catalogIndex,
+          "select",
+        );
+        console.log(
+          `${LOG_PREFIX} [handleTap] [Star: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px mag=${hit.magnitude.toFixed(2)}]`,
+        );
+      } else {
+        // Solar-system states already arrive in the scientific snapshot.
+        this.deps.selectionChangedCallback?.(hit);
+        console.log(
+          `${LOG_PREFIX} [handleTap] [Solar body: ${hit.bodyId} dist=${hit.screenDistanceCssPx.toFixed(1)}px]`,
+        );
+      }
     } else {
       // Click a buit → clear selection
       this.clearSelection();
@@ -250,6 +269,7 @@ export class ScenePickingController {
 
     // Si és el mateix hover que abans, no fer res
     if (
+      hit.kind === "star" &&
       this.hoverRef &&
       this.hoverRef.resourceId === hit.ref.resourceId &&
       this.hoverRef.resourceVersion === hit.ref.resourceVersion &&
@@ -259,7 +279,10 @@ export class ScenePickingController {
     }
 
     this.hoverHit = hit;
-    this.hoverRef = hit.ref;
+    this.hoverRef = hit.kind === "star" ? hit.ref : null;
+
+    // Solar-system hover has no asynchronous catalogue resolution.
+    if (hit.kind !== "star") return;
 
     // Debounce la resolució backend del hover
     if (this.hoverDebounceTimer) {

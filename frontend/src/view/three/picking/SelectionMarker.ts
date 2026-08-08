@@ -8,7 +8,8 @@
  * - Hidden si l'estrella surt del viewport o el recurs és evicted
  */
 
-const MARKER_SIZE = 32; // px
+const MINIMUM_MARKER_SIZE = 32; // CSS px
+const MARKER_PADDING = 8; // CSS px outside the rendered object
 const MARKER_COLOR = "#f1cd88"; // color gold de TerraLab3D
 
 export class SelectionMarker {
@@ -20,13 +21,17 @@ export class SelectionMarker {
     this.element = document.createElement("div");
     this.element.style.cssText = `
       position: absolute;
-      width: ${MARKER_SIZE}px;
-      height: ${MARKER_SIZE}px;
+      width: ${MINIMUM_MARKER_SIZE}px;
+      height: ${MINIMUM_MARKER_SIZE}px;
       pointer-events: none;
       z-index: 50;
       display: none;
+      box-sizing: border-box;
+      border: 1.5px solid ${MARKER_COLOR};
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(241, 205, 136, 0.75), inset 0 0 8px rgba(241, 205, 136, 0.2);
+      transition: width 80ms linear, height 80ms linear;
     `;
-    this.element.innerHTML = this.createSvg();
   }
 
   mount(container: HTMLElement): void {
@@ -37,16 +42,20 @@ export class SelectionMarker {
   /**
    * Actualitza la posició del marker en coordenades CSS relatives al container.
    */
-  update(x: number, y: number): void {
+  update(x: number, y: number, visualRadiusCssPx = MINIMUM_MARKER_SIZE / 2): void {
     if (!this.container) return;
 
-    const rect = this.container.getBoundingClientRect();
-    const localX = x;
-    const localY = y;
+    const size = Math.max(
+      MINIMUM_MARKER_SIZE,
+      visualRadiusCssPx * 2 + MARKER_PADDING,
+    );
 
-    // Centrar el marker
-    this.element.style.left = `${localX - MARKER_SIZE / 2}px`;
-    this.element.style.top = `${localY - MARKER_SIZE / 2}px`;
+    // The ring follows the apparent disc radius. This makes a zoomed Moon
+    // remain enclosed rather than leaving a fixed star-sized cursor behind.
+    this.element.style.width = `${size}px`;
+    this.element.style.height = `${size}px`;
+    this.element.style.left = `${x - size / 2}px`;
+    this.element.style.top = `${y - size / 2}px`;
 
     if (!this.visible) {
       this.visible = true;
@@ -71,10 +80,10 @@ export class SelectionMarker {
   }
 
   private createSvg(): string {
-    const r = MARKER_SIZE / 2;
+    const r = MINIMUM_MARKER_SIZE / 2;
     const baseR = r * 0.4;
 
-    return `<svg width="${MARKER_SIZE}" height="${MARKER_SIZE}" viewBox="0 0 ${MARKER_SIZE} ${MARKER_SIZE}" xmlns="http://www.w3.org/2000/svg">
+    return `<svg width="${MINIMUM_MARKER_SIZE}" height="${MINIMUM_MARKER_SIZE}" viewBox="0 0 ${MINIMUM_MARKER_SIZE} ${MINIMUM_MARKER_SIZE}" xmlns="http://www.w3.org/2000/svg">
       <!-- Anell fix central -->
       <circle cx="${r}" cy="${r}" r="${baseR}"
         fill="none" stroke="${MARKER_COLOR}" stroke-width="1.5" opacity="0.9"/>

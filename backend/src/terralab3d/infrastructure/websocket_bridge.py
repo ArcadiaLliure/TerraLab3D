@@ -270,6 +270,13 @@ class WebSocketBridge:
         await self.send(payload)
         return byte_count
 
+    async def send_moon_surface_resource(self, descriptor: Any) -> None:
+        """Send only the small local resource descriptor, never texture bytes."""
+
+        payload = descriptor.to_dict()
+        payload["type"] = "moon_surface_resource"
+        await self.send(payload)
+
     async def send_location_error(self, message: str) -> None:
         await self.send({
             "type": "location_error",
@@ -314,5 +321,4 @@ class WebSocketBridge:
             "protocolVersion": PROTOCOL_VERSION,
             "capabilities": ["camera", "viewport", "shutdown"],
         })
-
 

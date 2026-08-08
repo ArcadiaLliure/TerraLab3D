@@ -15,6 +15,7 @@ from datetime import datetime
 import aiohttp.web
 
 from .websocket_bridge import WebSocketBridge
+from terralab3d.application.ports.moon_surface_assets import MoonSurfaceAssetPort
 
 log = logging.getLogger("terralab3d.server")
 
@@ -26,12 +27,14 @@ class TerraLabServer:
         self,
         dist_dir: Path,
         bridge: WebSocketBridge,
+        moon_surface_assets: MoonSurfaceAssetPort | None = None,
         *,
         host: str = "127.0.0.1",
         port: int = 14398,
     ) -> None:
         self._dist_dir = dist_dir
         self._bridge = bridge
+        self._moon_surface_assets = moon_surface_assets
         self._host = host
         self._port = port
         self._actual_port = 0
@@ -51,6 +54,8 @@ class TerraLabServer:
         """Inicia el servidor i retorna l'URL base."""
         self._app = aiohttp.web.Application()
         self._app.router.add_get("/ws", self._bridge.handle_websocket)
+        if self._moon_surface_assets is not None:
+            self._app.router.add_get("/moon-assets/{asset_name}", self._serve_moon_asset)
         self._app.router.add_get("/", self._serve_index)
         self._app.router.add_static(
             "/", self._dist_dir, show_index=False,
@@ -96,3 +101,18 @@ class TerraLabServer:
     ) -> aiohttp.web.FileResponse:
         """Serveix index.html per a la ruta arrel."""
         return aiohttp.web.FileResponse(self._dist_dir / "index.html")
+
+    async def _serve_moon_asset(
+        self, request: aiohttp.web.Request,
+    ) -> aiohttp.web.StreamResponse:
+        """Serve only names accepted by the validated managed-layer manifest."""
+
+        if self._moon_surface_assets is None:
+            raise aiohttp.web.HTTPNotFound()
+        path = self._moon_surface_assets.resolve_asset(request.match_info["asset_name"])
+        if path is None:
+            raise aiohttp.web.HTTPNotFound()
+        response = aiohttp.web.FileResponse(path)
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        return response

@@ -20,6 +20,7 @@
 import * as THREE from "three";
 import type { StarPickHit, StarPickRef } from "../../../contracts/star_picking_contracts";
 import type { SkyVisibilityState } from "../../../contracts/sky_environment_contracts";
+import { DEFAULT_SKY_VISIBILITY } from "../../../contracts/sky_visibility_defaults";
 import type { StarResourceEntry } from "../StarFieldRenderer";
 import type { CelestialTransformState } from "../CelestialTransformState";
 import { StarSpatialIndex } from "./StarSpatialIndex";
@@ -145,11 +146,9 @@ export class StarPickProvider {
       return null;
     }
 
-    const visibilityState = this.deps.getSkyVisibilityState();
-    if (!visibilityState) {
-      // Si no tenim estat de visibilitat, no podem saber què és clicable
-      return null;
-    }
+    // Rendering uses this same baseline until the first environment packet
+    // arrives. Picking must remain available during that window or a reconnect.
+    const visibilityState = this.deps.getSkyVisibilityState() ?? DEFAULT_SKY_VISIBILITY;
 
     const { camera, renderer, transformState } = this.deps;
     const rect = renderer.domElement.getBoundingClientRect();
@@ -191,7 +190,14 @@ export class StarPickProvider {
 
     const resources = this.deps.getStarResources();
     for (const [resId, entry] of resources) {
-      const index = this.spatialIndices.get(resId);
+      // A binary resource may survive a bridge reconnect while this picker is
+      // newly created.  Make the persistent CPU index self-healing instead of
+      // silently turning every visible star into a miss.
+      let index = this.spatialIndices.get(resId);
+      if (!index) {
+        this.buildIndex(resId, entry);
+        index = this.spatialIndices.get(resId);
+      }
       if (!index) continue;
 
       const rawCandidates = index.queryCone(
@@ -285,13 +291,12 @@ export class StarPickProvider {
     this._candidateCounts.push(totalCandidates);
     if (this._candidateCounts.length > 1000) this._candidateCounts.shift();
 
-    // 7. Worldroot occlusion check (star behind opaque world geometry)
-    // Només si hi ha candidats
-    if (candidates.length > 0) {
-      this.filterOccluded(candidates, camera);
-    }
+    // Three's depth buffer is the visual authority for terrain and the
+    // virtual Earth. A second CPU raycast against those auxiliary meshes was
+    // not equivalent and could reject stars that were plainly on screen.
+    // Keep interaction aligned with what the user can actually see.
 
-    // 8. Ranking determinista
+    // 7. Ranking determinista
     if (candidates.length === 0) {
       this._missCount++;
       const elapsed = performance.now() - t0;

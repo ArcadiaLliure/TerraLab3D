@@ -33,6 +33,8 @@ import { TimeBar } from "./view/ui/components/TimeBar";
 import { CelestialTransformState } from "./view/three/CelestialTransformState";
 import { PointerGestureRouter } from "./view/three/picking/PointerGestureRouter";
 import { StarPickProvider } from "./view/three/picking/StarPickProvider";
+import { SolarSystemPickProvider } from "./view/three/picking/SolarSystemPickProvider";
+import { CelestialPickProvider } from "./view/three/picking/CelestialPickProvider";
 import { ScenePickingController } from "./view/three/picking/ScenePickingController";
 
 // ─── Bootstrap ───────────────────────────────────────────────────────
@@ -97,6 +99,9 @@ function main(): void {
     onSolarSystemVisibilityChanged: (part, visible) => {
       sceneHost.getSolarSystemRenderer().setVisibility(part, visible);
     },
+    onMoonSurfaceToggled: (enabled) => {
+      sceneHost.getSolarSystemRenderer().setMoonSurfaceEnabled(enabled);
+    },
   });
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
@@ -122,7 +127,7 @@ function main(): void {
   
   let currentSkyVisibilityState: any = null;
 
-  const pickProvider = new StarPickProvider({
+  const starPickProvider = new StarPickProvider({
     camera: sceneHost.camera,
     transformState: celestialTransformState,
     renderer: sceneHost.renderer,
@@ -133,6 +138,15 @@ function main(): void {
     getPointScale: () => sceneHost.getStarFieldRenderer().getPointScale(),
     isStarLayerVisible: () => sceneHost.getStarFieldRenderer().visible,
   });
+  const solarSystemPickProvider = new SolarSystemPickProvider({
+    camera: sceneHost.camera,
+    getViewportRect: () => sceneHost.renderer.domElement.getBoundingClientRect(),
+    getPickableBodies: () => sceneHost.getSolarSystemRenderer().getPickableBodies(),
+  });
+  const pickProvider = new CelestialPickProvider({
+    starPicker: starPickProvider,
+    solarSystemPicker: solarSystemPickProvider,
+  });
 
   const pickingController = new ScenePickingController({
     gestureRouter,
@@ -140,9 +154,8 @@ function main(): void {
     resolveCallback: (reqId, gen, resId, resVer, catIdx, purpose) => {
       bridge.sendResolveStarPick(reqId, gen, resId, resVer, catIdx, purpose);
     },
-    selectionChangedCallback: (resolvedStar) => {
-      // Passem a tipus any per evitar problemes temporals d'interfície amb HUD no implementat encara
-      (locationHUD as any).setSelectedStar?.(resolvedStar);
+    selectionChangedCallback: (selection) => {
+      locationHUD.setSelectedCelestial(selection);
     },
   });
 
@@ -238,7 +251,7 @@ function main(): void {
       const resId = metadata.resourceId as string;
       const entry = sceneHost.getStarFieldRenderer().getResource(resId);
       if (entry) {
-        pickProvider.buildIndex(resId, entry);
+        starPickProvider.buildIndex(resId, entry);
       }
     },
     onStarPickResolved(msg) {
@@ -258,6 +271,13 @@ function main(): void {
       sceneHost.getSolarSystemRenderer().updateSnapshot(snapshot, bridgeBytes);
       skyPage.updateSolarSystem(snapshot);
       diagnostics.updateSolarSystem(snapshot, sceneHost.getSolarSystemRenderer().metrics());
+    },
+    onMoonSurfaceResource(resource) {
+      const moonMetrics = sceneHost.getSolarSystemRenderer().configureMoonSurface(
+        resource,
+        sceneHost.renderer.capabilities.maxTextureSize,
+      );
+      skyPage.updateMoonSurfaceResource(resource, moonMetrics.selectedResource);
     },
     onShutdownRequested() {
       renderLoop.stop();
@@ -321,6 +341,12 @@ function main(): void {
         solarSystemSnapshotApplyCount: solar.snapshotApplyCount,
         solarSystemStaleSnapshotCount: solar.staleSnapshotCount,
         solarSystemBridgeBytes: solar.lastBridgeBytes,
+        moonGeometryBuildCount: solar.moon.geometryBuildCount,
+        moonMaterialBuildCount: solar.moon.materialBuildCount,
+        moonAlbedoTextureLoadCount: solar.moon.albedoTextureLoadCount,
+        moonNormalTextureLoadCount: solar.moon.normalTextureLoadCount,
+        moonTextureUploadBytes: solar.moon.textureUploadBytes,
+        moonBridgeTextureBytes: solar.moon.bridgeTextureBytes,
       });
     }
 

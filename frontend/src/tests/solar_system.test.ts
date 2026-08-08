@@ -1,12 +1,25 @@
 import * as THREE from "three";
 
-import type { SolarSystemBodyState, SolarSystemSnapshot } from "../contracts/solar_system_contracts";
+import type {
+  LunarOrientationState,
+  MoonSurfaceResourceDescriptor,
+  SolarSystemBodyState,
+  SolarSystemSnapshot,
+} from "../contracts/solar_system_contracts";
 import { threeFromEnu } from "../view/three/celestialCoordinates";
 import {
   phaseLightDirectionThree,
   PLANET_PRESENTATIONS,
   SolarSystemRenderer,
 } from "../view/three/SolarSystemRenderer";
+import {
+  moonIlluminationFractionFromGeometry,
+  moonLightDirectionThree,
+} from "../view/three/MoonSurfaceRenderer";
+import { SolarSystemPickProvider } from "../view/three/picking/SolarSystemPickProvider";
+import { StarPickProvider } from "../view/three/picking/StarPickProvider";
+import { CelestialTransformState } from "../view/three/CelestialTransformState";
+import type { StarResourceEntry } from "../view/three/StarFieldRenderer";
 import { formatPlanetLabel } from "../view/three/SolarSystemLabels";
 
 let passed = 0;
@@ -45,8 +58,61 @@ function body(
     phaseAngleDeg,
     apparentMagnitude: id === "sun" ? -26.7 : -4,
     brightLimbPositionAngleDeg: id === "sun" ? null : 90,
+    orientation: id === "moon" ? lunarOrientation() : null,
     source: "DE421",
     quality: "precise",
+  };
+}
+
+function lunarOrientation(
+  bodyToENUQuaternion: readonly [number, number, number, number] = [0, 0, 0, 1],
+): LunarOrientationState {
+  return {
+    frame: "MOON_ME_DE421",
+    source: "JPL DE421 + NAIF lunar PCK",
+    quality: "precise",
+    bodyToENUQuaternion,
+    librationLongitudeDeg: 1.52,
+    librationLatitudeDeg: -6.749,
+    subEarthLongitudeDeg: 1.52,
+    subEarthLatitudeDeg: -6.749,
+    subObserverLongitudeDeg: 0.73,
+    subObserverLatitudeDeg: -6.41,
+    northPolePositionAngleDeg: 22.59,
+    brightLimbPositionAngleDeg: 114.09,
+    moonToSunDirectionENU: [1, 0, 0],
+    computeMs: 2,
+    detail: null,
+  };
+}
+
+function moonResource(): MoonSurfaceResourceDescriptor {
+  const asset = (
+    role: "albedo_8k" | "albedo_4k" | "normal_4k",
+    widthPx: number,
+    heightPx: number,
+  ) => ({
+    role,
+    name: `${role}.png`,
+    url: `/moon-assets/${role}.png`,
+    widthPx,
+    heightPx,
+    sha256: role.repeat(8).slice(0, 64),
+    byteSize: 1024,
+  });
+  return {
+    status: "ready",
+    label: "LRO 2025 8K",
+    datasetId: "nasa-cgi-moon-kit-lro-lola",
+    version: "LROC color map 2025",
+    projection: "global equirectangular/cylindrical",
+    centralLongitudeDeg: 0,
+    colorSpace: "sRGB",
+    albedo8k: asset("albedo_8k", 8192, 4096),
+    albedo4k: asset("albedo_4k", 4096, 2048),
+    normalMap: asset("normal_4k", 4096, 2048),
+    credits: ["NASA's Scientific Visualization Studio"],
+    detail: null,
   };
 }
 
@@ -84,8 +150,8 @@ const parent = new THREE.Group();
 const renderer = new SolarSystemRenderer(parent);
 assert(parent.children.includes(renderer.root), "persistent root is attached once");
 assert(renderer.metrics().entityBuildCount === 9, "nine persistent entities are built");
-assert(renderer.metrics().geometryBuildCount === 1, "one geometry is shared");
-assert(renderer.metrics().materialBuildCount === 9, "materials are built only at construction");
+assert(renderer.metrics().geometryBuildCount === 2, "one shared body geometry and one lunar surface geometry are built");
+assert(renderer.metrics().materialBuildCount === 10, "Moon keeps independent textured and fallback materials");
 
 assert(renderer.updateSnapshot(snapshot(1, "2024-01-01T00:00:00Z"), 2048, 1_000), "first snapshot accepted");
 assert(renderer.getBodyObject("sun")?.visible === true, "sun above horizon is visible");
@@ -134,11 +200,215 @@ for (let generation = 7; generation < 107; generation++) {
   renderer.updateSnapshot(snapshot(generation, `2024-01-01T00:00:${String(generation % 60).padStart(2, "0")}Z`), 1000, generation * 1000);
 }
 assert(renderer.metrics().entityBuildCount === 9, "timeline updates do not rebuild entities");
-assert(renderer.metrics().geometryBuildCount === 1, "timeline updates do not rebuild geometry");
-assert(renderer.metrics().materialBuildCount === 9, "timeline updates do not rebuild materials");
+assert(renderer.metrics().geometryBuildCount === 2, "timeline updates do not rebuild geometry");
+assert(renderer.metrics().materialBuildCount === 10, "timeline updates do not rebuild materials");
 
 renderer.dispose();
 assert(!parent.children.includes(renderer.root), "dispose detaches the root");
+
+const loadedUrls: string[] = [];
+const loadedTextures: THREE.Texture[] = [];
+let disposedTextures = 0;
+const fakeTextureLoad = (
+  url: string,
+  onLoad: (texture: THREE.Texture) => void,
+  _onError: (error: unknown) => void,
+): void => {
+  const texture = new THREE.Texture();
+  texture.addEventListener("dispose", () => disposedTextures++);
+  loadedUrls.push(url);
+  loadedTextures.push(texture);
+  onLoad(texture);
+};
+const moonParent = new THREE.Group();
+const texturedRenderer = new SolarSystemRenderer(moonParent, fakeTextureLoad);
+texturedRenderer.configureMoonSurface(moonResource(), 4096);
+assert(loadedUrls[0]?.endsWith("albedo_4k.png") === true, "4K fallback is selected for a 4096 texture limit");
+assert(loadedUrls[1]?.endsWith("normal_4k.png") === true, "LOLA normal map is loaded once when supported");
+texturedRenderer.updateSnapshot(snapshot(1, "2024-01-01T00:00:00Z"), 1600, 1_000);
+assert(texturedRenderer.metrics().moon.surfaceApplied, "LRO surface is applied only with precise body orientation");
+assert(
+  texturedRenderer.getBodyObject("moon")?.visible === false,
+  "the neutral fallback is hidden once the LRO albedo is ready",
+);
+assert(
+  texturedRenderer.getLabelAnchor("moon")?.visible === true,
+  "the Moon label stays anchored while its visual layer changes",
+);
+const uploadBytes = texturedRenderer.metrics().moon.textureUploadBytes;
+assert(uploadBytes > 0, "estimated persistent GPU upload bytes are recorded");
+
+const moonMesh = texturedRenderer.getBodyObject("moon")!;
+const calibration = moonMesh.parent!;
+const bodyXAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(calibration.quaternion);
+const bodyNorth = new THREE.Vector3(0, 1, 0).applyQuaternion(calibration.quaternion);
+const bodyEast = new THREE.Vector3(0, 0, -1).applyQuaternion(calibration.quaternion);
+near(bodyXAxis.x, 1, 1e-12, "fixed UV calibration keeps longitude zero on body +X");
+near(bodyNorth.z, 1, 1e-12, "fixed UV calibration maps image north to lunar +Z");
+near(bodyEast.y, 1, 1e-12, "fixed UV calibration maps increasing U to east-positive lunar +Y");
+const calibrationBefore = calibration.quaternion.clone();
+
+const rotatedMoon = {
+  ...body("moon", [0, 0.5, 1]),
+  orientation: lunarOrientation([0, 0, Math.SQRT1_2, Math.SQRT1_2]),
+};
+texturedRenderer.updateSnapshot(
+  { ...snapshot(2, "2024-01-01T00:00:01Z", 2), moon: rotatedMoon },
+  1600,
+  2_000,
+);
+assert(calibration.quaternion.equals(calibrationBefore), "dataset calibration never changes with date or observer");
+assert(texturedRenderer.metrics().moon.albedoTextureLoadCount === 1, "timeline does not reload lunar albedo");
+assert(texturedRenderer.metrics().moon.normalTextureLoadCount === 1, "timeline does not reload lunar normals");
+assert(texturedRenderer.metrics().moon.textureUploadBytes === uploadBytes, "timeline does not re-upload lunar textures");
+assert(texturedRenderer.metrics().moon.bridgeTextureBytes === 0, "texture bytes never cross the bridge");
+
+const unavailableOrientationMoon = { ...body("moon", [0, 0.5, 1]), orientation: null };
+texturedRenderer.updateSnapshot(
+  { ...snapshot(3, "2024-01-01T00:00:02Z", 3), moon: unavailableOrientationMoon },
+  1600,
+  3_000,
+);
+assert(!texturedRenderer.metrics().moon.surfaceApplied, "missing orientation retains the honest Step 8 fallback");
+assert(
+  texturedRenderer.getBodyObject("moon")?.visible === true,
+  "missing orientation still leaves the persistent Moon fallback visible",
+);
+
+const preciseLightMoon = {
+  ...body("moon", [0, 0.5, 1]),
+  orientation: { ...lunarOrientation(), moonToSunDirectionENU: [0, 1, 0] as const },
+};
+near(
+  moonLightDirectionThree(preciseLightMoon, new THREE.Vector3(1, 0, 0)).y,
+  1,
+  1e-12,
+  "precise lunar phase uses the Moon-to-Sun ephemeris direction",
+);
+const crescentGeometryMoon = {
+  ...body("moon", [0, 0, 1]),
+  orientation: {
+    ...lunarOrientation(),
+    moonToSunDirectionENU: [Math.sqrt(3) / 2, 0, 0.5] as const,
+  },
+};
+near(
+  moonIlluminationFractionFromGeometry(crescentGeometryMoon)!,
+  0.25,
+  1e-12,
+  "geometric Moon terminator preserves the ephemeris illumination fraction",
+);
+
+texturedRenderer.dispose();
+assert(disposedTextures === loadedTextures.length, "shutdown disposes every loaded Moon texture");
+
+const highResolutionUrls: string[] = [];
+const highResolutionRenderer = new SolarSystemRenderer(
+  new THREE.Group(),
+  (url, onLoad) => {
+    highResolutionUrls.push(url);
+    onLoad(new THREE.Texture());
+  },
+);
+highResolutionRenderer.configureMoonSurface(moonResource(), 8192);
+assert(highResolutionUrls[0]?.endsWith("albedo_8k.png") === true, "8K albedo is selected only when GPU capability permits it");
+highResolutionRenderer.dispose();
+
+const unsupportedUrls: string[] = [];
+const unsupportedRenderer = new SolarSystemRenderer(
+  new THREE.Group(),
+  (url) => { unsupportedUrls.push(url); },
+);
+unsupportedRenderer.configureMoonSurface(moonResource(), 2048);
+assert(unsupportedUrls.length === 0, "no oversized texture is loaded when even 4K is unsupported");
+assert(unsupportedRenderer.metrics().moon.surfaceStatus === "unavailable", "unsupported texture size has an explicit fallback status");
+unsupportedRenderer.dispose();
+
+const pickRoot = new THREE.Group();
+const pickRenderer = new SolarSystemRenderer(pickRoot);
+const pickedSun = body("sun", [0, 0, 1]);
+const pickedMoon = body("moon", [1, 0, 0]);
+const pickedVenus = body("venus", [-1, 0, 0]);
+pickRenderer.updateSnapshot({
+  ...snapshot(1, "2024-01-01T00:00:00Z"),
+  sun: pickedSun,
+  moon: pickedMoon,
+  planets: [pickedVenus],
+}, 1200, 1_000);
+const pickableIds = pickRenderer.getPickableBodies().map((candidate) => candidate.id);
+assert(pickableIds.includes("sun"), "Sun is exposed to the interaction layer when visible");
+assert(pickableIds.includes("moon"), "Moon fallback is exposed to the interaction layer when visible");
+assert(pickableIds.includes("venus"), "visible planets are exposed to the interaction layer");
+
+const pickCamera = new THREE.PerspectiveCamera(60, 1000 / 600, 0.01, 2_000_000);
+pickCamera.position.set(0, 0, 0);
+pickCamera.lookAt(0, 0, -1);
+pickCamera.updateProjectionMatrix();
+pickCamera.updateMatrixWorld(true);
+pickRoot.updateMatrixWorld(true);
+const solarPicker = new SolarSystemPickProvider({
+  camera: pickCamera,
+  getViewportRect: () => ({ left: 0, top: 0, width: 1000, height: 600 }),
+  getPickableBodies: () => pickRenderer.getPickableBodies(),
+});
+const sunPick = solarPicker.pick(500, 300);
+assert(sunPick?.kind === "solar_system_body" && sunPick.bodyId === "sun", "screen-space picking selects the Sun at its rendered centre");
+assert(solarPicker.reproject("sun")?.x === 500, "selected Solar body reprojects for the persistent marker");
+const wideFovProjection = solarPicker.reproject("sun")!;
+pickCamera.fov = 10;
+pickCamera.updateProjectionMatrix();
+pickCamera.updateMatrixWorld(true);
+const narrowFovProjection = solarPicker.reproject("sun")!;
+assert(
+  narrowFovProjection.visualRadiusCssPx > wideFovProjection.visualRadiusCssPx * 5,
+  "Solar selection radius follows the apparent disc when the FOV narrows",
+);
+pickRenderer.dispose();
+
+const starTransform = new CelestialTransformState();
+starTransform.update(1, [1, 0, 0, 0, 1, 0, 0, 0, 1]);
+const starCamera = new THREE.PerspectiveCamera(60, 1000 / 600, 0.01, 2_000_000);
+const starDirection = new THREE.Vector3(0, 0.5, -Math.sqrt(0.75));
+starCamera.lookAt(starDirection);
+starCamera.updateProjectionMatrix();
+starCamera.updateMatrixWorld(true);
+const starGeometry = new THREE.BufferGeometry();
+const starMaterial = new THREE.ShaderMaterial();
+const starEntry: StarResourceEntry = {
+  resourceId: "test-stars",
+  version: "1",
+  role: "general",
+  starCount: 1,
+  points: new THREE.Points(starGeometry, starMaterial),
+  geometry: starGeometry,
+  material: starMaterial,
+  catalogIndices: new Uint32Array([0]),
+  magnitudesArray: new Float32Array([0]),
+  equatorialPositions: new Float32Array(starDirection.toArray()),
+};
+const starResources = new Map([[starEntry.resourceId, starEntry]]);
+const starPicker = new StarPickProvider({
+  camera: starCamera,
+  transformState: starTransform,
+  renderer: {
+    domElement: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 1000, height: 600 }) },
+    getPixelRatio: () => 1,
+  } as unknown as THREE.WebGLRenderer,
+  worldRoot: new THREE.Group(),
+  getStarResources: () => starResources,
+  getMagnitudeLimit: () => 8,
+  getSkyVisibilityState: () => null,
+  getPointScale: () => 1,
+  isStarLayerVisible: () => true,
+});
+const restoredStarPick = starPicker.pick(500, 300);
+assert(
+  restoredStarPick?.kind === "star" && restoredStarPick.ref.catalogIndex === 0,
+  "star picking self-heals a missing spatial index and uses the render visibility baseline",
+);
+starPicker.dispose();
+starGeometry.dispose();
+starMaterial.dispose();
 
 console.log(`Solar system tests: ${passed} passed, ${failed} failed`);
 if (failed > 0) (globalThis as { process?: { exit(code: number): void } }).process?.exit(1);

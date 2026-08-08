@@ -1,5 +1,8 @@
 import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
-import type { SolarSystemSnapshot } from "../../../contracts/solar_system_contracts";
+import type {
+  MoonSurfaceResourceDescriptor,
+  SolarSystemSnapshot,
+} from "../../../contracts/solar_system_contracts";
 
 export interface SkyPageOptions {
   onStarLayerToggled?: (visible: boolean) => void;
@@ -13,6 +16,7 @@ export interface SkyPageOptions {
     part: "system" | "sun" | "moon" | "planets",
     visible: boolean,
   ) => void;
+  onMoonSurfaceToggled?: (enabled: boolean) => void;
 }
 
 export class SkyPage {
@@ -38,6 +42,7 @@ export class SkyPage {
   private bortleContainer!: HTMLDivElement;
   private magContainer!: HTMLDivElement;
   private solarStatusLabel!: HTMLDivElement;
+  private moonSurfaceStatusLabel!: HTMLDivElement;
 
   constructor(options: SkyPageOptions = {}) {
     this.options = options;
@@ -81,6 +86,18 @@ export class SkyPage {
       }));
       group.appendChild(row);
     }
+    const surfaceRow = document.createElement("div");
+    surfaceRow.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:10px;padding-left:12px;";
+    const surfaceText = document.createElement("span");
+    surfaceText.textContent = "Superfície LRO/LOLA";
+    surfaceRow.append(surfaceText, this.createToggleButton("Activa", "Inactiva", true, (enabled) => {
+      this.options.onMoonSurfaceToggled?.(enabled);
+    }));
+    group.appendChild(surfaceRow);
+    this.moonSurfaceStatusLabel = document.createElement("div");
+    this.moonSurfaceStatusLabel.style.cssText = "font-size:9px;color:var(--color-text-muted);padding-left:12px;";
+    this.moonSurfaceStatusLabel.textContent = "surface unavailable";
+    group.appendChild(this.moonSurfaceStatusLabel);
     this.solarStatusLabel = document.createElement("div");
     this.solarStatusLabel.style.cssText = "font-size:9px;color:var(--color-text-muted);line-height:1.4;";
     this.solarStatusLabel.textContent = "Efemèride: carregant…";
@@ -316,13 +333,28 @@ export class SkyPage {
     const source = snapshot.source === "DE421" ? "DE421" : "fallback";
     const moonState = moon === null
       ? "Lluna unavailable"
-      : `Lluna ${(moon.illuminationFraction * 100).toFixed(0)}%`;
+      : `Lluna ${(moon.illuminationFraction * 100).toFixed(0)}% · ${
+        moon.orientation?.quality === "precise"
+          ? moon.orientation.frame
+          : `orientació ${moon.orientation?.quality ?? "unavailable"}`
+      }`;
     this.solarStatusLabel.textContent = [
       `Efemèride: ${source}`,
       `Sol ${snapshot.sun.altitudeDeg.toFixed(1)}°`,
       moonState,
       `${snapshot.planets.length} planetes`,
     ].join(" · ");
+  }
+
+  public updateMoonSurfaceResource(
+    resource: MoonSurfaceResourceDescriptor,
+    selectedLabel = resource.label,
+  ): void {
+    this.moonSurfaceStatusLabel.textContent = selectedLabel;
+    this.moonSurfaceStatusLabel.style.color = resource.status === "ready"
+      ? "#4ade80"
+      : resource.status === "invalid" ? "#ff8a80" : "var(--color-text-muted)";
+    this.moonSurfaceStatusLabel.title = resource.detail ?? resource.credits.join(" · ");
   }
 
   public updateStarCatalogStatus(status: {

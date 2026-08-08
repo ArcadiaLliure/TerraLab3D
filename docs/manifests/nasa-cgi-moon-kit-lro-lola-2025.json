@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "datasetId": "nasa-cgi-moon-kit-lro-lola",
+  "source": "NASA Scientific Visualization Studio — CGI Moon Kit",
+  "sourcePage": "https://svs.gsfc.nasa.gov/4720/",
+  "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_16bit_srgb_8k.tif",
+  "sourceFile": "lroc_color_16bit_srgb_8k.tif",
+  "sourceVersion": "LROC color map 2025",
+  "acquisitionDate": "2026-08-08",
+  "sha256": "db7808e878b6a55eb409bb231eab8deb477f84b5c9d7396d76ff73e5d54992d9",
+  "projection": "global equirectangular/cylindrical",
+  "centralLongitudeDeg": 0,
+  "longitudeDirection": "east-positive",
+  "northAtTop": true,
+  "uvConvention": "U increases eastward from -180 to +180 degrees; V source rows run north to south; the renderer applies one fixed mesh-to-MOON_ME_DE421 calibration",
+  "colorSpace": "sRGB",
+  "generatedAsset": "moon_albedo_lro_2025_8k.jpg",
+  "generatedAssetSha256": "587725c2f35f92c93b408490577df1423205ac57a58c89d22a243233d484598e",
+  "generatorVersion": "terralab3d-moon-assets/1.0.0",
+  "credits": [
+    "NASA's Scientific Visualization Studio",
+    "Ernie Wright (USRA), visualizer",
+    "Noah Petro (NASA/GSFC), scientist",
+    "LROC WAC Color Mosaic — LRO Camera / Arizona State University",
+    "DEM — Lunar Reconnaissance Orbiter Laser Altimeter (LOLA)"
+  ],
+  "assets": [
+    {
+      "role": "albedo_8k",
+      "name": "moon_albedo_lro_2025_8k.jpg",
+      "widthPx": 8192,
+      "heightPx": 4096,
+      "sha256": "587725c2f35f92c93b408490577df1423205ac57a58c89d22a243233d484598e",
+      "byteSize": 9874348
+    },
+    {
+      "role": "albedo_4k",
+      "name": "moon_albedo_lro_2025_4k.jpg",
+      "widthPx": 4096,
+      "heightPx": 2048,
+      "sha256": "64aa3bd226bf92d04381bd558deab5a6232da7990f4cfca6ab15f635b3b46150",
+      "byteSize": 2614138
+    },
+    {
+      "role": "normal_4k",
+      "name": "moon_normal_lola_4k.png",
+      "widthPx": 4096,
+      "heightPx": 2048,
+      "sha256": "7814d0510592c76e636e0b921ea2b91b5216c043e69cf8fd5744e30835b3fd6e",
+      "byteSize": 10726611
+    }
+  ],
+  "dem": {
+    "sourceFile": "ldem_16.tif",
+    "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_16.tif",
+    "sha256": "1ea42bf44f7e9d694f79c3afa7145f97fbf06cc67372067d9fe73dce43bad796",
+    "widthPx": 5760,
+    "heightPx": 2880,
+    "verticalUnits": "floating-point kilometres relative to radius 1737.4 km",
+    "referenceRadiusKm": 1737.4,
+    "normalScale": 1.0,
+    "generatedAsset": "moon_normal_lola_4k.png",
+    "generatedAssetSha256": "7814d0510592c76e636e0b921ea2b91b5216c043e69cf8fd5744e30835b3fd6e"
+  },
+  "orientation": {
+    "frame": "MOON_ME_DE421",
+    "rangeStartUtc": "1900-01-01",
+    "rangeEndUtcExclusive": "2051-01-01",
+    "files": [
+      {
+        "name": "moon_080317.tf",
+        "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/fk/satellites/moon_080317.tf",
+        "sha256": "78732477b96f9863e7b0d65bcee3c22b8707ca5ed0db56d1173319cb2e8c7993"
+      },
+      {
+        "name": "moon_pa_de421_1900-2050.bpc",
+        "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de421_1900-2050.bpc",
+        "sha256": "656f90616403d75a75f0cd6c8830fc5b44f8cb4facb5ccb8915e752b397520cf"
+      }
+    ]
+  }
+}

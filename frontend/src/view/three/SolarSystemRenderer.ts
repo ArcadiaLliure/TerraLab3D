@@ -2,11 +2,19 @@ import * as THREE from "three";
 
 import type { SkyEnvironmentSnapshot } from "../../contracts/sky_environment_contracts";
 import type {
+  LunarOrientationState,
+  MoonSurfaceResourceDescriptor,
   SolarSystemBodyId,
   SolarSystemBodyState,
   SolarSystemSnapshot,
 } from "../../contracts/solar_system_contracts";
 import { threeFromEnu } from "./celestialCoordinates";
+import {
+  MoonSurfaceRenderer,
+  moonLightDirectionThree,
+  type MoonSurfaceRenderMetrics,
+  type MoonTextureLoad,
+} from "./MoonSurfaceRenderer";
 
 const CELESTIAL_RADIUS = 900_000;
 const INTERPOLATION_MS = 1000;
@@ -20,20 +28,26 @@ export const PLANET_IDS: readonly PlanetBodyId[] = [
 
 /** Shared visual identity for each planet disc and its projected tag. */
 export const PLANET_PRESENTATIONS = {
-  mercury: { label: "Mercury", color: 0xdcc8af, cssColor: "#dcc8af" },
-  venus: { label: "Venus", color: 0xfff5d2, cssColor: "#fff5d2" },
-  mars: { label: "Mars", color: 0xff7350, cssColor: "#ff7350" },
-  jupiter: { label: "Jupiter", color: 0xf5d7af, cssColor: "#f5d7af" },
-  saturn: { label: "Saturn", color: 0xebcd87, cssColor: "#ebcd87" },
-  uranus: { label: "Uranus", color: 0xa5e1eb, cssColor: "#a5e1eb" },
-  neptune: { label: "Neptune", color: 0x6e9bff, cssColor: "#6e9bff" },
+  mercury: { label: "Mercury", color: 0xdcc8af, cssColor: "#dcc8af", textureUrl: "/assets/textures/planets/mercury.jpg" },
+  venus: { label: "Venus", color: 0xfff5d2, cssColor: "#fff5d2", textureUrl: "/assets/textures/planets/venus.jpg" },
+  mars: { label: "Mars", color: 0xff7350, cssColor: "#ff7350", textureUrl: "/assets/textures/planets/mars.jpg" },
+  jupiter: { label: "Jupiter", color: 0xf5d7af, cssColor: "#f5d7af", textureUrl: "/assets/textures/planets/jupiter.jpg" },
+  saturn: { label: "Saturn", color: 0xebcd87, cssColor: "#ebcd87", textureUrl: "/assets/textures/planets/saturn.jpg" },
+  uranus: { label: "Uranus", color: 0xa5e1eb, cssColor: "#a5e1eb", textureUrl: "/assets/textures/planets/uranus.jpg" },
+  neptune: { label: "Neptune", color: 0x6e9bff, cssColor: "#6e9bff", textureUrl: "/assets/textures/planets/neptune.jpg" },
 } satisfies Record<PlanetBodyId, {
   readonly label: string;
   readonly color: number;
   readonly cssColor: string;
+  readonly textureUrl: string;
 }>;
 
-const BODY_IDS: readonly SolarSystemBodyId[] = ["sun", "moon", ...PLANET_IDS];
+export const PLANET_EXTRA_TEXTURE_URLS = {
+  venusSurface: "/assets/textures/planets/venus_surface.jpg",
+  saturnRings: "/assets/textures/planets/saturn_rings.png",
+};
+
+const GENERIC_BODY_IDS: readonly SolarSystemBodyId[] = ["sun", ...PLANET_IDS];
 
 const BODY_COLORS: Readonly<Record<SolarSystemBodyId, number>> = {
   sun: 0xfff4c2,
@@ -88,6 +102,13 @@ interface BodyEntity {
   readonly uniforms: BodyUniforms;
 }
 
+/** Visible celestial body ready for a local screen-space hit test. */
+export interface PickableSolarSystemBody {
+  readonly id: SolarSystemBodyId;
+  readonly state: SolarSystemBodyState;
+  readonly object: THREE.Object3D;
+}
+
 interface Interpolation {
   readonly startedMs: number;
   readonly from: ReadonlyMap<SolarSystemBodyId, SolarSystemBodyState>;
@@ -101,12 +122,14 @@ export interface SolarSystemRenderMetrics {
   readonly snapshotApplyCount: number;
   readonly staleSnapshotCount: number;
   readonly lastBridgeBytes: number;
+  readonly moon: MoonSurfaceRenderMetrics;
 }
 
 export class SolarSystemRenderer {
   readonly root = new THREE.Group();
   private readonly planetsRoot = new THREE.Group();
   private readonly geometry: THREE.SphereGeometry;
+  private readonly moonSurface: MoonSurfaceRenderer;
   private readonly entities = new Map<SolarSystemBodyId, BodyEntity>();
   private displayed = new Map<SolarSystemBodyId, SolarSystemBodyState>();
   private target = new Map<SolarSystemBodyId, SolarSystemBodyState>();
@@ -125,22 +148,23 @@ export class SolarSystemRenderer {
   private _lastBridgeBytes = 0;
 
   readonly entityBuildCount: number;
-  readonly geometryBuildCount = 1;
+  readonly geometryBuildCount = 2;
   readonly materialBuildCount: number;
 
-  constructor(parent: THREE.Object3D) {
+  constructor(parent: THREE.Object3D, moonTextureLoad?: MoonTextureLoad) {
     this.root.name = "solarSystemRoot";
     this.planetsRoot.name = "planets";
     this.geometry = new THREE.SphereGeometry(1, 32, 20);
-    for (const id of BODY_IDS) {
+    this.moonSurface = new MoonSurfaceRenderer(this.root, moonTextureLoad);
+    for (const id of GENERIC_BODY_IDS) {
       const entity = this.createEntity(id);
-      (id === "sun" || id === "moon" ? this.root : this.planetsRoot).add(entity.mesh);
+      (id === "sun" ? this.root : this.planetsRoot).add(entity.mesh);
       this.entities.set(id, entity);
     }
     this.root.add(this.planetsRoot);
     parent.add(this.root);
-    this.entityBuildCount = this.entities.size;
-    this.materialBuildCount = this.entities.size;
+    this.entityBuildCount = this.entities.size + 1;
+    this.materialBuildCount = this.entities.size + this.moonSurface.materialBuildCount;
   }
 
   updateSnapshot(snapshot: SolarSystemSnapshot, bridgeBytes = 0, nowMs = performance.now()): boolean {
@@ -198,8 +222,52 @@ export class SolarSystemRenderer {
     this.applyDisplayed();
   }
 
+  setMoonSurfaceEnabled(enabled: boolean): void {
+    this.moonSurface.setSurfaceEnabled(enabled);
+  }
+
+  configureMoonSurface(
+    resource: MoonSurfaceResourceDescriptor,
+    maxTextureSize: number,
+  ): MoonSurfaceRenderMetrics {
+    this.moonSurface.configureResource(resource, maxTextureSize);
+    return this.moonSurface.metrics();
+  }
+
   getBodyObject(id: SolarSystemBodyId): THREE.Mesh | undefined {
+    if (id === "moon") return this.moonSurface.mesh;
     return this.entities.get(id)?.mesh;
+  }
+
+  /** Stable projection target; it remains present while Moon visual layers swap. */
+  getLabelAnchor(id: SolarSystemBodyId): THREE.Object3D | undefined {
+    if (id === "moon") return this.moonSurface.labelAnchor;
+    return this.entities.get(id)?.mesh;
+  }
+
+  /**
+   * Gives the interaction layer only bodies that are actually rendered and
+   * enabled. It deliberately hides material/resource swaps behind the Moon
+   * surface renderer.
+   */
+  getPickableBodies(): readonly PickableSolarSystemBody[] {
+    const bodies: PickableSolarSystemBody[] = [];
+    for (const [id, state] of this.displayed) {
+      if (id === "moon") {
+        const object = this.moonSurface.getPickObject();
+        if (object !== undefined) bodies.push({ id, state, object });
+        continue;
+      }
+      const entity = this.entities.get(id);
+      if (
+        entity !== undefined
+        && entity.mesh.visible
+        && entity.uniforms.uRenderAlpha.value > 0.01
+      ) {
+        bodies.push({ id, state, object: entity.mesh });
+      }
+    }
+    return bodies;
   }
 
   isPlanetLabelVisible(id: PlanetBodyId): boolean {
@@ -217,6 +285,7 @@ export class SolarSystemRenderer {
       snapshotApplyCount: this._snapshotApplyCount,
       staleSnapshotCount: this._staleSnapshotCount,
       lastBridgeBytes: this._lastBridgeBytes,
+      moon: this.moonSurface.metrics(),
     };
   }
 
@@ -225,6 +294,7 @@ export class SolarSystemRenderer {
     this.disposed = true;
     this.root.removeFromParent();
     this.geometry.dispose();
+    this.moonSurface.dispose();
     for (const entity of this.entities.values()) entity.mesh.material.dispose();
     this.entities.clear();
   }
@@ -233,7 +303,7 @@ export class SolarSystemRenderer {
     const uniforms: BodyUniforms = {
       uColor: { value: new THREE.Color(BODY_COLORS[id]) },
       uLightDirectionThree: { value: new THREE.Vector3(0, 0, 1) },
-      uNightSide: { value: id === "moon" ? 0.015 : 0.06 },
+      uNightSide: { value: 0.06 },
       uRenderAlpha: { value: 1 },
       uEmissive: { value: id === "sun" },
     };
@@ -257,12 +327,27 @@ export class SolarSystemRenderer {
     for (const [id, entity] of this.entities) {
       if (!available.has(id)) entity.mesh.visible = false;
     }
+    if (!available.has("moon")) this.moonSurface.mesh.visible = false;
   }
 
   private applyDisplayed(): void {
     const sun = this.displayed.get("sun");
     if (sun === undefined) return;
     for (const [id, state] of this.displayed) {
+      if (id === "moon") {
+        const direction = threeFromEnu(state.directionENU).normalize();
+        this.moonSurface.root.position.copy(direction).multiplyScalar(CELESTIAL_RADIUS);
+        this.moonSurface.root.scale.setScalar(
+          CELESTIAL_RADIUS * Math.sin(THREE.MathUtils.degToRad(state.angularRadiusDeg)),
+        );
+        const fallbackLight = phaseLightDirectionThree(state, sun);
+        this.moonSurface.updateState(
+          state,
+          moonLightDirectionThree(state, fallbackLight),
+          this.isVisible(id) && state.altitudeDeg + state.angularRadiusDeg > 0,
+        );
+        continue;
+      }
       const entity = this.entities.get(id);
       if (entity === undefined) continue;
       const direction = threeFromEnu(state.directionENU).normalize();
@@ -334,7 +419,91 @@ function interpolateBody(
     illuminationFraction: lerp(start.illuminationFraction, target.illuminationFraction),
     phaseAngleDeg: lerp(start.phaseAngleDeg, target.phaseAngleDeg),
     apparentMagnitude: lerp(start.apparentMagnitude, target.apparentMagnitude),
+    orientation: interpolateOrientation(start.orientation, target.orientation, fraction),
   };
+}
+
+function interpolateOrientation(
+  start: LunarOrientationState | null,
+  target: LunarOrientationState | null,
+  fraction: number,
+): LunarOrientationState | null {
+  if (
+    start === null
+    || target === null
+    || start.quality !== "precise"
+    || target.quality !== "precise"
+    || start.bodyToENUQuaternion === null
+    || target.bodyToENUQuaternion === null
+  ) return target;
+  const first = new THREE.Quaternion(...start.bodyToENUQuaternion);
+  const second = new THREE.Quaternion(...target.bodyToENUQuaternion);
+  first.slerp(second, fraction).normalize();
+  const lerpNullable = (a: number | null, b: number | null): number | null => (
+    a === null || b === null ? b : THREE.MathUtils.lerp(a, b, fraction)
+  );
+  return {
+    ...target,
+    bodyToENUQuaternion: [first.x, first.y, first.z, first.w],
+    librationLongitudeDeg: interpolateAngleNullable(
+      start.librationLongitudeDeg,
+      target.librationLongitudeDeg,
+      fraction,
+    ),
+    librationLatitudeDeg: lerpNullable(
+      start.librationLatitudeDeg,
+      target.librationLatitudeDeg,
+    ),
+    subEarthLongitudeDeg: interpolateAngleNullable(
+      start.subEarthLongitudeDeg,
+      target.subEarthLongitudeDeg,
+      fraction,
+    ),
+    subEarthLatitudeDeg: lerpNullable(start.subEarthLatitudeDeg, target.subEarthLatitudeDeg),
+    subObserverLongitudeDeg: interpolateAngleNullable(
+      start.subObserverLongitudeDeg,
+      target.subObserverLongitudeDeg,
+      fraction,
+    ),
+    subObserverLatitudeDeg: lerpNullable(
+      start.subObserverLatitudeDeg,
+      target.subObserverLatitudeDeg,
+    ),
+    northPolePositionAngleDeg: interpolateAngleNullable(
+      start.northPolePositionAngleDeg,
+      target.northPolePositionAngleDeg,
+      fraction,
+    ),
+    brightLimbPositionAngleDeg: interpolateAngleNullable(
+      start.brightLimbPositionAngleDeg,
+      target.brightLimbPositionAngleDeg,
+      fraction,
+    ),
+    moonToSunDirectionENU: interpolateDirection(
+      start.moonToSunDirectionENU,
+      target.moonToSunDirectionENU,
+      fraction,
+    ),
+    computeMs: target.computeMs,
+  };
+}
+
+function interpolateDirection(
+  start: readonly [number, number, number] | null,
+  target: readonly [number, number, number] | null,
+  fraction: number,
+): readonly [number, number, number] | null {
+  if (start === null || target === null) return target;
+  const value = new THREE.Vector3(...start).lerp(new THREE.Vector3(...target), fraction).normalize();
+  return [value.x, value.y, value.z];
+}
+
+function interpolateAngleNullable(
+  start: number | null,
+  target: number | null,
+  fraction: number,
+): number | null {
+  return start === null || target === null ? target : interpolateAngle(start, target, fraction);
 }
 
 function interpolateAngle(start: number, target: number, fraction: number): number {

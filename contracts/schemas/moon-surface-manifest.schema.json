@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terralab3d.local/schemas/moon-surface-manifest.schema.json",
+  "title": "TerraLab3D managed Moon surface manifest",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "datasetId",
+    "source",
+    "sourcePage",
+    "sourceUrl",
+    "sourceFile",
+    "sourceVersion",
+    "acquisitionDate",
+    "sha256",
+    "projection",
+    "centralLongitudeDeg",
+    "colorSpace",
+    "generatedAsset",
+    "generatedAssetSha256",
+    "generatorVersion",
+    "credits",
+    "assets",
+    "dem",
+    "orientation"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "datasetId": { "const": "nasa-cgi-moon-kit-lro-lola" },
+    "source": { "type": "string", "minLength": 1 },
+    "sourcePage": { "type": "string", "format": "uri" },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "sourceFile": { "type": "string", "minLength": 1 },
+    "sourceVersion": { "type": "string", "minLength": 1 },
+    "acquisitionDate": { "type": "string", "format": "date" },
+    "sha256": { "$ref": "#/$defs/sha256" },
+    "projection": { "type": "string", "minLength": 1 },
+    "centralLongitudeDeg": { "const": 0 },
+    "longitudeDirection": { "const": "east-positive" },
+    "northAtTop": { "const": true },
+    "uvConvention": { "type": "string", "minLength": 1 },
+    "colorSpace": { "const": "sRGB" },
+    "generatedAsset": { "type": "string", "minLength": 1 },
+    "generatedAssetSha256": { "$ref": "#/$defs/sha256" },
+    "generatorVersion": { "type": "string", "minLength": 1 },
+    "credits": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "assets": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "dem": { "type": "object" },
+    "orientation": { "type": "object" }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "asset": {
+      "type": "object",
+      "required": ["role", "name", "widthPx", "heightPx", "sha256", "byteSize"],
+      "properties": {
+        "role": { "enum": ["albedo_8k", "albedo_4k", "normal_4k"] },
+        "name": { "type": "string", "pattern": "^[^/\\\\]+$" },
+        "widthPx": { "type": "integer", "minimum": 1 },
+        "heightPx": { "type": "integer", "minimum": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "byteSize": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

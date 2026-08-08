@@ -146,7 +146,9 @@ export class DiagnosticsOverlay implements BridgeStateListener {
   updateSolarSystem(snapshot: SolarSystemSnapshot, metrics: SolarSystemRenderMetrics): void {
     const moon = snapshot.moon === null
       ? "moon unavailable"
-      : `moon ${(snapshot.moon.illuminationFraction * 100).toFixed(0)}%`;
+      : `moon ${(snapshot.moon.illuminationFraction * 100).toFixed(0)}% ${
+        snapshot.moon.orientation?.quality ?? "unavailable"
+      } ${metrics.moon.selectedResource}`;
     this.solarSystemText.textContent = [
       snapshot.source,
       `g${snapshot.generation}`,

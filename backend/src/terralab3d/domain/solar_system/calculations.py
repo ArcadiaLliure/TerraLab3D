@@ -13,6 +13,12 @@ from .models import ApparentBodyState, BodyKind, EphemerisQuality, ScientificObs
 
 AU_KM = 149_597_870.7
 SUN_RADIUS_KM = 695_700.0
+Matrix3 = tuple[
+    tuple[float, float, float],
+    tuple[float, float, float],
+    tuple[float, float, float],
+]
+Vector3 = tuple[float, float, float]
 
 
 def angular_radius_deg(physical_radius_km: float, distance_km: float) -> float:
@@ -45,6 +51,114 @@ def bright_limb_position_angle_deg(
         - math.cos(sun_dec) * math.sin(moon_dec) * math.cos(delta_ra)
     )
     return math.degrees(math.atan2(y, x)) % 360.0
+
+
+def ecef_to_enu_rotation(latitude_deg: float, longitude_deg: float) -> Matrix3:
+    """Return the column-vector rotation from Earth-fixed XYZ to local ENU."""
+
+    latitude = math.radians(latitude_deg)
+    longitude = math.radians(longitude_deg)
+    sin_latitude = math.sin(latitude)
+    cos_latitude = math.cos(latitude)
+    sin_longitude = math.sin(longitude)
+    cos_longitude = math.cos(longitude)
+    return (
+        (-sin_longitude, cos_longitude, 0.0),
+        (-sin_latitude * cos_longitude, -sin_latitude * sin_longitude, cos_latitude),
+        (cos_latitude * cos_longitude, cos_latitude * sin_longitude, sin_latitude),
+    )
+
+
+def matrix3_multiply(left: Matrix3, right: Matrix3) -> Matrix3:
+    return tuple(
+        tuple(sum(left[row][k] * right[k][column] for k in range(3)) for column in range(3))
+        for row in range(3)
+    )  # type: ignore[return-value]
+
+
+def matrix3_transpose(matrix: Matrix3) -> Matrix3:
+    return tuple(tuple(matrix[column][row] for column in range(3)) for row in range(3))  # type: ignore[return-value]
+
+
+def matrix3_apply(matrix: Matrix3, vector: Vector3) -> Vector3:
+    return tuple(sum(matrix[row][column] * vector[column] for column in range(3)) for row in range(3))  # type: ignore[return-value]
+
+
+def rotation_matrix_to_quaternion(matrix: Matrix3) -> tuple[float, float, float, float]:
+    """Convert a proper 3×3 column-vector rotation to normalized ``x,y,z,w``."""
+
+    trace = matrix[0][0] + matrix[1][1] + matrix[2][2]
+    if trace > 0.0:
+        scale = math.sqrt(trace + 1.0) * 2.0
+        w = 0.25 * scale
+        x = (matrix[2][1] - matrix[1][2]) / scale
+        y = (matrix[0][2] - matrix[2][0]) / scale
+        z = (matrix[1][0] - matrix[0][1]) / scale
+    elif matrix[0][0] > matrix[1][1] and matrix[0][0] > matrix[2][2]:
+        scale = math.sqrt(1.0 + matrix[0][0] - matrix[1][1] - matrix[2][2]) * 2.0
+        w = (matrix[2][1] - matrix[1][2]) / scale
+        x = 0.25 * scale
+        y = (matrix[0][1] + matrix[1][0]) / scale
+        z = (matrix[0][2] + matrix[2][0]) / scale
+    elif matrix[1][1] > matrix[2][2]:
+        scale = math.sqrt(1.0 + matrix[1][1] - matrix[0][0] - matrix[2][2]) * 2.0
+        w = (matrix[0][2] - matrix[2][0]) / scale
+        x = (matrix[0][1] + matrix[1][0]) / scale
+        y = 0.25 * scale
+        z = (matrix[1][2] + matrix[2][1]) / scale
+    else:
+        scale = math.sqrt(1.0 + matrix[2][2] - matrix[0][0] - matrix[1][1]) * 2.0
+        w = (matrix[1][0] - matrix[0][1]) / scale
+        x = (matrix[0][2] + matrix[2][0]) / scale
+        y = (matrix[1][2] + matrix[2][1]) / scale
+        z = 0.25 * scale
+    magnitude = math.sqrt(x * x + y * y + z * z + w * w)
+    if magnitude <= 1e-15:
+        raise ValueError("Rotation matrix produced a degenerate quaternion")
+    return x / magnitude, y / magnitude, z / magnitude, w / magnitude
+
+
+def normalize_vector(vector: Vector3) -> Vector3:
+    magnitude = math.sqrt(sum(component * component for component in vector))
+    if magnitude <= 1e-15:
+        raise ValueError("Cannot normalize a zero-length vector")
+    return tuple(component / magnitude for component in vector)  # type: ignore[return-value]
+
+
+def north_pole_position_angle_deg(
+    observer_to_moon_icrf: Vector3,
+    lunar_north_pole_icrf: Vector3,
+    celestial_north_icrf: Vector3 = (0.0, 0.0, 1.0),
+) -> float:
+    """Position angle of lunar north, eastward from the supplied celestial north."""
+
+    line_of_sight = normalize_vector(observer_to_moon_icrf)
+    pole = normalize_vector(lunar_north_pole_icrf)
+    north = normalize_vector(_reject(normalize_vector(celestial_north_icrf), line_of_sight))
+    east = normalize_vector(_cross(north, line_of_sight))
+    projected_pole = normalize_vector(_reject(pole, line_of_sight))
+    return math.degrees(math.atan2(_dot(projected_pole, east), _dot(projected_pole, north))) % 360.0
+
+
+def signed_longitude_deg(value: float) -> float:
+    return (value + 180.0) % 360.0 - 180.0
+
+
+def _dot(first: Vector3, second: Vector3) -> float:
+    return sum(a * b for a, b in zip(first, second, strict=True))
+
+
+def _reject(vector: Vector3, axis: Vector3) -> Vector3:
+    projection = _dot(vector, axis)
+    return tuple(vector[index] - projection * axis[index] for index in range(3))  # type: ignore[return-value]
+
+
+def _cross(first: Vector3, second: Vector3) -> Vector3:
+    return (
+        first[1] * second[2] - first[2] * second[1],
+        first[2] * second[0] - first[0] * second[2],
+        first[0] * second[1] - first[1] * second[0],
+    )
 
 
 def sun_apparent_magnitude(distance_au: float) -> float:

@@ -81,20 +81,20 @@ export class PointerGestureRouter {
 
   attach(container: HTMLElement): void {
     this.container = container;
-    // Usar capture phase per veure els events ABANS que CameraRig
-    // però NO cridar preventDefault ni stopPropagation
-    container.addEventListener("pointerdown", this.onPointerDownBound);
-    container.addEventListener("pointermove", this.onPointerMoveBound);
-    container.addEventListener("pointerup", this.onPointerUpBound);
-    container.addEventListener("pointerleave", this.onPointerLeaveBound);
+    // Observe in capture phase before CameraRig takes pointer capture. The
+    // router still never prevents or stops the navigation gesture.
+    container.addEventListener("pointerdown", this.onPointerDownBound, true);
+    container.addEventListener("pointermove", this.onPointerMoveBound, true);
+    container.addEventListener("pointerup", this.onPointerUpBound, true);
+    container.addEventListener("pointerleave", this.onPointerLeaveBound, true);
   }
 
   detach(): void {
     if (!this.container) return;
-    this.container.removeEventListener("pointerdown", this.onPointerDownBound);
-    this.container.removeEventListener("pointermove", this.onPointerMoveBound);
-    this.container.removeEventListener("pointerup", this.onPointerUpBound);
-    this.container.removeEventListener("pointerleave", this.onPointerLeaveBound);
+    this.container.removeEventListener("pointerdown", this.onPointerDownBound, true);
+    this.container.removeEventListener("pointermove", this.onPointerMoveBound, true);
+    this.container.removeEventListener("pointerup", this.onPointerUpBound, true);
+    this.container.removeEventListener("pointerleave", this.onPointerLeaveBound, true);
     this.container = null;
     this.cancelHoverRaf();
   }
