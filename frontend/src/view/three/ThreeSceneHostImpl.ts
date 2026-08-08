@@ -105,7 +105,7 @@ export class ThreeSceneHostImpl {
     this.scene.add(this.worldRoot);
 
     // Camera (initial values; CameraRigImpl manages pose)
-    this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 2000);
+    this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 2000000);
 
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -202,6 +202,15 @@ export class ThreeSceneHostImpl {
     // ─── Recentre celestialRoot to camera position ───────────────────
     // This eliminates translational parallax for sky objects.
     this.celestialRoot.position.copy(this.camera.position);
+    
+    // Ancorar la línia de l'horitzó al terra (Y=0)
+    this.horizontalGrid.root.position.y = -this.camera.position.y;
+    
+    // Ampliar dinàmicament el grid segons l'alçada perquè mantingui la dimensió visual
+    const baseHeight = 50.0;
+    const scale = Math.max(1.0, this.camera.position.y / baseHeight);
+    this.horizontalGrid.root.scale.set(scale, scale, scale);
+    
     this._transformUpdateCount++;
 
     // ─── Phase 4: LOD update based on current FOV ────────────────────

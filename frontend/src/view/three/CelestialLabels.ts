@@ -236,11 +236,16 @@ export class CelestialLabels {
       const azRad = label.def.azDeg * DEG;
       const altRad = label.def.altDeg * DEG;
       const cosAlt = Math.cos(altRad);
+      // Escala dinàmica idèntica a la del grid perquè quadrin exactament
+      const baseHeight = 50.0;
+      const scale = Math.max(1.0, cameraPositionWorld.y / baseHeight);
+      const currentRadius = LABEL_SPHERE_RADIUS * scale;
 
-      // World pos = camera position + direction * radius
-      const worldX = cameraPositionWorld.x + Math.sin(azRad) * cosAlt * LABEL_SPHERE_RADIUS;
-      const worldY = cameraPositionWorld.y + Math.sin(altRad) * LABEL_SPHERE_RADIUS;
-      const worldZ = cameraPositionWorld.z + (-Math.cos(azRad) * cosAlt * LABEL_SPHERE_RADIUS);
+      // World pos = camera position (X, Z) + direction * radius
+      // Associem l'horitzó al terra (Y=0)
+      const worldX = cameraPositionWorld.x + Math.sin(azRad) * cosAlt * currentRadius;
+      const worldY = 0 + Math.sin(altRad) * currentRadius;
+      const worldZ = cameraPositionWorld.z + (-Math.cos(azRad) * cosAlt * currentRadius);
 
       this._projVec.set(worldX, worldY, worldZ);
       this._projVec.project(camera);

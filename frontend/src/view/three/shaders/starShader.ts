@@ -43,10 +43,11 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
 
     // ── Lògica d'Extinció i Visibilitat (Pas 7) ──
     float h = degrees(asin(clamp(posWorld.y / length(posWorld), -1.0, 1.0)));
-    float h_clamp = max(0.0, h);
+    // Utilitzem abs(h) per a una atmosfera 360º simètrica
+    float h_calc = abs(h);
     
     // Kasten-Young Airmass
-    float denominator = sin(radians(h_clamp)) + 0.50572 * pow(h_clamp + 6.07995, -1.6364);
+    float denominator = sin(radians(h_calc)) + 0.50572 * pow(h_calc + 6.07995, -1.6364);
     float airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
     
     // Magnitud límit efectiva a aquesta altitud
@@ -58,8 +59,8 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
     float edge1 = effectiveLimit;
     vAlpha = 1.0 - smoothstep(edge0, edge1, magnitude);
 
-    // Ocultació dura per optimització (invisible, sota terra o fora de catàleg)
-    if (magnitude > u_magnitudeLimit || vAlpha < 0.02 || posWorld.y < -0.05) {
+    // Ocultació dura per optimització (invisible o fora de catàleg)
+    if (magnitude > u_magnitudeLimit || vAlpha < 0.02) {
       gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
       gl_PointSize = 0.0;
       return;

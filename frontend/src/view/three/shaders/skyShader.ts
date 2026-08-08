@@ -49,17 +49,7 @@ void main() {
     float viewAlt = asin(clamp(viewDir.y, -1.0, 1.0));
     float viewAltDeg = viewAlt * 180.0 / PI;
     
-    if (viewDir.y < -0.05) {
-        // Sota l'horitzó (night floor)
-        // Utilitzem una transició suau per evitar aliasing
-        float blend = smoothstep(-0.05, 0.0, viewDir.y);
-        gl_FragColor = vec4(mix(COLOR_GROUND, vec3(0.0), blend), 1.0);
-        
-        // Si estem per sota i no prop de l'horitzó, sortim ràpid
-        if (viewDir.y < -0.1) {
-            return;
-        }
-    }
+
     
     if (!u_atmosphereEnabled) {
         // Sense atmosfera: fons negre
@@ -141,10 +131,6 @@ void main() {
     // Clamp final i alpha 1.0
     gl_FragColor = vec4(clamp(skyColor, 0.0, 1.0), 1.0);
     
-    // Transició suau horitzó - sota terra (si viewDir.y és entre -0.05 i 0.0)
-    if (viewDir.y < 0.0) {
-        float blend = smoothstep(-0.05, 0.0, viewDir.y);
-        gl_FragColor.rgb = mix(COLOR_GROUND, gl_FragColor.rgb, blend);
-    }
+
 }
 `;
