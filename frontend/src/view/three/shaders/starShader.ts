@@ -19,26 +19,51 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
   attribute float catalogIndex;
 
   uniform mat3 u_equatorialToENUMatrix;
-  uniform float u_magnitudeLimit;
+  uniform float u_magnitudeLimit; // Límit dur absolut del catàleg
   uniform float u_pointScale;
   uniform float u_devicePixelRatio;
   uniform float u_radius;
 
+  // Uniforms de Visibilitat (Pas 7)
+  uniform float u_zenithMagnitudeLimit;
+  uniform float u_extinctionCoefficient;
+  uniform float u_twilightSuppression;
+  uniform float u_fadeWidthMag;
+
   varying vec3 vColor;
   varying float vMagnitude;
+  varying float vAlpha;
 
   void main() {
     vColor = color;
     vMagnitude = magnitude;
 
-    if (magnitude > u_magnitudeLimit) {
+    // Rotació equatorial → ENU/Three.js
+    vec3 posWorld = u_equatorialToENUMatrix * position;
+
+    // ── Lògica d'Extinció i Visibilitat (Pas 7) ──
+    float h = degrees(asin(clamp(posWorld.y / length(posWorld), -1.0, 1.0)));
+    float h_clamp = max(0.0, h);
+    
+    // Kasten-Young Airmass
+    float denominator = sin(radians(h_clamp)) + 0.50572 * pow(h_clamp + 6.07995, -1.6364);
+    float airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
+    
+    // Magnitud límit efectiva a aquesta altitud
+    float effectiveLimit = u_zenithMagnitudeLimit - u_extinctionCoefficient * (airmass - 1.0) - u_twilightSuppression;
+    
+    // Fade suau (alpha=1 si mag < límit-fade, alpha=0 si mag > límit)
+    // smoothstep requereix edge0 < edge1 en GLSL
+    float edge0 = effectiveLimit - u_fadeWidthMag;
+    float edge1 = effectiveLimit;
+    vAlpha = 1.0 - smoothstep(edge0, edge1, magnitude);
+
+    // Ocultació dura per optimització (invisible, sota terra o fora de catàleg)
+    if (magnitude > u_magnitudeLimit || vAlpha < 0.02 || posWorld.y < -0.05) {
       gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
       gl_PointSize = 0.0;
       return;
     }
-
-    // Rotació equatorial → ENU/Three.js
-    vec3 posWorld = u_equatorialToENUMatrix * position;
 
     // Col·locar a l'esfera celeste a distància u_radius
     vec4 mvPosition = modelViewMatrix * vec4(posWorld * u_radius, 1.0);
@@ -58,6 +83,7 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
 export const STAR_FRAGMENT_SHADER = /* glsl */ `
   varying vec3 vColor;
   varying float vMagnitude;
+  varying float vAlpha;
 
   void main() {
     // gl_PointCoord està en [0, 1] x [0, 1]
@@ -95,6 +121,6 @@ export const STAR_FRAGMENT_SHADER = /* glsl */ `
       finalColor = mix(vColor, vec3(1.0), (0.3 - dist) / 0.3 * 0.6);
     }
 
-    gl_FragColor = vec4(finalColor, finalAlpha);
+    gl_FragColor = vec4(finalColor, finalAlpha * vAlpha);
   }
 `;

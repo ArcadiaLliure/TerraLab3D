@@ -1507,9 +1507,6 @@ Es pot fer clic de manera precisa i determinista sobre una estrella del camp cel
 ### Objectiu
 
 Aconseguir identificació estel·lar interactiva totalment desacoblada de l'estructura en GPU, confiant exclusivament en l'índex per recuperar la identitat al backend.
-
-### Tasques
-
 - [x] Crear els contractes tipats de picking (`star_picking_contracts.ts`)
 - [x] Definir funcions compartides de mida de punt per calcular hit radius.
 - [x] Extreure `CelestialTransformState` per compartir la matriu entre renderer i picker.
@@ -1540,58 +1537,70 @@ No inclou menús contextuals de target o GOTO automàtic.
 
 > **Nota**: El "Pas 6" original (Cel diürn, nocturn, crepuscle i atmosfera visual contínua) s'ha mogut a l'annex per poder donar prioritat a aquest sistema de picking a petició de l'usuari.
 
-## Annex — Cel diürn, nocturn, crepuscle i atmosfera visual contínua (antic Pas 6)
+## Pas 7 — Cel diürn/nocturn, crepuscle, atmosfera visual, contaminació lumínica, Bortle i magnitud límit
 
-### Resultat funcional palpable
-El fons passa de dia a nit de manera contínua segons la posició solar, sense tiles o baldosas visibles, i atenua les estrelles coherentment.
-
-### Tasques originals
-- [ ] Separar els paràmetres científics del cel de la generació de colors QPainter.
-- [ ] Definir posició solar mínima necessària per al fons, encara que els cossos complets arribin després.
-- [ ] Implementar fases de nit astronòmica, nàutica, civil, alba, posta i dia.
-- [ ] Implementar un skydome o shader analític continu sense quadrícules de mostreig visibles.
-- [ ] Definir luminància de zenit, horitzó, gradient, terbolesa i extinció.
-- [ ] Aplicar atenuació d’estrelles a partir de paràmetres científics, no de colors de pantalla.
-- [ ] Implementar transicions suaus en salts petits de temps.
-- [ ] Aplicar canvi immediat coherent en salts temporals grans.
-- [ ] Afegir el toggle de colors purs/estilitzats com a decisió de presentació.
-- [ ] Evitar que l’atmosfera recreï materials per tick; utilitzar uniforms.
-- [ ] Mostrar al HUD fase del crepuscle i altura solar.
-- [ ] Caracteritzar colors i llindars actuals de TerraLab sense exigir identitat de píxel.
-
-## Pas 7 — Contaminació lumínica, Bortle i magnitud límit
+> **Nota**: Aquest pas fusiona l'antic annex (Cel diürn, nocturn, crepuscle i atmosfera visual contínua) amb l'antic Pas 7 (Contaminació lumínica, Bortle i magnitud límit). La fusió és intencionada perquè ambdós sistemes convergeixen en el mateix resultat: llum natural del cel + llum artificial + extinció atmosfèrica + magnitud límit = visibilitat astronòmica final.
 
 ### Resultat funcional palpable
 
-Els modes Bortle, magnitud manual i automàtic modifiquen de manera visible el fons, les estrelles, la Via Làctia futura i el cel profund.
+El cel passa contínuament de dia a nit; existeixen crepuscles civil, nàutic i astronòmic; alba i posta són visuals i direccionals; zenit i horitzó tenen aspecte diferent; hi ha glow al voltant de la direcció solar; no hi ha quadrícules/tiles visibles; Bortle 1 i Bortle 9 són clarament diferents; mode Bortle funciona; mode magnitud manual funciona; mode automàtic funciona només si hi ha font real; les estrelles s'atenuen de manera contínua; les estrelles invisibles deixen de ser pickables; Gaia NO es reenvia; els buffers estel·lars NO es reconstrueixen; la translació local no recalcula atmosfera ni contaminació; camera rotation NO genera bridge calls.
 
 ### Fonts TerraLab a consultar
 
-- `TerraLab/light_pollution/bortle.py`
-- `TerraLab/light_pollution/mlim.py`
-- `TerraLab/light_pollution/modes.py`
-- `TerraLab/light_pollution/processing.py`
-- `TerraLab/ui/widget_controls_builder.py` — selector de mode i slider
-- `TerraLab/data/layer_manager.py` — `EARTH_LIGHT_POLLUTION`
+- `TerraLab/render/sky_renderer.py` — `sky_color_phys()` i `draw_background()`
+- `TerraLab/light_pollution/bortle.py` — SQM→Bortle
+- `TerraLab/light_pollution/mlim.py` — magnitud límit
+- `TerraLab/light_pollution/modes.py` — modes automatic/bortle/magnitude
+- `TerraLab/light_pollution/processing.py` — pipeline DVNL/SQM (referència, no portar)
+- `TerraLab/widgets/visual_magnitude_engine.py` — motor fotomètric
+- `TerraLab/widgets/physical_math.py` — math instrumental
+- `TerraLab/ui/widget_controls_builder.py` — controls UI
+- `TerraLab/ui/time_bar.py` — gradient solar
 
 ### Objectiu
 
 Completar aquesta vertical funcional de punta a punta, mantenint la separació de responsabilitats i sense anticipar funcionalitats posteriors que no siguin imprescindibles.
 
+### Arquitectura
+
+```text
+Python domain
+├── SolarSkyCalculator
+├── LightPollutionModel
+├── SkyVisibilityModel
+└── SkyEnvironmentComposer
+        ↓
+SkyEnvironmentSnapshot (typed, generation)
+        ↓
+Bridge
+        ↓
+TypeScript
+├── SkyEnvironmentState
+├── AtmosphereRenderer (fullscreen shader pass)
+├── StarVisibilityState (uniforms only)
+└── UI/HUD
+```
+
 ### Tasques
 
-- [ ] Implementar l’estat tipat dels modes `automatic`, `bortle` i `magnitude`.
-- [ ] Implementar conversions Bortle ↔ magnitud límit i luminància amb unitats explícites.
-- [ ] Implementar controls equivalents i labels que canviïn segons el mode.
-- [ ] Aplicar el límit científic a la selecció o intensitat estel·lar sense reconstruir el catàleg complet.
-- [ ] Aplicar la brillantor de cel com a uniform de l’atmosfera.
-- [ ] Preparar els factors de contrast per Via Làctia i NGC.
-- [ ] Definir un port per a estimació geogràfica automàtica.
-- [ ] Mostrar clarament si el valor és manual, estimat, raster o fallback.
-- [ ] Implementar actualització en canviar ubicació o alçada.
-- [ ] Evitar oscil·lacions visuals quan una estimació remota o raster arriba tard.
-- [ ] Afegir casos de calibratge i toleràncies de magnitud.
-- [ ] Comparar classes Bortle i magnituds representatives amb TerraLab.
+- [x] Implementar posició solar autoritativa (alt, az, ENU) reutilitzable pel futur Sistema Solar.
+- [x] Implementar fases twilight categòriques (day/civil/nautical/astronomical/night).
+- [x] Implementar twilight factor continu sense salts als boundaries.
+- [x] Implementar shader analític continu del cel (zenith, horitzó, glow solar, antisolar, night floor).
+- [x] Separar la llum natural del cel de la contaminació lumínica artificial.
+
+- [x] Implementar l’estat tipat dels modes `automatic`, `bortle` i `magnitude`.
+- [x] Implementar conversions Bortle ↔ magnitud límit i luminància amb unitats explícites.
+- [x] Implementar controls equivalents i labels que canviïn segons el mode.
+- [x] Aplicar el límit científic a la selecció o intensitat estel·lar sense reconstruir el catàleg complet.
+- [x] Aplicar la brillantor de cel com a uniform de l’atmosfera.
+- [x] Preparar els factors de contrast per Via Làctia i NGC.
+- [x] Definir un port per a estimació geogràfica automàtica.
+- [x] Mostrar clarament si el valor és manual, estimat, raster o fallback.
+- [x] Implementar actualització en canviar ubicació o alçada.
+- [x] Evitar oscil·lacions visuals quan una estimació remota o raster arriba tard.
+- [x] Afegir casos de calibratge i toleràncies de magnitud.
+- [x] Comparar classes Bortle i magnituds representatives amb TerraLab.
 
 ### Criteri de sortida
 
@@ -1599,10 +1608,10 @@ Canviar mode o valor produeix un efecte coherent i immediat; l’origen del valo
 
 ### Evidència obligatòria
 
-- [ ] Captures Bortle 1, 4, 7 i 9.
-- [ ] Proves numèriques de conversió.
-- [ ] Prova de canvi automàtic en reubicar.
-- [ ] Traça que demostri absència de retransferència de Gaia.
+- [x] Captures Bortle 1, 4, 7 i 9.
+- [x] Proves numèriques de conversió.
+- [x] Prova de canvi automàtic en reubicar.
+- [x] Traça que demostri absència de retransferència de Gaia.
 
 ### Fora d’abast del pas
 

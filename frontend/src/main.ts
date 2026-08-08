@@ -15,6 +15,7 @@ import type { BackendMessageListener } from "./bridge/WebSocketBridge";
 import { CameraRigImpl } from "./view/three/CameraRigImpl";
 import { RenderLoopImpl } from "./view/three/RenderLoopImpl";
 import { ThreeSceneHostImpl } from "./view/three/ThreeSceneHostImpl";
+import { AtmosphereRenderer } from "./view/three/AtmosphereRenderer";
 import type { OverlayVisibility } from "./view/three/ThreeSceneHostImpl";
 import { DiagnosticsOverlay } from "./view/ui/DiagnosticsOverlay";
 import { NavigationWorld } from "./view/three/terrain/NavigationWorld";
@@ -59,6 +60,12 @@ function main(): void {
   });
   shell.mount(container);
 
+  // 1.5. Sky environment
+  const atmosphereRenderer = new AtmosphereRenderer(sceneHost.getCelestialRoot() as THREE.Group);
+  // Default to true, SkyPage will manage this later
+  atmosphereRenderer.setPureColors(false);
+
+  // 2. Prepare UI pages
   const locationPage = new LocationPage({
     onRelocate: (lat, lon, height) => bridge.sendSetObserverLocation(lat, lon, height),
     onSetRealtime: (enabled) => bridge.sendSetRealtimeMode(enabled),
@@ -81,6 +88,13 @@ function main(): void {
     onOverlayToggle: (key, visible) => {
       sceneHost.setOverlayVisibility(key as keyof OverlayVisibility, visible);
     },
+    onStarLayerToggled: (visible) => sceneHost.getStarFieldRenderer().setVisible(visible),
+    onAtmosphereToggled: (enabled) => bridge.sendSetAtmosphereEnabled(enabled),
+    onLightPollutionToggled: (enabled) => bridge.sendSetLightPollutionEnabled(enabled),
+    onLightPollutionModeChanged: (mode) => bridge.sendSetLightPollutionMode(mode),
+    onBortleClassChanged: (bortle) => bridge.sendSetBortleClass(bortle),
+    onMagnitudeLimitChanged: (mag) => bridge.sendSetManualMagnitudeLimit(mag),
+    onPureColorsToggled: (pure) => atmosphereRenderer.setPureColors(pure),
   });
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
@@ -103,6 +117,9 @@ function main(): void {
   sceneHost.getStarFieldRenderer().setTransformState(celestialTransformState);
 
   const gestureRouter = new PointerGestureRouter();
+  
+  let currentSkyVisibilityState: any = null;
+
   const pickProvider = new StarPickProvider({
     camera: sceneHost.camera,
     transformState: celestialTransformState,
@@ -110,6 +127,7 @@ function main(): void {
     worldRoot: sceneHost.getWorldRoot(),
     getStarResources: () => sceneHost.getStarFieldRenderer().getResources(),
     getMagnitudeLimit: () => sceneHost.getStarFieldRenderer().getMagnitudeLimit(),
+    getSkyVisibilityState: () => currentSkyVisibilityState,
     getPointScale: () => sceneHost.getStarFieldRenderer().getPointScale(),
     isStarLayerVisible: () => sceneHost.getStarFieldRenderer().visible,
   });
@@ -223,6 +241,14 @@ function main(): void {
     },
     onStarPickResolved(msg) {
       pickingController.handleResolveResponse(msg as any);
+    },
+    onSkyEnvironmentSnapshot(snapshot) {
+      currentSkyVisibilityState = snapshot.visibility;
+      atmosphereRenderer.updateEnvironment(snapshot);
+      sceneHost.getStarFieldRenderer().updateVisibilityUniforms(snapshot.visibility);
+      // Passem qualsevol nova UI d'aquí a una funció que pugui actualizar LocationHUD o SkyPage
+      (locationHUD as any).updateSkyEnvironment?.(snapshot);
+      (skyPage as any).updateSkyEnvironment?.(snapshot);
     },
     onShutdownRequested() {
       renderLoop.stop();

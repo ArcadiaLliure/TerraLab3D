@@ -18,6 +18,7 @@
 import * as THREE from "three";
 import { STAR_FRAGMENT_SHADER, STAR_VERTEX_SHADER } from "./shaders/starShader";
 import type { StarResourceMetadata } from "../../contracts/star_picking_contracts";
+import type { SkyVisibilityState } from "../../contracts/sky_environment_contracts";
 import type { CelestialTransformState } from "./CelestialTransformState";
 
 export interface StarResourceEntry {
@@ -43,8 +44,9 @@ export class StarFieldRenderer {
   private pointScale = 1.0;
   private isVisible = true;
 
-  /** Referència compartida a l'estat de transformació celeste (Pas 6). */
+  /** Referència compartida a l'estat de transformació  // Visibilitat i temps
   private transformState: CelestialTransformState | null = null;
+  private currentVisibilityState: SkyVisibilityState | null = null;
 
   constructor() {
     this.rootGroup.name = "starFieldRoot";
@@ -82,8 +84,23 @@ export class StarFieldRenderer {
 
   public setMagnitudeLimit(limit: number): void {
     this.magnitudeLimit = limit;
+    // Ara aquest límit actua com a "límit dur" (hard cutoff)
+    // El límit efectiu (LP + extinció) es controla via u_zenithMagnitudeLimit
     for (const entry of this.resources.values()) {
       entry.material.uniforms.u_magnitudeLimit.value = limit;
+      entry.material.uniformsNeedUpdate = true;
+    }
+  }
+
+  /** Actualitza els paràmetres de visibilitat atmosfèrica i contaminació lumínica. */
+  public updateVisibilityUniforms(state: SkyVisibilityState): void {
+    this.currentVisibilityState = state;
+    for (const entry of this.resources.values()) {
+      const u = entry.material.uniforms;
+      u.u_zenithMagnitudeLimit.value = state.zenithMagnitudeLimit;
+      u.u_extinctionCoefficient.value = state.extinctionCoefficient;
+      u.u_twilightSuppression.value = state.twilightSuppression;
+      u.u_fadeWidthMag.value = state.fadeWidthMag;
       entry.material.uniformsNeedUpdate = true;
     }
   }
@@ -186,6 +203,11 @@ export class StarFieldRenderer {
         u_pointScale: { value: this.pointScale },
         u_devicePixelRatio: { value: window.devicePixelRatio || 1.0 },
         u_radius: { value: 950.0 }, // Esfera cel·lar recentrada a 950m
+        // Visibilitat (Pas 7) - valors per defecte o l'últim rebut
+        u_zenithMagnitudeLimit: { value: this.currentVisibilityState ? this.currentVisibilityState.zenithMagnitudeLimit : 7.6 },
+        u_extinctionCoefficient: { value: this.currentVisibilityState ? this.currentVisibilityState.extinctionCoefficient : 0.25 },
+        u_twilightSuppression: { value: this.currentVisibilityState ? this.currentVisibilityState.twilightSuppression : 0.0 },
+        u_fadeWidthMag: { value: this.currentVisibilityState ? this.currentVisibilityState.fadeWidthMag : 0.75 },
       },
       transparent: true,
       depthWrite: false,

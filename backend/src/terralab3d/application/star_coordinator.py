@@ -144,6 +144,26 @@ class StarCoordinator:
 
         await self._publish_status()
 
+    async def publish_current_state(self) -> None:
+        """República l'estat actual i els recursos al frontend.
+        Útil quan el client es desconnecta i es torna a connectar (F5).
+        """
+        if not self._started or self._disposed:
+            return
+            
+        # Re-enviar recursos carregats (re-construint el buffer des del batch en RAM)
+        for res_id, batch in self._batches.items():
+            descriptor = self._resources.get(res_id)
+            if descriptor:
+                await self._build_and_publish_resource(
+                    resource_id=res_id,
+                    role=descriptor.role,
+                    batch=batch,
+                )
+                
+        # Re-enviar l'estat actual
+        await self._publish_status()
+
     async def update_celestial_transform(
         self, latitude_deg: float, lst_deg: float,
     ) -> None:

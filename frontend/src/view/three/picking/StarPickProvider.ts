@@ -19,9 +19,11 @@
 
 import * as THREE from "three";
 import type { StarPickHit, StarPickRef } from "../../../contracts/star_picking_contracts";
+import type { SkyVisibilityState } from "../../../contracts/sky_environment_contracts";
 import type { StarResourceEntry } from "../StarFieldRenderer";
 import type { CelestialTransformState } from "../CelestialTransformState";
 import { StarSpatialIndex } from "./StarSpatialIndex";
+import { StarVisibilityEvaluator } from "./StarVisibilityEvaluator";
 import {
   computeStarHitRadiusCssPx,
   computeStarVisualRadiusCssPx,
@@ -57,6 +59,7 @@ export interface StarPickProviderDeps {
   worldRoot: THREE.Group;
   getStarResources: () => ReadonlyMap<string, StarResourceEntry>;
   getMagnitudeLimit: () => number;
+  getSkyVisibilityState: () => SkyVisibilityState | null;
   getPointScale: () => number;
   isStarLayerVisible: () => boolean;
 }
@@ -142,9 +145,14 @@ export class StarPickProvider {
       return null;
     }
 
-    const camera = this.deps.camera;
-    const domElement = this.deps.renderer.domElement;
-    const rect = domElement.getBoundingClientRect();
+    const visibilityState = this.deps.getSkyVisibilityState();
+    if (!visibilityState) {
+      // Si no tenim estat de visibilitat, no podem saber què és clicable
+      return null;
+    }
+
+    const { camera, renderer, transformState } = this.deps;
+    const rect = renderer.domElement.getBoundingClientRect();
 
     // 1. Convertir client px → NDC [-1, 1]
     const localX = clientX - rect.left;
@@ -198,7 +206,7 @@ export class StarPickProvider {
       for (const starIdx of rawCandidates) {
         const mag = entry.magnitudesArray[starIdx];
 
-        // Rebutjar per magnitud
+        // Rebutjar per magnitud (límit dur del catàleg)
         if (mag > magnitudeLimit) continue;
 
         // Posició equatorial
@@ -209,6 +217,17 @@ export class StarPickProvider {
         // Transformar a Three.js via matriu actual
         _worldPos.set(eqX, eqY, eqZ);
         _worldPos.applyMatrix3(this.deps.transformState.equatorialToThree);
+        
+        // Avaluar altitud i visibilitat fotomètrica real (Pas 7)
+        // Altitud: asin(world.y / radius)
+        const altitudeDeg = Math.asin(Math.max(-1.0, Math.min(1.0, _worldPos.y))) * (180.0 / Math.PI);
+        const evalResult = StarVisibilityEvaluator.evaluate(mag, altitudeDeg, visibilityState);
+        
+        if (!evalResult.visible || _worldPos.y < -0.05) {
+          continue; // Invisible fotomètricament o sota l'horitzó
+        }
+        
+        // Reescalar la posició a l'esfera
         _worldPos.multiplyScalar(SKY_RADIUS);
 
         // Afegir offset celestialRoot (centrat a camera)

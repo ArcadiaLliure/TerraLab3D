@@ -1,4 +1,5 @@
 import type { NavigationCameraPose, MotionState, NavigationMode } from "../../../contracts/navigation";
+import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
 
 const DEG = Math.PI / 180;
 
@@ -35,6 +36,7 @@ export class LocationHUD {
   private observerSection: HTMLDivElement;
   private viewSection: HTMLDivElement;
   private cameraSection: HTMLDivElement;
+  private skySection: HTMLDivElement;
   private readonly starContainer: HTMLDivElement;
   private hudVisible = true;
 
@@ -78,6 +80,13 @@ export class LocationHUD {
     // Camera local section
     this.cameraSection = document.createElement("div");
     this.element.appendChild(this.cameraSection);
+
+    // Separator 3
+    this.element.appendChild(this.createSep());
+
+    // Sky section
+    this.skySection = document.createElement("div");
+    this.element.appendChild(this.skySection);
 
     this.starContainer = document.createElement("div");
     this.starContainer.style.cssText = `
@@ -214,6 +223,43 @@ export class LocationHUD {
 
   public dispose(): void {
     this.element.remove();
+  }
+
+  public updateSkyEnvironment(snapshot: SkyEnvironmentSnapshot): void {
+    const sunAlt = snapshot.sunAltitudeDeg.toFixed(1);
+    
+    let lpInfo = "";
+    if (snapshot.lightPollutionEnabled) {
+      lpInfo = `Bortle ${snapshot.bortleClass?.toFixed(1) || "?"} | Mag lím: ${snapshot.visibility.zenithMagnitudeLimit.toFixed(1)}`;
+    } else {
+      lpInfo = `Mag lím: ${snapshot.visibility.zenithMagnitudeLimit.toFixed(1)} (sense LP)`;
+    }
+    
+    let atmoInfo = snapshot.atmosphereEnabled ? "Activa" : "Inactiva";
+    let phase = snapshot.twilightPhase;
+    // Traducció simple
+    const phaseCa: any = {
+      "day": "Dia",
+      "civil": "C. Civil",
+      "nautical": "C. Nàutic",
+      "astronomical": "C. Astronòmic",
+      "night": "Nit"
+    };
+
+    this.skySection.innerHTML = `
+      <div style="display:flex; justify-content:space-between;">
+        <span style="color:var(--color-text-muted);">Sol (alt):</span>
+        <span style="color:var(--color-gold);">${sunAlt}° (${phaseCa[phase] || phase})</span>
+      </div>
+      <div style="display:flex; justify-content:space-between;">
+        <span style="color:var(--color-text-muted);">Atmosfera:</span>
+        <span style="color:var(--color-gold);">${atmoInfo}</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:2px;">
+        <span style="color:var(--color-text-muted);">Cel fosc:</span>
+        <span style="color:var(--color-text-bright);">${lpInfo}</span>
+      </div>
+    `;
   }
 
   // ─── Private ──────────────────────────────────────────────────

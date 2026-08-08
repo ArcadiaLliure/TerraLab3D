@@ -68,6 +68,7 @@ export interface BackendMessageListener {
   onCelestialFrameTransform?(generation: number, matrix3x3: number[]): void;
   onStarResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
   onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
+  onSkyEnvironmentSnapshot?(snapshot: import("../contracts/sky_environment_contracts").SkyEnvironmentSnapshot): void;
 }
 
 export class WebSocketBridge {
@@ -243,6 +244,26 @@ export class WebSocketBridge {
     });
   }
 
+  sendSetAtmosphereEnabled(enabled: boolean): void {
+    this.sendMessage({ type: "set_atmosphere_enabled", enabled });
+  }
+
+  sendSetLightPollutionEnabled(enabled: boolean): void {
+    this.sendMessage({ type: "set_light_pollution_enabled", enabled });
+  }
+
+  sendSetLightPollutionMode(mode: "automatic" | "bortle" | "magnitude"): void {
+    this.sendMessage({ type: "set_light_pollution_mode", mode });
+  }
+
+  sendSetBortleClass(bortleClass: number): void {
+    this.sendMessage({ type: "set_bortle_class", bortleClass });
+  }
+
+  sendSetManualMagnitudeLimit(magnitudeLimit: number): void {
+    this.sendMessage({ type: "set_manual_magnitude_limit", magnitudeLimit });
+  }
+
   // ─── Private ────────────────────────────────────────────────────────
 
   private handleBackendMessage(msg: BackendMessage): void {
@@ -324,13 +345,20 @@ export class WebSocketBridge {
           l.onStarPickResolved?.(msg as any);
         }
         break;
+      case "sky_environment_snapshot":
+        for (const l of this.messageListeners) {
+          l.onSkyEnvironmentSnapshot?.(msg as any);
+        }
+        break;
+      default:
+        console.warn("[Bridge] Unknown message type:", msg.type);
     }
   }
 
-  public sendSetSimulationTime(currentTimeIso: string): void {
+  public sendSetSimulationTime(currentTimeIso: string) {
     this.sendMessage({
       type: "set_simulation_time",
-      currentTimeIso
+      currentTimeIso,
     } as any);
   }
 

@@ -222,6 +222,12 @@ class WebSocketBridge:
             "isRealtime": is_realtime,
         })
 
+    async def send_sky_environment_snapshot(self, snapshot: Any) -> None:
+        """Envia l'estat complet del cel i atmosfera (Pas 7)."""
+        payload = snapshot.to_dict()
+        payload["type"] = "sky_environment_snapshot"
+        await self.send(payload)
+
     async def send_location_error(self, message: str) -> None:
         await self.send({
             "type": "location_error",

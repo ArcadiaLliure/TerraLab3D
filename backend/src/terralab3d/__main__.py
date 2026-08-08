@@ -25,6 +25,8 @@ from datetime import datetime, timedelta, timezone
 
 from terralab3d.domain.time.engine import AstronomicalEngine
 from terralab3d.domain.time.models import ClockMode, SimulationInstant, ClockState
+from terralab3d.domain.sky_background.sky_environment import SkyEnvironmentComposer
+from terralab3d.domain.light_pollution.models import LightPollutionMode
 
 logging.basicConfig(
     level=logging.INFO,
@@ -155,15 +157,19 @@ async def run() -> int:
         # Quan el frontend es connecta, enviem la ubicació inicial, iniciem estrelles, etc.
         await broadcast_location()
         await broadcast_time()
-        # Iniciar la càrrega d'estrelles en segon pla (fallback -> gaia general)
-        asyncio.create_task(star_coordinator.start())
+        # Iniciar la càrrega d'estrelles o re-enviar les existents si ja estan carregades (re-connexió F5)
+        if not star_coordinator._started:
+            asyncio.create_task(star_coordinator.start())
+        else:
+            asyncio.create_task(star_coordinator.publish_current_state())
 
     bridge.on("set_observer_location", _handle_set_location)
     bridge.on("frontend_ready", _on_frontend_ready)
     bridge.on("resolve_star_pick", _handle_resolve_star_pick)
 
-    # ── 3.2. Lògica de Temps (Fase 3) ────────────────────────────────
+    # ── 3.2. Lògica de Temps (Fase 3) i Cel (Fase 7) ─────────────────
     engine = AstronomicalEngine()
+    sky_composer = SkyEnvironmentComposer()
     
     sim_time_utc = datetime.now(timezone.utc)
     is_realtime = True
@@ -189,6 +195,18 @@ async def run() -> int:
             sun_altitudes=sun_alts,
             is_realtime=is_realtime
         )
+        
+        # Generar i enviar l'estat del cel (Pas 7)
+        hour = sim_time_utc.hour + sim_time_utc.minute / 60.0 + sim_time_utc.second / 3600.0
+        snapshot = sky_composer.compose(
+            sim_time_utc.year,
+            sim_time_utc.month,
+            sim_time_utc.day,
+            hour,
+            current_observer.location.latitude_deg,
+            current_observer.location.longitude_deg,
+        )
+        await bridge.send_sky_environment_snapshot(snapshot)
         
         # Enviar actualització de transformació d'estrelles (LST o latitud han pogut canviar)
         await star_coordinator.update_celestial_transform(
@@ -240,6 +258,37 @@ async def run() -> int:
     bridge.on("timeline_drag_started", _handle_timeline_drag_started)
     bridge.on("timeline_drag_finished", _handle_timeline_drag_finished)
     bridge.on("request_offset_day", _handle_request_offset_day)
+
+    # ── 3.3. Handlers de UI per a Cel i Atmosfera (Fase 7) ───────────
+    async def _handle_set_atmosphere_enabled(data: dict[str, Any]) -> None:
+        sky_composer.atmosphere_enabled = bool(data.get("enabled", True))
+        await broadcast_time()
+
+    async def _handle_set_light_pollution_enabled(data: dict[str, Any]) -> None:
+        sky_composer.light_pollution_enabled = bool(data.get("enabled", True))
+        await broadcast_time()
+
+    async def _handle_set_light_pollution_mode(data: dict[str, Any]) -> None:
+        mode_str = data.get("mode", "bortle")
+        try:
+            sky_composer.light_pollution_mode = LightPollutionMode(mode_str)
+        except ValueError:
+            pass
+        await broadcast_time()
+
+    async def _handle_set_bortle_class(data: dict[str, Any]) -> None:
+        sky_composer.bortle_value = float(data.get("bortleClass", 4.0))
+        await broadcast_time()
+
+    async def _handle_set_manual_magnitude_limit(data: dict[str, Any]) -> None:
+        sky_composer.magnitude_limit = float(data.get("magnitudeLimit", 6.0))
+        await broadcast_time()
+
+    bridge.on("set_atmosphere_enabled", _handle_set_atmosphere_enabled)
+    bridge.on("set_light_pollution_enabled", _handle_set_light_pollution_enabled)
+    bridge.on("set_light_pollution_mode", _handle_set_light_pollution_mode)
+    bridge.on("set_bortle_class", _handle_set_bortle_class)
+    bridge.on("set_manual_magnitude_limit", _handle_set_manual_magnitude_limit)
 
     async def clock_ticker() -> None:
         """S'encarrega d'avançar el temps si està en temps real i publicar l'estat."""

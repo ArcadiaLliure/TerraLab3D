@@ -1,14 +1,37 @@
+import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
+
 export interface SkyPageOptions {
-  onOverlayToggle?: (key: string, visible: boolean) => void;
+  onStarLayerToggled?: (visible: boolean) => void;
+  onAtmosphereToggled?: (enabled: boolean) => void;
+  onLightPollutionToggled?: (enabled: boolean) => void;
+  onLightPollutionModeChanged?: (mode: "automatic" | "bortle" | "magnitude") => void;
+  onBortleClassChanged?: (bortle: number) => void;
+  onMagnitudeLimitChanged?: (mag: number) => void;
+  onPureColorsToggled?: (pure: boolean) => void;
 }
 
 export class SkyPage {
   private element: HTMLDivElement;
+  private options: SkyPageOptions;
+  
+  // Elements UI que s'actualitzen dinàmicament
   private starSourceLabel: HTMLSpanElement;
   private starCountLabel: HTMLSpanElement;
   private starsToggleBtn: HTMLButtonElement;
   private starsVisible = true;
-  private options: SkyPageOptions;
+  
+  private atmoToggleBtn: HTMLButtonElement;
+  private pureColorsToggleBtn: HTMLButtonElement;
+  
+  private lpToggleBtn: HTMLButtonElement;
+  private lpModeSelect: HTMLSelectElement;
+  private lpBortleInput: HTMLInputElement;
+  private lpMagInput: HTMLInputElement;
+  private lpBortleValue: HTMLSpanElement;
+  private lpMagValue: HTMLSpanElement;
+  private lpSourceLabel: HTMLDivElement;
+  private bortleContainer: HTMLDivElement;
+  private magContainer: HTMLDivElement;
 
   constructor(options: SkyPageOptions = {}) {
     this.options = options;
@@ -23,10 +46,15 @@ export class SkyPage {
     `;
 
     const desc = document.createElement("p");
-    desc.textContent = "Paràmetres de visualització de la volta celeste, estrelles, constel·lacions i atmosfera.";
+    desc.textContent = "Paràmetres de visualització de la volta celeste, atmosfera i contaminació lumínica.";
     this.element.appendChild(desc);
 
-    // ─── Grup: Volta Celeste ─────────────────────────────────────────
+    this.buildAtmoGroup();
+    this.buildLightPollutionGroup();
+    this.buildStarGroup();
+  }
+
+  private createGroup(titleText: string): [HTMLDivElement, HTMLDivElement] {
     const group = document.createElement("div");
     group.style.cssText = `
       background: var(--color-surface-raised);
@@ -38,57 +66,171 @@ export class SkyPage {
       gap: 8px;
     `;
 
+    const titleRow = document.createElement("div");
+    titleRow.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
+    
     const title = document.createElement("div");
     title.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px;";
-    title.textContent = "Volta Celeste";
-    group.appendChild(title);
+    title.textContent = titleText;
+    
+    titleRow.appendChild(title);
+    group.appendChild(titleRow);
+    
+    return [group, titleRow];
+  }
 
-    const info = document.createElement("div");
-    info.style.cssText = "font-size: 10px; color: var(--color-text-muted);";
-    info.textContent = "Mode actiu: Graella equatorial i temps sideral local.";
-    group.appendChild(info);
-
-    this.element.appendChild(group);
-
-    // ─── Grup: Camp Estel·lar Gaia / Fallback ────────────────────────
-    const starGroup = document.createElement("div");
-    starGroup.style.cssText = `
-      background: var(--color-surface-raised);
-      border: 1px solid var(--color-border);
-      border-radius: var(--border-radius-md);
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    `;
-
-    const starTitleRow = document.createElement("div");
-    starTitleRow.style.cssText = "display: flex; justify-content: space-between; align-items: center;";
-
-    const starTitle = document.createElement("div");
-    starTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px;";
-    starTitle.textContent = "Camp Estel·lar Gaia";
-    starTitleRow.appendChild(starTitle);
-
-    this.starsToggleBtn = document.createElement("button");
-    this.starsToggleBtn.textContent = "Visible";
-    this.starsToggleBtn.style.cssText = `
+  private createToggleButton(textOn: string, textOff: string, initialState: boolean, onClick: (state: boolean) => void): HTMLButtonElement {
+    const btn = document.createElement("button");
+    let state = initialState;
+    const updateBtn = () => {
+      btn.textContent = state ? textOn : textOff;
+      btn.style.color = state ? "var(--color-gold)" : "var(--color-text-muted)";
+    };
+    btn.style.cssText = `
       padding: 2px 8px;
       font-size: 10px;
       border-radius: 4px;
       border: 1px solid var(--color-border);
       background: var(--color-surface);
-      color: var(--color-gold);
       cursor: pointer;
     `;
-    this.starsToggleBtn.onclick = () => {
-      this.starsVisible = !this.starsVisible;
-      this.starsToggleBtn.textContent = this.starsVisible ? "Visible" : "Ocult";
-      this.starsToggleBtn.style.color = this.starsVisible ? "var(--color-gold)" : "var(--color-text-muted)";
-      this.options.onOverlayToggle?.("stars", this.starsVisible);
+    updateBtn();
+    btn.onclick = () => {
+      state = !state;
+      updateBtn();
+      onClick(state);
     };
-    starTitleRow.appendChild(this.starsToggleBtn);
-    starGroup.appendChild(starTitleRow);
+    return btn;
+  }
+
+  private buildAtmoGroup() {
+    const [group, titleRow] = this.createGroup("Atmosfera Visual");
+    
+    this.atmoToggleBtn = this.createToggleButton("Activada", "Desactivada", true, (state) => {
+      this.options.onAtmosphereToggled?.(state);
+    });
+    titleRow.appendChild(this.atmoToggleBtn);
+
+    const pureRow = document.createElement("div");
+    pureRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; font-size: 10px;";
+    pureRow.innerHTML = "<span>Colors Purs (debug)</span>";
+    
+    this.pureColorsToggleBtn = this.createToggleButton("On", "Off", false, (state) => {
+      this.options.onPureColorsToggled?.(state);
+    });
+    pureRow.appendChild(this.pureColorsToggleBtn);
+    
+    group.appendChild(pureRow);
+    this.element.appendChild(group);
+  }
+
+  private buildLightPollutionGroup() {
+    const [group, titleRow] = this.createGroup("Contaminació Lumínica");
+    
+    this.lpToggleBtn = this.createToggleButton("Activada", "Desactivada", true, (state) => {
+      this.options.onLightPollutionToggled?.(state);
+    });
+    titleRow.appendChild(this.lpToggleBtn);
+
+    // Mode Selector
+    const modeRow = document.createElement("div");
+    modeRow.style.cssText = "display: flex; justify-content: space-between; align-items: center; font-size: 10px;";
+    modeRow.innerHTML = "<span>Mode:</span>";
+    
+    this.lpModeSelect = document.createElement("select");
+    this.lpModeSelect.style.cssText = "background: var(--color-surface); color: var(--color-text-bright); border: 1px solid var(--color-border); border-radius: 4px; padding: 2px 4px; font-size: 10px;";
+    
+    const modes = [
+      { value: "automatic", label: "Automàtic (estimat)" },
+      { value: "bortle", label: "Classe Bortle" },
+      { value: "magnitude", label: "Magnitud Límit" }
+    ];
+    modes.forEach(m => {
+      const opt = document.createElement("option");
+      opt.value = m.value;
+      opt.textContent = m.label;
+      this.lpModeSelect.appendChild(opt);
+    });
+    this.lpModeSelect.value = "bortle";
+    this.lpModeSelect.onchange = () => {
+      this.options.onLightPollutionModeChanged?.(this.lpModeSelect.value as any);
+      this.updateConditionalVisibility();
+    };
+    modeRow.appendChild(this.lpModeSelect);
+    group.appendChild(modeRow);
+
+    // Bortle Slider
+    this.bortleContainer = document.createElement("div");
+    this.bortleContainer.style.cssText = "display: flex; flex-direction: column; gap: 4px; font-size: 10px;";
+    
+    const bortleLabelRow = document.createElement("div");
+    bortleLabelRow.style.cssText = "display: flex; justify-content: space-between;";
+    bortleLabelRow.innerHTML = "<span>Bortle:</span>";
+    this.lpBortleValue = document.createElement("span");
+    this.lpBortleValue.style.color = "var(--color-text-bright)";
+    this.lpBortleValue.textContent = "4.0";
+    bortleLabelRow.appendChild(this.lpBortleValue);
+    
+    this.lpBortleInput = document.createElement("input");
+    this.lpBortleInput.type = "range";
+    this.lpBortleInput.min = "1";
+    this.lpBortleInput.max = "9";
+    this.lpBortleInput.step = "0.1";
+    this.lpBortleInput.value = "4.0";
+    this.lpBortleInput.oninput = () => {
+      const val = Number(this.lpBortleInput.value);
+      this.lpBortleValue.textContent = val.toFixed(1);
+      this.options.onBortleClassChanged?.(val);
+    };
+    
+    this.bortleContainer.appendChild(bortleLabelRow);
+    this.bortleContainer.appendChild(this.lpBortleInput);
+    group.appendChild(this.bortleContainer);
+
+    // Magnitude Slider
+    this.magContainer = document.createElement("div");
+    this.magContainer.style.cssText = "display: flex; flex-direction: column; gap: 4px; font-size: 10px; display: none;";
+    
+    const magLabelRow = document.createElement("div");
+    magLabelRow.style.cssText = "display: flex; justify-content: space-between;";
+    magLabelRow.innerHTML = "<span>Mag límit:</span>";
+    this.lpMagValue = document.createElement("span");
+    this.lpMagValue.style.color = "var(--color-text-bright)";
+    this.lpMagValue.textContent = "6.0";
+    magLabelRow.appendChild(this.lpMagValue);
+    
+    this.lpMagInput = document.createElement("input");
+    this.lpMagInput.type = "range";
+    this.lpMagInput.min = "3.0";
+    this.lpMagInput.max = "8.0";
+    this.lpMagInput.step = "0.1";
+    this.lpMagInput.value = "6.0";
+    this.lpMagInput.oninput = () => {
+      const val = Number(this.lpMagInput.value);
+      this.lpMagValue.textContent = val.toFixed(1);
+      this.options.onMagnitudeLimitChanged?.(val);
+    };
+    
+    this.magContainer.appendChild(magLabelRow);
+    this.magContainer.appendChild(this.lpMagInput);
+    group.appendChild(this.magContainer);
+    
+    // Status info for Automatic mode or equivalents
+    this.lpSourceLabel = document.createElement("div");
+    this.lpSourceLabel.style.cssText = "font-size: 9px; color: var(--color-text-muted); margin-top: 4px;";
+    group.appendChild(this.lpSourceLabel);
+
+    this.element.appendChild(group);
+  }
+
+  private buildStarGroup() {
+    const [group, titleRow] = this.createGroup("Camp Estel·lar Gaia");
+
+    this.starsToggleBtn = this.createToggleButton("Visible", "Ocult", true, (state) => {
+      this.starsVisible = state;
+      this.options.onStarLayerToggled?.(state);
+    });
+    titleRow.appendChild(this.starsToggleBtn);
 
     const sourceRow = document.createElement("div");
     sourceRow.style.cssText = "font-size: 10px; display: flex; justify-content: space-between;";
@@ -97,7 +239,7 @@ export class SkyPage {
     this.starSourceLabel.style.cssText = "font-weight: 600; color: var(--color-text-bright);";
     this.starSourceLabel.textContent = "Carregant...";
     sourceRow.appendChild(this.starSourceLabel);
-    starGroup.appendChild(sourceRow);
+    group.appendChild(sourceRow);
 
     const countRow = document.createElement("div");
     countRow.style.cssText = "font-size: 10px; display: flex; justify-content: space-between;";
@@ -106,9 +248,33 @@ export class SkyPage {
     this.starCountLabel.style.cssText = "font-weight: 600; color: var(--color-text-bright);";
     this.starCountLabel.textContent = "0";
     countRow.appendChild(this.starCountLabel);
-    starGroup.appendChild(countRow);
+    group.appendChild(countRow);
 
-    this.element.appendChild(starGroup);
+    this.element.appendChild(group);
+  }
+
+  private updateConditionalVisibility() {
+    const mode = this.lpModeSelect.value;
+    this.bortleContainer.style.display = (mode === "bortle") ? "flex" : "none";
+    this.magContainer.style.display = (mode === "magnitude") ? "flex" : "none";
+  }
+
+  public updateSkyEnvironment(snapshot: SkyEnvironmentSnapshot): void {
+    // Si l'usuari no ha interactuat, actualitzem els controls
+    if (this.lpModeSelect.value !== snapshot.lightPollutionMode) {
+      this.lpModeSelect.value = snapshot.lightPollutionMode;
+      this.updateConditionalVisibility();
+    }
+    
+    let info = "";
+    if (snapshot.lightPollutionMode === "automatic") {
+      info = `Font Automàtica: ${snapshot.lightPollutionSource}. Bortle actiu: ${snapshot.bortleClass?.toFixed(1) || 'N/A'}`;
+    } else if (snapshot.lightPollutionMode === "magnitude") {
+      info = `Bortle equivalent (aproximat): ${snapshot.bortleClass?.toFixed(1)}`;
+    } else {
+      info = `Magnitud zenital efectiva: ${snapshot.visibility.zenithMagnitudeLimit.toFixed(1)}`;
+    }
+    this.lpSourceLabel.textContent = info;
   }
 
   public updateStarCatalogStatus(status: {

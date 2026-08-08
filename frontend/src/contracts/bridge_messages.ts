@@ -4,6 +4,8 @@
  * sides can switch on it safely.
  */
 
+import type { SkyEnvironmentSnapshot } from "./sky_environment_contracts";
+
 // ─── Frontend → Python ───────────────────────────────────────────────
 
 export interface FrontendReadyMessage {
@@ -91,6 +93,33 @@ export interface ResolveStarPickMessage {
   readonly purpose: "select" | "hover";
 }
 
+// ─── Cel i Atmosfera (Pas 7) ─────────────────────────────────────────
+
+export interface SetAtmosphereEnabledMessage {
+  readonly type: "set_atmosphere_enabled";
+  readonly enabled: boolean;
+}
+
+export interface SetLightPollutionEnabledMessage {
+  readonly type: "set_light_pollution_enabled";
+  readonly enabled: boolean;
+}
+
+export interface SetLightPollutionModeMessage {
+  readonly type: "set_light_pollution_mode";
+  readonly mode: "automatic" | "bortle" | "magnitude";
+}
+
+export interface SetBortleClassMessage {
+  readonly type: "set_bortle_class";
+  readonly bortleClass: number;
+}
+
+export interface SetManualMagnitudeLimitMessage {
+  readonly type: "set_manual_magnitude_limit";
+  readonly magnitudeLimit: number;
+}
+
 export type FrontendMessage =
   | FrontendReadyMessage
   | CameraChangedMessage
@@ -103,7 +132,12 @@ export type FrontendMessage =
   | CameraMotionStartedMessage
   | CameraMotionStoppedMessage
   | CameraResetCompletedMessage
-  | ResolveStarPickMessage;
+  | ResolveStarPickMessage
+  | SetAtmosphereEnabledMessage
+  | SetLightPollutionEnabledMessage
+  | SetLightPollutionModeMessage
+  | SetBortleClassMessage
+  | SetManualMagnitudeLimitMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -187,6 +221,12 @@ export interface StarPickResolvedMessage {
   readonly star?: StarPickResolvedPayloadStar;
 }
 
+// ─── Cel i Atmosfera (Pas 7) ─────────────────────────────────────────
+
+export interface SkyEnvironmentSnapshotMessage extends SkyEnvironmentSnapshot {
+  readonly type: "sky_environment_snapshot";
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
@@ -197,7 +237,8 @@ export type BackendMessage =
   | SimulationTimeSnapshotMessage
   | StarCatalogStatusMessage
   | CelestialFrameTransformMessage
-  | StarPickResolvedMessage;
+  | StarPickResolvedMessage
+  | SkyEnvironmentSnapshotMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 
