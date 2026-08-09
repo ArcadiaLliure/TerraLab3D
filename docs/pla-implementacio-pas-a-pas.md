@@ -86,7 +86,7 @@ Aquestes activitats no són passos separats. S’executen dins de cada vertical 
 | 4 | Fons del cel | 6 |
 | 5 | Estrelles i Gaia | 5 |
 | 6 | Traces circumpolars | 14 |
-| 7 | Sistema solar | 8, 8.5, 8.6, 9 |
+| 7 | Sistema solar | 8, 8.5, 8.6, 8.7, 9 |
 | 8 | Via Làctia i pols Planck | 10 |
 | 9 | Cel profund NGC/IC | 11 |
 | 10 | Cerca astronòmica | 12 |
@@ -2312,6 +2312,8 @@ Three.js només representa aquest estat amb recursos persistents.
 
 ## Pas 8.6 — Planetes texturitzats, orientació física, anells i tots els satèl·lits naturals planetaris
 
+> **Revisió 2026-08-09:** aquest pas incorpora les consideracions descobertes durant l’anàlisi específica dels anells de Saturn. Les conclusions de l’informe s’han integrat només després de corregir les diferències entre centre planetari i baricentre, B geocèntric/topocèntric, radis PCK, convenció ENU/Three.js i ordre de quaternions.
+
 ### Resultat funcional palpable
 
 El Sistema Solar deixa de representar els planetes com a discos o esferes genèriques i passa a disposar d’una representació 3D persistent i físicament orientada dels planetes, els anells de Saturn i els satèl·lits naturals planetaris coneguts amb efemèride disponible.
@@ -2379,7 +2381,7 @@ Revisar especialment:
 - convenció d’eixos i quaternions;
 - `celestialRoot`;
 - bridge binari existent;
-- sistema de recursos i manifests;																																																																																																																																																																																	
+- sistema de recursos i manifests;
 - UI `Cel → Sistema solar`;
 - lifecycle de textures/materials/geometries;
 - sistema de picking i labels existent.
@@ -2473,6 +2475,31 @@ DSK  → forma irregular d’alta fidelitat quan existeixi i s’adopti explíci
 
 No barrejar aquestes responsabilitats dins del renderer.
 
+#### Separació obligatòria entre posició, orientació i frame local
+
+Són responsabilitats científiques diferents i no es poden fusionar en un únic càlcul opac:
+
+```text
+SPK
+→ on és el cos i amb quina velocitat es mou
+
+PCK/FK/BPC
+→ com està orientat el cos respecte de l’ICRF/J2000
+
+Earth orientation + ScientificObserver
+→ com es transforma l’estat ICRF/J2000 al frame local de l’observador
+```
+
+Per tant:
+
+- [ ] la posició no es deriva del PCK;
+- [ ] el pol/eix/meridià principal no es deriva de l’SPK;
+- [ ] el renderer no pot reconstruir cap d’aquestes dues coses;
+- [ ] el frame local de l’observador s’aplica després d’obtenir l’estat inercial coherent;
+- [ ] totes tres etapes han de compartir el mateix instant ET/TDB i la mateixa política d’aberració.
+
+No crear una API específica `pck_get_pole()` si SPICE ja pot proporcionar la transformació completa mitjançant `pxform()`; el pol es pot obtenir transformant l’eix +Z del frame body-fixed o extraient-lo de la matriu amb una convenció documentada.
+
 #### PCK genèric
 
 Font preferent inicial:
@@ -2492,6 +2519,50 @@ BODY<id>_RADII
 ```
 
 No reimplementar manualment aquestes fórmules si la llibreria SPICE pot proporcionar directament la transformació del frame body-fixed.
+
+#### SPK planetaris i centres planetaris
+
+No assumir que `de*.bsp` conté directament el centre de tots els planetes gegants.
+
+En una efemèride planetària JPL com DE440:
+
+```text
+DE440
+├── Sun (10)
+├── Mercury (199)
+├── Venus (299)
+├── Earth (399)
+├── Moon (301)
+├── Jupiter barycenter (5)
+├── Saturn barycenter (6)
+├── Uranus barycenter (7)
+├── Neptune barycenter (8)
+└── Pluto barycenter (9)
+```
+
+Per Saturn, el centre físic `SATURN (699)` és proporcionat pels SPK del sistema saturnià que el contenen. `sat441.bsp`, per exemple, conté `SATURN (699)` juntament amb múltiples satèl·lits i segments necessaris de DE440.
+
+Això implica que una consulta aparentment simple:
+
+```python
+spice.spkezr("SATURN", et, "J2000", aberration, "EARTH")
+```
+
+només és vàlida si el `KernelManifest` ha carregat una cadena completa de segments que permeti resoldre:
+
+```text
+Earth
+→ Saturn barycenter
+→ Saturn center (699)
+```
+
+Regles:
+
+- [ ] no documentar `de*.bsp = planetes` i `sat*.bsp = només llunes` com una separació absoluta;
+- [ ] distingir `planet/system barycenter` de `planet center`;
+- [ ] validar amb `spkobj()`/coverage o mecanisme equivalent quins NAIF IDs conté realment cada kernel;
+- [ ] fer que el manifest resolgui la cadena necessària per cos i instant;
+- [ ] no dependre del nom del fitxer per inferir els bodies que conté.
 
 #### SPK de satèl·lits
 
@@ -2739,6 +2810,81 @@ Triton.parent = Neptune
 
 però **no obliga** que el node Three.js de la lluna sigui fill directe del node traduït del planeta. Si `celestialRoot` representa direccions a distància virtual, l’arbre de render ha de respectar aquesta convenció i no introduir errors de paral·laxi per una jerarquia inadequada.
 
+### Transformació ICRF/J2000 → frame local de l’observador
+
+La representació correcta respecte de l’horitzó requereix una transformació explícita des del frame inercial a un frame local dependent de `ScientificObserver` i de l’instant.
+
+No és acceptable que el pol de Saturn, el planeta o els anells es transformin només una vegada a un frame fix terrestre: l’orientació respecte de l’horitzó canvia amb la rotació de la Terra i amb la ubicació de l’observador.
+
+Flux preferent d’alta precisió:
+
+```text
+ICRF/J2000
+→ Earth orientation a l’instant ET
+→ ITRF93 / Earth-fixed
+→ base local de l’observador
+→ ENU canònic (East, North, Up)
+→ convenció TerraLab3D (East, Up, North)
+→ Three.js
+```
+
+Quan s’utilitzi SPICE per a orientació terrestre precisa, preferir un binary Earth PCK d’alta precisió per a `ITRF93` dins del seu coverage. No utilitzar silenciosament `IAU_EARTH` com a equivalent d’alta precisió.
+
+Si el pipeline existent del Pas 3/Pas 8 utilitza LST i fórmules astronòmiques validades, mantenir una única implementació coherent. En aquest cas:
+
+```text
+latitud + LST
+```
+
+és suficient per a la transformació horitzontal si `LST` ja incorpora la longitud. No passar `longitude` i `LST` com si fossin graus de llibertat independents ni sumar la longitud dues vegades.
+
+Convenció espacial ja establerta a TerraLab3D:
+
+```text
+Three.js / celestial local
++X = Est
++Y = Amunt
++Z = Nord
+```
+
+Per tant, si una funció científica retorna ENU canònic `(E, N, U)`, l’adaptador a Three.js ha de fer explícitament:
+
+```text
+(E, N, U) → (X, Y, Z) = (E, U, N)
+```
+
+I l’elevació geomètrica es deriva de la component **Up**, no de `Z`:
+
+```python
+geometric_elevation_rad = asin(direction_local_y / norm(direction_local))
+```
+
+si el vector ja està expressat en la convenció Three.js/TerraLab3D.
+
+Contracte conceptual recomanat:
+
+```python
+class CelestialFrameTransformPort(Protocol):
+    def icrf_to_local_enu(
+        self,
+        vector_icrf: Vector3,
+        observer: ScientificObserver,
+        instant: SimulationInstant,
+    ) -> Vector3:
+        ...
+```
+
+Requisits:
+
+- [ ] reutilitzar la transformació topocèntrica autoritativa ja existent al Pas 8;
+- [ ] no crear una transformació específica només per Saturn;
+- [ ] provar latituds i longituds diferents a la mateixa UTC;
+- [ ] provar ambdós hemisferis;
+- [ ] documentar clarament la convenció d’eixos de cada frontera;
+- [ ] normalitzar vectors de direcció després de les transformacions quan pertoqui;
+- [ ] no confondre una rotació de frame amb una translació topocèntrica;
+- [ ] el `camera roll` només modifica la projecció visual, no el frame científic local.
+
 ### Aberració i light-time
 
 La política d’aberració ha de ser única per a planetes i satèl·lits.
@@ -2871,18 +3017,50 @@ Requisits:
 
 Per Júpiter, Saturn, Urà i Neptú, una textura estàtica representa aparença visual de referència, no meteorologia epoch-correct. Aquesta limitació s’ha de documentar.
 
-### Il·luminació planetària
+### Il·luminació solar direccional comuna
 
-La fase ha de provenir de geometria física.
+La fase ha de provenir de geometria física i el sistema ha de reutilitzar explícitament el pipeline d’il·luminació direccional introduït per a la Lluna.
 
 ```text
 normal superfície
 + direcció cos → Sol
 + direcció cos → observador
-→ il·luminació
+→ il·luminació solar direccional
 → terminador
 → fase aparent
 ```
+
+Responsabilitats:
+
+```text
+Python / ciència
+→ calcula Body → Sun direction en un frame autoritatiu
+→ transforma la direcció al frame renderer-neutral necessari
+
+Three.js
+→ aplica la direcció rebuda al material/shader
+→ calcula N·L i la resposta visual
+→ no calcula efemèrides
+```
+
+No és obligatori materialitzar el Sol com un únic `THREE.DirectionalLight` global. Per fidelitat geomètrica, cada cos ha de disposar de la seva pròpia `bodyToSunDirection`, perquè la direcció local cap al Sol no és exactament idèntica per a tots els cossos del Sistema Solar.
+
+Implementacions acceptables:
+
+```text
+uniform bodyToSunDirection
+```
+
+o un mecanisme equivalent basat en llum direccional, sempre que:
+
+- [ ] la direcció provingui de l’efemèride autoritativa;
+- [ ] no estigui enganxada a la càmera;
+- [ ] el costat nocturn existeixi geomètricament i no sigui una màscara alpha;
+- [ ] la textura no contingui fase pre-renderitzada;
+- [ ] la il·luminació es calculi en espai lineal;
+- [ ] no s’afegeixi una llum ambient arbitrària que destrueixi el terminador;
+- [ ] la direcció solar s’actualitzi només quan ho exigeixi el tick científic/tolerància angular, no per frame;
+- [ ] el mateix contracte funcioni per planetes i satèl·lits naturals.
 
 No utilitzar:
 
@@ -2891,57 +3069,167 @@ planetTexture_phase_25.png
 planetTexture_phase_50.png
 ```
 
-No duplicar el Sol. Reutilitzar el mateix vector/direcció solar autoritativa del Pas 8/8.5.
+No duplicar el Sol ni crear un segon model solar per Saturn. Reutilitzar la mateixa autoritat Sol/efemèrides del Pas 8/8.5.
 
-### Saturn — orientació física
+### Saturn — orientació física, equador i separació de la rotació superficial
 
 Saturn és un cas especial visual, no científicament excepcional.
 
-El PCK proporciona el frame/orientació del cos. El pla equatorial és perpendicular al vector del pol nord de Saturn.
+El PCK defineix el frame body-fixed i els radis/forma del planeta. El pla equatorial queda determinat directament pel pol nord:
+
+```text
+p = vector unitari del pol nord
+pla equatorial = { v | dot(v, p) = 0 }
+normal del pla equatorial = p
+pla principal dels anells ≈ pla equatorial
+```
+
+No calcular un segon “angle d’inclinació dels anells” per orientar el mesh.
+
+Tanmateix, cal separar dues rotacions que el frame body-fixed complet combina:
+
+```text
+orientació de l’eix/pol
+→ defineix equador i pla dels anells
+
+W / prime meridian
+→ rotació de la superfície de Saturn al voltant del seu eix
+```
+
+Els anells **no són solidaris amb la rotació W de la superfície**: les partícules orbiten diferencialment. Geomètricament, aplicar W no canvia el pla dels anells perquè és una rotació al voltant de la seva normal, però no s’ha de fer que una textura/estructura azimutal dels anells giri com si fos enganxada al meridià de Saturn.
+
+Arbre recomanat:
+
+```text
+saturnRoot
+└── equatorialOrientationRoot      # orienta pol/equador, sense semàntica de spin dels anells
+    ├── surfaceSpinRoot            # aplica W al planeta/textura
+    │   └── planetSurface
+    └── ringSystem                 # comparteix el pla equatorial, no el spin superficial
+```
+
+Per obtenir l’orientació:
+
+- [ ] preferir `pxform()`/frame SPICE a reconstruir RA/DEC/W a mà;
+- [ ] obtenir el pol transformant l’eix +Z del frame body-fixed o mitjançant una extracció de matriu documentada;
+- [ ] derivar una base equatorial estable si el renderer necessita un quaternion complet;
+- [ ] si el recurs dels anells és purament radial/axisimètric, només la normal del pla és físicament rellevant;
+- [ ] si existeix textura amb estructura azimutal, documentar explícitament quina convenció física/visual en determina l’azimut.
+
+### Saturn — matriu SPICE i quaternion Three.js
+
+SPICE treballa naturalment amb matrius de rotació; Three.js aplica habitualment quaternions.
+
+Exemple conceptual:
+
+```python
+body_to_icrf_matrix = spice.pxform("IAU_SATURN", "J2000", et)
+body_to_enu_matrix = icrf_to_enu_matrix @ body_to_icrf_matrix
+body_to_enu_quaternion = matrix_to_quaternion(body_to_enu_matrix)
+```
+
+La conversió ha de preservar handedness i convenció d’eixos. El contracte del bridge ha de fixar **un únic ordre de components**.
+
+Per compatibilitat directa amb `THREE.Quaternion.set(...)`, utilitzar:
+
+```text
+[x, y, z, w]
+```
+
+No enviar `[w, x, y, z]` i passar-lo directament a `Quaternion.set(x, y, z, w)`.
+
+Provar sempre:
+
+```text
+matriu SPICE
+→ quaternion backend
+→ quaternion Three.js
+→ vector base transformat
+```
+
+contra la transformació matricial original dins tolerància.
+
+### Saturn — angle d’obertura B: geocèntric vs topocèntric
+
+`B` és útil com a **mètrica diagnòstica**, no com a autoritat de rotació.
+
+Cal distingir dues definicions:
+
+```text
+B_geocentric
+→ direcció Saturn → centre de la Terra
+→ mateix valor per a tots els observadors terrestres a un instant
+
+B_topocentric
+→ direcció Saturn → observador real
+→ pot variar lleument amb la ubicació per paral·laxi
+```
 
 Conceptualment:
 
 ```text
-p = pol nord de Saturn
-pla equatorial = pla amb normal p
-pla dels anells ≈ pla equatorial
+B = asin(dot(n_ring_j2000, direction_saturn_to_observer_j2000))
 ```
 
-Els anells s’han d’orientar a partir del mateix `bodyToICRFQuaternion` de Saturn.
+No utilitzar la direcció inversa sense documentar el signe.
+
+Per Saturn, la diferència topocèntrica és petita perquè és molt llunyà, però **no és matemàticament zero**. Per tant, no és correcte provar que un únic `B` topocèntric sigui idèntic per a qualsevol latitud/longitud.
+
+Requisits:
+
+- [ ] exposar `ringOpeningGeocentricDeg` si es vol una mètrica comuna comparable amb almanacs;
+- [ ] exposar `ringOpeningTopocentricDeg` només si és útil per diagnòstic de la vista real;
+- [ ] no utilitzar cap dels dos per rotar `ringSystem`;
+- [ ] la inclinació aparent respecte de l’horitzó emergeix de `equatorialOrientationRoot` + frame local de l’observador + càmera;
+- [ ] el canvi d’ubicació pot canviar l’orientació aparent respecte de l’horitzó encara que `B_geocentric` es mantingui.
+
+### Saturn — radi i forma des del PCK
+
+No hardcodejar el radi de Saturn com a constant de renderer.
+
+Obtenir-lo de la font PCK activa:
+
+```python
+radii = spice.bodvrd("SATURN", "RADII", 3)
+```
+
+Amb `pck00011.tpc`, el fixture de referència és:
+
+```text
+BODY699_RADII = (60268, 60268, 54364) km
+```
+
+No confondre aquests radis IAU/PCK amb constants de models dinàmics que poden aparèixer dins dels comentaris d’un SPK saturnià; per exemple, SAT441 documenta un `RADIUS = 60330 km` utilitzat pel seu model dinàmic, que no substitueix `BODY699_RADII` com a forma visual/cartogràfica de Saturn.
+
+### Saturn — aparença dels anells emergeix de la geometria
+
+La geometria 3D és l’autoritat visual:
+
+```text
+pol/equador real
++ transformació ICRF → local observador
++ projecció de càmera
+→ obertura i angle aparent dels anells
+```
 
 No implementar:
 
-```text
-rings.rotation.x = angleVisualAnells(data)
+```typescript
+ringGroup.rotation.x = calculateRingOpening(date);
 ```
 
-Implementar:
+Ni modificar artificialment l’opacitat només perquè `abs(B) < llindar`.
 
-```text
-Saturn orientationRoot
-├── planetSurface
-└── ringSystem
-```
+Quan els anells són gairebé de cantell, la geometria ha de col·lapsar naturalment cap a una línia prima. Els artefactes subpíxel s’han de resoldre amb tècniques de rasterització/coverage, no falsificant la física.
 
-El `ringSystem` està fix respecte del pla equatorial de Saturn; l’obertura aparent canvia perquè canvia la geometria observador–Saturn.
+Cas límit `B ≈ 0°`:
 
-### Saturn — diagnòstic de l’obertura dels anells
-
-Es pot calcular un valor diagnòstic `B` sense utilitzar-lo per orientar els anells:
-
-```text
-B = asin(dot(n_ring, direction_saturn_to_observer))
-```
-
-On:
-
-```text
-B = 0°   → anells de cantell
-B > 0    → es veu una cara del pla
-B < 0    → es veu la cara oposada
-```
-
-Aquest valor és útil per tests, HUD de diagnòstic i comparacions externes, però **no és l’autoritat de rotació del mesh**.
+- [ ] geometria estable sense NaN ni flips;
+- [ ] no invertir UV ni normal arbitràriament en canviar el signe;
+- [ ] evitar z-fighting;
+- [ ] conservar gruix físic/visual documentat si se’n modela un;
+- [ ] permetre AA/alpha-to-coverage o estabilització subpíxel si és necessària;
+- [ ] qualsevol “visibility aid” que faci els anells més gruixuts/opacs ha de ser opcional i marcat com a no científic.
 
 ### Saturn — geometria dels anells
 
@@ -2956,6 +3244,22 @@ La representació mínima fidedigna ha d’incloure:
 - divisió de Cassini;
 - anell A;
 - opcionalment D/F/G/E segons LOD i qualitat visual.
+
+Fixture radial de referència de la NASA Saturnian Rings Fact Sheet:
+
+```text
+Saturn equator        60 268 km
+C inner edge          74 658 km
+C outer / B inner     91 975 km
+B outer edge         117 507 km
+A inner edge         122 340 km
+A outer edge         136 780 km
+F ring               139 826 km
+```
+
+La divisió de Cassini és la regió principal entre l’outer edge de B i l’inner edge d’A; no reduir-la a un únic radi sense amplada.
+
+Aquests valors són fixtures de font, no literals dispersos pel renderer. Han de viure en dades/versionat/provenance i poder-se substituir per una font millor sense canviar el codi visual.
 
 No és necessari modelar partícules individuals.
 
@@ -2978,7 +3282,11 @@ Si no existeix:
 
 - [ ] implementar un fallback radial procedimental clarament identificat com a aproximació visual;
 - [ ] conservar dimensions i orientació físiques;
+- [ ] representar variació radial d’opacitat/albedo entre C, B, Cassini i A amb paràmetres documentats, no amb un únic color pla;
+- [ ] no hardcodejar colors hex com si fossin fotometria científica; qualsevol paleta procedimental ha de quedar marcada com `VISUAL_REFERENCE`;
 - [ ] no inventar estructura fina de Cassini/Cassini Division més enllà del model documentat.
+
+El fallback pot utilitzar geometries separades per bandes o una única geometria annular amb coordenada radial. La decisió ha de prioritzar persistència GPU, transicions radials i absència de seams.
 
 ### Saturn — oclusió correcta planeta/anells
 
@@ -2987,10 +3295,33 @@ Requisits visuals:
 - [ ] la meitat posterior dels anells queda ocultada pel planeta quan geomètricament correspon;
 - [ ] la meitat anterior passa davant del disc;
 - [ ] el depth buffer decideix la intersecció, no una màscara 2D manual;
-- [ ] els anells poden mostrar cara il·luminada i no il·luminada de manera diferenciada si el material ho suporta;
+- [ ] utilitzar material de doble cara (`DoubleSide` o shader equivalent) perquè el pla es pugui observar des del nord i des del sud;
+- [ ] no aplicar simplement “la cara posterior rep menys llum”: la resposta ha de dependre de la direcció real Ring → Sun, de la normal del pla i, si existeix, del perfil radial d’opacitat/transmissió;
+- [ ] calcular com a diagnòstic el signe de l’elevació del Sol sobre el pla dels anells per distingir cara solar i cara oposada;
+- [ ] els anells poden mostrar cara il·luminada i transmesa/no il·luminada de manera diferenciada si el material ho suporta;
 - [ ] el canvi de signe de `B` no provoca un flip artificial de textura;
 - [ ] no hi ha z-fighting al pla equatorial;
 - [ ] els anells continuen correctes amb resize, FOV i roll de càmera.
+
+### Saturn — ombres entre planeta i anells
+
+Distingir tres fenòmens:
+
+```text
+Saturn → ombra sobre els anells
+anells → atenuació/ombra sobre Saturn
+self-shadow microscòpic entre partícules dels anells
+```
+
+Per una renderització fidedigna, els dos primers són efectes macroscòpics reals i han de quedar previstos pel contracte d’il·luminació. No afirmar que “els anells no tenen ombra”.
+
+Abast d’aquest pas:
+
+- [ ] preparar la geometria/inputs perquè Saturn pugui bloquejar la llum solar que arriba a una regió dels anells;
+- [ ] preparar la contribució d’opacitat radial perquè els anells puguin atenuar la llum solar sobre Saturn;
+- [ ] preferir una solució analítica en shader basada en Sol–Saturn–pla dels anells si evita shadow maps innecessaris;
+- [ ] si aquests dos efectes no s’implementen en aquesta iteració, marcar-los explícitament com a `pending fidelity`, no com a físicament inexistents;
+- [ ] deixar fora de l’abast el self-shadow microscòpic/mútua ocultació entre partícules individuals i la dispersió múltiple d’alta fidelitat.
 
 ### Altres sistemes d’anells
 
@@ -3380,6 +3711,30 @@ Per satèl·lits sense model fotomètric fiable:
 - permetre visibilitat per selecció/LOD si l’usuari activa el sistema;
 - diferenciar “no visible físicament a simple vista” de “no carregat”.
 
+### Elevació, horitzó i hook de refracció
+
+La visibilitat no és una propietat exclusiva de Saturn; ha de reutilitzar el pipeline d’oclusió/horitzó del Pas 8.
+
+Estat mínim útil:
+
+```text
+geometricElevationDeg
+horizonElevationDeg
+horizonVisible
+refractionApplied
+```
+
+Amb la convenció TerraLab3D `+Y = Up`, l’elevació es deriva de la component local vertical. No utilitzar `directionENU.z` com a `Up` si el vector ja ha estat adaptat a `(East, Up, North)`.
+
+Política:
+
+- [ ] calcular elevació geomètrica en el frame local;
+- [ ] reutilitzar l’horitzó pla existent del Pas 8 fins que el Pas 15 aporti perfil DEM;
+- [ ] no posar `mesh.visible = false` amb una regla Saturn-específica si el sistema compartit d’oclusió ja resol el cas;
+- [ ] mantenir separat `geometricElevation` de qualsevol futura `apparentElevation` refractada;
+- [ ] deixar un hook de correcció atmosfèrica al pipeline observacional, però **no implementar refracció al Pas 8.6**;
+- [ ] la futura refracció pot alterar posició/elevació aparent prop de l’horitzó, però no l’orientació body-fixed ni el pla físic dels anells.
+
 ### UI
 
 Integrar dins de la jerarquia existent:
@@ -3499,8 +3854,14 @@ clock interpolation
 authoritative celestial state
 → tick científic Python
 
-body orientation
-→ tick científic o quan la tolerància angular ho exigeixi
+body axis / pole orientation
+→ cache per tolerància angular; evoluciona molt més lentament que la posició orbital
+
+body prime-meridian rotation W
+→ tick científic/interpolació quan la textura body-fixed ho exigeixi
+
+ring-plane orientation
+→ depèn de l’eix/pol, no de W; no reconstruir geometria
 
 orbit geometry
 → només canvi de generació
@@ -3653,7 +4014,8 @@ No registrar:
 - [ ] Suportar esfera i el·lipsoide.
 - [ ] Carregar textura local per manifest.
 - [ ] Aplicar quaternion científic.
-- [ ] Aplicar il·luminació solar física.
+- [ ] Aplicar il·luminació solar direccional física amb `bodyToSunDirection` per cos.
+- [ ] Actualitzar la direcció solar per tick/tolerància científica, mai per frame de càmera.
 - [ ] Aplicar LOD.
 - [ ] Integrar picking.
 - [ ] Integrar labels.
@@ -3674,17 +4036,30 @@ No registrar:
 
 ### Tasques — Saturn
 
+- [ ] Separar estrictament posició SPK, orientació PCK i transformació local de l’observador.
+- [ ] Validar la cadena SPK necessària per obtenir `SATURN (699)` i no confondre-la amb `SATURN BARYCENTER (6)`.
 - [ ] Obtenir orientació de Saturn del frame/PCK.
-- [ ] Derivar el pla equatorial de la transformació física.
-- [ ] Crear `ringSystem` persistent.
-- [ ] Orientar-lo amb Saturn, no amb un angle visual manual.
+- [ ] Obtenir `BODY699_RADII` del PCK actiu; no hardcodejar 60330 km com a radi visual.
+- [ ] Derivar el pol nord i el pla equatorial de la transformació física.
+- [ ] Implementar/validar ICRF/J2000 → frame local de l’observador amb la convenció `(East, Up, North)`.
+- [ ] Crear `equatorialOrientationRoot`, `surfaceSpinRoot` i `ringSystem` persistents o una estructura equivalent amb les mateixes responsabilitats.
+- [ ] Aplicar W/prime-meridian a la superfície de Saturn sense convertir-lo en spin dels anells.
+- [ ] Orientar `ringSystem` pel pla equatorial, no amb un angle visual manual.
+- [ ] Convertir matriu SPICE → quaternion renderer-neutral → quaternion Three.js `[x,y,z,w]` i validar equivalència numèrica.
 - [ ] Implementar dimensions radials documentades.
 - [ ] Implementar A/B/C + Cassini com a mínim.
 - [ ] Utilitzar textura/alpha local si existeix i és adequada.
-- [ ] Implementar fallback radial si no existeix.
+- [ ] Implementar fallback radial si no existeix, amb variació radial documentada d’albedo/opacitat.
+- [ ] Implementar material de doble cara amb direcció solar física.
+- [ ] Reutilitzar la il·luminació solar direccional comuna `Body → Sun`.
 - [ ] Validar depth/oclusió davant/darrere del planeta.
-- [ ] Calcular `B` només com a diagnòstic.
-- [ ] Provar dates amb anells molt oberts i propers al cantell.
+- [ ] Preparar ombra Saturn → anells i anells → Saturn; no confondre-ho amb self-shadow microscòpic.
+- [ ] Calcular `B_geocentric` només com a diagnòstic/almanac.
+- [ ] Calcular `B_topocentric` només si és útil per validar la vista real; no exigir que sigui idèntic entre observadors.
+- [ ] No modificar opacitat arbitràriament quan `B ≈ 0°`; gestionar el cas límit amb geometria/rasterització estable.
+- [ ] Calcular elevació geomètrica i reutilitzar el sistema compartit d’horitzó.
+- [ ] Deixar hook de refracció futura sense implementar-la al Pas 8.6.
+- [ ] Provar dates amb anells molt oberts, propers al cantell i amb canvi de signe de B.
 
 ### Tasques — satèl·lits naturals
 
@@ -3805,13 +4180,24 @@ Per cada textura planetària local:
 
 ### Proves obligatòries — Saturn i anells
 
+- [ ] `SATURN (699)` es resol amb una cadena SPK vàlida i no es confon amb `SATURN BARYCENTER (6)`.
+- [ ] `BODY699_RADII` del PCK actiu coincideix amb el fixture de la versió instal·lada; per `pck00011.tpc`, `(60268, 60268, 54364) km`.
 - [ ] Ring plane perpendicular al pol de Saturn dins tolerància numèrica.
-- [ ] `B` calculat per diagnòstic coincideix amb la geometria.
-- [ ] Quan `B ≈ 0`, els anells es veuen de cantell.
+- [ ] Transformació ICRF/J2000 → local canvia correctament amb latitud/LST i conserva norma/angles.
+- [ ] Mateixa UTC, observadors diferents → orientació respecte de l’horitzó diferent quan correspon.
+- [ ] `B_geocentric` és independent de la ubicació concreta de l’observador terrestre.
+- [ ] `B_topocentric` pot diferir lleument entre observadors i la diferència és coherent amb la paral·laxi.
+- [ ] `B` diagnòstic coincideix amb la geometria i no intervé en el quaternion del ring mesh.
+- [ ] Matriu SPICE i quaternion serialitzat `[x,y,z,w]` transformen vectors base de manera equivalent dins tolerància.
+- [ ] `surfaceSpinRoot` pot variar W sense alterar el pla de `ringSystem`.
+- [ ] Quan `B ≈ 0`, els anells es veuen de cantell sense canvi artificial d’opacitat, NaN ni flip.
 - [ ] En canviar de signe `B`, es veu la cara oposada sense flip artificial.
-- [ ] A/B/C i Cassini mantenen proporcions radials.
+- [ ] Material de doble cara funciona des del nord i sud del pla.
+- [ ] Direcció solar del material coincideix amb Saturn → Sol de l’efemèride.
+- [ ] A/B/C i Cassini mantenen proporcions radials documentades.
 - [ ] Planeta oculta correctament la part posterior.
 - [ ] Part anterior oculta correctament el disc quan correspon.
+- [ ] Elevació geomètrica utilitza la component `Up` correcta; cos sota l’horitzó és tractat pel pipeline compartit.
 - [ ] Sense z-fighting.
 - [ ] Textura dels anells carregada una vegada si existeix.
 - [ ] `ring_geometry_build_count` estable.
@@ -3892,7 +4278,18 @@ El Pas 8.6 no es considera complet fins que:
 - [ ] els planetes reutilitzen el pipeline genèric extret de la Lluna sempre que sigui aplicable;
 - [ ] els planetes tenen orientació física derivada del model científic, no rotations visuals manuals;
 - [ ] Saturn té anells persistents alineats amb el seu equador real;
+- [ ] la posició de Saturn, la seva orientació i el frame local de l’observador tenen autoritats separades i explícites;
+- [ ] `SATURN (699)` no es confon amb `SATURN BARYCENTER (6)`;
+- [ ] els radis de Saturn provenen del PCK actiu;
+- [ ] la transformació ICRF/J2000 → local depèn correctament de l’observador i respecta `+Y = Up`;
+- [ ] els anells comparteixen el pla equatorial però no hereten semànticament el spin W de la superfície;
+- [ ] matriu SPICE → quaternion → Three.js conserva la transformació i usa ordre `[x,y,z,w]`;
 - [ ] la inclinació aparent dels anells emergeix de la geometria;
+- [ ] `B_geocentric` i `B_topocentric` estan diferenciats i cap d’ells controla la rotació del mesh;
+- [ ] el cas `B ≈ 0°` és estable sense truc d’opacitat científicament fals;
+- [ ] els anells tenen material de doble cara amb il·luminació solar direccional física;
+- [ ] planetes i satèl·lits reutilitzen un sistema comú de `Body → Sun direction`, sense llum enganxada a càmera;
+- [ ] visibilitat/horitzó reutilitza el pipeline compartit i la refracció queda preparada però no implementada;
 - [ ] el catàleg del snapshot cobreix 461 planetary satellites;
 - [ ] tots els satèl·lits amb SPK vàlid poden obtenir posició;
 - [ ] cap absència de kernel/orientació/textura queda amagada;
@@ -3907,7 +4304,7 @@ El Pas 8.6 no es considera complet fins que:
 - [ ] el sistema és data-driven i no conté centenars de classes específiques;
 - [ ] lifecycle i `dispose` són idempotents;
 - [ ] totes les proves científiques, visuals i de rendiment passen;
-- [ ] els Passos 1–8.5 continuen funcionant;
+- [ ] els Passos 1–8.6 continuen funcionant;
 - [ ] el Pas 9 encara no s’ha començat.
 
 ### Evidència obligatòria
@@ -3918,7 +4315,11 @@ El Pas 8.6 no es considera complet fins que:
 - [ ] Snapshot versionat del catàleg JPL.
 - [ ] Report de cobertura `catalogats / amb SPK / amb orientació / amb radi / amb textura`.
 - [ ] Prova numèrica del pol/equador de Saturn.
-- [ ] Prova numèrica de `B` dels anells en diverses dates.
+- [ ] Prova de provenance dels radis de Saturn des del PCK actiu.
+- [ ] Prova de cadena SPK Earth → Saturn barycenter → Saturn center.
+- [ ] Prova numèrica ICRF/J2000 → local en diversos observadors.
+- [ ] Prova d’equivalència matriu SPICE ↔ quaternion Three.js `[x,y,z,w]`.
+- [ ] Prova numèrica de `B_geocentric` i `B_topocentric` dels anells en diverses dates.
 - [ ] Captures de Saturn amb anells oberts i propers al cantell.
 - [ ] Captures dels sistemes de Júpiter, Saturn, Urà i Neptú amb llunes.
 - [ ] Captura de Plutó + Caront/Nix/Hidra/Quèrberos/Estix quan el FOV/mode d’inspecció ho permeti.
@@ -3942,6 +4343,8 @@ Aquest pas no implementa encara:
 - trajectòries topocèntriques temporals del Pas 9;
 - atmosfera meteorològica temporal de Júpiter/Saturn;
 - núvols 3D volumètrics planetaris;
+- self-shadow microscòpic i dispersió múltiple entre partícules individuals dels anells;
+- refracció atmosfèrica aparent, que queda com a extensió del pipeline observacional;
 - ombres topogràfiques d’alta resolució sobre totes les llunes;
 - DSK d’alta resolució per centenars de cossos;
 - textures científiques d’alta resolució per a totes les llunes quan no existeixen;
@@ -3965,12 +4368,27 @@ la càmera només projecta l’estat resultant.
 Per Saturn:
 
 ```text
-orientació de Saturn
-→ pol nord
+SPK complet
+→ posició del centre de Saturn (699)
+
+PCK/FK
+→ pol nord + frame body-fixed
 → pla equatorial
-→ pla dels anells
-→ projecció de càmera
-→ inclinació aparent correcta
+
+ScientificObserver + Earth orientation
+→ ICRF/J2000 → frame local
+
+pla equatorial
+→ ringSystem
+
+W / prime meridian
+→ només surfaceSpinRoot de Saturn
+
+Body → Sun direction
+→ il·luminació direccional de planeta i anells
+
+frame local + càmera
+→ inclinació/aparença aparent correcta
 ```
 
 Mai:
@@ -4115,6 +4533,36 @@ La regla arquitectònica central és:
 Python determina QUINA llum física/astronòmica existeix i d’on prové.
 Three.js determina COM aquesta llum es representa eficientment a la GPU.
 ```
+
+### Frontera obligatòria entre el Pas 8.6 i el Pas 8.7
+
+Aquest pas **no substitueix ni absorbeix** la il·luminació específica dels cossos del Pas 8.6.
+
+La separació és:
+
+```text
+Pas 8.6 — il·luminació dels cossos del sistema solar
+├── Body → Sun direction per planeta/satèl·lit
+├── terminador i fase emergents de normals + direcció solar
+├── il·luminació física de Saturn i dels anells
+└── materials/geometries persistents dels cossos
+
+Pas 8.7 — il·luminació de l’escena local de TerraLab3D
+├── SunDirectionalLight
+├── MoonDirectionalLight
+├── component difusa del cel
+├── materials PBR de worldRoot
+└── ombres locals
+```
+
+Regles:
+
+- [ ] `SunDirectionalLight` no s’utilitza com a substitut de `bodyToSunDirection` dels planetes, satèl·lits o anells.
+- [ ] La il·luminació de cada cos llunyà continua utilitzant la seva pròpia geometria `Body → Sun` definida al Pas 8.6.
+- [ ] El Pas 8.7 consumeix la direcció topocèntrica del Sol i de la Lluna per il·luminar `worldRoot` i els objectes locals.
+- [ ] Cap `DirectionalLight` global pot imposar un terminador incorrecte als cossos del sistema solar.
+- [ ] Els dos sistemes comparteixen fonts científiques, convencions de coordenades, color management i lifecycle, però tenen responsabilitats renderer diferents.
+- [ ] Una refactorització futura no pot eliminar el Pas 8.7 perquè el Pas 8.6 ja calculi direccions d’il·luminació dels cossos.
 
 ### Regles d’autoritat
 
@@ -4630,7 +5078,7 @@ El Pas 8.7 no es considera complet fins que:
 - [ ] els fallbacks són explícits;
 - [ ] lifecycle i `dispose` són verificables;
 - [ ] totes les proves passen;
-- [ ] els Passos 1–8.5 continuen funcionant;
+- [ ] els Passos 1–8.6 continuen funcionant;
 - [ ] el Pas 9 encara no s’ha començat.
 
 ### Evidència obligatòria
@@ -4681,8 +5129,9 @@ La regla final del Pas 8.7 és:
 Pas 7 defineix l’entorn atmosfèric;
 Pas 8 defineix on són el Sol i la Lluna;
 Pas 8.5 manté coherent la geometria i orientació lunar;
-LightingEnvironmentComposer deriva un estat d’il·luminació petit i autoritatiu;
-Three.js el representa amb llums persistents, materials PBR i ombres;
+Pas 8.6 manté la il·luminació específica Body → Sun dels planetes, satèl·lits i anells;
+LightingEnvironmentComposer deriva l’estat d’il·luminació local de l’escena;
+Three.js el representa amb llums direccionals persistents, component difusa, materials PBR i ombres;
 la càmera només observa el resultat.
 ```
 
