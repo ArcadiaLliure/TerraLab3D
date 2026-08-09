@@ -5,6 +5,12 @@ import type { SolarSystemPickHit } from "../../three/picking/SolarSystemPickProv
 
 const DEG = Math.PI / 180;
 
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>'"]/g, (character) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
+  })[character] ?? character);
+}
+
 /**
  * Compute the cardinal direction suffix for a given azimuth.
  * Returns "N", "NE", "E", "SE", "S", "SO", "O", "NO".
@@ -237,7 +243,7 @@ export class LocationHUD {
   }
 
   private setSelectedSolarBody(hit: SolarSystemPickHit): void {
-    const labels: Record<SolarSystemPickHit["bodyId"], string> = {
+    const labels: Readonly<Record<string, string>> = {
       sun: "Sol",
       moon: "Lluna",
       mercury: "Mercuri",
@@ -247,15 +253,37 @@ export class LocationHUD {
       saturn: "Saturn",
       uranus: "Urà",
       neptune: "Neptú",
+      pluto: "Plutó",
     };
     const state = hit.state;
+    const name = escapeHtml(state.displayName ?? labels[hit.bodyId] ?? hit.bodyId);
+    const magnitude = state.apparentMagnitude === null
+      ? "no validada"
+      : state.apparentMagnitude.toFixed(2);
+    const parent = state.parentNaifId === undefined || state.parentNaifId === null
+      ? ""
+      : ` &nbsp; Pare: ${state.parentNaifId}`;
+    const naif = state.naifId === undefined ? "" : `<div>NAIF: ${state.naifId}${parent}</div>`;
+    const radii = state.radiiKm === undefined || state.radiiKm === null
+      ? "radi no disponible"
+      : `radis: ${state.radiiKm.map((value) => value.toFixed(2)).join(" / ")} km`;
+    const ring = state.ringDiagnostics === undefined || state.ringDiagnostics === null
+      ? ""
+      : `<div>B geo/topo: ${state.ringDiagnostics.ringOpeningGeocentricDeg.toFixed(2)}° / ${state.ringDiagnostics.ringOpeningTopocentricDeg.toFixed(2)}°</div>`;
     this.starContainer.style.display = "block";
     this.starContainer.innerHTML = `
       <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cos celeste seleccionat</div>
-      <div>${labels[hit.bodyId]}</div>
+      <div>${name}</div>
+      ${naif}
       <div>Alt: ${state.altitudeDeg.toFixed(2)}° &nbsp; Az: ${state.azimuthDeg.toFixed(2)}°</div>
-      <div>Mag: ${state.apparentMagnitude.toFixed(2)} &nbsp; Il·luminació: ${(state.illuminationFraction * 100).toFixed(0)}%</div>
-      <div style="opacity: 0.7; font-size: 11px;">${state.source} · ${state.quality}</div>
+      <div>Distància: ${state.distanceKm.toLocaleString(undefined, { maximumFractionDigits: 0 })} km</div>
+      <div>Diàmetre aparent: ${state.angularDiameterDeg.toFixed(5)}° &nbsp; ${radii}</div>
+      <div>Mag: ${magnitude} &nbsp; Il·luminació: ${(state.illuminationFraction * 100).toFixed(0)}%</div>
+      <div>Fase: ${state.phaseAngleDeg.toFixed(2)}° &nbsp; Cobertura: ${state.coverageStatus ?? "legacy"}</div>
+      <div>Orientació: ${state.orientationQuality ?? state.orientation?.quality ?? "unavailable"} &nbsp; Forma: ${state.shapeQuality ?? "unavailable"}</div>
+      <div>Textura: ${state.textureQuality ?? "unavailable"} &nbsp; Kernel: ${escapeHtml(state.ephemerisKernelId ?? "legacy")}</div>
+      ${ring}
+      <div style="opacity: 0.7; font-size: 11px;">${escapeHtml(state.source)} · ${state.quality}</div>
     `;
   }
 

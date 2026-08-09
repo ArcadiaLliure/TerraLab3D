@@ -277,6 +277,25 @@ class WebSocketBridge:
         payload["type"] = "moon_surface_resource"
         await self.send(payload)
 
+    async def send_planet_texture_manifest(self, descriptor: Any) -> None:
+        payload = descriptor.texture_manifest_dict()
+        payload["type"] = "planet_texture_manifest"
+        await self.send(payload)
+
+    async def send_satellite_catalog_manifest(self, descriptor: Any) -> None:
+        payload = descriptor.catalog_manifest_dict()
+        payload["type"] = "solar_system_catalog_manifest"
+        await self.send(payload)
+
+    async def send_orbit_geometry(self, resource: Any) -> int:
+        await self.send_binary_resource(
+            resource.resource_id,
+            resource.version,
+            resource.metadata,
+            resource.payload,
+        )
+        return len(resource.payload)
+
     async def send_location_error(self, message: str) -> None:
         await self.send({
             "type": "location_error",
@@ -321,4 +340,3 @@ class WebSocketBridge:
             "protocolVersion": PROTOCOL_VERSION,
             "capabilities": ["camera", "viewport", "shutdown"],
         })
-

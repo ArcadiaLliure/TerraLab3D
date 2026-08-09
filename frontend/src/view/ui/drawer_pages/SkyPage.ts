@@ -1,6 +1,7 @@
 import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
 import type {
   MoonSurfaceResourceDescriptor,
+  SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "../../../contracts/solar_system_contracts";
 
@@ -13,10 +14,13 @@ export interface SkyPageOptions {
   onMagnitudeLimitChanged?: (mag: number) => void;
   onPureColorsToggled?: (pure: boolean) => void;
   onSolarSystemVisibilityChanged?: (
-    part: "system" | "sun" | "moon" | "planets",
+    part: "system" | "sun" | "moon" | "planets" | "rings" | "satellites" | "orbits",
     visible: boolean,
   ) => void;
   onMoonSurfaceToggled?: (enabled: boolean) => void;
+  onSatelliteSystemsChanged?: (systems: readonly string[]) => void;
+  onSatelliteLodChanged?: (mode: "auto" | "faithful" | "diagnostic") => void;
+  onSatelliteLabelsToggled?: (enabled: boolean) => void;
 }
 
 export class SkyPage {
@@ -43,6 +47,8 @@ export class SkyPage {
   private magContainer!: HTMLDivElement;
   private solarStatusLabel!: HTMLDivElement;
   private moonSurfaceStatusLabel!: HTMLDivElement;
+  private satelliteCatalogStatusLabel!: HTMLDivElement;
+  private readonly enabledSatelliteSystems = new Set<string>();
 
   constructor(options: SkyPageOptions = {}) {
     this.options = options;
@@ -98,6 +104,80 @@ export class SkyPage {
     this.moonSurfaceStatusLabel.style.cssText = "font-size:9px;color:var(--color-text-muted);padding-left:12px;";
     this.moonSurfaceStatusLabel.textContent = "surface unavailable";
     group.appendChild(this.moonSurfaceStatusLabel);
+
+    const extendedLabels: ReadonlyArray<["rings" | "satellites" | "orbits", string, boolean]> = [
+      ["rings", "Anells de Saturn", true],
+      ["satellites", "Satèl·lits naturals", false],
+      ["orbits", "Òrbites SPK", false],
+    ];
+    for (const [part, label, initial] of extendedLabels) {
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:10px;";
+      const text = document.createElement("span");
+      text.textContent = label;
+      row.append(text, this.createToggleButton("Visible", "Ocult", initial, (visible) => {
+        this.options.onSolarSystemVisibilityChanged?.(part, visible);
+      }));
+      group.appendChild(row);
+    }
+
+    const systemsTitle = document.createElement("div");
+    systemsTitle.textContent = "Sistemes de satèl·lits";
+    systemsTitle.style.cssText = "font-size:10px;color:var(--color-text-bright);margin-top:2px;";
+    group.appendChild(systemsTitle);
+    const systems = ["mars", "jupiter", "saturn", "uranus", "neptune", "pluto"] as const;
+    const systemLabels: Readonly<Record<typeof systems[number], string>> = {
+      mars: "Mart", jupiter: "Júpiter", saturn: "Saturn",
+      uranus: "Urà", neptune: "Neptú", pluto: "Plutó",
+    };
+    const grid = document.createElement("div");
+    grid.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;font-size:9px;";
+    for (const system of systems) {
+      const label = document.createElement("label");
+      label.style.cssText = "display:flex;align-items:center;gap:4px;cursor:pointer;";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.onchange = () => {
+        if (input.checked) this.enabledSatelliteSystems.add(system);
+        else this.enabledSatelliteSystems.delete(system);
+        this.options.onSatelliteSystemsChanged?.([...this.enabledSatelliteSystems]);
+      };
+      label.append(input, document.createTextNode(systemLabels[system]));
+      grid.appendChild(label);
+    }
+    group.appendChild(grid);
+
+    const lodRow = document.createElement("div");
+    lodRow.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:10px;";
+    const lodText = document.createElement("span");
+    lodText.textContent = "LOD satèl·lits";
+    const lodSelect = document.createElement("select");
+    lodSelect.style.cssText = "background:var(--color-surface);color:var(--color-text-bright);border:1px solid var(--color-border);border-radius:4px;padding:2px 4px;font-size:10px;";
+    for (const [value, label] of [["auto", "Automàtic"], ["faithful", "Fidel"], ["diagnostic", "Diagnòstic"]] as const) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      lodSelect.appendChild(option);
+    }
+    lodSelect.onchange = () => this.options.onSatelliteLodChanged?.(
+      lodSelect.value as "auto" | "faithful" | "diagnostic",
+    );
+    lodRow.append(lodText, lodSelect);
+    group.appendChild(lodRow);
+
+    const labelRow = document.createElement("div");
+    labelRow.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:10px;";
+    const labelText = document.createElement("span");
+    labelText.textContent = "Etiquetes de satèl·lits";
+    labelRow.append(labelText, this.createToggleButton("Actives", "Inactives", true, (enabled) => {
+      this.options.onSatelliteLabelsToggled?.(enabled);
+    }));
+    group.appendChild(labelRow);
+
+    this.satelliteCatalogStatusLabel = document.createElement("div");
+    this.satelliteCatalogStatusLabel.style.cssText = "font-size:9px;color:var(--color-text-muted);line-height:1.4;";
+    this.satelliteCatalogStatusLabel.textContent = "Catàleg de satèl·lits: carregant…";
+    group.appendChild(this.satelliteCatalogStatusLabel);
     this.solarStatusLabel = document.createElement("div");
     this.solarStatusLabel.style.cssText = "font-size:9px;color:var(--color-text-muted);line-height:1.4;";
     this.solarStatusLabel.textContent = "Efemèride: carregant…";
@@ -330,7 +410,7 @@ export class SkyPage {
 
   public updateSolarSystem(snapshot: SolarSystemSnapshot): void {
     const moon = snapshot.moon;
-    const source = snapshot.source === "DE421" ? "DE421" : "fallback";
+    const source = snapshot.source;
     const moonState = moon === null
       ? "Lluna unavailable"
       : `Lluna ${(moon.illuminationFraction * 100).toFixed(0)}% · ${
@@ -343,7 +423,24 @@ export class SkyPage {
       `Sol ${snapshot.sun.altitudeDeg.toFixed(1)}°`,
       moonState,
       `${snapshot.planets.length} planetes`,
+      `${snapshot.satelliteEphemerisCount ?? 0}/${snapshot.catalogCount ?? 0} satèl·lits amb efemèride`,
+      `kernels ${snapshot.kernelStatus ?? "legacy"}`,
     ].join(" · ");
+  }
+
+  public updateSatelliteCatalog(manifest: SatelliteCatalogManifest): void {
+    this.satelliteCatalogStatusLabel.textContent = [
+      `Catàleg ${manifest.catalogDate}: ${manifest.counts.total}`,
+      `SPK ${manifest.coverage.withSpk}`,
+      `orientació ${manifest.coverage.withOrientation}`,
+      `radi ${manifest.coverage.withRadius}`,
+      manifest.coverage.withoutSpk.length > 0
+        ? `sense SPK: ${manifest.coverage.withoutSpk.join(", ")}`
+        : "cobertura SPK completa",
+    ].join(" · ");
+    this.satelliteCatalogStatusLabel.style.color = manifest.status === "ready"
+      ? "#4ade80"
+      : manifest.status === "partial" ? "#facc15" : "#ff8a80";
   }
 
   public updateMoonSurfaceResource(

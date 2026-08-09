@@ -16,6 +16,7 @@ import aiohttp.web
 
 from .websocket_bridge import WebSocketBridge
 from terralab3d.application.ports.moon_surface_assets import MoonSurfaceAssetPort
+from terralab3d.application.ports.solar_system_assets import SolarSystemAssetPort
 
 log = logging.getLogger("terralab3d.server")
 
@@ -28,6 +29,7 @@ class TerraLabServer:
         dist_dir: Path,
         bridge: WebSocketBridge,
         moon_surface_assets: MoonSurfaceAssetPort | None = None,
+        solar_system_assets: SolarSystemAssetPort | None = None,
         *,
         host: str = "127.0.0.1",
         port: int = 14398,
@@ -35,6 +37,7 @@ class TerraLabServer:
         self._dist_dir = dist_dir
         self._bridge = bridge
         self._moon_surface_assets = moon_surface_assets
+        self._solar_system_assets = solar_system_assets
         self._host = host
         self._port = port
         self._actual_port = 0
@@ -56,6 +59,8 @@ class TerraLabServer:
         self._app.router.add_get("/ws", self._bridge.handle_websocket)
         if self._moon_surface_assets is not None:
             self._app.router.add_get("/moon-assets/{asset_name}", self._serve_moon_asset)
+        if self._solar_system_assets is not None:
+            self._app.router.add_get("/planet-assets/{asset_name}", self._serve_planet_asset)
         self._app.router.add_get("/", self._serve_index)
         self._app.router.add_static(
             "/", self._dist_dir, show_index=False,
@@ -110,6 +115,21 @@ class TerraLabServer:
         if self._moon_surface_assets is None:
             raise aiohttp.web.HTTPNotFound()
         path = self._moon_surface_assets.resolve_asset(request.match_info["asset_name"])
+        if path is None:
+            raise aiohttp.web.HTTPNotFound()
+        response = aiohttp.web.FileResponse(path)
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        return response
+
+    async def _serve_planet_asset(
+        self, request: aiohttp.web.Request,
+    ) -> aiohttp.web.StreamResponse:
+        """Serve validated external textures without copying them into Git."""
+
+        if self._solar_system_assets is None:
+            raise aiohttp.web.HTTPNotFound()
+        path = self._solar_system_assets.resolve_texture(request.match_info["asset_name"])
         if path is None:
             raise aiohttp.web.HTTPNotFound()
         response = aiohttp.web.FileResponse(path)

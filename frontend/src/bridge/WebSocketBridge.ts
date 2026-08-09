@@ -26,6 +26,8 @@ import type {
 import type { NavigationCameraPose, MotionState } from "../contracts/navigation";
 import type {
   MoonSurfaceResourceDescriptor,
+  PlanetTextureManifest,
+  SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "../contracts/solar_system_contracts";
 
@@ -72,10 +74,13 @@ export interface BackendMessageListener {
   }): void;
   onCelestialFrameTransform?(generation: number, matrix3x3: number[]): void;
   onStarResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
+  onBinaryResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
   onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
   onSkyEnvironmentSnapshot?(snapshot: import("../contracts/sky_environment_contracts").SkyEnvironmentSnapshot): void;
   onSolarSystemSnapshot?(snapshot: SolarSystemSnapshot): void;
   onMoonSurfaceResource?(resource: MoonSurfaceResourceDescriptor): void;
+  onPlanetTextureManifest?(manifest: PlanetTextureManifest): void;
+  onSolarSystemCatalogManifest?(manifest: SatelliteCatalogManifest): void;
 }
 
 export class WebSocketBridge {
@@ -167,7 +172,8 @@ export class WebSocketBridge {
     const payloadBuffer = arrayBuffer.slice(4 + headerLen);
 
     for (const l of this.messageListeners) {
-      l.onStarResourceReady?.(metadata, payloadBuffer);
+      if (l.onBinaryResourceReady) l.onBinaryResourceReady(metadata, payloadBuffer);
+      else l.onStarResourceReady?.(metadata, payloadBuffer);
     }
   }
 
@@ -371,6 +377,16 @@ export class WebSocketBridge {
           l.onMoonSurfaceResource?.(msg);
         }
         break;
+      case "planet_texture_manifest":
+        for (const l of this.messageListeners) {
+          l.onPlanetTextureManifest?.(msg);
+        }
+        break;
+      case "solar_system_catalog_manifest":
+        for (const l of this.messageListeners) {
+          l.onSolarSystemCatalogManifest?.(msg);
+        }
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -419,6 +435,19 @@ export class WebSocketBridge {
     this.sendMessage({
       type: "request_offset_day",
       offsetDays
+    });
+  }
+
+  public setSatelliteSystems(systems: readonly string[]): void {
+    this.sendMessage({ type: "set_satellite_systems", systems });
+  }
+
+  public requestSatelliteOrbit(bodyId: string, intervalDays = 30, sampleCount = 256): void {
+    this.sendMessage({
+      type: "request_satellite_orbit",
+      bodyId,
+      intervalDays,
+      sampleCount,
     });
   }
 

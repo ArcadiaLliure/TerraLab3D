@@ -30,7 +30,9 @@ from terralab3d.domain.sky_background.sky_environment import SkyEnvironmentCompo
 from terralab3d.domain.light_pollution.models import LightPollutionMode
 from terralab3d.domain.solar_system.models import ScientificObserver, SolarSystemSnapshot
 from terralab3d.application.ephemeris_coordinator import EphemerisCoordinator
+from terralab3d.application.orbit_sampler import OrbitSampler
 from terralab3d.infrastructure.adapters.ephemeris.adapter import SkyfieldEphemerisAdapter
+from terralab3d.infrastructure.adapters.ephemeris.spice_adapter import SpiceEphemerisAdapter
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,12 +48,11 @@ async def run() -> int:
     from terralab3d.infrastructure.server import TerraLabServer
     from terralab3d.infrastructure.websocket_bridge import WebSocketBridge
     from terralab3d.infrastructure.adapters.file_assets.moon_surface import ManagedMoonSurfaceAssets
-    from terralab3d.infrastructure.app_paths import seed_solar_system_planet_assets
+    from terralab3d.infrastructure.adapters.file_assets.solar_system import ManagedSolarSystemAssets
 
     # ── 1. Compilar frontend i inicialitzar assets de dades ───────────
     try:
         dist_dir = bundle_frontend()
-        seed_solar_system_planet_assets()
     except Exception as exc:
         log.error("La meva construcció del frontend ha fallat: %s", exc)
         return 1
@@ -59,7 +60,8 @@ async def run() -> int:
     # ── 2. Crear pont i servidor ──────────────────────────────────────
     bridge = WebSocketBridge()
     moon_surface_assets = ManagedMoonSurfaceAssets()
-    server = TerraLabServer(dist_dir, bridge, moon_surface_assets)
+    solar_system_assets = ManagedSolarSystemAssets()
+    server = TerraLabServer(dist_dir, bridge, moon_surface_assets, solar_system_assets)
 
     loop = asyncio.get_running_loop()
     shutdown_requested = asyncio.Event()
@@ -168,6 +170,8 @@ async def run() -> int:
         # Quan el frontend es connecta, enviem la ubicació inicial, iniciem estrelles, etc.
         await broadcast_location()
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
+        await bridge.send_planet_texture_manifest(solar_system_assets.descriptor)
+        await bridge.send_satellite_catalog_manifest(solar_system_assets.descriptor)
         await broadcast_time()
         # Iniciar la càrrega d'estrelles o re-enviar les existents si ja estan carregades (re-connexió F5)
         if not star_coordinator._started:
@@ -199,15 +203,107 @@ async def run() -> int:
         )
         return byte_count
 
-    ephemeris_adapter = SkyfieldEphemerisAdapter()
+    if (
+        solar_system_assets.kernel_manifest_path is not None
+        and solar_system_assets.satellite_catalog is not None
+    ):
+        try:
+            ephemeris_adapter = SpiceEphemerisAdapter(
+                solar_system_assets.kernel_manifest_path,
+                solar_system_assets.satellite_catalog,
+            )
+        except Exception as exc:
+            log.exception(
+                "MGP: [__main__.py] [ephemeris] "
+                "[SPICE unavailable; es conserva el fallback validat DE421: %s]",
+                exc,
+            )
+            ephemeris_adapter = SkyfieldEphemerisAdapter()
+    else:
+        ephemeris_adapter = SkyfieldEphemerisAdapter()
     ephemeris_coordinator = EphemerisCoordinator(ephemeris_adapter, publish_solar_system)
+    orbit_sampler = (
+        OrbitSampler(ephemeris_adapter)
+        if isinstance(ephemeris_adapter, SpiceEphemerisAdapter)
+        else None
+    )
     metadata = ephemeris_adapter.metadata
     log.info(
-        "Efemèride: kernel=%s skyfield=%s sha256=%s",
+        "Efemèride: provider=%s kernel=%s generation=%s sha256=%s",
+        metadata.provider,
         metadata.kernel_name or "fallback",
-        metadata.skyfield_version or "unavailable",
+        metadata.kernel_generation or metadata.skyfield_version or "unavailable",
         metadata.kernel_sha256 or "unavailable",
     )
+
+    async def _handle_set_satellite_systems(data: dict[str, Any]) -> None:
+        if not isinstance(ephemeris_adapter, SpiceEphemerisAdapter):
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "SPICE_UNAVAILABLE",
+                "message": "Els kernels de satèl·lits no estan disponibles",
+            })
+            return
+        try:
+            systems = data.get("systems", ())
+            if not isinstance(systems, list):
+                raise ValueError("systems must be a list")
+            ephemeris_adapter.set_satellite_systems(str(item) for item in systems)
+            ephemeris_coordinator.request(
+                sim_time_utc, scientific_observer(), observer_generation
+            )
+        except (TypeError, ValueError) as exc:
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "INVALID_SATELLITE_SYSTEMS",
+                "message": str(exc),
+            })
+
+    async def _handle_request_satellite_orbit(data: dict[str, Any]) -> None:
+        if orbit_sampler is None or not isinstance(ephemeris_adapter, SpiceEphemerisAdapter):
+            return
+        body_id = str(data.get("bodyId", ""))
+        definition = next(
+            (
+                item
+                for item in ephemeris_adapter.satellite_catalog.satellites
+                if item.body_id == body_id
+            ),
+            None,
+        )
+        if definition is None:
+            return
+        interval_days = max(0.01, min(3650.0, float(data.get("intervalDays", 30.0))))
+        sample_count = max(16, min(2048, int(data.get("sampleCount", 256))))
+        center_et = ephemeris_adapter.utc_to_et(sim_time_utc)
+        half_interval = interval_days * 43_200.0
+        start_et = max(
+            center_et - half_interval,
+            definition.coverage_start_et or center_et - half_interval,
+        )
+        end_et = min(
+            center_et + half_interval,
+            definition.coverage_end_et or center_et + half_interval,
+        )
+        geometry = await asyncio.to_thread(
+            orbit_sampler.sample,
+            definition,
+            start_et,
+            end_et,
+            sample_count,
+            metadata.kernel_generation or "unknown",
+        )
+        log.info(
+            "MGP: [OrbitSampler] [sample] [body=%s samples=%d duration_ms=%.3f cache_hits=%d]",
+            body_id,
+            sample_count,
+            orbit_sampler.last_sampling_duration_ms,
+            orbit_sampler.cache_hit_count,
+        )
+        await bridge.send_orbit_geometry(orbit_sampler.encode(geometry))
+
+    bridge.on("set_satellite_systems", _handle_set_satellite_systems)
+    bridge.on("request_satellite_orbit", _handle_request_satellite_orbit)
 
     def scientific_observer() -> ScientificObserver:
         return ScientificObserver(
@@ -464,15 +560,33 @@ async def _on_viewport_resized(data: dict[str, Any]) -> None:
 async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
     log.info(
         "Frontend metrics: frame_ms_p50=%.2f frame_ms_p95=%.2f samples=%d "
-        "entities=%d materials=%d snapshots=%d stale=%d bridge_bytes=%d",
+        "entities=%d geometries=%d materials=%d snapshots=%d stale=%d bridge_bytes=%d",
         data.get("frameMsP50", 0.0),
         data.get("frameMsP95", 0.0),
         data.get("frameSampleCount", 0),
         data.get("solarSystemEntityBuildCount", 0),
-        data.get("solarSystemMaterialBuildCount", 0),
+        data.get("solarBodyGeometryBuildCount", 0),
+        data.get(
+            "solarBodyMaterialBuildCount",
+            data.get("solarSystemMaterialBuildCount", 0),
+        ),
         data.get("solarSystemSnapshotApplyCount", 0),
         data.get("solarSystemStaleSnapshotCount", 0),
         data.get("solarSystemBridgeBytes", 0),
+    )
+    log.info(
+        "Solar 8.6 metrics: planet_texture_loads=%d texture_upload_bytes=%d "
+        "catalog=%d states=%d ring_geometry=%d ring_material=%d "
+        "orbit_geometry=%d orbit_bridge_bytes=%d gpu_estimate_bytes=%d",
+        data.get("planetTextureLoadCount", 0),
+        data.get("planetTextureUploadBytes", 0),
+        data.get("satelliteCatalogCount", 0),
+        data.get("satelliteStateCountPerTick", 0),
+        data.get("ringGeometryBuildCount", 0),
+        data.get("ringMaterialBuildCount", 0),
+        data.get("orbitGeometryBuildCount", 0),
+        data.get("orbitBridgeBytes", 0),
+        data.get("gpuMemoryEstimateBytes", 0),
     )
     log.info(
         "Moon metrics: geometry=%d material=%d albedo_loads=%d normal_loads=%d "

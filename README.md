@@ -57,11 +57,17 @@ La quantitat d’estrelles visibles s’adapta a les condicions d’observació 
 L’aplicació mostra la posició aparent dels principals objectes del sistema solar:
 
 * el Sol;
-* la Lluna;
-* els planetes;
-* satèl·lits artificials disponibles. -> Properament, si existeixen recursos
+* la Lluna amb superfície i libració físiques;
+* Mercuri, Venus, Mart, Júpiter, Saturn, Urà i Neptú texturitzats i orientats;
+* Plutó amb representació genèrica honesta quan no hi ha textura local;
+* els anells A/B/C i la divisió de Cassini, alineats amb l’equador real de Saturn;
+* el catàleg versionat dels 461 satèl·lits naturals planetaris coneguts a
+  2026-07-09, amb posicions SPK per als 459 que disposen de kernel oficial;
+* òrbites planetocèntriques mostrejades directament dels SPK.
 
 Les seves posicions s’actualitzen segons la ubicació, la data i l’hora seleccionades.
+Els recursos científics i les textures es resolen des de la biblioteca indicada
+per `data_location.json`; no es dupliquen dins del repositori.
 
 ### Horitzó i relleu
 
@@ -323,4 +329,5 @@ L’objectiu és reunir en una mateixa escena interactiva el territori, l’hori
 ## Crèdits i Llicències
 
 * **Textures dels planetes del Sistema Solar**: Les textures utilitzades per als planetes estan basades en dades d'elevació i imatges públiques de la NASA (misions MESSENGER, Viking, Cassini i Telescopi Espacial Hubble) ajustades per [Solar System Scope](https://www.solarsystemscope.com/textures/). Distribudes sota la llicència **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
-
+* **Efemèrides i orientació**: kernels oficials [NAIF/JPL](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/) i contrast numèric amb [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/).
+* **Catàleg de satèl·lits naturals**: [JPL Solar System Dynamics](https://ssd.jpl.nasa.gov/sats/discovery.html), snapshot 2026-07-09.

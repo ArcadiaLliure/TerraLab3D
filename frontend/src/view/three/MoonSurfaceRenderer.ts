@@ -1,5 +1,6 @@
 import * as THREE from "three";
 
+import type { SkyEnvironmentSnapshot } from "../../contracts/sky_environment_contracts";
 import type {
   MoonSurfaceAsset,
   MoonSurfaceResourceDescriptor,
@@ -12,6 +13,10 @@ import {
 
 const FALLBACK_COLOR = new THREE.Color(0xd8d8d2);
 const MIP_FACTOR = 4 / 3;
+/** Exact lunar night-side term restored from commit 439b9f6. */
+export const LUNAR_NIGHT_SIDE_VISIBILITY = 0.015;
+/** Cancels MeshLambertMaterial's 1/π BRDF to match the Pas 8 direct-light shader. */
+export const LUNAR_LAMBERT_LIGHT_INTENSITY = Math.PI;
 
 export type MoonTextureLoad = (
   url: string,
@@ -45,12 +50,15 @@ export class MoonSurfaceRenderer {
   /** Non-rendering centre used by the persistent Moon label. */
   readonly labelAnchor = new THREE.Object3D();
   /** Stable visual anchor for labels and for the non-data fallback. */
-  readonly mesh: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+  readonly mesh: THREE.Mesh<THREE.SphereGeometry, THREE.MeshLambertMaterial>;
 
   private readonly geometry: THREE.SphereGeometry;
-  private readonly fallbackMaterial: THREE.MeshBasicMaterial;
+  private readonly fallbackMaterial: THREE.MeshLambertMaterial;
   private readonly surfaceMaterial: THREE.MeshLambertMaterial;
   private readonly surfaceMesh: THREE.Mesh<THREE.SphereGeometry, THREE.MeshLambertMaterial>;
+  private readonly phaseLightDirection = { value: new THREE.Vector3(0, 0, 1) };
+  private readonly daylightVeil = { value: 0 };
+  private readonly daylightNeutral = { value: FALLBACK_COLOR.clone() };
   /** The only scene light allowed to affect the lunar surface. */
   private readonly sunLight: THREE.DirectionalLight;
   private readonly sunTarget: THREE.Object3D;
@@ -78,7 +86,7 @@ export class MoonSurfaceRenderer {
     this.surfaceCalibration.name = "moonSurfaceCalibration";
 
     this.geometry = new THREE.SphereGeometry(1, 96, 64);
-    this.fallbackMaterial = new THREE.MeshBasicMaterial({
+    this.fallbackMaterial = new THREE.MeshLambertMaterial({
       color: FALLBACK_COLOR,
       depthTest: true,
       depthWrite: false,
@@ -89,6 +97,18 @@ export class MoonSurfaceRenderer {
       depthWrite: false,
       normalScale: new THREE.Vector2(0.45, 0.45),
     });
+    restoreLunarAtmosphericVisibility(
+      this.fallbackMaterial,
+      this.phaseLightDirection,
+      this.daylightVeil,
+      this.daylightNeutral,
+    );
+    restoreLunarAtmosphericVisibility(
+      this.surfaceMaterial,
+      this.phaseLightDirection,
+      this.daylightVeil,
+      this.daylightNeutral,
+    );
     this.mesh = new THREE.Mesh(this.geometry, this.fallbackMaterial);
     this.mesh.name = "moonFallbackMesh";
     this.mesh.visible = false;
@@ -99,7 +119,10 @@ export class MoonSurfaceRenderer {
     this.surfaceMesh.visible = false;
     this.surfaceMesh.frustumCulled = false;
     this.surfaceMesh.renderOrder = -100;
-    this.sunLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    this.sunLight = new THREE.DirectionalLight(
+      0xffffff,
+      LUNAR_LAMBERT_LIGHT_INTENSITY,
+    );
     this.sunTarget = new THREE.Object3D();
     this.sunLight.target = this.sunTarget;
 
@@ -216,6 +239,7 @@ export class MoonSurfaceRenderer {
     // Three's directional light points from its target towards its position.
     // In the Moon-local frame that is precisely the Moon -> Sun vector.
     this.sunLight.position.copy(lightDirectionThree).normalize();
+    this.phaseLightDirection.value.copy(lightDirectionThree).normalize();
     this.sunTarget.position.set(0, 0, 0);
     this.bodyVisible = visible;
     this.mesh.userData.apparentState = moon;
@@ -227,6 +251,10 @@ export class MoonSurfaceRenderer {
   setSurfaceEnabled(enabled: boolean): void {
     this.surfaceEnabled = enabled;
     this.refreshVisuals();
+  }
+
+  updateEnvironment(snapshot: SkyEnvironmentSnapshot): void {
+    this.daylightVeil.value = lunarDaylightVeil(snapshot);
   }
 
   metrics(): MoonSurfaceRenderMetrics {
@@ -290,6 +318,81 @@ export class MoonSurfaceRenderer {
   }
 }
 
+/**
+ * Restores the Pas 8 visibility model verbatim: the physical atmosphere stays
+ * behind the Moon and becomes predominant through phase-dependent alpha.
+ * Surface colour and relief remain the responsibility of MeshLambertMaterial.
+ */
+function restoreLunarAtmosphericVisibility(
+  material: THREE.MeshLambertMaterial,
+  lightDirection: THREE.IUniform<THREE.Vector3>,
+  daylightVeil: THREE.IUniform<number>,
+  daylightNeutral: THREE.IUniform<THREE.Color>,
+): void {
+  material.transparent = true;
+  material.depthWrite = false;
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uMoonLightDirectionThree = lightDirection;
+    shader.uniforms.uMoonDaylightVeil = daylightVeil;
+    shader.uniforms.uMoonDaylightNeutral = daylightNeutral;
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        "#include <common>",
+        "#include <common>\nvarying vec3 vMoonNormalWorld;",
+      )
+      .replace(
+        "#include <normal_vertex>",
+        [
+          "#include <normal_vertex>",
+          "vMoonNormalWorld = normalize(mat3(modelMatrix) * normal);",
+        ].join("\n"),
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        "#include <common>",
+        [
+          "#include <common>",
+          "uniform vec3 uMoonLightDirectionThree;",
+          "uniform float uMoonDaylightVeil;",
+          "uniform vec3 uMoonDaylightNeutral;",
+          "varying vec3 vMoonNormalWorld;",
+        ].join("\n"),
+      )
+      .replace(
+        "#include <map_fragment>",
+        [
+          "#include <map_fragment>",
+          "diffuseColor.rgb = mix(diffuseColor.rgb, uMoonDaylightNeutral, uMoonDaylightVeil);",
+        ].join("\n"),
+      )
+      .replace(
+        "#include <opaque_fragment>",
+        [
+          "float moonDirectLight = max(dot(normalize(vMoonNormalWorld), normalize(uMoonLightDirectionThree)), 0.0);",
+          `diffuseColor.a *= clamp(moonDirectLight + ${LUNAR_NIGHT_SIDE_VISIBILITY}, 0.0, 1.0);`,
+          "#include <opaque_fragment>",
+        ].join("\n"),
+      );
+  };
+  material.customProgramCacheKey = () => "moon-pas8-atmospheric-daylight-v1";
+}
+
+export function lunarAtmosphericOpacity(directLight: number): number {
+  return Math.max(0, Math.min(1, directLight + LUNAR_NIGHT_SIDE_VISIBILITY));
+}
+
+export function lunarDaylightVeil(
+  environment: Pick<
+    SkyEnvironmentSnapshot,
+    "atmosphereEnabled" | "twilightFactor" | "horizonHaze"
+  >,
+): number {
+  if (!environment.atmosphereEnabled) return 0;
+  const daylight = Math.max(0, Math.min(1, 1 - environment.twilightFactor));
+  const haze = Math.max(0, Math.min(1, environment.horizonHaze));
+  return daylight * haze;
+}
+
 function selectAlbedo(
   resource: MoonSurfaceResourceDescriptor,
   maxTextureSize: number,
@@ -318,7 +421,11 @@ export function moonLightDirectionThree(
   moon: SolarSystemBodyState,
   fallback: THREE.Vector3,
 ): THREE.Vector3 {
-  const direction = moon.orientation?.moonToSunDirectionENU;
+  const direction = moon.orientation !== null
+    && moon.orientation !== undefined
+    && "moonToSunDirectionENU" in moon.orientation
+    ? moon.orientation.moonToSunDirectionENU
+    : null;
   return direction === null || direction === undefined
     ? fallback
     : threeFromEnu(direction).normalize();
@@ -328,7 +435,11 @@ export function moonLightDirectionThree(
 export function moonIlluminationFractionFromGeometry(
   moon: SolarSystemBodyState,
 ): number | null {
-  const direction = moon.orientation?.moonToSunDirectionENU;
+  const direction = moon.orientation !== null
+    && moon.orientation !== undefined
+    && "moonToSunDirectionENU" in moon.orientation
+    ? moon.orientation.moonToSunDirectionENU
+    : null;
   if (direction === null || direction === undefined) return null;
   const moonToObserver = threeFromEnu(moon.directionENU).normalize().negate();
   const moonToSun = threeFromEnu(direction).normalize();

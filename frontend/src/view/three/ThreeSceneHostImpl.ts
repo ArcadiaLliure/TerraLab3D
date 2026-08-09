@@ -193,6 +193,10 @@ export class ThreeSceneHostImpl {
     return this.solarSystemRenderer;
   }
 
+  getSolarSystemLabels(): SolarSystemLabels {
+    return this.solarSystemLabels;
+  }
+
   mount(container: HTMLElement): void {
     this.container = container;
     const rect = container.getBoundingClientRect();
@@ -244,6 +248,7 @@ export class ThreeSceneHostImpl {
 
     // ─── Phase 4: LOD update based on current FOV ────────────────────
     this.horizontalGrid.updateLOD(this.currentFovDeg);
+    this.solarSystemRenderer.updateCamera(this.currentFovDeg, this.renderer.domElement.clientHeight);
 
     // ─── Phase 4: Celestial equator update ───────────────────────────
     this.celestialEquator.update();

@@ -7,6 +7,8 @@
 import type { SkyEnvironmentSnapshot } from "./sky_environment_contracts";
 import type {
   MoonSurfaceResourceDescriptor,
+  PlanetTextureManifest,
+  SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "./solar_system_contracts";
 
@@ -76,6 +78,18 @@ export interface TimelineDragFinishedMessage {
 export interface RequestOffsetDayMessage {
   readonly type: "request_offset_day";
   readonly offsetDays: number;
+}
+
+export interface SetSatelliteSystemsMessage {
+  readonly type: "set_satellite_systems";
+  readonly systems: readonly string[];
+}
+
+export interface RequestSatelliteOrbitMessage {
+  readonly type: "request_satellite_orbit";
+  readonly bodyId: string;
+  readonly intervalDays: number;
+  readonly sampleCount: number;
 }
 
 // ─── Navigation messages (Phase 3.5) ─────────────────────────────────
@@ -159,10 +173,21 @@ export interface FrontendPerformanceMetricsMessage {
   readonly frameMsP95: number;
   readonly frameSampleCount: number;
   readonly solarSystemEntityBuildCount: number;
+  readonly solarBodyGeometryBuildCount: number;
+  readonly solarBodyMaterialBuildCount: number;
   readonly solarSystemMaterialBuildCount: number;
   readonly solarSystemSnapshotApplyCount: number;
   readonly solarSystemStaleSnapshotCount: number;
   readonly solarSystemBridgeBytes: number;
+  readonly planetTextureLoadCount: number;
+  readonly planetTextureUploadBytes: number;
+  readonly satelliteCatalogCount: number;
+  readonly satelliteStateCountPerTick: number;
+  readonly ringGeometryBuildCount: number;
+  readonly ringMaterialBuildCount: number;
+  readonly orbitGeometryBuildCount: number;
+  readonly orbitBridgeBytes: number;
+  readonly gpuMemoryEstimateBytes: number;
   readonly moonGeometryBuildCount: number;
   readonly moonMaterialBuildCount: number;
   readonly moonAlbedoTextureLoadCount: number;
@@ -190,6 +215,8 @@ export type FrontendMessage =
   | TimelineDragStartedMessage
   | TimelineDragFinishedMessage
   | RequestOffsetDayMessage
+  | SetSatelliteSystemsMessage
+  | RequestSatelliteOrbitMessage
   | NavigationModeChangedMessage
   | CameraPoseChangedMessage
   | CameraMotionStartedMessage
@@ -308,6 +335,14 @@ export interface MoonSurfaceResourceMessage extends MoonSurfaceResourceDescripto
   readonly type: "moon_surface_resource";
 }
 
+export interface PlanetTextureManifestMessage extends PlanetTextureManifest {
+  readonly type: "planet_texture_manifest";
+}
+
+export interface SolarSystemCatalogManifestMessage extends SatelliteCatalogManifest {
+  readonly type: "solar_system_catalog_manifest";
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
@@ -321,7 +356,9 @@ export type BackendMessage =
   | StarPickResolvedMessage
   | SkyEnvironmentSnapshotMessage
   | SolarSystemSnapshotMessage
-  | MoonSurfaceResourceMessage;
+  | MoonSurfaceResourceMessage
+  | PlanetTextureManifestMessage
+  | SolarSystemCatalogManifestMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

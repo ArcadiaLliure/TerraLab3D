@@ -42,6 +42,7 @@ class EphemerisCoordinator:
         self.last_bridge_bytes = 0
         self._compute_ms: deque[float] = deque(maxlen=256)
         self._lunar_orientation_compute_ms: deque[float] = deque(maxlen=256)
+        self._orientation_batch_compute_ms: deque[float] = deque(maxlen=256)
 
     def request(
         self,
@@ -93,6 +94,19 @@ class EphemerisCoordinator:
             "lunar_orientation_compute_ms_p95": _percentile(
                 sorted(self._lunar_orientation_compute_ms), 0.95
             ),
+            "orientation_batch_duration_ms_p50": _percentile(
+                sorted(self._orientation_batch_compute_ms), 0.50
+            ),
+            "orientation_batch_duration_ms_p95": _percentile(
+                sorted(self._orientation_batch_compute_ms), 0.95
+            ),
+            "spice_query_count": getattr(self._port, "query_count", 0),
+            "spice_query_duration_ms": getattr(
+                self._port, "last_query_duration_ms", 0.0
+            ),
+            "orientation_query_count": getattr(
+                self._port, "orientation_query_count", 0
+            ),
             "moon_kernel_load_count": getattr(
                 self._port, "lunar_orientation_kernel_load_count", 0
             ),
@@ -117,6 +131,12 @@ class EphemerisCoordinator:
                 self._compute_ms.append(snapshot.compute_ms)
                 if snapshot.moon is not None and snapshot.moon.orientation is not None:
                     self._lunar_orientation_compute_ms.append(snapshot.moon.orientation.compute_ms)
+                orientation_times = [
+                    item.orientation.compute_ms
+                    for item in (snapshot.planets + snapshot.satellites)
+                    if item.orientation is not None
+                ]
+                self._orientation_batch_compute_ms.append(sum(orientation_times))
                 if self._closed:
                     break
                 published = snapshot.with_generation(

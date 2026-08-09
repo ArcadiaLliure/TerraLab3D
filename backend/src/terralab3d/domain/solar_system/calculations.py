@@ -181,6 +181,89 @@ def moon_apparent_magnitude(
     )
 
 
+def planet_apparent_magnitude(
+    naif_id: int,
+    sun_distance_au: float,
+    observer_distance_au: float,
+    phase_angle_deg: float,
+    *,
+    ring_opening_sun_deg: float = 0.0,
+    ring_opening_observer_deg: float = 0.0,
+    decimal_year: float = 2000.0,
+) -> float | None:
+    """Mallama/Hilton visual models already used by the Step 8 stack.
+
+    Static textures never enter this calculation. Saturn's ring term receives
+    diagnostic physical opening angles, while bodies without a validated model
+    return ``None`` instead of a fabricated magnitude.
+    """
+
+    r = max(sun_distance_au, 1e-12)
+    delta = max(observer_distance_au, 1e-12)
+    phase = max(0.0, min(180.0, phase_angle_deg))
+    distance_factor = 5.0 * math.log10(r * delta)
+    if naif_id == 199:
+        p = phase
+        phase_factor = (
+            6.3280e-2 * p
+            - 1.6336e-3 * p**2
+            + 3.3644e-5 * p**3
+            - 3.4265e-7 * p**4
+            + 1.6893e-9 * p**5
+            - 3.0334e-12 * p**6
+        )
+        return -0.613 + distance_factor + phase_factor
+    if naif_id == 299:
+        if phase < 163.7:
+            phase_factor = (
+                -1.044e-3 * phase
+                + 3.687e-4 * phase**2
+                - 2.814e-6 * phase**3
+                + 8.938e-9 * phase**4
+            )
+        else:
+            phase_factor = 240.44228 - 2.81914 * phase + 8.39034e-3 * phase**2
+        return -4.384 + distance_factor + phase_factor
+    if naif_id == 499:
+        if phase <= 50.0:
+            return -1.601 + distance_factor + 2.267e-2 * phase - 1.302e-4 * phase**2
+        return -0.367 + distance_factor - 0.02573 * phase + 0.0003445 * phase**2
+    if naif_id == 599:
+        if phase <= 12.0:
+            return -9.395 + distance_factor + (6.16e-4 * phase - 3.7e-4) * phase
+        phase_pi = phase / 180.0
+        brightness = (
+            ((((-1.876 * phase_pi + 2.809) * phase_pi - 0.062) * phase_pi - 0.363)
+              * phase_pi - 1.507) * phase_pi + 1.0
+        )
+        return -9.428 + distance_factor - 2.5 * math.log10(max(brightness, 1e-12))
+    if naif_id == 699:
+        product = ring_opening_sun_deg * ring_opening_observer_deg
+        effective_opening = math.sqrt(product) if product >= 0.0 else 0.0
+        if phase > 6.5 or effective_opening > 27.0:
+            return None
+        opening_rad = math.radians(effective_opening)
+        ring_term = (
+            -1.825 * math.sin(opening_rad)
+            + 0.026 * phase
+            - 0.378 * math.sin(opening_rad) * math.exp(-2.25 * phase)
+        )
+        return -8.914 + distance_factor + ring_term
+    if naif_id == 799:
+        average_sub_latitude = (
+            abs(ring_opening_sun_deg) + abs(ring_opening_observer_deg)
+        ) * 0.5
+        phase_term = (1.045e-4 * phase + 6.587e-3) * phase if phase > 3.1 else 0.0
+        return -7.110 + distance_factor - 0.00084 * average_sub_latitude + phase_term
+    if naif_id == 899:
+        base = max(-7.00, min(-6.89, -6.89 - 0.0054 * (decimal_year - 1980.0)))
+        phase_term = 7.944e-3 * phase + 9.617e-5 * phase**2 if phase > 1.9 else 0.0
+        return base + distance_factor + phase_term
+    if naif_id == 999:
+        return -0.7 + distance_factor + 0.041 * phase
+    return None
+
+
 def analytical_sun_state(
     utc: datetime,
     observer: ScientificObserver,

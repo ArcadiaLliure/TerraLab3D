@@ -20,7 +20,6 @@ from __future__ import annotations
 import json
 import logging
 import os
-import shutil
 import sys
 from pathlib import Path
 
@@ -95,27 +94,3 @@ def resolve_solar_system_planets_dir() -> Path:
     planets_dir = root / "data" / "sky" / "solar-system" / "planets"
     planets_dir.mkdir(parents=True, exist_ok=True)
     return planets_dir
-
-
-def seed_solar_system_planet_assets() -> Path:
-    """Sincronitza les meves meves textures de planetes del frontend cap a la biblioteca de dades de l'usuari."""
-    planets_dir = resolve_solar_system_planets_dir()
-    frontend_public_planets = (
-        Path(__file__).resolve().parents[4]
-        / "frontend"
-        / "public"
-        / "assets"
-        / "textures"
-        / "planets"
-    )
-
-    if frontend_public_planets.exists():
-        for asset in frontend_public_planets.iterdir():
-            if asset.is_file():
-                dest_file = planets_dir / asset.name
-                if not dest_file.exists() or dest_file.stat().st_size != asset.stat().st_size:
-                    shutil.copy2(asset, dest_file)
-                    log.info("MGP: [app_paths] [seed_planets] Copiat %s -> %s", asset.name, dest_file)
-
-    return planets_dir
-

@@ -1,5 +1,6 @@
 import * as THREE from "three";
 
+import type { SkyEnvironmentSnapshot } from "../contracts/sky_environment_contracts";
 import type {
   LunarOrientationState,
   MoonSurfaceResourceDescriptor,
@@ -13,6 +14,10 @@ import {
   SolarSystemRenderer,
 } from "../view/three/SolarSystemRenderer";
 import {
+  LUNAR_LAMBERT_LIGHT_INTENSITY,
+  LUNAR_NIGHT_SIDE_VISIBILITY,
+  lunarAtmosphericOpacity,
+  lunarDaylightVeil,
   moonIlluminationFractionFromGeometry,
   moonLightDirectionThree,
 } from "../view/three/MoonSurfaceRenderer";
@@ -116,6 +121,38 @@ function moonResource(): MoonSurfaceResourceDescriptor {
   };
 }
 
+function skyEnvironment(
+  twilightFactor: number,
+  atmosphereEnabled = true,
+  horizonHaze = 0.3,
+): SkyEnvironmentSnapshot {
+  return {
+    generation: 1,
+    solarSystemGeneration: 1,
+    sunAltitudeDeg: twilightFactor === 0 ? 20 : -20,
+    sunAzimuthDeg: 180,
+    sunDirectionENU: [0, 1, 0],
+    twilightPhase: twilightFactor === 0 ? "day" : "night",
+    twilightFactor,
+    atmosphereEnabled,
+    turbidity: 2.5,
+    horizonHaze,
+    lightPollutionEnabled: true,
+    lightPollutionMode: "bortle",
+    lightPollutionSource: "manual_bortle",
+    bortleClass: 4,
+    sqmZenith: 20.5,
+    configuredMagnitudeLimit: 6,
+    visibility: {
+      zenithMagnitudeLimit: 6,
+      extinctionCoefficient: 0.25,
+      twilightSuppression: 0,
+      fadeWidthMag: 0.75,
+      skyBrightnessNormalized: 1 - twilightFactor,
+    },
+  };
+}
+
 function snapshot(
   generation: number,
   timestampUtc: string,
@@ -149,9 +186,9 @@ assert(PLANET_PRESENTATIONS.mars.cssColor === "#ff7350", "Mars tag uses its char
 const parent = new THREE.Group();
 const renderer = new SolarSystemRenderer(parent);
 assert(parent.children.includes(renderer.root), "persistent root is attached once");
-assert(renderer.metrics().entityBuildCount === 9, "nine persistent entities are built");
-assert(renderer.metrics().geometryBuildCount === 2, "one shared body geometry and one lunar surface geometry are built");
-assert(renderer.metrics().materialBuildCount === 10, "Moon keeps independent textured and fallback materials");
+assert(renderer.metrics().entityBuildCount === 10, "Sun, Moon and eight persistent planetary entities are built");
+assert(renderer.metrics().geometryBuildCount === 4, "shared bodies, Moon, Saturn rings and satellite batch are built once");
+assert(renderer.metrics().materialBuildCount === 13, "persistent body, ring and satellite materials are built once");
 
 assert(renderer.updateSnapshot(snapshot(1, "2024-01-01T00:00:00Z"), 2048, 1_000), "first snapshot accepted");
 assert(renderer.getBodyObject("sun")?.visible === true, "sun above horizon is visible");
@@ -199,9 +236,9 @@ assert(phaseLightDirectionThree(quarter, sunWest).x < -0.99, "bright limb revers
 for (let generation = 7; generation < 107; generation++) {
   renderer.updateSnapshot(snapshot(generation, `2024-01-01T00:00:${String(generation % 60).padStart(2, "0")}Z`), 1000, generation * 1000);
 }
-assert(renderer.metrics().entityBuildCount === 9, "timeline updates do not rebuild entities");
-assert(renderer.metrics().geometryBuildCount === 2, "timeline updates do not rebuild geometry");
-assert(renderer.metrics().materialBuildCount === 10, "timeline updates do not rebuild materials");
+assert(renderer.metrics().entityBuildCount === 10, "timeline updates do not rebuild entities");
+assert(renderer.metrics().geometryBuildCount === 4, "timeline updates do not rebuild geometry");
+assert(renderer.metrics().materialBuildCount === 13, "timeline updates do not rebuild materials");
 
 renderer.dispose();
 assert(!parent.children.includes(renderer.root), "dispose detaches the root");
@@ -235,10 +272,62 @@ assert(
   texturedRenderer.getLabelAnchor("moon")?.visible === true,
   "the Moon label stays anchored while its visual layer changes",
 );
+const activeMoonObject = texturedRenderer.getPickableBodies()
+  .find((candidate) => candidate.id === "moon")?.object as THREE.Mesh;
+const activeMoonMaterial = activeMoonObject.material as THREE.MeshLambertMaterial;
+assert(
+  activeMoonMaterial.transparent
+    && !activeMoonMaterial.depthWrite
+    && activeMoonMaterial.emissive.getHex() === 0x000000
+    && activeMoonMaterial.color.getHex() === 0xffffff
+    && activeMoonMaterial.customProgramCacheKey() === "moon-pas8-atmospheric-daylight-v1",
+  "the LRO material restores the Pas 8 atmospheric phase transparency without fill light",
+);
+near(
+  lunarAtmosphericOpacity(0),
+  LUNAR_NIGHT_SIDE_VISIBILITY,
+  1e-12,
+  "the lunar night side restores the exact 0.015 visibility from commit 439b9f6",
+);
+near(lunarAtmosphericOpacity(0.5), 0.515, 1e-12, "phase alpha preserves the Pas 8 direct-light formula");
+near(lunarAtmosphericOpacity(1), 1, 1e-12, "phase alpha is clamped at full illumination");
+near(lunarDaylightVeil(skyEnvironment(0)), 0.3, 1e-12, "daylight haze whitens the lunar albedo");
+near(lunarDaylightVeil(skyEnvironment(1)), 0, 1e-12, "night preserves the unmodified LRO albedo");
+near(lunarDaylightVeil(skyEnvironment(0, false)), 0, 1e-12, "disabled atmosphere adds no lunar veil");
+const shaderProbe = {
+  uniforms: {},
+  vertexShader: "#include <common>\n#include <normal_vertex>",
+  fragmentShader: "#include <common>\n#include <opaque_fragment>",
+};
+activeMoonMaterial.onBeforeCompile(
+  shaderProbe as Parameters<typeof activeMoonMaterial.onBeforeCompile>[0],
+  {} as THREE.WebGLRenderer,
+);
+assert(
+  shaderProbe.fragmentShader.includes("moonDirectLight + 0.015")
+    && shaderProbe.fragmentShader.includes("uMoonDaylightNeutral"),
+  "the compiled lunar material contains phase alpha and the daylight neutral veil",
+);
+const shaderUniforms = shaderProbe.uniforms as Record<string, THREE.IUniform<unknown>>;
+texturedRenderer.updateEnvironment(skyEnvironment(0));
+near(
+  shaderUniforms.uMoonDaylightVeil?.value as number,
+  0.3,
+  1e-12,
+  "the authoritative sky snapshot reaches the persistent lunar material",
+);
 const uploadBytes = texturedRenderer.metrics().moon.textureUploadBytes;
 assert(uploadBytes > 0, "estimated persistent GPU upload bytes are recorded");
 
 const moonMesh = texturedRenderer.getBodyObject("moon")!;
+const moonLight = moonMesh.parent?.parent?.parent?.children
+  .find((child): child is THREE.DirectionalLight => child instanceof THREE.DirectionalLight);
+near(
+  moonLight?.intensity ?? 0,
+  LUNAR_LAMBERT_LIGHT_INTENSITY,
+  1e-12,
+  "lunar Lambert light restores the Pas 8 unit diffuse response instead of losing 1/π",
+);
 const calibration = moonMesh.parent!;
 const bodyXAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(calibration.quaternion);
 const bodyNorth = new THREE.Vector3(0, 1, 0).applyQuaternion(calibration.quaternion);
@@ -298,7 +387,43 @@ near(
   1e-12,
   "geometric Moon terminator preserves the ephemeris illumination fraction",
 );
-
+let completePhaseSweepIsCorrect = true;
+for (let phaseAngleDeg = 0; phaseAngleDeg <= 180; phaseAngleDeg++) {
+  const phaseAngleRad = THREE.MathUtils.degToRad(phaseAngleDeg);
+  const expectedIllumination = (1 + Math.cos(phaseAngleRad)) / 2;
+  for (const limbDirection of [-1, 1] as const) {
+    const phaseMoon = {
+      ...body("moon", [0, 0, 1]),
+      orientation: {
+        ...lunarOrientation(),
+        moonToSunDirectionENU: [
+          limbDirection * Math.sin(phaseAngleRad),
+          0,
+          -Math.cos(phaseAngleRad),
+        ] as const,
+      },
+    };
+    const actualIllumination = moonIlluminationFractionFromGeometry(phaseMoon);
+    const actualLightDirection = moonLightDirectionThree(
+      phaseMoon,
+      new THREE.Vector3(7, 8, 9),
+    );
+    const expectedLightDirection = new THREE.Vector3(
+      limbDirection * Math.sin(phaseAngleRad),
+      0,
+      Math.cos(phaseAngleRad),
+    );
+    if (
+      actualIllumination === null
+      || Math.abs(actualIllumination - expectedIllumination) > 1e-12
+      || actualLightDirection.distanceTo(expectedLightDirection) > 1e-12
+    ) completePhaseSweepIsCorrect = false;
+  }
+}
+assert(
+  completePhaseSweepIsCorrect,
+  "all lunar phases from 0° to 180° preserve illumination for both limb directions",
+);
 texturedRenderer.dispose();
 assert(disposedTextures === loadedTextures.length, "shutdown disposes every loaded Moon texture");
 

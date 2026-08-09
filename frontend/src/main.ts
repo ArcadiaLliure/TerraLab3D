@@ -68,6 +68,27 @@ function main(): void {
   const atmosphereRenderer = new AtmosphereRenderer(sceneHost.getCelestialRoot());
   // Default to true, SkyPage will manage this later
   atmosphereRenderer.setPureColors(false);
+  let enabledSatelliteSystems: readonly string[] = [];
+  let satelliteOrbitsVisible = false;
+  const representativeOrbitBody: Readonly<Record<string, { bodyId: string; intervalDays: number }[]>> = {
+    mars: [{ bodyId: "naif-401", intervalDays: 0.4 }, { bodyId: "naif-402", intervalDays: 1.5 }],
+    jupiter: [{ bodyId: "naif-501", intervalDays: 2 }, { bodyId: "naif-502", intervalDays: 4 }, { bodyId: "naif-503", intervalDays: 7 }, { bodyId: "naif-504", intervalDays: 17 }],
+    saturn: [{ bodyId: "naif-606", intervalDays: 16 }, { bodyId: "naif-605", intervalDays: 5 }, { bodyId: "naif-604", intervalDays: 3 }, { bodyId: "naif-608", intervalDays: 80 }],
+    uranus: [{ bodyId: "naif-703", intervalDays: 9 }, { bodyId: "naif-704", intervalDays: 14 }],
+    neptune: [{ bodyId: "naif-801", intervalDays: 6 }],
+    pluto: [{ bodyId: "naif-901", intervalDays: 7 }],
+  };
+  const requestRepresentativeOrbits = () => {
+    if (!satelliteOrbitsVisible) return;
+    for (const system of enabledSatelliteSystems) {
+      const orbits = representativeOrbitBody[system];
+      if (orbits !== undefined) {
+        for (const orbit of orbits) {
+          bridge.requestSatelliteOrbit(orbit.bodyId, orbit.intervalDays);
+        }
+      }
+    }
+  };
 
   // 2. Prepare UI pages
   const locationPage = new LocationPage({
@@ -98,9 +119,24 @@ function main(): void {
     onPureColorsToggled: (pure) => atmosphereRenderer.setPureColors(pure),
     onSolarSystemVisibilityChanged: (part, visible) => {
       sceneHost.getSolarSystemRenderer().setVisibility(part, visible);
+      if (part === "orbits") {
+        satelliteOrbitsVisible = visible;
+        requestRepresentativeOrbits();
+      }
     },
     onMoonSurfaceToggled: (enabled) => {
       sceneHost.getSolarSystemRenderer().setMoonSurfaceEnabled(enabled);
+    },
+    onSatelliteSystemsChanged: (systems) => {
+      enabledSatelliteSystems = [...systems];
+      bridge.setSatelliteSystems(systems);
+      requestRepresentativeOrbits();
+    },
+    onSatelliteLodChanged: (mode) => {
+      sceneHost.getSolarSystemRenderer().setSatelliteLodMode(mode);
+    },
+    onSatelliteLabelsToggled: (enabled) => {
+      sceneHost.getSolarSystemLabels().setSatelliteLabelsEnabled(enabled);
     },
   });
   const skyContainer = shell.getPageContainer("sky");
@@ -246,13 +282,15 @@ function main(): void {
       sceneHost.getStarFieldRenderer().updateCelestialTransform(generation, matrix3x3);
       celestialTransformState.update(generation, matrix3x3 as number[]);
     },
-    onStarResourceReady(metadata, bufferPayload) {
-      sceneHost.getStarFieldRenderer().registerBinaryResource(metadata, bufferPayload);
-      const resId = metadata.resourceId as string;
-      const entry = sceneHost.getStarFieldRenderer().getResource(resId);
-      if (entry) {
-        starPickProvider.buildIndex(resId, entry);
+    onBinaryResourceReady(metadata, bufferPayload) {
+      if (metadata.role === "solar_system_orbit") {
+        sceneHost.getSolarSystemRenderer().registerOrbitResource(metadata, bufferPayload);
+        return;
       }
+      sceneHost.getStarFieldRenderer().registerBinaryResource(metadata, bufferPayload);
+      const resourceId = metadata.resourceId as string;
+      const entry = sceneHost.getStarFieldRenderer().getResource(resourceId);
+      if (entry) starPickProvider.buildIndex(resourceId, entry);
     },
     onStarPickResolved(msg) {
       pickingController.handleResolveResponse(msg as any);
@@ -278,6 +316,17 @@ function main(): void {
         sceneHost.renderer.capabilities.maxTextureSize,
       );
       skyPage.updateMoonSurfaceResource(resource, moonMetrics.selectedResource);
+    },
+    onPlanetTextureManifest(manifest) {
+      sceneHost.getSolarSystemRenderer().configurePlanetTextures(
+        manifest,
+        sceneHost.renderer.capabilities.maxTextureSize,
+      );
+    },
+    onSolarSystemCatalogManifest(manifest) {
+      sceneHost.getSolarSystemRenderer().configureSatelliteCatalog(manifest);
+      sceneHost.getSolarSystemLabels().configureSatelliteCatalog(manifest);
+      skyPage.updateSatelliteCatalog(manifest);
     },
     onShutdownRequested() {
       renderLoop.stop();
@@ -337,10 +386,25 @@ function main(): void {
         frameMsP95: frames.p95Ms,
         frameSampleCount: frames.sampleCount,
         solarSystemEntityBuildCount: solar.entityBuildCount,
+        solarBodyGeometryBuildCount: solar.geometryBuildCount,
+        solarBodyMaterialBuildCount: solar.materialBuildCount,
         solarSystemMaterialBuildCount: solar.materialBuildCount,
         solarSystemSnapshotApplyCount: solar.snapshotApplyCount,
         solarSystemStaleSnapshotCount: solar.staleSnapshotCount,
         solarSystemBridgeBytes: solar.lastBridgeBytes,
+        planetTextureLoadCount: solar.planetTextureLoadCount,
+        planetTextureUploadBytes: solar.planetTextureUploadBytes,
+        satelliteCatalogCount: solar.satellites.catalogCount,
+        satelliteStateCountPerTick: solar.satellites.stateCount,
+        ringGeometryBuildCount: solar.rings.geometryBuildCount,
+        ringMaterialBuildCount: solar.rings.materialBuildCount,
+        orbitGeometryBuildCount: solar.orbits.geometryBuildCount,
+        orbitBridgeBytes: solar.orbits.bridgeBytes,
+        gpuMemoryEstimateBytes: solar.planetTextureUploadBytes
+          + solar.moon.textureUploadBytes
+          + solar.rings.textureUploadBytes
+          + solar.satellites.catalogCount * 3 * Float32Array.BYTES_PER_ELEMENT * 2
+          + solar.orbits.bridgeBytes,
         moonGeometryBuildCount: solar.moon.geometryBuildCount,
         moonMaterialBuildCount: solar.moon.materialBuildCount,
         moonAlbedoTextureLoadCount: solar.moon.albedoTextureLoadCount,

@@ -605,7 +605,24 @@ export class CameraRigImpl implements CameraRig {
     e.preventDefault();
     this.animating = false;
     const factor = e.deltaY > 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
-    this.zoomTo(this.hFovDeg * factor);
+    const oldHFov = this.hFovDeg;
+    const newHFov = clamp(this.hFovDeg * factor, MIN_FOV, MAX_FOV);
+    
+    if (newHFov === oldHFov || !this.container) return;
+
+    const rect = this.container.getBoundingClientRect();
+    const dx = e.clientX - rect.left - rect.width / 2;
+    const dy = rect.top + rect.height / 2 - e.clientY;
+    
+    const aspect = this.camera.aspect || 1;
+    const oldVFov = hFovToVFov(oldHFov, aspect);
+    const newVFov = hFovToVFov(newHFov, aspect);
+    
+    const deltaAz = -(dx / rect.width) * (oldHFov - newHFov);
+    const deltaAlt = (dy / rect.height) * (oldVFov - newVFov);
+    
+    this.orbit(deltaAz, deltaAlt);
+    this.zoomTo(newHFov);
   }
 
   private onKeyDown(e: KeyboardEvent): void {

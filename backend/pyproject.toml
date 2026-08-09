@@ -11,6 +11,7 @@ dependencies = [
     "aiohttp>=3.9",
     "skyfield==1.55",
     "skyfield-data==7.0.0",
+    "spiceypy==7.0.0",
 ]
 
 [tool.setuptools]
