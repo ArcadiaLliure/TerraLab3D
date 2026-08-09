@@ -17,6 +17,7 @@
  *   │   ├── horizon
  *   │   ├── ground
  *   │   └── localReferenceObjects (from NavigationWorld)
+ *   ├── lightingRoot   (persistent local-world Sun, Moon and diffuse sky)
  *   └── cameraRig / camera (managed by CameraRigImpl)
  *
  * Phase 4 additions:
@@ -34,6 +35,8 @@ import { CelestialEquator } from "./CelestialEquator";
 import { StarFieldRenderer } from "./StarFieldRenderer";
 import { SolarSystemRenderer } from "./SolarSystemRenderer";
 import { SolarSystemLabels } from "./SolarSystemLabels";
+import { SceneLightingController } from "./lighting/SceneLightingController";
+import { applyRendererColorPolicy } from "./rendererColorPolicy";
 
 const LOG_PREFIX = "MGP: [ThreeSceneHost]";
 
@@ -59,6 +62,7 @@ export class ThreeSceneHostImpl {
   // ─── Scene tree roots ──────────────────────────────────────────────
   private readonly celestialRoot: THREE.Group;
   private readonly worldRoot: THREE.Group;
+  private readonly lightingController: SceneLightingController;
 
   // ─── Phase 4 components ────────────────────────────────────────────
   private readonly horizontalGrid: HorizontalGrid;
@@ -125,6 +129,8 @@ export class ThreeSceneHostImpl {
     // Renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
+    applyRendererColorPolicy(this.renderer);
+    this.lightingController = new SceneLightingController(this.scene, this.renderer);
 
     // ─── Phase 5: Star Field Renderer ────────────────────────────────
     this.starFieldRenderer = new StarFieldRenderer();
@@ -197,6 +203,10 @@ export class ThreeSceneHostImpl {
     return this.solarSystemLabels;
   }
 
+  getLightingController(): SceneLightingController {
+    return this.lightingController;
+  }
+
   mount(container: HTMLElement): void {
     this.container = container;
     const rect = container.getBoundingClientRect();
@@ -219,6 +229,7 @@ export class ThreeSceneHostImpl {
 
     this.solarSystemRenderer.update(timestampMs);
     this.starFieldRenderer.interpolate(timestampMs);
+    this.lightingController.update(timestampMs, this.camera.position);
 
     // ─── Celestial rotation (legacy LST sphere) ──────────────────────
     const diff = this.targetLstRad - this.currentLstRad;
@@ -355,6 +366,7 @@ export class ThreeSceneHostImpl {
     this.celestialEquator.dispose();
     this.starFieldRenderer.dispose();
     this.solarSystemRenderer.dispose();
+    this.lightingController.dispose();
 
     this.scene.traverse((obj) => {
       if (

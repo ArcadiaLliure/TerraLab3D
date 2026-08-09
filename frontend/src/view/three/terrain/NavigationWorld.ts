@@ -15,6 +15,7 @@ import * as THREE from "three";
 import type { TerrainSampler } from "../../../contracts/TerrainSampler";
 import type { NavigationEnvelope, NavigationReadiness } from "../../../contracts/navigation";
 import { TechnicalTerrainSampler } from "./TechnicalTerrainSampler";
+import { PBRMaterialPolicy } from "../materials/PBRMaterialPolicy";
 
 const TERRAIN_SIZE = 500;        // ±500m → 1000×1000m total
 const TERRAIN_SEGMENTS = 128;    // 128×128 grid
@@ -25,6 +26,7 @@ const LOG_PREFIX = "MGP: [NavigationWorld]";
 
 export class NavigationWorld {
   private readonly sampler: TechnicalTerrainSampler;
+  private readonly materialPolicy = new PBRMaterialPolicy();
   private terrainMesh: THREE.Mesh | null = null;
   private terrainGroup: THREE.Group;
   private referenceObjects: THREE.Group;
@@ -57,6 +59,12 @@ export class NavigationWorld {
   /** Returns the TerrainSampler interface — consumers never see the concrete class. */
   getTerrainSampler(): TerrainSampler {
     return this.sampler;
+  }
+
+  metrics(): { readonly pbrMaterialBuildCount: number } {
+    return {
+      pbrMaterialBuildCount: this.materialPolicy.metrics().materialBuildCount,
+    };
   }
 
   /**
@@ -131,21 +139,11 @@ export class NavigationWorld {
     this.terrainGroup.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
         obj.geometry.dispose();
-        if (Array.isArray(obj.material)) {
-          obj.material.forEach((m) => m.dispose());
-        } else {
-          obj.material.dispose();
-        }
       }
     });
     this.referenceObjects.traverse((obj) => {
       if (obj instanceof THREE.Mesh) {
         obj.geometry.dispose();
-        if (Array.isArray(obj.material)) {
-          obj.material.forEach((m) => m.dispose());
-        } else {
-          obj.material.dispose();
-        }
       }
     });
     if (this.boundsIndicator) {
@@ -156,6 +154,7 @@ export class NavigationWorld {
     this.terrainGroup.removeFromParent();
     this.referenceObjects.removeFromParent();
     this.boundsIndicator?.removeFromParent();
+    this.materialPolicy.dispose();
   }
 
   // ─── Private: Terrain ──────────────────────────────────────────────
@@ -187,15 +186,7 @@ export class NavigationWorld {
 
     geo.computeVertexNormals();
 
-    // The celestial renderer owns its Sun light.  A scene-level ambient or
-    // directional light also illuminates the Moon and breaks its calculated
-    // phase, so the local navigation terrain intentionally stays unlit.
-    const mat = new THREE.MeshBasicMaterial({
-      color: 0x1a2a20,
-      side: THREE.DoubleSide,
-    });
-
-    this.terrainMesh = new THREE.Mesh(geo, mat);
+    this.terrainMesh = new THREE.Mesh(geo, this.materialPolicy.terrain);
     this.terrainMesh.name = "technical_terrain_mesh";
     this.terrainMesh.receiveShadow = true;
 
@@ -244,12 +235,8 @@ export class NavigationWorld {
   // ─── Private: Reference Objects ────────────────────────────────────
 
   private buildReferenceObjects(): void {
-    const cubeMat = new THREE.MeshBasicMaterial({
-      color: 0x4488aa,
-    });
-    const columnMat = new THREE.MeshBasicMaterial({
-      color: 0xcc8844,
-    });
+    const cubeMat = this.materialPolicy.referenceBlue;
+    const columnMat = this.materialPolicy.referenceOrange;
 
     // Near objects (10–30m)
     this.addCube(8, 0, -15, 1.5, cubeMat);
@@ -278,6 +265,7 @@ export class NavigationWorld {
     const groundH = this.terrainHeight(eastM, northM);
     const geo = new THREE.BoxGeometry(size, size, size);
     const mesh = new THREE.Mesh(geo, material);
+    mesh.name = "localReferenceCube";
     mesh.position.set(eastM, groundH + size / 2, zThree);
     mesh.castShadow = true;
     this.referenceObjects.add(mesh);
@@ -294,6 +282,7 @@ export class NavigationWorld {
     const groundH = this.terrainHeight(eastM, northM);
     const geo = new THREE.CylinderGeometry(radius, radius, height, 12);
     const mesh = new THREE.Mesh(geo, material);
+    mesh.name = "localReferenceColumn";
     mesh.position.set(eastM, groundH + height / 2, zThree);
     mesh.castShadow = true;
     this.referenceObjects.add(mesh);

@@ -144,7 +144,7 @@ export class SolarSystemLabels {
         isVisible = this.solarSystemRenderer.isPlanetLabelVisible(id as PlanetBodyId, state);
       }
 
-      if (!isVisible || object === undefined || state === undefined) {
+      if (!isVisible || object === undefined || state === undefined || !this.solarSystemRenderer.isBodyVisuallyObservable(state)) {
         this.hide(label);
         continue;
       }
@@ -260,7 +260,8 @@ function naifIdToPlanetId(naifId: number): PlanetBodyId | "sun" | "moon" | undef
     case 10: return "sun";
     case 199: return "mercury";
     case 299: return "venus";
-    case 399: return "earth";
+    // Earth is the observer/world root, not a rendered celestial label anchor.
+    case 399: return undefined;
     case 301: return "moon";
     case 499: return "mars";
     case 599: return "jupiter";

@@ -138,6 +138,9 @@ function main(): void {
     onSatelliteLabelsToggled: (enabled) => {
       sceneHost.getSolarSystemLabels().setSatelliteLabelsEnabled(enabled);
     },
+    onShadowQualityChanged: (quality) => {
+      sceneHost.getLightingController().setShadowQuality(quality);
+    },
   });
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
@@ -210,6 +213,7 @@ function main(): void {
 
   // 3. Phase 3.5: Prepare navigation world and wire terrain dependencies
   navigationWorld.prepare(sceneHost.getWorldRoot());
+  sceneHost.getLightingController().invalidateShadowGeometry();
   sceneHost.setNavigationWorld(navigationWorld);
   const terrainSampler = navigationWorld.getTerrainSampler();
   cameraRig.setTerrainDependencies(terrainSampler, groundFollower);
@@ -310,6 +314,12 @@ function main(): void {
       skyPage.updateSolarSystem(snapshot);
       diagnostics.updateSolarSystem(snapshot, sceneHost.getSolarSystemRenderer().metrics());
     },
+    onLightingEnvironmentSnapshot(snapshot) {
+      const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
+      sceneHost.getLightingController().applySnapshot(snapshot, bridgeBytes);
+      atmosphereRenderer.updateLighting(snapshot);
+      diagnostics.updateLighting(snapshot, sceneHost.getLightingController().metrics());
+    },
     onMoonSurfaceResource(resource) {
       const moonMetrics = sceneHost.getSolarSystemRenderer().configureMoonSurface(
         resource,
@@ -381,6 +391,9 @@ function main(): void {
       performanceUpdateAccum = 0;
       const frames = renderLoop.frameMetrics;
       const solar = sceneHost.getSolarSystemRenderer().metrics();
+      const lighting = sceneHost.getLightingController().metrics();
+      const navigation = navigationWorld.metrics();
+      const rendererInfo = sceneHost.renderer.info;
       bridge.sendPerformanceMetrics({
         frameMsP50: frames.p50Ms,
         frameMsP95: frames.p95Ms,
@@ -411,6 +424,25 @@ function main(): void {
         moonNormalTextureLoadCount: solar.moon.normalTextureLoadCount,
         moonTextureUploadBytes: solar.moon.textureUploadBytes,
         moonBridgeTextureBytes: solar.moon.bridgeTextureBytes,
+        sunLightBuildCount: lighting.sunLightBuildCount,
+        moonLightBuildCount: lighting.moonLightBuildCount,
+        diffuseLightBuildCount: lighting.diffuseLightBuildCount,
+        pbrMaterialBuildCount: navigation.pbrMaterialBuildCount,
+        sunShadowUpdateCount: lighting.shadow.sunShadowUpdateCount,
+        moonShadowUpdateCount: lighting.shadow.moonShadowUpdateCount,
+        lightingSnapshotCount: lighting.snapshotApplyCount,
+        lightingStaleCount: lighting.staleSnapshotCount,
+        lightingBridgeBytes: lighting.lastBridgeBytes,
+        rendererRenderCalls: rendererInfo.render.calls,
+        rendererMemoryGeometries: rendererInfo.memory.geometries,
+        rendererMemoryTextures: rendererInfo.memory.textures,
+        shadowMapEstimateBytes: lighting.shadow.shadowMapEstimateBytes,
+        shadowOffFrameMsP50: lighting.shadow.timings.off.p50Ms,
+        shadowOffFrameMsP95: lighting.shadow.timings.off.p95Ms,
+        shadowMediumFrameMsP50: lighting.shadow.timings.medium.p50Ms,
+        shadowMediumFrameMsP95: lighting.shadow.timings.medium.p95Ms,
+        shadowHighFrameMsP50: lighting.shadow.timings.high.p50Ms,
+        shadowHighFrameMsP95: lighting.shadow.timings.high.p95Ms,
       });
     }
 

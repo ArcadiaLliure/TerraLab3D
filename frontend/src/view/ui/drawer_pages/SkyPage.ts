@@ -21,6 +21,7 @@ export interface SkyPageOptions {
   onSatelliteSystemsChanged?: (systems: readonly string[]) => void;
   onSatelliteLodChanged?: (mode: "auto" | "faithful" | "diagnostic") => void;
   onSatelliteLabelsToggled?: (enabled: boolean) => void;
+  onShadowQualityChanged?: (quality: "off" | "low" | "medium" | "high") => void;
 }
 
 export class SkyPage {
@@ -252,6 +253,27 @@ export class SkyPage {
     pureRow.appendChild(this.pureColorsToggleBtn);
     
     group.appendChild(pureRow);
+
+    const shadowRow = document.createElement("div");
+    shadowRow.style.cssText = "display:flex;justify-content:space-between;align-items:center;font-size:10px;";
+    const shadowText = document.createElement("span");
+    shadowText.textContent = "Ombres locals";
+    const shadowSelect = document.createElement("select");
+    shadowSelect.style.cssText = "background:var(--color-surface);color:var(--color-text-bright);border:1px solid var(--color-border);border-radius:4px;padding:2px 4px;font-size:10px;";
+    for (const [value, label] of [
+      ["off", "Off"], ["low", "Baixa"], ["medium", "Mitjana"], ["high", "Alta"],
+    ] as const) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      shadowSelect.appendChild(option);
+    }
+    shadowSelect.value = "medium";
+    shadowSelect.onchange = () => this.options.onShadowQualityChanged?.(
+      shadowSelect.value as "off" | "low" | "medium" | "high",
+    );
+    shadowRow.append(shadowText, shadowSelect);
+    group.appendChild(shadowRow);
     this.element.appendChild(group);
   }
 

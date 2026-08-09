@@ -38,6 +38,7 @@ class WebSocketBridge:
         self._shutdown_event = asyncio.Event()
         self._binary_bytes_sent = 0
         self._solar_system_bridge_bytes = 0
+        self._lighting_bridge_bytes = 0
 
     @property
     def connected(self) -> bool:
@@ -59,6 +60,10 @@ class WebSocketBridge:
     @property
     def solar_system_bridge_bytes(self) -> int:
         return self._solar_system_bridge_bytes
+
+    @property
+    def lighting_bridge_bytes(self) -> int:
+        return self._lighting_bridge_bytes
 
     def on(self, msg_type: str, handler: MessageHandler) -> None:
         """Registra un manegador per a un tipus de missatge específic."""
@@ -267,6 +272,16 @@ class WebSocketBridge:
         payload["type"] = "solar_system_snapshot"
         byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
         self._solar_system_bridge_bytes = byte_count
+        await self.send(payload)
+        return byte_count
+
+    async def send_lighting_environment_snapshot(self, snapshot: Any) -> int:
+        """Send the compact Step 8.7 DTO; it never contains GPU assets."""
+
+        payload = snapshot.to_dict()
+        payload["type"] = "lighting_environment_snapshot"
+        byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+        self._lighting_bridge_bytes = byte_count
         await self.send(payload)
         return byte_count
 

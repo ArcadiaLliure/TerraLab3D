@@ -12,35 +12,26 @@ void main() {
 export const skyFragmentShader = `
 uniform vec3 u_sunDirectionENU;
 uniform float u_sunAltitudeDeg;
+uniform vec3 u_moonDirectionENU;
+uniform float u_moonAltitudeDeg;
+uniform vec3 u_moonColorLinear;
+uniform float u_moonIntensity;
 uniform float u_twilightFactor;
 uniform float u_turbidity;
 uniform float u_bortleClass;
 uniform float u_artificialBrightness;
 uniform bool u_atmosphereEnabled;
 uniform bool u_pureColors;
+uniform vec3 u_zenithColorLinear;
+uniform vec3 u_horizonColorLinear;
+uniform vec3 u_groundColorLinear;
 
 varying vec3 vViewRay;
 
 const float PI = 3.14159265359;
 
-// Colors físics aproximats (calibrats amb TerraLab sky_color_phys)
-const vec3 COLOR_DAY_ZENITH = vec3(0.15, 0.35, 0.70);
-const vec3 COLOR_DAY_HORIZON = vec3(0.55, 0.65, 0.75);
-
-const vec3 COLOR_SUNSET_ZENITH = vec3(0.1, 0.2, 0.5);
-const vec3 COLOR_SUNSET_HORIZON = vec3(0.9, 0.4, 0.1);
-
-const vec3 COLOR_CIVIL_ZENITH = vec3(0.05, 0.1, 0.25);
-const vec3 COLOR_CIVIL_HORIZON = vec3(0.4, 0.15, 0.1);
-
-const vec3 COLOR_NAUTICAL_ZENITH = vec3(0.01, 0.02, 0.05);
-const vec3 COLOR_NAUTICAL_HORIZON = vec3(0.05, 0.05, 0.1);
-
-const vec3 COLOR_NIGHT_ZENITH = vec3(0.0, 0.0, 0.0);
-const vec3 COLOR_NIGHT_HORIZON = vec3(0.0, 0.0, 0.0);
-
-const vec3 COLOR_LP_GLOW = vec3(0.55, 0.51, 0.43); // 140, 130, 110 (warm yellow/brown)
-const vec3 COLOR_GROUND = vec3(0.01, 0.01, 0.01);
+// sRGB (0.55, 0.51, 0.43) decoded once to linear-sRGB.
+const vec3 COLOR_LP_GLOW = vec3(0.2633, 0.2232, 0.1559);
 
 void main() {
     vec3 viewDir = normalize(vViewRay);
@@ -57,38 +48,17 @@ void main() {
         return;
     }
     
-    // 1. COLORS BASE (Interpolació per altitud solar)
-    vec3 zenithColor = vec3(0.0);
-    vec3 horizonColor = vec3(0.0);
-    
-    if (u_sunAltitudeDeg >= 6.0) {
-        zenithColor = COLOR_DAY_ZENITH;
-        horizonColor = COLOR_DAY_HORIZON;
-    } else if (u_sunAltitudeDeg >= 0.0) {
-        float t = u_sunAltitudeDeg / 6.0;
-        zenithColor = mix(COLOR_SUNSET_ZENITH, COLOR_DAY_ZENITH, t);
-        horizonColor = mix(COLOR_SUNSET_HORIZON, COLOR_DAY_HORIZON, t);
-    } else if (u_sunAltitudeDeg >= -6.0) {
-        float t = (u_sunAltitudeDeg + 6.0) / 6.0;
-        zenithColor = mix(COLOR_CIVIL_ZENITH, COLOR_SUNSET_ZENITH, t);
-        horizonColor = mix(COLOR_CIVIL_HORIZON, COLOR_SUNSET_HORIZON, t);
-    } else if (u_sunAltitudeDeg >= -12.0) {
-        float t = (u_sunAltitudeDeg + 12.0) / 6.0;
-        zenithColor = mix(COLOR_NAUTICAL_ZENITH, COLOR_CIVIL_ZENITH, t);
-        horizonColor = mix(COLOR_NAUTICAL_HORIZON, COLOR_CIVIL_HORIZON, t);
-    } else if (u_sunAltitudeDeg >= -18.0) {
-        float t = (u_sunAltitudeDeg + 18.0) / 6.0;
-        zenithColor = mix(COLOR_NIGHT_ZENITH, COLOR_NAUTICAL_ZENITH, t);
-        horizonColor = mix(COLOR_NIGHT_HORIZON, COLOR_NAUTICAL_HORIZON, t);
-    } else {
-        zenithColor = COLOR_NIGHT_ZENITH;
-        horizonColor = COLOR_NIGHT_HORIZON;
-    }
-    
+    // 1. PALETA COMPARTIDA — resolta una vegada al snapshot del Pas 7.
+    vec3 zenithColor = u_zenithColorLinear;
+    vec3 horizonColor = u_horizonColorLinear;
+
     // 2. MIX HORITZÓ - ZENIT (per a la vista actual)
     // El gradient va ràpid a prop de l'horitzó i és estable amunt
     float zenithBlend = clamp(pow(max(0.0, viewDir.y), 0.5), 0.0, 1.0);
     vec3 skyColor = mix(horizonColor, zenithColor, zenithBlend);
+    if (viewDir.y < 0.0) {
+        skyColor = mix(horizonColor, u_groundColorLinear, clamp(-viewDir.y * 4.0, 0.0, 1.0));
+    }
     
     // 3. GLOW SOLAR (Scattering)
     float gamma = acos(clamp(dot(viewDir, u_sunDirectionENU), -1.0, 1.0));
@@ -102,8 +72,48 @@ void main() {
         // Ampliat per terbolesa
         glowFactor *= min(1.0, u_turbidity * 0.5);
         
-        vec3 glowColor = mix(vec3(1.0, 0.8, 0.4), vec3(1.0, 1.0, 0.9), sunIntensity);
+        // Constants are linear-sRGB equivalents of the established sRGB
+        // scattering colours, so output encoding does not brighten them twice.
+        vec3 glowColor = mix(
+            vec3(1.0, 0.6038, 0.1329),
+            vec3(1.0, 1.0, 0.7874),
+            sunIntensity
+        );
         skyColor += glowColor * glowFactor * sunIntensity * 0.5;
+    }
+
+    // 3b. AURÈOLA SOLAR ATMOSFÈRICA (Mie, sense lens flare)
+    // Dues escales angulars donen un nucli compacte i una dispersió exterior
+    // suau. La terbolesa amplia l'aurèola; el Sol sota l'horitzó no la dibuixa.
+    float sunAboveHorizon = smoothstep(-0.833, 1.5, u_sunAltitudeDeg);
+    float haze = clamp((u_turbidity - 1.0) / 9.0, 0.0, 1.0);
+    float innerWidthRad = mix(0.018, 0.040, haze);
+    float outerWidthRad = mix(0.055, 0.120, haze);
+    float innerAureole = exp(-gamma / innerWidthRad);
+    float outerAureole = exp(-gamma / outerWidthRad);
+    float lowSunWarmth = 1.0 - smoothstep(3.0, 25.0, u_sunAltitudeDeg);
+    vec3 solarHaloColor = mix(
+        vec3(1.0, 0.6383, 0.2957),
+        vec3(1.0, 0.1195, 0.0072),
+        lowSunWarmth
+    );
+    float solarHalo = sunAboveHorizon
+        * (innerAureole * mix(0.72, 0.92, haze)
+            + outerAureole * mix(0.10, 0.22, haze));
+    skyColor += solarHaloColor * solarHalo;
+    
+    // 3c. AURÈOLA LUNAR ATMOSFÈRICA (Mie)
+    if (u_moonIntensity > 0.0) {
+        float moonGamma = acos(clamp(dot(viewDir, u_moonDirectionENU), -1.0, 1.0));
+        float moonAboveHorizon = smoothstep(-0.833, 1.5, u_moonAltitudeDeg);
+        float moonInnerAureole = exp(-moonGamma / innerWidthRad);
+        float moonOuterAureole = exp(-moonGamma / outerWidthRad);
+        
+        float moonHalo = moonAboveHorizon 
+            * (moonInnerAureole * mix(0.72, 0.92, haze) 
+               + moonOuterAureole * mix(0.10, 0.22, haze));
+        
+        skyColor += u_moonColorLinear * moonHalo * u_moonIntensity * 1.5;
     }
     
     // 4. CONTAMINACIÓ LUMÍNICA (Bortle Glow)
@@ -130,7 +140,39 @@ void main() {
     
     // Clamp final i alpha 1.0
     gl_FragColor = vec4(clamp(skyColor, 0.0, 1.0), 1.0);
-    
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
 
 }
 `;
+
+/** CPU mirror of the shader's scalar halo profile for deterministic QA. */
+export function solarAtmosphericHaloStrength(
+  angularSeparationDeg: number,
+  sunAltitudeDeg: number,
+  turbidity: number,
+): number {
+  if (![angularSeparationDeg, sunAltitudeDeg, turbidity].every(Number.isFinite)) return 0;
+  const gamma = Math.max(0, angularSeparationDeg) * Math.PI / 180;
+  const aboveHorizon = smoothstep(-0.833, 1.5, sunAltitudeDeg);
+  const haze = clamp01((turbidity - 1) / 9);
+  const innerWidth = lerp(0.018, 0.040, haze);
+  const outerWidth = lerp(0.055, 0.120, haze);
+  return aboveHorizon * (
+    Math.exp(-gamma / innerWidth) * lerp(0.72, 0.92, haze)
+    + Math.exp(-gamma / outerWidth) * lerp(0.10, 0.22, haze)
+  );
+}
+
+function smoothstep(edge0: number, edge1: number, value: number): number {
+  const t = clamp01((value - edge0) / (edge1 - edge0));
+  return t * t * (3 - 2 * t);
+}
+
+function lerp(start: number, end: number, fraction: number): number {
+  return start + (end - start) * fraction;
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}

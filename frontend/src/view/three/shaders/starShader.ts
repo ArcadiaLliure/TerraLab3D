@@ -134,5 +134,7 @@ export const STAR_FRAGMENT_SHADER = /* glsl */ `
     }
 
     gl_FragColor = vec4(finalColor, finalAlpha * vAlpha);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;

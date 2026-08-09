@@ -29,6 +29,7 @@ from terralab3d.domain.time.models import ClockMode, SimulationInstant, ClockSta
 from terralab3d.domain.sky_background.sky_environment import SkyEnvironmentComposer
 from terralab3d.domain.light_pollution.models import LightPollutionMode
 from terralab3d.domain.solar_system.models import ScientificObserver, SolarSystemSnapshot
+from terralab3d.domain.lighting.environment import LightingEnvironmentComposer
 from terralab3d.application.ephemeris_coordinator import EphemerisCoordinator
 from terralab3d.application.orbit_sampler import OrbitSampler
 from terralab3d.infrastructure.adapters.ephemeris.adapter import SkyfieldEphemerisAdapter
@@ -186,6 +187,7 @@ async def run() -> int:
     # ── 3.2. Lògica de Temps (Fase 3) i Cel (Fase 7) ─────────────────
     engine = AstronomicalEngine()
     sky_composer = SkyEnvironmentComposer()
+    lighting_composer = LightingEnvironmentComposer()
     sim_time_utc = datetime.now(timezone.utc)
     is_realtime = True
     is_time_playing = True
@@ -194,12 +196,14 @@ async def run() -> int:
     latest_solar_system: SolarSystemSnapshot | None = None
 
     async def publish_solar_system(snapshot: SolarSystemSnapshot) -> int:
-        """Publish one coherent Sun to both the body renderer and atmosphere."""
+        """Publish one coherent science state to bodies, sky and local lighting."""
         nonlocal latest_solar_system
         latest_solar_system = snapshot
         byte_count = await bridge.send_solar_system_snapshot(snapshot)
-        await bridge.send_sky_environment_snapshot(
-            sky_composer.compose(snapshot.sun, snapshot.generation)
+        sky = sky_composer.compose(snapshot.sun, snapshot.generation)
+        await bridge.send_sky_environment_snapshot(sky)
+        await bridge.send_lighting_environment_snapshot(
+            lighting_composer.compose(sky, snapshot)
         )
         return byte_count
 
@@ -314,11 +318,13 @@ async def run() -> int:
 
     async def broadcast_sky_environment() -> None:
         if bridge.connected and latest_solar_system is not None:
-            await bridge.send_sky_environment_snapshot(
-                sky_composer.compose(
-                    latest_solar_system.sun,
-                    latest_solar_system.generation,
-                )
+            sky = sky_composer.compose(
+                latest_solar_system.sun,
+                latest_solar_system.generation,
+            )
+            await bridge.send_sky_environment_snapshot(sky)
+            await bridge.send_lighting_environment_snapshot(
+                lighting_composer.compose(sky, latest_solar_system)
             )
 
     async def broadcast_time() -> None:
@@ -597,6 +603,35 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("moonNormalTextureLoadCount", 0),
         data.get("moonTextureUploadBytes", 0),
         data.get("moonBridgeTextureBytes", 0),
+    )
+    log.info(
+        "Lighting 8.7 metrics: sun_build=%d moon_build=%d diffuse_build=%d "
+        "pbr_materials=%d snapshots=%d stale=%d bridge_bytes=%d "
+        "sun_shadow_updates=%d moon_shadow_updates=%d shadow_bytes=%d "
+        "renderer_calls=%d renderer_geometries=%d renderer_textures=%d",
+        data.get("sunLightBuildCount", 0),
+        data.get("moonLightBuildCount", 0),
+        data.get("diffuseLightBuildCount", 0),
+        data.get("pbrMaterialBuildCount", 0),
+        data.get("lightingSnapshotCount", 0),
+        data.get("lightingStaleCount", 0),
+        data.get("lightingBridgeBytes", 0),
+        data.get("sunShadowUpdateCount", 0),
+        data.get("moonShadowUpdateCount", 0),
+        data.get("shadowMapEstimateBytes", 0),
+        data.get("rendererRenderCalls", 0),
+        data.get("rendererMemoryGeometries", 0),
+        data.get("rendererMemoryTextures", 0),
+    )
+    log.info(
+        "Shadow timings: off_p50=%.2f off_p95=%.2f "
+        "medium_p50=%.2f medium_p95=%.2f high_p50=%.2f high_p95=%.2f",
+        data.get("shadowOffFrameMsP50", 0.0),
+        data.get("shadowOffFrameMsP95", 0.0),
+        data.get("shadowMediumFrameMsP50", 0.0),
+        data.get("shadowMediumFrameMsP95", 0.0),
+        data.get("shadowHighFrameMsP50", 0.0),
+        data.get("shadowHighFrameMsP95", 0.0),
     )
 
 

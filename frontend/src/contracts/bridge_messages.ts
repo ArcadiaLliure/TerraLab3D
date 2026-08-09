@@ -5,6 +5,7 @@
  */
 
 import type { SkyEnvironmentSnapshot } from "./sky_environment_contracts";
+import type { LightingEnvironmentSnapshot } from "./lighting_environment_contracts";
 import type {
   MoonSurfaceResourceDescriptor,
   PlanetTextureManifest,
@@ -194,6 +195,25 @@ export interface FrontendPerformanceMetricsMessage {
   readonly moonNormalTextureLoadCount: number;
   readonly moonTextureUploadBytes: number;
   readonly moonBridgeTextureBytes: 0;
+  readonly sunLightBuildCount: number;
+  readonly moonLightBuildCount: number;
+  readonly diffuseLightBuildCount: number;
+  readonly pbrMaterialBuildCount: number;
+  readonly sunShadowUpdateCount: number;
+  readonly moonShadowUpdateCount: number;
+  readonly lightingSnapshotCount: number;
+  readonly lightingStaleCount: number;
+  readonly lightingBridgeBytes: number;
+  readonly rendererRenderCalls: number;
+  readonly rendererMemoryGeometries: number;
+  readonly rendererMemoryTextures: number;
+  readonly shadowMapEstimateBytes: number;
+  readonly shadowOffFrameMsP50: number;
+  readonly shadowOffFrameMsP95: number;
+  readonly shadowMediumFrameMsP50: number;
+  readonly shadowMediumFrameMsP95: number;
+  readonly shadowHighFrameMsP50: number;
+  readonly shadowHighFrameMsP95: number;
 }
 
 export interface SetTimeRateMessage {
@@ -331,6 +351,10 @@ export interface SolarSystemSnapshotMessage extends SolarSystemSnapshot {
   readonly type: "solar_system_snapshot";
 }
 
+export interface LightingEnvironmentSnapshotMessage extends LightingEnvironmentSnapshot {
+  readonly type: "lighting_environment_snapshot";
+}
+
 export interface MoonSurfaceResourceMessage extends MoonSurfaceResourceDescriptor {
   readonly type: "moon_surface_resource";
 }
@@ -356,6 +380,7 @@ export type BackendMessage =
   | StarPickResolvedMessage
   | SkyEnvironmentSnapshotMessage
   | SolarSystemSnapshotMessage
+  | LightingEnvironmentSnapshotMessage
   | MoonSurfaceResourceMessage
   | PlanetTextureManifestMessage
   | SolarSystemCatalogManifestMessage;

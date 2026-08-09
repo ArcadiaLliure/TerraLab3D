@@ -39,4 +39,11 @@ export interface SkyEnvironmentSnapshot {
   
   // Computed visibility parameters
   readonly visibility: SkyVisibilityState;
+
+  // Shared linear-sRGB palette: authoritative input for both sky rendering
+  // and the renderer-side diffuse-light approximation.
+  readonly zenithColorLinear: readonly [number, number, number];
+  readonly horizonColorLinear: readonly [number, number, number];
+  readonly groundColorLinear: readonly [number, number, number];
+  readonly skyDiffuseIntensity: number;
 }

@@ -14,7 +14,7 @@ import {
   SolarSystemRenderer,
 } from "../view/three/SolarSystemRenderer";
 import {
-  LUNAR_LAMBERT_LIGHT_INTENSITY,
+  LUNAR_INDEPENDENT_LIGHTING_CACHE_KEY,
   LUNAR_NIGHT_SIDE_VISIBILITY,
   lunarAtmosphericOpacity,
   lunarDaylightVeil,
@@ -150,6 +150,10 @@ function skyEnvironment(
       fadeWidthMag: 0.75,
       skyBrightnessNormalized: 1 - twilightFactor,
     },
+    zenithColorLinear: [0.02, 0.1, 0.4],
+    horizonColorLinear: [0.25, 0.35, 0.5],
+    groundColorLinear: [0.001, 0.001, 0.001],
+    skyDiffuseIntensity: atmosphereEnabled ? 0.5 : 0,
   };
 }
 
@@ -280,7 +284,7 @@ assert(
     && !activeMoonMaterial.depthWrite
     && activeMoonMaterial.emissive.getHex() === 0x000000
     && activeMoonMaterial.color.getHex() === 0xffffff
-    && activeMoonMaterial.customProgramCacheKey() === "moon-pas8-atmospheric-daylight-v1",
+    && activeMoonMaterial.customProgramCacheKey() === LUNAR_INDEPENDENT_LIGHTING_CACHE_KEY,
   "the LRO material restores the Pas 8 atmospheric phase transparency without fill light",
 );
 near(
@@ -297,7 +301,15 @@ near(lunarDaylightVeil(skyEnvironment(0, false)), 0, 1e-12, "disabled atmosphere
 const shaderProbe = {
   uniforms: {},
   vertexShader: "#include <common>\n#include <normal_vertex>",
-  fragmentShader: "#include <common>\n#include <opaque_fragment>",
+  fragmentShader: [
+    "#include <common>",
+    "#include <map_fragment>",
+    "#include <lights_lambert_fragment>",
+    "#include <lights_fragment_begin>",
+    "#include <lights_fragment_maps>",
+    "#include <lights_fragment_end>",
+    "#include <opaque_fragment>",
+  ].join("\n"),
 };
 activeMoonMaterial.onBeforeCompile(
   shaderProbe as Parameters<typeof activeMoonMaterial.onBeforeCompile>[0],
@@ -305,8 +317,10 @@ activeMoonMaterial.onBeforeCompile(
 );
 assert(
   shaderProbe.fragmentShader.includes("moonDirectLight + 0.015")
-    && shaderProbe.fragmentShader.includes("uMoonDaylightNeutral"),
-  "the compiled lunar material contains phase alpha and the daylight neutral veil",
+    && shaderProbe.fragmentShader.includes("uMoonDaylightNeutral")
+    && shaderProbe.fragmentShader.includes("Independent Moon -> Sun lighting")
+    && !shaderProbe.fragmentShader.includes("<lights_fragment_begin>"),
+  "the compiled lunar material keeps atmospheric alpha and ignores all scene-light accumulation",
 );
 const shaderUniforms = shaderProbe.uniforms as Record<string, THREE.IUniform<unknown>>;
 texturedRenderer.updateEnvironment(skyEnvironment(0));
@@ -320,13 +334,9 @@ const uploadBytes = texturedRenderer.metrics().moon.textureUploadBytes;
 assert(uploadBytes > 0, "estimated persistent GPU upload bytes are recorded");
 
 const moonMesh = texturedRenderer.getBodyObject("moon")!;
-const moonLight = moonMesh.parent?.parent?.parent?.children
-  .find((child): child is THREE.DirectionalLight => child instanceof THREE.DirectionalLight);
-near(
-  moonLight?.intensity ?? 0,
-  LUNAR_LAMBERT_LIGHT_INTENSITY,
-  1e-12,
-  "lunar Lambert light restores the Pas 8 unit diffuse response instead of losing 1/π",
+assert(
+  moonMesh.parent?.parent?.parent?.getObjectByProperty("isLight", true) === undefined,
+  "the Moon subtree owns no Three.js light and cannot leak Body→Sun light onto terrain",
 );
 const calibration = moonMesh.parent!;
 const bodyXAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(calibration.quaternion);

@@ -15,8 +15,7 @@ const FALLBACK_COLOR = new THREE.Color(0xd8d8d2);
 const MIP_FACTOR = 4 / 3;
 /** Exact lunar night-side term restored from commit 439b9f6. */
 export const LUNAR_NIGHT_SIDE_VISIBILITY = 0.015;
-/** Cancels MeshLambertMaterial's 1/π BRDF to match the Pas 8 direct-light shader. */
-export const LUNAR_LAMBERT_LIGHT_INTENSITY = Math.PI;
+export const LUNAR_INDEPENDENT_LIGHTING_CACHE_KEY = "moon-pas8-atmospheric-independent-v2";
 
 export type MoonTextureLoad = (
   url: string,
@@ -59,9 +58,6 @@ export class MoonSurfaceRenderer {
   private readonly phaseLightDirection = { value: new THREE.Vector3(0, 0, 1) };
   private readonly daylightVeil = { value: 0 };
   private readonly daylightNeutral = { value: FALLBACK_COLOR.clone() };
-  /** The only scene light allowed to affect the lunar surface. */
-  private readonly sunLight: THREE.DirectionalLight;
-  private readonly sunTarget: THREE.Object3D;
   private readonly loadTexture: MoonTextureLoad;
   private albedo: THREE.Texture | null = null;
   private normalMap: THREE.Texture | null = null;
@@ -119,13 +115,6 @@ export class MoonSurfaceRenderer {
     this.surfaceMesh.visible = false;
     this.surfaceMesh.frustumCulled = false;
     this.surfaceMesh.renderOrder = -100;
-    this.sunLight = new THREE.DirectionalLight(
-      0xffffff,
-      LUNAR_LAMBERT_LIGHT_INTENSITY,
-    );
-    this.sunTarget = new THREE.Object3D();
-    this.sunLight.target = this.sunTarget;
-
     // Fixed dataset/UV calibration only: mesh Y is lunar north (+Z body),
     // and increasing U maps to east-positive lunar longitude (+Y body).
     this.surfaceCalibration.quaternion.setFromAxisAngle(
@@ -134,7 +123,7 @@ export class MoonSurfaceRenderer {
     );
     this.surfaceCalibration.add(this.mesh, this.surfaceMesh);
     this.bodyRoot.add(this.surfaceCalibration);
-    this.root.add(this.bodyRoot, this.sunLight, this.sunTarget, this.labelAnchor);
+    this.root.add(this.bodyRoot, this.labelAnchor);
 
     parent.add(this.root);
   }
@@ -236,11 +225,7 @@ export class MoonSurfaceRenderer {
     } else {
       this.bodyRoot.quaternion.identity();
     }
-    // Three's directional light points from its target towards its position.
-    // In the Moon-local frame that is precisely the Moon -> Sun vector.
-    this.sunLight.position.copy(lightDirectionThree).normalize();
     this.phaseLightDirection.value.copy(lightDirectionThree).normalize();
-    this.sunTarget.position.set(0, 0, 0);
     this.bodyVisible = visible;
     this.mesh.userData.apparentState = moon;
     this.surfaceMesh.userData.apparentState = moon;
@@ -321,7 +306,10 @@ export class MoonSurfaceRenderer {
 /**
  * Restores the Pas 8 visibility model verbatim: the physical atmosphere stays
  * behind the Moon and becomes predominant through phase-dependent alpha.
- * Surface colour and relief remain the responsibility of MeshLambertMaterial.
+ * Surface colour and relief remain the responsibility of MeshLambertMaterial,
+ * but its light accumulation is replaced completely. This preserves the normal
+ * map while guaranteeing that scene-global Sun/Moon/sky lights cannot change
+ * the lunar phase, terminator or atmospheric night-side transparency.
  */
 function restoreLunarAtmosphericVisibility(
   material: THREE.MeshLambertMaterial,
@@ -366,6 +354,19 @@ function restoreLunarAtmosphericVisibility(
         ].join("\n"),
       )
       .replace(
+        "#include <lights_lambert_fragment>",
+        [
+          "// Independent Moon -> Sun lighting: never consume scene lights.",
+          "vec3 moonLightDirectionView = normalize(mat3(viewMatrix) * uMoonLightDirectionThree);",
+          "float moonSurfaceDirect = max(dot(normal, moonLightDirectionView), 0.0);",
+          "reflectedLight.directDiffuse = diffuseColor.rgb * moonSurfaceDirect;",
+          "reflectedLight.indirectDiffuse = vec3(0.0);",
+        ].join("\n"),
+      )
+      .replace("#include <lights_fragment_begin>", "")
+      .replace("#include <lights_fragment_maps>", "")
+      .replace("#include <lights_fragment_end>", "")
+      .replace(
         "#include <opaque_fragment>",
         [
           "float moonDirectLight = max(dot(normalize(vMoonNormalWorld), normalize(uMoonLightDirectionThree)), 0.0);",
@@ -374,7 +375,7 @@ function restoreLunarAtmosphericVisibility(
         ].join("\n"),
       );
   };
-  material.customProgramCacheKey = () => "moon-pas8-atmospheric-daylight-v1";
+  material.customProgramCacheKey = () => LUNAR_INDEPENDENT_LIGHTING_CACHE_KEY;
 }
 
 export function lunarAtmosphericOpacity(directLight: number): number {

@@ -351,6 +351,13 @@ export class SolarSystemRenderer {
     return (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0);
   }
 
+  isBodyVisuallyObservable(state: SolarSystemBodyState): boolean {
+    if (!this.environment) return true;
+    if (this.environment.twilightPhase === "night") return true;
+    if (state.apparentMagnitude === null) return true;
+    return state.apparentMagnitude <= this.environment.visibility.zenithMagnitudeLimit;
+  }
+
   metrics(): SolarSystemRenderMetrics {
     let textureLoads = 0;
     let textureBytes = 0;

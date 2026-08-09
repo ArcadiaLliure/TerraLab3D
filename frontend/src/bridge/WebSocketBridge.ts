@@ -24,6 +24,7 @@ import type {
   FrontendPerformanceMetricsMessage,
 } from "../contracts/bridge_messages";
 import type { NavigationCameraPose, MotionState } from "../contracts/navigation";
+import type { LightingEnvironmentSnapshot } from "../contracts/lighting_environment_contracts";
 import type {
   MoonSurfaceResourceDescriptor,
   PlanetTextureManifest,
@@ -78,6 +79,7 @@ export interface BackendMessageListener {
   onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
   onSkyEnvironmentSnapshot?(snapshot: import("../contracts/sky_environment_contracts").SkyEnvironmentSnapshot): void;
   onSolarSystemSnapshot?(snapshot: SolarSystemSnapshot): void;
+  onLightingEnvironmentSnapshot?(snapshot: LightingEnvironmentSnapshot): void;
   onMoonSurfaceResource?(resource: MoonSurfaceResourceDescriptor): void;
   onPlanetTextureManifest?(manifest: PlanetTextureManifest): void;
   onSolarSystemCatalogManifest?(manifest: SatelliteCatalogManifest): void;
@@ -370,6 +372,11 @@ export class WebSocketBridge {
       case "solar_system_snapshot":
         for (const l of this.messageListeners) {
           l.onSolarSystemSnapshot?.(msg);
+        }
+        break;
+      case "lighting_environment_snapshot":
+        for (const l of this.messageListeners) {
+          l.onLightingEnvironmentSnapshot?.(msg);
         }
         break;
       case "moon_surface_resource":

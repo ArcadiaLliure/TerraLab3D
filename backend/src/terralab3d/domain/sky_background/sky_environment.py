@@ -10,6 +10,7 @@ from terralab3d.domain.atmosphere.models import AtmosphereState
 from terralab3d.domain.light_pollution.calculations import resolve_light_pollution_state
 from terralab3d.domain.light_pollution.models import LightPollutionMode
 from terralab3d.domain.sky_background.solar_direction import twilight_factor, twilight_phase
+from terralab3d.domain.sky_background.sky_palette import sky_light_palette
 from terralab3d.domain.sky_background.visibility import SkyVisibilityCalculator, SkyVisibilityState
 from terralab3d.domain.solar_system.models import ApparentBodyState
 
@@ -33,6 +34,10 @@ class SkyEnvironmentSnapshot:
     sqm_zenith: float | None
     configured_magnitude_limit: float | None
     visibility: SkyVisibilityState
+    zenith_color_linear: tuple[float, float, float]
+    horizon_color_linear: tuple[float, float, float]
+    ground_color_linear: tuple[float, float, float]
+    sky_diffuse_intensity: float
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -59,6 +64,10 @@ class SkyEnvironmentSnapshot:
                 "fadeWidthMag": self.visibility.fade_width_mag,
                 "skyBrightnessNormalized": self.visibility.sky_brightness_normalized,
             },
+            "zenithColorLinear": list(self.zenith_color_linear),
+            "horizonColorLinear": list(self.horizon_color_linear),
+            "groundColorLinear": list(self.ground_color_linear),
+            "skyDiffuseIntensity": self.sky_diffuse_intensity,
         }
 
 
@@ -109,6 +118,11 @@ class SkyEnvironmentComposer:
                 atmosphere.extinction_coefficient if self.atmosphere_enabled else 0.0
             ),
         )
+        palette = sky_light_palette(
+            solar_altitude,
+            night_factor,
+            self.atmosphere_enabled,
+        )
         return SkyEnvironmentSnapshot(
             generation=self._generation,
             solar_system_generation=solar_system_generation,
@@ -127,4 +141,8 @@ class SkyEnvironmentComposer:
             sqm_zenith=light_pollution.sqm_zenith,
             configured_magnitude_limit=light_pollution.configured_magnitude_limit,
             visibility=visibility,
+            zenith_color_linear=palette.zenith_color_linear,
+            horizon_color_linear=palette.horizon_color_linear,
+            ground_color_linear=palette.ground_color_linear,
+            sky_diffuse_intensity=palette.diffuse_intensity,
         )

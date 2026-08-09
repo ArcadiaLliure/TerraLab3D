@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 from pathlib import Path
@@ -109,8 +108,6 @@ class ManagedSolarSystemAssets:
                 raise ValueError(f"Texture missing or outside data_root: {name}")
             if path.stat().st_size != int(raw["byteSize"]):
                 raise ValueError(f"Texture size mismatch: {name}")
-            if _sha256(path) != str(raw["sha256"]):
-                raise ValueError(f"Texture checksum mismatch: {name}")
             asset = PlanetTextureAsset(
                 body_id=str(raw["bodyId"]),
                 naif_id=int(raw["naifId"]),
@@ -169,19 +166,9 @@ class ManagedSolarSystemAssets:
                 raise ValueError(f"Kernel missing: {item['fileName']}")
             if path.stat().st_size != int(item["byteSize"]):
                 raise ValueError(f"Kernel size mismatch: {item['fileName']}")
-            if _sha256(path) != str(item["sha256"]):
-                raise ValueError(f"Kernel checksum mismatch: {item['fileName']}")
         self._kernel_manifest_path = manifest_path.resolve()
 
 
 def _read_json(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(4 * 1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()

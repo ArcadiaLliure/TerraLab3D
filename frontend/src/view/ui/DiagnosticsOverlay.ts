@@ -9,6 +9,8 @@ import type { BridgeState, BridgeStateListener } from "../../bridge/WebSocketBri
 import type { SolarSystemSnapshot } from "../../contracts/solar_system_contracts";
 import type { SolarSystemRenderMetrics } from "../three/SolarSystemRenderer";
 import type { FrameTimingMetrics } from "../three/RenderLoopImpl";
+import type { LightingEnvironmentSnapshot } from "../../contracts/lighting_environment_contracts";
+import type { SceneLightingMetrics } from "../three/lighting/SceneLightingController";
 
 const STATE_COLORS: Record<BridgeState, string> = {
   connecting: "#f5a623",
@@ -24,6 +26,7 @@ export class DiagnosticsOverlay implements BridgeStateListener {
   private readonly fpsText: HTMLSpanElement;
   private readonly sessionText: HTMLSpanElement;
   private readonly solarSystemText: HTMLSpanElement;
+  private readonly lightingText: HTMLSpanElement;
   private readonly errorBanner: HTMLDivElement;
 
   constructor() {
@@ -96,6 +99,15 @@ export class DiagnosticsOverlay implements BridgeStateListener {
     this.solarSystemText.textContent = "ephemeris: --";
     this.root.appendChild(this.solarSystemText);
 
+    const sep4 = document.createElement("span");
+    sep4.textContent = "│";
+    sep4.style.opacity = "0.3";
+    this.root.appendChild(sep4);
+
+    this.lightingText = document.createElement("span");
+    this.lightingText.textContent = "lighting: --";
+    this.root.appendChild(this.lightingText);
+
     // ─── Error banner (center, hidden by default) ────────────────────
     this.errorBanner = document.createElement("div");
     this.errorBanner.id = "bridge-error-banner";
@@ -154,6 +166,17 @@ export class DiagnosticsOverlay implements BridgeStateListener {
       `g${snapshot.generation}`,
       `sun ${snapshot.sun.altitudeDeg.toFixed(1)}°`,
       moon,
+      `${metrics.lastBridgeBytes} B`,
+    ].join(" · ");
+  }
+
+  updateLighting(snapshot: LightingEnvironmentSnapshot, metrics: SceneLightingMetrics): void {
+    this.lightingText.textContent = [
+      `light g${snapshot.generation}`,
+      `sun ${snapshot.sun.intensity.toFixed(3)} ${snapshot.sun.intensityKind}`,
+      `moon ${snapshot.moon.intensity.toExponential(1)} ${snapshot.moon.intensityKind}`,
+      `sky ${snapshot.skyDiffuse.quality}`,
+      `shadow ${metrics.shadow.quality}/${metrics.shadow.sunShadowUpdateCount}`,
       `${metrics.lastBridgeBytes} B`,
     ].join(" · ");
   }

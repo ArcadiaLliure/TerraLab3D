@@ -181,11 +181,12 @@ export class StarFieldRenderer {
     const positions = new Float32Array(payloadBuffer, posOffset, posLen / 4);
     const magnitudes = new Float32Array(payloadBuffer, magOffset, magLen / 4);
 
-    // Color: convertir uint8 [0..255] a Float32Array [0..1]
+    // Color del catàleg arriba en sRGB uint8. Convertim una sola vegada a
+    // linear-sRGB perquè el shader faci exactament una codificació de sortida.
     const u8Colors = new Uint8Array(payloadBuffer, colOffset, colLen);
     const floatColors = new Float32Array(starCount * 3);
     for (let i = 0; i < u8Colors.length; i++) {
-      floatColors[i] = u8Colors[i]! / 255.0;
+      floatColors[i] = srgbChannelToLinear(u8Colors[i]! / 255.0);
     }
 
     // Catalog indices: conservar Uint32Array canònic per al picking
@@ -309,4 +310,10 @@ function uniform<T>(material: THREE.ShaderMaterial, name: string): THREE.IUnifor
   const value = material.uniforms[name];
   if (value === undefined) throw new Error(`Missing star shader uniform: ${name}`);
   return value as THREE.IUniform<T>;
+}
+
+export function srgbChannelToLinear(value: number): number {
+  return value <= 0.04045
+    ? value / 12.92
+    : Math.pow((value + 0.055) / 1.055, 2.4);
 }
