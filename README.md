@@ -339,5 +339,12 @@ L’objectiu és reunir en una mateixa escena interactiva el territori, l’hori
 ## Crèdits i Llicències
 
 * **Textures dels planetes del Sistema Solar**: Les textures utilitzades per als planetes estan basades en dades d'elevació i imatges públiques de la NASA (misions MESSENGER, Viking, Cassini i Telescopi Espacial Hubble) ajustades per [Solar System Scope](https://www.solarsystemscope.com/textures/). Distribudes sota la llicència **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+
+> **Nota sobre les dades i recursos següents**: TerraLab3D no inclou ni redistribueix directament els conjunts de dades pesants ni els catàlegs al repositori del projecte. L'aplicació els descarrega a petició directament des dels servidors i enllaços originals de cada proveïdor científic oficial.
+
+* **Via Làctia (Fons galàctic)**: Mapa de fons en alta resolució cortesia de [NASA/Goddard Space Flight Center — Scientific Visualization Studio (SVS 4851)](https://svs.gsfc.nasa.gov/4851/).
+* **Mapa de pols de la Via Làctia**: Dades d'opacitat del model GNILC $\tau_{353}$ de la missió Planck, cortesia de la [Planck Collaboration](https://www.cosmos.esa.int/web/planck) i descarregat des del [Planck Legacy Archive / NASA-IPAC IRSA](https://irsa.ipac.caltech.edu/data/Planck/release_2/all-sky-maps/previews/COM_CompMap_Dust-GNILC-Model-Opacity_2048_R2.01/).
+* **Catàleg d'estrelles (Gaia DR3)**: Dades astromètriques i fotomètriques de la missió Gaia de l'Agència Espacial Europea ([ESA / Gaia / DPAC](https://www.cosmos.esa.int/web/gaia)), consultades via el servei [ESA Gaia Archive](https://gea.esac.esa.int/archive/).
+* **Catàleg d'objectes de cel profund (NGC/IC)**: Basat en el catàleg [OpenNGC](https://github.com/mattiaverga/OpenNGC) de Mattia Verga, el qual utilitza dades extretes del servei TAP del [German Astrophysical Virtual Observatory (GVO)](https://dc.g-vo.org/tap).
 * **Efemèrides i orientació**: kernels oficials [NAIF/JPL](https://naif.jpl.nasa.gov/pub/naif/generic_kernels/) i contrast numèric amb [NASA/JPL Horizons](https://ssd.jpl.nasa.gov/horizons/).
 * **Catàleg de satèl·lits naturals**: [JPL Solar System Dynamics](https://ssd.jpl.nasa.gov/sats/discovery.html), snapshot 2026-07-09.

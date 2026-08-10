@@ -10,7 +10,7 @@ Modelar NGC/IC, classificació, dimensions aparents, magnitud, visibilitat i atr
 
 ## 3. Entrades i sortides
 
-- **Entrades:** Catàleg NGC/IC, atmosfera, instrument, magnitud límit i camp visual.
+- **Entrades:** Catàleg NGC/IC ([OpenNGC](https://github.com/mattiaverga/OpenNGC) / [GVO TAP service](https://dc.g-vo.org/tap)), atmosfera, instrument, magnitud límit i camp visual.
 - **Sortides:** Objectes seleccionats i atributs d’instanciació persistents.
 
 ## 4. Dependències permeses
