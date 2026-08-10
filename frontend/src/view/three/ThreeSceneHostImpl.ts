@@ -33,6 +33,7 @@ import { HorizontalGrid } from "./HorizontalGrid";
 import { CelestialLabels } from "./CelestialLabels";
 import { CelestialEquator } from "./CelestialEquator";
 import { StarFieldRenderer } from "./StarFieldRenderer";
+import { DeepSkyRenderer } from "./DeepSkyRenderer";
 import { GalacticSkyRenderer } from "./GalacticSkyRenderer";
 import { SolarSystemRenderer } from "./SolarSystemRenderer";
 import { SolarSystemLabels } from "./SolarSystemLabels";
@@ -70,6 +71,7 @@ export class ThreeSceneHostImpl {
   private readonly celestialLabels: CelestialLabels;
   private readonly celestialEquator: CelestialEquator;
   private readonly starFieldRenderer: StarFieldRenderer;
+  private readonly deepSkyRenderer: DeepSkyRenderer;
   private readonly galacticSkyRenderer: GalacticSkyRenderer;
   private readonly solarSystemRenderer: SolarSystemRenderer;
   private readonly solarSystemLabels: SolarSystemLabels;
@@ -140,9 +142,12 @@ export class ThreeSceneHostImpl {
       this.renderer.capabilities.maxTextureSize,
     );
 
-    // ─── Phase 5: Star Field Renderer ────────────────────────────────
+    // ─── Phase 5 & 11: Star Field & Deep Sky Renderers ───────────────
     this.starFieldRenderer = new StarFieldRenderer();
     this.starFieldRenderer.attachToParent(this.celestialRoot);
+    this.deepSkyRenderer = new DeepSkyRenderer();
+    this.deepSkyRenderer.attachToParent(this.celestialRoot);
+    
     this.solarSystemRenderer = new SolarSystemRenderer(this.celestialRoot);
     this.solarSystemLabels = new SolarSystemLabels(this.solarSystemRenderer);
 
@@ -203,6 +208,10 @@ export class ThreeSceneHostImpl {
     return this.starFieldRenderer;
   }
 
+  getDeepSkyRenderer(): DeepSkyRenderer {
+    return this.deepSkyRenderer;
+  }
+
   getGalacticSkyRenderer(): GalacticSkyRenderer {
     return this.galacticSkyRenderer;
   }
@@ -228,6 +237,7 @@ export class ThreeSceneHostImpl {
     // Phase 4: Mount celestial labels
     this.celestialLabels.mount(container);
     this.solarSystemLabels.mount(container);
+    this.deepSkyRenderer.labels.mount(container);
   }
 
   resize(widthPx: number, heightPx: number): void {
@@ -241,6 +251,7 @@ export class ThreeSceneHostImpl {
 
     this.solarSystemRenderer.update(timestampMs);
     this.starFieldRenderer.interpolate(timestampMs);
+    this.deepSkyRenderer.interpolate(timestampMs, this.camera);
     this.galacticSkyRenderer.syncTransform();
     this.lightingController.update(timestampMs, this.camera.position);
 
@@ -288,6 +299,11 @@ export class ThreeSceneHostImpl {
     if (this.disposed) return;
     this.celestialLabels.update(this.camera, this.camera.position);
     this.solarSystemLabels.update(this.camera);
+
+    const dsMatrix = this.deepSkyRenderer.getTransformMatrix();
+    if (dsMatrix) {
+      this.deepSkyRenderer.labels.update(this.camera, dsMatrix);
+    }
   }
 
   setSiderealTime(lstDeg: number): void {
@@ -378,6 +394,7 @@ export class ThreeSceneHostImpl {
     this.solarSystemLabels.dispose();
     this.celestialEquator.dispose();
     this.starFieldRenderer.dispose();
+    this.deepSkyRenderer.dispose();
     this.galacticSkyRenderer.dispose();
     this.solarSystemRenderer.dispose();
     this.lightingController.dispose();

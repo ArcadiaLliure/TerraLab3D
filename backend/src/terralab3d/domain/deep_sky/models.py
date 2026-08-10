@@ -11,15 +11,26 @@ class DeepSkyKind(str, Enum):
     NEBULA = "nebula"
     OPEN_CLUSTER = "open_cluster"
     GLOBULAR_CLUSTER = "globular_cluster"
+    CLUSTER_NEBULA = "cluster_nebula"
+    STELLAR_ASSOCIATION = "stellar_association"
     OTHER = "other"
 
 @dataclass(frozen=True, slots=True)
 class DeepSkyObject:
     object_id: DeepSkyObjectId
     canonical_name: str
-    kind: DeepSkyKind
+    aliases: tuple[str, ...]
+    source_type: str
+    visual_family: DeepSkyKind
+    render_eligible: bool
     coordinate: EquatorialCoordinate
-    major_axis_deg: float | None
-    minor_axis_deg: float | None
+    major_axis_arcmin: float | None
+    minor_axis_arcmin: float | None
     position_angle_deg: float | None
-    apparent_magnitude: float | None
+    v_magnitude: float | None
+    b_magnitude: float | None
+    surface_brightness: float | None
+    hubble_type: str | None
+    messier_number: str | None
+    common_name: str | None
+    flags: int

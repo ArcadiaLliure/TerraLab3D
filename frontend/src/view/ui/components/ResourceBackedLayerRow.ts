@@ -156,11 +156,15 @@ export class ResourceBackedLayerRow {
             this.progressBarContainer.style.display = "none";
             
             if (state.status === "ERROR") {
-                this.statusText.textContent = "Error";
+                const msg = (state as any).errorMessage || "Error desconegut";
+                this.statusText.textContent = `Error: ${msg}`;
+                this.statusText.title = msg;
+                console.error(`MGP: [ResourceLayer] Error de descàrrega per a ${this.resourceId}: ${msg}`);
                 this.statusText.style.color = "var(--color-error, #ff5555)";
                 this.actionBtn.textContent = "Reintentar";
             } else {
                 this.statusText.textContent = "";
+                this.statusText.title = "";
                 this.statusText.style.color = "var(--color-text-muted)";
                 this.actionBtn.textContent = "Baixar";
             }

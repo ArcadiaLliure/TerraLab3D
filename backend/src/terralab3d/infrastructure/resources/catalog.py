@@ -132,9 +132,9 @@ class ResourceCatalog:
             credits=("Mattia Verga", "OpenNGC Contributors"),
             variants=(
                 ResourceVariant(
-                    id=VariantId("master"),
-                    title="Master (Mutable)",
-                    source_url="https://raw.githubusercontent.com/mattiaverga/OpenNGC/master/database_files/NGC.csv",
+                    id=VariantId("pinned"),
+                    title="OpenNGC (da90466)",
+                    source_url="https://raw.githubusercontent.com/mattiaverga/OpenNGC/da90466031b0372c896588b85be6016c617e205b/database_files/NGC.csv",
                 ),
             )
         ))

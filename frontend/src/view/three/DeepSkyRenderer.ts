@@ -1,0 +1,359 @@
+/**
+ * Renderitzador del catàleg de cel profund (NGC/IC) per a Three.js.
+ */
+import * as THREE from "three";
+import type { CelestialTransformState } from "./CelestialTransformState";
+import type { SkyVisibilityState } from "../../contracts/sky_environment_contracts";
+import { DEFAULT_SKY_VISIBILITY } from "../../contracts/sky_visibility_defaults";
+import { DeepSkyLabels } from "./DeepSkyLabels";
+
+const VERTEX_SHADER = `
+  precision highp float;
+  uniform mat3 u_equatorialToENUMatrix;
+  uniform float u_radius;
+  
+  attribute vec3 equatorialDirection;
+  attribute vec3 northTangent;
+  attribute vec3 eastTangent;
+  attribute float majorAxisArcmin;
+  attribute float minorAxisArcmin;
+  attribute float positionAngleDeg;
+  attribute float magnitude;
+  attribute float surfaceBrightness;
+  attribute float familyCode;
+  attribute float flags;
+  attribute float catalogIndex;
+
+  // The local quad coordinates: -0.5 to 0.5
+  varying vec2 vUv;
+  varying float vFamily;
+  varying float vMagnitude;
+  varying float vSurfBr;
+  varying float vFlags;
+  
+  void main() {
+    vUv = position.xy;
+    vFamily = familyCode;
+    vMagnitude = magnitude;
+    vSurfBr = surfaceBrightness;
+    vFlags = flags;
+    
+    // Convert arcminutes to radians
+    // 1 arcmin = 1/60 deg = pi / 10800 rad
+    float radPerArcmin = 3.14159265359 / 10800.0;
+    
+    // Default size if major/minor missing: say 2 arcmin
+    float maj = majorAxisArcmin > 0.0 ? majorAxisArcmin : 5.0;
+    float min = minorAxisArcmin > 0.0 ? minorAxisArcmin : maj;
+    
+    // (Removed minimum size forcing per user request)
+    
+    // The quad size in radians on the sphere
+    // We multiply by 1.2 to give some padding for rendering
+    float wRad = min * radPerArcmin * 1.2;
+    float hRad = maj * radPerArcmin * 1.2;
+    
+    // Position angle (measured East of North). PA is given in degrees.
+    // If it's NaN (not greater than or equal to 0, nor less than 0), default to 0.0
+    float paVal = (positionAngleDeg >= 0.0 || positionAngleDeg < 0.0) ? positionAngleDeg : 0.0;
+    float paRad = paVal * 3.14159265359 / 180.0;
+    
+    // Rotate the local quad vertices by PA
+    float cosPA = cos(paRad);
+    float sinPA = sin(paRad);
+    
+    // Local coords (x is East-ish, y is North-ish)
+    // Actually PA is from North (y) towards East (x), so:
+    // x' = x*cosPA + y*sinPA
+    // y' = -x*sinPA + y*cosPA
+    vec2 localPos = position.xy; // -0.5 to 0.5
+    float lx = localPos.x * wRad;
+    float ly = localPos.y * hRad;
+    
+    float rx = lx * cosPA + ly * sinPA;
+    float ry = -lx * sinPA + ly * cosPA;
+    
+    // Compute the 3D direction on the unit sphere
+    vec3 dir = equatorialDirection + rx * eastTangent + ry * northTangent;
+    dir = normalize(dir);
+    
+    // Transform to ENU using the same matrix as stars
+    vec3 enuDir = u_equatorialToENUMatrix * dir;
+    
+    // Project to the sky sphere
+    vec3 finalPos = enuDir * u_radius;
+    
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(finalPos, 1.0);
+  }
+`;
+
+const FRAGMENT_SHADER = `
+  precision highp float;
+  
+  varying vec2 vUv;
+  varying float vFamily;
+  varying float vMagnitude;
+  varying float vSurfBr;
+  varying float vFlags;
+  
+  uniform float u_zenithMagnitudeLimit;
+  uniform float u_extinctionCoefficient;
+  uniform float u_twilightSuppression;
+  uniform float u_fadeWidthMag;
+  
+  void main() {
+    // Distance from center of the quad
+    vec2 st = vUv * 2.0; // -1 to 1
+    float d = length(st);
+    
+    if (d > 1.0) discard;
+    
+    // Visibility fade based on twilight only.
+    // The user explicitly requested not to cull deep sky objects by their magnitude.
+    float fade = 1.0 - u_twilightSuppression;
+    
+    if (fade <= 0.01) discard;
+
+    vec3 color = vec3(0.6, 0.7, 0.9); // default bluish/whiteish
+    
+    // Family codes:
+    // 0: Galaxy
+    // 1: Nebula
+    // 2: Open Cluster
+    // 3: Globular Cluster
+    // 4: Cluster + Nebula
+    // 5: Stellar Association
+    // 6: Other
+    
+    float alpha = 1.0;
+    
+    if (vFamily < 0.5) {
+      // Galaxy: diffuse ellipse -> Change to outline
+      color = vec3(0.6, 0.7, 0.9);
+      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
+      alpha *= 1.2;
+    } else if (vFamily < 1.5) {
+      // Nebula: square/ellipse outline
+      color = vec3(0.3, 0.8, 0.5);
+      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
+      alpha *= 1.2;
+    } else if (vFamily < 2.5) {
+      // Open Cluster: dotted circle outline
+      color = vec3(0.9, 0.9, 0.3);
+      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
+      float a = atan(st.y, st.x);
+      alpha *= (sin(a * 25.0) > 0.0) ? 1.0 : 0.0;
+    } else if (vFamily < 3.5) {
+      // Globular Cluster: circle with cross
+      color = vec3(0.9, 0.8, 0.5);
+      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
+      if (d < 0.9 && (abs(st.x) < 0.05 || abs(st.y) < 0.05)) alpha = max(alpha, 0.6);
+    } else {
+      // Other: simple outline
+      color = vec3(0.5, 0.5, 0.5);
+      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
+    }
+    
+    gl_FragColor = vec4(color, alpha * fade * 0.8);
+  }
+`;
+
+export class DeepSkyRenderer {
+  private readonly rootGroup = new THREE.Group();
+  private isVisible = true;
+  private transformState: CelestialTransformState | null = null;
+  private currentVisibilityState: SkyVisibilityState | null = null;
+  
+  private mesh: THREE.Mesh | null = null;
+  private material: THREE.ShaderMaterial | null = null;
+  private geometry: THREE.InstancedBufferGeometry | null = null;
+  
+  public metadata: any = null;
+  public payloadBuffer: ArrayBuffer | null = null;
+
+  public readonly labels = new DeepSkyLabels();
+
+  constructor() {
+    this.rootGroup.name = "deepSkyRoot";
+  }
+
+  public setTransformState(state: CelestialTransformState): void {
+    this.transformState = state;
+  }
+
+  public attachToParent(parentGroup: THREE.Group, overlayParent?: HTMLElement): void {
+    parentGroup.add(this.rootGroup);
+    if (overlayParent) {
+      this.labels.mount(overlayParent);
+    }
+  }
+
+  public detachFromParent(): void {
+    this.rootGroup.removeFromParent();
+  }
+
+  public setVisible(visible: boolean): void {
+    this.isVisible = visible;
+    this.rootGroup.visible = visible;
+    this.labels.setVisible(visible);
+    console.log(`MGP: [DeepSkyRenderer] setVisible: ${visible} (rootGroup.visible = ${this.rootGroup.visible})`);
+  }
+
+  public get visible(): boolean {
+    return this.isVisible;
+  }
+
+  public updateVisibilityUniforms(state: SkyVisibilityState): void {
+    this.currentVisibilityState = state;
+    this.labels.updateVisibilityUniforms(state);
+    if (this.material) {
+      this.material.uniforms["u_zenithMagnitudeLimit"]!.value = state.zenithMagnitudeLimit;
+      this.material.uniforms["u_extinctionCoefficient"]!.value = state.extinctionCoefficient;
+      this.material.uniforms["u_twilightSuppression"]!.value = state.twilightSuppression;
+      this.material.uniforms["u_fadeWidthMag"]!.value = state.fadeWidthMag;
+      this.material.uniformsNeedUpdate = true;
+    }
+  }
+
+  public updateCelestialTransform(generation: number, matrix3x3: number[]): void {
+    if (!this.material || !matrix3x3 || matrix3x3.length !== 9) return;
+
+    if (this.transformState) {
+      this.transformState.update(generation, matrix3x3);
+    } else {
+      const mat3 = this.material.uniforms["u_equatorialToENUMatrix"]!.value as THREE.Matrix3;
+      mat3.set(
+        matrix3x3[0]!, matrix3x3[1]!, matrix3x3[2]!,
+        matrix3x3[3]!, matrix3x3[4]!, matrix3x3[5]!,
+        matrix3x3[6]!, matrix3x3[7]!, matrix3x3[8]!,
+      );
+      this.material.uniformsNeedUpdate = true;
+    }
+  }
+
+  public getTransformMatrix(): THREE.Matrix3 | null {
+    if (!this.material) return null;
+    return this.material.uniforms["u_equatorialToENUMatrix"]!.value as THREE.Matrix3;
+  }
+
+  public interpolate(timestampMs: number, camera?: THREE.PerspectiveCamera): void {
+    if (!this.transformState || !this.transformState.isValid || !this.material) return;
+
+    this.transformState.interpolate(timestampMs);
+
+    const mArray = this.transformState.getMatrix3x3Array();
+    const mat3 = this.material.uniforms["u_equatorialToENUMatrix"]!.value as THREE.Matrix3;
+    mat3.set(
+      mArray[0]!, mArray[1]!, mArray[2]!,
+      mArray[3]!, mArray[4]!, mArray[5]!,
+      mArray[6]!, mArray[7]!, mArray[8]!,
+    );
+    this.material.uniformsNeedUpdate = true;
+  }
+
+  public registerBinaryResource(metadata: any, payloadBuffer: ArrayBuffer): void {
+    if (this.mesh) {
+      this.disposeResource();
+    }
+
+    const layout = metadata.bufferLayout;
+    const count = metadata.renderableCount ?? metadata.recordCount;
+    // Silence log
+
+    const eqDirs = new Float32Array(payloadBuffer!, layout.equatorialDirections!.offset, count * 3);
+    const nTans = new Float32Array(payloadBuffer, layout.northTangents.offset, count * 3);
+    const eTans = new Float32Array(payloadBuffer, layout.eastTangents.offset, count * 3);
+    const majAx = new Float32Array(payloadBuffer, layout.majorAxisArcmin!.offset, count);
+    const minAx = new Float32Array(payloadBuffer, layout.minorAxisArcmin!.offset, count);
+    const paDeg = new Float32Array(payloadBuffer, layout.positionAngleDeg!.offset, count);
+    const mags = new Float32Array(payloadBuffer, layout.magnitude!.offset, count);
+    const surfBr = new Float32Array(payloadBuffer, layout.surfaceBrightness!.offset, count);
+    const families = new Float32Array(count);
+    const flags = new Float32Array(count);
+    const catIndex = new Float32Array(count);
+
+    const famU32 = new Uint32Array(payloadBuffer, layout.familyCode!.offset, count);
+    const flU32 = new Uint32Array(payloadBuffer, layout.flags!.offset, count);
+    const idxU32 = new Uint32Array(payloadBuffer, layout.catalogIndex!.offset, count);
+
+    for (let i = 0; i < count; i++) {
+      families[i] = famU32[i]!;
+      flags[i] = flU32[i]!;
+      catIndex[i] = idxU32[i]!;
+    }
+
+    this.geometry = new THREE.InstancedBufferGeometry();
+    this.geometry.instanceCount = count;
+    // A simple quad
+    const baseGeometry = new THREE.PlaneGeometry(1, 1);
+    this.geometry.index = baseGeometry.index;
+    this.geometry.attributes.position = baseGeometry.attributes.position as THREE.BufferAttribute;
+
+    this.geometry.setAttribute("equatorialDirection", new THREE.InstancedBufferAttribute(eqDirs as any, 3));
+    this.geometry.setAttribute("northTangent", new THREE.InstancedBufferAttribute(nTans, 3));
+    this.geometry.setAttribute("eastTangent", new THREE.InstancedBufferAttribute(eTans, 3));
+    this.geometry.setAttribute("majorAxisArcmin", new THREE.InstancedBufferAttribute(majAx as any, 1));
+    this.geometry.setAttribute("minorAxisArcmin", new THREE.InstancedBufferAttribute(minAx as any, 1));
+    this.geometry.setAttribute("positionAngleDeg", new THREE.InstancedBufferAttribute(paDeg as any, 1));
+    this.geometry.setAttribute("magnitude", new THREE.InstancedBufferAttribute(mags as any, 1));
+    this.geometry.setAttribute("surfaceBrightness", new THREE.InstancedBufferAttribute(surfBr as any, 1));
+    this.geometry.setAttribute("familyCode", new THREE.InstancedBufferAttribute(families as any, 1));
+    this.geometry.setAttribute("flags", new THREE.InstancedBufferAttribute(flags as any, 1));
+    this.geometry.setAttribute("catalogIndex", new THREE.InstancedBufferAttribute(catIndex as any, 1));
+
+    const mat3 = new THREE.Matrix3();
+    if (this.transformState && this.transformState.isValid) {
+      mat3.copy(this.transformState.equatorialToThree);
+    }
+
+    this.material = new THREE.ShaderMaterial({
+      vertexShader: VERTEX_SHADER,
+      fragmentShader: FRAGMENT_SHADER,
+      uniforms: {
+        u_equatorialToENUMatrix: { value: mat3 },
+        u_radius: { value: 1000000.0 }, // background sphere
+        u_zenithMagnitudeLimit: { value: this.currentVisibilityState?.zenithMagnitudeLimit ?? DEFAULT_SKY_VISIBILITY.zenithMagnitudeLimit },
+        u_extinctionCoefficient: { value: this.currentVisibilityState?.extinctionCoefficient ?? DEFAULT_SKY_VISIBILITY.extinctionCoefficient },
+        u_twilightSuppression: { value: this.currentVisibilityState?.twilightSuppression ?? DEFAULT_SKY_VISIBILITY.twilightSuppression },
+        u_fadeWidthMag: { value: this.currentVisibilityState?.fadeWidthMag ?? DEFAULT_SKY_VISIBILITY.fadeWidthMag },
+      },
+      transparent: true,
+      depthWrite: false,
+      depthTest: true,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide,
+    });
+
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.mesh.name = "deepSkyInstancedMesh";
+    this.mesh.frustumCulled = false;
+
+    this.rootGroup.add(this.mesh);
+    
+
+    this.metadata = metadata;
+    this.payloadBuffer = payloadBuffer;
+    this.labels.registerLabels(metadata, payloadBuffer);
+  }
+
+  public disposeResource(): void {
+    if (this.mesh) {
+      this.mesh.removeFromParent();
+      this.mesh = null;
+    }
+    if (this.geometry) {
+      this.geometry.dispose();
+      this.geometry = null;
+    }
+    if (this.material) {
+      this.material.dispose();
+      this.material = null;
+    }
+  }
+
+  public dispose(): void {
+    this.disposeResource();
+    this.rootGroup.removeFromParent();
+    this.labels.dispose();
+  }
+}

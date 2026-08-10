@@ -68,6 +68,7 @@ async def run() -> int:
     from terralab3d.infrastructure.adapters.file_assets.lunar_limb import LroLolaLimbProfileProvider
     from terralab3d.infrastructure.adapters.file_assets.galactic import ManagedGalacticAssets
     from terralab3d.infrastructure.adapters.planck.adapter import PlanckDustAdapter
+    from terralab3d.infrastructure.adapters.ngc_catalog.adapter import NgcCatalogPostProcessor, NgcCatalogAdapter
     from terralab3d.infrastructure.resources.catalog import ResourceCatalog
     from terralab3d.infrastructure.resources.installation_repository import ResourceInstallationRepository
     from terralab3d.infrastructure.resources.download_manager import DownloadJobManager
@@ -92,7 +93,10 @@ async def run() -> int:
         resource_catalog,
         resource_repo,
         bridge,
-        post_processors={ResourceId("sky.planck_dust"): PlanckDustAdapter()},
+        post_processors={
+            ResourceId("sky.planck_dust"): PlanckDustAdapter(),
+            ResourceId("sky.ngc"): NgcCatalogPostProcessor(),
+        },
     )
     server = TerraLabServer(
         dist_dir,
@@ -101,6 +105,11 @@ async def run() -> int:
         solar_system_assets,
         galactic_assets,
     )
+
+    from terralab3d.application.deep_sky_coordinator import DeepSkyCoordinator
+    deep_sky_adapter = NgcCatalogAdapter(resource_repo)
+    deep_sky_coordinator = DeepSkyCoordinator(deep_sky_adapter)
+    deep_sky_coordinator.set_publishers(bridge.send_binary_resource)
 
     loop = asyncio.get_running_loop()
     shutdown_requested = asyncio.Event()
@@ -255,6 +264,8 @@ async def run() -> int:
             asyncio.create_task(star_coordinator.start())
         else:
             asyncio.create_task(star_coordinator.publish_current_state())
+
+        asyncio.create_task(deep_sky_coordinator.publish_current_state())
 
         # Send initial resource catalog
         _handle_request_catalog_snapshot({})
@@ -789,6 +800,8 @@ async def run() -> int:
         log.info("Mètriques Pas 9 cerques: %s", event_search_coordinator.metrics())
     if trajectory_coordinator is not None:
         log.info("Mètriques Pas 9 trajectòries: %s", trajectory_coordinator.metrics())
+        
+    await deep_sky_coordinator.shutdown()
 
     if bridge.connected:
         await bridge.request_shutdown()

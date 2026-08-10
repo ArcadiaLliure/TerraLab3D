@@ -1,5 +1,5 @@
 """Ports d’accés a catàlegs propietat de la capa d’aplicació."""
-from typing import Protocol, Sequence
+from typing import Protocol, Sequence, Any
 from terralab3d.domain.deep_sky.models import DeepSkyObject
 from terralab3d.domain.stars.models import StarCatalogQuery, StarRecord
 
@@ -8,4 +8,4 @@ class StarCatalogPort(Protocol):
     def close(self) -> None: ...
 
 class DeepSkyCatalogPort(Protocol):
-    def all_objects(self) -> Sequence[DeepSkyObject]: ...
+    def load_index(self) -> tuple[dict[str, Any], bytes] | None: ...

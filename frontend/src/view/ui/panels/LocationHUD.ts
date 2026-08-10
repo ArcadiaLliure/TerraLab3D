@@ -7,6 +7,7 @@ import type {
 } from "../../../contracts/astronomical_event_contracts";
 import type { ResolvedStar } from "../../../contracts/star_picking_contracts";
 import type { SolarSystemPickHit } from "../../three/picking/SolarSystemPickProvider";
+import type { DeepSkyPickHit } from "../../../contracts/deep_sky_picking_contracts";
 import { formatLocalAndUtcTime } from "../timeFormatting";
 
 const DEG = Math.PI / 180;
@@ -234,11 +235,13 @@ export class LocationHUD {
     this.element.style.display = visible ? "flex" : "none";
   }
 
-  public setSelectedCelestial(selection: ResolvedStar | SolarSystemPickHit | null): void {
+  public setSelectedCelestial(selection: ResolvedStar | SolarSystemPickHit | DeepSkyPickHit | null): void {
     if (selection === null) {
       this.setSelectedStar(null);
     } else if (selection.kind === "star") {
       this.setSelectedStar(selection);
+    } else if (selection.kind === "deep_sky") {
+      this.setSelectedDeepSky(selection);
     } else {
       this.setSelectedSolarBody(selection);
     }
@@ -264,6 +267,32 @@ export class LocationHUD {
       <div>RA: ${star.raDeg.toFixed(4)}° &nbsp; Dec: ${star.decDeg.toFixed(4)}°</div>
       <div>Mag: ${star.magnitude.toFixed(2)} &nbsp; BP-RP: ${bpRpText}</div>
       <div style="opacity: 0.7; font-size: 11px;">Font: ${star.sourceRole}</div>
+    `;
+  }
+
+  private setSelectedDeepSky(hit: DeepSkyPickHit): void {
+    const labels: Record<number, string> = {
+      0: "Galaxia",
+      1: "Nebulosa Emissió",
+      2: "Cúmul Obert",
+      3: "Cúmul Globular",
+      4: "Nebulosa Planetaria",
+      5: "Romanent Supernova",
+      6: "Nebulosa Obscura",
+      7: "Nebulosa Reflexió",
+      8: "Altres",
+    };
+    const familyName = labels[hit.familyCode] || "Objecte de Cel Profund";
+    const mag = hit.magnitude < 15 ? hit.magnitude.toFixed(2) : "N/A";
+    const size = hit.majorAxisArcmin > 0 ? `${hit.majorAxisArcmin.toFixed(1)}' x ${hit.minorAxisArcmin.toFixed(1)}'` : "N/A";
+
+    this.starContainer.style.display = "block";
+    this.starContainer.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cielo Profundo (NGC)</div>
+      <div>${escapeHtml(hit.objectLabel)}</div>
+      <div>${familyName}</div>
+      <div>Mag: ${mag} &nbsp; Tamaño: ${size}</div>
+      <div style="opacity: 0.7; font-size: 11px;">Catálogo: NGC/IC</div>
     `;
   }
 

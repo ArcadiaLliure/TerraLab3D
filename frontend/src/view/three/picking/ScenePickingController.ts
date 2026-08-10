@@ -17,6 +17,7 @@ import { PointerGestureRouter } from "./PointerGestureRouter";
 import { CelestialPickProvider, type CelestialPickHit } from "./CelestialPickProvider";
 import { SelectionMarker } from "./SelectionMarker";
 import type { SolarSystemPickHit } from "./SolarSystemPickProvider";
+import type { DeepSkyPickHit } from "../../../contracts/deep_sky_picking_contracts";
 
 const LOG_PREFIX = "MGP: [ScenePickingController]";
 
@@ -29,7 +30,7 @@ export type ResolveCallback = (
   purpose: "select" | "hover",
 ) => void;
 
-export type SelectedCelestial = ResolvedStar | SolarSystemPickHit;
+export type SelectedCelestial = ResolvedStar | SolarSystemPickHit | DeepSkyPickHit;
 export type SelectionChangedCallback = (selection: SelectedCelestial | null) => void;
 
 export interface ScenePickingControllerDeps {
@@ -246,6 +247,8 @@ export class ScenePickingController {
         console.log(
           `${LOG_PREFIX} [handleTap] [Star: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px mag=${hit.magnitude.toFixed(2)}]`,
         );
+      } else if (hit.kind === "deep_sky") {
+        this.deps.selectionChangedCallback?.(hit);
       } else {
         // Solar-system states already arrive in the scientific snapshot.
         this.deps.selectionChangedCallback?.(hit);

@@ -237,8 +237,10 @@ class DownloadJobManager:
                         existing_bytes = 0
                         temp_path.unlink(missing_ok=True)
                     elif response.status not in (200, 206):
+                        msg = f"Error HTTP {response.status}: {response.reason}"
+                        log.error("MGP: [DownloadManager] [Error a la descàrrega %s: %s]", job_id, msg)
                         await self._fail_job(
-                            job_id, resource_id, variant_id, "HTTP_ERROR", f"Error HTTP {response.status}"
+                            job_id, resource_id, variant_id, "HTTP_ERROR", msg
                         )
                         return
 
@@ -412,6 +414,7 @@ class DownloadJobManager:
     async def _fail_job(
         self, job_id: str, resource_id: ResourceId, variant_id: VariantId, code: str, msg: str
     ) -> None:
+        log.error("MGP: [DownloadManager] [Job fallit %s] %s: %s", job_id, code, msg)
         self._repository.set_resource_state(
             resource_id, ResourceInstallState.ERROR, variant_id, error_message=msg
         )

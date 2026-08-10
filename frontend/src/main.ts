@@ -37,6 +37,7 @@ import { CelestialTransformState } from "./view/three/CelestialTransformState";
 import { PointerGestureRouter } from "./view/three/picking/PointerGestureRouter";
 import { StarPickProvider } from "./view/three/picking/StarPickProvider";
 import { SolarSystemPickProvider } from "./view/three/picking/SolarSystemPickProvider";
+import { DeepSkyPickProvider } from "./view/three/picking/DeepSkyPickProvider";
 import { CelestialPickProvider } from "./view/three/picking/CelestialPickProvider";
 import { ScenePickingController } from "./view/three/picking/ScenePickingController";
 
@@ -157,6 +158,7 @@ function main(): void {
 
   const skyPage = new SkyPage(resourceManager, {
     onStarLayerToggled: (visible) => sceneHost.getStarFieldRenderer().setVisible(visible),
+    onNgcToggled: (visible) => sceneHost.getDeepSkyRenderer().setVisible(visible),
     onAtmosphereToggled: (enabled) => bridge.sendSetAtmosphereEnabled(enabled),
     onLightPollutionToggled: (enabled) => bridge.sendSetLightPollutionEnabled(enabled),
     onLightPollutionModeChanged: (mode) => bridge.sendSetLightPollutionMode(mode),
@@ -218,6 +220,7 @@ function main(): void {
   // ─── Picking Initialization (Pas 6) ──────────────────────────────
   const celestialTransformState = new CelestialTransformState();
   sceneHost.getStarFieldRenderer().setTransformState(celestialTransformState);
+  sceneHost.getDeepSkyRenderer().setTransformState(celestialTransformState);
   sceneHost.getGalacticSkyRenderer().setTransformState(celestialTransformState);
 
   const gestureRouter = new PointerGestureRouter();
@@ -240,9 +243,18 @@ function main(): void {
     getViewportRect: () => sceneHost.renderer.domElement.getBoundingClientRect(),
     getPickableBodies: () => sceneHost.getSolarSystemRenderer().getPickableBodies(),
   });
+  const deepSkyPickProvider = new DeepSkyPickProvider({
+    camera: sceneHost.camera,
+    transformState: celestialTransformState,
+    renderer: sceneHost.renderer,
+    deepSkyRenderer: sceneHost.getDeepSkyRenderer(),
+    getSkyVisibilityState: () => currentSkyVisibilityState,
+    isDeepSkyLayerVisible: () => sceneHost.getDeepSkyRenderer().visible,
+  });
   const pickProvider = new CelestialPickProvider({
     starPicker: starPickProvider,
     solarSystemPicker: solarSystemPickProvider,
+    deepSkyPicker: deepSkyPickProvider,
   });
 
   const pickingController = new ScenePickingController({
@@ -353,6 +365,10 @@ function main(): void {
         sceneHost.getSolarSystemRenderer().registerApparentTrajectoryResource(metadata, bufferPayload);
         return;
       }
+      if (metadata.role === "deep_sky_catalog") {
+        sceneHost.getDeepSkyRenderer().registerBinaryResource(metadata, bufferPayload);
+        return;
+      }
       sceneHost.getStarFieldRenderer().registerBinaryResource(metadata, bufferPayload);
       const resourceId = metadata.resourceId as string;
       const entry = sceneHost.getStarFieldRenderer().getResource(resourceId);
@@ -366,6 +382,7 @@ function main(): void {
       atmosphereRenderer.updateEnvironment(snapshot);
       sceneHost.getSolarSystemRenderer().updateEnvironment(snapshot);
       sceneHost.getStarFieldRenderer().updateVisibilityUniforms(snapshot.visibility);
+      sceneHost.getDeepSkyRenderer().updateVisibilityUniforms(snapshot.visibility);
       sceneHost.getGalacticSkyRenderer().updateEnvironment(snapshot);
       // Passem qualsevol nova UI d'aquí a una funció que pugui actualizar LocationHUD o SkyPage
       (locationHUD as any).updateSkyEnvironment?.(snapshot);

@@ -24,6 +24,7 @@ export interface SkyPageOptions {
   onShadowQualityChanged?: (quality: "off" | "low" | "medium" | "high") => void;
   onMilkyWayToggled?: (visible: boolean) => void | Promise<void>;
   onPlanckDustToggled?: (visible: boolean) => void | Promise<void>;
+  onNgcToggled?: (visible: boolean) => void;
 }
 
 import { ResourceBackedLayerRow } from "../components/ResourceBackedLayerRow";
@@ -58,6 +59,7 @@ export class SkyPage {
 
   private milkyWayRow!: ResourceBackedLayerRow;
   private planckDustRow!: ResourceBackedLayerRow;
+  private ngcRow!: ResourceBackedLayerRow;
 
   constructor(private resourceManager: ResourceManager, options: SkyPageOptions = {}) {
     this.options = options;
@@ -430,6 +432,14 @@ export class SkyPage {
       onVisibilityChanged: (visible) => this.options.onPlanckDustToggled?.(visible),
     });
     group.appendChild(this.planckDustRow.getElement());
+
+    this.ngcRow = new ResourceBackedLayerRow(this.resourceManager, {
+      label: "Catàleg NGC/IC",
+      resourceId: "sky.ngc",
+      initialVisible: true,
+      onVisibilityChanged: (visible) => this.options.onNgcToggled?.(visible),
+    });
+    group.appendChild(this.ngcRow.getElement());
   }
 
   private updateConditionalVisibility() {
@@ -530,6 +540,7 @@ export class SkyPage {
   public dispose(): void {
     this.milkyWayRow.destroy();
     this.planckDustRow.destroy();
+    this.ngcRow.destroy();
     this.element.remove();
   }
 }
