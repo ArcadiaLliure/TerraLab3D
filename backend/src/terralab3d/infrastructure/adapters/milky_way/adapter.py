@@ -1,4 +1,7 @@
-"""Especificació abstracta de l’adaptador `milky_way`."""
+"""Import de compatibilitat per a l'adaptador d'assets galàctics gestionats."""
 
-class MilkyWayAdapterSpec:
-    """Ubicació i límit de cicle de vida de la futura implementació concreta."""
+from terralab3d.infrastructure.adapters.file_assets.galactic import (
+    ManagedGalacticAssets as MilkyWayAssetAdapter,
+)
+
+__all__ = ["MilkyWayAssetAdapter"]

@@ -1,7 +1,7 @@
 export class ToolsPage {
   private element: HTMLDivElement;
 
-  constructor() {
+  constructor(private onOpenResourceManager: () => void) {
     this.element = document.createElement("div");
     this.element.style.cssText = `
       display: flex;
@@ -35,6 +35,21 @@ export class ToolsPage {
     info.style.cssText = "font-size: 10px; color: var(--color-text-muted);";
     info.textContent = "Regla de mesura angular i eines de camp de visió (FOV).";
     group.appendChild(info);
+
+    const btn = document.createElement("button");
+    btn.textContent = "Obrir Gestor de Recursos";
+    btn.style.cssText = `
+        padding: 6px 12px;
+        margin-top: 8px;
+        background: var(--color-surface, #1a1a1a);
+        color: var(--color-gold, #facc15);
+        border: 1px solid var(--color-gold, #facc15);
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+    `;
+    btn.onclick = () => this.onOpenResourceManager();
+    group.appendChild(btn);
 
     this.element.appendChild(group);
   }

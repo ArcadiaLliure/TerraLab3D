@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import hashlib
 import logging
-import struct
 import time
 from typing import Any, Callable, Awaitable
 
@@ -28,7 +27,6 @@ import numpy as np
 
 from terralab3d.domain.stars.models import (
     CelestialFrameTransform,
-    GaiaAvailability,
     StarBatch,
     StarCatalogStatus,
     StarResourceDescriptor,
@@ -37,7 +35,6 @@ from terralab3d.domain.stars.models import (
 from terralab3d.domain.stars.calculations import (
     bp_rp_to_rgb_uint8,
     compute_celestial_transform_matrix,
-    deduplicate_positive_source_ids,
     ra_dec_to_unit_vectors,
 )
 from terralab3d.infrastructure.adapters.star_catalog_adapter import (
@@ -165,28 +162,37 @@ class StarCoordinator:
         await self._publish_status()
 
     async def update_celestial_transform(
-        self, latitude_deg: float, lst_deg: float,
-    ) -> None:
+        self,
+        latitude_deg: float,
+        lst_deg: float,
+        *,
+        force_publish: bool = False,
+    ) -> bool:
         """Actualitza la transformació equatorial→ENU.
 
         Es crida quan canvia LST o latitud. NO per frame visual.
         NO toca buffers estel·lars.
+
+        ``force_publish`` torna a enviar el darrer marc a un frontend nou sense
+        crear una generació científica falsa. Això evita que una reconnexió
+        mostri cap capa celeste amb la matriu identitat.
         """
         if self._disposed:
-            return
+            return False
 
-        # Evitar publicar si no ha canviat significativament
-        if (
+        changed = not (
             self._last_lat_deg is not None
             and self._last_lst_deg is not None
             and abs(latitude_deg - self._last_lat_deg) < 1e-6
             and abs(lst_deg - self._last_lst_deg) < 1e-4
-        ):
-            return
+        )
+        if not changed and not force_publish:
+            return False
 
-        self._last_lat_deg = latitude_deg
-        self._last_lst_deg = lst_deg
-        self._transform_generation += 1
+        if changed:
+            self._last_lat_deg = latitude_deg
+            self._last_lst_deg = lst_deg
+            self._transform_generation += 1
 
         matrix = compute_celestial_transform_matrix(latitude_deg, lst_deg)
         transform = CelestialFrameTransform(
@@ -200,6 +206,7 @@ class StarCoordinator:
                 "generation": transform.generation,
                 "matrix3x3": list(transform.matrix_3x3),
             })
+        return True
 
     def get_status(self) -> StarCatalogStatus:
         """Retorna l'estat actual del catàleg."""

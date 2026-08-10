@@ -22,7 +22,12 @@ export interface SkyPageOptions {
   onSatelliteLodChanged?: (mode: "auto" | "faithful" | "diagnostic") => void;
   onSatelliteLabelsToggled?: (enabled: boolean) => void;
   onShadowQualityChanged?: (quality: "off" | "low" | "medium" | "high") => void;
+  onMilkyWayToggled?: (visible: boolean) => void | Promise<void>;
+  onPlanckDustToggled?: (visible: boolean) => void | Promise<void>;
 }
+
+import { ResourceBackedLayerRow } from "../components/ResourceBackedLayerRow";
+import type { ResourceManager } from "../../../application/ResourceManager";
 
 export class SkyPage {
   private element: HTMLDivElement;
@@ -51,7 +56,10 @@ export class SkyPage {
   private satelliteCatalogStatusLabel!: HTMLDivElement;
   private readonly enabledSatelliteSystems = new Set<string>();
 
-  constructor(options: SkyPageOptions = {}) {
+  private milkyWayRow!: ResourceBackedLayerRow;
+  private planckDustRow!: ResourceBackedLayerRow;
+
+  constructor(private resourceManager: ResourceManager, options: SkyPageOptions = {}) {
     this.options = options;
 
     this.element = document.createElement("div");
@@ -405,6 +413,23 @@ export class SkyPage {
     group.appendChild(countRow);
 
     this.element.appendChild(group);
+
+    // Milky Way Row
+    this.milkyWayRow = new ResourceBackedLayerRow(this.resourceManager, {
+      label: "Via Làctia",
+      resourceId: "sky.milky_way",
+      initialVisible: false,
+      onVisibilityChanged: (visible) => this.options.onMilkyWayToggled?.(visible),
+    });
+    group.appendChild(this.milkyWayRow.getElement());
+
+    this.planckDustRow = new ResourceBackedLayerRow(this.resourceManager, {
+      label: "Pols Planck",
+      resourceId: "sky.planck_dust",
+      initialVisible: false,
+      onVisibilityChanged: (visible) => this.options.onPlanckDustToggled?.(visible),
+    });
+    group.appendChild(this.planckDustRow.getElement());
   }
 
   private updateConditionalVisibility() {
@@ -503,6 +528,8 @@ export class SkyPage {
   }
 
   public dispose(): void {
+    this.milkyWayRow.destroy();
+    this.planckDustRow.destroy();
     this.element.remove();
   }
 }

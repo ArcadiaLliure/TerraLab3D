@@ -21,7 +21,7 @@ import aiohttp.web
 
 log = logging.getLogger("terralab3d.bridge")
 
-PROTOCOL_VERSION = 1
+PROTOCOL_VERSION = 2
 
 # Àlies de tipus per als manegadors de missatges del pont
 MessageHandler = Callable[[dict[str, Any]], Awaitable[None] | None]
@@ -352,6 +352,20 @@ class WebSocketBridge:
         )
         self._trajectory_bridge_bytes = len(resource.payload)
         return len(resource.payload)
+
+    async def send_resource_catalog_snapshot(self, snapshot: Any) -> None:
+        payload = snapshot
+        if hasattr(snapshot, "to_dict"):
+            payload = snapshot.to_dict()
+        payload["type"] = "resource_catalog_snapshot"
+        await self.send(payload)
+
+    async def send_download_job_snapshot(self, snapshot: Any) -> None:
+        payload = snapshot
+        if hasattr(snapshot, "to_dict"):
+            payload = snapshot.to_dict()
+        payload["type"] = "download_job_snapshot"
+        await self.send(payload)
 
     async def send_location_error(self, message: str) -> None:
         await self.send({

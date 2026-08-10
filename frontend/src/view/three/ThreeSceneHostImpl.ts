@@ -33,6 +33,7 @@ import { HorizontalGrid } from "./HorizontalGrid";
 import { CelestialLabels } from "./CelestialLabels";
 import { CelestialEquator } from "./CelestialEquator";
 import { StarFieldRenderer } from "./StarFieldRenderer";
+import { GalacticSkyRenderer } from "./GalacticSkyRenderer";
 import { SolarSystemRenderer } from "./SolarSystemRenderer";
 import { SolarSystemLabels } from "./SolarSystemLabels";
 import { SceneLightingController } from "./lighting/SceneLightingController";
@@ -69,6 +70,7 @@ export class ThreeSceneHostImpl {
   private readonly celestialLabels: CelestialLabels;
   private readonly celestialEquator: CelestialEquator;
   private readonly starFieldRenderer: StarFieldRenderer;
+  private readonly galacticSkyRenderer: GalacticSkyRenderer;
   private readonly solarSystemRenderer: SolarSystemRenderer;
   private readonly solarSystemLabels: SolarSystemLabels;
 
@@ -131,6 +133,12 @@ export class ThreeSceneHostImpl {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     applyRendererColorPolicy(this.renderer);
     this.lightingController = new SceneLightingController(this.scene, this.renderer);
+
+    // ─── Pas 10: skydome galàctic persistent ────────────────────────
+    this.galacticSkyRenderer = new GalacticSkyRenderer(
+      this.celestialRoot,
+      this.renderer.capabilities.maxTextureSize,
+    );
 
     // ─── Phase 5: Star Field Renderer ────────────────────────────────
     this.starFieldRenderer = new StarFieldRenderer();
@@ -195,6 +203,10 @@ export class ThreeSceneHostImpl {
     return this.starFieldRenderer;
   }
 
+  getGalacticSkyRenderer(): GalacticSkyRenderer {
+    return this.galacticSkyRenderer;
+  }
+
   getSolarSystemRenderer(): SolarSystemRenderer {
     return this.solarSystemRenderer;
   }
@@ -229,6 +241,7 @@ export class ThreeSceneHostImpl {
 
     this.solarSystemRenderer.update(timestampMs);
     this.starFieldRenderer.interpolate(timestampMs);
+    this.galacticSkyRenderer.syncTransform();
     this.lightingController.update(timestampMs, this.camera.position);
 
     // ─── Celestial rotation (legacy LST sphere) ──────────────────────
@@ -365,6 +378,7 @@ export class ThreeSceneHostImpl {
     this.solarSystemLabels.dispose();
     this.celestialEquator.dispose();
     this.starFieldRenderer.dispose();
+    this.galacticSkyRenderer.dispose();
     this.solarSystemRenderer.dispose();
     this.lightingController.dispose();
 

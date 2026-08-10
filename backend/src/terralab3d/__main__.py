@@ -66,6 +66,12 @@ async def run() -> int:
     from terralab3d.infrastructure.adapters.file_assets.moon_surface import ManagedMoonSurfaceAssets
     from terralab3d.infrastructure.adapters.file_assets.solar_system import ManagedSolarSystemAssets
     from terralab3d.infrastructure.adapters.file_assets.lunar_limb import LroLolaLimbProfileProvider
+    from terralab3d.infrastructure.adapters.file_assets.galactic import ManagedGalacticAssets
+    from terralab3d.infrastructure.adapters.planck.adapter import PlanckDustAdapter
+    from terralab3d.infrastructure.resources.catalog import ResourceCatalog
+    from terralab3d.infrastructure.resources.installation_repository import ResourceInstallationRepository
+    from terralab3d.infrastructure.resources.download_manager import DownloadJobManager
+    from terralab3d.domain.identifiers import ResourceId, VariantId
 
     # ── 1. Compilar frontend i inicialitzar assets de dades ───────────
     try:
@@ -78,7 +84,23 @@ async def run() -> int:
     bridge = WebSocketBridge()
     moon_surface_assets = ManagedMoonSurfaceAssets()
     solar_system_assets = ManagedSolarSystemAssets()
-    server = TerraLabServer(dist_dir, bridge, moon_surface_assets, solar_system_assets)
+    resource_catalog = ResourceCatalog()
+    resource_repo = ResourceInstallationRepository()
+    resource_repo.discover_existing_resources()
+    galactic_assets = ManagedGalacticAssets(resource_repo)
+    download_manager = DownloadJobManager(
+        resource_catalog,
+        resource_repo,
+        bridge,
+        post_processors={ResourceId("sky.planck_dust"): PlanckDustAdapter()},
+    )
+    server = TerraLabServer(
+        dist_dir,
+        bridge,
+        moon_surface_assets,
+        solar_system_assets,
+        galactic_assets,
+    )
 
     loop = asyncio.get_running_loop()
     shutdown_requested = asyncio.Event()
@@ -88,6 +110,44 @@ async def run() -> int:
     bridge.on("viewport_resized", _on_viewport_resized)
     bridge.on("bridge_error", _on_bridge_error)
     bridge.on("frontend_performance_metrics", _on_frontend_performance_metrics)
+
+    # ── 2.5. Gestor Unificat de Recursos ──────────────────────────────
+    def _handle_request_catalog_snapshot(data: dict[str, Any]) -> None:
+        payload = {
+            "descriptors": [d.to_dict() for d in resource_catalog.get_all_descriptors()],
+            "installedStates": resource_repo.snapshot(),
+        }
+        asyncio.create_task(bridge.send_resource_catalog_snapshot(payload))
+
+    def _handle_request_resource_download(data: dict[str, Any]) -> None:
+        resource_id = data.get("resourceId")
+        variant_id = data.get("variantId")
+        if resource_id and variant_id:
+            download_manager.start_download(ResourceId(resource_id), VariantId(variant_id))
+
+    def _handle_pause_download(data: dict[str, Any]) -> None:
+        resource_id = data.get("resourceId")
+        variant_id = data.get("variantId")
+        if resource_id and variant_id:
+            download_manager.pause_download(ResourceId(resource_id), VariantId(variant_id))
+
+    def _handle_cancel_download(data: dict[str, Any]) -> None:
+        resource_id = data.get("resourceId")
+        variant_id = data.get("variantId")
+        if resource_id and variant_id:
+            download_manager.cancel_download(ResourceId(resource_id), VariantId(variant_id))
+
+    def _handle_delete_resource(data: dict[str, Any]) -> None:
+        resource_id = data.get("resourceId")
+        variant_id = data.get("variantId")
+        if resource_id and variant_id:
+            download_manager.delete_resource(ResourceId(resource_id), VariantId(variant_id))
+
+    bridge.on("request_catalog_snapshot", _handle_request_catalog_snapshot)
+    bridge.on("request_resource_download", _handle_request_resource_download)
+    bridge.on("pause_download", _handle_pause_download)
+    bridge.on("cancel_download", _handle_cancel_download)
+    bridge.on("delete_resource", _handle_delete_resource)
 
     # ── 3. Lògica d'Ubicació (Fase 2) ─────────────────────────────────
     from terralab3d.domain.observer.models import GeoLocation, ObserverProfile
@@ -115,7 +175,7 @@ async def run() -> int:
             lat = float(data.get("lat", 0.0))
             lon = float(data.get("lon", 0.0))
             height = float(data.get("extraHeight", 0.0))
-            
+
             loc = GeoLocation(latitude_deg=lat, longitude_deg=lon)
             current_observer = ObserverProfile(
                 observer_id=current_observer.observer_id,
@@ -189,12 +249,15 @@ async def run() -> int:
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
         await bridge.send_planet_texture_manifest(solar_system_assets.descriptor)
         await bridge.send_satellite_catalog_manifest(solar_system_assets.descriptor)
-        await broadcast_time()
+        await broadcast_time(force_celestial_transform=True)
         # Iniciar la càrrega d'estrelles o re-enviar les existents si ja estan carregades (re-connexió F5)
         if not star_coordinator._started:
             asyncio.create_task(star_coordinator.start())
         else:
             asyncio.create_task(star_coordinator.publish_current_state())
+
+        # Send initial resource catalog
+        _handle_request_catalog_snapshot({})
 
     bridge.on("set_observer_location", _handle_set_location)
     bridge.on("frontend_ready", _on_frontend_ready)
@@ -511,7 +574,7 @@ async def run() -> int:
                 )
             )
 
-    async def broadcast_time() -> None:
+    async def broadcast_time(*, force_celestial_transform: bool = False) -> None:
         if not bridge.connected:
             return
         # Calculate Astro parameters
@@ -537,6 +600,7 @@ async def run() -> int:
         await star_coordinator.update_celestial_transform(
             latitude_deg=current_observer.location.latitude_deg,
             lst_deg=lst_deg,
+            force_publish=force_celestial_transform,
         )
         ephemeris_coordinator.request(
             sim_time_utc,
@@ -799,6 +863,17 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("moonNormalTextureLoadCount", 0),
         data.get("moonTextureUploadBytes", 0),
         data.get("moonBridgeTextureBytes", 0),
+    )
+    log.info(
+        "Galactic metrics: geometry=%d material=%d milky_way_loads=%d "
+        "planck_loads=%d stale=%d active=%d texture_upload_bytes=%d",
+        data.get("galacticGeometryBuildCount", 0),
+        data.get("galacticMaterialBuildCount", 0),
+        data.get("milkyWayTextureLoadCount", 0),
+        data.get("planckTextureLoadCount", 0),
+        data.get("galacticStaleTextureCount", 0),
+        data.get("galacticActiveTextureCount", 0),
+        data.get("galacticTextureUploadBytes", 0),
     )
     log.info(
         "Lighting 8.7 metrics: sun_build=%d moon_build=%d diffuse_build=%d "

@@ -17,6 +17,11 @@ import type {
   SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "./solar_system_contracts";
+import type {
+  ResourceDescriptor,
+  DownloadJobSnapshot,
+  ResourceInstallState,
+} from "./resource_manager_contracts";
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
@@ -198,6 +203,36 @@ export interface SetManualMagnitudeLimitMessage {
   readonly magnitudeLimit: number;
 }
 
+// ─── Resource Manager (Pas 8.6, 9) ───────────────────────────────────
+
+export interface RequestCatalogSnapshotMessage {
+  readonly type: "request_catalog_snapshot";
+}
+
+export interface RequestResourceDownloadMessage {
+  readonly type: "request_resource_download";
+  readonly resourceId: string;
+  readonly variantId: string;
+}
+
+export interface PauseDownloadMessage {
+  readonly type: "pause_download";
+  readonly resourceId: string;
+  readonly variantId: string;
+}
+
+export interface CancelDownloadMessage {
+  readonly type: "cancel_download";
+  readonly resourceId: string;
+  readonly variantId: string;
+}
+
+export interface DeleteResourceMessage {
+  readonly type: "delete_resource";
+  readonly resourceId: string;
+  readonly variantId: string;
+}
+
 export interface FrontendPerformanceMetricsMessage {
   readonly type: "frontend_performance_metrics";
   readonly frameMsP50: number;
@@ -225,6 +260,13 @@ export interface FrontendPerformanceMetricsMessage {
   readonly trajectoryBridgeBytes: number;
   readonly solarTotalityGeometryBuildCount: number;
   readonly solarTotalityMaterialBuildCount: number;
+  readonly galacticGeometryBuildCount: number;
+  readonly galacticMaterialBuildCount: number;
+  readonly milkyWayTextureLoadCount: number;
+  readonly planckTextureLoadCount: number;
+  readonly galacticStaleTextureCount: number;
+  readonly galacticTextureUploadBytes: number;
+  readonly galacticActiveTextureCount: number;
   readonly gpuMemoryEstimateBytes: number;
   readonly moonGeometryBuildCount: number;
   readonly moonMaterialBuildCount: number;
@@ -277,6 +319,11 @@ export type FrontendMessage =
   | RequestEventSearchMessage
   | RequestApparentTrajectoryMessage
   | RequestAngularSeparationMessage
+  | RequestCatalogSnapshotMessage
+  | RequestResourceDownloadMessage
+  | PauseDownloadMessage
+  | CancelDownloadMessage
+  | DeleteResourceMessage
   | NavigationModeChangedMessage
   | CameraPoseChangedMessage
   | CameraMotionStartedMessage
@@ -407,6 +454,8 @@ export interface SolarSystemCatalogManifestMessage extends SatelliteCatalogManif
   readonly type: "solar_system_catalog_manifest";
 }
 
+// ─── Events astronòmics (Pas 8.5) ────────────────────────────────────
+
 export interface AstronomicalEventSnapshotMessage extends AstronomicalEventSnapshot {
   readonly type: "astronomical_event_snapshot";
 }
@@ -418,6 +467,30 @@ export interface EventSearchResultMessage extends AstronomicalEventSearchResult 
 export interface AngularSeparationResultMessage extends AngularSeparationResult {
   readonly type: "angular_separation_result";
 }
+
+// ─── Gestió de Recursos (Pas 8.6, 9) ─────────────────────────────────
+
+export interface ResourceCatalogSnapshotMessage {
+  readonly type: "resource_catalog_snapshot";
+  readonly descriptors: ResourceDescriptor[];
+  readonly installedStates: Record<
+    string,
+    {
+      status: ResourceInstallState;
+      variantId: string | null;
+      downloadedBytes: number;
+      verifiedAt: string | null;
+      error: string | null;
+      manifestData: Record<string, string | number | boolean> | null;
+    }
+  >;
+}
+
+export interface DownloadJobSnapshotMessage extends DownloadJobSnapshot {
+  readonly type: "download_job_snapshot";
+}
+
+// ─── Tipus Unió ──────────────────────────────────────────────────────
 
 export type BackendMessage =
   | HandshakeAckMessage
@@ -438,7 +511,9 @@ export type BackendMessage =
   | SolarSystemCatalogManifestMessage
   | AstronomicalEventSnapshotMessage
   | EventSearchResultMessage
-  | AngularSeparationResultMessage;
+  | AngularSeparationResultMessage
+  | ResourceCatalogSnapshotMessage
+  | DownloadJobSnapshotMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

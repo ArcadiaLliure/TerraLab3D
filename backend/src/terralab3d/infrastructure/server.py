@@ -17,6 +17,7 @@ import aiohttp.web
 from .websocket_bridge import WebSocketBridge
 from terralab3d.application.ports.moon_surface_assets import MoonSurfaceAssetPort
 from terralab3d.application.ports.solar_system_assets import SolarSystemAssetPort
+from terralab3d.infrastructure.adapters.file_assets.galactic import ManagedGalacticAssets
 
 log = logging.getLogger("terralab3d.server")
 
@@ -30,6 +31,7 @@ class TerraLabServer:
         bridge: WebSocketBridge,
         moon_surface_assets: MoonSurfaceAssetPort | None = None,
         solar_system_assets: SolarSystemAssetPort | None = None,
+        galactic_assets: ManagedGalacticAssets | None = None,
         *,
         host: str = "127.0.0.1",
         port: int = 14398,
@@ -38,6 +40,7 @@ class TerraLabServer:
         self._bridge = bridge
         self._moon_surface_assets = moon_surface_assets
         self._solar_system_assets = solar_system_assets
+        self._galactic_assets = galactic_assets
         self._host = host
         self._port = port
         self._actual_port = 0
@@ -61,6 +64,11 @@ class TerraLabServer:
             self._app.router.add_get("/moon-assets/{asset_name}", self._serve_moon_asset)
         if self._solar_system_assets is not None:
             self._app.router.add_get("/planet-assets/{asset_name}", self._serve_planet_asset)
+        if self._galactic_assets is not None:
+            self._app.router.add_get(
+                "/managed-galactic-assets/{resource_id}",
+                self._serve_galactic_asset,
+            )
         self._app.router.add_get("/", self._serve_index)
         self._app.router.add_static(
             "/", self._dist_dir, show_index=False,
@@ -134,5 +142,20 @@ class TerraLabServer:
             raise aiohttp.web.HTTPNotFound()
         response = aiohttp.web.FileResponse(path)
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        return response
+
+    async def _serve_galactic_asset(
+        self, request: aiohttp.web.Request,
+    ) -> aiohttp.web.StreamResponse:
+        """Serveix només l'asset READY resolt des del catàleg local."""
+
+        if self._galactic_assets is None:
+            raise aiohttp.web.HTTPNotFound()
+        path = self._galactic_assets.resolve_asset(request.match_info["resource_id"])
+        if path is None:
+            raise aiohttp.web.HTTPNotFound()
+        response = aiohttp.web.FileResponse(path)
+        response.headers["Cache-Control"] = "private, no-cache"
         response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
         return response

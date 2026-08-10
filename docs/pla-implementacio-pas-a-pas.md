@@ -5198,18 +5198,18 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 
 ### Tasques
 
-- [ ] Identificar i validar els formats FITS/PNG i metadades de coordenades actuals.
-- [ ] Definir descriptors versionats per textura de Via Làctia i mapa Planck.
-- [ ] Implementar adaptadors de càrrega i conversió fora del domini.
-- [ ] Definir orientació galàctica, offset RA, flips i frame de coordenades com a estat tipat.
-- [ ] Carregar la textura una sola vegada per versió.
-- [ ] Representar la Via Làctia en un skydome persistent.
-- [ ] Aplicar opacitat, blend i extinció amb uniforms.
-- [ ] Aplicar pols com densitat visual i/o extinció segons la semàntica caracteritzada.
-- [ ] Mostrar estat de càrrega, recurs absent, fallback i errors.
-- [ ] Implementar toggles independents de Via Làctia i Planck.
-- [ ] Evitar qualsevol sampling de pantalla al backend.
-- [ ] Comparar orientació i estructura reconeixible amb TerraLab.
+- [x] Identificar i validar els formats FITS/PNG i metadades de coordenades actuals.
+- [x] Definir descriptors versionats per textura de Via Làctia i mapa Planck.
+- [x] Implementar adaptadors de càrrega i conversió fora del domini.
+- [x] Definir orientació galàctica, offset RA, flips i frame de coordenades com a estat tipat.
+- [x] Carregar la textura una sola vegada per versió.
+- [x] Representar la Via Làctia en un skydome persistent.
+- [x] Aplicar opacitat, blend i extinció amb uniforms.
+- [x] Aplicar pols com densitat visual i/o extinció segons la semàntica caracteritzada.
+- [x] Mostrar estat de càrrega, recurs absent, fallback i errors.
+- [x] Implementar toggles independents de Via Làctia i Planck.
+- [x] Evitar qualsevol sampling de pantalla al backend.
+- [x] Comparar orientació i estructura reconeixible amb TerraLab.
 
 ### Criteri de sortida
 

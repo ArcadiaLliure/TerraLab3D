@@ -1,38 +1,11 @@
-# Adaptador d’infraestructura `milky_way`
+# Integració d’infraestructura `milky_way`
 
-## Propòsit
+La Via Làctia no reutilitza la textura galàctica de TerraLab. El catàleg
+`ResourceCatalog` descriu exclusivament els EXR celestes `milkyway_2020_*` de
+NASA SVS 4851. `DownloadJobManager` els descarrega per streaming i calcula el
+SHA-256 local; `ManagedGalacticAssets` només exposa al frontend el fitxer
+registrat com a `READY` dins de la llibreria de dades.
 
-Càrrega i validació de textures de Via Làctia.
-
-## Pertinença arquitectònica
-
-**Infraestructura / Adaptador.** Implementa un port propietat de l’aplicació.
-
-## Entrades i sortides
-
-Rep DTO tipats o peticions del port i retorna DTO tipats, handles binaris o esdeveniments de progrés.
-
-## Dependències permeses
-
-- Ports de `terralab3d.application.ports`.
-- Models purs del domini.
-- Biblioteques concretes necessàries per a aquesta integració.
-
-## Dependències prohibides
-
-- UI i components Three.js.
-- Decisions científiques que pertanyin al domini.
-- Estat global mutable no encapsulat.
-
-## PENDENTS
-
-- [ ] Identificar el port exacte que implementa.
-- [ ] Definir configuració i cicle de vida.
-- [ ] Implementar cancel·lació i errors tipats.
-- [ ] Caracteritzar la font equivalent de TerraLab abans de migrar-la.
-- [ ] Mesurar memòria, latència i bytes transferits.
-- [ ] Afegir proves amb recursos temporals o dobles del servei extern.
-
-## Migració des de TerraLab
-
-S’ha de traslladar només la part d’I/O, integració, caché o execució que correspongui. Qualsevol fórmula o decisió científica s’ha d’extreure al paquet de domini funcional apropiat.
+No hi ha conversió Galactic→ICRS per a aquest recurs. La interpretació
+ICRF/J2000 i les convencions RA/Dec pertanyen al renderer persistent
+`GalacticSkyRenderer`.

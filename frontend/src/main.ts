@@ -12,14 +12,17 @@
 
 import { WebSocketBridge } from "./bridge/WebSocketBridge";
 import type { BackendMessageListener } from "./bridge/WebSocketBridge";
+import { ResourceManager } from "./application/ResourceManager";
 import { CameraRigImpl } from "./view/three/CameraRigImpl";
 import { RenderLoopImpl } from "./view/three/RenderLoopImpl";
 import { ThreeSceneHostImpl } from "./view/three/ThreeSceneHostImpl";
 import { AtmosphereRenderer } from "./view/three/AtmosphereRenderer";
+import type { GalacticTextureResource } from "./view/three/GalacticSkyRenderer";
 import type { OverlayVisibility } from "./view/three/ThreeSceneHostImpl";
 import { DiagnosticsOverlay } from "./view/ui/DiagnosticsOverlay";
 import { NavigationWorld } from "./view/three/terrain/NavigationWorld";
 import { GroundFollower } from "./view/three/terrain/GroundFollower";
+import { ResourceManagerModal } from "./view/ui/modals/ResourceManagerModal";
 
 import { LocationPage } from "./view/ui/drawer_pages/LocationPage";
 import { SkyPage } from "./view/ui/drawer_pages/SkyPage";
@@ -47,9 +50,10 @@ function main(): void {
     return;
   }
 
-  // 1. Create subsystems and connect bridge immediately (parallel with 3D/UI setup)
+  // 1. Create subsystems. The bridge connects after all listeners are wired so
+  // the initial celestial transform and resource catalogue cannot be lost.
   const bridge = new WebSocketBridge();
-  bridge.connect();
+  const resourceManager = new ResourceManager(bridge);
   const sceneHost = new ThreeSceneHostImpl();
   const cameraRig = new CameraRigImpl(sceneHost.camera);
   const renderLoop = new RenderLoopImpl();
@@ -59,8 +63,11 @@ function main(): void {
   const navigationWorld = new NavigationWorld();
   const groundFollower = new GroundFollower();
 
+  const resourceManagerModal = new ResourceManagerModal(resourceManager);
+
   const shell = new Shell({
     onSetRealtime: (enabled) => bridge.sendSetRealtimeMode(enabled),
+    onOpenResourceManager: () => resourceManagerModal.open(),
   });
   shell.mount(container);
 
@@ -107,6 +114,28 @@ function main(): void {
     }
   };
 
+  const readyGalacticResource = (
+    resourceId: "sky.milky_way" | "sky.planck_dust",
+  ): GalacticTextureResource => {
+    const descriptor = resourceManager.getDescriptor(resourceId);
+    const state = resourceManager.getInstallState(resourceId);
+    if (!descriptor || state.status !== "READY" || state.variantId === null) {
+      throw new Error("El recurs encara no està disponible");
+    }
+    const variant = descriptor.variants.find((candidate) => candidate.id === state.variantId);
+    if (!variant) throw new Error("La variant instal·lada no existeix al catàleg");
+    const renderWidth = Number(state.manifestData?.renderWidth ?? variant.width ?? 0);
+    const renderHeight = Number(state.manifestData?.renderHeight ?? variant.height ?? 0);
+    const version = `${state.variantId}:${state.verifiedAt ?? "ready"}`;
+    return {
+      resourceId,
+      version,
+      url: `/managed-galactic-assets/${encodeURIComponent(resourceId)}?v=${encodeURIComponent(version)}`,
+      width: renderWidth,
+      height: renderHeight,
+    };
+  };
+
   // 2. Prepare UI pages
   const locationPage = new LocationPage({
     onRelocate: (lat, lon, height) => bridge.sendSetObserverLocation(lat, lon, height),
@@ -126,7 +155,7 @@ function main(): void {
   const locContainer = shell.getPageContainer("location");
   if (locContainer) locationPage.mount(locContainer);
 
-  const skyPage = new SkyPage({
+  const skyPage = new SkyPage(resourceManager, {
     onStarLayerToggled: (visible) => sceneHost.getStarFieldRenderer().setVisible(visible),
     onAtmosphereToggled: (enabled) => bridge.sendSetAtmosphereEnabled(enabled),
     onLightPollutionToggled: (enabled) => bridge.sendSetLightPollutionEnabled(enabled),
@@ -159,6 +188,16 @@ function main(): void {
     onShadowQualityChanged: (quality) => {
       sceneHost.getLightingController().setShadowQuality(quality);
     },
+    onMilkyWayToggled: async (visible) => {
+      const renderer = sceneHost.getGalacticSkyRenderer();
+      if (visible) await renderer.installMilkyWay(readyGalacticResource("sky.milky_way"));
+      renderer.setMilkyWayVisible(visible);
+    },
+    onPlanckDustToggled: async (visible) => {
+      const renderer = sceneHost.getGalacticSkyRenderer();
+      if (visible) await renderer.installPlanckDust(readyGalacticResource("sky.planck_dust"));
+      renderer.setPlanckDustVisible(visible);
+    },
   });
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
@@ -167,7 +206,7 @@ function main(): void {
   const earthContainer = shell.getPageContainer("earth");
   if (earthContainer) earthPage.mount(earthContainer);
 
-  const toolsPage = new ToolsPage();
+  const toolsPage = new ToolsPage(() => resourceManagerModal.open());
   const toolsContainer = shell.getPageContainer("tools");
   if (toolsContainer) toolsPage.mount(toolsContainer);
 
@@ -179,6 +218,7 @@ function main(): void {
   // ─── Picking Initialization (Pas 6) ──────────────────────────────
   const celestialTransformState = new CelestialTransformState();
   sceneHost.getStarFieldRenderer().setTransformState(celestialTransformState);
+  sceneHost.getGalacticSkyRenderer().setTransformState(celestialTransformState);
 
   const gestureRouter = new PointerGestureRouter();
   
@@ -302,7 +342,6 @@ function main(): void {
       skyPage.updateStarCatalogStatus(status);
     },
     onCelestialFrameTransform(generation, matrix3x3) {
-      sceneHost.getStarFieldRenderer().updateCelestialTransform(generation, matrix3x3);
       celestialTransformState.update(generation, matrix3x3 as number[]);
     },
     onBinaryResourceReady(metadata, bufferPayload) {
@@ -327,6 +366,7 @@ function main(): void {
       atmosphereRenderer.updateEnvironment(snapshot);
       sceneHost.getSolarSystemRenderer().updateEnvironment(snapshot);
       sceneHost.getStarFieldRenderer().updateVisibilityUniforms(snapshot.visibility);
+      sceneHost.getGalacticSkyRenderer().updateEnvironment(snapshot);
       // Passem qualsevol nova UI d'aquí a una funció que pugui actualizar LocationHUD o SkyPage
       (locationHUD as any).updateSkyEnvironment?.(snapshot);
       (skyPage as any).updateSkyEnvironment?.(snapshot);
@@ -398,6 +438,7 @@ function main(): void {
       skyPage.dispose();
       earthPage.dispose();
       toolsPage.dispose();
+      resourceManagerModal.dispose();
       locationHUD.dispose();
       bridge.dispose();
     },
@@ -414,6 +455,8 @@ function main(): void {
       }
     },
   });
+
+  bridge.connect();
 
   // 6. Render loop with deltaTime for navigation
   let fpsUpdateAccum = 0;
@@ -440,6 +483,7 @@ function main(): void {
       performanceUpdateAccum = 0;
       const frames = renderLoop.frameMetrics;
       const solar = sceneHost.getSolarSystemRenderer().metrics();
+      const galactic = sceneHost.getGalacticSkyRenderer().metrics();
       const lighting = sceneHost.getLightingController().metrics();
       const navigation = navigationWorld.metrics();
       const rendererInfo = sceneHost.renderer.info;
@@ -469,11 +513,19 @@ function main(): void {
         trajectoryBridgeBytes: solar.trajectories.bridgeBytes,
         solarTotalityGeometryBuildCount: solar.totality.geometryBuildCount,
         solarTotalityMaterialBuildCount: solar.totality.materialBuildCount,
+        galacticGeometryBuildCount: galactic.geometryBuildCount,
+        galacticMaterialBuildCount: galactic.materialBuildCount,
+        milkyWayTextureLoadCount: galactic.milkyWayTextureLoadCount,
+        planckTextureLoadCount: galactic.planckTextureLoadCount,
+        galacticStaleTextureCount: galactic.staleTextureCount,
+        galacticTextureUploadBytes: galactic.textureUploadBytes,
+        galacticActiveTextureCount: galactic.activeTextureCount,
         gpuMemoryEstimateBytes: solar.planetTextureUploadBytes
           + solar.moon.textureUploadBytes
           + solar.rings.textureUploadBytes
           + solar.satellites.catalogCount * 3 * Float32Array.BYTES_PER_ELEMENT * 2
-          + solar.orbits.bridgeBytes,
+          + solar.orbits.bridgeBytes
+          + galactic.textureUploadBytes,
         moonGeometryBuildCount: solar.moon.geometryBuildCount,
         moonMaterialBuildCount: solar.moon.materialBuildCount,
         moonAlbedoTextureLoadCount: solar.moon.albedoTextureLoadCount,
@@ -542,6 +594,7 @@ function main(): void {
     atmosphereRenderer.dispose();
     sceneHost.dispose();
     diagnostics.dispose();
+    resourceManagerModal.dispose();
     bridge.dispose();
   });
 }

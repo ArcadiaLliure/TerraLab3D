@@ -1,38 +1,23 @@
 # Adaptador d’infraestructura `planck`
 
-## Propòsit
+`PlanckDustAdapter` implementa el port `ResourcePostProcessor`. Rep el FITS
+HEALPix oficial `COM_CompMap_Dust-GNILC-Model-Opacity_2048_R2.01.fits`, valida
+`NSIDE`, `ORDERING`, `COORDSYS=G` i el camp `TAU353`, i genera una cache PNG
+equirectangular local.
 
-Càrrega i validació del mapa de pols Planck.
+Convenció del derivat:
 
-## Pertinença arquitectònica
+```text
+u=0     -> l=0°
+u creix -> longitud galàctica cap a la dreta
+v=0     -> b=+90°
+v=1     -> b=-90°
+```
 
-**Infraestructura / Adaptador.** Implementa un port propietat de l’aplicació.
+El FITS font no es modifica ni se substitueix. El percentil de visualització,
+dimensions i metadades de conversió queden registrats amb la instal·lació. La
+conversió s’executa fora del bucle de render i el resultat només s’aplica si el
+job continua vigent.
 
-## Entrades i sortides
-
-Rep DTO tipats o peticions del port i retorna DTO tipats, handles binaris o esdeveniments de progrés.
-
-## Dependències permeses
-
-- Ports de `terralab3d.application.ports`.
-- Models purs del domini.
-- Biblioteques concretes necessàries per a aquesta integració.
-
-## Dependències prohibides
-
-- UI i components Three.js.
-- Decisions científiques que pertanyin al domini.
-- Estat global mutable no encapsulat.
-
-## PENDENTS
-
-- [ ] Identificar el port exacte que implementa.
-- [ ] Definir configuració i cicle de vida.
-- [ ] Implementar cancel·lació i errors tipats.
-- [ ] Caracteritzar la font equivalent de TerraLab abans de migrar-la.
-- [ ] Mesurar memòria, latència i bytes transferits.
-- [ ] Afegir proves amb recursos temporals o dobles del servei extern.
-
-## Migració des de TerraLab
-
-S’ha de traslladar només la part d’I/O, integració, caché o execució que correspongui. Qualsevol fórmula o decisió científica s’ha d’extreure al paquet de domini funcional apropiat.
+Dependències concretes: `astropy`, `hpgeom`, `numpy` i `Pillow`. No hi ha cap
+dependència de UI o Three.js.

@@ -94,3 +94,46 @@ def resolve_solar_system_planets_dir() -> Path:
     planets_dir = root / "data" / "sky" / "solar-system" / "planets"
     planets_dir.mkdir(parents=True, exist_ok=True)
     return planets_dir
+
+
+def resolve_resource_state_dir() -> Path:
+    """Retorna el directori on es guarda l'estat local dels recursos i capes (state/resources)."""
+    root = resolve_data_root()
+    state_dir = root / "state" / "resources"
+    state_dir.mkdir(parents=True, exist_ok=True)
+    return state_dir
+
+
+def resolve_download_temp_dir() -> Path:
+    """Retorna el directori on es guarden les descàrregues parcials (state/downloads)."""
+    root = resolve_data_root()
+    temp_dir = root / "state" / "downloads"
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    return temp_dir
+
+
+def resolve_resource_install_dir(resource_id: str) -> Path:
+    """Retorna el directori on s'ha d'instal·lar un recurs basant-se en l'estructura oficial."""
+    root = resolve_data_root()
+    if resource_id.startswith("sky.milky_way") or resource_id.startswith("sky.planck_dust"):
+        d = root / "data" / "sky" / "milky-way"
+    elif resource_id.startswith("celestial.ngc"):
+        d = root / "data" / "sky" / "ngc"
+    elif resource_id.startswith("sky.stars") or resource_id.startswith("celestial.gaia"):
+        d = root / "data" / "sky" / "gaia"
+    elif resource_id.startswith("solar.saturn"):
+        d = root / "data" / "sky" / "solar-system" / "planets"
+    elif resource_id.startswith("solar."):
+        d = root / "data" / "sky" / "solar-system" / "kernels"
+    else:
+        d = root / "data" / "sky" / "managed"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def resolve_derived_resource_dir(resource_id: str) -> Path:
+    """Retorna la cache derivada d'un recurs sense exposar rutes arbitràries."""
+    safe_name = resource_id.replace(".", "-").replace("/", "-").replace("\\", "-")
+    derived_dir = resolve_data_root() / "cache" / "resources" / safe_name
+    derived_dir.mkdir(parents=True, exist_ok=True)
+    return derived_dir

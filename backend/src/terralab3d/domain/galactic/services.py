@@ -1,9 +1,29 @@
-"""Contractes de servei purs per a la capacitat Via Làctia i pols."""
+"""Composició de l'aparença galàctica sense I/O ni renderitzat."""
+
+from __future__ import annotations
+
+from terralab3d.domain.galactic.calculations import galactic_visibility_factor
+from terralab3d.domain.galactic.models import GalacticAppearance
 
 
-from typing import Protocol
-from .models import GalacticAppearance
+class GalacticVisibilityModel:
+    """Aplica l'estat del cel als controls visuals configurats de la capa."""
 
-class GalacticVisibilityModel(Protocol):
-    """Resol visibilitat de Via Làctia i pols sense mostrejar textures."""
-    def evaluate(self, *, bortle: float, magnitude_limit: float, atmosphere_extinction: float, instrument_gain: float) -> GalacticAppearance: ...
+    def evaluate(
+        self,
+        appearance: GalacticAppearance,
+        *,
+        sky_brightness_normalized: float,
+        light_pollution_enabled: bool,
+        bortle_class: float | None,
+    ) -> GalacticAppearance:
+        visibility = galactic_visibility_factor(
+            sky_brightness_normalized=sky_brightness_normalized,
+            light_pollution_enabled=light_pollution_enabled,
+            bortle_class=bortle_class,
+        )
+        return GalacticAppearance(
+            opacity=appearance.opacity * visibility,
+            dust_density_strength=appearance.dust_density_strength,
+            dust_extinction_strength=appearance.dust_extinction_strength,
+        )

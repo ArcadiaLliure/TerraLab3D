@@ -18,6 +18,7 @@ interface PageSpec {
 
 export interface ShellCallbacks {
   onSetRealtime?: (enabled: boolean) => void;
+  onOpenResourceManager?: () => void;
 }
 
 export class Shell {
@@ -66,8 +67,12 @@ export class Shell {
     });
 
     const btnLayers = this.createQuickButton("Gestionar capes", () => {
-      this.selectPage("earth");
-      this.openDrawer();
+      if (this.callbacks.onOpenResourceManager) {
+        this.callbacks.onOpenResourceManager();
+      } else {
+        this.selectPage("earth");
+        this.openDrawer();
+      }
     });
 
     const btnScope = this.createQuickButton("Tub / Telescopi", () => {

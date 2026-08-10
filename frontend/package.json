@@ -6,8 +6,8 @@
   "scripts": {
     "build": "esbuild src/main.ts --bundle --format=esm --outfile=dist/bundle.js --sourcemap",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:build": "esbuild src/tests/grid.test.ts src/tests/navigation.test.ts src/tests/solar_system.test.ts src/tests/solar_system_step8_6.test.ts src/tests/lighting_step8_7.test.ts src/tests/astronomical_events_step9.test.ts --bundle --platform=node --format=esm --outdir=.test-dist",
-    "test": "npm run test:build && node .test-dist/grid.test.js && node .test-dist/navigation.test.js && node .test-dist/solar_system.test.js && node .test-dist/solar_system_step8_6.test.js && node .test-dist/lighting_step8_7.test.js && node .test-dist/astronomical_events_step9.test.js"
+    "test:build": "esbuild src/tests/grid.test.ts src/tests/navigation.test.ts src/tests/solar_system.test.ts src/tests/solar_system_step8_6.test.ts src/tests/lighting_step8_7.test.ts src/tests/astronomical_events_step9.test.ts src/tests/galactic_step10.test.ts --bundle --platform=node --format=esm --outdir=.test-dist",
+    "test": "npm run test:build && node .test-dist/grid.test.js && node .test-dist/navigation.test.js && node .test-dist/solar_system.test.js && node .test-dist/solar_system_step8_6.test.js && node .test-dist/lighting_step8_7.test.js && node .test-dist/astronomical_events_step9.test.js && node .test-dist/galactic_step10.test.js"
   },
   "dependencies": {
     "three": "^0.179.0"

@@ -93,6 +93,8 @@ export interface BackendMessageListener {
   onEventSearchResult?(result: AstronomicalEventSearchResult): void;
   onApparentTrajectoryResource?(metadata: ApparentTrajectoryMetadata, bufferPayload: ArrayBuffer): void;
   onAngularSeparationResult?(result: AngularSeparationResult): void;
+  onResourceCatalogSnapshot?(msg: import("../contracts/bridge_messages").ResourceCatalogSnapshotMessage): void;
+  onDownloadJobSnapshot?(msg: import("../contracts/bridge_messages").DownloadJobSnapshotMessage): void;
 }
 
 export class WebSocketBridge {
@@ -422,6 +424,16 @@ export class WebSocketBridge {
           l.onAngularSeparationResult?.(msg);
         }
         break;
+      case "resource_catalog_snapshot":
+        for (const l of this.messageListeners) {
+          l.onResourceCatalogSnapshot?.(msg);
+        }
+        break;
+      case "download_job_snapshot":
+        for (const l of this.messageListeners) {
+          l.onDownloadJobSnapshot?.(msg);
+        }
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -519,6 +531,28 @@ export class WebSocketBridge {
     utc: string,
   ): void {
     this.sendMessage({ type: "request_angular_separation", requestId, bodyA, bodyB, utc });
+  }
+
+  // ─── Resource Manager (Pas 8.6, 9) ──────────────────────────────────
+
+  public requestCatalogSnapshot(): void {
+    this.sendMessage({ type: "request_catalog_snapshot" });
+  }
+
+  public requestResourceDownload(resourceId: string, variantId: string): void {
+    this.sendMessage({ type: "request_resource_download", resourceId, variantId });
+  }
+
+  public pauseDownload(resourceId: string, variantId: string): void {
+    this.sendMessage({ type: "pause_download", resourceId, variantId });
+  }
+
+  public cancelDownload(resourceId: string, variantId: string): void {
+    this.sendMessage({ type: "cancel_download", resourceId, variantId });
+  }
+
+  public deleteResource(resourceId: string, variantId: string): void {
+    this.sendMessage({ type: "delete_resource", resourceId, variantId });
   }
 
   // ─── Navigation messages (Phase 3.5) ────────────────────────────
