@@ -15,6 +15,12 @@ from terralab3d.domain.sky_background.visibility import SkyVisibilityCalculator,
 from terralab3d.domain.solar_system.models import ApparentBodyState
 
 
+# During totality the sky remains a bright deep twilight.  Keeping roughly
+# 4.5 magnitudes of daylight suppression exposes Venus and only the brightest
+# stars instead of turning the scene into a normal night sky.
+TOTALITY_TWILIGHT_SUPPRESSION_MAG = 4.5
+
+
 @dataclass(frozen=True, slots=True)
 class SkyEnvironmentSnapshot:
     generation: int
@@ -38,6 +44,8 @@ class SkyEnvironmentSnapshot:
     horizon_color_linear: tuple[float, float, float]
     ground_color_linear: tuple[float, float, float]
     sky_diffuse_intensity: float
+    solar_disc_transmission: float = 1.0
+    sky_eclipse_dimming_factor: float = 1.0
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -68,6 +76,8 @@ class SkyEnvironmentSnapshot:
             "horizonColorLinear": list(self.horizon_color_linear),
             "groundColorLinear": list(self.ground_color_linear),
             "skyDiffuseIntensity": self.sky_diffuse_intensity,
+            "solarDiscTransmission": self.solar_disc_transmission,
+            "skyEclipseDimmingFactor": self.sky_eclipse_dimming_factor,
         }
 
 
@@ -91,8 +101,13 @@ class SkyEnvironmentComposer:
         self,
         sun: ApparentBodyState,
         solar_system_generation: int,
+        *,
+        solar_disc_transmission: float = 1.0,
+        sky_eclipse_dimming_factor: float = 1.0,
     ) -> SkyEnvironmentSnapshot:
         self._generation += 1
+        disc_transmission = max(0.0, min(1.0, float(solar_disc_transmission)))
+        eclipse_dimming = max(0.0, min(1.0, float(sky_eclipse_dimming_factor)))
         solar_altitude = sun.horizontal.altitude_deg
         phase = twilight_phase(solar_altitude)
         night_factor = twilight_factor(solar_altitude)
@@ -105,15 +120,26 @@ class SkyEnvironmentComposer:
             automatic_source=self.automatic_source,
         )
         atmosphere = AtmosphereState()
-        suppression = (
+        normal_suppression = (
             twilight_suppression(solar_altitude) if self.atmosphere_enabled else 0.0
+        )
+        totality_suppression = min(
+            normal_suppression,
+            TOTALITY_TWILIGHT_SUPPRESSION_MAG,
+        )
+        suppression = totality_suppression + (
+            normal_suppression - totality_suppression
+        ) * eclipse_dimming
+        effective_night_factor = min(
+            1.0,
+            night_factor + (1.0 - night_factor) * (1.0 - eclipse_dimming),
         )
         visibility = self._visibility_calc.calculate(
             bortle_zenith_mag=light_pollution.zenith_magnitude_limit,
             twilight_suppression_mag=suppression,
             artificial_brightness=light_pollution.artificial_sky_brightness,
             natural_brightness=atmosphere.natural_sky_brightness,
-            twilight_factor=night_factor if self.atmosphere_enabled else 1.0,
+            twilight_factor=effective_night_factor if self.atmosphere_enabled else 1.0,
             extinction_coefficient=(
                 atmosphere.extinction_coefficient if self.atmosphere_enabled else 0.0
             ),
@@ -123,6 +149,7 @@ class SkyEnvironmentComposer:
             night_factor,
             self.atmosphere_enabled,
         )
+        color_scale = 0.08 + 0.92 * eclipse_dimming
         return SkyEnvironmentSnapshot(
             generation=self._generation,
             solar_system_generation=solar_system_generation,
@@ -141,8 +168,10 @@ class SkyEnvironmentComposer:
             sqm_zenith=light_pollution.sqm_zenith,
             configured_magnitude_limit=light_pollution.configured_magnitude_limit,
             visibility=visibility,
-            zenith_color_linear=palette.zenith_color_linear,
-            horizon_color_linear=palette.horizon_color_linear,
-            ground_color_linear=palette.ground_color_linear,
-            sky_diffuse_intensity=palette.diffuse_intensity,
+            zenith_color_linear=tuple(value * color_scale for value in palette.zenith_color_linear),
+            horizon_color_linear=tuple(value * color_scale for value in palette.horizon_color_linear),
+            ground_color_linear=tuple(value * color_scale for value in palette.ground_color_linear),
+            sky_diffuse_intensity=palette.diffuse_intensity * eclipse_dimming,
+            solar_disc_transmission=disc_transmission,
+            sky_eclipse_dimming_factor=eclipse_dimming,
         )

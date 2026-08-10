@@ -12,6 +12,11 @@ from typing import Any, Iterable
 
 from terralab3d.domain.geometry import EquatorialCoordinate, HorizontalCoordinate
 from terralab3d.domain.identifiers import CelestialBodyId
+from terralab3d.domain.eclipses.models import (
+    ApparentEventBody,
+    AstronomicalEventEphemeris,
+    GeometryQuality,
+)
 from terralab3d.domain.solar_system.calculations import (
     AU_KM,
     bright_limb_position_angle_deg,
@@ -124,6 +129,8 @@ class SpiceEphemerisAdapter:
         self.orientation_query_count = 0
         self.last_query_duration_ms = 0.0
         self.last_orientation_duration_ms = 0.0
+        self.event_query_count = 0
+        self.last_event_query_duration_ms = 0.0
         self._manager.open()
         self._metadata = EphemerisMetadata(
             kernel_name="DE440 + planetary satellite SPK",
@@ -143,6 +150,14 @@ class SpiceEphemerisAdapter:
     @property
     def metadata(self) -> EphemerisMetadata:
         return self._metadata
+
+    @property
+    def kernel_generation(self) -> str:
+        return self._manager.generation
+
+    @property
+    def kernel_load_count(self) -> int:
+        return self._manager.load_count
 
     @property
     def lunar_orientation_kernel_load_count(self) -> int:
@@ -287,6 +302,7 @@ class SpiceEphemerisAdapter:
                     icrf_to_enu_quaternion=rotation_matrix_to_quaternion(icrf_to_enu),
                     compute_ms=self.last_query_duration_ms,
                     detail="; ".join(detail_parts) or None,
+                    scientific_observer=observer,
                 )
             except Exception as exc:
                 raise SpiceEphemerisError(
@@ -294,6 +310,85 @@ class SpiceEphemerisAdapter:
                     context={
                         "operation": "snapshot",
                         "instantUtc": instant.isoformat(),
+                        "kernelGeneration": self._manager.generation,
+                    },
+                    cause=exc,
+                ) from exc
+
+    def event_ephemeris(
+        self,
+        utc: datetime,
+        observer: ScientificObserver,
+        body_ids: tuple[str, ...] = ("sun", "moon"),
+        *,
+        include_lunar_shadow_geometry: bool = False,
+    ) -> AstronomicalEventEphemeris:
+        """Return a lightweight topocentric state from the shared CSPICE pool.
+
+        This method intentionally does not call :meth:`snapshot`: no planets,
+        satellite batch or orientation batch is evaluated during a temporal
+        search.  It shares the same manager, lock, kernels and close lifecycle.
+        """
+
+        if self._closed:
+            raise SpiceEphemerisError(
+                "SPICE adapter is closed",
+                context={"operation": "event_ephemeris"},
+                cause=RuntimeError(),
+            )
+        instant = _as_utc(utc)
+        started = time.perf_counter()
+        spice = _spice()
+        with self._manager.lock:
+            try:
+                et = float(spice.str2et(instant.strftime("%Y-%m-%dT%H:%M:%S.%f")))
+                earth_frame = self._earth_fixed_frame(spice, et)
+                observer_position = self._observer_position(spice, observer)
+                earth_fixed_to_icrf = _matrix3(spice.pxform(earth_frame, "J2000", et))
+                observer_position_icrf = matrix3_apply(
+                    earth_fixed_to_icrf,
+                    observer_position,
+                )
+                icrf_to_enu = self._icrf_to_enu(spice, et, observer, earth_frame)
+                bodies = tuple(
+                    self._event_body(
+                        spice,
+                        body_id,
+                        et,
+                        observer_position,
+                        earth_frame,
+                        icrf_to_enu,
+                    )
+                    for body_id in dict.fromkeys(body_ids)
+                )
+                earth_to_sun = None
+                earth_to_moon = None
+                if include_lunar_shadow_geometry:
+                    sun_state, _ = spice.spkezr("10", et, "J2000", "NONE", "399")
+                    moon_state, _ = spice.spkezr("301", et, "J2000", "NONE", "399")
+                    earth_to_sun = _vector3(sun_state[:3])
+                    earth_to_moon = _vector3(moon_state[:3])
+                self.event_query_count += 1
+                self.last_event_query_duration_ms = (time.perf_counter() - started) * 1000.0
+                return AstronomicalEventEphemeris(
+                    timestamp_utc=instant,
+                    observer_latitude_deg=observer.latitude_deg,
+                    observer_longitude_deg=observer.longitude_deg,
+                    observer_elevation_m=observer.elevation_m,
+                    kernel_generation=self._manager.generation,
+                    source="SPICE/DE440 lightweight event port",
+                    quality=GeometryQuality.SCIENTIFIC,
+                    bodies=bodies,
+                    earth_to_sun_icrf_km=earth_to_sun,
+                    earth_to_moon_icrf_km=earth_to_moon,
+                    observer_position_icrf_km=observer_position_icrf,
+                )
+            except Exception as exc:
+                raise SpiceEphemerisError(
+                    f"Cannot calculate event ephemeris at {instant.isoformat()}",
+                    context={
+                        "operation": "event_ephemeris",
+                        "bodyIds": body_ids,
                         "kernelGeneration": self._manager.generation,
                     },
                     cause=exc,
@@ -349,6 +444,92 @@ class SpiceEphemerisAdapter:
                 orbit_generation=self._orbit_generation,
                 positions_parent_fixed_km=tuple(positions),
             )
+
+    def _event_body(
+        self,
+        spice: Any,
+        body_id: str,
+        et: float,
+        observer_position: Vector3,
+        earth_frame: str,
+        icrf_to_enu: Matrix3,
+    ) -> ApparentEventBody:
+        naif_id, radius_km, body_frame = self._event_body_definition(body_id)
+        topocentric_state, _ = spice.spkcpo(
+            str(naif_id),
+            et,
+            "J2000",
+            "OBSERVER",
+            self._manager.aberration_policy,
+            observer_position,
+            "EARTH",
+            earth_frame,
+        )
+        observer_to_body = _vector3(topocentric_state[:3])
+        distance_km = _norm(observer_to_body)
+        direction_icrf = normalize_vector(observer_to_body)
+        direction_enu_axes = normalize_vector(matrix3_apply(icrf_to_enu, direction_icrf))
+        direction_enu = _enu_to_wire(direction_enu_axes)
+        altitude_deg = math.degrees(
+            math.asin(_clamp(direction_enu_axes[2], -1.0, 1.0))
+        )
+        body_to_icrf_quaternion = None
+        north_position_angle = None
+        if body_frame is not None:
+            try:
+                body_to_icrf = _matrix3(spice.pxform(body_frame, "J2000", et))
+                body_to_icrf_quaternion = rotation_matrix_to_quaternion(body_to_icrf)
+                pole_icrf = normalize_vector(
+                    matrix3_apply(body_to_icrf, (0.0, 0.0, 1.0))
+                )
+                north_position_angle = north_pole_position_angle_deg(
+                    direction_icrf,
+                    pole_icrf,
+                )
+            except Exception:
+                body_to_icrf_quaternion = None
+                north_position_angle = None
+        return ApparentEventBody(
+            body_id=body_id,
+            naif_id=naif_id,
+            direction_icrf=direction_icrf,
+            direction_enu=direction_enu,
+            distance_km=distance_km,
+            angular_radius_deg=math.degrees(math.atan2(radius_km, distance_km)),
+            altitude_deg=altitude_deg,
+            physical_radius_km=radius_km,
+            body_to_icrf_quaternion=body_to_icrf_quaternion,
+            north_pole_position_angle_deg=north_position_angle,
+        )
+
+    def _event_body_definition(self, body_id: str) -> tuple[int, float, str | None]:
+        known: dict[str, tuple[int, float, str | None]] = {
+            "sun": (10, 695_700.0, "IAU_SUN"),
+            "moon": (301, 1_737.4, "MOON_ME_DE421"),
+            "mercury": (199, 2_439.7, "IAU_MERCURY"),
+            "venus": (299, 6_051.8, "IAU_VENUS"),
+            "mars": (499, 3_389.5, "IAU_MARS"),
+            "jupiter": (599, 69_911.0, "IAU_JUPITER"),
+            "saturn": (699, 58_232.0, "IAU_SATURN"),
+            "uranus": (799, 25_362.0, "IAU_URANUS"),
+            "neptune": (899, 24_622.0, "IAU_NEPTUNE"),
+            "pluto": (999, 1_188.3, "IAU_PLUTO"),
+        }
+        if body_id in known:
+            return known[body_id]
+        definition = next(
+            (item for item in self._catalog.satellites if item.body_id == body_id),
+            None,
+        )
+        if definition is None or definition.naif_id is None:
+            raise ValueError(f"Unknown or unavailable event body: {body_id}")
+        if definition.mean_radius_km is None:
+            raise ValueError(f"Event body has no validated radius: {body_id}")
+        return (
+            definition.naif_id,
+            definition.mean_radius_km,
+            definition.body_fixed_frame,
+        )
 
     def close(self) -> None:
         if self._closed:

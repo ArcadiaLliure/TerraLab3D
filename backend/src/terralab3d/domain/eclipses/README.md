@@ -29,22 +29,20 @@ Calcular geometria de contacte, magnitud, obscuriment, fases i visibilitat local
 
 | Element | Tipus | Responsabilitat | Estat |
 |---|---|---|---|
-| `EclipseEvent` | Entitat | Esdeveniment i contactes | Esquelet |
-| `EclipseInstantState` | DTO | Magnitud i fase instantània | Esquelet |
-| `EclipseGeometryCalculator` | Protocol científic | Intersecció angular i contactes | Esquelet |
+| `AstronomicalEventSnapshot` | DTO | Estat solar/lunar instantani coherent | Implementat |
+| `AstronomicalEventSearchResult` | DTO | Contactes i màxim refinats | Implementat |
+| `SolarEclipseState` | Valor | Classificació local, magnitud i obscuració | Implementat |
+| `LunarEclipseState` | Valor | Penombra/umbra terrestre i magnituds | Implementat |
+| `AstronomicalEventCalculator` | Servei pur | Composició renderer-neutral | Implementat |
 
 El paquet separa `models.py` (tipus i invariants), `calculations.py` (algoritmes científics purs) i `services.py` (composició de regles de domini).
 
-## 7. TODO
+## 7. Estat
 
-- [ ] Definir unitats, dominis, convencions, època de referència i toleràncies de cada valor públic.
-- [ ] Caracteritzar numèricament el comportament equivalent de TerraLab amb casos reproduïbles.
-- [ ] Implementar els càlculs purs sense I/O, estat global ni dependències gràfiques.
-- [ ] Afegir proves de propietats, casos límit i regressió numèrica.
-- [ ] Definir quins resultats són estàtics, ocasionals, per tick o per frame.
-- [ ] Connectar el servei de domini amb un cas d’ús d’aplicació tipat.
-- [ ] Definir els recursos o deltes mínims que l’aplicació haurà de publicar.
-- [ ] Validar que moure la càmera no torna a executar aquest paquet excepte quan sigui científicament necessari.
+La capacitat està implementada al Pas 9. Les unitats públiques són graus,
+quilòmetres i UTC aware. La classificació no té banda tolerant; les toleràncies
+de `0.25 s`/`1e-8°` són exclusives dels solvers numèrics. La càmera no és cap
+entrada científica. Vegeu `docs/pas-9-validacio.md`.
 
 ## 8. Migració des de TerraLab
 

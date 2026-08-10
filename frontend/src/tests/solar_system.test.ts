@@ -134,6 +134,8 @@ function skyEnvironment(
     sunDirectionENU: [0, 1, 0],
     twilightPhase: twilightFactor === 0 ? "day" : "night",
     twilightFactor,
+    solarDiscTransmission: 1,
+    skyEclipseDimmingFactor: 1,
     atmosphereEnabled,
     turbidity: 2.5,
     horizonHaze,
@@ -199,7 +201,7 @@ assert(renderer.getBodyObject("sun")?.visible === true, "sun above horizon is vi
 assert(renderer.getBodyObject("moon")?.visible === true, "moon above horizon is visible");
 near(
   renderer.getBodyObject("sun")!.scale.x,
-  900_000 * Math.sin(THREE.MathUtils.degToRad(0.266)),
+  renderer.getBodyObject("sun")!.position.length() * Math.sin(THREE.MathUtils.degToRad(0.266)),
   1e-9,
   "sphere scale preserves the scientific angular radius",
 );

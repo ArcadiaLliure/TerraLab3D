@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
 import type { SkyEnvironmentSnapshot } from "../../contracts/sky_environment_contracts";
-import type { LightingEnvironmentSnapshot } from "../../contracts/lighting_environment_contracts";
 import { setThreeFromEnu } from "./celestialCoordinates";
 import { skyFragmentShader, skyVertexShader } from "./shaders/skyShader";
 
@@ -10,10 +9,8 @@ export class AtmosphereRenderer {
   private readonly mesh: THREE.Mesh;
   private readonly sunDirection = { value: new THREE.Vector3(0, -1, 0) };
   private readonly sunAltitude = { value: -90.0 };
-  private readonly moonDirection = { value: new THREE.Vector3(0, -1, 0) };
-  private readonly moonAltitude = { value: -90.0 };
-  private readonly moonColor = { value: new THREE.Color(0, 0, 0) };
-  private readonly moonIntensity = { value: 0.0 };
+  private readonly solarDiscTransmission = { value: 1.0 };
+  private readonly skyEclipseDimmingFactor = { value: 1.0 };
   private readonly twilight = { value: 1.0 };
   private readonly turbidity = { value: 2.5 };
   private readonly bortle = { value: 4.0 };
@@ -32,10 +29,8 @@ export class AtmosphereRenderer {
       uniforms: {
         u_sunDirectionENU: this.sunDirection,
         u_sunAltitudeDeg: this.sunAltitude,
-        u_moonDirectionENU: this.moonDirection,
-        u_moonAltitudeDeg: this.moonAltitude,
-        u_moonColorLinear: this.moonColor,
-        u_moonIntensity: this.moonIntensity,
+        u_solarDiscTransmission: this.solarDiscTransmission,
+        u_skyEclipseDimmingFactor: this.skyEclipseDimmingFactor,
         u_twilightFactor: this.twilight,
         u_turbidity: this.turbidity,
         u_bortleClass: this.bortle,
@@ -62,6 +57,8 @@ export class AtmosphereRenderer {
     this.sunAltitude.value = snapshot.sunAltitudeDeg;
     this.twilight.value = snapshot.twilightFactor;
     this.turbidity.value = snapshot.turbidity;
+    this.solarDiscTransmission.value = snapshot.solarDiscTransmission;
+    this.skyEclipseDimmingFactor.value = snapshot.skyEclipseDimmingFactor;
     if (snapshot.lightPollutionEnabled && snapshot.bortleClass !== null) {
       this.bortle.value = snapshot.bortleClass;
       const linear = (snapshot.bortleClass - 1.0) / 8.0;
@@ -78,18 +75,6 @@ export class AtmosphereRenderer {
 
   setPureColors(enabled: boolean): void {
     this.pureColors.value = enabled;
-  }
-
-  updateLighting(snapshot: LightingEnvironmentSnapshot): void {
-    if (snapshot.moon.enabled) {
-      setThreeFromEnu(this.moonDirection.value, snapshot.moon.directionToSourceENU);
-      this.moonAltitude.value = snapshot.moon.altitudeDeg;
-      this.moonColor.value.setRGB(...snapshot.moon.colorLinear);
-      this.moonIntensity.value = snapshot.moon.intensity;
-    } else {
-      this.moonAltitude.value = -90.0;
-      this.moonIntensity.value = 0.0;
-    }
   }
 
   dispose(): void {

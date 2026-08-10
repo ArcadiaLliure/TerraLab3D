@@ -32,6 +32,21 @@ from terralab3d.domain.solar_system.models import ScientificObserver, SolarSyste
 from terralab3d.domain.lighting.environment import LightingEnvironmentComposer
 from terralab3d.application.ephemeris_coordinator import EphemerisCoordinator
 from terralab3d.application.orbit_sampler import OrbitSampler
+from terralab3d.application.apparent_trajectory import (
+    ApparentTrajectoryCoordinator,
+    ApparentTrajectorySampler,
+)
+from terralab3d.application.astronomical_events import (
+    AstronomicalEventSearcher,
+    AstronomicalEventService,
+    EventSearchCoordinator,
+)
+from terralab3d.domain.eclipses.models import (
+    AstronomicalEventEphemeris,
+    EclipseKind,
+    GeometryQuality,
+)
+from terralab3d.domain.eclipses.services import AstronomicalEventCalculator
 from terralab3d.infrastructure.adapters.ephemeris.adapter import SkyfieldEphemerisAdapter
 from terralab3d.infrastructure.adapters.ephemeris.spice_adapter import SpiceEphemerisAdapter
 
@@ -50,6 +65,7 @@ async def run() -> int:
     from terralab3d.infrastructure.websocket_bridge import WebSocketBridge
     from terralab3d.infrastructure.adapters.file_assets.moon_surface import ManagedMoonSurfaceAssets
     from terralab3d.infrastructure.adapters.file_assets.solar_system import ManagedSolarSystemAssets
+    from terralab3d.infrastructure.adapters.file_assets.lunar_limb import LroLolaLimbProfileProvider
 
     # ── 1. Compilar frontend i inicialitzar assets de dades ───────────
     try:
@@ -79,7 +95,7 @@ async def run() -> int:
 
     current_observer = ObserverProfile(
         observer_id=ObserverId("default"),
-        location=GeoLocation(latitude_deg=41.189795, longitude_deg=1.210058),
+        location=GeoLocation(latitude_deg=41.21240330896238, longitude_deg=0.8072721734579367),
         height_offset_m=0.0
     )
     observer_generation = 1
@@ -194,16 +210,58 @@ async def run() -> int:
     time_rate = 1.0
     time_drag_active = False
     latest_solar_system: SolarSystemSnapshot | None = None
+    latest_event = None
+    event_service: AstronomicalEventService | None = None
+    event_search_coordinator: EventSearchCoordinator | None = None
+    trajectory_coordinator: ApparentTrajectoryCoordinator | None = None
+    lunar_limb_provider: LroLolaLimbProfileProvider | None = None
 
     async def publish_solar_system(snapshot: SolarSystemSnapshot) -> int:
         """Publish one coherent science state to bodies, sky and local lighting."""
-        nonlocal latest_solar_system
+        nonlocal latest_solar_system, latest_event
         latest_solar_system = snapshot
+        observer = snapshot.scientific_observer
+        if event_service is not None and observer is not None:
+            event = await asyncio.to_thread(
+                event_service.snapshot,
+                snapshot.timestamp_utc,
+                observer,
+                observer_generation=snapshot.observer_generation,
+                source_solar_system_generation=snapshot.generation,
+            )
+        else:
+            fallback_observer = observer or scientific_observer()
+            event = AstronomicalEventCalculator().calculate(
+                AstronomicalEventEphemeris(
+                    timestamp_utc=snapshot.timestamp_utc,
+                    observer_latitude_deg=fallback_observer.latitude_deg,
+                    observer_longitude_deg=fallback_observer.longitude_deg,
+                    observer_elevation_m=fallback_observer.elevation_m,
+                    kernel_generation=snapshot.kernel_generation or "unavailable",
+                    source="event geometry unavailable",
+                    quality=GeometryQuality.UNAVAILABLE,
+                    bodies=(),
+                ),
+                observer_generation=snapshot.observer_generation,
+                source_solar_system_generation=snapshot.generation,
+            )
+        latest_event = event
         byte_count = await bridge.send_solar_system_snapshot(snapshot)
-        sky = sky_composer.compose(snapshot.sun, snapshot.generation)
+        await bridge.send_astronomical_event_snapshot(event)
+        sky = sky_composer.compose(
+            snapshot.sun,
+            snapshot.generation,
+            solar_disc_transmission=event.solar.solar_disc_transmission,
+            sky_eclipse_dimming_factor=event.sky_eclipse_dimming_factor,
+        )
         await bridge.send_sky_environment_snapshot(sky)
         await bridge.send_lighting_environment_snapshot(
-            lighting_composer.compose(sky, snapshot)
+            lighting_composer.compose(
+                sky,
+                snapshot,
+                direct_solar_visibility_factor=event.solar.solar_disc_transmission,
+                lunar_direct_visibility_factor=event.lunar.mean_lunar_light_transmission,
+            )
         )
         return byte_count
 
@@ -231,6 +289,20 @@ async def run() -> int:
         if isinstance(ephemeris_adapter, SpiceEphemerisAdapter)
         else None
     )
+    if isinstance(ephemeris_adapter, SpiceEphemerisAdapter):
+        lunar_limb_provider = LroLolaLimbProfileProvider()
+        event_service = AstronomicalEventService(
+            ephemeris_adapter,
+            lunar_limb_provider,
+        )
+        event_search_coordinator = EventSearchCoordinator(
+            AstronomicalEventSearcher(ephemeris_adapter),
+            bridge.send_event_search_result,
+        )
+        trajectory_coordinator = ApparentTrajectoryCoordinator(
+            ApparentTrajectorySampler(ephemeris_adapter),
+            bridge.send_apparent_trajectory,
+        )
     metadata = ephemeris_adapter.metadata
     log.info(
         "Efemèride: provider=%s kernel=%s generation=%s sha256=%s",
@@ -306,8 +378,98 @@ async def run() -> int:
         )
         await bridge.send_orbit_geometry(orbit_sampler.encode(geometry))
 
+    async def _handle_request_event_search(data: dict[str, Any]) -> None:
+        if event_search_coordinator is None:
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "EVENT_SEARCH_UNAVAILABLE",
+                "message": "La cerca precisa requereix SPICE/DE440",
+            })
+            return
+        try:
+            request_id = str(data["requestId"])
+            event_type = EclipseKind(str(data.get("eventType", "solar")))
+            if event_type not in {EclipseKind.SOLAR, EclipseKind.LUNAR}:
+                raise ValueError("eventType must be solar or lunar")
+            start_utc = datetime.fromisoformat(str(data["startUtc"]).replace("Z", "+00:00"))
+            end_utc = datetime.fromisoformat(str(data["endUtc"]).replace("Z", "+00:00"))
+            event_search_coordinator.request(
+                request_id=request_id,
+                event_type=event_type,
+                observer=scientific_observer(),
+                observer_generation=observer_generation,
+                start_utc=start_utc,
+                end_utc=end_utc,
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "INVALID_EVENT_SEARCH",
+                "message": str(exc),
+            })
+
+    async def _handle_request_apparent_trajectory(data: dict[str, Any]) -> None:
+        if trajectory_coordinator is None:
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "TRAJECTORY_UNAVAILABLE",
+                "message": "Les trajectòries precises requereixen SPICE/DE440",
+            })
+            return
+        try:
+            trajectory_coordinator.request(
+                request_id=str(data["requestId"]),
+                body_id=str(data["bodyId"]),
+                observer=scientific_observer(),
+                observer_generation=observer_generation,
+                start_utc=datetime.fromisoformat(
+                    str(data["startUtc"]).replace("Z", "+00:00")
+                ),
+                end_utc=datetime.fromisoformat(
+                    str(data["endUtc"]).replace("Z", "+00:00")
+                ),
+                sample_count=max(2, min(4096, int(data.get("sampleCount", 256)))),
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "INVALID_APPARENT_TRAJECTORY",
+                "message": str(exc),
+            })
+
+    async def _handle_request_angular_separation(data: dict[str, Any]) -> None:
+        if event_service is None:
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "ANGULAR_SEPARATION_UNAVAILABLE",
+                "message": "La separació precisa requereix SPICE/DE440",
+            })
+            return
+        try:
+            instant = datetime.fromisoformat(
+                str(data.get("utc", sim_time_utc.isoformat())).replace("Z", "+00:00")
+            )
+            result = await asyncio.to_thread(
+                event_service.measure_pair,
+                str(data["requestId"]),
+                instant,
+                scientific_observer(),
+                str(data["bodyA"]),
+                str(data["bodyB"]),
+            )
+            await bridge.send_angular_separation_result(result)
+        except (KeyError, TypeError, ValueError, RuntimeError) as exc:
+            await bridge.send({
+                "type": "bridge_error",
+                "code": "INVALID_ANGULAR_SEPARATION",
+                "message": str(exc),
+            })
+
     bridge.on("set_satellite_systems", _handle_set_satellite_systems)
     bridge.on("request_satellite_orbit", _handle_request_satellite_orbit)
+    bridge.on("request_event_search", _handle_request_event_search)
+    bridge.on("request_apparent_trajectory", _handle_request_apparent_trajectory)
+    bridge.on("request_angular_separation", _handle_request_angular_separation)
 
     def scientific_observer() -> ScientificObserver:
         return ScientificObserver(
@@ -318,13 +480,35 @@ async def run() -> int:
 
     async def broadcast_sky_environment() -> None:
         if bridge.connected and latest_solar_system is not None:
+            solar_transmission = (
+                latest_event.solar.solar_disc_transmission
+                if latest_event is not None
+                else 1.0
+            )
+            sky_dimming = (
+                latest_event.sky_eclipse_dimming_factor
+                if latest_event is not None
+                else 1.0
+            )
+            lunar_transmission = (
+                latest_event.lunar.mean_lunar_light_transmission
+                if latest_event is not None
+                else 1.0
+            )
             sky = sky_composer.compose(
                 latest_solar_system.sun,
                 latest_solar_system.generation,
+                solar_disc_transmission=solar_transmission,
+                sky_eclipse_dimming_factor=sky_dimming,
             )
             await bridge.send_sky_environment_snapshot(sky)
             await bridge.send_lighting_environment_snapshot(
-                lighting_composer.compose(sky, latest_solar_system)
+                lighting_composer.compose(
+                    sky,
+                    latest_solar_system,
+                    direct_solar_visibility_factor=solar_transmission,
+                    lunar_direct_visibility_factor=lunar_transmission,
+                )
             )
 
     async def broadcast_time() -> None:
@@ -527,8 +711,20 @@ async def run() -> int:
         pass
 
     # Demanar al frontend que netegi (si encara està connectat)
+    if event_search_coordinator is not None:
+        await event_search_coordinator.close()
+    if trajectory_coordinator is not None:
+        await trajectory_coordinator.close()
+    if lunar_limb_provider is not None:
+        lunar_limb_provider.close()
     await ephemeris_coordinator.close()
     log.info("Mètriques d'efemèrides: %s", ephemeris_coordinator.metrics())
+    if event_service is not None:
+        log.info("Mètriques Pas 9 instantànies: %s", event_service.metrics())
+    if event_search_coordinator is not None:
+        log.info("Mètriques Pas 9 cerques: %s", event_search_coordinator.metrics())
+    if trajectory_coordinator is not None:
+        log.info("Mètriques Pas 9 trajectòries: %s", trajectory_coordinator.metrics())
 
     if bridge.connected:
         await bridge.request_shutdown()
@@ -632,6 +828,18 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("shadowMediumFrameMsP95", 0.0),
         data.get("shadowHighFrameMsP50", 0.0),
         data.get("shadowHighFrameMsP95", 0.0),
+    )
+    log.info(
+        "Pas 9 render metrics: trajectory_geometry=%d trajectory_material=%d "
+        "trajectory_applies=%d trajectory_stale=%d trajectory_bytes=%d "
+        "totality_geometry=%d totality_material=%d",
+        data.get("trajectoryGeometryBuildCount", 0),
+        data.get("trajectoryMaterialBuildCount", 0),
+        data.get("trajectoryResourceApplyCount", 0),
+        data.get("trajectoryStaleResourceCount", 0),
+        data.get("trajectoryBridgeBytes", 0),
+        data.get("solarTotalityGeometryBuildCount", 0),
+        data.get("solarTotalityMaterialBuildCount", 0),
     )
 
 

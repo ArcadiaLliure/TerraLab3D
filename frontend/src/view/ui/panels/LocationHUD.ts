@@ -1,7 +1,13 @@
 import type { NavigationCameraPose, MotionState, NavigationMode } from "../../../contracts/navigation";
 import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
+import type {
+  AstronomicalEventSearchResult,
+  AstronomicalEventSnapshot,
+  AngularSeparationResult,
+} from "../../../contracts/astronomical_event_contracts";
 import type { ResolvedStar } from "../../../contracts/star_picking_contracts";
 import type { SolarSystemPickHit } from "../../three/picking/SolarSystemPickProvider";
+import { formatLocalAndUtcTime } from "../timeFormatting";
 
 const DEG = Math.PI / 180;
 
@@ -9,6 +15,19 @@ function escapeHtml(value: string): string {
   return value.replace(/[&<>'"]/g, (character) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
   })[character] ?? character);
+}
+
+function solarAppearanceLabel(
+  phase: AstronomicalEventSnapshot["totalityAppearance"]["phase"],
+): string {
+  return ({
+    partial: "parcialitat",
+    baily_ingress: "Perles de Baily (entrada)",
+    diamond_ingress: "anell de diamant (entrada)",
+    totality: "totalitat",
+    diamond_egress: "anell de diamant (sortida)",
+    baily_egress: "Perles de Baily (sortida)",
+  })[phase];
 }
 
 /**
@@ -45,6 +64,7 @@ export class LocationHUD {
   private viewSection: HTMLDivElement;
   private cameraSection: HTMLDivElement;
   private skySection: HTMLDivElement;
+  private eventSection: HTMLDivElement;
   private readonly starContainer: HTMLDivElement;
   private hudVisible = true;
 
@@ -95,6 +115,11 @@ export class LocationHUD {
     // Sky section
     this.skySection = document.createElement("div");
     this.element.appendChild(this.skySection);
+
+    this.element.appendChild(this.createSep());
+    this.eventSection = document.createElement("div");
+    this.eventSection.style.display = "none";
+    this.element.appendChild(this.eventSection);
 
     this.starContainer = document.createElement("div");
     this.starContainer.style.cssText = `
@@ -329,6 +354,53 @@ export class LocationHUD {
         <span style="color:var(--color-text-muted);">Cel fosc:</span>
         <span style="color:var(--color-text-bright);">${lpInfo}</span>
       </div>
+    `;
+  }
+
+  public updateAstronomicalEvent(snapshot: AstronomicalEventSnapshot): void {
+    const solar = snapshot.solar;
+    const lunar = snapshot.lunar;
+    const activeSolar = solar.classification !== "none";
+    const activeLunar = lunar.classification !== "none";
+    this.eventSection.style.display = activeSolar || activeLunar ? "block" : "none";
+    if (!activeSolar && !activeLunar) return;
+    this.eventSection.innerHTML = activeSolar ? `
+      <div style="font-weight:600;color:#f1cd88">ECLIPSI SOLAR · ${solar.classification.toUpperCase()}</div>
+      <div>Magnitud: ${solar.eclipseMagnitude.toFixed(4)}</div>
+      <div>Obscuració: ${(solar.obscuration * 100).toFixed(3)}%</div>
+      <div>Separació: ${solar.centerSeparation.toFixed(6)}°</div>
+      <div>Fase: ${solarAppearanceLabel(snapshot.totalityAppearance.phase)}</div>
+      <div style="opacity:.7">${snapshot.geometryQuality} · ${snapshot.limbQuality}</div>
+    ` : `
+      <div style="font-weight:600;color:#e2a2a2">ECLIPSI LUNAR · ${lunar.classification.toUpperCase()}</div>
+      <div>Magnitud umbral: ${lunar.umbralMagnitude.toFixed(4)}</div>
+      <div>Magnitud penumbral: ${lunar.penumbralMagnitude.toFixed(4)}</div>
+      <div style="opacity:.7">${snapshot.geometryQuality}</div>
+    `;
+  }
+
+  public updateEventSearchResult(result: AstronomicalEventSearchResult): void {
+    const greatest = result.greatestUtc === null
+      ? "—"
+      : formatLocalAndUtcTime(result.greatestUtc);
+    const contacts = result.contacts
+      .map((contact) => `${escapeHtml(contact.name)} ${formatLocalAndUtcTime(contact.instantUtc)}`)
+      .join(" · ");
+    this.eventSection.style.display = "block";
+    this.eventSection.insertAdjacentHTML("beforeend", `
+      <div style="margin-top:3px">Màxim: ${greatest}</div>
+      <div style="opacity:.8">${contacts || "Sense contactes locals"}</div>
+    `);
+  }
+
+  public updateAngularSeparation(result: AngularSeparationResult): void {
+    this.eventSection.style.display = "block";
+    this.eventSection.innerHTML = `
+      <div style="font-weight:600;color:#88ccff">SEPARACIÓ APARENT</div>
+      <div>${escapeHtml(result.bodyA)} ↔ ${escapeHtml(result.bodyB)}</div>
+      <div>Centres: ${result.separationDeg.toFixed(6)}°</div>
+      <div>Limbe: ${result.limbSeparationDeg.toFixed(6)}°</div>
+      <div style="opacity:.7">${result.occultation.classification} · ${result.quality}</div>
     `;
   }
 

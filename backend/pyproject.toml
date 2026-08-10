@@ -12,6 +12,7 @@ dependencies = [
     "skyfield==1.55",
     "skyfield-data==7.0.0",
     "spiceypy==7.0.0",
+    "Pillow>=10",
 ]
 
 [tool.setuptools]

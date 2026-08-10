@@ -7,6 +7,11 @@
 import type { SkyEnvironmentSnapshot } from "./sky_environment_contracts";
 import type { LightingEnvironmentSnapshot } from "./lighting_environment_contracts";
 import type {
+  AstronomicalEventSearchResult,
+  AstronomicalEventSnapshot,
+  AngularSeparationResult,
+} from "./astronomical_event_contracts";
+import type {
   MoonSurfaceResourceDescriptor,
   PlanetTextureManifest,
   SatelliteCatalogManifest,
@@ -91,6 +96,31 @@ export interface RequestSatelliteOrbitMessage {
   readonly bodyId: string;
   readonly intervalDays: number;
   readonly sampleCount: number;
+}
+
+export interface RequestEventSearchMessage {
+  readonly type: "request_event_search";
+  readonly requestId: string;
+  readonly eventType: "solar" | "lunar";
+  readonly startUtc: string;
+  readonly endUtc: string;
+}
+
+export interface RequestApparentTrajectoryMessage {
+  readonly type: "request_apparent_trajectory";
+  readonly requestId: string;
+  readonly bodyId: string;
+  readonly startUtc: string;
+  readonly endUtc: string;
+  readonly sampleCount: number;
+}
+
+export interface RequestAngularSeparationMessage {
+  readonly type: "request_angular_separation";
+  readonly requestId: string;
+  readonly bodyA: string;
+  readonly bodyB: string;
+  readonly utc: string;
 }
 
 // ─── Navigation messages (Phase 3.5) ─────────────────────────────────
@@ -188,6 +218,13 @@ export interface FrontendPerformanceMetricsMessage {
   readonly ringMaterialBuildCount: number;
   readonly orbitGeometryBuildCount: number;
   readonly orbitBridgeBytes: number;
+  readonly trajectoryGeometryBuildCount: number;
+  readonly trajectoryMaterialBuildCount: number;
+  readonly trajectoryResourceApplyCount: number;
+  readonly trajectoryStaleResourceCount: number;
+  readonly trajectoryBridgeBytes: number;
+  readonly solarTotalityGeometryBuildCount: number;
+  readonly solarTotalityMaterialBuildCount: number;
   readonly gpuMemoryEstimateBytes: number;
   readonly moonGeometryBuildCount: number;
   readonly moonMaterialBuildCount: number;
@@ -237,6 +274,9 @@ export type FrontendMessage =
   | RequestOffsetDayMessage
   | SetSatelliteSystemsMessage
   | RequestSatelliteOrbitMessage
+  | RequestEventSearchMessage
+  | RequestApparentTrajectoryMessage
+  | RequestAngularSeparationMessage
   | NavigationModeChangedMessage
   | CameraPoseChangedMessage
   | CameraMotionStartedMessage
@@ -367,6 +407,18 @@ export interface SolarSystemCatalogManifestMessage extends SatelliteCatalogManif
   readonly type: "solar_system_catalog_manifest";
 }
 
+export interface AstronomicalEventSnapshotMessage extends AstronomicalEventSnapshot {
+  readonly type: "astronomical_event_snapshot";
+}
+
+export interface EventSearchResultMessage extends AstronomicalEventSearchResult {
+  readonly type: "event_search_result";
+}
+
+export interface AngularSeparationResultMessage extends AngularSeparationResult {
+  readonly type: "angular_separation_result";
+}
+
 export type BackendMessage =
   | HandshakeAckMessage
   | SetCameraPoseMessage
@@ -383,7 +435,10 @@ export type BackendMessage =
   | LightingEnvironmentSnapshotMessage
   | MoonSurfaceResourceMessage
   | PlanetTextureManifestMessage
-  | SolarSystemCatalogManifestMessage;
+  | SolarSystemCatalogManifestMessage
+  | AstronomicalEventSnapshotMessage
+  | EventSearchResultMessage
+  | AngularSeparationResultMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

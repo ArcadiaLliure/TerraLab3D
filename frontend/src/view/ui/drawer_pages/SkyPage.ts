@@ -14,7 +14,7 @@ export interface SkyPageOptions {
   onMagnitudeLimitChanged?: (mag: number) => void;
   onPureColorsToggled?: (pure: boolean) => void;
   onSolarSystemVisibilityChanged?: (
-    part: "system" | "sun" | "moon" | "planets" | "rings" | "satellites" | "orbits",
+    part: "system" | "sun" | "moon" | "planets" | "rings" | "satellites" | "orbits" | "trajectories",
     visible: boolean,
   ) => void;
   onMoonSurfaceToggled?: (enabled: boolean) => void;
@@ -106,10 +106,11 @@ export class SkyPage {
     this.moonSurfaceStatusLabel.textContent = "surface unavailable";
     group.appendChild(this.moonSurfaceStatusLabel);
 
-    const extendedLabels: ReadonlyArray<["rings" | "satellites" | "orbits", string, boolean]> = [
+    const extendedLabels: ReadonlyArray<["rings" | "satellites" | "orbits" | "trajectories", string, boolean]> = [
       ["rings", "Anells de Saturn", true],
       ["satellites", "Satèl·lits naturals", false],
       ["orbits", "Òrbites SPK", false],
+      ["trajectories", "Trajectòries aparents", false],
     ];
     for (const [part, label, initial] of extendedLabels) {
       const row = document.createElement("div");

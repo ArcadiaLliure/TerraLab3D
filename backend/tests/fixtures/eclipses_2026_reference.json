@@ -1,0 +1,56 @@
+{
+  "provenance": {
+    "solar": "NASA GSFC Five Millennium Canon / 2026-08-12 path and circumstances",
+    "solarUrl": "https://eclipse.gsfc.nasa.gov/SEpath/SEpath2001/SE2026Aug12Tpath.html",
+    "lunar": "NASA GSFC lunar eclipse contact convention and 2026-03-03 event",
+    "lunarUrl": "https://eclipse.gsfc.nasa.gov/OH/OHres/LEfigurekey.html",
+    "ephemerisAuthority": "TerraLab3D managed NAIF SPICE DE440 family kernels",
+    "capturedUtc": "2026-08-10T00:00:00Z"
+  },
+  "solarTorroja": {
+    "observer": {"latitudeDeg": 41.21240330896238, "longitudeDeg": 0.8072721734579367, "elevationM": 330.0},
+    "intervalStartUtc": "2026-08-12T17:00:00Z",
+    "intervalEndUtc": "2026-08-12T20:00:00Z",
+    "expectedClassification": "total",
+    "greatestUtc": "2026-08-12T18:29:59.095500Z",
+    "maximumMagnitude": 1.0044504,
+    "maximumObscuration": 1.0,
+    "contactsUtc": {
+      "C1": "2026-08-12T17:35:28.007812Z",
+      "C2": "2026-08-12T18:29:24.023438Z",
+      "C3": "2026-08-12T18:30:34.101562Z",
+      "C4": "2026-08-12T19:21:15.820312Z"
+    },
+    "contactValidationToleranceSeconds": 2.0,
+    "northBoundaryAtGreatest": {
+      "latitudeDeg": 41.46487426757493,
+      "insideLatitudeDeg": 41.44987426757493,
+      "outsideLatitudeDeg": 41.47987426757493,
+      "observerSeparationKmApprox": 3.34
+    },
+    "southBoundaryAtGreatest": {
+      "latitudeDeg": 40.702748107907006,
+      "insideLatitudeDeg": 40.717748107907005,
+      "outsideLatitudeDeg": 40.68774810790701,
+      "observerSeparationKmApprox": 3.34
+    }
+  },
+  "lunar": {
+    "observer": {"latitudeDeg": 0.0, "longitudeDeg": 0.0, "elevationM": 0.0},
+    "intervalStartUtc": "2026-03-03T06:00:00Z",
+    "intervalEndUtc": "2026-03-03T16:00:00Z",
+    "expectedClassification": "total",
+    "greatestUtc": "2026-03-03T11:34:20.725903Z",
+    "maximumUmbralMagnitude": 1.1580646,
+    "contactsUtc": {
+      "P1": "2026-03-03T08:43:18.134766Z",
+      "U1": "2026-03-03T09:50:13.505859Z",
+      "U2": "2026-03-03T11:04:22.880859Z",
+      "U3": "2026-03-03T12:04:17.431641Z",
+      "U4": "2026-03-03T13:18:25.751953Z",
+      "P4": "2026-03-03T14:25:29.912109Z"
+    },
+    "contactValidationToleranceSeconds": 3.0,
+    "earthShadowAtmosphereFactor": 1.02
+  }
+}

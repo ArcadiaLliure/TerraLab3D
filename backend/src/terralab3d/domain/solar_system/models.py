@@ -291,6 +291,9 @@ class SolarSystemSnapshot:
     kernel_status: str = "unavailable"
     icrf_to_enu_quaternion: tuple[float, float, float, float] | None = None
     detail: str | None = None
+    # Internal orchestration context.  It is intentionally not serialized;
+    # the renderer never owns the scientific observer.
+    scientific_observer: ScientificObserver | None = None
 
     def with_generation(self, generation: int, observer_generation: int) -> "SolarSystemSnapshot":
         return replace(

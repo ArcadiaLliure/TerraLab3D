@@ -30,6 +30,7 @@ export interface LightingEnvironmentSnapshot {
   readonly sourceSolarSystemGeneration: number;
   /** The single composable Pas 9 hook; Pas 8.7 always publishes 1.0. */
   readonly directSolarVisibilityFactor: number;
+  readonly lunarDirectVisibilityFactor: number;
   readonly sun: DirectLightState;
   readonly moon: DirectLightState;
   readonly skyDiffuse: DiffuseSkyLightState;

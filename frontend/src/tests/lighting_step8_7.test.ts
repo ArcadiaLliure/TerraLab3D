@@ -47,6 +47,7 @@ function lightingSnapshot(
     sourceSkyGeneration: generation,
     sourceSolarSystemGeneration: generation,
     directSolarVisibilityFactor: 1,
+    lunarDirectVisibilityFactor: 1,
     sun: {
       enabled: true,
       directionToSourceENU: [1, 1, 0],

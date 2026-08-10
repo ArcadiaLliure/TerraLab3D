@@ -46,4 +46,7 @@ export interface SkyEnvironmentSnapshot {
   readonly horizonColorLinear: readonly [number, number, number];
   readonly groundColorLinear: readonly [number, number, number];
   readonly skyDiffuseIntensity: number;
+  /** Scientific disc geometry and separate atmospheric response. */
+  readonly solarDiscTransmission: number;
+  readonly skyEclipseDimmingFactor: number;
 }

@@ -2,6 +2,11 @@ import * as THREE from "three";
 
 import type { SkyEnvironmentSnapshot } from "../../contracts/sky_environment_contracts";
 import type {
+  ApparentTrajectoryMetadata,
+  AstronomicalEventSnapshot,
+  SolarEclipseState,
+} from "../../contracts/astronomical_event_contracts";
+import type {
   BodyOrientationState,
   LunarOrientationState,
   MoonSurfaceResourceDescriptor,
@@ -12,6 +17,8 @@ import type {
   SolarSystemSnapshot,
 } from "../../contracts/solar_system_contracts";
 import { threeFromEnu } from "./celestialCoordinates";
+import { ApparentTrajectoryRenderer, type ApparentTrajectoryMetrics } from "./ApparentTrajectoryRenderer";
+import { CelestialOcclusionPolicy } from "./CelestialOcclusionPolicy";
 import {
   MoonSurfaceRenderer,
   moonLightDirectionThree,
@@ -36,6 +43,7 @@ import {
   SaturnRingRenderer,
   type SaturnRingMetrics,
 } from "./SaturnRingRenderer";
+import { SolarTotalityRenderer } from "./SolarTotalityRenderer";
 
 const CELESTIAL_RADIUS = 900_000;
 const INTERPOLATION_MS = 1000;
@@ -133,6 +141,11 @@ export interface SolarSystemRenderMetrics {
   readonly rings: SaturnRingMetrics;
   readonly satellites: NaturalSatelliteMetrics;
   readonly orbits: SatelliteOrbitMetrics;
+  readonly trajectories: ApparentTrajectoryMetrics;
+  readonly totality: {
+    readonly geometryBuildCount: number;
+    readonly materialBuildCount: number;
+  };
 }
 
 export class SolarSystemRenderer {
@@ -145,6 +158,9 @@ export class SolarSystemRenderer {
   private readonly rings: SaturnRingRenderer;
   private readonly satellites: NaturalSatelliteRenderer;
   private readonly orbits: SatelliteOrbitRenderer;
+  private readonly trajectories: ApparentTrajectoryRenderer;
+  private readonly totality: SolarTotalityRenderer;
+  private readonly occlusion = new CelestialOcclusionPolicy(CELESTIAL_RADIUS);
   private displayed = new Map<SolarSystemBodyId, SolarSystemBodyState>();
   private target = new Map<SolarSystemBodyId, SolarSystemBodyState>();
   private interpolation: Interpolation | null = null;
@@ -152,6 +168,10 @@ export class SolarSystemRenderer {
   private latestGeneration = 0;
   private latestObserverGeneration = 0;
   private latestTimestampMs = 0;
+  private latestEventGeneration = 0;
+  private latestSolarEclipse: SolarEclipseState | null = null;
+  private latestTerrainLimb: AstronomicalEventSnapshot["totalityAppearance"]["terrainCorrectedLimb"] = null;
+  private eventBodySnapEnabled = false;
   private masterVisible = true;
   private sunVisible = true;
   private moonVisible = true;
@@ -188,6 +208,8 @@ export class SolarSystemRenderer {
     this.rings = new SaturnRingRenderer(saturn.root, textureLoad);
     this.satellites = new NaturalSatelliteRenderer(this.root);
     this.orbits = new SatelliteOrbitRenderer(this.root);
+    this.trajectories = new ApparentTrajectoryRenderer(this.root);
+    this.totality = new SolarTotalityRenderer(this.root);
     parent.add(this.root);
 
     this.entityBuildCount = 2 + this.planetVisuals.size;
@@ -238,7 +260,12 @@ export class SolarSystemRenderer {
     const nextDisplayed = new Map<SolarSystemBodyId, SolarSystemBodyState>();
     for (const [id, target] of this.interpolation.to) {
       const start = this.interpolation.from.get(id) ?? target;
-      nextDisplayed.set(id, interpolateBody(start, target, fraction));
+      nextDisplayed.set(
+        id,
+        this.eventBodySnapEnabled && isEclipseGeometryBody(id)
+          ? target
+          : interpolateBody(start, target, fraction),
+      );
     }
     this.displayed = nextDisplayed;
     this.applyDisplayed();
@@ -278,8 +305,38 @@ export class SolarSystemRenderer {
     return this.orbits.registerBinaryResource(metadata, buffer);
   }
 
+  registerApparentTrajectoryResource(
+    metadata: ApparentTrajectoryMetadata,
+    buffer: ArrayBuffer,
+  ): boolean {
+    return this.trajectories.registerBinaryResource(metadata, buffer);
+  }
+
+  updateEventSnapshot(snapshot: AstronomicalEventSnapshot): boolean {
+    if (
+      snapshot.generation <= this.latestEventGeneration
+      || snapshot.sourceSolarSystemGeneration !== this.latestGeneration
+      || snapshot.observerGeneration !== this.latestObserverGeneration
+    ) return false;
+    this.latestEventGeneration = snapshot.generation;
+    this.latestSolarEclipse = snapshot.solar;
+    this.latestTerrainLimb = snapshot.totalityAppearance.terrainCorrectedLimb;
+    this.eventBodySnapEnabled = snapshot.solar.classification !== "none"
+      || snapshot.lunar.classification !== "none";
+    if (this.eventBodySnapEnabled) {
+      for (const id of ["sun", "moon"] as const) {
+        const target = this.target.get(id);
+        if (target !== undefined) this.displayed.set(id, target);
+      }
+    }
+    this.totality.updateEvent(snapshot);
+    this.moonSurface.updateEclipse(snapshot.lunar);
+    this.applyDisplayed();
+    return true;
+  }
+
   setVisibility(
-    part: "system" | "sun" | "moon" | "planets" | "rings" | "satellites" | "orbits",
+    part: "system" | "sun" | "moon" | "planets" | "rings" | "satellites" | "orbits" | "trajectories",
     visible: boolean,
   ): void {
     if (part === "system") this.masterVisible = visible;
@@ -292,6 +349,7 @@ export class SolarSystemRenderer {
       this.satellites.setEnabled(visible);
     }
     if (part === "orbits") this.orbits.setEnabled(visible);
+    if (part === "trajectories") this.trajectories.setEnabled(visible);
     this.applyDisplayed();
   }
 
@@ -379,6 +437,11 @@ export class SolarSystemRenderer {
       rings: this.rings.metrics(),
       satellites: this.satellites.metrics(),
       orbits: this.orbits.metrics(),
+      trajectories: this.trajectories.metrics(),
+      totality: {
+        geometryBuildCount: this.totality.geometryBuildCount,
+        materialBuildCount: this.totality.materialBuildCount,
+      },
     };
   }
 
@@ -392,6 +455,8 @@ export class SolarSystemRenderer {
     this.rings.dispose();
     this.satellites.dispose();
     this.orbits.dispose();
+    this.trajectories.dispose();
+    this.totality.dispose();
     for (const visual of this.planetVisuals.values()) visual.dispose();
     this.planetVisuals.clear();
   }
@@ -439,20 +504,28 @@ export class SolarSystemRenderer {
       }
       if (id === "moon") {
         const direction = threeFromEnu(state.directionENU).normalize();
-        this.moonSurface.root.position.copy(direction).multiplyScalar(CELESTIAL_RADIUS);
-        this.moonSurface.root.scale.setScalar(apparentScale(state));
+        const radius = this.occlusion.presentationRadius(state, this.displayed.values());
+        this.moonSurface.root.position.copy(direction).multiplyScalar(radius);
+        this.moonSurface.setPresentationScale(
+          this.occlusion.apparentRadius(radius, state.angularRadiusDeg),
+        );
+        this.moonSurface.setRenderOrder(this.occlusion.renderOrder(state, this.displayed.values()));
         const fallbackLight = phaseLightDirectionThree(state, sun);
         this.moonSurface.updateState(
           state,
           moonLightDirectionThree(state, fallbackLight),
           this.isVisible(id) && (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0),
         );
+        this.totality.updateMoon(state);
         continue;
       }
       if (id === "sun") {
         const direction = threeFromEnu(state.directionENU).normalize();
-        this.sun.mesh.position.copy(direction).multiplyScalar(CELESTIAL_RADIUS);
-        this.sun.mesh.scale.setScalar(apparentScale(state));
+        const radius = this.occlusion.presentationRadius(state, this.displayed.values());
+        this.sun.mesh.position.copy(direction).multiplyScalar(radius);
+        this.sun.mesh.scale.setScalar(this.occlusion.apparentRadius(radius, state.angularRadiusDeg));
+        this.sun.mesh.renderOrder = this.occlusion.renderOrder(state, this.displayed.values());
+        this.totality.updateSun(state, radius);
         this.sun.uniforms.uRenderAlpha.value = 1;
         this.sun.mesh.visible = this.isVisible(id)
           && (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0);
@@ -466,14 +539,30 @@ export class SolarSystemRenderer {
         && (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0);
       visual.updateState(
         state,
-        apparentScale(state),
+        this.occlusion.apparentRadius(
+          this.occlusion.presentationRadius(state, this.displayed.values()),
+          state.angularRadiusDeg,
+        ),
         phaseLightDirectionThree(state, sun),
         visibility,
+        this.occlusion.presentationRadius(state, this.displayed.values()),
       );
+      visual.mesh.renderOrder = this.occlusion.renderOrder(state, this.displayed.values());
       if (id === "saturn") this.rings.updateState(state, visibility);
     }
     this.satellites.setEnabled(this.masterVisible && this.satellitesVisible);
     this.satellites.updateStates(satelliteStates);
+    if (this.latestSolarEclipse !== null) {
+      const moon = this.displayed.get("moon");
+      if (moon !== undefined) {
+        this.moonSurface.updateSolarOccultation(
+          this.latestSolarEclipse,
+          threeFromEnu(sun.directionENU).normalize(),
+          threeFromEnu(moon.directionENU).normalize(),
+          this.latestTerrainLimb,
+        );
+      }
+    }
   }
 
   private isVisible(id: SolarSystemBodyId): boolean {
@@ -512,6 +601,10 @@ function statesById(snapshot: SolarSystemSnapshot): Map<SolarSystemBodyId, Solar
   for (const planet of snapshot.planets) states.set(planet.id, planet);
   for (const satellite of snapshot.satellites ?? []) states.set(satellite.id, satellite);
   return states;
+}
+
+function isEclipseGeometryBody(id: SolarSystemBodyId): boolean {
+  return id === "sun" || id === "moon";
 }
 
 function interpolateBody(
@@ -655,10 +748,6 @@ function renderAlpha(body: SolarSystemBodyState, environment: SkyEnvironmentSnap
   const limit = environment?.visibility.zenithMagnitudeLimit ?? 6;
   const magnitudeVisibility = clamp01((limit - body.apparentMagnitude + 0.75) / 1.5);
   return magnitudeVisibility * night;
-}
-
-function apparentScale(state: SolarSystemBodyState): number {
-  return CELESTIAL_RADIUS * Math.sin(THREE.MathUtils.degToRad(state.angularRadiusDeg));
 }
 
 function isPlanetBodyId(id: string): id is PlanetBodyId {

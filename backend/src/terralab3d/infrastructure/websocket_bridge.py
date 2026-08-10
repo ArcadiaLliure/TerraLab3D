@@ -39,6 +39,8 @@ class WebSocketBridge:
         self._binary_bytes_sent = 0
         self._solar_system_bridge_bytes = 0
         self._lighting_bridge_bytes = 0
+        self._eclipse_snapshot_bytes = 0
+        self._trajectory_bridge_bytes = 0
 
     @property
     def connected(self) -> bool:
@@ -64,6 +66,14 @@ class WebSocketBridge:
     @property
     def lighting_bridge_bytes(self) -> int:
         return self._lighting_bridge_bytes
+
+    @property
+    def eclipse_snapshot_bytes(self) -> int:
+        return self._eclipse_snapshot_bytes
+
+    @property
+    def trajectory_bridge_bytes(self) -> int:
+        return self._trajectory_bridge_bytes
 
     def on(self, msg_type: str, handler: MessageHandler) -> None:
         """Registra un manegador per a un tipus de missatge específic."""
@@ -285,6 +295,28 @@ class WebSocketBridge:
         await self.send(payload)
         return byte_count
 
+    async def send_astronomical_event_snapshot(self, snapshot: Any) -> int:
+        payload = snapshot.to_dict()
+        payload["type"] = "astronomical_event_snapshot"
+        byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+        self._eclipse_snapshot_bytes = byte_count
+        await self.send(payload)
+        return byte_count
+
+    async def send_event_search_result(self, result: Any) -> int:
+        payload = result.to_dict()
+        payload["type"] = "event_search_result"
+        byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+        await self.send(payload)
+        return byte_count
+
+    async def send_angular_separation_result(self, result: Any) -> int:
+        payload = result.to_dict()
+        payload["type"] = "angular_separation_result"
+        byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+        await self.send(payload)
+        return byte_count
+
     async def send_moon_surface_resource(self, descriptor: Any) -> None:
         """Send only the small local resource descriptor, never texture bytes."""
 
@@ -309,6 +341,16 @@ class WebSocketBridge:
             resource.metadata,
             resource.payload,
         )
+        return len(resource.payload)
+
+    async def send_apparent_trajectory(self, resource: Any) -> int:
+        await self.send_binary_resource(
+            resource.resource_id,
+            resource.version,
+            resource.metadata,
+            resource.payload,
+        )
+        self._trajectory_bridge_bytes = len(resource.payload)
         return len(resource.payload)
 
     async def send_location_error(self, message: str) -> None:

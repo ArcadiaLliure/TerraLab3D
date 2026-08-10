@@ -69,6 +69,16 @@ Les seves posicions s’actualitzen segons la ubicació, la data i l’hora sele
 Els recursos científics i les textures es resolen des de la biblioteca indicada
 per `data_location.json`; no es dupliquen dins del repositori.
 
+### Eclipsis i trajectòries aparents
+
+TerraLab3D calcula amb SPICE la geometria topocèntrica dels eclipsis solars,
+l'ombra terrestre dels eclipsis lunars, contactes refinats, separacions i
+ocultacions sol·licitades. La classificació solar és local per observador i no
+depèn de llindars d'obscuració. Les trajectòries aparents al cel són recursos
+versionats diferents de les òrbites planetocèntriques SPK. Prop de la totalitat,
+el limbe LRO/LOLA governa les Perles de Baily i l'anell de diamant; la corona
+procedural queda marcada explícitament com a aproximada.
+
 ### Horitzó i relleu
 
 TerraLab3D calcula l’horitzó real que envolta l’observador.

@@ -1,4 +1,5 @@
 import { WebSocketBridge } from "../../../bridge/WebSocketBridge";
+import { formatLocalAndUtcTime } from "../timeFormatting";
 
 export class TimeBar {
   private container: HTMLDivElement;
@@ -214,11 +215,7 @@ export class TimeBar {
     this.ctx.fillStyle = "#d8b26a"; // --color-gold
     this.ctx.fillRect(markerX - 1, 0, 3, h);
     
-    // Formatter
-    const hh = this.currentTime.getUTCHours().toString().padStart(2, '0');
-    const mm = this.currentTime.getUTCMinutes().toString().padStart(2, '0');
-    const ss = this.currentTime.getUTCSeconds().toString().padStart(2, '0');
-    this.timeLabel.textContent = `${hh}:${mm}:${ss} UTC ${this.isRealtime ? '(Real)' : '(Simulat)'}`;
+    this.timeLabel.textContent = `${formatLocalAndUtcTime(this.currentTime)} ${this.isRealtime ? '(Real)' : '(Simulat)'}`;
   }
   
   private getColor(val: number): string {

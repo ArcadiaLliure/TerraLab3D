@@ -162,8 +162,9 @@ export class PhysicalBodyVisual {
     apparentRadius: number,
     lightDirectionThree: THREE.Vector3,
     visible: boolean,
+    presentationRadius = 900_000,
   ): void {
-    this.root.position.copy(threeFromEnu(state.directionENU).normalize()).multiplyScalar(900_000);
+    this.root.position.copy(threeFromEnu(state.directionENU).normalize()).multiplyScalar(presentationRadius);
     this.root.scale.setScalar(apparentRadius);
     const orientation = bodyOrientation(state);
     if (orientation?.bodyToENUQuaternion !== null && orientation !== null) {

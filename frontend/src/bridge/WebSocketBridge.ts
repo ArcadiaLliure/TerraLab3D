@@ -26,6 +26,12 @@ import type {
 import type { NavigationCameraPose, MotionState } from "../contracts/navigation";
 import type { LightingEnvironmentSnapshot } from "../contracts/lighting_environment_contracts";
 import type {
+  ApparentTrajectoryMetadata,
+  AngularSeparationResult,
+  AstronomicalEventSearchResult,
+  AstronomicalEventSnapshot,
+} from "../contracts/astronomical_event_contracts";
+import type {
   MoonSurfaceResourceDescriptor,
   PlanetTextureManifest,
   SatelliteCatalogManifest,
@@ -83,6 +89,10 @@ export interface BackendMessageListener {
   onMoonSurfaceResource?(resource: MoonSurfaceResourceDescriptor): void;
   onPlanetTextureManifest?(manifest: PlanetTextureManifest): void;
   onSolarSystemCatalogManifest?(manifest: SatelliteCatalogManifest): void;
+  onAstronomicalEventSnapshot?(snapshot: AstronomicalEventSnapshot): void;
+  onEventSearchResult?(result: AstronomicalEventSearchResult): void;
+  onApparentTrajectoryResource?(metadata: ApparentTrajectoryMetadata, bufferPayload: ArrayBuffer): void;
+  onAngularSeparationResult?(result: AngularSeparationResult): void;
 }
 
 export class WebSocketBridge {
@@ -174,6 +184,9 @@ export class WebSocketBridge {
     const payloadBuffer = arrayBuffer.slice(4 + headerLen);
 
     for (const l of this.messageListeners) {
+      if (metadata.role === "apparent_trajectory") {
+        l.onApparentTrajectoryResource?.(metadata as ApparentTrajectoryMetadata, payloadBuffer);
+      }
       if (l.onBinaryResourceReady) l.onBinaryResourceReady(metadata, payloadBuffer);
       else l.onStarResourceReady?.(metadata, payloadBuffer);
     }
@@ -394,6 +407,21 @@ export class WebSocketBridge {
           l.onSolarSystemCatalogManifest?.(msg);
         }
         break;
+      case "astronomical_event_snapshot":
+        for (const l of this.messageListeners) {
+          l.onAstronomicalEventSnapshot?.(msg);
+        }
+        break;
+      case "event_search_result":
+        for (const l of this.messageListeners) {
+          l.onEventSearchResult?.(msg);
+        }
+        break;
+      case "angular_separation_result":
+        for (const l of this.messageListeners) {
+          l.onAngularSeparationResult?.(msg);
+        }
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -456,6 +484,41 @@ export class WebSocketBridge {
       intervalDays,
       sampleCount,
     });
+  }
+
+  public requestEventSearch(
+    requestId: string,
+    eventType: "solar" | "lunar",
+    startUtc: string,
+    endUtc: string,
+  ): void {
+    this.sendMessage({ type: "request_event_search", requestId, eventType, startUtc, endUtc });
+  }
+
+  public requestApparentTrajectory(
+    requestId: string,
+    bodyId: string,
+    startUtc: string,
+    endUtc: string,
+    sampleCount = 256,
+  ): void {
+    this.sendMessage({
+      type: "request_apparent_trajectory",
+      requestId,
+      bodyId,
+      startUtc,
+      endUtc,
+      sampleCount,
+    });
+  }
+
+  public requestAngularSeparation(
+    requestId: string,
+    bodyA: string,
+    bodyB: string,
+    utc: string,
+  ): void {
+    this.sendMessage({ type: "request_angular_separation", requestId, bodyA, bodyB, utc });
   }
 
   // ─── Navigation messages (Phase 3.5) ────────────────────────────

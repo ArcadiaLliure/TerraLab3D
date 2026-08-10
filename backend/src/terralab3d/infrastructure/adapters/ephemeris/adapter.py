@@ -325,6 +325,7 @@ class SkyfieldEphemerisAdapter:
             moon=moon_state,
             planets=planets,
             compute_ms=(time.perf_counter() - started) * 1000.0,
+            scientific_observer=observer,
         )
 
     def _lunar_orientation(

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { EclipseSceneAppearance } from "../../../contracts/astronomical_event_contracts";
 
 import type {
   DiffuseSkyLightState,
@@ -49,6 +50,7 @@ export class SceneLightingController {
   private _snapshotApplyCount = 0;
   private _staleSnapshotCount = 0;
   private _lastBridgeBytes = 0;
+  private eclipseAppearance: EclipseSceneAppearance | null = null;
 
   constructor(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
     this.root.name = "lightingRoot";
@@ -132,6 +134,11 @@ export class SceneLightingController {
     this.shadowController.setQuality(quality);
   }
 
+  setEclipseAppearance(appearance: EclipseSceneAppearance): void {
+    this.eclipseAppearance = appearance;
+    if (this.displayed !== null) this.applyState(this.displayed);
+  }
+
   getShadowQuality(): ShadowQuality {
     return this.shadowController.getQuality();
   }
@@ -171,7 +178,37 @@ export class SceneLightingController {
     );
     this.shadowController.applyMoonDirection(moonDirection);
     applyDiffuseLight(this.diffuseSkyLight, snapshot.skyDiffuse);
+    if (this.eclipseAppearance !== null) {
+      applyVisualEclipseAppearance(
+        this.sunLight,
+        this.moonLight,
+        this.diffuseSkyLight,
+        this.eclipseAppearance,
+      );
+    }
   }
+}
+
+function applyVisualEclipseAppearance(
+  sun: THREE.DirectionalLight,
+  moon: THREE.DirectionalLight,
+  diffuse: THREE.HemisphereLight,
+  appearance: EclipseSceneAppearance,
+): void {
+  if (appearance.strength <= 0) return;
+  const saturation = Math.max(0, appearance.saturation);
+  const coolShift = THREE.MathUtils.clamp(-appearance.colorTemperatureShift, 0, 1);
+  for (const color of [sun.color, moon.color, diffuse.color, diffuse.groundColor]) {
+    const luminance = color.r * 0.2126 + color.g * 0.7152 + color.b * 0.0722;
+    color.lerp(new THREE.Color(luminance, luminance, luminance), 1 - saturation);
+    color.multiply(new THREE.Color(1 - coolShift * 0.035, 1, 1 + coolShift * 0.055));
+  }
+  const exposure = Math.max(0, appearance.midtoneExposure);
+  const ratio = Math.max(0, appearance.directToDiffuseRatio);
+  const contrast = Math.max(0.1, appearance.contrast);
+  sun.intensity *= exposure * ratio * contrast;
+  moon.intensity *= exposure;
+  diffuse.intensity *= exposure / contrast;
 }
 
 function applyDirectLight(light: THREE.DirectionalLight, state: DirectLightState): void {

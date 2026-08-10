@@ -12,10 +12,8 @@ void main() {
 export const skyFragmentShader = `
 uniform vec3 u_sunDirectionENU;
 uniform float u_sunAltitudeDeg;
-uniform vec3 u_moonDirectionENU;
-uniform float u_moonAltitudeDeg;
-uniform vec3 u_moonColorLinear;
-uniform float u_moonIntensity;
+uniform float u_solarDiscTransmission;
+uniform float u_skyEclipseDimmingFactor;
 uniform float u_twilightFactor;
 uniform float u_turbidity;
 uniform float u_bortleClass;
@@ -79,7 +77,7 @@ void main() {
             vec3(1.0, 1.0, 0.7874),
             sunIntensity
         );
-        skyColor += glowColor * glowFactor * sunIntensity * 0.5;
+        skyColor += glowColor * glowFactor * sunIntensity * 0.5 * u_solarDiscTransmission;
     }
 
     // 3b. AURÈOLA SOLAR ATMOSFÈRICA (Mie, sense lens flare)
@@ -100,21 +98,12 @@ void main() {
     float solarHalo = sunAboveHorizon
         * (innerAureole * mix(0.72, 0.92, haze)
             + outerAureole * mix(0.10, 0.22, haze));
-    skyColor += solarHaloColor * solarHalo;
+    skyColor += solarHaloColor * solarHalo * u_solarDiscTransmission;
     
-    // 3c. AURÈOLA LUNAR ATMOSFÈRICA (Mie)
-    if (u_moonIntensity > 0.0) {
-        float moonGamma = acos(clamp(dot(viewDir, u_moonDirectionENU), -1.0, 1.0));
-        float moonAboveHorizon = smoothstep(-0.833, 1.5, u_moonAltitudeDeg);
-        float moonInnerAureole = exp(-moonGamma / innerWidthRad);
-        float moonOuterAureole = exp(-moonGamma / outerWidthRad);
-        
-        float moonHalo = moonAboveHorizon 
-            * (moonInnerAureole * mix(0.72, 0.92, haze) 
-               + moonOuterAureole * mix(0.10, 0.22, haze));
-        
-        skyColor += u_moonColorLinear * moonHalo * u_moonIntensity * 1.5;
-    }
+    // The backend palette already carries the eclipse dimming.  Keep only a
+    // modest local contrast response here: applying the full factor twice made
+    // totality look like an ordinary black night instead of deep twilight.
+    skyColor *= mix(0.88, 1.0, u_skyEclipseDimmingFactor);
     
     // 4. CONTAMINACIÓ LUMÍNICA (Bortle Glow)
     if (u_artificialBrightness > 0.0) {

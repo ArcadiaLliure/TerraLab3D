@@ -28,7 +28,7 @@ _SUN_VISUAL_INTENSITY = 3.0
 # imperceptible after atmospheric extinction on the deliberately dark local
 # terrain.  This remains far below the Sun while making measured lunar flux
 # observable without changing the Moon disc, its phase or its terminator.
-_FULL_MOON_VISUAL_INTENSITY = 0.8
+_FULL_MOON_VISUAL_INTENSITY = 0.15
 
 
 @dataclass(frozen=True, slots=True)
@@ -83,6 +83,7 @@ class LightingEnvironmentSnapshot:
     moon: DirectLightState
     sky_diffuse: DiffuseSkyLightState
     direct_solar_visibility_factor: float = 1.0
+    lunar_direct_visibility_factor: float = 1.0
     exposure_hint: float | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -93,6 +94,7 @@ class LightingEnvironmentSnapshot:
             "sourceSkyGeneration": self.source_sky_generation,
             "sourceSolarSystemGeneration": self.source_solar_system_generation,
             "directSolarVisibilityFactor": self.direct_solar_visibility_factor,
+            "lunarDirectVisibilityFactor": self.lunar_direct_visibility_factor,
             "sun": self.sun.to_dict(),
             "moon": self.moon.to_dict(),
             "skyDiffuse": self.sky_diffuse.to_dict(),
@@ -115,10 +117,15 @@ class LightingEnvironmentComposer:
         solar_system: SolarSystemSnapshot,
         *,
         direct_solar_visibility_factor: float = 1.0,
+        lunar_direct_visibility_factor: float = 1.0,
     ) -> LightingEnvironmentSnapshot:
         visibility = _finite_clamp01(
             direct_solar_visibility_factor,
             "directSolarVisibilityFactor",
+        )
+        lunar_visibility = _finite_clamp01(
+            lunar_direct_visibility_factor,
+            "lunarDirectVisibilityFactor",
         )
         self._generation += 1
         self.snapshot_count += 1
@@ -128,10 +135,11 @@ class LightingEnvironmentComposer:
             source_sky_generation=sky.generation,
             source_solar_system_generation=solar_system.generation,
             sun=self._compose_sun(sky, solar_system.sun, visibility),
-            moon=self._compose_moon(sky, solar_system.moon),
+            moon=self._compose_moon(sky, solar_system.moon, lunar_visibility),
             sky_diffuse=self._compose_diffuse(sky),
             # Pas 9 has one explicit hook and does not need to refactor lighting.
             direct_solar_visibility_factor=visibility,
+            lunar_direct_visibility_factor=lunar_visibility,
         )
 
     def metrics(self) -> dict[str, int]:
@@ -169,6 +177,7 @@ class LightingEnvironmentComposer:
     def _compose_moon(
         sky: SkyEnvironmentSnapshot,
         moon: ApparentBodyState | None,
+        eclipse_visibility: float,
     ) -> DirectLightState:
         if moon is None:
             return DirectLightState(
@@ -204,7 +213,7 @@ class LightingEnvironmentComposer:
         if altitude <= 0.0:
             intensity = 0.0
         else:
-            intensity *= transmission
+            intensity *= transmission * eclipse_visibility
         return DirectLightState(
             enabled=intensity > 1e-9,
             direction_to_source_enu=direction,

@@ -70,6 +70,8 @@ function main(): void {
   atmosphereRenderer.setPureColors(false);
   let enabledSatelliteSystems: readonly string[] = [];
   let satelliteOrbitsVisible = false;
+  let latestSimulationTimeIso = new Date().toISOString();
+  let lastEventSearchKey = "";
   const representativeOrbitBody: Readonly<Record<string, { bodyId: string; intervalDays: number }[]>> = {
     mars: [{ bodyId: "naif-401", intervalDays: 0.4 }, { bodyId: "naif-402", intervalDays: 1.5 }],
     jupiter: [{ bodyId: "naif-501", intervalDays: 2 }, { bodyId: "naif-502", intervalDays: 4 }, { bodyId: "naif-503", intervalDays: 7 }, { bodyId: "naif-504", intervalDays: 17 }],
@@ -87,6 +89,21 @@ function main(): void {
           bridge.requestSatelliteOrbit(orbit.bodyId, orbit.intervalDays);
         }
       }
+    }
+  };
+  const requestDefaultApparentTrajectories = () => {
+    const center = Date.parse(latestSimulationTimeIso);
+    if (!Number.isFinite(center)) return;
+    const startUtc = new Date(center - 12 * 3_600_000).toISOString();
+    const endUtc = new Date(center + 12 * 3_600_000).toISOString();
+    for (const bodyId of ["sun", "moon", "mars"]) {
+      bridge.requestApparentTrajectory(
+        `trajectory:${bodyId}:${latestSimulationTimeIso}`,
+        bodyId,
+        startUtc,
+        endUtc,
+        256,
+      );
     }
   };
 
@@ -123,6 +140,7 @@ function main(): void {
         satelliteOrbitsVisible = visible;
         requestRepresentativeOrbits();
       }
+      if (part === "trajectories" && visible) requestDefaultApparentTrajectories();
     },
     onMoonSurfaceToggled: (enabled) => {
       sceneHost.getSolarSystemRenderer().setMoonSurfaceEnabled(enabled);
@@ -274,6 +292,7 @@ function main(): void {
       alert("Error d'ubicació: " + msg);
     },
     onSimulationTimeSnapshot(currentTimeIso, julianDay, lstDeg, sunAltitudes, isRealtime) {
+      latestSimulationTimeIso = currentTimeIso;
       timeBar.updateState(currentTimeIso, sunAltitudes, isRealtime);
       locationPage.updateTimeState(currentTimeIso, isRealtime);
       shell.updateRealtimeUI(isRealtime);
@@ -289,6 +308,10 @@ function main(): void {
     onBinaryResourceReady(metadata, bufferPayload) {
       if (metadata.role === "solar_system_orbit") {
         sceneHost.getSolarSystemRenderer().registerOrbitResource(metadata, bufferPayload);
+        return;
+      }
+      if (metadata.role === "apparent_trajectory") {
+        sceneHost.getSolarSystemRenderer().registerApparentTrajectoryResource(metadata, bufferPayload);
         return;
       }
       sceneHost.getStarFieldRenderer().registerBinaryResource(metadata, bufferPayload);
@@ -317,8 +340,34 @@ function main(): void {
     onLightingEnvironmentSnapshot(snapshot) {
       const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
       sceneHost.getLightingController().applySnapshot(snapshot, bridgeBytes);
-      atmosphereRenderer.updateLighting(snapshot);
       diagnostics.updateLighting(snapshot, sceneHost.getLightingController().metrics());
+    },
+    onAstronomicalEventSnapshot(snapshot) {
+      sceneHost.getSolarSystemRenderer().updateEventSnapshot(snapshot);
+      sceneHost.getLightingController().setEclipseAppearance(snapshot.sceneAppearance);
+      locationHUD.updateAstronomicalEvent(snapshot);
+      const eventType = snapshot.solar.classification !== "none"
+        ? "solar"
+        : snapshot.lunar.classification !== "none" ? "lunar" : null;
+      if (eventType !== null) {
+        const timestamp = Date.parse(snapshot.timestampUtc);
+        const dayKey = `${eventType}:${snapshot.observerGeneration}:${snapshot.timestampUtc.slice(0, 10)}`;
+        if (Number.isFinite(timestamp) && dayKey !== lastEventSearchKey) {
+          lastEventSearchKey = dayKey;
+          bridge.requestEventSearch(
+            `event:${dayKey}`,
+            eventType,
+            new Date(timestamp - 12 * 3_600_000).toISOString(),
+            new Date(timestamp + 12 * 3_600_000).toISOString(),
+          );
+        }
+      }
+    },
+    onEventSearchResult(result) {
+      locationHUD.updateEventSearchResult(result);
+    },
+    onAngularSeparationResult(result) {
+      locationHUD.updateAngularSeparation(result);
     },
     onMoonSurfaceResource(resource) {
       const moonMetrics = sceneHost.getSolarSystemRenderer().configureMoonSurface(
@@ -413,6 +462,13 @@ function main(): void {
         ringMaterialBuildCount: solar.rings.materialBuildCount,
         orbitGeometryBuildCount: solar.orbits.geometryBuildCount,
         orbitBridgeBytes: solar.orbits.bridgeBytes,
+        trajectoryGeometryBuildCount: solar.trajectories.geometryBuildCount,
+        trajectoryMaterialBuildCount: solar.trajectories.materialBuildCount,
+        trajectoryResourceApplyCount: solar.trajectories.resourceApplyCount,
+        trajectoryStaleResourceCount: solar.trajectories.staleResourceCount,
+        trajectoryBridgeBytes: solar.trajectories.bridgeBytes,
+        solarTotalityGeometryBuildCount: solar.totality.geometryBuildCount,
+        solarTotalityMaterialBuildCount: solar.totality.materialBuildCount,
         gpuMemoryEstimateBytes: solar.planetTextureUploadBytes
           + solar.moon.textureUploadBytes
           + solar.rings.textureUploadBytes
