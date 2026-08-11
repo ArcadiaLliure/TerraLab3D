@@ -41,6 +41,7 @@ from terralab3d.application.astronomical_events import (
     AstronomicalEventService,
     EventSearchCoordinator,
 )
+from terralab3d.application.search_coordinator import AstronomicalSearchCoordinator
 from terralab3d.domain.eclipses.models import (
     AstronomicalEventEphemeris,
     EclipseKind,
@@ -57,6 +58,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("terralab3d")
 
+SIMULATION_TICK_INTERVAL_SEC = 1.0 / 30.0  # 30 updates per second for smooth ephemeris tracking
 
 async def run() -> int:
     """Punt d'entrada asíncron principal."""
@@ -289,6 +291,9 @@ async def run() -> int:
     event_search_coordinator: EventSearchCoordinator | None = None
     trajectory_coordinator: ApparentTrajectoryCoordinator | None = None
     lunar_limb_provider: LroLolaLimbProfileProvider | None = None
+    
+    # Pas 12: Cerca astronòmica
+    search_coordinator = AstronomicalSearchCoordinator(bridge.send_astronomical_search_result)
 
     async def publish_solar_system(snapshot: SolarSystemSnapshot) -> int:
         """Publish one coherent science state to bodies, sky and local lighting."""
@@ -545,6 +550,53 @@ async def run() -> int:
     bridge.on("request_apparent_trajectory", _handle_request_apparent_trajectory)
     bridge.on("request_angular_separation", _handle_request_angular_separation)
 
+    async def _handle_astronomical_search_request(data: dict[str, Any]) -> None:
+        try:
+            req_id = data["requestId"]
+            gen = data["generation"]
+            query = data["query"]
+            limit = data.get("limit", 20)
+            
+            # Poblar index dinàmicament just abans de la primera cerca (només si l'hem de recrear, 
+            # però com que els planetes es mouen poc, podem agafar snapshot actual)
+            planets_data = []
+            if latest_solar_system:
+                for b in latest_solar_system.bodies:
+                    # En TerraLab v1, name s'usava per a cerca
+                    # Afegim body.name com a àlies i canon_name.
+                    planets_data.append({
+                        "body_id": b.body_id,
+                        "canon_name": b.name,
+                        "aliases": [b.name], # Podríem afegir el català o altres àlies aquí
+                        "coordinate_snapshot": b.equatorial_position
+                    })
+                # També afegim el Sol i la Lluna
+                planets_data.append({
+                    "body_id": "sun",
+                    "canon_name": "Sol",
+                    "aliases": ["Sol", "Sun"],
+                    "coordinate_snapshot": latest_solar_system.sun.equatorial_position
+                })
+                planets_data.append({
+                    "body_id": "moon",
+                    "canon_name": "Lluna",
+                    "aliases": ["Lluna", "Moon"],
+                    "coordinate_snapshot": latest_solar_system.moon.equatorial_position
+                })
+
+            # Reconstruim l'índex per garantir estrelles + planetes actualitzats
+            search_coordinator.build_index(
+                named_stars=[], # A implementar: extraure noms rellevants d'estrelles si cal
+                ngc_objects=[], # A implementar: extraure noms NGC del meta
+                planets=planets_data
+            )
+            
+            search_coordinator.search(req_id, gen, query, limit)
+        except Exception as e:
+            log.error("MGP: [__main__] Error executant cerca: %s", e)
+            
+    bridge.on("astronomical_search_request", _handle_astronomical_search_request)
+
     def scientific_observer() -> ScientificObserver:
         return ScientificObserver(
             latitude_deg=current_observer.location.latitude_deg,
@@ -712,7 +764,7 @@ async def run() -> int:
     async def clock_ticker() -> None:
         """S'encarrega d'avançar el temps si està en temps real i publicar l'estat."""
         nonlocal sim_time_utc
-        tick_interval = 1.0  # 1-second refresh rate
+        tick_interval = SIMULATION_TICK_INTERVAL_SEC
         while not shutdown_requested.is_set():
             await asyncio.sleep(tick_interval)
             if not time_drag_active:

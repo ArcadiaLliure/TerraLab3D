@@ -19,8 +19,12 @@ class SearchQuery:
 
 @dataclass(frozen=True, slots=True)
 class SearchResult:
-    target_id: str
+    target_ref: str
     kind: SearchTargetKind
     display_name: str
-    coordinate: EquatorialCoordinate
     score: float
+    availability: str = "available"
+    coordinate_snapshot: EquatorialCoordinate | None = None
+    resource_id: str | None = None
+    matched_alias: str | None = None
+

@@ -40,6 +40,8 @@ import { SolarSystemPickProvider } from "./view/three/picking/SolarSystemPickPro
 import { DeepSkyPickProvider } from "./view/three/picking/DeepSkyPickProvider";
 import { CelestialPickProvider } from "./view/three/picking/CelestialPickProvider";
 import { ScenePickingController } from "./view/three/picking/ScenePickingController";
+import { TrackingTargetResolver } from "./view/three/picking/TrackingTargetResolver";
+import { FocusTrackingController } from "./view/three/picking/FocusTrackingController";
 
 // ─── Bootstrap ───────────────────────────────────────────────────────
 
@@ -156,7 +158,14 @@ function main(): void {
   const locContainer = shell.getPageContainer("location");
   if (locContainer) locationPage.mount(locContainer);
 
-  const skyPage = new SkyPage(resourceManager, {
+  const skyPage = new SkyPage(bridge, resourceManager, {
+    onSearchSelected: (selection) => {
+      // Ens assegurem que el locationHUD s'actualitza i comença el seguiment
+      locationHUD.setSelectedCelestial(selection as any);
+      if (selection) {
+        focusTrackingController.startTracking(selection);
+      }
+    },
     onStarLayerToggled: (visible) => sceneHost.getStarFieldRenderer().setVisible(visible),
     onNgcToggled: (visible) => sceneHost.getDeepSkyRenderer().setVisible(visible),
     onAtmosphereToggled: (enabled) => bridge.sendSetAtmosphereEnabled(enabled),
@@ -265,7 +274,21 @@ function main(): void {
     },
     selectionChangedCallback: (selection) => {
       locationHUD.setSelectedCelestial(selection);
+      if (selection) {
+        focusTrackingController.startTracking(selection);
+      } else {
+        focusTrackingController.stopTracking();
+      }
     },
+  });
+
+  // Tracking (Pas 12)
+  const trackingResolver = new TrackingTargetResolver();
+  trackingResolver.updateCelestialTransform(celestialTransformState);
+  const focusTrackingController = new FocusTrackingController(cameraRig, trackingResolver);
+  
+  cameraRig.onUserInteraction(() => {
+    focusTrackingController.stopTracking();
   });
 
   // 2. Mount scene + UI
@@ -393,6 +416,7 @@ function main(): void {
       sceneHost.getSolarSystemRenderer().updateSnapshot(snapshot, bridgeBytes);
       skyPage.updateSolarSystem(snapshot);
       diagnostics.updateSolarSystem(snapshot, sceneHost.getSolarSystemRenderer().metrics());
+      trackingResolver.updateSolarSystemSnapshot(snapshot);
     },
     onLightingEnvironmentSnapshot(snapshot) {
       const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
@@ -487,6 +511,9 @@ function main(): void {
     
     // Actualitza el marker de selecció
     pickingController.updateMarker();
+
+    // Actualitza el seguiment automàtic de càmera
+    focusTrackingController.update();
 
     // Update FPS display at ~1 Hz
     fpsUpdateAccum += 1;

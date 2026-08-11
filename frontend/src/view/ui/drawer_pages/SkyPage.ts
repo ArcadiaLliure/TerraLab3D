@@ -4,6 +4,8 @@ import type {
   SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "../../../contracts/solar_system_contracts";
+import type { AstronomicalSearchResultPayload } from "../../../contracts/bridge_messages";
+import type { WebSocketBridge } from "../../../bridge/WebSocketBridge";
 
 export interface SkyPageOptions {
   onStarLayerToggled?: (visible: boolean) => void;
@@ -25,9 +27,11 @@ export interface SkyPageOptions {
   onMilkyWayToggled?: (visible: boolean) => void | Promise<void>;
   onPlanckDustToggled?: (visible: boolean) => void | Promise<void>;
   onNgcToggled?: (visible: boolean) => void;
+  onSearchSelected?: (result: AstronomicalSearchResultPayload) => void;
 }
 
 import { ResourceBackedLayerRow } from "../components/ResourceBackedLayerRow";
+import { SearchWidget } from "../components/SearchWidget";
 import type { ResourceManager } from "../../../application/ResourceManager";
 
 export class SkyPage {
@@ -60,8 +64,9 @@ export class SkyPage {
   private milkyWayRow!: ResourceBackedLayerRow;
   private planckDustRow!: ResourceBackedLayerRow;
   private ngcRow!: ResourceBackedLayerRow;
+  private searchWidget!: SearchWidget;
 
-  constructor(private resourceManager: ResourceManager, options: SkyPageOptions = {}) {
+  constructor(private bridge: WebSocketBridge, private resourceManager: ResourceManager, options: SkyPageOptions = {}) {
     this.options = options;
 
     this.element = document.createElement("div");
@@ -76,6 +81,15 @@ export class SkyPage {
     const desc = document.createElement("p");
     desc.textContent = "Paràmetres de visualització de la volta celeste, atmosfera i contaminació lumínica.";
     this.element.appendChild(desc);
+
+    this.searchWidget = new SearchWidget(this.bridge, {
+      onSelect: (res) => {
+        if (this.options.onSearchSelected) {
+          this.options.onSearchSelected(res);
+        }
+      }
+    });
+    this.element.appendChild(this.searchWidget.getElement());
 
     this.buildSolarSystemGroup();
     this.buildAtmoGroup();

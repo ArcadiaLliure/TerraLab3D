@@ -25,6 +25,15 @@ import type {
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
+export interface AstronomicalSearchRequestMessage {
+  readonly type: "astronomical_search_request";
+  readonly requestId: string;
+  readonly generation: number;
+  readonly query: string;
+  readonly limit: number;
+}
+
+
 export interface FrontendReadyMessage {
   readonly type: "frontend_ready";
   readonly protocolVersion: 2;
@@ -335,7 +344,8 @@ export type FrontendMessage =
   | SetLightPollutionModeMessage
   | SetBortleClassMessage
   | SetManualMagnitudeLimitMessage
-  | FrontendPerformanceMetricsMessage;
+  | FrontendPerformanceMetricsMessage
+  | AstronomicalSearchRequestMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -490,6 +500,27 @@ export interface DownloadJobSnapshotMessage extends DownloadJobSnapshot {
   readonly type: "download_job_snapshot";
 }
 
+// ─── Astronomical Search (Pas 12) ────────────────────────────────────
+
+export interface AstronomicalSearchResultPayload {
+  readonly targetRef: string;
+  readonly kind: "star" | "body" | "deep_sky" | "coordinate";
+  readonly displayName: string;
+  readonly score: number;
+  readonly availability: string;
+  readonly coordinateSnapshot?: { raDeg: number; decDeg: number };
+  readonly resourceId?: string;
+  readonly matchedAlias?: string;
+}
+
+export interface AstronomicalSearchResultMessage {
+  readonly type: "astronomical_search_result";
+  readonly requestId: string;
+  readonly generation: number;
+  readonly status: "ok" | "stale" | "invalid";
+  readonly results: AstronomicalSearchResultPayload[];
+}
+
 // ─── Tipus Unió ──────────────────────────────────────────────────────
 
 export type BackendMessage =
@@ -512,9 +543,11 @@ export type BackendMessage =
   | AstronomicalEventSnapshotMessage
   | EventSearchResultMessage
   | AngularSeparationResultMessage
+  | DownloadJobSnapshotMessage
   | ResourceCatalogSnapshotMessage
-  | DownloadJobSnapshotMessage;
+  | AstronomicalSearchResultMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 
 export type BridgeMessage = FrontendMessage | BackendMessage;
+

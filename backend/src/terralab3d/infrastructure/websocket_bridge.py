@@ -210,6 +210,24 @@ class WebSocketBridge:
             payload["star"] = star_data
         await self.send(payload)
 
+    # ─── Astronomical Search (Pas 12) ──────────────────────────────────
+
+    async def send_astronomical_search_result(
+        self,
+        request_id: str,
+        generation: int,
+        status: str,
+        results: list[dict[str, Any]]
+    ) -> None:
+        await self.send({
+            "type": "astronomical_search_result",
+            "requestId": request_id,
+            "generation": generation,
+            "status": status,
+            "results": results,
+        })
+
+
     async def send_set_camera_pose(
         self,
         az: float, alt: float, fov: float, roll: float = 0.0,

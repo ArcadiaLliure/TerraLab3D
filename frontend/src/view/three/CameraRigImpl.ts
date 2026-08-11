@@ -101,6 +101,7 @@ export class CameraRigImpl implements CameraRig {
   private poseCallback: PoseChangedCallback | null = null;
   private navigationModeCallback: NavigationModeChangedCallback | null = null;
   private navigationPoseCallback: NavigationPoseCallback | null = null;
+  private userInteractionCallback: (() => void) | null = null;
   private throttleTimer: ReturnType<typeof setTimeout> | null = null;
   private dirty = false;
 
@@ -368,6 +369,10 @@ export class CameraRigImpl implements CameraRig {
     this.navigationPoseCallback = cb;
   }
 
+  onUserInteraction(cb: () => void): void {
+    this.userInteractionCallback = cb;
+  }
+
   attach(container: HTMLElement): void {
     this.container = container;
     container.addEventListener("pointerdown", this.onPointerDownBound);
@@ -577,6 +582,7 @@ export class CameraRigImpl implements CameraRig {
 
   private onPointerDown(e: PointerEvent): void {
     if (e.button !== 0 && e.button !== 2) return;
+    this.userInteractionCallback?.();
     this.dragging = true;
     this.lastX = e.clientX;
     this.lastY = e.clientY;
@@ -603,6 +609,8 @@ export class CameraRigImpl implements CameraRig {
 
   private onWheel(e: WheelEvent): void {
     e.preventDefault();
+    // No cridem this.userInteractionCallback?.(); perquè volem 
+    // permetre fer zoom mentre segueix trackejant l'objectiu
     this.animating = false;
     const factor = e.deltaY > 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
     const oldHFov = this.hFovDeg;
@@ -630,6 +638,7 @@ export class CameraRigImpl implements CameraRig {
     const tag = (e.target as HTMLElement)?.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
+    this.userInteractionCallback?.();
     this.animating = false;
 
     // Navigation keys (WASD, Shift, Space, Ctrl, Q, E, X)

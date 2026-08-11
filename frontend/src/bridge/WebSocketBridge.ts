@@ -95,6 +95,7 @@ export interface BackendMessageListener {
   onAngularSeparationResult?(result: AngularSeparationResult): void;
   onResourceCatalogSnapshot?(msg: import("../contracts/bridge_messages").ResourceCatalogSnapshotMessage): void;
   onDownloadJobSnapshot?(msg: import("../contracts/bridge_messages").DownloadJobSnapshotMessage): void;
+  onAstronomicalSearchResult?(msg: import("../contracts/bridge_messages").AstronomicalSearchResultMessage): void;
 }
 
 export class WebSocketBridge {
@@ -434,6 +435,11 @@ export class WebSocketBridge {
           l.onDownloadJobSnapshot?.(msg);
         }
         break;
+      case "astronomical_search_result":
+        for (const l of this.messageListeners) {
+          l.onAstronomicalSearchResult?.(msg);
+        }
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -537,6 +543,18 @@ export class WebSocketBridge {
 
   public requestCatalogSnapshot(): void {
     this.sendMessage({ type: "request_catalog_snapshot" });
+  }
+
+  // ─── Astronomical Search (Pas 12) ──────────────────────────────────
+
+  public requestAstronomicalSearch(requestId: string, generation: number, query: string, limit = 20): void {
+    this.sendMessage({
+      type: "astronomical_search_request",
+      requestId,
+      generation,
+      query,
+      limit,
+    });
   }
 
   public requestResourceDownload(resourceId: string, variantId: string): void {
