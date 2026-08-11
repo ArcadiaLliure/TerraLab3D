@@ -8,6 +8,7 @@ import type {
 import type { ResolvedStar } from "../../../contracts/star_picking_contracts";
 import type { SolarSystemPickHit } from "../../three/picking/SolarSystemPickProvider";
 import type { DeepSkyPickHit } from "../../../contracts/deep_sky_picking_contracts";
+import type { AstronomicalSearchResultPayload } from "../../../contracts/bridge_messages";
 import { formatLocalAndUtcTime } from "../timeFormatting";
 
 const DEG = Math.PI / 180;
@@ -235,16 +236,36 @@ export class LocationHUD {
     this.element.style.display = visible ? "flex" : "none";
   }
 
-  public setSelectedCelestial(selection: ResolvedStar | SolarSystemPickHit | DeepSkyPickHit | null): void {
+
+  public setSelectedCelestial(
+    selection: ResolvedStar | SolarSystemPickHit | DeepSkyPickHit | AstronomicalSearchResultPayload | null,
+  ): void {
     if (selection === null) {
       this.setSelectedStar(null);
+    } else if ("displayName" in selection && "targetRef" in selection) {
+      this.setSelectedSearchResult(selection as AstronomicalSearchResultPayload);
     } else if (selection.kind === "star") {
-      this.setSelectedStar(selection);
+      this.setSelectedStar(selection as ResolvedStar);
     } else if (selection.kind === "deep_sky") {
-      this.setSelectedDeepSky(selection);
+      this.setSelectedDeepSky(selection as DeepSkyPickHit);
     } else {
-      this.setSelectedSolarBody(selection);
+      this.setSelectedSolarBody(selection as SolarSystemPickHit);
     }
+  }
+
+  private setSelectedSearchResult(res: AstronomicalSearchResultPayload): void {
+    this.starContainer.style.display = "block";
+    const raText = res.coordinateSnapshot ? `${res.coordinateSnapshot.raDeg.toFixed(4)}°` : "N/A";
+    const decText = res.coordinateSnapshot ? `${res.coordinateSnapshot.decDeg.toFixed(4)}°` : "N/A";
+    const matched = res.matchedAlias ? `<div>Alias: ${escapeHtml(res.matchedAlias)}</div>` : "";
+    
+    this.starContainer.innerHTML = `
+      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Resultat de cerca</div>
+      <div>${escapeHtml(res.displayName)}</div>
+      ${matched}
+      <div>Ref: ${escapeHtml(res.targetRef)} &nbsp; Tipus: ${escapeHtml(res.kind)}</div>
+      <div>RA: ${raText} &nbsp; Dec: ${decText}</div>
+    `;
   }
 
   public setSelectedStar(star: ResolvedStar | null): void {

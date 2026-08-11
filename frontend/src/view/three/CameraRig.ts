@@ -12,4 +12,5 @@ export interface CameraRig {
   zoomTo(horizontalFovDeg: number): void;
   resize(widthPx: number, heightPx: number): void;
   updateMatrices(): void;
+  setTrackingState(isTracking: boolean): void;
 }

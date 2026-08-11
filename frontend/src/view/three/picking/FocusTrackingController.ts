@@ -42,6 +42,7 @@ export class FocusTrackingController {
         altitudeDeg: resolved.altitudeDeg,
       });
       this.state = "tracking";
+      this.cameraRig.setTrackingState(true);
     }
   }
 
@@ -49,6 +50,7 @@ export class FocusTrackingController {
     if (this.state !== "inactive") {
         this.state = "inactive";
         this.currentTarget = null;
+        this.cameraRig.setTrackingState(false);
         console.info("MGP: [FocusTrackingController] Tracking aturat");
     }
   }

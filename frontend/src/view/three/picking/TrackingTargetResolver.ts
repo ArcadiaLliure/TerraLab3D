@@ -3,6 +3,8 @@ import type { SelectedCelestial } from "./ScenePickingController";
 import type { AstronomicalSearchResultPayload } from "../../../contracts/bridge_messages";
 import type { CelestialTransformState } from "../CelestialTransformState";
 import type { SolarSystemSnapshot } from "../../../contracts/solar_system_contracts";
+import type { SolarSystemRenderer } from "../SolarSystemRenderer";
+import { threeDirectionToCameraPose } from "../CameraRigImpl";
 
 export interface ResolvedTrackingDirection {
   azimuthDeg: number;
@@ -19,6 +21,7 @@ export type TrackingTarget = any;
 export class TrackingTargetResolver {
   private celestialTransform: CelestialTransformState | null = null;
   private latestSnapshot: SolarSystemSnapshot | null = null;
+  private solarSystemRenderer: SolarSystemRenderer | null = null;
   
   // Vector temporal per evitar instanciacions
   private readonly _tempVec3 = new Vector3();
@@ -31,16 +34,19 @@ export class TrackingTargetResolver {
     this.latestSnapshot = snapshot;
   }
 
+  public updateSolarSystemRenderer(renderer: SolarSystemRenderer): void {
+    this.solarSystemRenderer = renderer;
+  }
+
   public resolve(target: TrackingTarget): ResolvedTrackingDirection | null {
     if (!target) return null;
 
     const t = target as any;
 
-    if (t.bodyId) {
-      return this.resolveSolarSystem(t.bodyId);
-    }
-    if (t.targetRef && t.kind === "body") {
-      return this.resolveSolarSystem(t.targetRef);
+    const bodyId = t.bodyId || (t.kind === "body" ? t.targetRef : null);
+    if (bodyId) {
+      const sol = this.resolveSolarSystem(bodyId);
+      if (sol) return sol;
     }
     if (t.raDeg !== undefined && t.decDeg !== undefined) {
       return this.resolveEquatorial(t.raDeg, t.decDeg);
@@ -55,51 +61,36 @@ export class TrackingTargetResolver {
   private resolveEquatorial(raDeg: number, decDeg: number): ResolvedTrackingDirection | null {
     if (!this.celestialTransform) return null;
     
-    // Convertir RA/Dec a Vector3 i aplicar matriu de transformació
-    const phi = MathUtils.degToRad(90 - decDeg);
-    const theta = MathUtils.degToRad(raDeg);
+    const ra = MathUtils.degToRad(raDeg);
+    const dec = MathUtils.degToRad(decDeg);
+    const cosDec = Math.cos(dec);
     
-    this._tempVec3.setFromSphericalCoords(1.0, phi, theta);
+    // Convertir RA/Dec a Vector3 usant la mateixa convenció que backend/domain/stars/calculations.py
+    // X = cos(dec) * cos(ra)
+    // Y = cos(dec) * sin(ra)
+    // Z = sin(dec)
+    this._tempVec3.set(
+      cosDec * Math.cos(ra),
+      cosDec * Math.sin(ra),
+      Math.sin(dec)
+    );
     
-    // Transformació Equatorial (ICRS) -> Topocèntrica (ENU)
+    // Transformació Equatorial (ICRS) -> Topocèntrica Three.js (ENU: +X=East, +Y=Up, -Z=North)
+    // NOTA: La matriu equatorialToThree ja fa tota la transformació.
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
     
-    // Convertir de nou a esfèriques per obtenir Az/Alt
-    // En el nostre sistema ENU (ThreeJS): x=Est, y=Amunt, z=-Nord
-    // l'Azimuth 0 és Nord, creix cap a l'Est.
-    const altDeg = MathUtils.radToDeg(Math.asin(this._tempVec3.y));
-    const azDeg = MathUtils.radToDeg(Math.atan2(this._tempVec3.x, -this._tempVec3.z));
-    
-    // En CameraRigImpl: 0=Nord, 90=Oest, 180=Sud, 270=Est
-    // atan2 dóna 90 per a Est (+X). Ho hem de mapejar a 270.
-    const rigAz = 360 - azDeg;
-    
-    return {
-      azimuthDeg: rigAz >= 360 ? rigAz - 360 : rigAz,
-      altitudeDeg: altDeg
-    };
+    // Centralitzat amb la mateixa matemàtica de CameraRigImpl
+    return threeDirectionToCameraPose(this._tempVec3);
   }
 
   private resolveSolarSystem(bodyId: string): ResolvedTrackingDirection | null {
-    if (!this.latestSnapshot) return null;
+    if (!this.solarSystemRenderer) return null;
     
-    let state = null;
-    if (bodyId === "sun") {
-      state = this.latestSnapshot.sun;
-    } else if (bodyId === "moon") {
-      state = this.latestSnapshot.moon;
-    } else {
-      state = this.latestSnapshot.planets.find(b => b.id === bodyId) ||
-              (this.latestSnapshot.satellites || []).find(b => b.id === bodyId);
-    }
+    // Usem la posició visual interpolada exacta usada pel render, per evitar jitter
+    const dir = this.solarSystemRenderer.getDisplayedBodyDirection(bodyId as any);
+    if (!dir) return null;
     
-    if (!state) return null;
-    
-    // El snapshot ja conté la posició aparent respecte l'observador.
-    // L'Azimuth ja és Topocèntric i Altitude també.
-    return {
-      azimuthDeg: (360 - state.azimuthDeg) % 360,
-      altitudeDeg: state.altitudeDeg
-    };
+    // Centralitzat amb la mateixa matemàtica de CameraRigImpl
+    return threeDirectionToCameraPose(dir);
   }
 }

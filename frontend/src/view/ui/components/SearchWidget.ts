@@ -76,6 +76,11 @@ export class SearchWidget {
     this.bridge.addMessageListener({
       onAstronomicalSearchResult: (msg) => {
         if (msg.requestId === this.currentRequestId && msg.generation === this.currentGeneration) {
+          if (msg.status === "error") {
+            this.loadingIndicator.style.display = "none";
+            this.resultsContainer.innerHTML = "<div style='font-size: 10px; color: #ff5555; padding: 4px;'>Error en la cerca.</div>";
+            return;
+          }
           this.renderResults(msg.results);
         }
       }
@@ -102,6 +107,14 @@ export class SearchWidget {
       this.currentRequestId = `search-${Date.now()}`;
       this.currentGeneration++;
       this.bridge.requestAstronomicalSearch(this.currentRequestId, this.currentGeneration, query, 15);
+      
+      // Defensive timeout
+      const capturedId = this.currentRequestId;
+      setTimeout(() => {
+        if (this.currentRequestId === capturedId && this.loadingIndicator.style.display === "block") {
+           this.loadingIndicator.style.display = "none";
+        }
+      }, 5000);
     }, 300);
   }
 

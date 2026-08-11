@@ -18,4 +18,6 @@ export interface DeepSkyPickHit {
   readonly majorAxisArcmin: number;
   readonly minorAxisArcmin: number;
   readonly familyCode: number;
+  readonly raDeg: number;
+  readonly decDeg: number;
 }

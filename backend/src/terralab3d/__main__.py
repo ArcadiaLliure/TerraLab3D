@@ -58,7 +58,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("terralab3d")
 
-SIMULATION_TICK_INTERVAL_SEC = 1.0 / 30.0  # 30 updates per second for smooth ephemeris tracking
+SIMULATION_TICK_INTERVAL_SEC = 1.0  # 1 update per second for stable base ephemeris
 
 async def run() -> int:
     """Punt d'entrada asíncron principal."""
@@ -557,43 +557,120 @@ async def run() -> int:
             query = data["query"]
             limit = data.get("limit", 20)
             
-            # Poblar index dinàmicament just abans de la primera cerca (només si l'hem de recrear, 
-            # però com que els planetes es mouen poc, podem agafar snapshot actual)
-            planets_data = []
-            if latest_solar_system:
-                for b in latest_solar_system.bodies:
-                    # En TerraLab v1, name s'usava per a cerca
-                    # Afegim body.name com a àlies i canon_name.
-                    planets_data.append({
-                        "body_id": b.body_id,
-                        "canon_name": b.name,
-                        "aliases": [b.name], # Podríem afegir el català o altres àlies aquí
-                        "coordinate_snapshot": b.equatorial_position
-                    })
-                # També afegim el Sol i la Lluna
-                planets_data.append({
-                    "body_id": "sun",
-                    "canon_name": "Sol",
-                    "aliases": ["Sol", "Sun"],
-                    "coordinate_snapshot": latest_solar_system.sun.equatorial_position
-                })
-                planets_data.append({
-                    "body_id": "moon",
-                    "canon_name": "Lluna",
-                    "aliases": ["Lluna", "Moon"],
-                    "coordinate_snapshot": latest_solar_system.moon.equatorial_position
-                })
+            # Poblar index dinàmicament just abans de la primera cerca
+            if latest_solar_system and not search_coordinator.is_index_built:
+                planets_data = []
+                indexed_ids = set()
+                
+                # 1. Carregar tots els satèl·lits del catàleg complet (460+)
+                sat_catalog = solar_system_assets.satellite_catalog
+                if sat_catalog:
+                    for defn in sat_catalog.satellites:
+                        aliases = [defn.name]
+                        if defn.provisional_designation:
+                            aliases.append(defn.provisional_designation)
+                        planets_data.append({
+                            "body_id": defn.body_id,
+                            "canon_name": defn.name,
+                            "aliases": aliases,
+                        })
+                        indexed_ids.add(defn.body_id)
 
-            # Reconstruim l'índex per garantir estrelles + planetes actualitzats
-            search_coordinator.build_index(
-                named_stars=[], # A implementar: extraure noms rellevants d'estrelles si cal
-                ngc_objects=[], # A implementar: extraure noms NGC del meta
-                planets=planets_data
-            )
+                # 2. Afegir cossos principals del sistema solar (Sol, Lluna, Planetes, etc.)
+                all_bodies = [latest_solar_system.sun, latest_solar_system.moon]
+                if latest_solar_system.planets:
+                    all_bodies.extend(latest_solar_system.planets)
+                if latest_solar_system.satellites:
+                    all_bodies.extend(latest_solar_system.satellites)
+                    
+                for b in all_bodies:
+                    name = b.display_name if b.display_name else b.body_id.capitalize()
+                    aliases = [name]
+                    if b.body_id == "sun": aliases.extend(["Sol", "Sun"])
+                    elif b.body_id == "moon": aliases.extend(["Lluna", "Luna", "Moon"])
+                    elif b.body_id == "earth": aliases.extend(["Terra", "Tierra", "Earth"])
+                    elif b.body_id == "mercury": aliases.extend(["Mercuri", "Mercurio", "Mercury"])
+                    elif b.body_id == "venus": aliases.extend(["Venus"])
+                    elif b.body_id == "mars": aliases.extend(["Mart", "Marte", "Mars"])
+                    elif b.body_id == "jupiter": aliases.extend(["Júpiter", "Jupiter"])
+                    elif b.body_id == "saturn": aliases.extend(["Saturn", "Saturno"])
+                    elif b.body_id == "uranus": aliases.extend(["Urà", "Urano", "Uranus"])
+                    elif b.body_id == "neptune": aliases.extend(["Neptú", "Neptuno", "Neptune"])
+                    elif b.body_id == "pluto": aliases.extend(["Plutó", "Plutón", "Pluto"])
+
+                    if b.body_id in indexed_ids:
+                        for pd in planets_data:
+                            if pd["body_id"] == b.body_id:
+                                pd["coordinate_snapshot"] = b.equatorial
+                                break
+                    else:
+                        planets_data.append({
+                            "body_id": b.body_id,
+                            "canon_name": name,
+                            "aliases": aliases,
+                            "coordinate_snapshot": b.equatorial
+                        })
+                        indexed_ids.add(b.body_id)
+
+                # 3. Objectes NGC / Cel Profund
+                ngc_objects = deep_sky_adapter.load_search_objects()
+
+                # 4. Estrelles importants / Gaia (Named stars)
+                named_stars = [
+                    {"name": "Sirius", "source_id": "Gaia-1", "ra": 101.28715, "dec": -16.7161},
+                    {"name": "Canopus", "source_id": "Gaia-2", "ra": 95.98787, "dec": -52.6957},
+                    {"name": "Rigil Kentaurus", "source_id": "Gaia-3", "ra": 219.9021, "dec": -60.833},
+                    {"name": "Arcturus", "source_id": "Gaia-4", "ra": 213.9153, "dec": 19.1824},
+                    {"name": "Vega", "source_id": "Gaia-5", "ra": 279.23473, "dec": 38.78369},
+                    {"name": "Capella", "source_id": "Gaia-6", "ra": 79.1723, "dec": 45.998},
+                    {"name": "Rigel", "source_id": "Gaia-7", "ra": 78.63446, "dec": -8.20164},
+                    {"name": "Procyon", "source_id": "Gaia-8", "ra": 114.8255, "dec": 5.225},
+                    {"name": "Achernar", "source_id": "Gaia-9", "ra": 24.4285, "dec": -57.2367},
+                    {"name": "Betelgeuse", "source_id": "Gaia-10", "ra": 88.7929, "dec": 7.40706},
+                    {"name": "Hadar", "source_id": "Gaia-11", "ra": 210.9559, "dec": -60.373},
+                    {"name": "Altair", "source_id": "Gaia-12", "ra": 297.6958, "dec": 8.8683},
+                    {"name": "Aldebaran", "source_id": "Gaia-13", "ra": 68.98016, "dec": 16.5093},
+                    {"name": "Spica", "source_id": "Gaia-14", "ra": 201.2983, "dec": -11.1613},
+                    {"name": "Antares", "source_id": "Gaia-15", "ra": 247.3519, "dec": -26.432},
+                    {"name": "Pollux", "source_id": "Gaia-16", "ra": 116.3289, "dec": 28.0262},
+                    {"name": "Fomalhaut", "source_id": "Gaia-17", "ra": 344.4127, "dec": -29.6222},
+                    {"name": "Deneb", "source_id": "Gaia-18", "ra": 310.3579, "dec": 45.2803},
+                    {"name": "Regulus", "source_id": "Gaia-19", "ra": 152.0929, "dec": 11.9672},
+                    {"name": "Adhara", "source_id": "Gaia-20", "ra": 104.6565, "dec": -28.9721},
+                    {"name": "Castor", "source_id": "Gaia-21", "ra": 113.6494, "dec": 31.8883},
+                    {"name": "Shaula", "source_id": "Gaia-22", "ra": 263.4022, "dec": -37.0984},
+                    {"name": "Bellatrix", "source_id": "Gaia-23", "ra": 81.2827, "dec": 6.3497},
+                    {"name": "Elnath", "source_id": "Gaia-24", "ra": 81.573, "dec": 28.6075},
+                    {"name": "Miaplacidus", "source_id": "Gaia-25", "ra": 139.7554, "dec": -69.7172},
+                    {"name": "Alnilam", "source_id": "Gaia-26", "ra": 84.0534, "dec": -1.2019},
+                    {"name": "Alnitak", "source_id": "Gaia-27", "ra": 85.1897, "dec": -1.9426},
+                    {"name": "Alioth", "source_id": "Gaia-28", "ra": 193.5073, "dec": 55.9598},
+                    {"name": "Dubhe", "source_id": "Gaia-29", "ra": 165.932, "dec": 61.751},
+                    {"name": "Mirfak", "source_id": "Gaia-30", "ra": 51.0807, "dec": 49.8612},
+                    {"name": "Alkaid", "source_id": "Gaia-31", "ra": 206.8852, "dec": 49.3133},
+                    {"name": "Polaris", "source_id": "Gaia-32", "ra": 37.9546, "dec": 89.2641},
+                    {"name": "Mizar", "source_id": "Gaia-33", "ra": 200.9814, "dec": 54.9254},
+                    {"name": "Algol", "source_id": "Gaia-34", "ra": 47.0422, "dec": 40.9556},
+                    {"name": "Kochab", "source_id": "Gaia-35", "ra": 222.6764, "dec": 74.1555},
+                    {"name": "Denebola", "source_id": "Gaia-36", "ra": 177.2649, "dec": 14.5721},
+                ]
+
+                search_coordinator.build_index(
+                    named_stars=named_stars,
+                    ngc_objects=ngc_objects,
+                    planets=planets_data
+                )
             
-            search_coordinator.search(req_id, gen, query, limit)
+            await search_coordinator.search(req_id, gen, query, limit)
         except Exception as e:
             log.error("MGP: [__main__] Error executant cerca: %s", e)
+            req_id = data.get("requestId", "")
+            gen = data.get("generation", 0)
+            if req_id:
+                try:
+                    await bridge.send_astronomical_search_result(req_id, gen, "error", [])
+                except Exception:
+                    pass
             
     bridge.on("astronomical_search_request", _handle_astronomical_search_request)
 

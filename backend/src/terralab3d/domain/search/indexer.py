@@ -44,7 +44,7 @@ class AstronomicalSearchIndex:
             name = s.get("name", "").strip()
             if not name:
                 continue
-            coord = EquatorialCoordinate(ra_deg=float(s["ra"]), dec_deg=float(s["dec"]))
+            coord = EquatorialCoordinate(right_ascension_deg=float(s["ra"]), declination_deg=float(s["dec"]))
             self._add_entry(
                 target_ref=str(s.get("source_id", "")),
                 kind=SearchTargetKind.STAR,
@@ -59,7 +59,7 @@ class AstronomicalSearchIndex:
         # 3. Objectes NGC/IC (Deep Sky)
         for obj in ngc_objects:
             canon = getattr(obj, "common_name", None) or getattr(obj, "name", "NGC")
-            coord = EquatorialCoordinate(ra_deg=float(obj.ra_deg), dec_deg=float(obj.dec_deg))
+            coord = EquatorialCoordinate(right_ascension_deg=float(obj.ra_deg), declination_deg=float(obj.dec_deg))
             target_ref = obj.name
             
             # Recollir àlies

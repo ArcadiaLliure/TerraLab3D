@@ -122,6 +122,9 @@ export class DeepSkyPickProvider {
       if (dist > hitRadius) continue;
 
       if (!bestHit || dist < bestHit.screenDistanceCssPx) {
+        const decDeg = Math.asin(vz) * (180 / Math.PI);
+        const raDeg = ((Math.atan2(vy, vx) * (180 / Math.PI)) + 360) % 360;
+
         bestHit = {
           kind: "deep_sky",
           ref: {
@@ -138,6 +141,8 @@ export class DeepSkyPickProvider {
           majorAxisArcmin: majAx[i]!,
           minorAxisArcmin: minAx[i]!,
           familyCode: famU32[i]!,
+          raDeg,
+          decDeg,
         };
       }
     }

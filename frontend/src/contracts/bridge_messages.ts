@@ -517,7 +517,7 @@ export interface AstronomicalSearchResultMessage {
   readonly type: "astronomical_search_result";
   readonly requestId: string;
   readonly generation: number;
-  readonly status: "ok" | "stale" | "invalid";
+  readonly status: "ok" | "stale" | "invalid" | "error";
   readonly results: AstronomicalSearchResultPayload[];
 }
 

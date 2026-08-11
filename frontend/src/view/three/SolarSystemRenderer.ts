@@ -90,7 +90,8 @@ const SUN_VERTEX_SHADER = /* glsl */ `
   void main() {
     vec4 worldPosition = modelMatrix * vec4(position, 1.0);
     vCelestialY = worldPosition.y - cameraPosition.y;
-    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
   }
 `;
 
@@ -402,6 +403,17 @@ export class SolarSystemRenderer {
     }
     bodies.push(...this.satellites.getPickableBodies());
     return bodies;
+  }
+
+  getDisplayedBodyDirection(id: SolarSystemBodyId): THREE.Vector3 | null {
+    // Obtenim l'objecte visual actualment interpolat
+    const obj = this.getLabelAnchor(id);
+    if (!obj) return null;
+    
+    // El celestialRoot no té rotació (està alineat amb l'ENU de ThreeJS), només translació.
+    const state = this.displayed.get(id);
+    if (!state) return null;
+    return threeFromEnu(state.directionENU).normalize();
   }
 
   isPlanetLabelVisible(id: PlanetBodyId, state: SolarSystemBodyState | undefined): boolean {

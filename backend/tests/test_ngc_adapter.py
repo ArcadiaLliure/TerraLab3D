@@ -32,7 +32,7 @@ EmptyData;GCl;12:00:00.0;-10:00:00;XYZ;;;;;;;;;;;;;;;;;
         
         # Layout test
         import json
-        meta_file = tmp_path / "ngc_metadata.json"
+        meta_file = tmp_path / "sky.ngc.json"
         with open(meta_file, "r") as f:
             meta = json.load(f)
             

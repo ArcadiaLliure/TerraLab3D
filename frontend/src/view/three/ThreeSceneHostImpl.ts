@@ -246,7 +246,7 @@ export class ThreeSceneHostImpl {
     this.starFieldRenderer.updateViewport(window.devicePixelRatio);
   }
 
-  render(timestampMs: number): void {
+  updateVisualState(timestampMs: number): void {
     if (this.disposed) return;
 
     this.solarSystemRenderer.update(timestampMs);
@@ -288,7 +288,10 @@ export class ThreeSceneHostImpl {
     // ─── Phase 4: Celestial equator update ───────────────────────────
     this.celestialEquator.update();
 
-    // ─── Render ──────────────────────────────────────────────────────
+  }
+  
+  renderFrame(): void {
+    if (this.disposed) return;
     this.renderer.render(this.scene, this.camera);
   }
 

@@ -66,6 +66,7 @@ export class CameraRigImpl implements CameraRig {
   private velocityUp = 0;
   private velocityNorth = 0;
   private navigationMode: NavigationMode = "walk";
+  private isTrackingTarget = false;
 
   // ─── Settings ──────────────────────────────────────────────────────
   private walkSettings: WalkNavigationSettings = { ...DEFAULT_WALK_SETTINGS };
@@ -145,6 +146,10 @@ export class CameraRigImpl implements CameraRig {
     this.rollDeg = p.rollDeg;
     this.animating = false;
     this.applyToCamera();
+  }
+  
+  setTrackingState(isTracking: boolean): void {
+    this.isTrackingTarget = isTracking;
   }
 
   orbit(deltaAz: number, deltaAlt: number): void {
@@ -582,7 +587,6 @@ export class CameraRigImpl implements CameraRig {
 
   private onPointerDown(e: PointerEvent): void {
     if (e.button !== 0 && e.button !== 2) return;
-    this.userInteractionCallback?.();
     this.dragging = true;
     this.lastX = e.clientX;
     this.lastY = e.clientY;
@@ -594,6 +598,9 @@ export class CameraRigImpl implements CameraRig {
     if (!this.dragging) return;
     const dx = e.clientX - this.lastX;
     const dy = e.clientY - this.lastY;
+    if (dx === 0 && dy === 0) return;
+    
+    this.userInteractionCallback?.();
     this.lastX = e.clientX;
     this.lastY = e.clientY;
     const fovScale = this.hFovDeg / 60;
@@ -629,7 +636,9 @@ export class CameraRigImpl implements CameraRig {
     const deltaAz = -(dx / rect.width) * (oldHFov - newHFov);
     const deltaAlt = (dy / rect.height) * (oldVFov - newVFov);
     
-    this.orbit(deltaAz, deltaAlt);
+    if (!this.isTrackingTarget) {
+      this.orbit(deltaAz, deltaAlt);
+    }
     this.zoomTo(newHFov);
   }
 
@@ -638,7 +647,6 @@ export class CameraRigImpl implements CameraRig {
     const tag = (e.target as HTMLElement)?.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
 
-    this.userInteractionCallback?.();
     this.animating = false;
 
     // Navigation keys (WASD, Shift, Space, Ctrl, Q, E, X)
@@ -649,6 +657,7 @@ export class CameraRigImpl implements CameraRig {
       "KeyQ", "KeyE", "KeyX",
     ];
     if (navKeys.includes(e.code)) {
+      this.userInteractionCallback?.();
       e.preventDefault();
       this.keysDown.add(e.code);
       return;
@@ -670,6 +679,8 @@ export class CameraRigImpl implements CameraRig {
 
     // Original arrow/zoom keys
     const fovScale = this.hFovDeg / 60;
+    
+    let handled = true;
     switch (e.key) {
       case "ArrowLeft": this.orbit(KEY_STEP * fovScale, 0); break;
       case "ArrowRight": this.orbit(-KEY_STEP * fovScale, 0); break;
@@ -677,9 +688,13 @@ export class CameraRigImpl implements CameraRig {
       case "ArrowDown": this.orbit(0, -KEY_STEP * fovScale); break;
       case "+": case "=": this.zoomTo(this.hFovDeg / ZOOM_STEP); break;
       case "-": this.zoomTo(this.hFovDeg * ZOOM_STEP); break;
-      default: return;
+      default: handled = false; break;
     }
-    e.preventDefault();
+    
+    if (handled) {
+      this.userInteractionCallback?.();
+      e.preventDefault();
+    }
   }
 
   private onKeyUp(e: KeyboardEvent): void {
@@ -835,9 +850,26 @@ function lerpAngle(a: number, b: number, t: number): number {
   return normalizeAzimuth(a + diff * t);
 }
 
-/** Move current value towards target by at most maxDelta. */
 function approachValue(current: number, target: number, maxDelta: number): number {
   const diff = target - current;
   if (Math.abs(diff) <= maxDelta) return target;
   return current + Math.sign(diff) * maxDelta;
+}
+
+/**
+ * Converts a Three.js direction vector (ENU: +X=East, +Y=Up, -Z=North)
+ * to CameraRig pose (Azimuth/Altitude) using the CameraRig conventions:
+ * Azimuth: 0=North, 90=West, 180=South, 270=East
+ */
+export function threeDirectionToCameraPose(dir: THREE.Vector3): { azimuthDeg: number; altitudeDeg: number } {
+  // dirY = sin(alt)
+  const altDeg = Math.asin(Math.max(-1, Math.min(1, dir.y))) * (180 / Math.PI);
+  
+  // dirX = -sin(az) * cos(alt)
+  // dirZ = -cos(az) * cos(alt)
+  // atan2(y, x) -> atan2(sin, cos) -> atan2(-dirX, -dirZ)
+  let azDeg = Math.atan2(-dir.x, -dir.z) * (180 / Math.PI);
+  azDeg = ((azDeg % 360) + 360) % 360;
+  
+  return { azimuthDeg: azDeg, altitudeDeg: altDeg };
 }

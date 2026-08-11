@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+from dataclasses import dataclass
 import hashlib
 import json
 import logging
@@ -343,11 +344,84 @@ class NgcCatalogPostProcessor(ResourcePostProcessor):
         return ProcessedResource(bin_path, metadata)
 
 
+@dataclass
+class NgcSearchItem:
+    name: str
+    common_name: str | None
+    messier_nr: int | None
+    ra_deg: float
+    dec_deg: float
+
+
 class NgcCatalogAdapter(DeepSkyCatalogPort):
     """Adaptador per llegir l'índex binari d'NGC del repositori de recursos."""
 
     def __init__(self, resource_repo: Any):
         self._resource_repo = resource_repo
+
+    def _resolve_csv_source(self) -> Path | None:
+        data_root = resolve_data_root()
+        for p in [
+            data_root / "data" / "sky" / "managed" / "NGC.csv",
+            data_root / "data" / "sky" / "openngc_catalog.csv",
+            data_root / "data" / "sky" / "ngc" / "NGC.csv",
+        ]:
+            if p.exists():
+                return p
+        return None
+
+    def load_search_objects(self) -> list[NgcSearchItem]:
+        source_path = self._resolve_csv_source()
+        if not source_path:
+            return []
+
+        items: list[NgcSearchItem] = []
+        try:
+            with open(source_path, "r", encoding="utf-8-sig", newline="") as f:
+                sample = f.read(8192)
+                f.seek(0)
+                delimiter = ";" if ";" in sample and "," not in sample.splitlines()[0] else ","
+                try:
+                    dialect = csv.Sniffer().sniff(sample, delimiters=",;|\t")
+                    delimiter = str(getattr(dialect, "delimiter", ",") or ",")
+                except Exception:
+                    pass
+                reader = csv.DictReader(f, delimiter=delimiter)
+                for row in reader:
+                    if not isinstance(row, dict):
+                        continue
+                    mapped = _row_map(row)
+                    ra_deg = parse_ra_deg(_pick_value(mapped, "raj2000", "ra_deg", "radeg"), assume_hours_for_scalar=False)
+                    if ra_deg is None:
+                        ra_deg = parse_ra_deg(_pick_value(mapped, "ra"), assume_hours_for_scalar=True)
+                    dec_deg = parse_dec_deg(_pick_value(mapped, "dej2000", "dec_deg", "decj2000", "dec"))
+                    if ra_deg is None or dec_deg is None:
+                        continue
+
+                    raw_name = str(_pick_value(mapped, "name") or "").strip()
+                    if not raw_name:
+                        ngc_nr = _to_opt_int(_pick_value(mapped, "ngc"))
+                        ic_nr = _to_opt_int(_pick_value(mapped, "ic"))
+                        if ngc_nr is not None and ngc_nr > 0:
+                            raw_name = f"NGC {ngc_nr}"
+                        elif ic_nr is not None and ic_nr > 0:
+                            raw_name = f"IC {ic_nr}"
+                    
+                    name_clean = _normalize_obj_name(raw_name) if raw_name else ""
+                    messier = _to_opt_int(_pick_value(mapped, "messier_nr", "m"))
+                    comname = _first_common_name(_pick_value(mapped, "comname", "common_names", "common names"))
+
+                    if name_clean or comname or messier:
+                        items.append(NgcSearchItem(
+                            name=name_clean or (f"M{messier}" if messier else "NGC"),
+                            common_name=comname,
+                            messier_nr=messier,
+                            ra_deg=ra_deg,
+                            dec_deg=dec_deg,
+                        ))
+        except Exception as e:
+            log.error("MGP: [NgcCatalogAdapter] Error carregant objectes de cerca NGC: %s", e)
+        return items
 
     def load_index(self) -> tuple[dict[str, Any], bytes] | None:
         resource_id = ResourceId("sky.ngc")
@@ -356,19 +430,11 @@ class NgcCatalogAdapter(DeepSkyCatalogPort):
         bin_file = self._resource_repo.resolve_render_asset(resource_id)
 
         if not bin_file or not bin_file.exists():
-            source_path = None
-            if state and state.get("resolvedPath"):
+            source_path = self._resolve_csv_source()
+            if not source_path and state and state.get("resolvedPath"):
                 p = Path(state["resolvedPath"])
                 if p.exists():
                     source_path = p
-            if not source_path:
-                data_root = resolve_data_root()
-                p1 = data_root / "data" / "sky" / "managed" / "NGC.csv"
-                p2 = data_root / "data" / "sky" / "openngc_catalog.csv"
-                if p1.exists():
-                    source_path = p1
-                elif p2.exists():
-                    source_path = p2
 
             if not source_path:
                 log.warning("MGP: [NgcCatalogAdapter] No s'ha trobat cap font CSV per a sky.ngc")

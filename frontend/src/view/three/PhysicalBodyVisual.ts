@@ -14,7 +14,8 @@ const VERTEX_SHADER = /* glsl */ `
   void main() {
     vUv = uv;
     vNormalWorld = normalize(mat3(modelMatrix) * normal);
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
   }
 `;
 

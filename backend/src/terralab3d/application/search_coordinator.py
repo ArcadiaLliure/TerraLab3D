@@ -17,6 +17,11 @@ class AstronomicalSearchCoordinator:
         self._calculator = DefaultSearchNormalizationCalculator()
         self._index = AstronomicalSearchIndex(self._calculator)
         self._active_ngc = True
+        self._is_index_built = False
+        
+    @property
+    def is_index_built(self) -> bool:
+        return self._is_index_built
         
     def set_active_ngc(self, active: bool) -> None:
         self._active_ngc = active
@@ -33,6 +38,7 @@ class AstronomicalSearchCoordinator:
             len(named_stars), len(ngc_objects), len(planets)
         )
         self._index.build_index(named_stars, ngc_objects, planets)
+        self._is_index_built = True
 
     async def search(self, request_id: str, generation: int, query_text: str, limit: int = 20) -> None:
         if not query_text:
@@ -45,10 +51,10 @@ class AstronomicalSearchCoordinator:
             results = [{
                 "targetRef": "coordinate",
                 "kind": "coordinate",
-                "displayName": f"RA {coord.ra_deg:.4f}° Dec {coord.dec_deg:.4f}°",
+                "displayName": f"RA {coord.right_ascension_deg:.4f}° Dec {coord.declination_deg:.4f}°",
                 "score": 100,
                 "availability": "available",
-                "coordinateSnapshot": {"raDeg": coord.ra_deg, "decDeg": coord.dec_deg},
+                "coordinateSnapshot": {"raDeg": coord.right_ascension_deg, "decDeg": coord.declination_deg},
             }]
             await self._publish(request_id, generation, "ok", results)
             return
@@ -73,8 +79,8 @@ class AstronomicalSearchCoordinator:
             }
             if r.coordinate_snapshot is not None:
                 d["coordinateSnapshot"] = {
-                    "raDeg": r.coordinate_snapshot.ra_deg,
-                    "decDeg": r.coordinate_snapshot.dec_deg,
+                    "raDeg": r.coordinate_snapshot.right_ascension_deg,
+                    "decDeg": r.coordinate_snapshot.declination_deg,
                 }
             if r.resource_id:
                 d["resourceId"] = r.resource_id

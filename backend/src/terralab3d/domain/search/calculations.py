@@ -65,6 +65,6 @@ class DefaultSearchNormalizationCalculator(SearchNormalizationCalculator):
             if not (-90.0 <= dec_deg <= 90.0):
                 return None
                 
-            return EquatorialCoordinate(ra_deg=ra_deg, dec_deg=dec_deg)
+            return EquatorialCoordinate(right_ascension_deg=ra_deg, declination_deg=dec_deg)
         except (ValueError, TypeError):
             return None

@@ -285,6 +285,7 @@ function main(): void {
   // Tracking (Pas 12)
   const trackingResolver = new TrackingTargetResolver();
   trackingResolver.updateCelestialTransform(celestialTransformState);
+  trackingResolver.updateSolarSystemRenderer(sceneHost.getSolarSystemRenderer());
   const focusTrackingController = new FocusTrackingController(cameraRig, trackingResolver);
   
   cameraRig.onUserInteraction(() => {
@@ -506,14 +507,21 @@ function main(): void {
   renderLoop.start((timestampMs: number) => {
     // Phase 3.5: Update navigation physics
     cameraRig.updateNavigation(timestampMs);
-    cameraRig.updateMatrices();
-    sceneHost.render(timestampMs);
     
-    // Actualitza el marker de selecció
-    pickingController.updateMarker();
+    // Avançar les interpolacions visuals (SolarSystem, Stars, DeepSky)
+    sceneHost.updateVisualState(timestampMs);
 
-    // Actualitza el seguiment automàtic de càmera
+    // Actualitza el seguiment automàtic de càmera utilitzant l'estat visual ja interpolat
     focusTrackingController.update();
+
+    // Aplica les matrius finals de càmera
+    cameraRig.updateMatrices();
+    
+    // Renderitza el frame (WebGL)
+    sceneHost.renderFrame();
+    
+    // Actualitza el marker de selecció sobre la geometria ja calculada
+    pickingController.updateMarker();
 
     // Update FPS display at ~1 Hz
     fpsUpdateAccum += 1;
