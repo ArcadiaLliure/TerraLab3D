@@ -160,10 +160,11 @@ function main(): void {
 
   const skyPage = new SkyPage(bridge, resourceManager, {
     onSearchSelected: (selection) => {
-      // Ens assegurem que el locationHUD s'actualitza i comença el seguiment
+      console.log("MGP: [main.ts] [onSearchSelected]", selection);
       locationHUD.setSelectedCelestial(selection as any);
       if (selection) {
         focusTrackingController.startTracking(selection);
+        pickingController.setExternalTarget(selection);
       }
     },
     onStarLayerToggled: (visible) => sceneHost.getStarFieldRenderer().setVisible(visible),
@@ -233,7 +234,7 @@ function main(): void {
   sceneHost.getGalacticSkyRenderer().setTransformState(celestialTransformState);
 
   const gestureRouter = new PointerGestureRouter();
-  
+
   let currentSkyVisibilityState: any = null;
 
   const starPickProvider = new StarPickProvider({
@@ -287,7 +288,7 @@ function main(): void {
   trackingResolver.updateCelestialTransform(celestialTransformState);
   trackingResolver.updateSolarSystemRenderer(sceneHost.getSolarSystemRenderer());
   const focusTrackingController = new FocusTrackingController(cameraRig, trackingResolver);
-  
+
   cameraRig.onUserInteraction(() => {
     focusTrackingController.stopTracking();
   });
@@ -507,7 +508,7 @@ function main(): void {
   renderLoop.start((timestampMs: number) => {
     // Phase 3.5: Update navigation physics
     cameraRig.updateNavigation(timestampMs);
-    
+
     // Avançar les interpolacions visuals (SolarSystem, Stars, DeepSky)
     sceneHost.updateVisualState(timestampMs);
 
@@ -516,12 +517,12 @@ function main(): void {
 
     // Aplica les matrius finals de càmera
     cameraRig.updateMatrices();
-    
+
     // Renderitza el frame (WebGL)
     sceneHost.renderFrame();
-    
+
     // Actualitza el marker de selecció sobre la geometria ja calculada
-    pickingController.updateMarker();
+    pickingController.updateMarker(sceneHost.camera, trackingResolver);
 
     // Update FPS display at ~1 Hz
     fpsUpdateAccum += 1;

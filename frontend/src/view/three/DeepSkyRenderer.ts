@@ -102,59 +102,43 @@ const FRAGMENT_SHADER = `
   uniform float u_fadeWidthMag;
   
   void main() {
-    // Distance from center of the quad
-    vec2 st = vUv * 2.0; // -1 to 1
+    // Distance from center of the quad (-1 to 1)
+    vec2 st = vUv * 2.0;
     float d = length(st);
     
     if (d > 1.0) discard;
     
-    // Visibility fade based on twilight only.
-    // The user explicitly requested not to cull deep sky objects by their magnitude.
     float fade = 1.0 - u_twilightSuppression;
-    
     if (fade <= 0.01) discard;
 
-    vec3 color = vec3(0.6, 0.7, 0.9); // default bluish/whiteish
+    vec3 color = vec3(0.36, 0.70, 1.0); // default galaxy blue
     
-    // Family codes:
-    // 0: Galaxy
-    // 1: Nebula
-    // 2: Open Cluster
-    // 3: Globular Cluster
-    // 4: Cluster + Nebula
-    // 5: Stellar Association
-    // 6: Other
-    
-    float alpha = 1.0;
-    
+    // Distinct vibrant color per deep sky family (matching E:\\Desarrollo\\TerraLab)
     if (vFamily < 0.5) {
-      // Galaxy: diffuse ellipse -> Change to outline
-      color = vec3(0.6, 0.7, 0.9);
-      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
-      alpha *= 1.2;
+      // 0: Galaxy -> Light Blue / Cyan
+      color = vec3(0.36, 0.70, 1.0);
     } else if (vFamily < 1.5) {
-      // Nebula: square/ellipse outline
-      color = vec3(0.3, 0.8, 0.5);
-      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
-      alpha *= 1.2;
+      // 1: Nebula -> Emerald Green / Teal
+      color = vec3(0.30, 0.71, 0.67);
     } else if (vFamily < 2.5) {
-      // Open Cluster: dotted circle outline
-      color = vec3(0.9, 0.9, 0.3);
-      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
-      float a = atan(st.y, st.x);
-      alpha *= (sin(a * 25.0) > 0.0) ? 1.0 : 0.0;
+      // 2: Open Cluster -> Bright Gold / Yellow
+      color = vec3(1.0, 0.83, 0.31);
     } else if (vFamily < 3.5) {
-      // Globular Cluster: circle with cross
-      color = vec3(0.9, 0.8, 0.5);
-      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
-      if (d < 0.9 && (abs(st.x) < 0.05 || abs(st.y) < 0.05)) alpha = max(alpha, 0.6);
+      // 3: Globular Cluster -> Amber / Warm Orange
+      color = vec3(1.0, 0.71, 0.30);
+    } else if (vFamily < 4.5) {
+      // 4: Cluster + Nebula -> Cyan / Green
+      color = vec3(0.30, 0.81, 0.88);
     } else {
-      // Other: simple outline
-      color = vec3(0.5, 0.5, 0.5);
-      alpha = smoothstep(0.8, 0.9, d) - smoothstep(0.9, 1.0, d);
+      // 5-6: Association / Other -> Soft Purple
+      color = vec3(0.80, 0.57, 0.85);
     }
     
-    gl_FragColor = vec4(color, alpha * fade * 0.8);
+    // Smooth solid glowing disc dot (no outlines)
+    float alpha = smoothstep(1.0, 0.0, d);
+    alpha = pow(alpha, 1.8);
+    
+    gl_FragColor = vec4(color, alpha * fade * 0.9);
   }
 `;
 
@@ -163,11 +147,11 @@ export class DeepSkyRenderer {
   private isVisible = true;
   private transformState: CelestialTransformState | null = null;
   private currentVisibilityState: SkyVisibilityState | null = null;
-  
+
   private mesh: THREE.Mesh | null = null;
   private material: THREE.ShaderMaterial | null = null;
   private geometry: THREE.InstancedBufferGeometry | null = null;
-  
+
   public metadata: any = null;
   public payloadBuffer: ArrayBuffer | null = null;
 

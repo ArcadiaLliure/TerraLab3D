@@ -65,14 +65,14 @@ export class DeepSkyPickProvider {
 
     const count = metadata.renderableCount ?? metadata.recordCount;
     const layout = metadata.bufferLayout;
-    
+
     const eqDirs = new Float32Array(payloadBuffer, layout.equatorialDirections.offset, count * 3);
     const mags = new Float32Array(payloadBuffer, layout.magnitude.offset, count);
     const majAx = new Float32Array(payloadBuffer, layout.majorAxisArcmin.offset, count);
     const minAx = new Float32Array(payloadBuffer, layout.minorAxisArcmin.offset, count);
     const famU32 = new Uint32Array(payloadBuffer, layout.familyCode.offset, count);
     const catU32 = new Uint32Array(payloadBuffer, layout.catalogIndex.offset, count);
-    const objectLabels = metadata.objectLabels as string[];
+    const objectLabels = (metadata.objectLabels as string[] | undefined) ?? [];
 
     let bestHit: DeepSkyPickHit | null = null;
     const visibilityState = this.deps.getSkyVisibilityState() ?? DEFAULT_SKY_VISIBILITY;
@@ -92,7 +92,7 @@ export class DeepSkyPickProvider {
 
       // Check horizon cull (y > 0ish)
       if (_worldPos.y < -0.1) continue;
-      
+
       const mag = mags[i]! > -1 ? mags[i]! : 15.0;
 
       // Twilight fade check

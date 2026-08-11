@@ -18,6 +18,7 @@ import { CelestialPickProvider, type CelestialPickHit } from "./CelestialPickPro
 import { SelectionMarker } from "./SelectionMarker";
 import type { SolarSystemPickHit } from "./SolarSystemPickProvider";
 import type { DeepSkyPickHit } from "../../../contracts/deep_sky_picking_contracts";
+import * as THREE from "three";
 
 const LOG_PREFIX = "MGP: [ScenePickingController]";
 
@@ -95,20 +96,82 @@ export class ScenePickingController {
     this.started = true;
   }
 
-  /**
-   * Reproyecta el marker de selecció. Cridar des del render loop.
-   */
-  updateMarker(): void {
-    if (!this.selectedHit || !this.started) {
+  private externalTarget: any = null;
+
+  public setExternalTarget(target: any): void {
+    console.log(`${LOG_PREFIX} [setExternalTarget] Target:`, target);
+    this.externalTarget = target;
+    if (!target) {
+      this.selectedHit = null;
+      this.selectionMarker.hide();
       return;
     }
 
-    const pos = this.deps.pickProvider.reproject(this.selectedHit);
-    if (pos) {
-      this.selectionMarker.update(pos.x, pos.y, pos.visualRadiusCssPx);
-    } else {
-      this.selectionMarker.hide();
+    if (target.kind === "body" || target.bodyId || target.targetRef) {
+      const bodyId = target.bodyId || target.targetRef;
+      this.selectedHit = {
+        kind: "solar_system_body",
+        bodyId,
+        state: {} as any,
+        screenXCssPx: 0,
+        screenYCssPx: 0,
+        screenDistanceCssPx: 0,
+        hitRadiusCssPx: 20,
+        visualRadiusCssPx: 20,
+      };
     }
+  }
+
+  /**
+   * Reproyecta el marker de selecció. Cridar des del render loop.
+   */
+  updateMarker(camera?: THREE.Camera, trackingResolver?: any): void {
+    if (!this.started) {
+      return;
+    }
+
+    if (this.selectedHit) {
+      const pos = this.deps.pickProvider.reproject(this.selectedHit);
+      if (pos) {
+        this.selectionMarker.update(pos.x, pos.y, pos.visualRadiusCssPx);
+        return;
+      }
+    }
+
+    if (this.externalTarget && trackingResolver && camera) {
+      const resolved = trackingResolver.resolve(this.externalTarget);
+      if (resolved) {
+        const pos = this.projectDirectionToScreen(resolved.azimuthDeg, resolved.altitudeDeg, camera);
+        if (pos) {
+          this.selectionMarker.update(pos.x, pos.y, 16);
+          return;
+        }
+      }
+    }
+
+    this.selectionMarker.hide();
+  }
+
+  private projectDirectionToScreen(azimuthDeg: number, altitudeDeg: number, camera: THREE.Camera): { x: number; y: number } | null {
+    const azRad = azimuthDeg * (Math.PI / 180);
+    const altRad = altitudeDeg * (Math.PI / 180);
+    const cosAlt = Math.cos(altRad);
+
+    const vec = new THREE.Vector3(
+      Math.sin(azRad) * cosAlt,
+      Math.sin(altRad),
+      -Math.cos(azRad) * cosAlt
+    ).multiplyScalar(1000000).add(camera.position);
+
+    vec.project(camera);
+    if (vec.z > 1.0) return null;
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const x = (vec.x * 0.5 + 0.5) * width;
+    const y = (-vec.y * 0.5 + 0.5) * height;
+
+    return { x, y };
   }
 
   /**

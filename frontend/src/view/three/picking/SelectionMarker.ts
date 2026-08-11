@@ -27,11 +27,9 @@ export class SelectionMarker {
       z-index: 50;
       display: none;
       box-sizing: border-box;
-      border: 1.5px solid ${MARKER_COLOR};
-      border-radius: 50%;
-      box-shadow: 0 0 8px rgba(241, 205, 136, 0.75), inset 0 0 8px rgba(241, 205, 136, 0.2);
       transition: width 80ms linear, height 80ms linear;
     `;
+    this.element.innerHTML = this.createSvg();
   }
 
   mount(container: HTMLElement): void {
@@ -50,8 +48,6 @@ export class SelectionMarker {
       visualRadiusCssPx * 2 + MARKER_PADDING,
     );
 
-    // The ring follows the apparent disc radius. This makes a zoomed Moon
-    // remain enclosed rather than leaving a fixed star-sized cursor behind.
     this.element.style.width = `${size}px`;
     this.element.style.height = `${size}px`;
     this.element.style.left = `${x - size / 2}px`;
@@ -60,6 +56,7 @@ export class SelectionMarker {
     if (!this.visible) {
       this.visible = true;
       this.element.style.display = "block";
+      console.log(`MGP: [SelectionMarker] Marker visible at x=${x.toFixed(1)} y=${y.toFixed(1)} size=${size}px`);
     }
   }
 
@@ -80,20 +77,35 @@ export class SelectionMarker {
   }
 
   private createSvg(): string {
-    const r = MINIMUM_MARKER_SIZE / 2;
-    const baseR = r * 0.4;
-
-    return `<svg width="${MINIMUM_MARKER_SIZE}" height="${MINIMUM_MARKER_SIZE}" viewBox="0 0 ${MINIMUM_MARKER_SIZE} ${MINIMUM_MARKER_SIZE}" xmlns="http://www.w3.org/2000/svg">
-      <!-- Anell fix central -->
-      <circle cx="${r}" cy="${r}" r="${baseR}"
-        fill="none" stroke="${MARKER_COLOR}" stroke-width="1.5" opacity="0.9"/>
-      
-      <!-- Anell expansiu (pulse) mitjançant SVG natiu -->
-      <circle cx="${r}" cy="${r}" r="${baseR}" fill="none" stroke="${MARKER_COLOR}">
-        <animate attributeName="r" from="${baseR}" to="${r * 0.9}" dur="1.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.25 0.1 0.25 1"/>
-        <animate attributeName="opacity" from="1" to="0" dur="1.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.25 0.1 0.25 1"/>
-        <animate attributeName="stroke-width" from="2" to="0.5" dur="1.5s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.25 0.1 0.25 1"/>
-      </circle>
+    return `<svg width="100%" height="100%" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          @keyframes markerPulseRing {
+            0% { transform: scale(0.65); opacity: 0.9; stroke-width: 2.5; }
+            50% { transform: scale(1.15); opacity: 0.3; stroke-width: 1.0; }
+            100% { transform: scale(0.65); opacity: 0.9; stroke-width: 2.5; }
+          }
+          @keyframes markerPulseInner {
+            0% { transform: scale(0.9); opacity: 1.0; }
+            50% { transform: scale(1.05); opacity: 0.7; }
+            100% { transform: scale(0.9); opacity: 1.0; }
+          }
+          .pulse-ring {
+            transform-origin: 20px 20px;
+            animation: markerPulseRing 1.4s ease-in-out infinite;
+          }
+          .pulse-inner {
+            transform-origin: 20px 20px;
+            animation: markerPulseInner 1.4s ease-in-out infinite;
+          }
+        </style>
+      </defs>
+      <!-- Outer Pulsing Ring -->
+      <circle class="pulse-ring" cx="20" cy="20" r="16" fill="none" stroke="${MARKER_COLOR}" />
+      <!-- Inner Ring -->
+      <circle class="pulse-inner" cx="20" cy="20" r="10" fill="none" stroke="${MARKER_COLOR}" stroke-width="1.8" />
+      <!-- Center Dot -->
+      <circle cx="20" cy="20" r="2.5" fill="${MARKER_COLOR}" />
     </svg>`;
   }
 }

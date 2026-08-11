@@ -3,9 +3,18 @@ import type { SkyVisibilityState } from "../../contracts/sky_environment_contrac
 
 const LOG_PREFIX = "MGP: [DeepSkyLabels]";
 
+function escapeHtml(str: string): string {
+  if (!str) return "";
+  return String(str).replace(/[&<>'"]/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
+  })[c] ?? c);
+}
+
 interface LabelState {
   index: number;
   label: string;
+  familyCode: number;
+  magnitude: number;
   worldPos: THREE.Vector3;
   priority: number; // based on magnitude or size
   screenX: number;
@@ -14,14 +23,24 @@ interface LabelState {
   halfHeight: number;
 }
 
+const FAMILY_COLORS: Record<number, string> = {
+  0: "#5c9dff", // Galaxy: Light Blue
+  1: "#4db6ac", // Nebula: Teal/Emerald
+  2: "#ffd54f", // Open Cluster: Bright Gold
+  3: "#ffb74d", // Globular Cluster: Amber/Orange
+  4: "#4dd0e1", // Cluster + Nebula: Light Cyan
+  5: "#a1887f", // Association: Bronze
+  6: "#ce93d8", // Other: Purple
+};
+
 export class DeepSkyLabels {
   private readonly container: HTMLDivElement;
   private readonly labels: LabelState[] = [];
   private readonly _projVec = new THREE.Vector3();
-  
+
   private isVisible = true;
   private currentVisibilityState: SkyVisibilityState | null = null;
-  private maxVisibleLabels = 150; // Limit DOM elements
+  private maxVisibleLabels = 100; // Limit DOM elements for clean view
   private readonly domPool: HTMLDivElement[] = [];
 
   constructor() {
@@ -29,7 +48,7 @@ export class DeepSkyLabels {
     this.container.className = "deepsky-labels-container";
     this.container.style.cssText =
       "position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:4;";
-      
+
     // Pre-create DOM pool
     for (let i = 0; i < this.maxVisibleLabels; i++) {
       const el = this.createLabelElement("");
@@ -52,12 +71,10 @@ export class DeepSkyLabels {
   }
 
   registerLabels(metadata: any, payloadBuffer: ArrayBuffer): void {
-    // Clear array
     this.labels.length = 0;
     for (const el of this.domPool) {
       el.style.display = "none";
     }
-    this.labels.length = 0;
 
     const count = metadata.renderableCount ?? metadata.recordCount;
     const objectLabels = metadata.objectLabels as string[] | undefined;
@@ -70,6 +87,9 @@ export class DeepSkyLabels {
     const eqDirs = new Float32Array(payloadBuffer, layout.equatorialDirections.offset, count * 3);
     const mags = new Float32Array(payloadBuffer, layout.magnitude.offset, count);
     const majAx = new Float32Array(payloadBuffer, layout.majorAxisArcmin.offset, count);
+    const familyCodes = layout.familyCode
+      ? new Uint32Array(payloadBuffer, layout.familyCode.offset, count)
+      : null;
 
     const radius = 1000000;
 
@@ -79,9 +99,8 @@ export class DeepSkyLabels {
 
       const mag = mags[i]! > -1 ? mags[i]! : 15.0;
       const maj = majAx[i]! > 0 ? majAx[i]! : 1.0;
-      
-      // Calculate a simple priority: brighter is better (lower priority value)
-      // If magnitude is unknown (15), use size as tie-breaker
+      const familyCode = familyCodes ? familyCodes[i]! : 6;
+
       const priority = mag - (maj * 0.01);
 
       const vx = eqDirs[i * 3]!;
@@ -92,6 +111,8 @@ export class DeepSkyLabels {
       this.labels.push({
         index: i,
         label,
+        familyCode,
+        magnitude: mag,
         worldPos,
         priority,
         screenX: 0,
@@ -101,22 +122,18 @@ export class DeepSkyLabels {
       });
     }
 
-    // Pre-sort by priority so we only ever consider the most prominent ones
     this.labels.sort((a, b) => a.priority - b.priority);
-
-    console.info(`${LOG_PREFIX} Loaded ${this.labels.length} labels, pooled ${this.maxVisibleLabels} DOM elements.`);
   }
 
   update(camera: THREE.PerspectiveCamera, equatorialToENU: THREE.Matrix3): void {
     if (!this.isVisible) return;
-    
+
     const rect = this.container.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
 
     const halfW = rect.width / 2;
     const halfH = rect.height / 2;
-    
-    // Twilight suppression fade
+
     const twilightFade = this.currentVisibilityState ? (1.0 - this.currentVisibilityState.twilightSuppression) : 1.0;
     if (twilightFade <= 0.01) {
       for (const el of this.domPool) {
@@ -125,42 +142,43 @@ export class DeepSkyLabels {
       return;
     }
 
+    // Dynamic FOV-based magnitude threshold (prevents clutter when zoomed out)
+    const fov = camera.fov;
+    const effectiveMagLimit = Math.max(7.0, 7.0 + (90.0 - fov) * 0.1);
+
     let visibleCount = 0;
     const occupied: Array<{ x: number; y: number; hw: number; hh: number }> = [];
 
-    // Since this.labels is sorted by priority, we iterate until we fill the maxVisibleLabels
     for (let i = 0; i < this.labels.length; i++) {
       if (visibleCount >= this.maxVisibleLabels) break;
-      
-      const label = this.labels[i]!;
-      
-      // Transform world pos to ENU space using the matrix
-      this._projVec.copy(label.worldPos);
-      this._projVec.applyMatrix3(equatorialToENU);
-      
-      // Project to screen
-      this._projVec.project(camera);
 
-      // Behind camera
-      if (this._projVec.z > 1) {
+      const label = this.labels[i]!;
+
+      // Filter out faint objects when zoomed out unless it's a Messier / major object
+      const labelStr = typeof label.label === "string" ? label.label : "";
+      const isMessier = labelStr.startsWith("M") && !labelStr.startsWith("NGC");
+      if (label.magnitude > effectiveMagLimit && !isMessier) {
         continue;
       }
+
+      this._projVec.copy(label.worldPos);
+      this._projVec.applyMatrix3(equatorialToENU);
+      this._projVec.project(camera);
+
+      if (this._projVec.z > 1) continue;
 
       const sx = this._projVec.x * halfW + halfW;
       const sy = -this._projVec.y * halfH + halfH;
 
-      // Out of viewport margin
       const margin = 20;
       if (sx < -margin || sx > rect.width + margin || sy < -margin || sy > rect.height + margin) {
         continue;
       }
 
-      // Estimate bounds
       const fontSize = 11;
-      label.halfWidth = label.label.length * fontSize * 0.35 + 10; // offset padding
+      label.halfWidth = label.label.length * fontSize * 0.35 + 10;
       label.halfHeight = fontSize * 0.6;
-      
-      // Anti-overlap
+
       let overlaps = false;
       for (const occ of occupied) {
         if (
@@ -176,17 +194,17 @@ export class DeepSkyLabels {
         label.screenX = sx;
         label.screenY = sy;
         occupied.push({ x: sx, y: sy, hw: label.halfWidth, hh: label.halfHeight });
-        
+
         const el = this.domPool[visibleCount]!;
-        el.textContent = label.label;
+        const color = FAMILY_COLORS[label.familyCode] ?? "#5c9dff";
+        el.innerHTML = `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${color};margin-right:5px;box-shadow:0 0 5px ${color};vertical-align:middle;"></span><span style="vertical-align:middle;">${escapeHtml(label.label)}</span>`;
         el.style.display = "";
-        el.style.transform = `translate(${sx + 15}px, ${sy - 8}px)`; // offset from center
-        el.style.opacity = (twilightFade * 0.8).toFixed(2);
+        el.style.transform = `translate(${sx + 10}px, ${sy - 7}px)`;
+        el.style.opacity = (twilightFade * 0.85).toFixed(2);
         visibleCount++;
       }
     }
-    
-    // Hide unused pool elements
+
     for (let i = visibleCount; i < this.maxVisibleLabels; i++) {
       this.domPool[i]!.style.display = "none";
     }
