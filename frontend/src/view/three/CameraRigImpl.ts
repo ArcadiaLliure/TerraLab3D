@@ -35,7 +35,7 @@ import {
 import { CameraVisualSmoother } from "./CameraVisualSmoother";
 
 const DEG = Math.PI / 180;
-const MIN_FOV = 0.001;
+const MIN_FOV = 0.0001;
 const MAX_FOV = 120;
 const MIN_ALT = -90;
 const MAX_ALT = 90;
@@ -151,7 +151,7 @@ export class CameraRigImpl implements CameraRig {
     this.animating = false;
     this.applyToCamera();
   }
-  
+
   setTrackingState(isTracking: boolean): void {
     this.isTrackingTarget = isTracking;
   }
@@ -603,7 +603,7 @@ export class CameraRigImpl implements CameraRig {
     const dx = e.clientX - this.lastX;
     const dy = e.clientY - this.lastY;
     if (dx === 0 && dy === 0) return;
-    
+
     this.userInteractionCallback?.();
     this.lastX = e.clientX;
     this.lastY = e.clientY;
@@ -626,20 +626,20 @@ export class CameraRigImpl implements CameraRig {
     const factor = e.deltaY > 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
     const oldHFov = this.hFovDeg;
     const newHFov = clamp(this.hFovDeg * factor, MIN_FOV, MAX_FOV);
-    
+
     if (newHFov === oldHFov || !this.container) return;
 
     const rect = this.container.getBoundingClientRect();
     const dx = e.clientX - rect.left - rect.width / 2;
     const dy = rect.top + rect.height / 2 - e.clientY;
-    
+
     const aspect = this.camera.aspect || 1;
     const oldVFov = hFovToVFov(oldHFov, aspect);
     const newVFov = hFovToVFov(newHFov, aspect);
-    
+
     const deltaAz = -(dx / rect.width) * (oldHFov - newHFov);
     const deltaAlt = (dy / rect.height) * (oldVFov - newVFov);
-    
+
     if (!this.isTrackingTarget) {
       this.orbit(deltaAz, deltaAlt);
     }
@@ -683,7 +683,7 @@ export class CameraRigImpl implements CameraRig {
 
     // Original arrow/zoom keys
     const fovScale = this.hFovDeg / 60;
-    
+
     let handled = true;
     switch (e.key) {
       case "ArrowLeft": this.orbit(KEY_STEP * fovScale, 0); break;
@@ -694,7 +694,7 @@ export class CameraRigImpl implements CameraRig {
       case "-": this.zoomTo(this.hFovDeg * ZOOM_STEP); break;
       default: handled = false; break;
     }
-    
+
     if (handled) {
       this.userInteractionCallback?.();
       e.preventDefault();
@@ -868,12 +868,12 @@ function approachValue(current: number, target: number, maxDelta: number): numbe
 export function threeDirectionToCameraPose(dir: THREE.Vector3): { azimuthDeg: number; altitudeDeg: number } {
   // dirY = sin(alt)
   const altDeg = Math.asin(Math.max(-1, Math.min(1, dir.y))) * (180 / Math.PI);
-  
+
   // dirX = -sin(az) * cos(alt)
   // dirZ = -cos(az) * cos(alt)
   // atan2(y, x) -> atan2(sin, cos) -> atan2(-dirX, -dirZ)
   let azDeg = Math.atan2(-dir.x, -dir.z) * (180 / Math.PI);
   azDeg = ((azDeg % 360) + 360) % 360;
-  
+
   return { azimuthDeg: azDeg, altitudeDeg: altDeg };
 }
