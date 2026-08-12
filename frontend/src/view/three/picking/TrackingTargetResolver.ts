@@ -54,6 +54,12 @@ export class TrackingTargetResolver {
       const sol = this.resolveSolarSystem(target.bodyId);
       if (sol) return sol;
     }
+    
+    // Si el target té coordenades exactes associades, usa-les sempre per evitar el jitter de Float32!
+    if ('raDeg' in target && typeof target.raDeg === 'number' && 'decDeg' in target && typeof target.decDeg === 'number') {
+      return this.resolveEquatorial(target.raDeg, target.decDeg);
+    }
+    
     if (target.kind === "coordinate") {
       return this.resolveEquatorial(target.raDeg, target.decDeg);
     }
@@ -84,9 +90,15 @@ export class TrackingTargetResolver {
       Math.sin(dec)
     );
     
-    // Transformació Equatorial (ICRS) -> Topocèntrica Three.js (ENU: +X=East, +Y=Up, -Z=North)
-    // NOTA: La matriu equatorialToThree ja fa tota la transformació.
+    // Transformació Equatorial (ICRS) -> Topocèntrica ENU
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
+    
+    // ENU: x=East, y=North, z=Up. Three.js: x=East, y=Up, z=-North
+    const e = this._tempVec3.x;
+    const n = this._tempVec3.y;
+    const u = this._tempVec3.z;
+    this._tempVec3.set(e, u, -n);
+    
     return threeDirectionToCameraPose(this._tempVec3);
   }
 
@@ -105,6 +117,13 @@ export class TrackingTargetResolver {
 
     this._tempVec3.set(vx, vy, vz);
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
+    
+    // ENU: x=East, y=North, z=Up. Three.js: x=East, y=Up, z=-North
+    const e = this._tempVec3.x;
+    const n = this._tempVec3.y;
+    const u = this._tempVec3.z;
+    this._tempVec3.set(e, u, -n);
+    
     return threeDirectionToCameraPose(this._tempVec3);
   }
 
@@ -126,17 +145,24 @@ export class TrackingTargetResolver {
 
     this._tempVec3.set(vx, vy, vz);
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
+    
+    // ENU: x=East, y=North, z=Up. Three.js: x=East, y=Up, z=-North
+    const e = this._tempVec3.x;
+    const n = this._tempVec3.y;
+    const u = this._tempVec3.z;
+    this._tempVec3.set(e, u, -n);
+    
     return threeDirectionToCameraPose(this._tempVec3);
   }
 
-  private resolveSolarSystem(bodyId: string): ResolvedTrackingDirection | null {
+  private resolveSolarSystem(id: string): ResolvedTrackingDirection | null {
     if (!this.solarSystemRenderer) return null;
-    
+
     // Usem la posició visual interpolada exacta usada pel render, per evitar jitter
-    const dir = this.solarSystemRenderer.getDisplayedBodyDirection(bodyId as any);
+    // i evitar problemes amb vectors no normalitzats que causen clamp de càmera.
+    const dir = this.solarSystemRenderer.getDisplayedBodyDirection(id as any);
     if (!dir) return null;
-    
-    // Centralitzat amb la mateixa matemàtica de CameraRigImpl
+
     return threeDirectionToCameraPose(dir);
   }
 }

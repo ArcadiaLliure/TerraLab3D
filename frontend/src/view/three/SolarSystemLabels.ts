@@ -15,6 +15,7 @@ import {
 interface PlanetLabel {
   readonly element: HTMLDivElement;
   readonly text: HTMLSpanElement;
+  readonly dot?: HTMLSpanElement;
   readonly width: number;
   readonly height: number;
   visible: boolean;
@@ -186,6 +187,33 @@ export class SolarSystemLabels {
       } else {
         label.text.textContent = baseName;
       }
+      let isOccluded = false;
+      if (id.startsWith("naif-") || id.startsWith("provisional-")) {
+        const parentStringId = state.parentNaifId ? naifIdToPlanetId(state.parentNaifId) : (state.parentBodyId as SolarSystemBodyId | undefined);
+        if (parentStringId) {
+          const parentAnchor = this.solarSystemRenderer.getLabelAnchor(parentStringId);
+          const parentState = parentAnchor?.userData.apparentState as SolarSystemBodyState | undefined;
+          if (parentState) {
+            const satDir = new THREE.Vector3(...state.directionENU).normalize();
+            const parentDir = new THREE.Vector3(...parentState.directionENU).normalize();
+            const angularSepRad = satDir.angleTo(parentDir);
+            const parentRadiusRad = THREE.MathUtils.degToRad(parentState.angularRadiusDeg);
+            
+            if (angularSepRad < parentRadiusRad && state.distanceKm > parentState.distanceKm) {
+              isOccluded = true;
+            }
+          }
+        }
+      }
+
+      if (isOccluded) {
+        label.text.style.opacity = "0.4";
+        if (label.dot) label.dot.style.display = "none";
+      } else {
+        label.text.style.opacity = "1";
+        if (label.dot) label.dot.style.display = "block";
+      }
+
       label.text.style.left = `${textOffset}px`;
       label.screenX = screenX;
       label.screenY = screenY;
@@ -227,8 +255,9 @@ export class SolarSystemLabels {
     const element = document.createElement("div");
     element.style.cssText = "position:absolute;display:none;pointer-events:none;";
 
+    let dot: HTMLSpanElement | undefined;
     if (id !== "moon") {
-      const dot = document.createElement("span");
+      dot = document.createElement("span");
       dot.style.cssText = `position:absolute;left:0;top:0;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:${cssColor};box-shadow:0 0 6px ${cssColor};`;
       element.appendChild(dot);
     }
@@ -241,6 +270,7 @@ export class SolarSystemLabels {
     return {
       element,
       text,
+      dot,
       width: `${name} -99.9`.length * 7.2 + 22,
       height: LABEL_HEIGHT_PX,
       visible: false,

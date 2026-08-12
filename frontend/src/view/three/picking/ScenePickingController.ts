@@ -108,7 +108,9 @@ export class ScenePickingController {
   }
 
   /** Munta el marker al container del canvas. */
+  private container: HTMLElement | null = null;
   mount(container: HTMLElement): void {
+    this.container = container;
     this.selectionMarker.mount(container);
     window.addEventListener("keydown", this.onKeyDownBound);
     this.started = true;
@@ -161,7 +163,7 @@ export class ScenePickingController {
     vec.project(camera);
     if (vec.z > 1.0) return null;
 
-    const rect = camera.parent ? (camera as any)._canvasRect : null;
+    const rect = this.container ? this.container.getBoundingClientRect() : null;
     const width = rect ? rect.width : window.innerWidth;
     const height = rect ? rect.height : window.innerHeight;
     const x = (vec.x * 0.5 + 0.5) * width;

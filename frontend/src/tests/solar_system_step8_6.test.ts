@@ -191,13 +191,22 @@ const satellites = new NaturalSatelliteRenderer(new THREE.Group());
 satellites.configureCatalog(catalog);
 satellites.setEnabled(true);
 const satelliteState = body("naif-10001", "natural_satellite", null);
-satellites.updateStates([{ ...satelliteState, parentBodyId: "jupiter" }]);
+const dummyMap = new Map<any, any>();
+const dummyOcclusion = {
+  presentationRadius: () => 0,
+  apparentRadius: () => 0,
+  renderOrder: () => 0,
+  testLineOfSight: () => true,
+  baseRadius: () => 0,
+  maximumRadialSpan: () => 0
+};
+satellites.updateStates([{ ...satelliteState, parentBodyId: "jupiter" }], dummyMap, dummyOcclusion);
 assert(satellites.metrics().catalogCount === 461, "one data-driven catalog keeps all 461 entries");
 assert(satellites.metrics().entityBuildCount === 460, "the existing Moon is not duplicated");
 assert(satellites.metrics().stateCount === 1, "only requested system states enter each tick");
 assert(satellites.getPickableBodies().length === 1, "visible natural satellites are selectable");
 const entityBuildCount = satellites.metrics().entityBuildCount;
-satellites.updateStates([{ ...satelliteState, parentBodyId: "jupiter", azimuthDeg: 91 }]);
+satellites.updateStates([{ ...satelliteState, parentBodyId: "jupiter", azimuthDeg: 91 }], dummyMap, dummyOcclusion);
 assert(satellites.metrics().entityBuildCount === entityBuildCount, "timeline updates rebuild no satellite entities");
 satellites.dispose();
 

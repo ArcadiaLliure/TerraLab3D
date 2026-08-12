@@ -563,7 +563,7 @@ export class SolarSystemRenderer {
       if (id === "saturn") this.rings.updateState(state, visibility);
     }
     this.satellites.setEnabled(this.masterVisible && this.satellitesVisible);
-    this.satellites.updateStates(satelliteStates);
+    this.satellites.updateStates(satelliteStates, this.displayed, this.occlusion);
     if (this.latestSolarEclipse !== null) {
       const moon = this.displayed.get("moon");
       if (moon !== undefined) {

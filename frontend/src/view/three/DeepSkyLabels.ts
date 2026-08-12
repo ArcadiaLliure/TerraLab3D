@@ -101,6 +101,8 @@ export class DeepSkyLabels {
       const maj = majAx[i]! > 0 ? majAx[i]! : 1.0;
       const familyCode = familyCodes ? familyCodes[i]! : 6;
 
+      // Calculate a simple priority: brighter is better (lower priority value)
+      // If magnitude is unknown (15), use size as tie-breaker
       const priority = mag - (maj * 0.01);
 
       const vx = eqDirs[i * 3]!;

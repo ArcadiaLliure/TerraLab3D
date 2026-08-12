@@ -35,19 +35,18 @@ console.log("Running TrackingTargetResolver tests...");
   assertCloseTo(res1!.azimuthDeg, 270, 0.5, "RA=0, Dec=0 -> East");
   assertCloseTo(res1!.altitudeDeg, 0, 0.5, "RA=0, Dec=0 -> Alt 0");
 
-  // Case 2: RA=90, Dec=0 -> Equatorial [0,1,0] -> ENU [0,1,0] (Zenith -> alt 90)
+  // Case 2: RA=90, Dec=0 -> Equatorial [0,1,0] -> ENU [0,1,0] (North -> az 0)
   const res2 = resolver.resolve({ kind: "coordinate", raDeg: 90, decDeg: 0, frame: "J2000" });
-  assertCloseTo(res2!.altitudeDeg, 90, 0.5, "RA=90, Dec=0 -> Zenith");
+  assertCloseTo(res2!.azimuthDeg, 0, 0.5, "RA=90, Dec=0 -> North");
+  assertCloseTo(res2!.altitudeDeg, 0, 0.5, "RA=90, Dec=0 -> Alt 0");
 
-  // Case 3: Dec=+90 -> Equatorial [0,0,1] -> ENU [0,0,1] (South -> az 180)
+  // Case 3: Dec=+90 -> Equatorial [0,0,1] -> ENU [0,0,1] (Zenith -> alt 90)
   const res3 = resolver.resolve({ kind: "coordinate", raDeg: 0, decDeg: 90, frame: "J2000" });
-  assertCloseTo(res3!.azimuthDeg, 180, 0.5, "Dec=+90 -> South");
-  assertCloseTo(res3!.altitudeDeg, 0, 0.5, "Dec=+90 -> Alt 0");
+  assertCloseTo(res3!.altitudeDeg, 90, 0.5, "Dec=+90 -> Zenith");
 
-  // Case 4: Dec=-90 -> Equatorial [0,0,-1] -> ENU [0,0,-1] (North -> az 0)
+  // Case 4: Dec=-90 -> Equatorial [0,0,-1] -> ENU [0,0,-1] (Nadir -> alt -90)
   const res4 = resolver.resolve({ kind: "coordinate", raDeg: 0, decDeg: -90, frame: "J2000" });
-  assertCloseTo(res4!.azimuthDeg, 0, 0.5, "Dec=-90 -> North");
-  assertCloseTo(res4!.altitudeDeg, 0, 0.5, "Dec=-90 -> Alt 0");
+  assertCloseTo(res4!.altitudeDeg, -90, 0.5, "Dec=-90 -> Nadir");
 }
 
 {

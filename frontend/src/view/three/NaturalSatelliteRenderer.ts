@@ -4,9 +4,11 @@ import type {
   SatelliteCatalogManifest,
   SatelliteBodyId,
   SolarSystemBodyState,
+  SolarSystemBodyId,
 } from "../../contracts/solar_system_contracts";
 import { threeFromEnu } from "./celestialCoordinates";
 import type { PickableSolarSystemBody } from "./SolarSystemRenderer";
+import type { CelestialOcclusionPolicy } from "./CelestialOcclusionPolicy";
 
 const CELESTIAL_RADIUS = 900_000;
 
@@ -186,7 +188,11 @@ export class NaturalSatelliteRenderer {
     }
   }
 
-  updateStates(states: readonly SolarSystemBodyState[]): void {
+  updateStates(
+    states: readonly SolarSystemBodyState[],
+    allStates: ReadonlyMap<SolarSystemBodyId, SolarSystemBodyState>,
+    occlusion: CelestialOcclusionPolicy,
+  ): void {
     if (this.disposed) return;
     for (const item of this.items.values()) item.anchor.visible = false;
     
@@ -196,7 +202,18 @@ export class NaturalSatelliteRenderer {
       const item = this.items.get(state.id);
       if (item === undefined) continue;
       
-      const position = threeFromEnu(state.directionENU).normalize().multiplyScalar(CELESTIAL_RADIUS);
+      let radius = CELESTIAL_RADIUS;
+      const parentState = state.parentBodyId ? allStates.get(state.parentBodyId as SolarSystemBodyId) : undefined;
+      if (parentState) {
+        const parentRadius = occlusion.presentationRadius(parentState, allStates.values());
+        if (state.distanceKm > parentState.distanceKm) {
+          radius = parentRadius + 50; // Darrere (ocultació)
+        } else {
+          radius = parentRadius - 50; // Davant (trànsit)
+        }
+      }
+
+      const position = threeFromEnu(state.directionENU).normalize().multiplyScalar(radius);
       const visible = this.enabled && (state.horizonVisible ?? state.altitudeDeg >= 0);
       
       item.anchor.position.copy(position);

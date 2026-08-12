@@ -166,6 +166,8 @@ export function fromSearchResult(result: AstronomicalSearchResultPayload | null)
           resourceId: parts[0]!,
           resourceVersion: parts[1]!,
           catalogIndex: parseInt(parts[2]!, 10),
+          raDeg: result.coordinateSnapshot?.raDeg,
+          decDeg: result.coordinateSnapshot?.decDeg,
           // We don't have sourceId directly in search result usually, unless it's in targetRef.
         };
       }
@@ -188,7 +190,9 @@ export function fromSearchResult(result: AstronomicalSearchResultPayload | null)
            kind: "deep_sky",
            resourceId: parts[0]!,
            resourceVersion: parts[1]!,
-           catalogIndex: parseInt(parts[2]!, 10)
+           catalogIndex: parseInt(parts[2]!, 10),
+           raDeg: result.coordinateSnapshot?.raDeg,
+           decDeg: result.coordinateSnapshot?.decDeg
          };
        }
     }

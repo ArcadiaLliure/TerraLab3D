@@ -11,6 +11,8 @@ export interface StarTargetRef {
   readonly resourceVersion: string;
   readonly catalogIndex: number;
   readonly sourceId?: string; // Només quan està resolt
+  readonly raDeg?: number;
+  readonly decDeg?: number;
 }
 
 export interface SolarSystemTargetRef {
@@ -23,6 +25,8 @@ export interface DeepSkyTargetRef {
   readonly resourceId: string;
   readonly resourceVersion: string;
   readonly catalogIndex: number;
+  readonly raDeg?: number;
+  readonly decDeg?: number;
 }
 
 export interface CoordinateTargetRef {
