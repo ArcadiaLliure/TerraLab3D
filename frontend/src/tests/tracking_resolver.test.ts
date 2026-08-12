@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { TrackingTargetResolver } from "../view/three/picking/TrackingTargetResolver";
 import { CelestialTransformState } from "../view/three/CelestialTransformState";
 import type { SolarSystemRenderer } from "../view/three/SolarSystemRenderer";
+import { threeDirectionToCameraPose } from "../view/three/CameraRigImpl";
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
@@ -30,21 +31,21 @@ console.log("Running TrackingTargetResolver tests...");
   resolver.updateCelestialTransform(transform);
   
   // Case 1: RA=0, Dec=0 -> Equatorial [1,0,0] -> ENU [1,0,0] (East -> az 270)
-  const res1 = resolver.resolve({ raDeg: 0, decDeg: 0 });
+  const res1 = resolver.resolve({ kind: "coordinate", raDeg: 0, decDeg: 0, frame: "J2000" });
   assertCloseTo(res1!.azimuthDeg, 270, 0.5, "RA=0, Dec=0 -> East");
   assertCloseTo(res1!.altitudeDeg, 0, 0.5, "RA=0, Dec=0 -> Alt 0");
 
   // Case 2: RA=90, Dec=0 -> Equatorial [0,1,0] -> ENU [0,1,0] (Zenith -> alt 90)
-  const res2 = resolver.resolve({ raDeg: 90, decDeg: 0 });
+  const res2 = resolver.resolve({ kind: "coordinate", raDeg: 90, decDeg: 0, frame: "J2000" });
   assertCloseTo(res2!.altitudeDeg, 90, 0.5, "RA=90, Dec=0 -> Zenith");
 
   // Case 3: Dec=+90 -> Equatorial [0,0,1] -> ENU [0,0,1] (South -> az 180)
-  const res3 = resolver.resolve({ raDeg: 0, decDeg: 90 });
+  const res3 = resolver.resolve({ kind: "coordinate", raDeg: 0, decDeg: 90, frame: "J2000" });
   assertCloseTo(res3!.azimuthDeg, 180, 0.5, "Dec=+90 -> South");
   assertCloseTo(res3!.altitudeDeg, 0, 0.5, "Dec=+90 -> Alt 0");
 
   // Case 4: Dec=-90 -> Equatorial [0,0,-1] -> ENU [0,0,-1] (North -> az 0)
-  const res4 = resolver.resolve({ raDeg: 0, decDeg: -90 });
+  const res4 = resolver.resolve({ kind: "coordinate", raDeg: 0, decDeg: -90, frame: "J2000" });
   assertCloseTo(res4!.azimuthDeg, 0, 0.5, "Dec=-90 -> North");
   assertCloseTo(res4!.altitudeDeg, 0, 0.5, "Dec=-90 -> Alt 0");
 }
@@ -76,20 +77,20 @@ console.log("Running TrackingTargetResolver tests...");
   
   resolver.updateSolarSystemRenderer(mockRenderer);
   
-  const resultMoon = resolver.resolve({ bodyId: "moon" });
+  const resultMoon = resolver.resolve({ kind: "solar_system", bodyId: "moon" });
   assertCloseTo(resultMoon!.azimuthDeg, 270, 0.5, "Moon az 270");
   assertCloseTo(resultMoon!.altitudeDeg, 0, 0.5, "Moon alt 0");
   
-  const resultSun = resolver.resolve({ bodyId: "sun" });
+  const resultSun = resolver.resolve({ kind: "solar_system", bodyId: "sun" });
   assertCloseTo(resultSun!.altitudeDeg, 90, 0.5, "Sun alt 90");
   
-  const resultJup = resolver.resolve({ targetRef: "jupiter", kind: "body" });
+  const resultJup = resolver.resolve({ kind: "solar_system", bodyId: "jupiter" });
   assertCloseTo(resultJup!.azimuthDeg, 45, 0.5, "Jupiter az 45");
   
-  const slightlyEast = resolver.resolve({ bodyId: "test1" });
+  const slightlyEast = resolver.resolve({ kind: "solar_system", bodyId: "test1" });
   assertCloseTo(slightlyEast!.azimuthDeg, 359.94, 0.1, "Test1 az ~360");
   
-  const slightlyWest = resolver.resolve({ bodyId: "test2" });
+  const slightlyWest = resolver.resolve({ kind: "solar_system", bodyId: "test2" });
   assertCloseTo(slightlyWest!.azimuthDeg, 0.06, 0.1, "Test2 az ~0");
 }
 
@@ -100,7 +101,6 @@ console.log("Running TrackingTargetResolver tests...");
   // Ensure that taking an exact ENU direction (e.g. from SolarSystemRenderer)
   // converting it to CameraRig pose, and applying it to a camera,
   // yields exactly the same direction and projects to NDC (0,0).
-  const { threeDirectionToCameraPose } = require("../view/three/CameraRigImpl");
   
   // Simulated displayed ENU direction (very extreme FOV precision check)
   const dirENU = new THREE.Vector3(-0.123456789, 0.987654321, -0.555555555).normalize();

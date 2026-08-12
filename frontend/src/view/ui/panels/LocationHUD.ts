@@ -5,10 +5,8 @@ import type {
   AstronomicalEventSnapshot,
   AngularSeparationResult,
 } from "../../../contracts/astronomical_event_contracts";
-import type { ResolvedStar } from "../../../contracts/star_picking_contracts";
-import type { SolarSystemPickHit } from "../../three/picking/SolarSystemPickProvider";
-import type { DeepSkyPickHit } from "../../../contracts/deep_sky_picking_contracts";
 import type { AstronomicalSearchResultPayload } from "../../../contracts/bridge_messages";
+import type { CelestialInspectionModel } from "../../../contracts/celestial_selection_contracts";
 import { formatLocalAndUtcTime } from "../timeFormatting";
 
 const DEG = Math.PI / 180;
@@ -60,6 +58,13 @@ function computeViewAzimuth(azDeg: number, altDeg: number): number | null {
   return ((azDeg % 360) + 360) % 360;
 }
 
+export interface LocationHUDCallbacks {
+  onCenter?: () => void;
+  onFollow?: () => void;
+  onRelease?: () => void;
+  onClear?: () => void;
+}
+
 export class LocationHUD {
   private element: HTMLDivElement;
   private observerSection: HTMLDivElement;
@@ -70,7 +75,7 @@ export class LocationHUD {
   private readonly starContainer: HTMLDivElement;
   private hudVisible = true;
 
-  constructor() {
+  constructor(private readonly callbacks: LocationHUDCallbacks = {}) {
     this.element = document.createElement("div");
     this.element.id = "location-hud";
     this.element.style.cssText = `
@@ -129,6 +134,7 @@ export class LocationHUD {
       padding-top: 10px;
       border-top: 1px solid rgba(255,255,255,0.2);
       display: none;
+      pointer-events: auto;
     `;
     this.element.appendChild(this.starContainer);
 
@@ -237,129 +243,95 @@ export class LocationHUD {
   }
 
 
-  public setSelectedCelestial(
-    selection: ResolvedStar | SolarSystemPickHit | DeepSkyPickHit | AstronomicalSearchResultPayload | null,
-  ): void {
-    if (selection === null) {
-      this.setSelectedStar(null);
-    } else if ("displayName" in selection && "targetRef" in selection) {
-      this.setSelectedSearchResult(selection as AstronomicalSearchResultPayload);
-    } else if (selection.kind === "star") {
-      this.setSelectedStar(selection as ResolvedStar);
-    } else if (selection.kind === "deep_sky") {
-      this.setSelectedDeepSky(selection as DeepSkyPickHit);
-    } else {
-      this.setSelectedSolarBody(selection as SolarSystemPickHit);
-    }
-  }
-
-  private setSelectedSearchResult(res: AstronomicalSearchResultPayload): void {
-    this.starContainer.style.display = "block";
-    const raText = res.coordinateSnapshot ? `${res.coordinateSnapshot.raDeg.toFixed(4)}°` : "N/A";
-    const decText = res.coordinateSnapshot ? `${res.coordinateSnapshot.decDeg.toFixed(4)}°` : "N/A";
-    const matched = res.matchedAlias ? `<div>Alias: ${escapeHtml(res.matchedAlias)}</div>` : "";
-    
-    this.starContainer.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Resultat de cerca</div>
-      <div>${escapeHtml(res.displayName)}</div>
-      ${matched}
-      <div>Ref: ${escapeHtml(res.targetRef)} &nbsp; Tipus: ${escapeHtml(res.kind)}</div>
-      <div>RA: ${raText} &nbsp; Dec: ${decText}</div>
-    `;
-  }
-
-  public setSelectedStar(star: ResolvedStar | null): void {
-    if (!star) {
+  public updateInspection(model: CelestialInspectionModel | null): void {
+    if (!model) {
       this.starContainer.style.display = "none";
       this.starContainer.innerHTML = "";
       return;
     }
-    
+
     this.starContainer.style.display = "block";
+    let html = "";
     
-    let bpRpText = "N/A";
-    if (star.bpRp !== null && star.bpRp !== undefined) {
-      bpRpText = star.bpRp.toFixed(2);
+    if (model.availability === "unavailable") {
+      html += `<div style="color: #ff5555; font-weight: bold; margin-bottom: 4px;">Recurs no disponible</div>`;
     }
+
+    if (model.kind === "star") {
+      const bpRpText = model.fields.bpRp !== null && model.fields.bpRp !== undefined ? model.fields.bpRp.toFixed(2) : "N/A";
+      html += `
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Estrella seleccionada</div>
+        <div>ID: ${model.fields.sourceId ?? (model.targetRef as any).sourceId ?? "Pendent de resolució..."}</div>
+        <div>RA: ${model.fields.raDeg?.toFixed(4) ?? "N/A"}° &nbsp; Dec: ${model.fields.decDeg?.toFixed(4) ?? "N/A"}°</div>
+        <div>Mag: ${model.fields.magnitude?.toFixed(2) ?? "N/A"} &nbsp; BP-RP: ${bpRpText}</div>
+        <div style="opacity: 0.7; font-size: 11px;">Font: ${model.fields.sourceRole ?? "N/A"}</div>
+      `;
+    } else if (model.kind === "deep_sky") {
+      const mag = model.fields.magnitude !== null ? model.fields.magnitude.toFixed(2) : "N/A";
+      const size = model.fields.majorAxisArcmin !== null ? `${model.fields.majorAxisArcmin.toFixed(1)}' x ${model.fields.minorAxisArcmin?.toFixed(1) ?? "?"}'` : "N/A";
+      
+      const labels: Record<number, string> = {
+        0: "Galaxia",
+        1: "Nebulosa Emissió",
+        2: "Cúmul Obert",
+        3: "Cúmul Globular",
+        4: "Nebulosa Planetaria",
+        5: "Romanent Supernova",
+        6: "Nebulosa Obscura",
+        7: "Nebulosa Reflexió",
+        8: "Altres",
+      };
+      const familyName = labels[model.fields.familyCode as number] || "Objecte de Cel Profund";
+
+      html += `
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cel Profund (NGC)</div>
+        <div>${escapeHtml(model.displayName)}</div>
+        <div>${familyName}</div>
+        <div>Mag: ${mag} &nbsp; Grandària: ${size}</div>
+        <div style="opacity: 0.7; font-size: 11px;">Catàleg: NGC/IC</div>
+      `;
+    } else if (model.kind === "solar_system") {
+      const magnitude = model.fields.apparentMagnitude === null || model.fields.apparentMagnitude === undefined
+        ? "no validada"
+        : model.fields.apparentMagnitude.toFixed(2);
+      
+      html += `
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cos celeste seleccionat</div>
+        <div>${escapeHtml(model.displayName)}</div>
+        <div>Alt: ${model.fields.altitudeDeg?.toFixed(2) ?? "N/A"}° &nbsp; Az: ${model.fields.azimuthDeg?.toFixed(2) ?? "N/A"}°</div>
+        <div>Distància: ${model.fields.distanceKm?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? "N/A"} km</div>
+        <div>Mag: ${magnitude}</div>
+      `;
+    } else if (model.kind === "coordinate") {
+      html += `
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Coordenada</div>
+        <div>RA: ${model.fields.raDeg?.toFixed(4) ?? "N/A"}°</div>
+        <div>Dec: ${model.fields.decDeg?.toFixed(4) ?? "N/A"}°</div>
+      `;
+    }
+
+    // Actions
+    html += `
+      <div style="margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap;">
+        <button id="loc-hud-btn-center" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Centrar</button>
+        <button id="loc-hud-btn-follow" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Seguir</button>
+        <button id="loc-hud-btn-release" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Alliberar</button>
+        <button id="loc-hud-btn-clear" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Netejar</button>
+      </div>
+    `;
+    this.starContainer.innerHTML = html;
+
+    const btnCenter = this.starContainer.querySelector("#loc-hud-btn-center");
+    if (btnCenter && this.callbacks.onCenter) btnCenter.addEventListener("click", this.callbacks.onCenter);
     
-    this.starContainer.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Estrella seleccionada</div>
-      <div>ID: ${star.sourceId}</div>
-      <div>RA: ${star.raDeg.toFixed(4)}° &nbsp; Dec: ${star.decDeg.toFixed(4)}°</div>
-      <div>Mag: ${star.magnitude.toFixed(2)} &nbsp; BP-RP: ${bpRpText}</div>
-      <div style="opacity: 0.7; font-size: 11px;">Font: ${star.sourceRole}</div>
-    `;
-  }
-
-  private setSelectedDeepSky(hit: DeepSkyPickHit): void {
-    const labels: Record<number, string> = {
-      0: "Galaxia",
-      1: "Nebulosa Emissió",
-      2: "Cúmul Obert",
-      3: "Cúmul Globular",
-      4: "Nebulosa Planetaria",
-      5: "Romanent Supernova",
-      6: "Nebulosa Obscura",
-      7: "Nebulosa Reflexió",
-      8: "Altres",
-    };
-    const familyName = labels[hit.familyCode] || "Objecte de Cel Profund";
-    const mag = hit.magnitude < 15 ? hit.magnitude.toFixed(2) : "N/A";
-    const size = hit.majorAxisArcmin > 0 ? `${hit.majorAxisArcmin.toFixed(1)}' x ${hit.minorAxisArcmin.toFixed(1)}'` : "N/A";
-
-    this.starContainer.style.display = "block";
-    this.starContainer.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cielo Profundo (NGC)</div>
-      <div>${escapeHtml(hit.objectLabel)}</div>
-      <div>${familyName}</div>
-      <div>Mag: ${mag} &nbsp; Tamaño: ${size}</div>
-      <div style="opacity: 0.7; font-size: 11px;">Catálogo: NGC/IC</div>
-    `;
-  }
-
-  private setSelectedSolarBody(hit: SolarSystemPickHit): void {
-    const labels: Readonly<Record<string, string>> = {
-      sun: "Sol",
-      moon: "Lluna",
-      mercury: "Mercuri",
-      venus: "Venus",
-      mars: "Mart",
-      jupiter: "Júpiter",
-      saturn: "Saturn",
-      uranus: "Urà",
-      neptune: "Neptú",
-      pluto: "Plutó",
-    };
-    const state = hit.state;
-    const name = escapeHtml(state.displayName ?? labels[hit.bodyId] ?? hit.bodyId);
-    const magnitude = state.apparentMagnitude === null
-      ? "no validada"
-      : state.apparentMagnitude.toFixed(2);
-    const parent = state.parentNaifId === undefined || state.parentNaifId === null
-      ? ""
-      : ` &nbsp; Pare: ${state.parentNaifId}`;
-    const naif = state.naifId === undefined ? "" : `<div>NAIF: ${state.naifId}${parent}</div>`;
-    const radii = state.radiiKm === undefined || state.radiiKm === null
-      ? "radi no disponible"
-      : `radis: ${state.radiiKm.map((value) => value.toFixed(2)).join(" / ")} km`;
-    const ring = state.ringDiagnostics === undefined || state.ringDiagnostics === null
-      ? ""
-      : `<div>B geo/topo: ${state.ringDiagnostics.ringOpeningGeocentricDeg.toFixed(2)}° / ${state.ringDiagnostics.ringOpeningTopocentricDeg.toFixed(2)}°</div>`;
-    this.starContainer.style.display = "block";
-    this.starContainer.innerHTML = `
-      <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cos celeste seleccionat</div>
-      <div>${name}</div>
-      ${naif}
-      <div>Alt: ${state.altitudeDeg.toFixed(2)}° &nbsp; Az: ${state.azimuthDeg.toFixed(2)}°</div>
-      <div>Distància: ${state.distanceKm.toLocaleString(undefined, { maximumFractionDigits: 0 })} km</div>
-      <div>Diàmetre aparent: ${state.angularDiameterDeg.toFixed(5)}° &nbsp; ${radii}</div>
-      <div>Mag: ${magnitude} &nbsp; Il·luminació: ${(state.illuminationFraction * 100).toFixed(0)}%</div>
-      <div>Fase: ${state.phaseAngleDeg.toFixed(2)}° &nbsp; Cobertura: ${state.coverageStatus ?? "legacy"}</div>
-      <div>Orientació: ${state.orientationQuality ?? state.orientation?.quality ?? "unavailable"} &nbsp; Forma: ${state.shapeQuality ?? "unavailable"}</div>
-      <div>Textura: ${state.textureQuality ?? "unavailable"} &nbsp; Kernel: ${escapeHtml(state.ephemerisKernelId ?? "legacy")}</div>
-      ${ring}
-      <div style="opacity: 0.7; font-size: 11px;">${escapeHtml(state.source)} · ${state.quality}</div>
-    `;
+    const btnFollow = this.starContainer.querySelector("#loc-hud-btn-follow");
+    if (btnFollow && this.callbacks.onFollow) btnFollow.addEventListener("click", this.callbacks.onFollow);
+    
+    const btnRelease = this.starContainer.querySelector("#loc-hud-btn-release");
+    if (btnRelease && this.callbacks.onRelease) btnRelease.addEventListener("click", this.callbacks.onRelease);
+    
+    const btnClear = this.starContainer.querySelector("#loc-hud-btn-clear");
+    if (btnClear && this.callbacks.onClear) btnClear.addEventListener("click", this.callbacks.onClear);
   }
 
   public mount(container: HTMLElement): void {

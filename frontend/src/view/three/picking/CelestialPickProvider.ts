@@ -38,7 +38,12 @@ export class CelestialPickProvider {
     const hits = [solarBody, star, deepSky].filter((h): h is CelestialPickHit => h !== null);
     if (hits.length === 0) return null;
     
-    hits.sort((a, b) => normalizedDistance(a) - normalizedDistance(b));
+    hits.sort((a, b) => {
+      const distDiff = normalizedDistance(a) - normalizedDistance(b);
+      if (Math.abs(distDiff) > 1e-4) return distDiff;
+      // Tie-break estable per tipus: planeta > estrella > NGC
+      return getPriority(a) - getPriority(b);
+    });
     return hits[0]!;
   }
 
@@ -61,8 +66,14 @@ export class CelestialPickProvider {
 }
 
 function normalizedDistance(hit: CelestialPickHit): number {
-  if (hit.kind === "deep_sky") {
-    return hit.screenDistanceCssPx / 30.0; // Assume 30px hit radius for normalization
-  }
   return hit.screenDistanceCssPx / hit.hitRadiusCssPx;
+}
+
+function getPriority(hit: CelestialPickHit): number {
+  switch (hit.kind) {
+    case "solar_system_body": return 0;
+    case "star": return 1;
+    case "deep_sky": return 2;
+    default: return 3;
+  }
 }

@@ -1,5 +1,6 @@
 export interface DeepSkyPickRef {
   readonly resourceId: string;
+  readonly resourceVersion: string;
   readonly catalogIndex: number;
 }
 
@@ -12,11 +13,12 @@ export interface DeepSkyPickHit {
   readonly visualRadiusCssPx: number;
   readonly hitRadiusCssPx: number;
   
-  // Directly resolved properties (no backend roundtrip needed)
   readonly objectLabel: string;
-  readonly magnitude: number;
-  readonly majorAxisArcmin: number;
-  readonly minorAxisArcmin: number;
+  readonly magnitude: number | null;
+  readonly majorAxisArcmin: number | null;
+  readonly minorAxisArcmin: number | null;
+  readonly positionAngleDeg: number | null;
+  readonly surfaceBrightness: number | null;
   readonly familyCode: number;
   readonly raDeg: number;
   readonly decDeg: number;

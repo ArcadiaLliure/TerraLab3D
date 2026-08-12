@@ -134,11 +134,16 @@ const FRAGMENT_SHADER = `
       color = vec3(0.80, 0.57, 0.85);
     }
     
-    // Smooth solid glowing disc dot (no outlines)
-    float alpha = smoothstep(1.0, 0.0, d);
-    alpha = pow(alpha, 1.8);
+    // Línea simple y fina (rodoneta)
+    // d va de 0 al centro a 1 en el borde exterior.
+    // Trazamos la línea en d = 0.95
+    float distToLine = abs(d - 0.95);
     
-    gl_FragColor = vec4(color, alpha * fade * 0.9);
+    // Un grosor muy fino para que sea una línea simple sin rellenos ni glows
+    float thickness = 0.03;
+    float alpha = smoothstep(thickness, 0.0, distToLine);
+    
+    gl_FragColor = vec4(color, alpha * fade);
   }
 `;
 
@@ -154,6 +159,7 @@ export class DeepSkyRenderer {
 
   public metadata: any = null;
   public payloadBuffer: ArrayBuffer | null = null;
+  public readonly catalogIndexToBufferIndex = new Map<number, number>();
 
   public readonly labels = new DeepSkyLabels();
 
@@ -260,10 +266,13 @@ export class DeepSkyRenderer {
     const flU32 = new Uint32Array(payloadBuffer, layout.flags!.offset, count);
     const idxU32 = new Uint32Array(payloadBuffer, layout.catalogIndex!.offset, count);
 
+    this.catalogIndexToBufferIndex.clear();
     for (let i = 0; i < count; i++) {
       families[i] = famU32[i]!;
       flags[i] = flU32[i]!;
-      catIndex[i] = idxU32[i]!;
+      const catalogIdx = idxU32[i]!;
+      catIndex[i] = catalogIdx;
+      this.catalogIndexToBufferIndex.set(catalogIdx, i);
     }
 
     this.geometry = new THREE.InstancedBufferGeometry();
@@ -321,6 +330,7 @@ export class DeepSkyRenderer {
   }
 
   public disposeResource(): void {
+    this.catalogIndexToBufferIndex.clear();
     if (this.mesh) {
       this.mesh.removeFromParent();
       this.mesh = null;

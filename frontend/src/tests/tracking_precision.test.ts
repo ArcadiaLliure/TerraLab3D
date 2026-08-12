@@ -53,7 +53,7 @@ console.log("=== TerraLab3D Tracking Precision & Float32 Emulation Tests ===");
       for (let j=0; j<4; j++) {
         let sum = 0.0;
         for (let k=0; k<4; k++) {
-          sum += Math.fround(a[i + k*4] * b[k + j*4]);
+          sum += Math.fround(a[i + k*4]! * b[k + j*4]!);
         }
         r[i + j*4] = Math.fround(sum);
       }
@@ -68,7 +68,7 @@ console.log("=== TerraLab3D Tracking Precision & Float32 Emulation Tests ===");
   for (let i=0; i<4; i++) {
     let sum = 0;
     for (let j=0; j<4; j++) {
-      sum += Math.fround(viewF32_modelF32[i + j*4] * positionFloat32[j]);
+      sum += Math.fround(viewF32_modelF32[i + j*4]! * positionFloat32[j]!);
     }
     mvPosF32[i] = Math.fround(sum);
   }
@@ -101,7 +101,7 @@ console.log("=== TerraLab3D Tracking Precision & Float32 Emulation Tests ===");
   for (let i=0; i<4; i++) {
     let sum = 0;
     for (let j=0; j<4; j++) {
-      sum += Math.fround(modelViewMatrixF32[i + j*4] * positionFloat32[j]);
+      sum += Math.fround(modelViewMatrixF32[i + j*4]! * positionFloat32[j]!);
     }
     mvPosGoodF32[i] = Math.fround(sum);
   }
@@ -124,7 +124,7 @@ console.log("=== TerraLab3D Tracking Precision & Float32 Emulation Tests ===");
 {
   // 3. Wheel zoom fighting tracking test
   const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-  const rig = new CameraRigImpl(camera, null as any); // mock container
+  const rig = new CameraRigImpl(camera);
   
   const initialFov = rig.pose().horizontalFovDeg;
   

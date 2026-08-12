@@ -139,6 +139,10 @@ export class CameraRigImpl implements CameraRig {
     };
   }
 
+  isAnimating(): boolean {
+    return this.animating;
+  }
+
   setPose(p: CameraPose): void {
     this.azimuthDeg = p.azimuthDeg;
     this.altitudeDeg = clamp(p.altitudeDeg, MIN_ALT, MAX_ALT);

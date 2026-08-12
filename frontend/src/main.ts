@@ -22,6 +22,8 @@ import type { OverlayVisibility } from "./view/three/ThreeSceneHostImpl";
 import { DiagnosticsOverlay } from "./view/ui/DiagnosticsOverlay";
 import { NavigationWorld } from "./view/three/terrain/NavigationWorld";
 import { GroundFollower } from "./view/three/terrain/GroundFollower";
+import { CelestialSelectionController, fromSearchResult } from "./application/CelestialSelectionController";
+import { buildInspectionModel } from "./application/InspectionModelBuilder";
 import { ResourceManagerModal } from "./view/ui/modals/ResourceManagerModal";
 
 import { LocationPage } from "./view/ui/drawer_pages/LocationPage";
@@ -161,10 +163,9 @@ function main(): void {
   const skyPage = new SkyPage(bridge, resourceManager, {
     onSearchSelected: (selection) => {
       console.log("MGP: [main.ts] [onSearchSelected]", selection);
-      locationHUD.setSelectedCelestial(selection as any);
-      if (selection) {
-        focusTrackingController.startTracking(selection);
-        pickingController.setExternalTarget(selection);
+      const target = fromSearchResult(selection as any);
+      if (target) {
+        selectionController.select(target, "search");
       }
     },
     onStarLayerToggled: (visible) => sceneHost.getStarFieldRenderer().setVisible(visible),
@@ -225,7 +226,32 @@ function main(): void {
   const timeBar = new TimeBar(bridge);
   timeBar.mount(shell.getTimelineContainer());
 
-  const locationHUD = new LocationHUD();
+  const selectionController = new CelestialSelectionController();
+
+  const locationHUD = new LocationHUD({
+    onCenter: () => {
+       const state = selectionController.getState();
+       if (state.selectedTarget) {
+         const resolved = trackingResolver.resolve(state.selectedTarget);
+         if (resolved) {
+           cameraRig.animateTo(resolved.azimuthDeg, resolved.altitudeDeg, cameraRig.pose().horizontalFovDeg, 600);
+         }
+       }
+    },
+    onFollow: () => {
+       const state = selectionController.getState();
+       if (state.selectedTarget) {
+         focusTrackingController.startTracking(state.selectedTarget);
+       }
+    },
+    onRelease: () => {
+       focusTrackingController.stopTracking();
+    },
+    onClear: () => {
+       selectionController.clearSelection();
+    }
+  });
+
 
   // ─── Picking Initialization (Pas 6) ──────────────────────────────
   const celestialTransformState = new CelestialTransformState();
@@ -270,16 +296,9 @@ function main(): void {
   const pickingController = new ScenePickingController({
     gestureRouter,
     pickProvider,
+    selectionController,
     resolveCallback: (reqId, gen, resId, resVer, catIdx, purpose) => {
       bridge.sendResolveStarPick(reqId, gen, resId, resVer, catIdx, purpose);
-    },
-    selectionChangedCallback: (selection) => {
-      locationHUD.setSelectedCelestial(selection);
-      if (selection) {
-        focusTrackingController.startTracking(selection);
-      } else {
-        focusTrackingController.stopTracking();
-      }
     },
   });
 
@@ -287,10 +306,26 @@ function main(): void {
   const trackingResolver = new TrackingTargetResolver();
   trackingResolver.updateCelestialTransform(celestialTransformState);
   trackingResolver.updateSolarSystemRenderer(sceneHost.getSolarSystemRenderer());
+  trackingResolver.updateStarRenderer(sceneHost.getStarFieldRenderer());
+  trackingResolver.updateDeepSkyRenderer(sceneHost.getDeepSkyRenderer());
   const focusTrackingController = new FocusTrackingController(cameraRig, trackingResolver);
 
   cameraRig.onUserInteraction(() => {
     focusTrackingController.stopTracking();
+  });
+
+  selectionController.subscribe((state) => {
+    const model = buildInspectionModel(state, sceneHost);
+    locationHUD.updateInspection(model);
+    
+    // Auto-track si prové de search o pick
+    if (state.selectedTarget) {
+        if (state.source === "search" || state.source === "pick") {
+           focusTrackingController.startTracking(state.selectedTarget);
+        }
+    } else {
+        focusTrackingController.stopTracking();
+    }
   });
 
   // 2. Mount scene + UI
@@ -400,7 +435,23 @@ function main(): void {
       if (entry) starPickProvider.buildIndex(resourceId, entry);
     },
     onStarPickResolved(msg) {
+      if (!msg.star) return;
       pickingController.handleResolveResponse(msg as any);
+      // Actualitzar l'Inspector amb la nova info de l'estrella resolta
+      const state = selectionController.getState();
+      if (state.selectedTarget?.kind === "star" && state.selectedTarget.sourceId === msg.star.sourceId) {
+         // Re-render
+         const model = buildInspectionModel(state, sceneHost);
+         // Empeltem algunes dades que venen de msg.star (ex: BP-RP, magnitut refinada, sourceRole)
+         if (model && model.fields) {
+            model.fields.magnitude = msg.star.magnitude;
+            model.fields.bpRp = msg.star.bpRp;
+            model.fields.sourceRole = msg.star.sourceRole;
+            model.fields.raDeg = msg.star.raDeg;
+            model.fields.decDeg = msg.star.decDeg;
+         }
+         locationHUD.updateInspection(model);
+      }
     },
     onSkyEnvironmentSnapshot(snapshot) {
       currentSkyVisibilityState = snapshot.visibility;

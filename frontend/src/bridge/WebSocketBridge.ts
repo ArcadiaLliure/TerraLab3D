@@ -158,6 +158,7 @@ export class WebSocketBridge {
     };
 
     this.ws.onclose = (event: CloseEvent) => {
+      this.ws = null;
       if (this._disposed) return;
       if (event.code === 4001) {
         this.setState("disconnected", "S'ha obert en una altra pestanya");
@@ -168,6 +169,7 @@ export class WebSocketBridge {
     };
 
     this.ws.onerror = () => {
+      this.ws = null;
       if (this._disposed) return;
       this.setState("error", "WebSocket error");
     };

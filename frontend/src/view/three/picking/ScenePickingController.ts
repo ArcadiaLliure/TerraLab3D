@@ -18,6 +18,8 @@ import { CelestialPickProvider, type CelestialPickHit } from "./CelestialPickPro
 import { SelectionMarker } from "./SelectionMarker";
 import type { SolarSystemPickHit } from "./SolarSystemPickProvider";
 import type { DeepSkyPickHit } from "../../../contracts/deep_sky_picking_contracts";
+import type { CelestialSelectionController } from "../../../application/CelestialSelectionController";
+import { fromPickHit } from "../../../application/CelestialSelectionController";
 import * as THREE from "three";
 
 const LOG_PREFIX = "MGP: [ScenePickingController]";
@@ -37,8 +39,8 @@ export type SelectionChangedCallback = (selection: SelectedCelestial | null) => 
 export interface ScenePickingControllerDeps {
   gestureRouter: PointerGestureRouter;
   pickProvider: CelestialPickProvider;
+  selectionController: CelestialSelectionController;
   resolveCallback: ResolveCallback;
-  selectionChangedCallback?: SelectionChangedCallback;
 }
 
 const HOVER_DEBOUNCE_MS = 150;
@@ -47,10 +49,10 @@ export class ScenePickingController {
   private readonly deps: ScenePickingControllerDeps;
   private readonly selectionMarker: SelectionMarker;
 
-  // ─── Selection state ───────────────────────────────────────────────
+  // ─── Selection state (local tracking for hits) ───────────────
   private selectedHit: CelestialPickHit | null = null;
   private selectedRef: StarPickRef | null = null;
-  private resolvedStar: ResolvedStar | null = null;
+  private unsubscribeSelection: (() => void) | null = null;
 
   // ─── Hover state ───────────────────────────────────────────────────
   private hoverHit: CelestialPickHit | null = null;
@@ -80,6 +82,22 @@ export class ScenePickingController {
     deps.gestureRouter.onHover((x, y) => this.handleHover(x, y));
     deps.gestureRouter.onHoverClear(() => this.clearHover());
 
+    this.unsubscribeSelection = deps.selectionController.subscribe((state) => {
+      if (!state.selectedTarget) {
+        this.selectedHit = null;
+        this.selectedRef = null;
+        this.selectionMarker.hide();
+      } else if (state.source !== "pick" && state.availability !== "unavailable") {
+        // We only clear our internal *hit* cache if the source isn't pick.
+        // We keep selectedHit if it was just picked so we can project it.
+        // If it was searched, updateMarker will fall back to trackingResolver.
+        if (state.source === "search") {
+           this.selectedHit = null;
+           this.selectedRef = null;
+        }
+      }
+    });
+
     // Escape handler
     this.onKeyDownBound = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -96,31 +114,7 @@ export class ScenePickingController {
     this.started = true;
   }
 
-  private externalTarget: any = null;
-
-  public setExternalTarget(target: any): void {
-    console.log(`${LOG_PREFIX} [setExternalTarget] Target:`, target);
-    this.externalTarget = target;
-    if (!target) {
-      this.selectedHit = null;
-      this.selectionMarker.hide();
-      return;
-    }
-
-    if (target.kind === "body" || target.bodyId || target.targetRef) {
-      const bodyId = target.bodyId || target.targetRef;
-      this.selectedHit = {
-        kind: "solar_system_body",
-        bodyId,
-        state: {} as any,
-        screenXCssPx: 0,
-        screenYCssPx: 0,
-        screenDistanceCssPx: 0,
-        hitRadiusCssPx: 20,
-        visualRadiusCssPx: 20,
-      };
-    }
-  }
+  // Removed externalTarget and setExternalTarget
 
   /**
    * Reproyecta el marker de selecció. Cridar des del render loop.
@@ -138,8 +132,9 @@ export class ScenePickingController {
       }
     }
 
-    if (this.externalTarget && trackingResolver && camera) {
-      const resolved = trackingResolver.resolve(this.externalTarget);
+    const state = this.deps.selectionController.getState();
+    if (state.selectedTarget && state.availability !== "unavailable" && trackingResolver && camera) {
+      const resolved = trackingResolver.resolve(state.selectedTarget);
       if (resolved) {
         const pos = this.projectDirectionToScreen(resolved.azimuthDeg, resolved.altitudeDeg, camera);
         if (pos) {
@@ -158,7 +153,7 @@ export class ScenePickingController {
     const cosAlt = Math.cos(altRad);
 
     const vec = new THREE.Vector3(
-      Math.sin(azRad) * cosAlt,
+      -Math.sin(azRad) * cosAlt,
       Math.sin(altRad),
       -Math.cos(azRad) * cosAlt
     ).multiplyScalar(1000000).add(camera.position);
@@ -166,8 +161,9 @@ export class ScenePickingController {
     vec.project(camera);
     if (vec.z > 1.0) return null;
 
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+    const rect = camera.parent ? (camera as any)._canvasRect : null;
+    const width = rect ? rect.width : window.innerWidth;
+    const height = rect ? rect.height : window.innerHeight;
     const x = (vec.x * 0.5 + 0.5) * width;
     const y = (-vec.y * 0.5 + 0.5) * height;
 
@@ -208,8 +204,11 @@ export class ScenePickingController {
         || this.selectedRef.resourceVersion !== msg.star.resourceVersion
         || this.selectedRef.catalogIndex !== msg.star.catalogIndex
       ) return;
-      this.resolvedStar = msg.star;
-      this.deps.selectionChangedCallback?.(msg.star);
+      this.deps.selectionController.updateStarTargetWithSourceId(
+         msg.star.resourceId,
+         msg.star.catalogIndex,
+         msg.star.sourceId
+      );
       console.log(
         `${LOG_PREFIX} [handleResolveResponse] [Select resolved: sourceId=${msg.star.sourceId} RA=${msg.star.raDeg.toFixed(4)} Dec=${msg.star.decDeg.toFixed(4)} G=${msg.star.magnitude.toFixed(2)}]`,
       );
@@ -217,9 +216,9 @@ export class ScenePickingController {
     // Hover resolves es podrien usar per tooltip — per ara no fem res extra
   }
 
-  /** Retorna l'estrella resolta seleccionada. */
+  /** Retorna l'estrella resolta seleccionada. (Obsolet, usar SelectionController) */
   getResolvedSelection(): ResolvedStar | null {
-    return this.resolvedStar;
+    return null;
   }
 
   /** Retorna el hit local de la selecció. */
@@ -234,13 +233,7 @@ export class ScenePickingController {
 
   /** Neteja la selecció. */
   clearSelection(): void {
-    if (this.selectedHit || this.selectedRef) {
-      this.selectedHit = null;
-      this.selectedRef = null;
-      this.resolvedStar = null;
-      this.selectionMarker.hide();
-      this.deps.selectionChangedCallback?.(null);
-    }
+    this.deps.selectionController.clearSelection();
   }
 
   /**
@@ -248,11 +241,11 @@ export class ScenePickingController {
    * Si la selecció referencia aquest recurs, es neteja.
    */
   onResourceEvicted(resourceId: string): void {
-    if (this.selectedHit?.kind === "star" && this.selectedHit.ref.resourceId === resourceId) {
-      console.log(`${LOG_PREFIX} [onResourceEvicted] [Selecció invalidada: ${resourceId}]`);
-      this.clearSelection();
-    }
+    this.deps.selectionController.handleResourceEviction(resourceId);
     if (this.hoverHit?.kind === "star" && this.hoverHit.ref.resourceId === resourceId) {
+      this.clearHover();
+    }
+    if (this.hoverHit?.kind === "deep_sky" && this.hoverHit.ref.resourceId === resourceId) {
       this.clearHover();
     }
   }
@@ -269,10 +262,14 @@ export class ScenePickingController {
       this.hoverDebounceTimer = null;
     }
 
+    if (this.unsubscribeSelection) {
+      this.unsubscribeSelection();
+      this.unsubscribeSelection = null;
+    }
+
     this.selectionMarker.dispose();
     this.selectedHit = null;
     this.selectedRef = null;
-    this.resolvedStar = null;
     this.hoverHit = null;
     this.hoverRef = null;
   }
@@ -285,7 +282,8 @@ export class ScenePickingController {
     if (hit) {
       this.selectedHit = hit;
       this.selectedRef = hit.kind === "star" ? hit.ref : null;
-      this.resolvedStar = null;
+      
+      this.deps.selectionController.select(fromPickHit(hit), "pick");
 
       // Mostrar marker immediatament
       this.selectionMarker.update(
@@ -311,10 +309,10 @@ export class ScenePickingController {
           `${LOG_PREFIX} [handleTap] [Star: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px mag=${hit.magnitude.toFixed(2)}]`,
         );
       } else if (hit.kind === "deep_sky") {
-        this.deps.selectionChangedCallback?.(hit);
+        console.log(
+          `${LOG_PREFIX} [handleTap] [Deep Sky: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px]`
+        );
       } else {
-        // Solar-system states already arrive in the scientific snapshot.
-        this.deps.selectionChangedCallback?.(hit);
         console.log(
           `${LOG_PREFIX} [handleTap] [Solar body: ${hit.bodyId} dist=${hit.screenDistanceCssPx.toFixed(1)}px]`,
         );

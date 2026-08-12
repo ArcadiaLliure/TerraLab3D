@@ -1,17 +1,16 @@
 import { Vector3, MathUtils } from "three";
-import type { SelectedCelestial } from "./ScenePickingController";
-import type { AstronomicalSearchResultPayload } from "../../../contracts/bridge_messages";
-import type { CelestialTransformState } from "../CelestialTransformState";
 import type { SolarSystemSnapshot } from "../../../contracts/solar_system_contracts";
 import type { SolarSystemRenderer } from "../SolarSystemRenderer";
+import type { StarFieldRenderer } from "../StarFieldRenderer";
+import type { DeepSkyRenderer } from "../DeepSkyRenderer";
 import { threeDirectionToCameraPose } from "../CameraRigImpl";
+import type { CelestialTargetRef } from "../../../contracts/celestial_selection_contracts";
+import type { CelestialTransformState } from "../CelestialTransformState";
 
 export interface ResolvedTrackingDirection {
   azimuthDeg: number;
   altitudeDeg: number;
 }
-
-export type TrackingTarget = any;
 
 /**
  * Resol els objectius de seguiment (estrelles, planetes, coordenades fixes)
@@ -22,6 +21,8 @@ export class TrackingTargetResolver {
   private celestialTransform: CelestialTransformState | null = null;
   private latestSnapshot: SolarSystemSnapshot | null = null;
   private solarSystemRenderer: SolarSystemRenderer | null = null;
+  private starRenderer: StarFieldRenderer | null = null;
+  private deepSkyRenderer: DeepSkyRenderer | null = null;
   
   // Vector temporal per evitar instanciacions
   private readonly _tempVec3 = new Vector3();
@@ -38,21 +39,29 @@ export class TrackingTargetResolver {
     this.solarSystemRenderer = renderer;
   }
 
-  public resolve(target: TrackingTarget): ResolvedTrackingDirection | null {
+  public updateStarRenderer(renderer: StarFieldRenderer): void {
+    this.starRenderer = renderer;
+  }
+
+  public updateDeepSkyRenderer(renderer: DeepSkyRenderer): void {
+    this.deepSkyRenderer = renderer;
+  }
+
+  public resolve(target: CelestialTargetRef | null): ResolvedTrackingDirection | null {
     if (!target) return null;
 
-    const t = target as any;
-
-    const bodyId = t.bodyId || (t.kind === "body" ? t.targetRef : null);
-    if (bodyId) {
-      const sol = this.resolveSolarSystem(bodyId);
+    if (target.kind === "solar_system") {
+      const sol = this.resolveSolarSystem(target.bodyId);
       if (sol) return sol;
     }
-    if (t.raDeg !== undefined && t.decDeg !== undefined) {
-      return this.resolveEquatorial(t.raDeg, t.decDeg);
+    if (target.kind === "coordinate") {
+      return this.resolveEquatorial(target.raDeg, target.decDeg);
     }
-    if (t.coordinateSnapshot) {
-      return this.resolveEquatorial(t.coordinateSnapshot.raDeg, t.coordinateSnapshot.decDeg);
+    if (target.kind === "star") {
+      return this.resolveStar(target.resourceId, target.catalogIndex);
+    }
+    if (target.kind === "deep_sky") {
+      return this.resolveDeepSky(target.resourceId, target.catalogIndex);
     }
 
     return null;
@@ -78,8 +87,45 @@ export class TrackingTargetResolver {
     // Transformació Equatorial (ICRS) -> Topocèntrica Three.js (ENU: +X=East, +Y=Up, -Z=North)
     // NOTA: La matriu equatorialToThree ja fa tota la transformació.
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
+    return threeDirectionToCameraPose(this._tempVec3);
+  }
+
+  private resolveStar(resourceId: string, catalogIndex: number): ResolvedTrackingDirection | null {
+    if (!this.starRenderer || !this.celestialTransform) return null;
+    const resource = this.starRenderer.getResource(resourceId);
+    if (!resource || !resource.equatorialPositions) return null;
+
+    const count = resource.starCount;
+    if (catalogIndex >= count) return null;
+
+    const eqDirs = resource.equatorialPositions;
+    const vx = eqDirs[catalogIndex * 3]!;
+    const vy = eqDirs[catalogIndex * 3 + 1]!;
+    const vz = eqDirs[catalogIndex * 3 + 2]!;
+
+    this._tempVec3.set(vx, vy, vz);
+    this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
+    return threeDirectionToCameraPose(this._tempVec3);
+  }
+
+  private resolveDeepSky(resourceId: string, catalogIndex: number): ResolvedTrackingDirection | null {
+    if (!this.deepSkyRenderer || !this.celestialTransform) return null;
+    const { metadata, payloadBuffer, catalogIndexToBufferIndex } = this.deepSkyRenderer;
+    if (!metadata || !payloadBuffer || metadata.resourceId !== resourceId) return null;
+
+    const idx = catalogIndexToBufferIndex.get(catalogIndex);
+    if (idx === undefined) return null;
+
+    const count = metadata.renderableCount ?? metadata.recordCount;
+    const layout = metadata.bufferLayout;
+    const eqDirs = new Float32Array(payloadBuffer, layout.equatorialDirections.offset, count * 3);
     
-    // Centralitzat amb la mateixa matemàtica de CameraRigImpl
+    const vx = eqDirs[idx * 3]!;
+    const vy = eqDirs[idx * 3 + 1]!;
+    const vz = eqDirs[idx * 3 + 2]!;
+
+    this._tempVec3.set(vx, vy, vz);
+    this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
     return threeDirectionToCameraPose(this._tempVec3);
   }
 

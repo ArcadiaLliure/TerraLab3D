@@ -70,6 +70,8 @@ export class DeepSkyPickProvider {
     const mags = new Float32Array(payloadBuffer, layout.magnitude.offset, count);
     const majAx = new Float32Array(payloadBuffer, layout.majorAxisArcmin.offset, count);
     const minAx = new Float32Array(payloadBuffer, layout.minorAxisArcmin.offset, count);
+    const paDeg = new Float32Array(payloadBuffer, layout.positionAngleDeg.offset, count);
+    const surfBr = new Float32Array(payloadBuffer, layout.surfaceBrightness.offset, count);
     const famU32 = new Uint32Array(payloadBuffer, layout.familyCode.offset, count);
     const catU32 = new Uint32Array(payloadBuffer, layout.catalogIndex.offset, count);
     const objectLabels = (metadata.objectLabels as string[] | undefined) ?? [];
@@ -129,6 +131,7 @@ export class DeepSkyPickProvider {
           kind: "deep_sky",
           ref: {
             resourceId: metadata.resourceId,
+            resourceVersion: metadata.version || "unknown",
             catalogIndex: catU32[i]!,
           },
           screenXCssPx: screenX,
@@ -137,9 +140,11 @@ export class DeepSkyPickProvider {
           visualRadiusCssPx: visualRadius,
           hitRadiusCssPx: hitRadius,
           objectLabel: objectLabels[i] || "NGC",
-          magnitude: mag,
-          majorAxisArcmin: majAx[i]!,
-          minorAxisArcmin: minAx[i]!,
+          magnitude: mags[i]! > -1 ? mags[i]! : null,
+          majorAxisArcmin: majAx[i]! > 0 ? majAx[i]! : null,
+          minorAxisArcmin: minAx[i]! > 0 ? minAx[i]! : null,
+          positionAngleDeg: (paDeg[i]! >= 0 || paDeg[i]! < 0) ? paDeg[i]! : null, // check NaN
+          surfaceBrightness: surfBr[i]! > 0 ? surfBr[i]! : null,
           familyCode: famU32[i]!,
           raDeg,
           decDeg,
@@ -152,28 +157,17 @@ export class DeepSkyPickProvider {
 
   reprojectRef(ref: DeepSkyPickRef): { x: number; y: number; visualRadiusCssPx: number } | null {
     if (!this.deps.transformState.isValid) return null;
-    const { metadata, payloadBuffer } = this.deps.deepSkyRenderer;
+    const { metadata, payloadBuffer, catalogIndexToBufferIndex } = this.deps.deepSkyRenderer;
     if (!metadata || !payloadBuffer || metadata.resourceId !== ref.resourceId) return null;
+    if (metadata.version && metadata.version !== ref.resourceVersion) return null; // Invalidate old version
+
+    const idx = catalogIndexToBufferIndex.get(ref.catalogIndex);
+    if (idx === undefined) return null;
 
     const count = metadata.renderableCount ?? metadata.recordCount;
     const layout = metadata.bufferLayout;
     const eqDirs = new Float32Array(payloadBuffer, layout.equatorialDirections.offset, count * 3);
     const majAx = new Float32Array(payloadBuffer, layout.majorAxisArcmin.offset, count);
-    const catU32 = new Uint32Array(payloadBuffer, layout.catalogIndex.offset, count);
-
-    // Find index (usually catalogIndex == array index)
-    let idx = ref.catalogIndex;
-    if (idx >= count || catU32[idx] !== ref.catalogIndex) {
-      idx = -1;
-      for (let i = 0; i < count; i++) {
-        if (catU32[i] === ref.catalogIndex) {
-          idx = i;
-          break;
-        }
-      }
-    }
-
-    if (idx < 0) return null;
 
     const camera = this.deps.camera;
     const rect = this.deps.renderer.domElement.getBoundingClientRect();
