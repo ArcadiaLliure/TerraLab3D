@@ -93,12 +93,6 @@ export class TrackingTargetResolver {
     // Transformació Equatorial (ICRS) -> Topocèntrica ENU
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
     
-    // ENU: x=East, y=North, z=Up. Three.js: x=East, y=Up, z=-North
-    const e = this._tempVec3.x;
-    const n = this._tempVec3.y;
-    const u = this._tempVec3.z;
-    this._tempVec3.set(e, u, -n);
-    
     return threeDirectionToCameraPose(this._tempVec3);
   }
 
@@ -117,12 +111,6 @@ export class TrackingTargetResolver {
 
     this._tempVec3.set(vx, vy, vz);
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
-    
-    // ENU: x=East, y=North, z=Up. Three.js: x=East, y=Up, z=-North
-    const e = this._tempVec3.x;
-    const n = this._tempVec3.y;
-    const u = this._tempVec3.z;
-    this._tempVec3.set(e, u, -n);
     
     return threeDirectionToCameraPose(this._tempVec3);
   }
@@ -145,12 +133,6 @@ export class TrackingTargetResolver {
 
     this._tempVec3.set(vx, vy, vz);
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
-    
-    // ENU: x=East, y=North, z=Up. Three.js: x=East, y=Up, z=-North
-    const e = this._tempVec3.x;
-    const n = this._tempVec3.y;
-    const u = this._tempVec3.z;
-    this._tempVec3.set(e, u, -n);
     
     return threeDirectionToCameraPose(this._tempVec3);
   }

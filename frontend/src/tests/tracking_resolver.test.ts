@@ -21,12 +21,13 @@ console.log("Running TrackingTargetResolver tests...");
 {
   const resolver = new TrackingTargetResolver();
   const transform = new CelestialTransformState();
-  // We use Identity matrix for equatorialToThree.
-  // This means Equatorial (X,Y,Z) maps directly to ENU (East, Up, -North).
+  // We use a matrix that maps (X, Y, Z) -> (X, Z, -Y).
+  // This simulates the backend's equatorialToThree matrix which outputs
+  // Three.js coordinates (East, Up, -North) directly.
   transform.update(1, [
     1, 0, 0,
-    0, 1, 0,
-    0, 0, 1
+    0, 0, 1,
+    0, -1, 0
   ]);
   resolver.updateCelestialTransform(transform);
   
