@@ -486,7 +486,7 @@ function main(): void {
       sceneHost.getGalacticSkyRenderer().updateEnvironment(snapshot);
       // Passem qualsevol nova UI d'aquí a una funció que pugui actualizar LocationHUD o SkyPage
       (locationHUD as any).updateSkyEnvironment?.(snapshot);
-      (skyPage as any).updateSkyEnvironment?.(snapshot);
+      skyPage.updateSkyEnvironment(snapshot);
     },
     onSolarSystemSnapshot(snapshot) {
       starTrailRenderer.updateSolarSystemSnapshot(snapshot);

@@ -67,34 +67,6 @@ void main() {
 }
 `;
 
-/**
- * Càlcul exacte de la magnitud límit de TerraLab segons l'altitud del sol i el límit nocturn.
- */
-export function calculateTerraLabMagnitudeLimit(
-  nightLimit: number,
-  sunAltDeg: number,
-  eclipseFactor: number = 1.0
-): number {
-  if (sunAltDeg > -1.0 && eclipseFactor < 0.18) {
-    const totality = 1.0 - Math.max(0.0, eclipseFactor) / 0.18;
-    return Math.min(nightLimit, 1.0 + 3.0 * totality);
-  }
-  if (sunAltDeg > 0.0) {
-    return -10.0;
-  }
-  if (sunAltDeg > -6.0) {
-    return -10.0 + 10.0 * (sunAltDeg / -6.0);
-  }
-  if (sunAltDeg > -12.0) {
-    return 3.0 * ((sunAltDeg + 6.0) / -6.0);
-  }
-  if (sunAltDeg > -18.0) {
-    const t = (sunAltDeg + 12.0) / -6.0;
-    return 3.0 + (nightLimit - 3.0) * t;
-  }
-  return nightLimit;
-}
-
 export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
   private readonly rootGroup = new THREE.Group();
   
@@ -185,7 +157,6 @@ export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
     this.selectedStarsCount = 0;
     this.accumulatedPlaybackTimeSeconds = 0.0;
     this.startUtcMs = null;
-    this.lastUpdateMs = null;
     
     if (this.linesMesh) {
       this.rootGroup.remove(this.linesMesh);
@@ -195,9 +166,6 @@ export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
       this.linesGeometry = null;
       this.linesMaterial = null;
     }
-  }
-
-  public setTransformsBuffer(sessionId: string, buffer: ArrayBuffer): void {
   }
 
   public setCurrentSimulationTime(isoUtc: string): void {
