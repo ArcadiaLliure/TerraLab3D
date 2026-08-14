@@ -30,6 +30,10 @@ from terralab3d.domain.time.models import ClockMode, SimulationInstant, ClockSta
 from terralab3d.domain.sky_background.sky_environment import SkyEnvironmentComposer
 from terralab3d.domain.light_pollution.models import LightPollutionMode
 from terralab3d.domain.solar_system.models import ScientificObserver, SolarSystemSnapshot
+from terralab3d.domain.star_trails.models import (
+    StarTrailPlaybackConfig,
+    clamped_exposure_seconds,
+)
 from terralab3d.domain.lighting.environment import LightingEnvironmentComposer
 from terralab3d.application.ephemeris_coordinator import EphemerisCoordinator
 from terralab3d.application.orbit_sampler import OrbitSampler
@@ -798,9 +802,11 @@ async def run() -> int:
                 if star_trails_session["state"] == "running" and star_trails_session["startUtcIso"]:
                     try:
                         start_dt = datetime.fromisoformat(star_trails_session["startUtcIso"])
-                        elapsed = (sim_time_utc - start_dt).total_seconds()
-                        if elapsed < 0:
-                            elapsed = 0.0
+                        elapsed = clamped_exposure_seconds(
+                            start_dt,
+                            sim_time_utc,
+                            float(star_trails_session["durationSeconds"]),
+                        )
                         star_trails_session["accumulatedExposureSeconds"] = elapsed
                         await broadcast_star_trails_snapshot()
                     except Exception:
@@ -887,24 +893,39 @@ async def run() -> int:
     async def _handle_start_star_trails(data: dict[str, Any]) -> None:
         nonlocal star_trails_session, is_time_playing, is_realtime, time_rate
         sess_id = uuid.uuid4().hex[:12]
-        mag_limit = float(data.get("magnitudeLimit", 6.0))
-        rate = float(data.get("playbackRate", 1.0))
-        star_count = star_coordinator._general_star_count or star_coordinator._fallback_star_count or 9000
+        config = StarTrailPlaybackConfig.normalized(
+            duration_seconds=float(data.get("durationSeconds", 86_400.0)),
+            sample_interval_seconds=float(
+                data.get("sampleIntervalSeconds", 60.0)
+            ),
+            magnitude_limit=float(data.get("magnitudeLimit", 6.0)),
+            playback_rate=float(data.get("playbackRate", 1.0)),
+        )
+        is_realtime = False
+        is_time_playing = True
+        time_rate = config.playback_rate
         star_trails_session = {
             "sessionId": sess_id,
             "sessionVersion": 1,
             "state": "running",
             "startUtcIso": sim_time_utc.isoformat(),
             "accumulatedExposureSeconds": 0.0,
-            "durationSeconds": float(data.get("durationSeconds", 86400.0)),
-            "sampleIntervalSeconds": float(data.get("sampleIntervalSeconds", 60.0)),
-            "magnitudeLimit": mag_limit,
-            "playbackRate": rate,
-            "starCount": star_count,
-            "segmentCount": star_count * 128,
-            "gpuBytes": star_count * 128 * 2 * 28,
+            "durationSeconds": config.duration_seconds,
+            "sampleIntervalSeconds": config.sample_interval_seconds,
+            "magnitudeLimit": config.magnitude_limit,
+            "playbackRate": config.playback_rate,
+            # Renderer-owned diagnostics are overlaid from the actual filtered
+            # catalog and resident WebGL resources in the frontend.
+            "starCount": 0,
+            "segmentCount": 0,
+            "gpuBytes": 0,
         }
-        log.info("Star trails iniciat: %s (mag<=%.1f, rate=%.1fx)", sess_id, mag_limit, rate)
+        log.info(
+            "Star trails iniciat: %s (mag<=%.1f, rate=%.1fx)",
+            sess_id,
+            config.magnitude_limit,
+            config.playback_rate,
+        )
         await broadcast_star_trails_snapshot()
 
     async def _handle_pause_star_trails(data: dict[str, Any]) -> None:
@@ -971,9 +992,11 @@ async def run() -> int:
                 if star_trails_session["state"] == "running" and star_trails_session["startUtcIso"]:
                     try:
                         start_dt = datetime.fromisoformat(star_trails_session["startUtcIso"])
-                        elapsed = (sim_time_utc - start_dt).total_seconds()
-                        if elapsed < 0:
-                            elapsed = 0.0
+                        elapsed = clamped_exposure_seconds(
+                            start_dt,
+                            sim_time_utc,
+                            float(star_trails_session["durationSeconds"]),
+                        )
                         star_trails_session["accumulatedExposureSeconds"] = elapsed
                         if elapsed >= star_trails_session["durationSeconds"]:
                             star_trails_session["state"] = "completed"

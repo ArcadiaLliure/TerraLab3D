@@ -44,6 +44,7 @@ export class StarFieldRenderer {
   private magnitudeLimit = 8.0;
   private pointScale = 1.0;
   private isVisible = true;
+  private trailSuppressed = false;
 
   /** Shared celestial transform and visibility state. */
   private transformState: CelestialTransformState | null = null;
@@ -68,7 +69,13 @@ export class StarFieldRenderer {
 
   public setVisible(visible: boolean): void {
     this.isVisible = visible;
-    this.rootGroup.visible = visible;
+    this.syncVisibility();
+  }
+
+  /** Keep catalog/picking state alive while trails own the stellar appearance. */
+  public setTrailSuppressed(suppressed: boolean): void {
+    this.trailSuppressed = suppressed;
+    this.syncVisibility();
   }
 
   public get visible(): boolean {
@@ -303,6 +310,10 @@ export class StarFieldRenderer {
       this.disposeResource(resourceId);
     }
     this.rootGroup.removeFromParent();
+  }
+
+  private syncVisibility(): void {
+    this.rootGroup.visible = this.isVisible && !this.trailSuppressed;
   }
 }
 

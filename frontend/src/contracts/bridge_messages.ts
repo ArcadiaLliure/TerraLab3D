@@ -557,6 +557,7 @@ export interface StarTrailsSnapshotMessage {
   readonly state: string;
   readonly reason?: string;
   readonly accumulatedExposureSeconds: number;
+  readonly durationSeconds: number;
   readonly playbackRate: number;
   readonly starCount: number;
   readonly segmentCount: number;

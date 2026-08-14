@@ -37,6 +37,7 @@ const LOD_COARSE_EXIT = 75;      // Exit coarse when FOV < 75
 const HORIZON_COLOR = 0x66aacc;
 const GRID_COLOR = 0x334466;
 const GRID_MINOR_COLOR = 0x223344;
+const GRID_RENDER_ORDER = -800;
 const ZENITH_COLOR = 0xf1cd88;
 
 type GridLODLevel = "coarse" | "medium" | "fine";
@@ -79,9 +80,11 @@ export class HorizontalGrid {
       color: HORIZON_COLOR,
       transparent: true,
       opacity: 0.7,
+      depthWrite: false,
     });
     this.horizonRing = new THREE.LineLoop(horizonGeo, horizonMat);
     this.horizonRing.name = "horizonRing_alt0";
+    this.horizonRing.renderOrder = GRID_RENDER_ORDER;
     this.root.add(this.horizonRing);
 
     // ─── Zenith marker ───────────────────────────────────────
@@ -174,9 +177,11 @@ export class HorizontalGrid {
         color: isPrimary ? GRID_COLOR : GRID_MINOR_COLOR,
         transparent: true,
         opacity: isPrimary ? 0.4 : 0.2,
+        depthWrite: false,
       });
       const line = new THREE.LineLoop(circGeo, mat);
       line.name = `altCircle_${alt}`;
+      line.renderOrder = GRID_RENDER_ORDER;
       group.add(line);
       this._bufferUploadBytes += circGeo.getAttribute("position").array.byteLength;
 
@@ -186,9 +191,11 @@ export class HorizontalGrid {
         color: GRID_MINOR_COLOR,
         transparent: true,
         opacity: 0.1,
+        depthWrite: false,
       });
       const lineNeg = new THREE.LineLoop(circGeoNeg, matNeg);
       lineNeg.name = `altCircle_neg${alt}`;
+      lineNeg.renderOrder = GRID_RENDER_ORDER;
       group.add(lineNeg);
       this._bufferUploadBytes += circGeoNeg.getAttribute("position").array.byteLength;
     }
@@ -202,9 +209,11 @@ export class HorizontalGrid {
         color: isCardinal ? GRID_COLOR : (isPrimary ? GRID_COLOR : GRID_MINOR_COLOR),
         transparent: true,
         opacity: isCardinal ? 0.5 : (isPrimary ? 0.3 : 0.15),
+        depthWrite: false,
       });
       const line = new THREE.Line(merGeo, mat);
       line.name = `azMeridian_${az}`;
+      line.renderOrder = GRID_RENDER_ORDER;
       group.add(line);
       this._bufferUploadBytes += merGeo.getAttribute("position").array.byteLength;
     }

@@ -166,8 +166,12 @@ export function fromSearchResult(result: AstronomicalSearchResultPayload | null)
           resourceId: parts[0]!,
           resourceVersion: parts[1]!,
           catalogIndex: parseInt(parts[2]!, 10),
-          raDeg: result.coordinateSnapshot?.raDeg,
-          decDeg: result.coordinateSnapshot?.decDeg,
+          ...(result.coordinateSnapshot?.raDeg !== undefined
+            ? { raDeg: result.coordinateSnapshot.raDeg }
+            : {}),
+          ...(result.coordinateSnapshot?.decDeg !== undefined
+            ? { decDeg: result.coordinateSnapshot.decDeg }
+            : {}),
           // We don't have sourceId directly in search result usually, unless it's in targetRef.
         };
       }
@@ -191,8 +195,12 @@ export function fromSearchResult(result: AstronomicalSearchResultPayload | null)
            resourceId: parts[0]!,
            resourceVersion: parts[1]!,
            catalogIndex: parseInt(parts[2]!, 10),
-           raDeg: result.coordinateSnapshot?.raDeg,
-           decDeg: result.coordinateSnapshot?.decDeg
+           ...(result.coordinateSnapshot?.raDeg !== undefined
+             ? { raDeg: result.coordinateSnapshot.raDeg }
+             : {}),
+           ...(result.coordinateSnapshot?.decDeg !== undefined
+             ? { decDeg: result.coordinateSnapshot.decDeg }
+             : {})
          };
        }
     }

@@ -173,6 +173,7 @@ export class ThreeSceneHostImpl {
       color: 0x556677,
       transparent: true,
       opacity: 0.15,
+      depthWrite: false,
     });
     for (let i = 0; i < 12; i++) {
       const angle = (i / 12) * Math.PI;
@@ -185,7 +186,9 @@ export class ThreeSceneHostImpl {
         verts[j * 3 + 2] = Math.cos(theta) * HORIZON_RADIUS * Math.sin(angle);
       }
       geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
-      this.celestialSphere.add(new THREE.LineLoop(geo, meridianMat));
+      const meridian = new THREE.LineLoop(geo, meridianMat);
+      meridian.renderOrder = -800;
+      this.celestialSphere.add(meridian);
     }
 
     console.info(`${LOG_PREFIX} [constructor] [Escena inicialitzada amb grid horitzontal, equador celeste i etiquetes]`);

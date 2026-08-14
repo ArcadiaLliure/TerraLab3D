@@ -12,7 +12,7 @@ export class StarTrailsPanel {
   private btnClear: HTMLButtonElement;
 
   private currentState: string = "idle";
-  private currentReason?: string;
+  private currentReason: string | undefined;
 
   constructor(private bridge: WebSocketBridge) {
     this.element = document.createElement("div");
@@ -73,7 +73,7 @@ export class StarTrailsPanel {
     this.btnStart.addEventListener("click", (e) => {
       e.stopPropagation();
       console.log("[StarTrails] Botó INICIA premut.");
-      // 24 hours (86400), 60 sec intervals, mag 6.0 (naked-eye visual limit) + planets, 1.0x playback speed
+      // 24 hours, 60 sec intervals, mag 6.0 and 1.0x playback speed.
       this.bridge.startStarTrails(86400, 60, 6.0, 1.0);
     });
     controlsRow.appendChild(this.btnStart);

@@ -46,10 +46,12 @@ export class CelestialEquator {
       color: 0x00cccc,
       transparent: true,
       opacity: 0.4,
+      depthWrite: false,
     });
 
     this.equatorLine = new THREE.Line(geo, mat);
     this.equatorLine.name = "celestialEquator";
+    this.equatorLine.renderOrder = -800;
     this.root.add(this.equatorLine);
 
     this._geometryBuildCount++;

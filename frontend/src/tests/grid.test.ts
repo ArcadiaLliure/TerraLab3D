@@ -12,6 +12,9 @@
  *   8. Cardinal direction mapping
  */
 
+import * as THREE from "three";
+import { HorizontalGrid } from "../view/three/HorizontalGrid";
+
 // ─── Simple Assert Test Runner ───────────────────────────────────────
 
 let passed = 0;
@@ -276,6 +279,28 @@ function runTests() {
     const expectedR = Math.cos(alt30 * DEG);
     assertNear(y, expectedY, 0.001, `Alt 30° Y = sin(30°) = ${expectedY.toFixed(4)}`);
     assertNear(Math.sqrt(x * x + z * z), expectedR, 0.001, `Alt 30° horizontal radius = cos(30°) = ${expectedR.toFixed(4)}`);
+  }
+
+  // ── 10. Grid Composition Order ─────────────────────────────────────
+  console.log("\n10. Grid Composition Behind Celestial Content");
+  {
+    const grid = new HorizontalGrid();
+    let lineCount = 0;
+    let allLinesAvoidDepthWrites = true;
+    let allLinesRenderBehindStars = true;
+
+    grid.root.traverse((object) => {
+      if (!(object instanceof THREE.Line)) return;
+      lineCount++;
+      const materials = Array.isArray(object.material) ? object.material : [object.material];
+      allLinesAvoidDepthWrites &&= materials.every((material) => !material.depthWrite);
+      allLinesRenderBehindStars &&= object.renderOrder < 0;
+    });
+
+    assert(lineCount > 0, "horizontal grid exposes persistent line primitives");
+    assert(allLinesAvoidDepthWrites, "grid lines do not occlude stars or trails in the depth buffer");
+    assert(allLinesRenderBehindStars, "grid lines render before stellar content");
+    grid.dispose();
   }
 
   // ── Summary ────────────────────────────────────────────────────────

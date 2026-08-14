@@ -15,7 +15,7 @@ import {
 interface PlanetLabel {
   readonly element: HTMLDivElement;
   readonly text: HTMLSpanElement;
-  readonly dot?: HTMLSpanElement;
+  readonly dot: HTMLSpanElement | undefined;
   readonly width: number;
   readonly height: number;
   visible: boolean;

@@ -197,8 +197,8 @@ const dummyOcclusion = {
   apparentRadius: () => 0,
   renderOrder: () => 0,
   testLineOfSight: () => true,
-  baseRadius: () => 0,
-  maximumRadialSpan: () => 0
+  baseRadius: 0,
+  maximumRadialSpan: 0
 };
 satellites.updateStates([{ ...satelliteState, parentBodyId: "jupiter" }], dummyMap, dummyOcclusion);
 assert(satellites.metrics().catalogCount === 461, "one data-driven catalog keeps all 461 entries");

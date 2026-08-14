@@ -225,7 +225,12 @@ function main(): void {
   const toolsContainer = shell.getPageContainer("tools");
   if (toolsContainer) toolsPage.mount(toolsContainer);
 
-  const starTrailRenderer = new StarTrailLayerRendererImpl(sceneHost.getCelestialRoot(), sceneHost.getStarFieldRenderer());
+  const starTrailRenderer = new StarTrailLayerRendererImpl(
+    sceneHost.getCelestialRoot(),
+    sceneHost.getStarFieldRenderer(),
+    sceneHost.camera,
+    sceneHost.renderer,
+  );
 
   const timeBar = new TimeBar(bridge);
   timeBar.mount(shell.getTimelineContainer());
@@ -407,7 +412,6 @@ function main(): void {
       locationHUD.updateHUD(lat, lon, elevation, effectiveHeight, elevationSource);
       // Phase 4: Update observer latitude for celestial equator
       sceneHost.setObserverLatitude(lat);
-      starTrailRenderer.setObserverLatitude(lat);
     },
     onLocationError(msg) {
       locationPage.notifyError();
@@ -432,7 +436,13 @@ function main(): void {
       }
       lastStarTrailsState = snapshot.state;
       starTrailRenderer.applySnapshot(snapshot);
-      skyPage.updateStarTrailsSnapshot(snapshot);
+      const trailMetrics = starTrailRenderer.getMetrics();
+      skyPage.updateStarTrailsSnapshot({
+        ...snapshot,
+        starCount: trailMetrics.starCount,
+        segmentCount: trailMetrics.segmentCount,
+        gpuBytes: trailMetrics.gpuBytes,
+      });
     },
     onStarCatalogStatus(status) {
       skyPage.updateStarCatalogStatus(status);
@@ -489,7 +499,6 @@ function main(): void {
       skyPage.updateSkyEnvironment(snapshot);
     },
     onSolarSystemSnapshot(snapshot) {
-      starTrailRenderer.updateSolarSystemSnapshot(snapshot);
       const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
       sceneHost.getSolarSystemRenderer().updateSnapshot(snapshot, bridgeBytes);
       skyPage.updateSolarSystem(snapshot);

@@ -1,0 +1,33 @@
+{
+  "name": "north-celestial-pole-barcelona-2026-08-14",
+  "referenceCommits": {
+    "TerraLab": "1fbcf088a0bfc1f832fc0f2a8ba2808e3e783a7d",
+    "TerraLab3D": "eb9341eca0f623ec0d4b1801c6f2998b7224352c"
+  },
+  "observer": {
+    "latitudeDeg": 41.3874,
+    "longitudeDeg": 2.1686,
+    "elevationM": 12.0
+  },
+  "time": {
+    "startUtc": "2026-08-14T16:00:00Z",
+    "endUtc": "2026-08-14T22:00:00Z",
+    "exposureSeconds": 21600,
+    "expectedMeanSiderealArcDeg": 90.2464118416
+  },
+  "camera": {
+    "azimuthDeg": 0.0,
+    "altitudeDeg": 41.3874,
+    "horizontalFovDeg": 120.0,
+    "projection": "terralab-universal-stereographic",
+    "viewportWidthPx": 1920,
+    "viewportHeightPx": 1080
+  },
+  "photometry": {
+    "magnitudeLimit": 6.0,
+    "bortleClass": 1,
+    "expectedTerraLab3DGaiaStars": 6793,
+    "trailAlpha": 0.5411764705882353,
+    "lineWidthCssPx": 1.0
+  }
+}
