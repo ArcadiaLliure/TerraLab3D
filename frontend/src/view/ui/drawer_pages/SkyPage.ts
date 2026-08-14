@@ -4,7 +4,10 @@ import type {
   SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "../../../contracts/solar_system_contracts";
-import type { AstronomicalSearchResultPayload } from "../../../contracts/bridge_messages";
+import type {
+  AstronomicalSearchResultPayload,
+  StarTrailsSnapshotMessage,
+} from "../../../contracts/bridge_messages";
 import type { WebSocketBridge } from "../../../bridge/WebSocketBridge";
 
 export interface SkyPageOptions {
@@ -32,6 +35,7 @@ export interface SkyPageOptions {
 
 import { ResourceBackedLayerRow } from "../components/ResourceBackedLayerRow";
 import { SearchWidget } from "../components/SearchWidget";
+import { StarTrailsPanel } from "../components/StarTrailsPanel";
 import type { ResourceManager } from "../../../application/ResourceManager";
 
 export class SkyPage {
@@ -65,6 +69,7 @@ export class SkyPage {
   private planckDustRow!: ResourceBackedLayerRow;
   private ngcRow!: ResourceBackedLayerRow;
   private searchWidget!: SearchWidget;
+  private starTrailsPanel!: StarTrailsPanel;
 
   constructor(private bridge: WebSocketBridge, private resourceManager: ResourceManager, options: SkyPageOptions = {}) {
     this.options = options;
@@ -454,6 +459,13 @@ export class SkyPage {
       onVisibilityChanged: (visible) => this.options.onNgcToggled?.(visible),
     });
     group.appendChild(this.ngcRow.getElement());
+
+    this.starTrailsPanel = new StarTrailsPanel(this.bridge);
+    this.element.appendChild(this.starTrailsPanel.getElement());
+  }
+
+  public updateStarTrailsSnapshot(snapshot: StarTrailsSnapshotMessage): void {
+    this.starTrailsPanel.updateSnapshot(snapshot);
   }
 
   private updateConditionalVisibility() {

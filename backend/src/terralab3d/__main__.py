@@ -20,6 +20,7 @@ import logging
 import os
 import signal
 import sys
+import uuid
 import webbrowser
 from typing import Any
 from datetime import datetime, timedelta, timezone
@@ -269,8 +270,8 @@ async def run() -> int:
 
         asyncio.create_task(deep_sky_coordinator.publish_current_state())
 
-        # Send initial resource catalog
-        _handle_request_catalog_snapshot({})
+        if star_trails_session["sessionId"]:
+            await broadcast_star_trails_snapshot()
 
     bridge.on("set_observer_location", _handle_set_location)
     bridge.on("frontend_ready", _on_frontend_ready)
@@ -291,6 +292,40 @@ async def run() -> int:
     event_search_coordinator: EventSearchCoordinator | None = None
     trajectory_coordinator: ApparentTrajectoryCoordinator | None = None
     lunar_limb_provider: LroLolaLimbProfileProvider | None = None
+
+    # Capacitat Star Trails (Traces Circumpolars)
+    star_trails_session: dict[str, Any] = {
+        "sessionId": "",
+        "sessionVersion": 0,
+        "state": "idle",
+        "startUtcIso": "",
+        "accumulatedExposureSeconds": 0.0,
+        "durationSeconds": 86400.0,
+        "sampleIntervalSeconds": 60.0,
+        "magnitudeLimit": 6.0,
+        "playbackRate": 50.0,
+        "starCount": 0,
+        "segmentCount": 0,
+        "gpuBytes": 0,
+    }
+
+    async def broadcast_star_trails_snapshot() -> None:
+        if not bridge.connected:
+            return
+        await bridge.send({
+            "type": "star_trails_snapshot",
+            "sessionId": star_trails_session["sessionId"],
+            "sessionVersion": star_trails_session["sessionVersion"],
+            "state": star_trails_session["state"],
+            "startUtcIso": star_trails_session["startUtcIso"],
+            "accumulatedExposureSeconds": star_trails_session["accumulatedExposureSeconds"],
+            "durationSeconds": star_trails_session["durationSeconds"],
+            "playbackRate": star_trails_session["playbackRate"],
+            "magnitudeLimit": star_trails_session["magnitudeLimit"],
+            "starCount": star_trails_session["starCount"],
+            "segmentCount": star_trails_session["segmentCount"],
+            "gpuBytes": star_trails_session["gpuBytes"],
+        })
     
     # Pas 12: Cerca astronòmica
     search_coordinator = AstronomicalSearchCoordinator(bridge.send_astronomical_search_result)
@@ -760,6 +795,16 @@ async def run() -> int:
                     sim_time_utc = sim_time_utc.astimezone(timezone.utc)
                 is_realtime = False
                 await broadcast_time()
+                if star_trails_session["state"] == "running" and star_trails_session["startUtcIso"]:
+                    try:
+                        start_dt = datetime.fromisoformat(star_trails_session["startUtcIso"])
+                        elapsed = (sim_time_utc - start_dt).total_seconds()
+                        if elapsed < 0:
+                            elapsed = 0.0
+                        star_trails_session["accumulatedExposureSeconds"] = elapsed
+                        await broadcast_star_trails_snapshot()
+                    except Exception:
+                        pass
         except ValueError as e:
             log.warning("Invalid time format: %s", e)
 
@@ -838,6 +883,78 @@ async def run() -> int:
     bridge.on("set_bortle_class", _handle_set_bortle_class)
     bridge.on("set_manual_magnitude_limit", _handle_set_manual_magnitude_limit)
 
+    # ── 3.4. Handlers de Traces Circumpolars (Star Trails) ───────────
+    async def _handle_start_star_trails(data: dict[str, Any]) -> None:
+        nonlocal star_trails_session, is_time_playing, is_realtime, time_rate
+        sess_id = uuid.uuid4().hex[:12]
+        mag_limit = float(data.get("magnitudeLimit", 6.0))
+        rate = float(data.get("playbackRate", 1.0))
+        star_count = star_coordinator._general_star_count or star_coordinator._fallback_star_count or 9000
+        star_trails_session = {
+            "sessionId": sess_id,
+            "sessionVersion": 1,
+            "state": "running",
+            "startUtcIso": sim_time_utc.isoformat(),
+            "accumulatedExposureSeconds": 0.0,
+            "durationSeconds": float(data.get("durationSeconds", 86400.0)),
+            "sampleIntervalSeconds": float(data.get("sampleIntervalSeconds", 60.0)),
+            "magnitudeLimit": mag_limit,
+            "playbackRate": rate,
+            "starCount": star_count,
+            "segmentCount": star_count * 128,
+            "gpuBytes": star_count * 128 * 2 * 28,
+        }
+        log.info("Star trails iniciat: %s (mag<=%.1f, rate=%.1fx)", sess_id, mag_limit, rate)
+        await broadcast_star_trails_snapshot()
+
+    async def _handle_pause_star_trails(data: dict[str, Any]) -> None:
+        nonlocal is_time_playing
+        if star_trails_session["state"] == "running":
+            star_trails_session["state"] = "paused"
+            star_trails_session["sessionVersion"] += 1
+            is_time_playing = False
+            await broadcast_star_trails_snapshot()
+
+    async def _handle_resume_star_trails(data: dict[str, Any]) -> None:
+        nonlocal is_time_playing
+        if star_trails_session["state"] == "paused":
+            star_trails_session["state"] = "running"
+            star_trails_session["sessionVersion"] += 1
+            is_time_playing = True
+            await broadcast_star_trails_snapshot()
+
+    async def _handle_stop_star_trails(data: dict[str, Any]) -> None:
+        nonlocal is_time_playing
+        if star_trails_session["state"] in ("running", "paused"):
+            star_trails_session["state"] = "stopped"
+            star_trails_session["sessionVersion"] += 1
+            is_time_playing = False
+            await broadcast_star_trails_snapshot()
+
+    async def _handle_clear_star_trails(data: dict[str, Any]) -> None:
+        nonlocal star_trails_session
+        star_trails_session = {
+            "sessionId": "",
+            "sessionVersion": 0,
+            "state": "idle",
+            "startUtcIso": "",
+            "accumulatedExposureSeconds": 0.0,
+            "durationSeconds": 86400.0,
+            "sampleIntervalSeconds": 60.0,
+            "magnitudeLimit": 6.0,
+            "playbackRate": 50.0,
+            "starCount": 0,
+            "segmentCount": 0,
+            "gpuBytes": 0,
+        }
+        await broadcast_star_trails_snapshot()
+
+    bridge.on("start_star_trails", _handle_start_star_trails)
+    bridge.on("pause_star_trails", _handle_pause_star_trails)
+    bridge.on("resume_star_trails", _handle_resume_star_trails)
+    bridge.on("stop_star_trails", _handle_stop_star_trails)
+    bridge.on("clear_star_trails", _handle_clear_star_trails)
+
     async def clock_ticker() -> None:
         """S'encarrega d'avançar el temps si està en temps real i publicar l'estat."""
         nonlocal sim_time_utc
@@ -851,6 +968,19 @@ async def run() -> int:
                 elif is_time_playing:
                     sim_time_utc += timedelta(seconds=tick_interval * time_rate)
                     await broadcast_time()
+                if star_trails_session["state"] == "running" and star_trails_session["startUtcIso"]:
+                    try:
+                        start_dt = datetime.fromisoformat(star_trails_session["startUtcIso"])
+                        elapsed = (sim_time_utc - start_dt).total_seconds()
+                        if elapsed < 0:
+                            elapsed = 0.0
+                        star_trails_session["accumulatedExposureSeconds"] = elapsed
+                        if elapsed >= star_trails_session["durationSeconds"]:
+                            star_trails_session["state"] = "completed"
+                            star_trails_session["sessionVersion"] += 1
+                        await broadcast_star_trails_snapshot()
+                    except Exception:
+                        pass
 
     clock_task = asyncio.create_task(clock_ticker())
 

@@ -309,6 +309,30 @@ export interface SetTimeRateMessage {
   readonly rate: number;
 }
 
+export interface StartStarTrailsMessage {
+  readonly type: "start_star_trails";
+  readonly durationSeconds: number;
+  readonly sampleIntervalSeconds: number;
+  readonly magnitudeLimit: number;
+  readonly playbackRate: number;
+}
+
+export interface PauseStarTrailsMessage {
+  readonly type: "pause_star_trails";
+}
+
+export interface ResumeStarTrailsMessage {
+  readonly type: "resume_star_trails";
+}
+
+export interface StopStarTrailsMessage {
+  readonly type: "stop_star_trails";
+}
+
+export interface ClearStarTrailsMessage {
+  readonly type: "clear_star_trails";
+}
+
 export type FrontendMessage =
   | FrontendReadyMessage
   | CameraChangedMessage
@@ -345,7 +369,12 @@ export type FrontendMessage =
   | SetBortleClassMessage
   | SetManualMagnitudeLimitMessage
   | FrontendPerformanceMetricsMessage
-  | AstronomicalSearchRequestMessage;
+  | AstronomicalSearchRequestMessage
+  | StartStarTrailsMessage
+  | PauseStarTrailsMessage
+  | ResumeStarTrailsMessage
+  | StopStarTrailsMessage
+  | ClearStarTrailsMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -521,6 +550,21 @@ export interface AstronomicalSearchResultMessage {
   readonly results: AstronomicalSearchResultPayload[];
 }
 
+export interface StarTrailsSnapshotMessage {
+  readonly type: "star_trails_snapshot";
+  readonly sessionId: string;
+  readonly sessionVersion: number;
+  readonly state: string;
+  readonly reason?: string;
+  readonly accumulatedExposureSeconds: number;
+  readonly playbackRate: number;
+  readonly starCount: number;
+  readonly segmentCount: number;
+  readonly gpuBytes: number;
+  readonly magnitudeLimit: number;
+  readonly startUtcIso?: string;
+}
+
 // ─── Tipus Unió ──────────────────────────────────────────────────────
 
 export type BackendMessage =
@@ -545,7 +589,8 @@ export type BackendMessage =
   | AngularSeparationResultMessage
   | DownloadJobSnapshotMessage
   | ResourceCatalogSnapshotMessage
-  | AstronomicalSearchResultMessage;
+  | AstronomicalSearchResultMessage
+  | StarTrailsSnapshotMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

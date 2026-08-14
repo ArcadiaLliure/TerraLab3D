@@ -96,6 +96,7 @@ export interface BackendMessageListener {
   onResourceCatalogSnapshot?(msg: import("../contracts/bridge_messages").ResourceCatalogSnapshotMessage): void;
   onDownloadJobSnapshot?(msg: import("../contracts/bridge_messages").DownloadJobSnapshotMessage): void;
   onAstronomicalSearchResult?(msg: import("../contracts/bridge_messages").AstronomicalSearchResultMessage): void;
+  onStarTrailsSnapshot?(snapshot: import("../contracts/bridge_messages").StarTrailsSnapshotMessage): void;
 }
 
 export class WebSocketBridge {
@@ -442,6 +443,11 @@ export class WebSocketBridge {
           l.onAstronomicalSearchResult?.(msg);
         }
         break;
+      case "star_trails_snapshot":
+        for (const l of this.messageListeners) {
+          l.onStarTrailsSnapshot?.(msg as any);
+        }
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -622,6 +628,45 @@ export class WebSocketBridge {
     metrics: Omit<FrontendPerformanceMetricsMessage, "type">,
   ): void {
     this.sendMessage({ type: "frontend_performance_metrics", ...metrics });
+  }
+
+  public startStarTrails(
+    durationSeconds: number,
+    sampleIntervalSeconds: number,
+    magnitudeLimit: number,
+    playbackRate: number,
+  ): void {
+    try {
+      if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        console.warn("[Bridge] WebSocket no connectat per startStarTrails");
+        return;
+      }
+      this.sendMessage({
+        type: "start_star_trails",
+        durationSeconds,
+        sampleIntervalSeconds,
+        magnitudeLimit,
+        playbackRate,
+      });
+    } catch (err) {
+      console.error("[Bridge] Error enviant start_star_trails:", err);
+    }
+  }
+
+  public pauseStarTrails(): void {
+    this.sendMessage({ type: "pause_star_trails" });
+  }
+
+  public resumeStarTrails(): void {
+    this.sendMessage({ type: "resume_star_trails" });
+  }
+
+  public stopStarTrails(): void {
+    this.sendMessage({ type: "stop_star_trails" });
+  }
+
+  public clearStarTrails(): void {
+    this.sendMessage({ type: "clear_star_trails" });
   }
 
   private sendMessage(msg: FrontendMessage): void {

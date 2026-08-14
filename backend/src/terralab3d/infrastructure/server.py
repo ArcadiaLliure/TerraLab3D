@@ -56,9 +56,21 @@ class TerraLabServer:
     def actual_port(self) -> int:
         return self._actual_port
 
+    @aiohttp.web.middleware
+    async def _remove_csp_middleware(self, request: aiohttp.web.Request, handler: Any) -> aiohttp.web.StreamResponse:
+        try:
+            response = await handler(request)
+            if "Content-Security-Policy" in response.headers:
+                del response.headers["Content-Security-Policy"]
+            return response
+        except aiohttp.web.HTTPException as ex:
+            if "Content-Security-Policy" in ex.headers:
+                del ex.headers["Content-Security-Policy"]
+            raise
+
     async def start(self) -> str:
         """Inicia el servidor i retorna l'URL base."""
-        self._app = aiohttp.web.Application()
+        self._app = aiohttp.web.Application(middlewares=[self._remove_csp_middleware])
         self._app.router.add_get("/ws", self._bridge.handle_websocket)
         if self._moon_surface_assets is not None:
             self._app.router.add_get("/moon-assets/{asset_name}", self._serve_moon_asset)

@@ -31,9 +31,9 @@ class WebSocketBridge:
     """Meitat del servidor del pont Python ↔ Three.js."""
 
     def __init__(self) -> None:
-        self._ws: aiohttp.web.WebSocketResponse | None = None
+        self._clients: set[Any] = set()
+        self._fallback_ws: Any = None
         self._session_id: str = ""
-        self._connected = False
         self._handlers: dict[str, list[MessageHandler]] = {}
         self._shutdown_event = asyncio.Event()
         self._binary_bytes_sent = 0
@@ -43,8 +43,22 @@ class WebSocketBridge:
         self._trajectory_bridge_bytes = 0
 
     @property
+    def _ws(self) -> Any:
+        if self._clients:
+            return next(iter(self._clients))
+        return self._fallback_ws
+
+    @_ws.setter
+    def _ws(self, ws: Any) -> None:
+        self._fallback_ws = ws
+        if ws is not None:
+            self._clients.add(ws)
+        else:
+            self._clients.clear()
+
+    @property
     def connected(self) -> bool:
-        return self._connected
+        return len(self._clients) > 0 or self._fallback_ws is not None
 
     @property
     def session_id(self) -> str:
@@ -82,7 +96,7 @@ class WebSocketBridge:
     async def handle_websocket(
         self, request: aiohttp.web.Request,
     ) -> aiohttp.web.WebSocketResponse:
-        """Gestiona una nova connexió WebSocket (una a la vegada)."""
+        """Gestiona una connexió WebSocket."""
         ws = aiohttp.web.WebSocketResponse(heartbeat=10)
         await ws.prepare(request)
         log.info("WebSocket connectat")
@@ -100,12 +114,7 @@ class WebSocketBridge:
             except json.JSONDecodeError:
                 pass
 
-        # Només un client a la vegada
-        if self._ws is not None and not self._ws.closed:
-            await self._ws.close(code=4001, message=b"Replaced by new connection")
-
-        self._ws = ws
-        self._connected = False
+        self._clients.add(ws)
         self._session_id = uuid.uuid4().hex[:16]
 
         # Despatxa el primer missatge llegit
@@ -134,17 +143,19 @@ class WebSocketBridge:
         except Exception:
             log.exception("Error a WebSocket")
         finally:
-            self._connected = False
-            if self._ws is ws:
-                self._ws = None
-            log.info("WebSocket desconnectat")
+            self._clients.discard(ws)
+            log.info("WebSocket desconnectat (clients actius: %d)", len(self._clients))
 
         return ws
 
     async def send(self, msg: dict[str, Any]) -> None:
-        """Envia un missatge JSON al frontend connectat."""
-        if self._ws and not self._ws.closed:
-            await self._ws.send_json(msg)
+        """Envia un missatge JSON a tots els frontends connectats."""
+        for ws in list(self._clients):
+            if not ws.closed:
+                try:
+                    await ws.send_json(msg)
+                except Exception:
+                    self._clients.discard(ws)
 
     async def send_binary_resource(
         self,
@@ -153,25 +164,21 @@ class WebSocketBridge:
         metadata: dict[str, Any],
         buffer: bytes,
     ) -> None:
-        """Envia un recurs binari al frontend.
-
-        Protocol binari:
-            4 bytes (uint32 LE): longitud del header JSON
-            N bytes: header JSON (UTF-8)
-            resta: payload binari (ArrayBuffer)
-
-        Prohibit Base64. Prohibit JSON massiu.
-        """
-        if not self._ws or self._ws.closed:
+        """Envia un recurs binari als frontends connectats."""
+        if not self._clients:
             return
 
         header_bytes = json.dumps(metadata).encode("utf-8")
         header_len = len(header_bytes)
 
-        # Construir missatge binari: [4 bytes len][header JSON][payload]
         import struct
         message = struct.pack("<I", header_len) + header_bytes + buffer
-        await self._ws.send_bytes(message)
+        for ws in list(self._clients):
+            if not ws.closed:
+                try:
+                    await ws.send_bytes(message)
+                except Exception:
+                    self._clients.discard(ws)
         self._binary_bytes_sent += len(message)
         log.info(
             "Recurs binari enviat: %s v%s (%d bytes header + %d bytes payload)",
@@ -416,9 +423,12 @@ class WebSocketBridge:
         
         handlers = self._handlers.get(msg_type, [])
         for handler in handlers:
-            result = handler(data)
-            if asyncio.iscoroutine(result):
-                await result
+            try:
+                result = handler(data)
+                if asyncio.iscoroutine(result):
+                    await result
+            except Exception:
+                log.exception("Error executant handler pel missatge %s", msg_type)
 
     async def _handle_handshake(self, _data: dict[str, Any]) -> None:
         self._connected = True

@@ -332,14 +332,19 @@ class StarCoordinator:
         catalog_indices = np.arange(n, dtype=np.uint32)  # [N] uint32
 
         # Construir buffer binari concatenat:
-        # [positions_f32 | magnitudes_f32 | colors_u8 | indices_u32]
+        # [positions_f32 | magnitudes_f32 | colors_u8 | padding | indices_u32]
         pos_bytes = positions.tobytes()       # N*12 bytes
         mag_bytes = magnitudes.tobytes()      # N*4 bytes
         col_bytes = colors.tobytes()          # N*3 bytes
+        
+        # PADDING per colors (ha de ser múltiple de 4 bytes)
+        padding_len = (4 - (len(col_bytes) % 4)) % 4
+        padding_bytes = b'\x00' * padding_len
+
         idx_bytes = catalog_indices.tobytes() # N*4 bytes
 
-        total_bytes = len(pos_bytes) + len(mag_bytes) + len(col_bytes) + len(idx_bytes)
-        buffer = pos_bytes + mag_bytes + col_bytes + idx_bytes
+        total_bytes = len(pos_bytes) + len(mag_bytes) + len(col_bytes) + padding_len + len(idx_bytes)
+        buffer = pos_bytes + mag_bytes + col_bytes + padding_bytes + idx_bytes
 
         # Hash del contingut
         content_hash = hashlib.sha256(buffer).hexdigest()[:16]
@@ -371,6 +376,7 @@ class StarCoordinator:
 
         # Publicar
         if self._resource_publisher:
+            idx_offset = len(pos_bytes) + len(mag_bytes) + len(col_bytes) + padding_len
             metadata = {
                 "type": "star_resource",
                 "resourceId": resource_id,
@@ -383,7 +389,7 @@ class StarCoordinator:
                     "positions": {"offset": 0, "length": len(pos_bytes), "dtype": "float32", "components": 3},
                     "magnitudes": {"offset": len(pos_bytes), "length": len(mag_bytes), "dtype": "float32", "components": 1},
                     "colors": {"offset": len(pos_bytes) + len(mag_bytes), "length": len(col_bytes), "dtype": "uint8", "components": 3},
-                    "catalogIndices": {"offset": len(pos_bytes) + len(mag_bytes) + len(col_bytes), "length": len(idx_bytes), "dtype": "uint32", "components": 1},
+                    "catalogIndices": {"offset": idx_offset, "length": len(idx_bytes), "dtype": "uint32", "components": 1},
                 },
             }
             await self._resource_publisher(resource_id, version, metadata, buffer)

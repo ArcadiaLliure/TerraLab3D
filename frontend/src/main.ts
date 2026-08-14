@@ -33,6 +33,8 @@ import { ToolsPage } from "./view/ui/drawer_pages/ToolsPage";
 import { LocationHUD } from "./view/ui/panels/LocationHUD";
 import { Shell } from "./view/ui/Shell";
 import { TimeBar } from "./view/ui/components/TimeBar";
+import { StarTrailsPanel } from "./view/ui/components/StarTrailsPanel";
+import { StarTrailLayerRendererImpl } from "./view/three/layers/StarTrailLayerRendererImpl";
 
 // ─── Picking (Pas 6) ─────────────────────────────────────────────────
 import { CelestialTransformState } from "./view/three/CelestialTransformState";
@@ -223,6 +225,8 @@ function main(): void {
   const toolsContainer = shell.getPageContainer("tools");
   if (toolsContainer) toolsPage.mount(toolsContainer);
 
+  const starTrailRenderer = new StarTrailLayerRendererImpl(sceneHost.getCelestialRoot(), sceneHost.getStarFieldRenderer());
+
   const timeBar = new TimeBar(bridge);
   timeBar.mount(shell.getTimelineContainer());
 
@@ -258,6 +262,7 @@ function main(): void {
   sceneHost.getStarFieldRenderer().setTransformState(celestialTransformState);
   sceneHost.getDeepSkyRenderer().setTransformState(celestialTransformState);
   sceneHost.getGalacticSkyRenderer().setTransformState(celestialTransformState);
+  starTrailRenderer.setTransformState(celestialTransformState);
 
   const gestureRouter = new PointerGestureRouter();
 
@@ -374,6 +379,9 @@ function main(): void {
     sceneHost.setCurrentFov(pose.horizontalFovDeg);
   });
 
+  let currentObserverLatitude = 41.38;
+  let lastStarTrailsState = "idle";
+
   const backendListener: BackendMessageListener = {
     onSetCameraPose(p) {
       cameraRig.animateTo(
@@ -393,11 +401,13 @@ function main(): void {
       );
     },
     onObserverLocationChanged(lat, lon, elevation, effectiveHeight, elevationSource) {
+      currentObserverLatitude = lat;
       locationPage.updateInputs(lat, lon);
       locationPage.notifySuccess();
       locationHUD.updateHUD(lat, lon, elevation, effectiveHeight, elevationSource);
       // Phase 4: Update observer latitude for celestial equator
       sceneHost.setObserverLatitude(lat);
+      starTrailRenderer.setObserverLatitude(lat);
     },
     onLocationError(msg) {
       locationPage.notifyError();
@@ -409,6 +419,20 @@ function main(): void {
       locationPage.updateTimeState(currentTimeIso, isRealtime);
       shell.updateRealtimeUI(isRealtime);
       sceneHost.setSiderealTime(lstDeg);
+      starTrailRenderer.setCurrentSimulationTime(currentTimeIso);
+    },
+    onStarTrailsSnapshot(snapshot) {
+      if (snapshot.state === "running" && lastStarTrailsState !== "running") {
+        // Direct the camera view towards the Celestial Pole (Polaris at Az 0°, Alt = lat in North; SCP at Az 180°, Alt = |lat| in South)
+        const lat = currentObserverLatitude;
+        const az = lat >= 0 ? 0.0 : 180.0;
+        const alt = Math.abs(lat);
+        const currentPose = cameraRig.pose();
+        cameraRig.animateTo(az, alt, currentPose.horizontalFovDeg, 1200);
+      }
+      lastStarTrailsState = snapshot.state;
+      starTrailRenderer.applySnapshot(snapshot);
+      skyPage.updateStarTrailsSnapshot(snapshot);
     },
     onStarCatalogStatus(status) {
       skyPage.updateStarCatalogStatus(status);
@@ -465,6 +489,7 @@ function main(): void {
       (skyPage as any).updateSkyEnvironment?.(snapshot);
     },
     onSolarSystemSnapshot(snapshot) {
+      starTrailRenderer.updateSolarSystemSnapshot(snapshot);
       const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
       sceneHost.getSolarSystemRenderer().updateSnapshot(snapshot, bridgeBytes);
       skyPage.updateSolarSystem(snapshot);
@@ -560,8 +585,9 @@ function main(): void {
     // Phase 3.5: Update navigation physics
     cameraRig.updateNavigation(timestampMs);
 
-    // Avançar les interpolacions visuals (SolarSystem, Stars, DeepSky)
+    // Avançar les interpolacions visuals (SolarSystem, Stars, DeepSky, StarTrails)
     sceneHost.updateVisualState(timestampMs);
+    starTrailRenderer.update(timestampMs);
 
     // Actualitza el seguiment automàtic de càmera utilitzant l'estat visual ja interpolat
     focusTrackingController.update();
