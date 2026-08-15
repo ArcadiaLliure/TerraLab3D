@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import type { SkyVisibilityState } from "../../contracts/sky_environment_contracts";
+import type { HorizonOcclusionState } from "./HorizonOcclusionState";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
 const LOG_PREFIX = "MGP: [DeepSkyLabels]";
 
@@ -43,7 +45,7 @@ export class DeepSkyLabels {
   private maxVisibleLabels = 100; // Limit DOM elements for clean view
   private readonly domPool: HTMLDivElement[] = [];
 
-  constructor() {
+  constructor(private readonly horizonState: HorizonOcclusionState | null = null) {
     this.container = document.createElement("div");
     this.container.className = "deepsky-labels-container";
     this.container.style.cssText =
@@ -91,7 +93,7 @@ export class DeepSkyLabels {
       ? new Uint32Array(payloadBuffer, layout.familyCode.offset, count)
       : null;
 
-    const radius = 1000000;
+    const radius = CELESTIAL_SCENE_RADIUS.distantSky;
 
     for (let i = 0; i < count; i++) {
       const label = objectLabels[i];
@@ -165,6 +167,7 @@ export class DeepSkyLabels {
 
       this._projVec.copy(label.worldPos);
       this._projVec.applyMatrix3(equatorialToENU);
+      if (this.horizonState?.isOccludedDirection(this._projVec)) continue;
       this._projVec.project(camera);
 
       if (this._projVec.z > 1) continue;

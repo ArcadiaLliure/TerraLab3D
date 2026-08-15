@@ -14,7 +14,11 @@
 import * as THREE from "three";
 import type { TerrainSampler } from "../../../contracts/TerrainSampler";
 import type { NavigationEnvelope, NavigationReadiness } from "../../../contracts/navigation";
-import { TechnicalTerrainSampler } from "./TechnicalTerrainSampler";
+import type { TerrainNavigationSampling } from "./TechnicalTerrainSampler";
+import {
+  LayeredTerrainSampler,
+  type TerrainDetailLayer,
+} from "./LayeredTerrainSampler";
 import { PBRMaterialPolicy } from "../materials/PBRMaterialPolicy";
 
 const TERRAIN_SIZE = 500;        // ±500m → 1000×1000m total
@@ -25,17 +29,18 @@ const MAX_ALTITUDE = 500;        // metres vertical
 const LOG_PREFIX = "MGP: [NavigationWorld]";
 
 export class NavigationWorld {
-  private readonly sampler: TechnicalTerrainSampler;
+  private readonly sampler: LayeredTerrainSampler;
   private readonly materialPolicy = new PBRMaterialPolicy();
   private terrainMesh: THREE.Mesh | null = null;
   private terrainGroup: THREE.Group;
   private referenceObjects: THREE.Group;
   private boundsIndicator: THREE.LineLoop | null = null;
+  private technicalPresentationVisible = true;
   private _envelope: NavigationEnvelope;
   private disposed = false;
 
   constructor() {
-    this.sampler = new TechnicalTerrainSampler();
+    this.sampler = new LayeredTerrainSampler();
     this.terrainGroup = new THREE.Group();
     this.terrainGroup.name = "terrain";
     this.referenceObjects = new THREE.Group();
@@ -61,10 +66,56 @@ export class NavigationWorld {
     return this.sampler;
   }
 
-  metrics(): { readonly pbrMaterialBuildCount: number } {
+  /**
+   * Make collision use the same observer-relative DEM geometry that is drawn.
+   * The synthetic patch remains only as the startup fallback before DEM data
+   * is available or after it is explicitly cleared.
+   */
+  setDemTerrainMesh(
+    mesh: THREE.Mesh | null,
+    sampling?: TerrainNavigationSampling | null,
+  ): void {
+    const collisionMesh = mesh ?? this.terrainMesh;
+    if (!collisionMesh) return;
+    this.sampler.setBaseTerrain(collisionMesh, sampling);
+  }
+
+  /** Keep a moving high-detail DEM chunk over the persistent wide mesh. */
+  setStreamingDemTerrainMesh(
+    mesh: THREE.Mesh | null,
+    sampling?: TerrainNavigationSampling | null,
+  ): void {
+    this.sampler.setDetailTerrain(mesh, sampling);
+  }
+
+  /** Keep collision aligned with every DEM detail chunk retained by render. */
+  setStreamingDemTerrainMeshes(layers: readonly TerrainDetailLayer[]): void {
+    this.sampler.setDetailTerrains(layers);
+  }
+
+  metrics(): {
+    readonly pbrMaterialBuildCount: number;
+    readonly technicalPresentationVisible: boolean;
+  } {
     return {
       pbrMaterialBuildCount: this.materialPolicy.metrics().materialBuildCount,
+      technicalPresentationVisible: this.technicalPresentationVisible,
     };
+  }
+
+  /**
+   * Keep the synthetic mesh available to the navigation sampler without
+   * presenting it as scientific terrain once a DEM-backed horizon is active.
+   */
+  setTechnicalPresentationVisible(visible: boolean): void {
+    if (this.technicalPresentationVisible === visible) return;
+    this.technicalPresentationVisible = visible;
+    this.terrainGroup.visible = visible;
+    this.referenceObjects.visible = visible;
+    console.info(
+      `${LOG_PREFIX} [setTechnicalPresentationVisible] `
+      + `[Presentació tècnica ${visible ? "visible" : "oculta; perfil DEM actiu"}]`,
+    );
   }
 
   /**
@@ -89,7 +140,7 @@ export class NavigationWorld {
 
       // Wire the sampler to the mesh
       if (this.terrainMesh) {
-        this.sampler.setTerrainMesh(this.terrainMesh);
+        this.sampler.setBaseTerrain(this.terrainMesh);
         this.setReadiness("collision_ready");
         this.setReadiness("navigation_ready");
         console.info(`${LOG_PREFIX} [prepare] [Zona navegable preparada generation=${this._envelope.generation}]`);

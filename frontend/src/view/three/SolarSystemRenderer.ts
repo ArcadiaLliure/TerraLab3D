@@ -44,8 +44,10 @@ import {
   type SaturnRingMetrics,
 } from "./SaturnRingRenderer";
 import { SolarTotalityRenderer } from "./SolarTotalityRenderer";
+import type { HorizonOcclusionState } from "./HorizonOcclusionState";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
-const CELESTIAL_RADIUS = 900_000;
+const CELESTIAL_RADIUS = CELESTIAL_SCENE_RADIUS.solarSystem;
 const INTERPOLATION_MS = 1000;
 const LARGE_TIME_JUMP_SECONDS = 120;
 
@@ -86,10 +88,7 @@ export const PLANET_EXTRA_TEXTURE_URLS = {
 };
 
 const SUN_VERTEX_SHADER = /* glsl */ `
-  varying float vCelestialY;
   void main() {
-    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-    vCelestialY = worldPosition.y - cameraPosition.y;
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * mvPosition;
   }
@@ -98,9 +97,7 @@ const SUN_VERTEX_SHADER = /* glsl */ `
 const SUN_FRAGMENT_SHADER = /* glsl */ `
   uniform vec3 uColor;
   uniform float uRenderAlpha;
-  varying float vCelestialY;
   void main() {
-    if (vCelestialY < 0.0) discard;
     gl_FragColor = vec4(uColor, uRenderAlpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -182,12 +179,17 @@ export class SolarSystemRenderer {
   private _snapshotApplyCount = 0;
   private _staleSnapshotCount = 0;
   private _lastBridgeBytes = 0;
+  private readonly horizonUnsubscribe: (() => void) | null;
 
   readonly entityBuildCount: number;
   readonly geometryBuildCount: number;
   readonly materialBuildCount: number;
 
-  constructor(parent: THREE.Object3D, textureLoad: MoonTextureLoad = browserTextureLoader()) {
+  constructor(
+    parent: THREE.Object3D,
+    textureLoad: MoonTextureLoad = browserTextureLoader(),
+    private readonly horizonState: HorizonOcclusionState | null = null,
+  ) {
     this.root.name = "solarSystemRoot";
     this.planetsRoot.name = "planets";
     this.sharedBodyGeometry = new THREE.SphereGeometry(1, 64, 40);
@@ -207,11 +209,12 @@ export class SolarSystemRenderer {
     const saturn = this.planetVisuals.get("saturn");
     if (saturn === undefined) throw new Error("Saturn visual was not constructed");
     this.rings = new SaturnRingRenderer(saturn.root, textureLoad);
-    this.satellites = new NaturalSatelliteRenderer(this.root);
+    this.satellites = new NaturalSatelliteRenderer(this.root, horizonState);
     this.orbits = new SatelliteOrbitRenderer(this.root);
     this.trajectories = new ApparentTrajectoryRenderer(this.root);
     this.totality = new SolarTotalityRenderer(this.root);
     parent.add(this.root);
+    this.horizonUnsubscribe = horizonState?.subscribe(() => this.applyDisplayed()) ?? null;
 
     this.entityBuildCount = 2 + this.planetVisuals.size;
     this.geometryBuildCount = 1
@@ -378,14 +381,14 @@ export class SolarSystemRenderer {
     if (id === "moon") return this.moonSurface.mesh;
     if (id === "sun") return this.sun.mesh;
     if (isPlanetBodyId(id)) return this.planetVisuals.get(id)?.mesh;
-    return this.satellites.getPickableBodies().find((item) => item.id === id)?.object;
+    return this.satellites.getBodyObject(id);
   }
 
   getLabelAnchor(id: SolarSystemBodyId): THREE.Object3D | undefined {
     if (id === "moon") return this.moonSurface.labelAnchor;
     if (id === "sun") return this.sun.mesh;
     if (isPlanetBodyId(id)) return this.planetVisuals.get(id)?.root;
-    return this.satellites.getPickableBodies().find((item) => item.id === id)?.object;
+    return this.satellites.getBodyObject(id);
   }
 
   getPickableBodies(): readonly PickableSolarSystemBody[] {
@@ -418,7 +421,7 @@ export class SolarSystemRenderer {
 
   isPlanetLabelVisible(id: PlanetBodyId, state: SolarSystemBodyState | undefined): boolean {
     if (!state || !this.planetsVisible || !this.masterVisible) return false;
-    return (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0);
+    return this.isAboveTerrainHorizon(state);
   }
 
   isBodyVisuallyObservable(state: SolarSystemBodyState): boolean {
@@ -460,6 +463,7 @@ export class SolarSystemRenderer {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.horizonUnsubscribe?.();
     this.root.removeFromParent();
     this.sharedBodyGeometry.dispose();
     this.sun.mesh.material.dispose();
@@ -526,7 +530,7 @@ export class SolarSystemRenderer {
         this.moonSurface.updateState(
           state,
           moonLightDirectionThree(state, fallbackLight),
-          this.isVisible(id) && (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0),
+          this.isVisible(id) && this.isAboveTerrainHorizon(state),
         );
         this.totality.updateMoon(state);
         continue;
@@ -539,16 +543,14 @@ export class SolarSystemRenderer {
         this.sun.mesh.renderOrder = this.occlusion.renderOrder(state, this.displayed.values());
         this.totality.updateSun(state, radius);
         this.sun.uniforms.uRenderAlpha.value = 1;
-        this.sun.mesh.visible = this.isVisible(id)
-          && (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0);
+        this.sun.mesh.visible = this.isVisible(id) && this.isAboveTerrainHorizon(state);
         this.sun.mesh.userData.apparentState = state;
         continue;
       }
       if (!isPlanetBodyId(id)) continue;
       const visual = this.planetVisuals.get(id);
       if (visual === undefined) continue;
-      const visibility = this.isVisible(id)
-        && (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg > 0);
+      const visibility = this.isVisible(id) && this.isAboveTerrainHorizon(state);
       visual.updateState(
         state,
         this.occlusion.apparentRadius(
@@ -583,6 +585,20 @@ export class SolarSystemRenderer {
     if (id === "moon") return this.moonVisible;
     if (id.startsWith("naif-") || id.startsWith("provisional-")) return this.satellitesVisible;
     return this.planetsVisible;
+  }
+
+  private isAboveTerrainHorizon(state: SolarSystemBodyState): boolean {
+    if (this.horizonState !== null) {
+      return !this.horizonState.isDiscFullyOccluded(
+        state.azimuthDeg,
+        state.altitudeDeg,
+        state.angularRadiusDeg,
+      );
+    }
+    // Runtime always supplies the shared HorizonOcclusionState. A renderer used
+    // in isolation may consume the backend-enriched flag, but must not invent a
+    // second flat-horizon authority when neither source is present.
+    return state.horizonVisible ?? true;
   }
 }
 

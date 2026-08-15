@@ -23,17 +23,19 @@ import type { SkyVisibilityState } from "../../../contracts/sky_environment_cont
 import { DEFAULT_SKY_VISIBILITY } from "../../../contracts/sky_visibility_defaults";
 import type { StarResourceEntry } from "../StarFieldRenderer";
 import type { CelestialTransformState } from "../CelestialTransformState";
+import type { HorizonOcclusionState } from "../HorizonOcclusionState";
 import { StarSpatialIndex } from "./StarSpatialIndex";
 import { StarVisibilityEvaluator } from "./StarVisibilityEvaluator";
 import {
   computeStarHitRadiusCssPx,
   computeStarVisualRadiusCssPx,
 } from "../shaders/starVisualParams";
+import { CELESTIAL_SCENE_RADIUS } from "../celestialScenePolicy";
 
 const LOG_PREFIX = "MGP: [StarPickProvider]";
 
 /** Radi de l'esfera celeste (ha de coincidir amb u_radius del shader). */
-const SKY_RADIUS = 1000000.0;
+const SKY_RADIUS = CELESTIAL_SCENE_RADIUS.distantSky;
 
 /** Prioritat de recursos per al ranking. Menys = més prioritari. */
 const ROLE_PRIORITY: Record<string, number> = {
@@ -63,6 +65,7 @@ export interface StarPickProviderDeps {
   getSkyVisibilityState: () => SkyVisibilityState | null;
   getPointScale: () => number;
   isStarLayerVisible: () => boolean;
+  horizonOcclusionState?: HorizonOcclusionState;
 }
 
 interface ScoredCandidate {
@@ -226,11 +229,12 @@ export class StarPickProvider {
         // Transformar a Three.js via matriu actual
         _worldPos.set(eqX, eqY, eqZ);
         _worldPos.applyMatrix3(this.deps.transformState.equatorialToThree);
+        if (this.deps.horizonOcclusionState?.isOccludedDirection(_worldPos)) continue;
         
         // Avaluar altitud i visibilitat fotomètrica real (Pas 7)
         // Altitud: asin(world.y / radius)
         const altitudeDeg = Math.asin(Math.max(-1.0, Math.min(1.0, _worldPos.y))) * (180.0 / Math.PI);
-        const evalResult = StarVisibilityEvaluator.evaluate(mag, altitudeDeg, visibilityState, camera.position.y);
+        const evalResult = StarVisibilityEvaluator.evaluate(mag, altitudeDeg, visibilityState);
         
         if (!evalResult.visible) {
           continue; // Invisible fotomètricament
@@ -368,6 +372,7 @@ export class StarPickProvider {
 
     _worldPos.set(eqX, eqY, eqZ);
     _worldPos.applyMatrix3(this.deps.transformState.equatorialToThree);
+    if (this.deps.horizonOcclusionState?.isOccludedDirection(_worldPos)) return null;
     _worldPos.multiplyScalar(SKY_RADIUS);
     _worldPos.add(camera.position);
 

@@ -18,6 +18,7 @@ import { CelestialPickProvider, type CelestialPickHit } from "./CelestialPickPro
 import { SelectionMarker } from "./SelectionMarker";
 import type { SolarSystemPickHit } from "./SolarSystemPickProvider";
 import type { DeepSkyPickHit } from "../../../contracts/deep_sky_picking_contracts";
+import { setThreeFromAzimuthAltitude } from "../celestialCoordinates";
 import type { CelestialSelectionController } from "../../../application/CelestialSelectionController";
 import { fromPickHit } from "../../../application/CelestialSelectionController";
 import * as THREE from "three";
@@ -150,15 +151,12 @@ export class ScenePickingController {
   }
 
   private projectDirectionToScreen(azimuthDeg: number, altitudeDeg: number, camera: THREE.Camera): { x: number; y: number } | null {
-    const azRad = azimuthDeg * (Math.PI / 180);
-    const altRad = altitudeDeg * (Math.PI / 180);
-    const cosAlt = Math.cos(altRad);
-
-    const vec = new THREE.Vector3(
-      -Math.sin(azRad) * cosAlt,
-      Math.sin(altRad),
-      -Math.cos(azRad) * cosAlt
-    ).multiplyScalar(1000000).add(camera.position);
+    const vec = setThreeFromAzimuthAltitude(
+      new THREE.Vector3(),
+      azimuthDeg,
+      altitudeDeg,
+      1000000,
+    ).add(camera.position);
 
     vec.project(camera);
     if (vec.z > 1.0) return null;

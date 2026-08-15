@@ -74,6 +74,14 @@ export class LocationHUD {
   private eventSection: HTMLDivElement;
   private readonly starContainer: HTMLDivElement;
   private hudVisible = true;
+  private observer = {
+    lat: 0,
+    lon: 0,
+    elevation: null as number | null,
+    heightOffset: 0,
+    effectiveHeight: null as number | null,
+    source: "No disponible",
+  };
 
   constructor(private readonly callbacks: LocationHUDCallbacks = {}) {
     this.element = document.createElement("div");
@@ -96,6 +104,8 @@ export class LocationHUD {
       pointer-events: none;
       z-index: 10;
       min-width: 200px;
+      max-height: calc(100vh - 30px);
+      overflow-y: auto;
     `;
 
     // Observer section
@@ -138,7 +148,7 @@ export class LocationHUD {
     `;
     this.element.appendChild(this.starContainer);
 
-    this.updateHUD(0, 0, 0, 0, "No disponible");
+    this.updateHUD(0, 0, null, 0, null, "No disponible");
     this.updateCameraHUD({
       positionEastM: 0,
       positionUpM: 0,
@@ -161,20 +171,39 @@ export class LocationHUD {
   public updateHUD(
     lat: number,
     lon: number,
-    elevation: number,
-    effectiveHeight: number,
+    elevation: number | null,
+    heightOffset: number,
+    effectiveHeight: number | null,
     source: string,
   ): void {
-    const latStr = lat.toFixed(4);
-    const lonStr = lon.toFixed(4);
-    const effStr = effectiveHeight.toFixed(1);
+    this.observer = { lat, lon, elevation, heightOffset, effectiveHeight, source };
+    this.renderObserverHUD();
+  }
+
+  /** Update only GPS position; DEM height can arrive later without UI lag. */
+  public updateNavigationCoordinates(lat: number, lon: number): void {
+    this.observer.lat = lat;
+    this.observer.lon = lon;
+    this.renderObserverHUD();
+  }
+
+  private renderObserverHUD(): void {
+    const { lat, lon, elevation, heightOffset, effectiveHeight, source } = this.observer;
+    // Six decimals make the live GPS movement visible (about decimetre
+    // latitude precision) instead of appearing frozen until 11 m have passed.
+    const latStr = lat.toFixed(6);
+    const lonStr = lon.toFixed(6);
+    const elevationStr = elevation === null ? "No disponible" : `${elevation.toFixed(1)} m`;
+    const effStr = effectiveHeight === null ? "No disponible" : `${effectiveHeight.toFixed(1)} m`;
 
     this.observerSection.innerHTML = `
     <div style="font-weight: 600; color: #d8b26a; margin-bottom: 2px;">
       OBSERVADOR
     </div>
     <div>Lat: ${latStr}° | Lon: ${lonStr}°</div>
-    <div>Alçada efectiva: ${effStr} m</div>
+    <div>Elevació DEM: ${elevationStr}</div>
+    <div>Offset ull: ${heightOffset.toFixed(1)} m</div>
+    <div>Alçada efectiva: ${effStr}</div>
     <div style="color: #88bbff; font-size: 10px; margin-top: 2px;">
       Font elev: ${source}
     </div>

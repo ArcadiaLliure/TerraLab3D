@@ -8,66 +8,30 @@ export interface StarVisibilityEvaluation {
   readonly effectiveLimit: number;
 }
 
-/**
- * Càlculs de visibilitat d'estrelles en CPU, reproduint
- * exactament la mateixa lògica fotomètrica i atmosfèrica que el shader GPU
- * per mantenir la coherència entre allò que es renderitza i allò que es pot clicar.
- */
+/** CPU parity for atmospheric visibility; terrain occlusion is a separate policy. */
 export class StarVisibilityEvaluator {
-  /** Llindar mínim d'alpha per considerar una estrella interactuable. */
   public static readonly MINIMUM_PICKABLE_ALPHA = 0.05;
 
-  /**
-   * Avalua si una estrella amb una magnitud i altitud donades
-   * és prou visible per ser interactuable segons l'estat atmosfèric actual.
-   *
-   * @param magnitude Magnitud absoluta (catàleg).
-   * @param altitudeDeg Altitud local sobre l'horitzó en graus [-90, +90].
-   * @param state Estat actual de visibilitat (extinció, LP, crepuscle).
-   */
   public static evaluate(
     magnitude: number,
     altitudeDeg: number,
     state: SkyVisibilityState,
-    cameraHeight: number,
   ): StarVisibilityEvaluation {
-    // Calcular depressió de l'horitzó per esfèricitat de la Terra
-    const R_E = 6371000.0;
-    const dip_angle = (Math.acos(R_E / (R_E + Math.max(0.0, cameraHeight)))) * (180.0 / Math.PI);
+    const hAtmosphere = Math.max(-5.0, altitudeDeg);
+    const denominator = Math.sin(hAtmosphere * DEG_TO_RAD)
+      + 0.50572 * Math.pow(hAtmosphere + 6.07995, -1.6364);
+    const airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
+    const effectiveLimit = state.zenithMagnitudeLimit
+      - state.extinctionCoefficient * (airmass - 1.0)
+      - state.twilightSuppression;
 
-    // Utilitzem abs() per a una atmosfera 360º simètrica centrada a l'horitzó físic
-    const hClamp = Math.abs(altitudeDeg + dip_angle);
-
-    // Kasten-Young Airmass (mateixa fórmula que shader)
-    const hRad = hClamp * DEG_TO_RAD;
-    const denominator = Math.sin(hRad) + 0.50572 * Math.pow(hClamp + 6.07995, -1.6364);
-    const base_airmass = denominator < 1e-5 ? 40.0 : 1.0 / denominator;
-    
-    // Atenuar extinció segons l'escala atmosfèrica
-    const atmosphereScale = Math.exp(-Math.max(0.0, cameraHeight) / 8500.0);
-    const airmass = 1.0 + (base_airmass - 1.0) * atmosphereScale;
-
-    // Límits efectius
-    const effectiveLimit =
-      state.zenithMagnitudeLimit -
-      state.extinctionCoefficient * (airmass - 1.0) -
-      state.twilightSuppression;
-
-    // Fade suau: smoothstep(min, max, x) on x és la magnitud.
-    // Com més brillant (magnitud més baixa), l'alpha s'acosta a 1.
-    // min = effectiveLimit
-    // max = effectiveLimit - fadeWidth
     let alpha = 0.0;
     if (magnitude < effectiveLimit - state.fadeWidthMag) {
       alpha = 1.0;
-    } else if (magnitude > effectiveLimit) {
-      alpha = 0.0;
-    } else {
-      // Interpolació smoothstep
+    } else if (magnitude <= effectiveLimit) {
       const t = (magnitude - effectiveLimit) / -state.fadeWidthMag;
       alpha = t * t * (3.0 - 2.0 * t);
     }
-
     return {
       visible: alpha >= this.MINIMUM_PICKABLE_ALPHA,
       alpha,

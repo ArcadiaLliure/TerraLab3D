@@ -26,6 +26,10 @@ import type {
 import type { NavigationCameraPose, MotionState } from "../contracts/navigation";
 import type { LightingEnvironmentSnapshot } from "../contracts/lighting_environment_contracts";
 import type {
+  HorizonProfileSettingsMessage,
+  HorizonStatusMessage,
+} from "../contracts/horizon_contracts";
+import type {
   ApparentTrajectoryMetadata,
   AngularSeparationResult,
   AstronomicalEventSearchResult,
@@ -62,7 +66,16 @@ export interface BackendMessageListener {
   onSetCameraPose?(pose: CameraPoseFromBackend): void;
   onFocusDirection?(focus: FocusFromBackend): void;
   onShutdownRequested?(): void;
-  onObserverLocationChanged?(lat: number, lon: number, elevation: number, effectiveHeight: number, elevationSource: string): void;
+  onObserverLocationChanged?(
+    lat: number,
+    lon: number,
+    elevation: number | null,
+    heightOffset: number,
+    effectiveHeight: number | null,
+    elevationSource: string,
+    navigation: boolean,
+  ): void;
+  onNavigationCoordinatesChanged?(lat: number, lon: number): void;
   onLocationError?(message: string): void;
   onSimulationTimeSnapshot?(
     currentTimeIso: string,
@@ -97,6 +110,7 @@ export interface BackendMessageListener {
   onDownloadJobSnapshot?(msg: import("../contracts/bridge_messages").DownloadJobSnapshotMessage): void;
   onAstronomicalSearchResult?(msg: import("../contracts/bridge_messages").AstronomicalSearchResultMessage): void;
   onStarTrailsSnapshot?(snapshot: import("../contracts/bridge_messages").StarTrailsSnapshotMessage): void;
+  onHorizonStatus?(status: HorizonStatusMessage): void;
 }
 
 export class WebSocketBridge {
@@ -238,6 +252,18 @@ export class WebSocketBridge {
     this.sendMessage(msg);
   }
 
+  sendHorizonSettings(settings: Omit<HorizonProfileSettingsMessage, "type">): void {
+    this.sendMessage({ type: "set_horizon_settings", ...settings });
+  }
+
+  recalculateHorizon(): void {
+    this.sendMessage({ type: "recalculate_horizon" });
+  }
+
+  cancelHorizon(): void {
+    this.sendMessage({ type: "cancel_horizon" });
+  }
+
   private shutdownRequested = false;
 
   dispose(): void {
@@ -344,8 +370,10 @@ export class WebSocketBridge {
             msg.lat,
             msg.lon,
             msg.elevation,
+            msg.heightOffset,
             msg.effectiveHeight,
             msg.elevationSource,
+            msg.navigation === true,
           );
         }
         break;
@@ -446,6 +474,16 @@ export class WebSocketBridge {
       case "star_trails_snapshot":
         for (const l of this.messageListeners) {
           l.onStarTrailsSnapshot?.(msg as any);
+        }
+        break;
+      case "horizon_status":
+        for (const l of this.messageListeners) {
+          l.onHorizonStatus?.(msg);
+        }
+        break;
+      case "navigation_coordinates_changed":
+        for (const l of this.messageListeners) {
+          l.onNavigationCoordinatesChanged?.(msg.lat, msg.lon);
         }
         break;
       default:
@@ -588,7 +626,7 @@ export class WebSocketBridge {
     this.sendMessage(msg);
   }
 
-  public sendCameraPoseChanged(pose: NavigationCameraPose, speedMps: number): void {
+  public sendCameraPoseChanged(pose: NavigationCameraPose, motion: MotionState): void {
     const msg: CameraPoseChangedMessage = {
       type: "camera_pose_changed",
       positionEastM: pose.positionEastM,
@@ -599,7 +637,9 @@ export class WebSocketBridge {
       rollDeg: pose.rollDeg,
       fovDeg: pose.fovDeg,
       navigationMode: pose.navigationMode,
-      speedMps,
+      speedMps: motion.speedMps,
+      velocityEastMps: motion.velocityEast,
+      velocityNorthMps: motion.velocityNorth,
     };
     this.sendMessage(msg);
   }

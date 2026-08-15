@@ -120,7 +120,7 @@ export class Shell {
     const specs = [
       { id: "location", title: "Ubicació", iconSvg: ICONS.location },
       { id: "sky", title: "Cel", iconSvg: ICONS.sky },
-      { id: "earth", title: "Terra", iconSvg: ICONS.earth },
+      { id: "earth", title: "Topografia", iconSvg: ICONS.earth },
       { id: "tools", title: "Eines", iconSvg: ICONS.tools },
     ];
 

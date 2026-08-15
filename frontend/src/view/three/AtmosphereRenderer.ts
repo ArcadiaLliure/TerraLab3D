@@ -4,6 +4,10 @@ import type { SkyEnvironmentSnapshot } from "../../contracts/sky_environment_con
 import { setThreeFromEnu } from "./celestialCoordinates";
 import { skyFragmentShader, skyVertexShader } from "./shaders/skyShader";
 
+// The atmosphere is a background pass. It must run before the DEM horizon,
+// whose depth-writing curtain masks sky and celestial objects below the ridge.
+export const ATMOSPHERE_RENDER_ORDER = -2_000;
+
 export class AtmosphereRenderer {
   private readonly material: THREE.ShaderMaterial;
   private readonly mesh: THREE.Mesh;
@@ -47,7 +51,7 @@ export class AtmosphereRenderer {
     });
     this.mesh = new THREE.Mesh(new THREE.BoxGeometry(2000, 2000, 2000), this.material);
     this.mesh.name = "atmosphere";
-    this.mesh.renderOrder = -1000;
+    this.mesh.renderOrder = ATMOSPHERE_RENDER_ORDER;
     this.mesh.frustumCulled = false;
     this.parent.add(this.mesh);
   }

@@ -1,7 +1,9 @@
 import type { NavigationMode, NavigationCameraPose, MotionState, NavigationReadiness } from "../../../contracts/navigation";
 
+export type LocationRelocationOutcome = "flight-started" | "terrain-reload" | "destination-unavailable";
+
 export interface LocationPageCallbacks {
-  onRelocate: (lat: number, lon: number, height: number) => void;
+  onRelocate: (lat: number, lon: number, height: number) => LocationRelocationOutcome;
   onSetRealtime: (enabled: boolean) => void;
   onOffsetDay: (offsetDays: number) => void;
   onSetDate: (dateIso: string) => void;
@@ -49,6 +51,7 @@ export class LocationPage {
 
   private isRealtimeActive = true;
   private currentNavMode: NavigationMode = "walk";
+  private statusHideTimer: number | null = null;
   private callbacks: LocationPageCallbacks;
 
   constructor(callbacks: LocationPageCallbacks) {
@@ -90,11 +93,26 @@ export class LocationPage {
     this.btnRelocate.onmouseout = () => this.btnRelocate.style.background = "var(--button-bg)";
 
     this.btnRelocate.onclick = () => {
-      const lat = parseFloat(this.inputLat.value) || 0;
-      const lon = parseFloat(this.inputLon.value) || 0;
-      const height = parseFloat(this.inputHeight.value) || 0;
+      const lat = Number(this.inputLat.value);
+      const lon = Number(this.inputLon.value);
+      const height = Number(this.inputHeight.value);
+      if (
+        !Number.isFinite(lat)
+        || !Number.isFinite(lon)
+        || !Number.isFinite(height)
+        || Math.abs(lat) > 90
+        || Math.abs(lon) > 180
+      ) {
+        this.notifyError("Coordenades o alçada no vàlides");
+        return;
+      }
       this.btnRelocate.textContent = "Reubicant...";
-      this.callbacks.onRelocate(lat, lon, height);
+      const outcome = this.callbacks.onRelocate(lat, lon, height);
+      if (outcome === "flight-started") {
+        this.notifyFlightStarted();
+      } else if (outcome === "destination-unavailable") {
+        this.notifyError("El destí no és dins del DEM carregat");
+      }
     };
 
     this.statusLabel = document.createElement("div");
@@ -348,7 +366,11 @@ export class LocationPage {
     }
   }
 
-  public updateInputs(lat: number, lon: number): void {
+  /**
+   * Updates the user-owned relocation fields after a true observer relocation.
+   * Live GPS navigation is intentionally displayed only in the HUD.
+   */
+  public updateConfiguredObserverInputs(lat: number, lon: number): void {
     this.inputLat.value = lat.toString();
     this.inputLon.value = lon.toString();
   }
@@ -368,15 +390,17 @@ export class LocationPage {
 
   public notifySuccess(): void {
     this.btnRelocate.textContent = "Reubicar";
-    this.statusLabel.textContent = "✓ Ubicació actualitzada";
-    this.statusLabel.style.opacity = "1";
-    setTimeout(() => {
-      this.statusLabel.style.opacity = "0";
-    }, 2500);
+    this.showStatus("✓ Ubicació actualitzada", "var(--color-success)");
   }
 
-  public notifyError(): void {
+  public notifyFlightStarted(): void {
     this.btnRelocate.textContent = "Reubicar";
+    this.showStatus("✓ Avió en ruta dins del DEM carregat", "var(--color-success)");
+  }
+
+  public notifyError(message = "No s'ha pogut actualitzar la ubicació"): void {
+    this.btnRelocate.textContent = "Reubicar";
+    this.showStatus(message, "var(--color-danger, #e86b6b)");
   }
 
   public mount(container: HTMLElement): void {
@@ -384,6 +408,7 @@ export class LocationPage {
   }
 
   public dispose(): void {
+    if (this.statusHideTimer !== null) window.clearTimeout(this.statusHideTimer);
     this.element.remove();
   }
 
@@ -419,6 +444,17 @@ export class LocationPage {
       this.btnRealtime.style.color = "var(--color-text)";
       this.btnRealtime.style.borderColor = "var(--color-border)";
     }
+  }
+
+  private showStatus(message: string, color: string): void {
+    if (this.statusHideTimer !== null) window.clearTimeout(this.statusHideTimer);
+    this.statusLabel.textContent = message;
+    this.statusLabel.style.color = color;
+    this.statusLabel.style.opacity = "1";
+    this.statusHideTimer = window.setTimeout(() => {
+      this.statusLabel.style.opacity = "0";
+      this.statusHideTimer = null;
+    }, 2_500);
   }
 
   private createInputRow(parent: HTMLElement, labelText: string, placeholder: string): HTMLInputElement {

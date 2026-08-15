@@ -1,0 +1,29 @@
+.terrain-goto-menu {
+  position: absolute;
+  z-index: 40;
+  min-width: 278px;
+  padding: 4px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--border-radius-md);
+  background: color-mix(in srgb, var(--color-surface) 94%, black);
+  box-shadow: 0 8px 26px rgb(0 0 0 / 42%);
+}
+
+.terrain-goto-menu__action {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-sm);
+  background: transparent;
+  color: var(--color-text);
+  text-align: left;
+  font-family: var(--font-family-mono);
+  cursor: pointer;
+}
+
+.terrain-goto-menu__action:hover,
+.terrain-goto-menu__action:focus-visible {
+  border-color: var(--color-gold);
+  background: var(--color-surface-hover);
+  outline: none;
+}

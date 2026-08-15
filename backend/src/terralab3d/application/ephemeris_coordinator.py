@@ -11,6 +11,8 @@ from typing import Awaitable, Callable
 
 from terralab3d.application.ports.ephemeris import EphemerisPort
 from terralab3d.domain.solar_system.models import ScientificObserver, SolarSystemSnapshot
+from terralab3d.domain.horizon.models import HorizonProfile
+from terralab3d.domain.horizon.services import HorizonVisibilityEnricher
 
 SnapshotPublisher = Callable[[SolarSystemSnapshot], Awaitable[int | None]]
 log = logging.getLogger("terralab3d.ephemeris.coordinator")
@@ -27,9 +29,16 @@ class _Request:
 class EphemerisCoordinator:
     """Maintains exactly one calculation in flight and one latest pending request."""
 
-    def __init__(self, port: EphemerisPort, publisher: SnapshotPublisher) -> None:
+    def __init__(
+        self,
+        port: EphemerisPort,
+        publisher: SnapshotPublisher,
+        horizon_profile: Callable[[], HorizonProfile | None] | None = None,
+    ) -> None:
         self._port = port
         self._publisher = publisher
+        self._horizon_profile = horizon_profile
+        self._horizon_enricher = HorizonVisibilityEnricher()
         self._generation = 0
         self._latest_requested_generation = 0
         self._pending: _Request | None = None
@@ -143,6 +152,9 @@ class EphemerisCoordinator:
                     request.generation,
                     request.observer_generation,
                 )
+                profile = self._horizon_profile() if self._horizon_profile is not None else None
+                if profile is not None and profile.observer_generation == request.observer_generation:
+                    published = self._horizon_enricher.enrich(published, profile)
                 try:
                     byte_count = await self._publisher(published)
                 except Exception:

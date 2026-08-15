@@ -657,8 +657,6 @@ class SpiceEphemerisAdapter:
                 else PhysicalModelQuality.VISUAL_REFERENCE if naif_id in {199, 299, 499, 599, 699, 799, 899} else PhysicalModelQuality.UNAVAILABLE
             ),
             geometric_elevation_deg=altitude_deg,
-            horizon_elevation_deg=0.0,
-            horizon_visible=altitude_deg + angular_radius > 0.0,
             refraction_applied=False,
             ring_diagnostics=ring_diagnostics,
         )

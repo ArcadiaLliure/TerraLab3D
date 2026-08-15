@@ -4,9 +4,11 @@ import type { SkyVisibilityState } from "../../../contracts/sky_environment_cont
 import { DEFAULT_SKY_VISIBILITY } from "../../../contracts/sky_visibility_defaults";
 import type { CelestialTransformState } from "../CelestialTransformState";
 import type { DeepSkyRenderer } from "../DeepSkyRenderer";
+import type { HorizonOcclusionState } from "../HorizonOcclusionState";
+import { CELESTIAL_SCENE_RADIUS } from "../celestialScenePolicy";
 
 const LOG_PREFIX = "MGP: [DeepSkyPickProvider]";
-const SKY_RADIUS = 1000000.0;
+const SKY_RADIUS = CELESTIAL_SCENE_RADIUS.distantSky;
 
 const _raycaster = new THREE.Raycaster();
 const _ndcVec = new THREE.Vector2();
@@ -23,6 +25,7 @@ export interface DeepSkyPickProviderDeps {
   deepSkyRenderer: DeepSkyRenderer;
   getSkyVisibilityState: () => SkyVisibilityState | null;
   isDeepSkyLayerVisible: () => boolean;
+  horizonOcclusionState?: HorizonOcclusionState;
 }
 
 export class DeepSkyPickProvider {
@@ -91,9 +94,7 @@ export class DeepSkyPickProvider {
 
       _worldPos.set(vx, vy, vz);
       _worldPos.applyMatrix3(this.deps.transformState.equatorialToThree);
-
-      // Check horizon cull (y > 0ish)
-      if (_worldPos.y < -0.1) continue;
+      if (this.deps.horizonOcclusionState?.isOccludedDirection(_worldPos)) continue;
 
       const mag = mags[i]! > -1 ? mags[i]! : 15.0;
 
@@ -178,6 +179,7 @@ export class DeepSkyPickProvider {
 
     _worldPos.set(vx, vy, vz);
     _worldPos.applyMatrix3(this.deps.transformState.equatorialToThree);
+    if (this.deps.horizonOcclusionState?.isOccludedDirection(_worldPos)) return null;
     _worldPos.multiplyScalar(SKY_RADIUS);
     _worldPos.add(camera.position);
 

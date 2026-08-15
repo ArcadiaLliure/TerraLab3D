@@ -68,10 +68,10 @@ export interface WalkNavigationSettings {
 
 export const DEFAULT_WALK_SETTINGS: Readonly<WalkNavigationSettings> = {
   eyeHeightM: 1.70,
-  walkSpeedMps: 2.50,
-  sprintSpeedMps: 6.00,
-  accelerationMps2: 8.00,
-  decelerationMps2: 10.00,
+  walkSpeedMps: 4.00,
+  sprintSpeedMps: 10.00,
+  accelerationMps2: 18.00,
+  decelerationMps2: 24.00,
   maximumStepHeightM: 0.50,
   maximumWalkableSlopeDeg: 45,
   groundProbeDistanceM: 50.0,
@@ -98,12 +98,12 @@ export interface FlightNavigationSettings {
 
 export const DEFAULT_FLIGHT_SETTINGS: Readonly<FlightNavigationSettings> = {
   minimumSpeedMps: 0,
-  cruiseSpeedMps: 100,
-  maximumSpeedMps: 1000,
-  accelerationMps2: 15,
-  brakingMps2: 20,
-  climbRateMps: 15,
-  descentRateMps: 15,
+  cruiseSpeedMps: 150,
+  maximumSpeedMps: 250,
+  accelerationMps2: 90,
+  brakingMps2: 120,
+  climbRateMps: 60,
+  descentRateMps: 60,
   maximumPitchDeg: 80,
   maximumRollDeg: 45,
   minimumClearanceM: 2,

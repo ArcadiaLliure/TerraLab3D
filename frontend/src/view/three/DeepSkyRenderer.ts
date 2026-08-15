@@ -6,11 +6,18 @@ import type { CelestialTransformState } from "./CelestialTransformState";
 import type { SkyVisibilityState } from "../../contracts/sky_environment_contracts";
 import { DEFAULT_SKY_VISIBILITY } from "../../contracts/sky_visibility_defaults";
 import { DeepSkyLabels } from "./DeepSkyLabels";
+import type { HorizonOcclusionState } from "./HorizonOcclusionState";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
+import {
+  HORIZON_GLSL_FUNCTIONS,
+  HORIZON_GLSL_UNIFORMS,
+} from "./shaders/horizonOcclusionShader";
 
 const VERTEX_SHADER = `
   precision highp float;
   uniform mat3 u_equatorialToENUMatrix;
   uniform float u_radius;
+  ${HORIZON_GLSL_UNIFORMS}
   
   attribute vec3 equatorialDirection;
   attribute vec3 northTangent;
@@ -30,6 +37,7 @@ const VERTEX_SHADER = `
   varying float vMagnitude;
   varying float vSurfBr;
   varying float vFlags;
+  ${HORIZON_GLSL_FUNCTIONS}
   
   void main() {
     vUv = position.xy;
@@ -79,6 +87,11 @@ const VERTEX_SHADER = `
     
     // Transform to ENU using the same matrix as stars
     vec3 enuDir = u_equatorialToENUMatrix * dir;
+    float altitudeDeg = degrees(asin(clamp(enuDir.y, -1.0, 1.0)));
+    if (altitudeDeg < horizonElevationAtDirection(enuDir)) {
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
     
     // Project to the sky sphere
     vec3 finalPos = enuDir * u_radius;
@@ -152,6 +165,7 @@ export class DeepSkyRenderer {
   private isVisible = true;
   private transformState: CelestialTransformState | null = null;
   private currentVisibilityState: SkyVisibilityState | null = null;
+  private readonly horizonUnsubscribe: (() => void) | null;
 
   private mesh: THREE.Mesh | null = null;
   private material: THREE.ShaderMaterial | null = null;
@@ -161,10 +175,12 @@ export class DeepSkyRenderer {
   public payloadBuffer: ArrayBuffer | null = null;
   public readonly catalogIndexToBufferIndex = new Map<number, number>();
 
-  public readonly labels = new DeepSkyLabels();
+  public readonly labels: DeepSkyLabels;
 
-  constructor() {
+  constructor(private readonly horizonState: HorizonOcclusionState | null = null) {
     this.rootGroup.name = "deepSkyRoot";
+    this.labels = new DeepSkyLabels(horizonState);
+    this.horizonUnsubscribe = horizonState?.subscribe(() => this.syncHorizonUniforms()) ?? null;
   }
 
   public setTransformState(state: CelestialTransformState): void {
@@ -304,7 +320,12 @@ export class DeepSkyRenderer {
       fragmentShader: FRAGMENT_SHADER,
       uniforms: {
         u_equatorialToENUMatrix: { value: mat3 },
-        u_radius: { value: 1000000.0 }, // background sphere
+        u_radius: { value: CELESTIAL_SCENE_RADIUS.distantSky },
+        u_horizonTexture: { value: this.horizonState?.gpuUniformValues().texture ?? null },
+        u_horizonSampleCount: { value: this.horizonState?.gpuUniformValues().sampleCount ?? 0 },
+        u_horizonTextureWidth: { value: this.horizonState?.gpuUniformValues().textureWidth ?? 1 },
+        u_horizonTextureHeight: { value: this.horizonState?.gpuUniformValues().textureHeight ?? 1 },
+        u_horizonEnabled: { value: this.horizonState?.gpuUniformValues().enabled ?? 0 },
         u_zenithMagnitudeLimit: { value: this.currentVisibilityState?.zenithMagnitudeLimit ?? DEFAULT_SKY_VISIBILITY.zenithMagnitudeLimit },
         u_extinctionCoefficient: { value: this.currentVisibilityState?.extinctionCoefficient ?? DEFAULT_SKY_VISIBILITY.extinctionCoefficient },
         u_twilightSuppression: { value: this.currentVisibilityState?.twilightSuppression ?? DEFAULT_SKY_VISIBILITY.twilightSuppression },
@@ -346,8 +367,20 @@ export class DeepSkyRenderer {
   }
 
   public dispose(): void {
+    this.horizonUnsubscribe?.();
     this.disposeResource();
     this.rootGroup.removeFromParent();
     this.labels.dispose();
+  }
+
+  private syncHorizonUniforms(): void {
+    if (!this.material || this.horizonState === null) return;
+    const values = this.horizonState.gpuUniformValues();
+    this.material.uniforms["u_horizonTexture"]!.value = values.texture;
+    this.material.uniforms["u_horizonSampleCount"]!.value = values.sampleCount;
+    this.material.uniforms["u_horizonTextureWidth"]!.value = values.textureWidth;
+    this.material.uniforms["u_horizonTextureHeight"]!.value = values.textureHeight;
+    this.material.uniforms["u_horizonEnabled"]!.value = values.enabled;
+    this.material.uniformsNeedUpdate = true;
   }
 }

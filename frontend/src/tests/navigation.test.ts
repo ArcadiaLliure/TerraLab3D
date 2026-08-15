@@ -11,9 +11,15 @@
 
 import type { TerrainSampler, GroundSample } from "../contracts/TerrainSampler";
 import type { NavigationCameraPose, WalkNavigationSettings } from "../contracts/navigation";
-import { DEFAULT_WALK_SETTINGS, defaultNavigationCameraPose } from "../contracts/navigation";
+import {
+  DEFAULT_FLIGHT_SETTINGS,
+  DEFAULT_WALK_SETTINGS,
+  defaultNavigationCameraPose,
+} from "../contracts/navigation";
 import { GroundFollower } from "../view/three/terrain/GroundFollower";
 import { CameraVisualSmoother } from "../view/three/CameraVisualSmoother";
+import { CameraRigImpl } from "../view/three/CameraRigImpl";
+import * as THREE from "three";
 
 // ─── Fake TerrainSampler for Unit Testing ─────────────────────────────
 
@@ -236,6 +242,41 @@ function runTests() {
 
     assert(!res.blocked, "GroundFollower works with custom DEM TerrainSampler without changes");
     assertNear(res.pose.positionUpM, 43.7, 0.001, "Height resolves to DEM height + eyeHeight (42 + 1.7)");
+  }
+
+  // â”€â”€ 8. Flight: DEM clearance and commercial-aircraft speed limit â”€â”€
+  console.log("\n8. Flight â€” DEM clearance and speed limit");
+  {
+    const sampler = new FakeTerrainSampler();
+    sampler.heightFn = () => 100;
+    const rig = new CameraRigImpl(new THREE.PerspectiveCamera());
+    rig.setTerrainDependencies(sampler, new GroundFollower());
+    rig.setNavigationMode("flight");
+    const internal = rig as unknown as {
+      positionEastM: number;
+      positionNorthM: number;
+      positionUpM: number;
+      updateFlightMode(deltaSeconds: number): void;
+    };
+    internal.positionUpM = 0;
+    internal.updateFlightMode(1 / 60);
+
+    assertNear(
+      rig.getNavigationPose().positionUpM,
+      102,
+      0.001,
+      "Flight is lifted to real DEM height plus minimum clearance",
+    );
+    assert(DEFAULT_FLIGHT_SETTINGS.maximumSpeedMps === 250, "Flight boost is capped at 250 m/s");
+
+    internal.positionEastM = 245;
+    internal.positionNorthM = -180;
+    internal.positionUpM = 500;
+    rig.setNavigationMode("walk");
+    const landed = rig.getNavigationPose();
+    assertNear(landed.positionEastM, 245, 0.001, "Landing preserves flight east coordinate");
+    assertNear(landed.positionNorthM, -180, 0.001, "Landing preserves flight north coordinate");
+    assertNear(landed.positionUpM, 101.7, 0.001, "Landing projects onto DEM at the current coordinate");
   }
 
   // ── Summary ────────────────────────────────────────────────────────

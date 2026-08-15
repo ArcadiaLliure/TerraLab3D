@@ -9,8 +9,10 @@ import type {
 import { threeFromEnu } from "./celestialCoordinates";
 import type { PickableSolarSystemBody } from "./SolarSystemRenderer";
 import type { CelestialOcclusionPolicy } from "./CelestialOcclusionPolicy";
+import type { HorizonOcclusionState } from "./HorizonOcclusionState";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
-const CELESTIAL_RADIUS = 900_000;
+const CELESTIAL_RADIUS = CELESTIAL_SCENE_RADIUS.solarSystem;
 
 const VERTEX_SHADER = /* glsl */ `
   attribute vec3 color;
@@ -109,7 +111,10 @@ export class NaturalSatelliteRenderer {
   private enabled = false;
   private disposed = false;
 
-  constructor(parent: THREE.Object3D) {
+  constructor(
+    parent: THREE.Object3D,
+    private readonly horizonState: HorizonOcclusionState | null = null,
+  ) {
     this.root.name = "naturalSatellitesRoot";
     this.sharedGeometry.setAttribute("position", new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3));
     
@@ -214,7 +219,15 @@ export class NaturalSatelliteRenderer {
       }
 
       const position = threeFromEnu(state.directionENU).normalize().multiplyScalar(radius);
-      const visible = this.enabled && (state.horizonVisible ?? state.altitudeDeg >= 0);
+      const visible = this.enabled && (
+        this.horizonState === null
+          ? (state.horizonVisible ?? state.altitudeDeg + state.angularRadiusDeg >= 0)
+          : !this.horizonState.isDiscFullyOccluded(
+            state.azimuthDeg,
+            state.altitudeDeg,
+            state.angularRadiusDeg,
+          )
+      );
       
       item.anchor.position.copy(position);
       item.anchor.visible = visible;
@@ -259,6 +272,10 @@ export class NaturalSatelliteRenderer {
       }
     }
     return result;
+  }
+
+  getBodyObject(id: SolarSystemBodyId): THREE.Object3D | undefined {
+    return this.items.get(id as SatelliteBodyId)?.anchor;
   }
 
   metrics(): NaturalSatelliteMetrics {

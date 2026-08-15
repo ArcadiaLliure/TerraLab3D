@@ -11,6 +11,34 @@ export function threeFromEnu(enu: ScientificEnu): THREE.Vector3 {
   return setThreeFromEnu(new THREE.Vector3(), enu);
 }
 
+/** Shared azimuth convention: 0=N, 90=E; Three axes +X East, +Y Up, -Z North. */
+export function setThreeFromAzimuthAltitude(
+  target: THREE.Vector3,
+  azimuthDeg: number,
+  altitudeDeg: number,
+  radius = 1,
+): THREE.Vector3 {
+  const azimuthRad = THREE.MathUtils.degToRad(azimuthDeg);
+  const altitudeRad = THREE.MathUtils.degToRad(altitudeDeg);
+  const horizontal = Math.cos(altitudeRad) * radius;
+  return target.set(
+    Math.sin(azimuthRad) * horizontal,
+    Math.sin(altitudeRad) * radius,
+    -Math.cos(azimuthRad) * horizontal,
+  );
+}
+
+export function azimuthAltitudeFromThreeDirection(
+  direction: { x: number; y: number; z: number },
+): { azimuthDeg: number; altitudeDeg: number } | null {
+  const length = Math.hypot(direction.x, direction.y, direction.z);
+  if (length <= 0) return null;
+  return {
+    azimuthDeg: (Math.atan2(direction.x, -direction.z) * 180 / Math.PI + 360) % 360,
+    altitudeDeg: Math.asin(Math.max(-1, Math.min(1, direction.y / length))) * 180 / Math.PI,
+  };
+}
+
 const ENU_AXES_TO_THREE = new THREE.Quaternion().setFromAxisAngle(
   new THREE.Vector3(1, 0, 0),
   -Math.PI / 2,

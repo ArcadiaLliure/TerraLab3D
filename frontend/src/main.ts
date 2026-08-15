@@ -25,6 +25,10 @@ import { GroundFollower } from "./view/three/terrain/GroundFollower";
 import { CelestialSelectionController, fromSearchResult } from "./application/CelestialSelectionController";
 import { buildInspectionModel } from "./application/InspectionModelBuilder";
 import { ResourceManagerModal } from "./view/ui/modals/ResourceManagerModal";
+import {
+  projectCoordinateToTerrainWorld,
+  type TerrainWorldAnchor,
+} from "./application/TerrainCoordinateProjector";
 
 import { LocationPage } from "./view/ui/drawer_pages/LocationPage";
 import { SkyPage } from "./view/ui/drawer_pages/SkyPage";
@@ -46,6 +50,7 @@ import { CelestialPickProvider } from "./view/three/picking/CelestialPickProvide
 import { ScenePickingController } from "./view/three/picking/ScenePickingController";
 import { TrackingTargetResolver } from "./view/three/picking/TrackingTargetResolver";
 import { FocusTrackingController } from "./view/three/picking/FocusTrackingController";
+import { TerrainGotoController } from "./view/three/terrain/TerrainGotoController";
 
 // ─── Bootstrap ───────────────────────────────────────────────────────
 
@@ -69,6 +74,9 @@ function main(): void {
   // Phase 3.5: Navigation world and terrain
   const navigationWorld = new NavigationWorld();
   const groundFollower = new GroundFollower();
+  // This anchor belongs to the persistent resident DEM, not to the live
+  // observer position reported by the aircraft/HUD.
+  let terrainWorldAnchor: TerrainWorldAnchor | null = null;
 
   const resourceManagerModal = new ResourceManagerModal(resourceManager);
 
@@ -145,7 +153,30 @@ function main(): void {
 
   // 2. Prepare UI pages
   const locationPage = new LocationPage({
-    onRelocate: (lat, lon, height) => bridge.sendSetObserverLocation(lat, lon, height),
+    onRelocate: (lat, lon, height) => {
+      const terrainLayer = sceneHost.getDemTerrainLayerRenderer();
+      const hasResidentTerrain = terrainLayer.getNavigationMesh() !== null;
+      if (!hasResidentTerrain || !terrainWorldAnchor) {
+        bridge.sendSetObserverLocation(lat, lon, height);
+        return "terrain-reload";
+      }
+
+      const destination = projectCoordinateToTerrainWorld(terrainWorldAnchor, {
+        latitudeDeg: lat,
+        longitudeDeg: lon,
+      });
+      if (!destination) return "destination-unavailable";
+
+      // Preserve the loaded mesh. CameraRig validates that this coordinate is
+      // actually sampled by it before starting the fast aircraft movement.
+      const started = cameraRig.gotoFlightTo(
+        destination.eastM,
+        destination.northM,
+        0,
+        Math.max(100, height + 1.7),
+      );
+      return started ? "flight-started" : "destination-unavailable";
+    },
     onSetRealtime: (enabled) => bridge.sendSetRealtimeMode(enabled),
     onOffsetDay: (offsetDays) => bridge.sendRequestOffsetDay(offsetDays),
     onSetDate: (dateIso) => bridge.sendSetSimulationTime(dateIso),
@@ -217,7 +248,18 @@ function main(): void {
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
 
-  const earthPage = new EarthPage();
+  const earthPage = new EarthPage({
+    onHorizonSettings: (settings) => {
+      sceneHost.getHorizonOcclusionState().setEnabled(settings.enabled);
+      bridge.sendHorizonSettings(settings);
+    },
+    onRegenerate: (settings) => {
+      sceneHost.getHorizonOcclusionState().setEnabled(settings.enabled);
+      bridge.sendHorizonSettings(settings);
+      bridge.recalculateHorizon();
+    },
+    onCancel: () => bridge.cancelHorizon(),
+  });
   const earthContainer = shell.getPageContainer("earth");
   if (earthContainer) earthPage.mount(earthContainer);
 
@@ -258,7 +300,7 @@ function main(): void {
     },
     onClear: () => {
        selectionController.clearSelection();
-    }
+    },
   });
 
 
@@ -283,6 +325,7 @@ function main(): void {
     getSkyVisibilityState: () => currentSkyVisibilityState,
     getPointScale: () => sceneHost.getStarFieldRenderer().getPointScale(),
     isStarLayerVisible: () => sceneHost.getStarFieldRenderer().visible,
+    horizonOcclusionState: sceneHost.getHorizonOcclusionState(),
   });
   const solarSystemPickProvider = new SolarSystemPickProvider({
     camera: sceneHost.camera,
@@ -296,6 +339,7 @@ function main(): void {
     deepSkyRenderer: sceneHost.getDeepSkyRenderer(),
     getSkyVisibilityState: () => currentSkyVisibilityState,
     isDeepSkyLayerVisible: () => sceneHost.getDeepSkyRenderer().visible,
+    horizonOcclusionState: sceneHost.getHorizonOcclusionState(),
   });
   const pickProvider = new CelestialPickProvider({
     starPicker: starPickProvider,
@@ -344,6 +388,20 @@ function main(): void {
   diagnostics.mount(canvasContainer);
   locationHUD.mount(canvasContainer);
   cameraRig.attach(sceneHost.renderer.domElement);
+  const terrainGotoController = new TerrainGotoController({
+    canvas: sceneHost.renderer.domElement,
+    menuParent: canvasContainer,
+    camera: sceneHost.camera,
+    getTerrainMeshes: () => sceneHost.getDemTerrainLayerRenderer().getGotoTargetMeshes(),
+    getTerrainWorldAnchor: () => terrainWorldAnchor,
+    onGoto: (destination) => {
+      cameraRig.gotoFlightTo(
+        destination.eastM,
+        destination.northM,
+        destination.terrainUpM,
+      );
+    },
+  });
   gestureRouter.attach(sceneHost.renderer.domElement);
   pickingController.mount(canvasContainer);
 
@@ -369,7 +427,7 @@ function main(): void {
 
   // Wire navigation pose updates (coalesced, not per-frame)
   cameraRig.onNavigationPoseChanged((pose, motion) => {
-    bridge.sendCameraPoseChanged(pose, motion.speedMps);
+    bridge.sendCameraPoseChanged(pose, motion);
   });
 
   // 4. Bridge ↔ Camera wiring
@@ -405,12 +463,25 @@ function main(): void {
         f.transitionMs ?? 600,
       );
     },
-    onObserverLocationChanged(lat, lon, elevation, effectiveHeight, elevationSource) {
+    onObserverLocationChanged(lat, lon, elevation, heightOffset, effectiveHeight, elevationSource, navigation) {
       currentObserverLatitude = lat;
-      locationPage.updateInputs(lat, lon);
-      locationPage.notifySuccess();
-      locationHUD.updateHUD(lat, lon, elevation, effectiveHeight, elevationSource);
+      if (!navigation) {
+        // A manual relocation rebuilds the terrain and re-anchors its ENU
+        // world. Camera GPS updates must retain that persistent anchor.
+        terrainWorldAnchor = { latitudeDeg: lat, longitudeDeg: lon };
+      }
+      if (!navigation) {
+        locationPage.updateConfiguredObserverInputs(lat, lon);
+        locationPage.notifySuccess();
+      }
+      locationHUD.updateHUD(lat, lon, elevation, heightOffset, effectiveHeight, elevationSource);
+      earthPage.updateObserver(lat, lon, elevation, heightOffset, effectiveHeight, elevationSource);
       // Phase 4: Update observer latitude for celestial equator
+      sceneHost.setObserverLatitude(lat);
+    },
+    onNavigationCoordinatesChanged(lat, lon) {
+      currentObserverLatitude = lat;
+      locationHUD.updateNavigationCoordinates(lat, lon);
       sceneHost.setObserverLatitude(lat);
     },
     onLocationError(msg) {
@@ -451,6 +522,28 @@ function main(): void {
       celestialTransformState.update(generation, matrix3x3 as number[]);
     },
     onBinaryResourceReady(metadata, bufferPayload) {
+      if (metadata.role === "horizon_profile") {
+        const horizonState = sceneHost.getHorizonOcclusionState();
+        const applied = horizonState.applyBinaryResource(metadata, bufferPayload);
+        if (applied) {
+          navigationWorld.setTechnicalPresentationVisible(!horizonState.hasDemBackedProfile);
+        }
+        return;
+      }
+      if (metadata.role === "terrain_mesh" || metadata.role === "terrain_stream_chunk") {
+        const demTerrain = sceneHost.getDemTerrainLayerRenderer();
+        if (demTerrain.applyBinaryResource(metadata, bufferPayload)) {
+          navigationWorld.setDemTerrainMesh(
+            demTerrain.getNavigationMesh(),
+            demTerrain.getNavigationSampling(),
+          );
+          navigationWorld.setStreamingDemTerrainMeshes(
+            demTerrain.getStreamingNavigationLayers(),
+          );
+          earthPage.updateTerrainSurface(metadata);
+        }
+        return;
+      }
       if (metadata.role === "solar_system_orbit") {
         sceneHost.getSolarSystemRenderer().registerOrbitResource(metadata, bufferPayload);
         return;
@@ -467,6 +560,9 @@ function main(): void {
       const resourceId = metadata.resourceId as string;
       const entry = sceneHost.getStarFieldRenderer().getResource(resourceId);
       if (entry) starPickProvider.buildIndex(resourceId, entry);
+    },
+    onHorizonStatus(status) {
+      earthPage.updateHorizonStatus(status);
     },
     onStarPickResolved(msg) {
       if (!msg.star) return;
@@ -558,6 +654,7 @@ function main(): void {
     onShutdownRequested() {
       renderLoop.stop();
       cameraRig.detach();
+      terrainGotoController.dispose();
       navigationWorld.dispose();
       atmosphereRenderer.dispose();
       sceneHost.dispose();
@@ -626,6 +723,8 @@ function main(): void {
       const lighting = sceneHost.getLightingController().metrics();
       const navigation = navigationWorld.metrics();
       const rendererInfo = sceneHost.renderer.info;
+      const horizon = sceneHost.getHorizonOcclusionState().metrics();
+      const horizonLayer = sceneHost.getHorizonLayerRenderer().metrics();
       bridge.sendPerformanceMetrics({
         frameMsP50: frames.p50Ms,
         frameMsP95: frames.p95Ms,
@@ -690,6 +789,12 @@ function main(): void {
         shadowMediumFrameMsP95: lighting.shadow.timings.medium.p95Ms,
         shadowHighFrameMsP50: lighting.shadow.timings.high.p50Ms,
         shadowHighFrameMsP95: lighting.shadow.timings.high.p95Ms,
+        horizonUploadBytes: horizon.horizonUploadBytes,
+        horizonTextureBuildCount: horizon.horizonTextureBuildCount,
+        horizonGeometryBuildCount: horizonLayer.geometryBuildCount,
+        horizonDrawCalls: horizonLayer.activeMeshCount,
+        horizonLookupCpuP50: horizon.horizonLookupCpuP50,
+        horizonLookupCpuP95: horizon.horizonLookupCpuP95,
       });
     }
 
@@ -729,6 +834,7 @@ function main(): void {
     resizeObserver.disconnect();
     renderLoop.stop();
     cameraRig.detach();
+    terrainGotoController.dispose();
     navigationWorld.dispose();
     atmosphereRenderer.dispose();
     sceneHost.dispose();

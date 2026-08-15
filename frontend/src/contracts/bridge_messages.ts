@@ -22,6 +22,10 @@ import type {
   DownloadJobSnapshot,
   ResourceInstallState,
 } from "./resource_manager_contracts";
+import type {
+  HorizonProfileSettingsMessage,
+  HorizonStatusMessage,
+} from "./horizon_contracts";
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
@@ -69,6 +73,14 @@ export interface SetObserverLocationMessage {
   readonly lat: number;
   readonly lon: number;
   readonly extraHeight: number;
+}
+
+export interface RecalculateHorizonMessage {
+  readonly type: "recalculate_horizon";
+}
+
+export interface CancelHorizonMessage {
+  readonly type: "cancel_horizon";
 }
 
 export interface SetSimulationTimeMessage {
@@ -155,6 +167,9 @@ export interface CameraPoseChangedMessage {
   readonly fovDeg: number;
   readonly navigationMode: "walk" | "flight";
   readonly speedMps: number;
+  /** Local ENU velocity lets the backend lead a streaming terrain chunk. */
+  readonly velocityEastMps: number;
+  readonly velocityNorthMps: number;
 }
 
 export interface CameraMotionStartedMessage {
@@ -302,6 +317,12 @@ export interface FrontendPerformanceMetricsMessage {
   readonly shadowMediumFrameMsP95: number;
   readonly shadowHighFrameMsP50: number;
   readonly shadowHighFrameMsP95: number;
+  readonly horizonUploadBytes?: number;
+  readonly horizonTextureBuildCount?: number;
+  readonly horizonGeometryBuildCount?: number;
+  readonly horizonDrawCalls?: number;
+  readonly horizonLookupCpuP50?: number;
+  readonly horizonLookupCpuP95?: number;
 }
 
 export interface SetTimeRateMessage {
@@ -374,7 +395,10 @@ export type FrontendMessage =
   | PauseStarTrailsMessage
   | ResumeStarTrailsMessage
   | StopStarTrailsMessage
-  | ClearStarTrailsMessage;
+  | ClearStarTrailsMessage
+  | HorizonProfileSettingsMessage
+  | RecalculateHorizonMessage
+  | CancelHorizonMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -409,9 +433,17 @@ export interface ObserverLocationChangedMessage {
   readonly type: "observer_location_changed";
   readonly lat: number;
   readonly lon: number;
-  readonly elevation: number;
-  readonly effectiveHeight: number;
+  readonly elevation: number | null;
+  readonly heightOffset: number;
+  readonly effectiveHeight: number | null;
   readonly elevationSource: string;
+  readonly navigation?: boolean;
+}
+
+export interface NavigationCoordinatesChangedMessage {
+  readonly type: "navigation_coordinates_changed";
+  readonly lat: number;
+  readonly lon: number;
 }
 
 export interface SimulationTimeSnapshotMessage {
@@ -574,6 +606,7 @@ export type BackendMessage =
   | FocusDirectionMessage
   | ShutdownRequestedMessage
   | ObserverLocationChangedMessage
+  | NavigationCoordinatesChangedMessage
   | LocationErrorMessage
   | SimulationTimeSnapshotMessage
   | StarCatalogStatusMessage
@@ -591,7 +624,8 @@ export type BackendMessage =
   | DownloadJobSnapshotMessage
   | ResourceCatalogSnapshotMessage
   | AstronomicalSearchResultMessage
-  | StarTrailsSnapshotMessage;
+  | StarTrailsSnapshotMessage
+  | HorizonStatusMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

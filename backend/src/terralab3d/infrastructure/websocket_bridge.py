@@ -267,7 +267,13 @@ class WebSocketBridge:
 
     async def send_observer_location_changed(
         self,
-        lat: float, lon: float, elevation: float, effective_height: float, source: str
+        lat: float,
+        lon: float,
+        elevation: float | None,
+        effective_height: float | None,
+        source: str,
+        height_offset: float = 0.0,
+        navigation: bool = False,
     ) -> None:
         await self.send({
             "type": "observer_location_changed",
@@ -276,7 +282,25 @@ class WebSocketBridge:
             "elevation": elevation,
             "effectiveHeight": effective_height,
             "elevationSource": source,
+            "heightOffset": height_offset,
+            "navigation": navigation,
         })
+
+    async def send_navigation_coordinates_changed(
+        self,
+        latitude_deg: float,
+        longitude_deg: float,
+    ) -> None:
+        """Publish GPS coordinates without waiting for a DEM height lookup."""
+
+        await self.send({
+            "type": "navigation_coordinates_changed",
+            "lat": latitude_deg,
+            "lon": longitude_deg,
+        })
+
+    async def send_horizon_status(self, status: dict[str, Any]) -> None:
+        await self.send(status)
 
     async def send_simulation_time_snapshot(
         self,

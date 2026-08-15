@@ -17,9 +17,11 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import math
 import os
 import signal
 import sys
+import threading
 import uuid
 import webbrowser
 from typing import Any
@@ -64,6 +66,7 @@ logging.basicConfig(
 log = logging.getLogger("terralab3d")
 
 SIMULATION_TICK_INTERVAL_SEC = 1.0  # 1 update per second for stable base ephemeris
+VISUAL_STREAM_MIN_SPEED_MPS = 0.5
 
 async def run() -> int:
     """Punt d'entrada asíncron principal."""
@@ -168,6 +171,27 @@ async def run() -> int:
     # ── 3. Lògica d'Ubicació (Fase 2) ─────────────────────────────────
     from terralab3d.domain.observer.models import GeoLocation, ObserverProfile
     from terralab3d.domain.identifiers import ObserverId
+    from terralab3d.domain.horizon.models import (
+        EARTH_RADIUS_M,
+        OBSERVER_EYE_HEIGHT_M,
+        HorizonProfileSettings,
+        HorizonRangeMode,
+        HorizonRequest,
+    )
+    from terralab3d.domain.horizon.calculations import resolve_visible_radius_m
+    from terralab3d.application.elevation_coordinator import ElevationCoordinator
+    from terralab3d.application.flight_terrain_refresh import (
+        decide_flight_profile_refresh,
+        decide_flight_stream_continuation,
+        decide_visibility_window_refresh,
+    )
+    from terralab3d.application.horizon_coordinator import HorizonCoordinator, pack_terrain_mesh
+    from terralab3d.application.terrain_mesh_builder import TerrainMeshBuilder
+    from terralab3d.infrastructure.adapters.dem import (
+        PyprojAeqdProjector,
+        RasterioElevationAdapter,
+    )
+    from terralab3d.infrastructure.adapters.dem.adapter import DemSamplingCancelled
 
     current_observer = ObserverProfile(
         observer_id=ObserverId("default"),
@@ -175,18 +199,362 @@ async def run() -> int:
         height_offset_m=0.0
     )
     observer_generation = 1
+    elevation_source = "no disponible — horitzó pla fallback"
+    elevation_adapter = RasterioElevationAdapter.from_configured_library()
+    elevation_coordinator = ElevationCoordinator(elevation_adapter)
+    horizon_settings = HorizonProfileSettings()
+    horizon_enabled = True
+    horizon_request_generation = 0
+    horizon_settings_generation = 1
+    elevation_task: asyncio.Task[None] | None = None
+    terrain_horizon_view: ObserverProfile | None = None
+    navigation_hud_view: ObserverProfile | None = None
+    terrain_horizon_generation = observer_generation
+    camera_horizon_projector = PyprojAeqdProjector()
+    # Global ENU origin of the wide resident mesh. Flight moves the camera in
+    # this world; it does not silently redefine the terrain coordinate frame.
+    terrain_world_observer = current_observer
 
-    async def broadcast_location() -> None:
+    def observer_distance_m(first: ObserverProfile, second: ObserverProfile) -> float:
+        latitude_delta_m = (first.location.latitude_deg - second.location.latitude_deg) * 111_320.0
+        longitude_delta_m = (
+            (first.location.longitude_deg - second.location.longitude_deg)
+            * 111_320.0
+            * math.cos(math.radians(first.location.latitude_deg))
+        )
+        return math.hypot(latitude_delta_m, longitude_delta_m)
+
+    async def publish_horizon_profile(metadata: dict[str, object], payload: bytes) -> int:
+        await bridge.send_binary_resource(
+            str(metadata["resourceId"]),
+            str(metadata["version"]),
+            metadata,
+            payload,
+        )
+        return len(payload)
+
+    horizon_coordinator = HorizonCoordinator(
+        elevation_adapter,
+        PyprojAeqdProjector(),
+        publish_horizon_profile,
+        bridge.send_horizon_status,
+    )
+    terrain_stream_builder = TerrainMeshBuilder(elevation_adapter, camera_horizon_projector)
+    terrain_stream_task: asyncio.Task[None] | None = None
+    terrain_stream_cancel: threading.Event | None = None
+    terrain_stream_generation = 0
+    terrain_stream_center_east_m = 0.0
+    terrain_stream_center_north_m = 0.0
+    terrain_stream_radius_m = 0.0
+    terrain_stream_velocity_east_mps = 0.0
+    terrain_stream_velocity_north_mps = 0.0
+    navigation_pose_east_m = 0.0
+    navigation_pose_north_m = 0.0
+    navigation_velocity_east_mps = 0.0
+    navigation_velocity_north_mps = 0.0
+    navigation_speed_mps = 0.0
+    terrain_regeneration_task: asyncio.Task[None] | None = None
+    terrain_regeneration_generation = 0
+
+    def new_horizon_request(
+        *,
+        force_recalculate: bool = False,
+        build_terrain_mesh: bool = True,
+        observer: ObserverProfile | None = None,
+    ) -> HorizonRequest:
+        nonlocal horizon_request_generation
+        horizon_request_generation += 1
+        profile_observer = (
+            observer
+            or (
+                terrain_world_observer
+                if build_terrain_mesh
+                else terrain_horizon_view or navigation_hud_view or current_observer
+            )
+        )
+        profile_generation = (
+            observer_generation
+            if build_terrain_mesh
+            else terrain_horizon_generation
+            if terrain_horizon_view is not None
+            else observer_generation
+        )
+        return HorizonRequest(
+            request_id=f"horizon-{horizon_request_generation}-{uuid.uuid4().hex[:8]}",
+            generation=horizon_request_generation,
+            observer_generation=profile_generation,
+            settings_generation=horizon_settings_generation,
+            latitude_deg=profile_observer.location.latitude_deg,
+            longitude_deg=profile_observer.location.longitude_deg,
+            terrain_elevation_m=profile_observer.location.elevation_m,
+            height_offset_m=profile_observer.height_offset_m,
+            settings=horizon_settings,
+            force_recalculate=force_recalculate,
+            build_terrain_mesh=build_terrain_mesh,
+        )
+
+    def cancel_visual_stream(*, reset_center: bool) -> None:
+        """Invalidate a background detail build without disturbing the wide mesh."""
+
+        nonlocal terrain_stream_cancel, terrain_stream_generation
+        nonlocal terrain_stream_center_east_m, terrain_stream_center_north_m
+        nonlocal terrain_stream_radius_m
+        nonlocal terrain_stream_velocity_east_mps, terrain_stream_velocity_north_mps
+        terrain_stream_generation += 1
+        if terrain_stream_cancel is not None:
+            terrain_stream_cancel.set()
+        terrain_stream_cancel = None
+        if reset_center:
+            terrain_stream_center_east_m = 0.0
+            terrain_stream_center_north_m = 0.0
+            terrain_stream_radius_m = 0.0
+            terrain_stream_velocity_east_mps = 0.0
+            terrain_stream_velocity_north_mps = 0.0
+
+    def visual_stream_lead_distance_m(speed_mps: float) -> float:
+        """Lead distance from measured mesh preparation, bounded for stable swaps."""
+
+        metrics = horizon_coordinator.metrics()
+        prepare_seconds = max(
+            float(metrics.get("terrainMeshBuildP95Ms", 0.0)),
+            float(metrics.get("terrainMeshBuildP50Ms", 0.0)),
+            1_000.0,
+        ) / 1_000.0
+        lead_seconds = min(35.0, max(8.0, prepare_seconds * 3.0))
+        return min(10_000.0, max(1_500.0, speed_mps * lead_seconds))
+
+    async def request_visual_stream_chunk(
+        east_m: float,
+        north_m: float,
+        velocity_east_mps: float,
+        velocity_north_mps: float,
+        speed_mps: float,
+        observer: ObserverProfile,
+        *,
+        force: bool = False,
+    ) -> None:
+        """Prepare the configured observer-centred range without clearing old meshes."""
+
+        nonlocal terrain_stream_task, terrain_stream_cancel, terrain_stream_generation
+        nonlocal terrain_stream_center_east_m, terrain_stream_center_north_m
+        nonlocal terrain_stream_radius_m
+        nonlocal terrain_stream_velocity_east_mps, terrain_stream_velocity_north_mps
+        if not force and speed_mps < VISUAL_STREAM_MIN_SPEED_MPS:
+            return
+        profile = horizon_coordinator.active_profile
+        if (
+            profile is None
+            or terrain_world_observer.location.elevation_m is None
+            or profile.terrain_elevation_m is None
+        ):
+            return
+        observer_eye_m = observer.effective_height_m + OBSERVER_EYE_HEIGHT_M
+        requested_radius_m = resolve_visible_radius_m(horizon_settings, observer_eye_m)
+        lead_distance_m = visual_stream_lead_distance_m(speed_mps)
+        if terrain_stream_task is not None and not terrain_stream_task.done():
+            # A normal sweep keeps useful in-flight work. Explicit regeneration
+            # is the exception: it must replace a build made with stale UI settings.
+            if force:
+                decision_reason = "forced"
+            else:
+                continuation = decide_flight_stream_continuation(
+                    active_velocity_east_mps=terrain_stream_velocity_east_mps,
+                    active_velocity_north_mps=terrain_stream_velocity_north_mps,
+                    current_velocity_east_mps=velocity_east_mps,
+                    current_velocity_north_mps=velocity_north_mps,
+                )
+                if continuation.keep_active_build or terrain_stream_cancel is None:
+                    return
+                decision_reason = continuation.reason
+            active_task = terrain_stream_task
+            cancel_visual_stream(reset_center=False)
+            log.info(
+                "MGP: [__main__.py] [visual_stream] "
+                "[cancel·lat chunk inservible reason=%s]",
+                decision_reason,
+            )
+            try:
+                await active_task
+            except asyncio.CancelledError:
+                pass
+
+        distance_to_center_m = math.hypot(
+            east_m - terrain_stream_center_east_m,
+            north_m - terrain_stream_center_north_m,
+        )
+        if terrain_stream_radius_m <= 0.0:
+            # The first completed wide mesh is centred at the world origin.
+            terrain_stream_radius_m = profile.visible_radius_m
+        window_decision = decide_visibility_window_refresh(
+            distance_from_loaded_center_m=distance_to_center_m,
+            loaded_radius_m=terrain_stream_radius_m,
+            requested_radius_m=requested_radius_m,
+            lead_distance_m=lead_distance_m,
+            force=force,
+        )
+        if not window_decision.should_refresh:
+            return
+
+        terrain_stream_generation += 1
+        generation = terrain_stream_generation
+        cancel_event = threading.Event()
+        terrain_stream_cancel = cancel_event
+        terrain_stream_velocity_east_mps = velocity_east_mps
+        terrain_stream_velocity_north_mps = velocity_north_mps
+        # Prediction decides when to start. The scientific and visual centre
+        # is always the observer position that caused this sweep.
+        target_east_m = east_m
+        target_north_m = north_m
+        terrain_request = HorizonRequest(
+            request_id=f"terrain-stream-{generation}-{uuid.uuid4().hex[:8]}",
+            generation=generation,
+            observer_generation=observer_generation,
+            settings_generation=horizon_settings_generation,
+            latitude_deg=terrain_world_observer.location.latitude_deg,
+            longitude_deg=terrain_world_observer.location.longitude_deg,
+            terrain_elevation_m=terrain_world_observer.location.elevation_m,
+            height_offset_m=terrain_world_observer.height_offset_m,
+            settings=horizon_settings,
+            build_terrain_mesh=True,
+        )
+
+        async def build_and_publish() -> None:
+            nonlocal terrain_stream_center_east_m, terrain_stream_center_north_m
+            nonlocal terrain_stream_radius_m
+            try:
+                terrain = await asyncio.to_thread(
+                    terrain_stream_builder.build,
+                    terrain_request,
+                    profile,
+                    cancel_event,
+                    None,
+                    center_east_m=target_east_m,
+                    center_north_m=target_north_m,
+                    visual_radius_m=requested_radius_m,
+                )
+            except DemSamplingCancelled:
+                return
+            except Exception:
+                log.exception(
+                    "MGP: [__main__.py] [visual_stream] [No s'ha pogut preparar el bloc DEM]"
+                )
+                return
+            if generation != terrain_stream_generation or cancel_event.is_set():
+                return
+            metadata, payload = pack_terrain_mesh(
+                profile,
+                terrain,
+                role="terrain_stream_chunk",
+                resource_id="earth.terrain.stream",
+            )
+            metadata.update({
+                "version": generation,
+                "contentKey": f"terrain-stream-{generation}",
+                "visibleRadiusM": requested_radius_m,
+                "latitudeDeg": observer.location.latitude_deg,
+                "longitudeDeg": observer.location.longitude_deg,
+                "settingsGeneration": terrain_request.settings_generation,
+                "streamCenterEastM": target_east_m,
+                "streamCenterNorthM": target_north_m,
+                "streamLeadDistanceM": lead_distance_m,
+            })
+            await bridge.send_binary_resource(
+                "earth.terrain.stream", str(generation), metadata, payload,
+            )
+            if generation != terrain_stream_generation or cancel_event.is_set():
+                return
+            terrain_stream_center_east_m = target_east_m
+            terrain_stream_center_north_m = target_north_m
+            terrain_stream_radius_m = requested_radius_m
+            log.info(
+                "MGP: [__main__.py] [visual_stream] "
+                "[chunk=%d reason=%s radius_km=%.1f center_east_m=%.1f "
+                "center_north_m=%.1f lead_m=%.1f vertices=%d]",
+                generation,
+                window_decision.reason,
+                requested_radius_m / 1_000.0,
+                target_east_m,
+                target_north_m,
+                lead_distance_m,
+                terrain.vertex_count,
+            )
+
+        terrain_stream_task = asyncio.create_task(
+            build_and_publish(), name=f"terrain-visual-stream-{generation}",
+        )
+
+    async def broadcast_location(
+        observer: ObserverProfile | None = None,
+        *,
+        source: str | None = None,
+        navigation: bool = False,
+    ) -> None:
+        visible_observer = observer or current_observer
         await bridge.send_observer_location_changed(
-            lat=current_observer.location.latitude_deg,
-            lon=current_observer.location.longitude_deg,
-            elevation=current_observer.location.elevation_m or 0.0,
-            effective_height=current_observer.effective_height_m,
-            source="Pendent (sense DEM)"
+            lat=visible_observer.location.latitude_deg,
+            lon=visible_observer.location.longitude_deg,
+            elevation=visible_observer.location.elevation_m,
+            effective_height=(
+                visible_observer.effective_height_m + OBSERVER_EYE_HEIGHT_M
+                if visible_observer.location.elevation_m is not None
+                else None
+            ),
+            source=source or elevation_source,
+            height_offset=visible_observer.height_offset_m,
+            navigation=navigation,
+        )
+
+    async def resolve_current_elevation(expected: ObserverProfile) -> None:
+        nonlocal current_observer, observer_generation, elevation_source
+        nonlocal terrain_horizon_view, navigation_hud_view, terrain_horizon_generation
+        nonlocal terrain_world_observer, terrain_stream_radius_m
+        result = await elevation_coordinator.resolve(expected.location)
+        if result is None or current_observer != expected:
+            return
+        sample = result.sample
+        if not sample.available:
+            elevation_source = "no disponible — horitzó pla fallback"
+            await broadcast_location()
+            return
+        current_observer = ObserverProfile(
+            observer_id=expected.observer_id,
+            location=GeoLocation(
+                expected.location.latitude_deg,
+                expected.location.longitude_deg,
+                sample.elevation_m,
+            ),
+            height_offset_m=expected.height_offset_m,
+        )
+        elevation_source = sample.source_id or "DEM"
+        observer_generation += 1
+        # This is the profile/mesh anchor. Camera motion updates HUD state, but
+        # must never turn a stopped walking observer into a terrain request.
+        terrain_world_observer = current_observer
+        terrain_horizon_view = current_observer
+        navigation_hud_view = None
+        terrain_horizon_generation = observer_generation
+        await horizon_coordinator.activate_observer_fallback(new_horizon_request())
+        await broadcast_location()
+        await broadcast_time(force_celestial_transform=True)
+        if horizon_enabled:
+            horizon_coordinator.request(new_horizon_request())
+            terrain_stream_radius_m = resolve_visible_radius_m(
+                horizon_settings,
+                current_observer.effective_height_m + OBSERVER_EYE_HEIGHT_M,
+            )
+        log.info(
+            "MGP: [__main__.py] [resolve_current_elevation] "
+            "[Elevació DEM real elevation_m=%.2f source=%s observer_generation=%d duration_ms=%.2f]",
+            sample.elevation_m,
+            elevation_source,
+            observer_generation,
+            result.duration_ms,
         )
 
     async def _handle_set_location(data: dict[str, Any]) -> None:
-        nonlocal current_observer, observer_generation
+        nonlocal current_observer, observer_generation, elevation_source, elevation_task
+        nonlocal terrain_horizon_view, navigation_hud_view, terrain_horizon_generation, terrain_world_observer
+        nonlocal terrain_regeneration_task, terrain_regeneration_generation
         try:
             lat = float(data.get("lat", 0.0))
             lon = float(data.get("lon", 0.0))
@@ -199,8 +567,24 @@ async def run() -> int:
                 height_offset_m=height
             )
             observer_generation += 1
+            terrain_world_observer = current_observer
+            terrain_horizon_view = None
+            navigation_hud_view = None
+            terrain_horizon_generation = observer_generation
+            elevation_source = "consultant DEM…"
+            elevation_coordinator.cancel()
+            horizon_coordinator.cancel()
+            cancel_visual_stream(reset_center=True)
+            terrain_regeneration_generation += 1
+            if terrain_regeneration_task is not None and not terrain_regeneration_task.done():
+                terrain_regeneration_task.cancel()
+            await horizon_coordinator.activate_observer_fallback(new_horizon_request())
             await broadcast_location()
             await broadcast_time()
+            elevation_task = asyncio.create_task(
+                resolve_current_elevation(current_observer),
+                name="bare-elevation-latest-wins",
+            )
             log.info(
                 "Ubicació de l'observador actualitzada a: %.4f, %.4f (alt: %.1f)",
                 current_observer.location.latitude_deg,
@@ -211,7 +595,288 @@ async def run() -> int:
             await bridge.send_location_error(str(e))
             log.warning("Error a l'actualitzar la ubicació: %s", e)
 
+    def request_horizon_for_live_observer(*, force_recalculate: bool) -> tuple[ObserverProfile, int, bool] | None:
+        """Capture one immutable live centre for the next scientific sweep."""
+
+        nonlocal terrain_horizon_view, terrain_horizon_generation
+        nonlocal terrain_stream_radius_m
+        live_observer = navigation_hud_view or terrain_horizon_view or current_observer
+        if live_observer.location.elevation_m is None:
+            return None
+        retain_world_mesh = horizon_coordinator.has_active_terrain
+        if retain_world_mesh:
+            terrain_horizon_view = live_observer
+            terrain_horizon_generation += 1
+            horizon_coordinator.request(new_horizon_request(
+                force_recalculate=force_recalculate,
+                build_terrain_mesh=False,
+                observer=live_observer,
+            ))
+            return live_observer, terrain_horizon_generation, True
+        horizon_coordinator.request(new_horizon_request(
+            force_recalculate=force_recalculate,
+            build_terrain_mesh=True,
+            observer=terrain_world_observer,
+        ))
+        terrain_stream_radius_m = resolve_visible_radius_m(
+            horizon_settings,
+            terrain_world_observer.effective_height_m + OBSERVER_EYE_HEIGHT_M,
+        )
+        return live_observer, observer_generation, False
+
+    async def regenerate_live_visibility(
+        generation: int,
+        live_observer: ObserverProfile,
+        profile_observer_generation: int,
+        retain_world_mesh: bool,
+        east_m: float,
+        north_m: float,
+        velocity_east_mps: float,
+        velocity_north_mps: float,
+        speed_mps: float,
+    ) -> None:
+        """Finish the forced live profile, then add its configured visual range."""
+
+        try:
+            await horizon_coordinator.wait_idle()
+            if generation != terrain_regeneration_generation or not retain_world_mesh:
+                return
+            profile = horizon_coordinator.active_profile
+            if profile is None or profile.observer_generation != profile_observer_generation:
+                return
+            await request_visual_stream_chunk(
+                east_m,
+                north_m,
+                velocity_east_mps,
+                velocity_north_mps,
+                speed_mps,
+                live_observer,
+                force=True,
+            )
+        except asyncio.CancelledError:
+            return
+
     # ── 3.1. Lògica d'Estrelles (Fase 5 i Pas 6) ─────────────────────
+    async def _handle_set_horizon_settings(data: dict[str, Any]) -> None:
+        nonlocal horizon_settings, horizon_settings_generation, horizon_enabled
+        nonlocal terrain_regeneration_task, terrain_regeneration_generation
+        try:
+            horizon_enabled = bool(data.get("enabled", horizon_enabled))
+            horizon_settings = HorizonProfileSettings(
+                range_mode=HorizonRangeMode(str(data.get("rangeMode", horizon_settings.range_mode.value))),
+                visible_radius_km=float(data.get("visibleRadiusKm", horizon_settings.visible_radius_km)),
+                angular_step_deg=float(data.get("angularStepDeg", horizon_settings.angular_step_deg)),
+                atmospheric_refraction_enabled=bool(
+                    data.get("atmosphericRefractionEnabled", horizon_settings.atmospheric_refraction_enabled)
+                ),
+                effective_earth_radius_factor=float(
+                    data.get("effectiveEarthRadiusFactor", horizon_settings.effective_earth_radius_factor)
+                ),
+                max_samples_per_ray=int(data.get("maxSamplesPerRay", horizon_settings.max_samples_per_ray)),
+                memory_budget_bytes=int(data.get("memoryBudgetBytes", horizon_settings.memory_budget_bytes)),
+            ).validated()
+            horizon_settings_generation += 1
+            terrain_regeneration_generation += 1
+            if terrain_regeneration_task is not None and not terrain_regeneration_task.done():
+                terrain_regeneration_task.cancel()
+            if horizon_enabled and current_observer.location.elevation_m is not None:
+                request_horizon_for_live_observer(force_recalculate=False)
+            else:
+                horizon_coordinator.cancel()
+                await horizon_coordinator.activate_observer_fallback(new_horizon_request())
+        except (TypeError, ValueError) as exc:
+            await bridge.send_horizon_status({
+                "type": "horizon_status",
+                "phase": "error",
+                "message": str(exc),
+                "generation": horizon_request_generation,
+                "observerGeneration": observer_generation,
+                "settingsGeneration": horizon_settings_generation,
+                "progress": None,
+            })
+
+    async def _handle_recalculate_horizon(data: dict[str, Any]) -> None:
+        nonlocal terrain_regeneration_task, terrain_regeneration_generation
+        if horizon_enabled and current_observer.location.elevation_m is not None:
+            requested = request_horizon_for_live_observer(force_recalculate=True)
+            if requested is None:
+                return
+            live_observer, profile_generation, retain_world_mesh = requested
+            terrain_regeneration_generation += 1
+            generation = terrain_regeneration_generation
+            if terrain_regeneration_task is not None and not terrain_regeneration_task.done():
+                terrain_regeneration_task.cancel()
+            terrain_regeneration_task = asyncio.create_task(
+                regenerate_live_visibility(
+                    generation,
+                    live_observer,
+                    profile_generation,
+                    retain_world_mesh,
+                    navigation_pose_east_m,
+                    navigation_pose_north_m,
+                    navigation_velocity_east_mps,
+                    navigation_velocity_north_mps,
+                    navigation_speed_mps,
+                ),
+                name=f"terrain-live-regeneration-{generation}",
+            )
+        else:
+            await horizon_coordinator.activate_observer_fallback(new_horizon_request())
+
+    async def _handle_cancel_horizon(data: dict[str, Any]) -> None:
+        nonlocal terrain_regeneration_task, terrain_regeneration_generation
+        terrain_regeneration_generation += 1
+        if terrain_regeneration_task is not None and not terrain_regeneration_task.done():
+            terrain_regeneration_task.cancel()
+        horizon_coordinator.cancel()
+
+    async def _handle_camera_pose_changed(data: dict[str, Any]) -> None:
+        """Refresh observer-centred visibility after meaningful navigation.
+
+        The navigation camera remains local to the already uploaded world mesh.
+        Movement nevertheless changes the eye point used by the horizon and
+        celestial visibility calculations. New configured-radius chunks are
+        added predictively; stopping by itself never starts a rebuild.
+        """
+
+        nonlocal terrain_horizon_view, navigation_hud_view, terrain_horizon_generation
+        nonlocal navigation_pose_east_m, navigation_pose_north_m
+        nonlocal navigation_velocity_east_mps, navigation_velocity_north_mps
+        nonlocal navigation_speed_mps
+        if current_observer.location.elevation_m is None:
+            return
+        try:
+            mode = str(data.get("navigationMode", "walk"))
+            east_m = float(data.get("positionEastM", 0.0))
+            north_m = float(data.get("positionNorthM", 0.0))
+            up_m = float(data.get("positionUpM", 0.0))
+            requested_speed_mps = max(0.0, float(data.get("speedMps", 0.0)))
+            velocity_east_mps = float(data.get("velocityEastMps", 0.0))
+            velocity_north_mps = float(data.get("velocityNorthMps", 0.0))
+        except (TypeError, ValueError):
+            return
+        if not all(math.isfinite(value) for value in (
+            east_m, north_m, up_m, requested_speed_mps,
+            velocity_east_mps, velocity_north_mps,
+        )):
+            return
+        navigation_pose_east_m = east_m
+        navigation_pose_north_m = north_m
+        navigation_velocity_east_mps = velocity_east_mps
+        navigation_velocity_north_mps = velocity_north_mps
+        navigation_speed_mps = requested_speed_mps
+        horizontal_m = math.hypot(east_m, north_m)
+        base_ground_m = float(current_observer.location.elevation_m)
+        azimuth_deg = math.degrees(math.atan2(east_m, north_m)) % 360.0
+        latitude, longitude = camera_horizon_projector.project(
+            current_observer.location.latitude_deg,
+            current_observer.location.longitude_deg,
+            azimuth_deg,
+            horizontal_m,
+        )
+        flight_location = GeoLocation(float(latitude), float(longitude))
+        # GPS position is cheap to derive from the local ENU pose. Publish it
+        # immediately; the slower DEM elevation lookup below must not freeze
+        # the observer coordinates shown in the HUD.
+        await bridge.send_navigation_coordinates_changed(
+            flight_location.latitude_deg,
+            flight_location.longitude_deg,
+        )
+        sample = await asyncio.to_thread(elevation_adapter.elevation, flight_location)
+        if not sample.available or sample.elevation_m is None:
+            return
+        effective_radius_m = EARTH_RADIUS_M * (
+            horizon_settings.effective_earth_radius_factor
+            if horizon_settings.atmospheric_refraction_enabled
+            else 1.0
+        )
+        theta = min(horizontal_m / effective_radius_m, math.pi * 0.5)
+        terrain_local_up_m = (
+            (effective_radius_m + float(sample.elevation_m)) * math.cos(theta)
+            - (effective_radius_m + base_ground_m)
+        )
+        camera_clearance_m = up_m - terrain_local_up_m
+        height_offset_m = camera_clearance_m - OBSERVER_EYE_HEIGHT_M
+        next_view = ObserverProfile(
+            observer_id=current_observer.observer_id,
+            location=GeoLocation(flight_location.latitude_deg, flight_location.longitude_deg, sample.elevation_m),
+            height_offset_m=height_offset_m,
+        )
+
+        previous_hud = navigation_hud_view
+        if previous_hud is None or observer_distance_m(next_view, previous_hud) >= 10.0 or (
+            abs(next_view.effective_height_m - previous_hud.effective_height_m) >= 2.0
+        ):
+            navigation_hud_view = next_view
+            await broadcast_location(
+                next_view,
+                source=sample.source_id or elevation_source,
+                navigation=True,
+            )
+
+        # The first request owns the base world mesh. A predictive
+        # profile-only navigation request is allowed only after that mesh is
+        # resident; otherwise it can supersede the initial build and leave a
+        # real horizon profile with no visible DEM mesh.
+        if not horizon_coordinator.has_active_terrain:
+            return
+
+        previous = terrain_horizon_view
+        if previous is None:
+            # An initial full terrain request owns the first profile. Do not
+            # cancel it just because the camera has started moving.
+            return
+        await request_visual_stream_chunk(
+            east_m,
+            north_m,
+            velocity_east_mps,
+            velocity_north_mps,
+            requested_speed_mps,
+            next_view,
+        )
+        coordinator_metrics = horizon_coordinator.metrics()
+        measured_prepare_ms = max(
+            float(coordinator_metrics.get("horizonBakeP50Ms", 0.0)),
+            float(coordinator_metrics.get("terrainMeshBuildP50Ms", 0.0)),
+        )
+        decision = decide_flight_profile_refresh(
+            distance_since_profile_m=observer_distance_m(next_view, previous),
+            eye_delta_m=abs(next_view.effective_height_m - previous.effective_height_m),
+            speed_mps=requested_speed_mps,
+            measured_prepare_ms=measured_prepare_ms,
+        )
+        if not decision.should_refresh:
+            return
+        # While a scientific navigation profile is baking, retain it. Sending a
+        # second request here would make HorizonCoordinator cancel and restart
+        # the same work whenever the aircraft reaches the lead boundary.
+        if horizon_coordinator.is_busy:
+            return
+        terrain_horizon_view = next_view
+        terrain_horizon_generation += 1
+        if horizon_enabled:
+            horizon_coordinator.request(new_horizon_request(build_terrain_mesh=False))
+        log.info(
+            "MGP: [__main__.py] [navigation_horizon] "
+            "[perfil predictiu mode=%s reason=%s lead_m=%.1f east_m=%.1f "
+            "north_m=%.1f eye_m=%.1f radius_km=%.1f]",
+            mode,
+            decision.reason,
+            decision.lead_distance_m,
+            east_m,
+            north_m,
+            next_view.effective_height_m + OBSERVER_EYE_HEIGHT_M,
+            resolve_visible_radius_m(
+                horizon_settings,
+                next_view.effective_height_m + OBSERVER_EYE_HEIGHT_M,
+            ) / 1_000.0,
+        )
+
+    bridge.on("set_horizon_settings", _handle_set_horizon_settings)
+    bridge.on("recalculate_horizon", _handle_recalculate_horizon)
+    bridge.on("cancel_horizon", _handle_cancel_horizon)
+    bridge.on("camera_pose_changed", _handle_camera_pose_changed)
+
     from terralab3d.application.star_coordinator import StarCoordinator
     from terralab3d.application.star_pick_resolver import StarPickResolver
     from terralab3d.domain.stars.star_pick_models import StarPickRequest
@@ -260,12 +925,24 @@ async def run() -> int:
             log.error("MGP: [__main__] [Error resolvent pick: %s]", e)
 
     async def _on_frontend_ready(data: dict[str, Any]) -> None:
+        nonlocal elevation_task
         # Quan el frontend es connecta, enviem la ubicació inicial, iniciem estrelles, etc.
+        if horizon_coordinator.active_profile is None:
+            await horizon_coordinator.activate_observer_fallback(new_horizon_request())
+        else:
+            await horizon_coordinator.publish_active()
         await broadcast_location()
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
         await bridge.send_planet_texture_manifest(solar_system_assets.descriptor)
         await bridge.send_satellite_catalog_manifest(solar_system_assets.descriptor)
         await broadcast_time(force_celestial_transform=True)
+        if current_observer.location.elevation_m is None and (
+            elevation_task is None or elevation_task.done()
+        ):
+            elevation_task = asyncio.create_task(
+                resolve_current_elevation(current_observer),
+                name="bare-elevation-initial",
+            )
         # Iniciar la càrrega d'estrelles o re-enviar les existents si ja estan carregades (re-connexió F5)
         if not star_coordinator._started:
             asyncio.create_task(star_coordinator.start())
@@ -401,7 +1078,11 @@ async def run() -> int:
             ephemeris_adapter = SkyfieldEphemerisAdapter()
     else:
         ephemeris_adapter = SkyfieldEphemerisAdapter()
-    ephemeris_coordinator = EphemerisCoordinator(ephemeris_adapter, publish_solar_system)
+    ephemeris_coordinator = EphemerisCoordinator(
+        ephemeris_adapter,
+        publish_solar_system,
+        horizon_profile=lambda: horizon_coordinator.active_profile,
+    )
     orbit_sampler = (
         OrbitSampler(ephemeris_adapter)
         if isinstance(ephemeris_adapter, SpiceEphemerisAdapter)
@@ -1074,6 +1755,27 @@ async def run() -> int:
         await trajectory_coordinator.close()
     if lunar_limb_provider is not None:
         lunar_limb_provider.close()
+    if terrain_regeneration_task is not None and not terrain_regeneration_task.done():
+        terrain_regeneration_task.cancel()
+        try:
+            await terrain_regeneration_task
+        except asyncio.CancelledError:
+            pass
+    cancel_visual_stream(reset_center=False)
+    if terrain_stream_task is not None:
+        try:
+            await terrain_stream_task
+        except asyncio.CancelledError:
+            pass
+    await horizon_coordinator.close()
+    if elevation_task is not None:
+        try:
+            await elevation_task
+        except asyncio.CancelledError:
+            pass
+    elevation_adapter.close()
+    log.info("MGP: [__main__.py] [shutdown] [Mètriques elevació: %s]", elevation_coordinator.metrics())
+    log.info("MGP: [__main__.py] [shutdown] [Mètriques horitzó: %s]", horizon_coordinator.metrics())
     await ephemeris_coordinator.close()
     log.info("Mètriques d'efemèrides: %s", ephemeris_coordinator.metrics())
     if event_service is not None:

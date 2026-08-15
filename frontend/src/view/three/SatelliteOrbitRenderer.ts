@@ -1,9 +1,10 @@
 import * as THREE from "three";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
 import type { SolarSystemBodyState, SolarSystemSnapshot } from "../../contracts/solar_system_contracts";
 import { threeFromEnu, threeQuaternionFromBodyToEnu } from "./celestialCoordinates";
 
-const CELESTIAL_RADIUS = 900_000;
+const CELESTIAL_RADIUS = CELESTIAL_SCENE_RADIUS.solarSystem;
 
 export interface OrbitBinaryMetadata {
   readonly resourceId: string;

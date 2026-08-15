@@ -21,6 +21,8 @@ import type { StarResourceMetadata } from "../../contracts/star_picking_contract
 import type { SkyVisibilityState } from "../../contracts/sky_environment_contracts";
 import { DEFAULT_SKY_VISIBILITY } from "../../contracts/sky_visibility_defaults";
 import type { CelestialTransformState } from "./CelestialTransformState";
+import type { HorizonOcclusionState } from "./HorizonOcclusionState";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
 export interface StarResourceEntry {
   readonly resourceId: string;
@@ -49,9 +51,11 @@ export class StarFieldRenderer {
   /** Shared celestial transform and visibility state. */
   private transformState: CelestialTransformState | null = null;
   private currentVisibilityState: SkyVisibilityState | null = null;
+  private readonly horizonUnsubscribe: (() => void) | null;
 
-  constructor() {
+  constructor(private readonly horizonState: HorizonOcclusionState | null = null) {
     this.rootGroup.name = "starFieldRoot";
+    this.horizonUnsubscribe = horizonState?.subscribe(() => this.syncHorizonUniforms()) ?? null;
   }
 
   /** Connecta l'estat de transformació celeste compartit. */
@@ -227,8 +231,12 @@ export class StarFieldRenderer {
         u_magnitudeLimit: { value: this.magnitudeLimit },
         u_pointScale: { value: this.pointScale },
         u_devicePixelRatio: { value: window.devicePixelRatio || 1.0 },
-        u_radius: { value: 1000000.0 }, // Esfera cel·lar a l'infinit (1000km)
-        u_cameraHeight: { value: 0.0 },
+        u_radius: { value: CELESTIAL_SCENE_RADIUS.distantSky },
+        u_horizonTexture: { value: this.horizonState?.gpuUniformValues().texture ?? null },
+        u_horizonSampleCount: { value: this.horizonState?.gpuUniformValues().sampleCount ?? 0 },
+        u_horizonTextureWidth: { value: this.horizonState?.gpuUniformValues().textureWidth ?? 1 },
+        u_horizonTextureHeight: { value: this.horizonState?.gpuUniformValues().textureHeight ?? 1 },
+        u_horizonEnabled: { value: this.horizonState?.gpuUniformValues().enabled ?? 0 },
         // Visibilitat (Pas 7) - valors per defecte o l'últim rebut
         u_zenithMagnitudeLimit: { value: this.currentVisibilityState?.zenithMagnitudeLimit ?? DEFAULT_SKY_VISIBILITY.zenithMagnitudeLimit },
         u_extinctionCoefficient: { value: this.currentVisibilityState?.extinctionCoefficient ?? DEFAULT_SKY_VISIBILITY.extinctionCoefficient },
@@ -278,13 +286,6 @@ export class StarFieldRenderer {
     }
   }
 
-  public updateCameraHeight(height: number): void {
-    for (const entry of this.resources.values()) {
-      uniform<number>(entry.material, "u_cameraHeight").value = height;
-      entry.material.uniformsNeedUpdate = true;
-    }
-  }
-
   /** Retorna tots els recursos registrats (lectura). */
   public getResources(): ReadonlyMap<string, StarResourceEntry> {
     return this.resources;
@@ -306,6 +307,7 @@ export class StarFieldRenderer {
   }
 
   public dispose(): void {
+    this.horizonUnsubscribe?.();
     for (const resourceId of Array.from(this.resources.keys())) {
       this.disposeResource(resourceId);
     }
@@ -314,6 +316,19 @@ export class StarFieldRenderer {
 
   private syncVisibility(): void {
     this.rootGroup.visible = this.isVisible && !this.trailSuppressed;
+  }
+
+  private syncHorizonUniforms(): void {
+    if (this.horizonState === null) return;
+    const values = this.horizonState.gpuUniformValues();
+    for (const entry of this.resources.values()) {
+      uniform<THREE.DataTexture>(entry.material, "u_horizonTexture").value = values.texture;
+      uniform<number>(entry.material, "u_horizonSampleCount").value = values.sampleCount;
+      uniform<number>(entry.material, "u_horizonTextureWidth").value = values.textureWidth;
+      uniform<number>(entry.material, "u_horizonTextureHeight").value = values.textureHeight;
+      uniform<number>(entry.material, "u_horizonEnabled").value = values.enabled;
+      entry.material.uniformsNeedUpdate = true;
+    }
   }
 }
 

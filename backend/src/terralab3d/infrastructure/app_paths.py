@@ -88,6 +88,12 @@ def resolve_gaia_data_dir() -> Path:
     return gaia_dir
 
 
+def resolve_elevation_data_dir() -> Path:
+    """Resolve configured Earth elevation data without creating fake coverage."""
+
+    return resolve_data_root() / "data" / "earth" / "elevation"
+
+
 def resolve_solar_system_planets_dir() -> Path:
     """Retorna el directori de dades dels planetes (data/sky/solar-system/planets sota l'arrel de la llibreria)."""
     root = resolve_data_root()

@@ -39,6 +39,9 @@ import { SolarSystemRenderer } from "./SolarSystemRenderer";
 import { SolarSystemLabels } from "./SolarSystemLabels";
 import { SceneLightingController } from "./lighting/SceneLightingController";
 import { applyRendererColorPolicy } from "./rendererColorPolicy";
+import { HorizonOcclusionState } from "./HorizonOcclusionState";
+import { HorizonLayerRenderer } from "./layers/HorizonLayerRenderer";
+import { DemTerrainLayerRenderer } from "./layers/DemTerrainLayerRenderer";
 
 const LOG_PREFIX = "MGP: [ThreeSceneHost]";
 
@@ -75,6 +78,9 @@ export class ThreeSceneHostImpl {
   private readonly galacticSkyRenderer: GalacticSkyRenderer;
   private readonly solarSystemRenderer: SolarSystemRenderer;
   private readonly solarSystemLabels: SolarSystemLabels;
+  private readonly horizonOcclusionState: HorizonOcclusionState;
+  private readonly horizonLayerRenderer: HorizonLayerRenderer;
+  private readonly demTerrainLayerRenderer: DemTerrainLayerRenderer;
 
   // ─── Legacy celestial sphere (meridians that rotate with LST) ──────
   private readonly celestialSphere: THREE.Group;
@@ -117,16 +123,6 @@ export class ThreeSceneHostImpl {
     this.scene.add(this.worldRoot);
 
     // ─── Terra Esfèrica Base ─────────────────────────────────────────
-    const R_E = 6371000.0;
-    const earthGeometry = new THREE.SphereGeometry(R_E, 64, 64);
-    const earthMaterial = new THREE.MeshBasicMaterial({ 
-      color: 0x010204, // Un blau molt fosc quasi negre per simular oceà a la nit
-    });
-    const earthSphere = new THREE.Mesh(earthGeometry, earthMaterial);
-    earthSphere.position.set(0, -R_E, 0); // Pol Nord exactament a Y=0
-    earthSphere.name = "virtualEarthSphere";
-    this.worldRoot.add(earthSphere);
-
     // Camera (initial values; CameraRigImpl manages pose)
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 2000000);
 
@@ -135,6 +131,14 @@ export class ThreeSceneHostImpl {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     applyRendererColorPolicy(this.renderer);
     this.lightingController = new SceneLightingController(this.scene, this.renderer);
+    this.horizonOcclusionState = new HorizonOcclusionState(
+      this.renderer.capabilities.maxTextureSize,
+    );
+    this.horizonLayerRenderer = new HorizonLayerRenderer(
+      this.celestialRoot,
+      this.horizonOcclusionState,
+    );
+    this.demTerrainLayerRenderer = new DemTerrainLayerRenderer(this.worldRoot);
 
     // ─── Pas 10: skydome galàctic persistent ────────────────────────
     this.galacticSkyRenderer = new GalacticSkyRenderer(
@@ -143,12 +147,16 @@ export class ThreeSceneHostImpl {
     );
 
     // ─── Phase 5 & 11: Star Field & Deep Sky Renderers ───────────────
-    this.starFieldRenderer = new StarFieldRenderer();
+    this.starFieldRenderer = new StarFieldRenderer(this.horizonOcclusionState);
     this.starFieldRenderer.attachToParent(this.celestialRoot);
-    this.deepSkyRenderer = new DeepSkyRenderer();
+    this.deepSkyRenderer = new DeepSkyRenderer(this.horizonOcclusionState);
     this.deepSkyRenderer.attachToParent(this.celestialRoot);
     
-    this.solarSystemRenderer = new SolarSystemRenderer(this.celestialRoot);
+    this.solarSystemRenderer = new SolarSystemRenderer(
+      this.celestialRoot,
+      undefined,
+      this.horizonOcclusionState,
+    );
     this.solarSystemLabels = new SolarSystemLabels(this.solarSystemRenderer);
 
     // ─── Phase 4: Horizontal Grid ────────────────────────────────────
@@ -227,6 +235,18 @@ export class ThreeSceneHostImpl {
     return this.solarSystemLabels;
   }
 
+  getHorizonOcclusionState(): HorizonOcclusionState {
+    return this.horizonOcclusionState;
+  }
+
+  getHorizonLayerRenderer(): HorizonLayerRenderer {
+    return this.horizonLayerRenderer;
+  }
+
+  getDemTerrainLayerRenderer(): DemTerrainLayerRenderer {
+    return this.demTerrainLayerRenderer;
+  }
+
   getLightingController(): SceneLightingController {
     return this.lightingController;
   }
@@ -257,6 +277,10 @@ export class ThreeSceneHostImpl {
     this.deepSkyRenderer.interpolate(timestampMs, this.camera);
     this.galacticSkyRenderer.syncTransform();
     this.lightingController.update(timestampMs, this.camera.position);
+    // This is a retained fog boundary derived from the indexed DEM coverage.
+    // Only its top edge follows the observer's 0° line; no terrain geometry is
+    // rebuilt in the render loop.
+    this.demTerrainLayerRenderer.updateCoverageFogTop(this.camera.position.y);
 
     // ─── Celestial rotation (legacy LST sphere) ──────────────────────
     const diff = this.targetLstRad - this.currentLstRad;
@@ -268,19 +292,8 @@ export class ThreeSceneHostImpl {
 
     // ─── Recentre celestialRoot to camera position ───────────────────
     // This eliminates translational parallax for sky objects.
-    this.starFieldRenderer.updateCameraHeight(this.camera.position.y);
     this.celestialRoot.position.copy(this.camera.position);
-    
-    // ─── Ancorar el grid i les etiquetes a l'horitzó físic percebut ──
-    const R_E = 6371000.0;
-    const cameraH = Math.max(0.0, this.camera.position.y);
-    const dipAngleRad = Math.acos(R_E / (R_E + cameraH));
-    
-    // Desplaçar el grid cap avall de manera que la seva línia verda de 0º
-    // quedi visualment alineada amb la curvatura del planeta (dip of the horizon)
-    const gridRadius = 1000000.0; // Ha de coincidir amb GRID_RADIUS
-    this.horizontalGrid.root.position.y = -gridRadius * Math.tan(dipAngleRad);
-    this.horizontalGrid.root.scale.set(1, 1, 1);
+    this.horizontalGrid.root.position.y = 0;
     
     this._transformUpdateCount++;
 
@@ -398,11 +411,14 @@ export class ThreeSceneHostImpl {
     this.horizontalGrid.dispose();
     this.celestialLabels.dispose();
     this.solarSystemLabels.dispose();
+    this.horizonLayerRenderer.dispose();
+    this.demTerrainLayerRenderer.dispose();
     this.celestialEquator.dispose();
     this.starFieldRenderer.dispose();
     this.deepSkyRenderer.dispose();
     this.galacticSkyRenderer.dispose();
     this.solarSystemRenderer.dispose();
+    this.horizonOcclusionState.dispose();
     this.lightingController.dispose();
 
     this.scene.traverse((obj) => {

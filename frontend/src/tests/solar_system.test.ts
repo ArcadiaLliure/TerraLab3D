@@ -48,6 +48,7 @@ function body(
   altitudeDeg = 30,
   phaseAngleDeg = 30,
 ): SolarSystemBodyState {
+  const angularRadiusDeg = id === "sun" ? 0.266 : id === "moon" ? 0.25 : 0.01;
   return {
     id,
     type: id === "sun" ? "sun" : id === "moon" ? "moon" : "planet",
@@ -57,7 +58,7 @@ function body(
     azimuthDeg: 90,
     directionENU,
     distanceKm: id === "moon" ? 384_400 : 149_597_870,
-    angularRadiusDeg: id === "sun" ? 0.266 : id === "moon" ? 0.25 : 0.01,
+    angularRadiusDeg,
     angularDiameterDeg: id === "sun" ? 0.532 : id === "moon" ? 0.5 : 0.02,
     illuminationFraction: (1 + Math.cos(THREE.MathUtils.degToRad(phaseAngleDeg))) / 2,
     phaseAngleDeg,
@@ -66,6 +67,8 @@ function body(
     orientation: id === "moon" ? lunarOrientation() : null,
     source: "DE421",
     quality: "precise",
+    horizonElevationDeg: 0,
+    horizonVisible: altitudeDeg + angularRadiusDeg > 0,
   };
 }
 
@@ -225,7 +228,7 @@ assert(renderer.metrics().staleSnapshotCount === 1, "stale snapshot is measured"
 const partialHorizon = { ...body("moon", [0, -0.001, 1], -0.1), angularRadiusDeg: 0.25 };
 renderer.updateSnapshot({ ...snapshot(4, "2024-01-01T00:00:02Z", 3), moon: partialHorizon }, 1800, 4_000);
 assert(renderer.getBodyObject("moon")?.visible === true, "disc intersecting horizon remains visible for shader clipping");
-const belowHorizon = { ...partialHorizon, altitudeDeg: -1 };
+const belowHorizon = { ...partialHorizon, altitudeDeg: -1, horizonVisible: false };
 renderer.updateSnapshot({ ...snapshot(5, "2024-01-01T00:00:03Z", 4), moon: belowHorizon }, 1800, 5_000);
 assert(renderer.getBodyObject("moon")?.visible === false, "body fully below horizon is hidden");
 

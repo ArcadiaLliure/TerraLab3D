@@ -7,6 +7,7 @@ import {
   GALACTIC_FRAGMENT_SHADER,
   GALACTIC_VERTEX_SHADER,
 } from "./shaders/galacticShader";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
 export interface GalacticTextureResource {
   readonly resourceId: "sky.milky_way" | "sky.planck_dust";
@@ -53,7 +54,7 @@ interface ResidentTexture {
   readonly estimatedBytes: number;
 }
 
-const SKY_RADIUS = 900_000;
+const SKY_RADIUS = CELESTIAL_SCENE_RADIUS.solarSystem;
 
 export class GalacticSkyRenderer {
   private readonly geometry: THREE.SphereGeometry;

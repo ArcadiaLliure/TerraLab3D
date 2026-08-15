@@ -236,6 +236,22 @@ assert(
   "only explicit local reference meshes are converted to PBR",
 );
 assert(navigation.metrics().pbrMaterialBuildCount === 3, "PBR materials are persistent and counted once");
+navigation.setTechnicalPresentationVisible(false);
+assert(
+  navigation.metrics().technicalPresentationVisible === false
+    && worldRoot.getObjectByName("terrain")?.visible === false
+    && worldRoot.getObjectByName("localReferenceObjects")?.visible === false,
+  "DEM-backed horizon hides the synthetic terrain presentation",
+);
+assert(
+  navigation.getTerrainSampler().sampleGround(0, 0) !== null,
+  "hidden synthetic terrain remains available only to the navigation sampler",
+);
+navigation.setTechnicalPresentationVisible(true);
+assert(
+  navigation.metrics().technicalPresentationVisible === true,
+  "fallback presentation can be restored explicitly when DEM is unavailable",
+);
 
 const obliqueSun: readonly [number, number, number] = [0.3, 0.7, 0.65];
 const flat = pbrDiffuseResponse([0, 1, 0], obliqueSun);

@@ -3,6 +3,7 @@ import type { SceneDelta } from "../../../contracts/scene";
 import type { CelestialTransformState } from "../CelestialTransformState";
 import type { StarFieldRenderer, StarResourceEntry } from "../StarFieldRenderer";
 import type { StarTrailLayerRenderer } from "./StarTrailLayerRenderer";
+import { CELESTIAL_SCENE_RADIUS } from "../celestialScenePolicy";
 import {
   buildTrailRibbonGeometryData,
   estimateTrailGpuBytes,
@@ -51,7 +52,7 @@ interface StarTrailViewport {
   getPixelRatio(): number;
 }
 
-const TRAIL_RADIUS = 1_000_000.0;
+const TRAIL_RADIUS = CELESTIAL_SCENE_RADIUS.distantSky;
 
 const TRAIL_VERTEX_SHADER = /* glsl */ `
 attribute vec3 equatorialPosition;

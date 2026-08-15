@@ -18,12 +18,13 @@
  */
 
 import * as THREE from "three";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
 const LOG_PREFIX = "MGP: [HorizontalGrid]";
 
 // ─── Constants ───────────────────────────────────────────────────────
 
-const GRID_RADIUS = 1000000;
+const GRID_RADIUS = CELESTIAL_SCENE_RADIUS.distantSky;
 const CIRCLE_SEGMENTS = 128;
 const DEG = Math.PI / 180;
 

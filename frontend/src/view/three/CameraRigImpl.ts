@@ -33,23 +33,39 @@ import {
   defaultNavigationCameraPose,
 } from "../../contracts/navigation";
 import { CameraVisualSmoother } from "./CameraVisualSmoother";
+import {
+  azimuthAltitudeFromThreeDirection,
+  setThreeFromAzimuthAltitude,
+} from "./celestialCoordinates";
 
 const DEG = Math.PI / 180;
 const MIN_FOV = 0.0001;
 const MAX_FOV = 120;
 const MIN_ALT = -90;
 const MAX_ALT = 90;
-const ORBIT_SPEED = 0.25;
-const KEY_STEP = 2;
+const ORBIT_SPEED = 0.45;
+const KEY_STEP = 4;
 const ZOOM_STEP = 1.1;
 const THROTTLE_MS = 16;
+const NAVIGATION_POSE_THROTTLE_MS = 100;
 const MAX_DELTA_TIME = 0.05; // 50ms cap
+const FLIGHT_COLLISION_PROBE_SPACING_M = 4;
+export const GOTO_FLIGHT_DURATION_S = 10;
+const GOTO_ARRIVAL_CLEARANCE_M = 100;
 
 const LOG_PREFIX = "MGP: [CameraRigImpl]";
 
 export type PoseChangedCallback = (pose: CameraPose) => void;
 export type NavigationModeChangedCallback = (mode: NavigationMode) => void;
 export type NavigationPoseCallback = (pose: NavigationCameraPose, motion: MotionState) => void;
+
+interface FlightGotoTarget {
+  readonly eastM: number;
+  readonly northM: number;
+  readonly upM: number;
+  /** Distance-adaptive speed that completes this specific journey in 10 s. */
+  readonly speedMps: number;
+}
 
 export class CameraRigImpl implements CameraRig {
   // ─── Rotation state (original) ─────────────────────────────────────
@@ -67,6 +83,7 @@ export class CameraRigImpl implements CameraRig {
   private velocityNorth = 0;
   private navigationMode: NavigationMode = "walk";
   private isTrackingTarget = false;
+  private gotoTarget: FlightGotoTarget | null = null;
 
   // ─── Settings ──────────────────────────────────────────────────────
   private walkSettings: WalkNavigationSettings = { ...DEFAULT_WALK_SETTINGS };
@@ -104,7 +121,9 @@ export class CameraRigImpl implements CameraRig {
   private navigationPoseCallback: NavigationPoseCallback | null = null;
   private userInteractionCallback: (() => void) | null = null;
   private throttleTimer: ReturnType<typeof setTimeout> | null = null;
+  private navigationPoseTimer: ReturnType<typeof setTimeout> | null = null;
   private dirty = false;
+  private navigationPoseDirty = false;
 
   // ─── Time tracking ─────────────────────────────────────────────────
   private lastTimestampMs = 0;
@@ -121,8 +140,6 @@ export class CameraRigImpl implements CameraRig {
   private readonly onKeyUpBound = this.onKeyUp.bind(this);
   private readonly onBlurBound = this.onBlur.bind(this);
   private readonly onVisibilityChangeBound = this.onVisibilityChange.bind(this);
-  private readonly onContextMenuBound = (e: Event) => e.preventDefault();
-
   constructor(camera: THREE.PerspectiveCamera) {
     this.camera = camera;
     this.applyToCamera();
@@ -225,12 +242,16 @@ export class CameraRigImpl implements CameraRig {
     // Skip if no terrain
     if (!this.terrainSampler || !this.terrainSampler.isReady()) return;
 
-    const isMoving = this.hasMovementInput();
+    const isMoving = this.hasMovementInput() || this.gotoTarget !== null;
 
     if (this.navigationMode === "walk") {
       this.updateWalkMode(deltaTime);
     } else {
       this.updateFlightMode(deltaTime);
+    }
+
+    if (isMoving || this.getMotionState().speedMps > 0.01) {
+      this.scheduleNavigationPosePublish();
     }
 
     // Motion state tracking for coalesced bridge events
@@ -252,6 +273,10 @@ export class CameraRigImpl implements CameraRig {
 
   setNavigationMode(mode: NavigationMode): void {
     if (mode === this.navigationMode) return;
+    if (this.gotoTarget) {
+      console.info(`${LOG_PREFIX} [setNavigationMode] [Canvi de mode ignorat durant un trajecte Goto actiu]`);
+      return;
+    }
     const prev = this.navigationMode;
     this.navigationMode = mode;
 
@@ -260,6 +285,7 @@ export class CameraRigImpl implements CameraRig {
     this.velocityUp = 0;
     this.velocityNorth = 0;
     this.keysDown.clear();
+    this.gotoTarget = null;
 
     if (mode === "walk" && this.terrainSampler && this.groundFollower) {
       // Project onto terrain when entering walk mode
@@ -290,11 +316,16 @@ export class CameraRigImpl implements CameraRig {
   }
 
   resetToOrigin(): void {
+    if (this.gotoTarget) {
+      console.info(`${LOG_PREFIX} [resetToOrigin] [Restabliment ignorat durant un trajecte Goto actiu]`);
+      return;
+    }
     this.positionEastM = 0;
     this.positionNorthM = 0;
     this.velocityEast = 0;
     this.velocityUp = 0;
     this.velocityNorth = 0;
+    this.gotoTarget = null;
 
     // Ground at origin
     if (this.terrainSampler?.isReady()) {
@@ -344,6 +375,76 @@ export class CameraRigImpl implements CameraRig {
     };
   }
 
+  /**
+   * Start an explicit high-speed flight to a triangle selected on the DEM.
+   * Manual flight remains capped by its user setting; this is a separate,
+   * observable navigation command and never changes that cap.
+   */
+  gotoFlightTo(
+    targetEastM: number,
+    targetNorthM: number,
+    targetTerrainUpM: number,
+    requestedArrivalClearanceM = GOTO_ARRIVAL_CLEARANCE_M,
+  ): boolean {
+    if (
+      !this.terrainSampler?.isReady()
+      || !Number.isFinite(targetEastM)
+      || !Number.isFinite(targetNorthM)
+      || !Number.isFinite(targetTerrainUpM)
+      || !Number.isFinite(requestedArrivalClearanceM)
+    ) return false;
+    this.setNavigationMode("flight");
+    const currentGround = this.terrainSampler.sampleGround(
+      this.positionEastM,
+      this.positionNorthM,
+      this.positionUpM,
+    );
+    if (!currentGround?.valid) return false;
+    this.positionUpM = Math.max(
+      this.positionUpM,
+      currentGround.heightM + this.flightSettings.minimumClearanceM,
+    );
+    const targetGround = this.terrainSampler.sampleGround(targetEastM, targetNorthM, targetTerrainUpM);
+    if (!targetGround?.valid) return false;
+    this.velocityEast = 0;
+    this.velocityNorth = 0;
+    this.velocityUp = 0;
+    const gotoTarget: FlightGotoTarget = {
+      eastM: targetEastM,
+      northM: targetNorthM,
+      upM: Math.max(
+        this.positionUpM,
+        targetGround.heightM + Math.max(
+          this.flightSettings.minimumClearanceM,
+          requestedArrivalClearanceM,
+        ),
+      ),
+      speedMps: 0,
+    };
+    const distanceM = Math.hypot(
+      gotoTarget.eastM - this.positionEastM,
+      gotoTarget.northM - this.positionNorthM,
+      gotoTarget.upM - this.positionUpM,
+    );
+    this.gotoTarget = {
+      ...gotoTarget,
+      speedMps: distanceM / GOTO_FLIGHT_DURATION_S,
+    };
+    console.info(
+      `${LOG_PREFIX} [gotoFlightTo] [Destino DEM east_m=${targetEastM.toFixed(1)} north_m=${targetNorthM.toFixed(1)} duration_s=${GOTO_FLIGHT_DURATION_S} speed_mps=${this.gotoTarget.speedMps.toFixed(1)}]`,
+    );
+    return true;
+  }
+
+  cancelGotoFlight(): void {
+    if (!this.gotoTarget) return;
+    this.gotoTarget = null;
+    this.velocityEast = 0;
+    this.velocityNorth = 0;
+    this.velocityUp = 0;
+    console.info(`${LOG_PREFIX} [cancelGotoFlight] [Trajecte Goto cancelÂ·lat]`);
+  }
+
   // ─── Extended API ──────────────────────────────────────────────────
 
   animateTo(azDeg: number, altDeg: number, fovDeg: number, durationMs: number): void {
@@ -389,7 +490,6 @@ export class CameraRigImpl implements CameraRig {
     container.addEventListener("pointerup", this.onPointerUpBound);
     container.addEventListener("pointerleave", this.onPointerUpBound);
     container.addEventListener("wheel", this.onWheelBound, { passive: false });
-    container.addEventListener("contextmenu", this.onContextMenuBound);
     window.addEventListener("keydown", this.onKeyDownBound);
     window.addEventListener("keyup", this.onKeyUpBound);
     window.addEventListener("blur", this.onBlurBound);
@@ -404,7 +504,6 @@ export class CameraRigImpl implements CameraRig {
     c.removeEventListener("pointerup", this.onPointerUpBound);
     c.removeEventListener("pointerleave", this.onPointerUpBound);
     c.removeEventListener("wheel", this.onWheelBound);
-    c.removeEventListener("contextmenu", this.onContextMenuBound);
     window.removeEventListener("keydown", this.onKeyDownBound);
     window.removeEventListener("keyup", this.onKeyUpBound);
     window.removeEventListener("blur", this.onBlurBound);
@@ -413,6 +512,10 @@ export class CameraRigImpl implements CameraRig {
     if (this.throttleTimer !== null) {
       clearTimeout(this.throttleTimer);
       this.throttleTimer = null;
+    }
+    if (this.navigationPoseTimer !== null) {
+      clearTimeout(this.navigationPoseTimer);
+      this.navigationPoseTimer = null;
     }
   }
 
@@ -498,6 +601,10 @@ export class CameraRigImpl implements CameraRig {
 
   private updateFlightMode(dt: number): void {
     if (!this.terrainSampler) return;
+    if (this.gotoTarget) {
+      this.updateGotoFlight(dt);
+      return;
+    }
 
     const settings = this.flightSettings;
     const isBoosting = this.keysDown.has("ShiftLeft") || this.keysDown.has("ShiftRight");
@@ -559,38 +666,122 @@ export class CameraRigImpl implements CameraRig {
     if (this.keysDown.has("KeyE")) this.rollDeg += 90 * dt;
     this.rollDeg = clamp(this.rollDeg, -settings.maximumRollDeg, settings.maximumRollDeg);
 
-    // Apply velocity
-    this.positionEastM += this.velocityEast * dt;
-    this.positionNorthM += this.velocityNorth * dt;
-    this.positionUpM += this.velocityUp * dt;
-
-    // Terrain clearance via TerrainSampler (not GroundFollower)
-    const sample = this.terrainSampler.sampleGround(
+    const swept = this.resolveFlightTerrainSweep(
       this.positionEastM,
       this.positionNorthM,
       this.positionUpM,
+      this.positionEastM + this.velocityEast * dt,
+      this.positionNorthM + this.velocityNorth * dt,
+      this.positionUpM + this.velocityUp * dt,
     );
-    if (sample && sample.valid) {
-      const minY = sample.heightM + settings.minimumClearanceM;
-      if (this.positionUpM < minY) {
-        this.positionUpM = minY;
-        if (this.velocityUp < 0) this.velocityUp = 0;
-      }
+    if (swept.blocked) {
+      this.velocityEast = 0;
+      this.velocityNorth = 0;
+      this.velocityUp = 0;
     }
-
-    // Altitude ceiling
-    if (this.positionUpM > settings.maximumAltitudeM) {
-      this.positionUpM = settings.maximumAltitudeM;
-      if (this.velocityUp > 0) this.velocityUp = 0;
-    }
-
+    this.applyFlightPosition(swept.eastM, swept.northM, swept.upM);
     this.applyToCamera();
+  }
+
+  /** Move the automatic Goto flight without weakening DEM collision. */
+  private updateGotoFlight(dt: number): void {
+    const target = this.gotoTarget;
+    if (!target) return;
+    const eastDelta = target.eastM - this.positionEastM;
+    const northDelta = target.northM - this.positionNorthM;
+    const upDelta = target.upM - this.positionUpM;
+    const remainingM = Math.hypot(eastDelta, northDelta, upDelta);
+    if (remainingM < 0.01) {
+      this.finishGotoFlight(target);
+      return;
+    }
+    const travelM = Math.min(target.speedMps * dt, remainingM);
+    const fraction = travelM / remainingM;
+    this.velocityEast = eastDelta / remainingM * target.speedMps;
+    this.velocityNorth = northDelta / remainingM * target.speedMps;
+    this.velocityUp = upDelta / remainingM * target.speedMps;
+    const swept = this.resolveFlightTerrainSweep(
+      this.positionEastM,
+      this.positionNorthM,
+      this.positionUpM,
+      this.positionEastM + eastDelta * fraction,
+      this.positionNorthM + northDelta * fraction,
+      this.positionUpM + upDelta * fraction,
+    );
+    if (swept.blocked) {
+      this.cancelGotoFlight();
+      this.applyFlightPosition(swept.eastM, swept.northM, swept.upM);
+      this.applyToCamera();
+      return;
+    }
+    this.applyFlightPosition(swept.eastM, swept.northM, swept.upM);
+    if (travelM === remainingM) this.finishGotoFlight(target);
+    this.applyToCamera();
+  }
+
+  /** Sweep the full flight segment against the same DEM sampler as manual flight. */
+  private resolveFlightTerrainSweep(
+    previousEastM: number,
+    previousNorthM: number,
+    previousUpM: number,
+    proposedEastM: number,
+    proposedNorthM: number,
+    proposedUpM: number,
+  ): { eastM: number; northM: number; upM: number; blocked: boolean } {
+    if (!this.terrainSampler) {
+      return { eastM: previousEastM, northM: previousNorthM, upM: previousUpM, blocked: true };
+    }
+    const horizontalDistance = Math.hypot(proposedEastM - previousEastM, proposedNorthM - previousNorthM);
+    const probeCount = Math.max(1, Math.ceil(horizontalDistance / FLIGHT_COLLISION_PROBE_SPACING_M));
+    let lastSafeEastM = previousEastM;
+    let lastSafeNorthM = previousNorthM;
+    let lastSafeUpM = previousUpM;
+    for (let probe = 0; probe <= probeCount; probe++) {
+      const fraction = probe / probeCount;
+      const eastM = previousEastM + (proposedEastM - previousEastM) * fraction;
+      const northM = previousNorthM + (proposedNorthM - previousNorthM) * fraction;
+      const upM = previousUpM + (proposedUpM - previousUpM) * fraction;
+      const sample = this.terrainSampler.sampleGround(eastM, northM, upM);
+      if (!sample?.valid) {
+        return { eastM: lastSafeEastM, northM: lastSafeNorthM, upM: lastSafeUpM, blocked: true };
+      }
+      const minimumUpM = sample.heightM + this.flightSettings.minimumClearanceM;
+      if (upM < minimumUpM) {
+        if (probe === 0) {
+          return { eastM: previousEastM, northM: previousNorthM, upM: minimumUpM, blocked: true };
+        }
+        return { eastM: lastSafeEastM, northM: lastSafeNorthM, upM: lastSafeUpM, blocked: true };
+      }
+      lastSafeEastM = eastM;
+      lastSafeNorthM = northM;
+      lastSafeUpM = Math.max(upM, minimumUpM);
+    }
+    return { eastM: lastSafeEastM, northM: lastSafeNorthM, upM: lastSafeUpM, blocked: false };
+  }
+
+  private applyFlightPosition(eastM: number, northM: number, upM: number): void {
+    this.positionEastM = eastM;
+    this.positionNorthM = northM;
+    this.positionUpM = Math.min(upM, this.flightSettings.maximumAltitudeM);
+    if (upM > this.flightSettings.maximumAltitudeM && this.velocityUp > 0) this.velocityUp = 0;
+  }
+
+  private finishGotoFlight(target: FlightGotoTarget): void {
+    this.positionEastM = target.eastM;
+    this.positionNorthM = target.northM;
+    this.positionUpM = target.upM;
+    this.gotoTarget = null;
+    this.velocityEast = 0;
+    this.velocityNorth = 0;
+    this.velocityUp = 0;
+    this.publishNavigationPose();
+    console.info(`${LOG_PREFIX} [finishGotoFlight] [Destino Goto alcanzado]`);
   }
 
   // ─── Input handlers ────────────────────────────────────────────────
 
   private onPointerDown(e: PointerEvent): void {
-    if (e.button !== 0 && e.button !== 2) return;
+    if (e.button !== 0) return;
     this.dragging = true;
     this.lastX = e.clientX;
     this.lastY = e.clientY;
@@ -647,6 +838,14 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
+    if (e.code === "Escape") {
+      if (this.gotoTarget) {
+        e.preventDefault();
+        this.cancelGotoFlight();
+      }
+      return;
+    }
+
     // Ignore when input/textarea is focused
     const tag = (e.target as HTMLElement)?.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -738,11 +937,11 @@ export class CameraRigImpl implements CameraRig {
   } {
     const azRad = this.azimuthDeg * DEG;
     // Forward in ENU: North is azimuth 0
-    const forwardE = -Math.sin(azRad);
+    const forwardE = Math.sin(azRad);
     const forwardN = Math.cos(azRad); // Corrected: cos(0) = 1 → north
     // Right is 90° clockwise from forward
     const rightE = Math.cos(azRad);
-    const rightN = Math.sin(azRad);
+    const rightN = -Math.sin(azRad);
     return { forwardE, forwardN, rightE, rightN };
   }
 
@@ -756,13 +955,13 @@ export class CameraRigImpl implements CameraRig {
     const cosAlt = Math.cos(altRad);
 
     // Forward vector in ENU coordinates (+X=East, +Y=Up, +Z=North)
-    const forwardE = -Math.sin(azRad) * cosAlt;
+    const forwardE = Math.sin(azRad) * cosAlt;
     const forwardU = Math.sin(altRad);
     const forwardN = Math.cos(azRad) * cosAlt;
 
     // Right vector on horizontal plane
     const rightE = Math.cos(azRad);
-    const rightN = Math.sin(azRad);
+    const rightN = -Math.sin(azRad);
 
     return { forwardE, forwardU, forwardN, rightE, rightN };
   }
@@ -770,14 +969,6 @@ export class CameraRigImpl implements CameraRig {
   // ─── Camera matrix ─────────────────────────────────────────────────
 
   private applyToCamera(): void {
-    const azRad = this.azimuthDeg * DEG;
-    const altRad = this.altitudeDeg * DEG;
-
-    const cosAlt = Math.cos(altRad);
-    const dirX = -Math.sin(azRad) * cosAlt;
-    const dirY = Math.sin(altRad);
-    const dirZ = -Math.cos(azRad) * cosAlt;
-
     // Position: ENU → Three.js (East=+X, Up=+Y, North=-Z)
     this.camera.position.set(
       this.positionEastM,
@@ -785,11 +976,11 @@ export class CameraRigImpl implements CameraRig {
       -this.positionNorthM,
     );
 
-    const target = new THREE.Vector3(
-      this.positionEastM + dirX,
-      this.positionUpM + dirY,
-      -this.positionNorthM + dirZ,
-    );
+    const target = setThreeFromAzimuthAltitude(
+      new THREE.Vector3(),
+      this.azimuthDeg,
+      this.altitudeDeg,
+    ).add(this.camera.position);
     this.camera.lookAt(target);
 
     // Apply roll if in flight mode
@@ -798,10 +989,15 @@ export class CameraRigImpl implements CameraRig {
       this.camera.rotateZ(-rollRad);
     }
 
-    // Update FOV
+    // Updating a projection matrix per movement frame is avoidable work: the
+    // view matrix changes with camera navigation, projection only with FOV or
+    // viewport changes.
     const aspect = this.camera.aspect || 1;
-    this.camera.fov = hFovToVFov(this.hFovDeg, aspect);
-    this.camera.updateProjectionMatrix();
+    const verticalFov = hFovToVFov(this.hFovDeg, aspect);
+    if (Math.abs(this.camera.fov - verticalFov) > 1e-10) {
+      this.camera.fov = verticalFov;
+      this.camera.updateProjectionMatrix();
+    }
   }
 
   // ─── Throttled pose publishing ─────────────────────────────────────
@@ -821,6 +1017,17 @@ export class CameraRigImpl implements CameraRig {
   private publishPoseNow(): void {
     this.dirty = false;
     this.poseCallback?.(this.pose());
+  }
+
+  private scheduleNavigationPosePublish(): void {
+    this.navigationPoseDirty = true;
+    if (this.navigationPoseTimer !== null) return;
+    this.navigationPoseTimer = setTimeout(() => {
+      this.navigationPoseTimer = null;
+      if (!this.navigationPoseDirty) return;
+      this.navigationPoseDirty = false;
+      this.publishNavigationPose();
+    }, NAVIGATION_POSE_THROTTLE_MS);
   }
 
   private publishNavigationPose(): void {
@@ -863,17 +1070,8 @@ function approachValue(current: number, target: number, maxDelta: number): numbe
 /**
  * Converts a Three.js direction vector (ENU: +X=East, +Y=Up, -Z=North)
  * to CameraRig pose (Azimuth/Altitude) using the CameraRig conventions:
- * Azimuth: 0=North, 90=West, 180=South, 270=East
+ * Azimuth: 0=North, 90=East, 180=South, 270=West
  */
 export function threeDirectionToCameraPose(dir: THREE.Vector3): { azimuthDeg: number; altitudeDeg: number } {
-  // dirY = sin(alt)
-  const altDeg = Math.asin(Math.max(-1, Math.min(1, dir.y))) * (180 / Math.PI);
-
-  // dirX = -sin(az) * cos(alt)
-  // dirZ = -cos(az) * cos(alt)
-  // atan2(y, x) -> atan2(sin, cos) -> atan2(-dirX, -dirZ)
-  let azDeg = Math.atan2(-dir.x, -dir.z) * (180 / Math.PI);
-  azDeg = ((azDeg % 360) + 360) % 360;
-
-  return { azimuthDeg: azDeg, altitudeDeg: altDeg };
+  return azimuthAltitudeFromThreeDirection(dir) ?? { azimuthDeg: 0, altitudeDeg: 0 };
 }

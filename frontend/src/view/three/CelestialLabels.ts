@@ -15,6 +15,7 @@
  */
 
 import * as THREE from "three";
+import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 
 const LOG_PREFIX = "MGP: [CelestialLabels]";
 
@@ -68,7 +69,7 @@ const COLOR_TICK = "#778899";
 const COLOR_ZENITH = "#f1cd88";
 
 // Sphere radius must match HorizontalGrid
-const LABEL_SPHERE_RADIUS = 1000000;
+const LABEL_SPHERE_RADIUS = CELESTIAL_SCENE_RADIUS.distantSky;
 const DEG = Math.PI / 180;
 
 // ─── Label Definitions ───────────────────────────────────────────────
