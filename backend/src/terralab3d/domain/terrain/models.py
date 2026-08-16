@@ -6,6 +6,7 @@ from enum import Enum
 from terralab3d.domain.identifiers import ResourceId, TerrainTileId
 
 class SurfaceMode(str, Enum):
+    BASE = "base"
     ORTHOPHOTO = "orthophoto"
     CATEGORICAL = "categorical"
 
@@ -34,3 +35,21 @@ class TerrainMaterialResource:
     mode: SurfaceMode
     texture_key: str | None
     category_buffer_key: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class TerrainChunkIdentity:
+    """Lightweight terrain chunk reference for surface coordination.
+
+    This DTO allows the surface subsystem to reference a specific terrain
+    chunk without importing Three.js or the full mesh builder.
+    """
+    content_key: str
+    version: int
+    vertex_count: int
+    center_east_m: float
+    center_north_m: float
+    bounds_west_deg: float | None = None
+    bounds_south_deg: float | None = None
+    bounds_east_deg: float | None = None
+    bounds_north_deg: float | None = None

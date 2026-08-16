@@ -1,6 +1,6 @@
 /**
  * Typed bridge messages exchanged over the WebSocket between Python and the
- * Three.js frontend.  Every message carries a `type` discriminant so both
+ * Three.js frontend. Every message carries a `type` discriminant so both
  * sides can switch on it safely.
  */
 
@@ -36,7 +36,6 @@ export interface AstronomicalSearchRequestMessage {
   readonly query: string;
   readonly limit: number;
 }
-
 
 export interface FrontendReadyMessage {
   readonly type: "frontend_ready";
@@ -323,11 +322,36 @@ export interface FrontendPerformanceMetricsMessage {
   readonly horizonDrawCalls?: number;
   readonly horizonLookupCpuP50?: number;
   readonly horizonLookupCpuP95?: number;
+  readonly terrainGeometryBuildCount?: number;
+  readonly terrainGeometryUploadBytes?: number;
+  readonly terrainVertexCount?: number;
+  readonly terrainTriangleCount?: number;
+  readonly terrainActiveMeshCount?: number;
+  readonly terrainSemanticAttributeBytes?: number;
+  readonly surfaceResourceApplyCount?: number;
+  readonly surfaceStaleResourceCount?: number;
+  readonly surfaceActiveResourceCount?: number;
+  readonly surfaceModeSwitchCount?: number;
+  readonly surfaceGeometryRebuildsCausedByStyle?: number;
 }
 
 export interface SetTimeRateMessage {
   readonly type: "set_time_rate";
   readonly rate: number;
+}
+
+export interface SetSurfaceModeMessage {
+  readonly type: "set_surface_mode";
+  readonly mode: "base" | "categorical_original";
+}
+
+export interface SetSurfaceSourceMessage {
+  readonly type: "set_surface_source";
+  readonly sourceId: string | null;
+}
+
+export interface RequestSurfaceCatalogMessage {
+  readonly type: "request_surface_catalog";
 }
 
 export interface StartStarTrailsMessage {
@@ -398,7 +422,10 @@ export type FrontendMessage =
   | ClearStarTrailsMessage
   | HorizonProfileSettingsMessage
   | RecalculateHorizonMessage
-  | CancelHorizonMessage;
+  | CancelHorizonMessage
+  | SetSurfaceModeMessage
+  | SetSurfaceSourceMessage
+  | RequestSurfaceCatalogMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -598,6 +625,37 @@ export interface StarTrailsSnapshotMessage {
   readonly startUtcIso?: string;
 }
 
+// ─── Cobertura Categòrica (Pas 17) ───────────────────────────────────
+
+export interface SurfaceCatalogSourceEntry {
+  readonly id: string;
+  readonly name: string;
+  readonly sourceType: string;
+  readonly resolutionM: number;
+  readonly priority: number;
+  readonly attribution?: string;
+  readonly enabled: boolean;
+}
+
+export interface SurfaceCatalogMessage {
+  readonly type: "surface_catalog";
+  readonly sources: readonly SurfaceCatalogSourceEntry[];
+  readonly selectedSourceId: string | null;
+  readonly mode: string;
+}
+
+export interface SurfaceStatusMessage {
+  readonly type: "surface_status";
+  readonly generation: number;
+  readonly mode: string;
+  readonly effectiveSource: string;
+  readonly resolvedFraction: number;
+  readonly fallbackFraction: number;
+  readonly sampleCount: number;
+  readonly cacheHits: number;
+  readonly cacheBytes: number;
+}
+
 // ─── Tipus Unió ──────────────────────────────────────────────────────
 
 export type BackendMessage =
@@ -625,9 +683,10 @@ export type BackendMessage =
   | ResourceCatalogSnapshotMessage
   | AstronomicalSearchResultMessage
   | StarTrailsSnapshotMessage
-  | HorizonStatusMessage;
+  | HorizonStatusMessage
+  | SurfaceCatalogMessage
+  | SurfaceStatusMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 
 export type BridgeMessage = FrontendMessage | BackendMessage;
-

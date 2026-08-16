@@ -18,6 +18,7 @@ dependencies = [
     "Pillow>=10",
     "rasterio>=1.4",
     "pyproj>=3.7",
+    "numpy"
 ]
 
 [tool.setuptools]

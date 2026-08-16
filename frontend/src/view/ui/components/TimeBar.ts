@@ -45,6 +45,7 @@ export class TimeBar {
     this.playPauseBtn.innerHTML = "⏸";
     this.playPauseBtn.addEventListener("click", () => {
       this.isTimePlaying = !this.isTimePlaying;
+      console.log(`MGP: Frontend (TimeBar.ts:47: Reprodueix/Pausa -> Commutar reproducció temporal: ${this.isTimePlaying})`);
       this.bridge.sendSetTimePlaying(this.isTimePlaying);
       this.updatePlayPauseIcon();
     });
@@ -118,6 +119,7 @@ export class TimeBar {
 
   private onMouseDown(e: MouseEvent) {
     this.isDragging = true;
+    console.log(`MGP: Frontend (TimeBar.ts:123: Barra temporal -> Inici d'arrossegament temporal: ${this.currentTime.toISOString()})`);
     this.bridge.sendTimelineDragStarted();
     this.updateTimeFromMouse(e);
   }
@@ -131,8 +133,10 @@ export class TimeBar {
     if (!this.isDragging) return;
     this.isDragging = false;
     this.updateTimeFromMouse(e);
+    console.log(`MGP: Frontend (TimeBar.ts:138: Barra temporal -> Fi d'arrossegament temporal: ${this.currentTime.toISOString()})`);
     this.bridge.sendTimelineDragFinished(this.currentTime.toISOString());
   }
+
 
   private lastSentTimeMs = 0;
 

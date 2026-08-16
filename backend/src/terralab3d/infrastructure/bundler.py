@@ -71,18 +71,21 @@ def bundle_frontend(*, force: bool = False) -> Path:
         "--platform=browser",
     ]
 
-    print(f"[bundler] Construint el frontend: {' '.join(cmd)}")
+    import os
+    env = dict(os.environ)
+    env["PYTHONIOENCODING"] = "utf-8"
+
     result = subprocess.run(
         cmd,
         cwd=str(_FRONTEND_DIR),
         capture_output=True,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
+        text=False,
     )
+    
+    safe_stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
 
     if result.returncode != 0:
-        print(result.stderr, file=sys.stderr)
+        print(safe_stderr, file=sys.stderr)
         raise RuntimeError(
             f"esbuild ha fallat (exit {result.returncode}):\n{result.stderr}"
         )

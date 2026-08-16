@@ -129,7 +129,7 @@ def test_visual_dem_mesh_uses_spherical_coordinates_at_long_range() -> None:
     builder = TerrainMeshBuilder(_SyntheticElevationPort(), _IdentityProjector())
     distance_m = 530_000.0
 
-    positions, valid = builder._sample_positions(  # noqa: SLF001
+    positions, valid, *_ = builder._sample_positions(  # noqa: SLF001
         request,
         np.asarray([distance_m]),
         np.asarray([0.0]),
@@ -542,7 +542,7 @@ def test_mesh_builder_never_turns_nodata_sentinels_into_cliffs() -> None:
                 np.zeros(request.latitude_deg.shape, dtype=np.int16),
             )
 
-    positions, valid = TerrainMeshBuilder(SentinelPort(), _IdentityProjector())._sample_positions(  # noqa: SLF001
+    positions, valid, *_ = TerrainMeshBuilder(SentinelPort(), _IdentityProjector())._sample_positions(  # noqa: SLF001
         _request(1),
         np.asarray([[0.0, 1.0], [2.0, 3.0]]),
         np.zeros((2, 2), dtype=np.float64),

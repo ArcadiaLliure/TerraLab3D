@@ -201,6 +201,51 @@ class ResourceInstallationRepository:
                     )
                     changed = True
 
+        # Discovery de Topografia / DEM
+        dem_dir = data_root / "data" / "earth" / "elevation"
+        if not dem_dir.exists():
+            dem_dir = data_root / "earth" / "elevation"
+        if dem_dir.exists():
+            has_dem_files = any(dem_dir.glob("*.npy")) or any(dem_dir.glob("*.tif"))
+            if has_dem_files and "earth.dem.elevation" not in resources:
+                self.set_resource_state(
+                    ResourceId("earth.dem.elevation"),
+                    ResourceInstallState.READY,
+                    VariantId("regional_5m"),
+                    resolved_path=str(dem_dir)
+                )
+                changed = True
+
+        # Discovery de Cobertura del Sòl (S2GLC)
+        surface_dir = data_root / "data" / "earth" / "surface"
+        if not surface_dir.exists():
+            surface_dir = data_root / "earth" / "surface"
+        if surface_dir.exists():
+            has_s2glc = any(surface_dir.rglob("*s2glc*.tif")) or (surface_dir / "Cobertura_del_s_l_categ_rica").exists()
+            if has_s2glc and "earth.surface.s2glc" not in resources:
+                self.set_resource_state(
+                    ResourceId("earth.surface.s2glc"),
+                    ResourceInstallState.READY,
+                    VariantId("europe_2017"),
+                    resolved_path=str(surface_dir)
+                )
+                changed = True
+
+        # Discovery de Contaminació Lumínica
+        light_dir = data_root / "data" / "earth" / "light-pollution"
+        if not light_dir.exists():
+            light_dir = data_root / "earth" / "light-pollution"
+        if light_dir.exists():
+            has_light = any(light_dir.rglob("*.tif"))
+            if has_light and "earth.light_pollution.dvnl" not in resources:
+                self.set_resource_state(
+                    ResourceId("earth.light_pollution.dvnl"),
+                    ResourceInstallState.READY,
+                    VariantId("dvnl_2022"),
+                    resolved_path=str(light_dir)
+                )
+                changed = True
+
         if changed:
-            log.info("MGP: [ResourceInstallationRepository] [Descobriment inicial ha completat noves deteccions]")
+            log.debug("MGP: [ResourceInstallationRepository] [Descobriment inicial ha completat noves deteccions]")
             self.save()

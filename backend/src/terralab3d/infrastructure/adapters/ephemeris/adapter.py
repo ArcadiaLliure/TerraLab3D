@@ -125,7 +125,7 @@ class SkyfieldEphemerisAdapter:
             )
             self._unavailable_detail = None
             self._open_lunar_orientation()
-            log.info(
+            log.debug(
                 "DE421 loaded once: %s sha256=%s range=%s..%s",
                 kernel_path,
                 digest,
@@ -230,7 +230,7 @@ class SkyfieldEphemerisAdapter:
                 lunar_orientation_range_start_utc="1900-01-01",
                 lunar_orientation_range_end_utc="2050-12-31",
             )
-            log.info(
+            log.debug(
                 "Lunar orientation loaded once: frame=%s kernels=%s,%s",
                 LUNAR_FRAME_NAME,
                 frame_path,

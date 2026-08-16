@@ -105,6 +105,7 @@ export class SkyPage {
   private buildSolarSystemGroup(): void {
     const [group, titleRow] = this.createGroup("Sistema solar");
     titleRow.appendChild(this.createToggleButton("Visible", "Ocult", true, (visible) => {
+      console.log(`MGP: Frontend (SkyPage.ts:108: Sistema Solar -> Commutar visibilitat: ${visible})`);
       this.options.onSolarSystemVisibilityChanged?.("system", visible);
     }));
     const labels: ReadonlyArray<["sun" | "moon" | "planets", string]> = [
@@ -118,6 +119,7 @@ export class SkyPage {
       const text = document.createElement("span");
       text.textContent = label;
       row.append(text, this.createToggleButton("Visible", "Ocult", true, (visible) => {
+        console.log(`MGP: Frontend (SkyPage.ts:121: ${label} -> Commutar visibilitat: ${visible})`);
         this.options.onSolarSystemVisibilityChanged?.(part, visible);
       }));
       group.appendChild(row);
@@ -127,6 +129,7 @@ export class SkyPage {
     const surfaceText = document.createElement("span");
     surfaceText.textContent = "Superfície LRO/LOLA";
     surfaceRow.append(surfaceText, this.createToggleButton("Activa", "Inactiva", true, (enabled) => {
+      console.log(`MGP: Frontend (SkyPage.ts:130: Superfície LRO/LOLA -> Commutar textura lunar: ${enabled})`);
       this.options.onMoonSurfaceToggled?.(enabled);
     }));
     group.appendChild(surfaceRow);
@@ -147,10 +150,12 @@ export class SkyPage {
       const text = document.createElement("span");
       text.textContent = label;
       row.append(text, this.createToggleButton("Visible", "Ocult", initial, (visible) => {
+        console.log(`MGP: Frontend (SkyPage.ts:150: ${label} -> Commutar visibilitat: ${visible})`);
         this.options.onSolarSystemVisibilityChanged?.(part, visible);
       }));
       group.appendChild(row);
     }
+
 
     const systemsTitle = document.createElement("div");
     systemsTitle.textContent = "Sistemes de satèl·lits";
@@ -269,6 +274,7 @@ export class SkyPage {
     const [group, titleRow] = this.createGroup("Atmosfera Visual");
     
     this.atmoToggleBtn = this.createToggleButton("Activada", "Desactivada", true, (state) => {
+      console.log(`MGP: Frontend (SkyPage.ts:276: Atmosfera Visual -> Commutar atmosfera: ${state})`);
       this.options.onAtmosphereToggled?.(state);
     });
     titleRow.appendChild(this.atmoToggleBtn);
@@ -278,6 +284,7 @@ export class SkyPage {
     pureRow.innerHTML = "<span>Colors Purs (debug)</span>";
     
     this.pureColorsToggleBtn = this.createToggleButton("On", "Off", false, (state) => {
+      console.log(`MGP: Frontend (SkyPage.ts:285: Colors Purs -> Commutar colors purs: ${state})`);
       this.options.onPureColorsToggled?.(state);
     });
     pureRow.appendChild(this.pureColorsToggleBtn);
@@ -299,9 +306,12 @@ export class SkyPage {
       shadowSelect.appendChild(option);
     }
     shadowSelect.value = "medium";
-    shadowSelect.onchange = () => this.options.onShadowQualityChanged?.(
-      shadowSelect.value as "off" | "low" | "medium" | "high",
-    );
+    shadowSelect.onchange = () => {
+      console.log(`MGP: Frontend (SkyPage.ts:307: Ombres locals -> Canvi qualitat ombres: ${shadowSelect.value})`);
+      this.options.onShadowQualityChanged?.(
+        shadowSelect.value as "off" | "low" | "medium" | "high",
+      );
+    };
     shadowRow.append(shadowText, shadowSelect);
     group.appendChild(shadowRow);
     this.element.appendChild(group);
@@ -311,6 +321,7 @@ export class SkyPage {
     const [group, titleRow] = this.createGroup("Contaminació Lumínica");
     
     this.lpToggleBtn = this.createToggleButton("Activada", "Desactivada", true, (state) => {
+      console.log(`MGP: Frontend (SkyPage.ts:321: Contaminació Lumínica -> Commutar contaminació: ${state})`);
       this.options.onLightPollutionToggled?.(state);
     });
     titleRow.appendChild(this.lpToggleBtn);
@@ -336,6 +347,7 @@ export class SkyPage {
     });
     this.lpModeSelect.value = "bortle";
     this.lpModeSelect.onchange = () => {
+      console.log(`MGP: Frontend (SkyPage.ts:348: Mode Contaminació -> Canvi de mode: ${this.lpModeSelect.value})`);
       this.options.onLightPollutionModeChanged?.(this.lpModeSelect.value as any);
       this.updateConditionalVisibility();
     };
@@ -363,6 +375,7 @@ export class SkyPage {
     this.lpBortleInput.oninput = () => {
       const val = Number(this.lpBortleInput.value);
       this.lpBortleValue.textContent = val.toFixed(1);
+      console.log(`MGP: Frontend (SkyPage.ts:373: Bortle Slider -> Classe Bortle: ${val.toFixed(1)})`);
       this.options.onBortleClassChanged?.(val);
     };
     
@@ -391,6 +404,7 @@ export class SkyPage {
     this.lpMagInput.oninput = () => {
       const val = Number(this.lpMagInput.value);
       this.lpMagValue.textContent = val.toFixed(1);
+      console.log(`MGP: Frontend (SkyPage.ts:400: Magnitude Slider -> Magnitud límit: ${val.toFixed(1)})`);
       this.options.onMagnitudeLimitChanged?.(val);
     };
     
@@ -410,9 +424,11 @@ export class SkyPage {
     const [group, titleRow] = this.createGroup("Camp Estel·lar Gaia");
 
     this.starsToggleBtn = this.createToggleButton("Visible", "Ocult", true, (state) => {
+      console.log(`MGP: Frontend (SkyPage.ts:422: Camp Estel·lar Gaia -> Commutar estrelles: ${state})`);
       this.starsVisible = state;
       this.options.onStarLayerToggled?.(state);
     });
+
     titleRow.appendChild(this.starsToggleBtn);
 
     const sourceRow = document.createElement("div");

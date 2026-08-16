@@ -96,6 +96,7 @@ export class LocationPage {
       const lat = Number(this.inputLat.value);
       const lon = Number(this.inputLon.value);
       const height = Number(this.inputHeight.value);
+      console.log(`MGP: Frontend (LocationPage.ts:96: Reubicar -> Canvi manual de coordenades [${lat}°, ${lon}°] +${height}m)`);
       if (
         !Number.isFinite(lat)
         || !Number.isFinite(lon)
@@ -115,211 +116,191 @@ export class LocationPage {
       }
     };
 
+    locSection.appendChild(this.btnRelocate);
+
     this.statusLabel = document.createElement("div");
     this.statusLabel.style.cssText = `
       font-size: 11px;
-      color: var(--color-success);
-      text-align: center;
       min-height: 14px;
-      opacity: 0;
       transition: opacity 0.3s ease;
-      font-weight: 500;
+      opacity: 0;
     `;
-
-    locSection.appendChild(this.btnRelocate);
     locSection.appendChild(this.statusLabel);
     this.element.appendChild(locSection);
 
-    // Separator
     this.element.appendChild(this.createSeparator());
 
-    // ── 2. Data i Hora ───────────────────────────────────────────────
-    const dateSection = document.createElement("div");
-    dateSection.style.cssText = "display: flex; flex-direction: column; gap: 8px;";
+    // ── 2. Data i Temps ─────────────────────────────────────────────
+    const timeSection = document.createElement("div");
+    timeSection.style.cssText = "display: flex; flex-direction: column; gap: 8px;";
 
-    const dateTitle = document.createElement("div");
-    dateTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px;";
-    dateTitle.textContent = "Data";
-    dateSection.appendChild(dateTitle);
+    const timeTitle = document.createElement("div");
+    timeTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px; margin-bottom: 2px;";
+    timeTitle.textContent = "Data de la simulació";
+    timeSection.appendChild(timeTitle);
 
-    const calRow = document.createElement("div");
-    calRow.style.cssText = "display: flex; align-items: center; gap: 6px;";
+    const dateRow = document.createElement("div");
+    dateRow.style.cssText = "display: flex; gap: 6px; align-items: center;";
 
-    this.btnPrevDay = this.createSmallButton("<", "Dia anterior");
-    this.btnPrevDay.onclick = () => this.callbacks.onOffsetDay(-1);
+    this.btnPrevDay = this.createSmallButton("‹", "Dia anterior");
+    this.btnPrevDay.onclick = () => {
+      console.log("MGP: Frontend (LocationPage.ts:133: Dia anterior -> Desplaçar -1 dia)");
+      this.callbacks.onOffsetDay(-1);
+    };
 
     this.inputDate = document.createElement("input");
     this.inputDate.type = "date";
     this.inputDate.style.cssText = `
       flex: 1;
-      height: 26px;
       background: var(--color-chrome);
       border: 1px solid var(--color-border);
-      color: var(--color-gold);
+      color: var(--color-text);
       border-radius: var(--border-radius-sm);
-      padding: 2px 6px;
+      padding: 4px 6px;
       font-family: inherit;
       font-size: 11px;
-      font-weight: 600;
-      text-align: center;
-      cursor: pointer;
+      color-scheme: dark;
     `;
-
-    const now = new Date();
-    const initY = now.getUTCFullYear();
-    const initM = String(now.getUTCMonth() + 1).padStart(2, "0");
-    const initD = String(now.getUTCDate()).padStart(2, "0");
-    this.inputDate.value = `${initY}-${initM}-${initD}`;
-
     this.inputDate.onchange = () => {
       if (this.inputDate.value) {
-        const dateObj = new Date(`${this.inputDate.value}T12:00:00.000Z`);
-        if (!isNaN(dateObj.getTime())) {
-          this.callbacks.onSetDate(dateObj.toISOString());
-        }
+        console.log(`MGP: Frontend (LocationPage.ts:148: Selecció data -> Nova data ${this.inputDate.value})`);
+        this.callbacks.onSetDate(this.inputDate.value);
       }
     };
 
-    this.btnNextDay = this.createSmallButton(">", "Dia següent");
-    this.btnNextDay.onclick = () => this.callbacks.onOffsetDay(1);
+    this.btnNextDay = this.createSmallButton("›", "Dia següent");
+    this.btnNextDay.onclick = () => {
+      console.log("MGP: Frontend (LocationPage.ts:154: Dia següent -> Desplaçar +1 dia)");
+      this.callbacks.onOffsetDay(1);
+    };
 
-    calRow.appendChild(this.btnPrevDay);
-    calRow.appendChild(this.inputDate);
-    calRow.appendChild(this.btnNextDay);
-    dateSection.appendChild(calRow);
+    dateRow.appendChild(this.btnPrevDay);
+    dateRow.appendChild(this.inputDate);
+    dateRow.appendChild(this.btnNextDay);
+    timeSection.appendChild(dateRow);
 
     this.btnRealtime = document.createElement("button");
     this.btnRealtime.textContent = "Temps real";
     this.btnRealtime.style.cssText = `
-      width: 100%;
-      height: 28px;
-      background: var(--color-surface-raised);
-      border: 1px solid var(--color-border);
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 1px solid var(--button-border);
       border-radius: var(--border-radius-sm);
-      color: var(--color-text);
+      padding: 6px 12px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 11px;
       transition: all 0.2s ease;
     `;
     this.btnRealtime.onclick = () => {
-      this.callbacks.onSetRealtime(!this.isRealtimeActive);
+      const next = !this.isRealtimeActive;
+      console.log(`MGP: Frontend (LocationPage.ts:172: Temps real -> Commutar a ${next})`);
+      this.callbacks.onSetRealtime(next);
     };
 
-    dateSection.appendChild(this.btnRealtime);
-    this.element.appendChild(dateSection);
-    this.setRealtimeUI(true);
+    timeSection.appendChild(this.btnRealtime);
+    this.element.appendChild(timeSection);
 
-    // Separator
     this.element.appendChild(this.createSeparator());
 
-    // ── 3. Navegació (Phase 3.5) ─────────────────────────────────────
+    // ── 3. Navegació 3D ─────────────────────────────────────────────
     const navSection = document.createElement("div");
     navSection.style.cssText = "display: flex; flex-direction: column; gap: 8px;";
 
     const navTitle = document.createElement("div");
-    navTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px;";
-    navTitle.textContent = "Navegació";
+    navTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px; margin-bottom: 2px;";
+    navTitle.textContent = "Navegació 3D";
     navSection.appendChild(navTitle);
 
-    // Mode toggle button row
     const modeRow = document.createElement("div");
-    modeRow.style.cssText = "display: flex; align-items: center; gap: 8px;";
+    modeRow.style.cssText = "display: flex; align-items: center; justify-content: space-between;";
 
-    this.btnNavMode = document.createElement("button");
-    this.btnNavMode.id = "nav-mode-toggle";
-    this.btnNavMode.style.cssText = `
-      width: 36px;
-      height: 36px;
-      border-radius: var(--border-radius-md);
-      background: var(--button-bg);
-      border: 1px solid var(--button-border);
-      color: var(--color-text);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-      padding: 6px;
-    `;
-    this.btnNavMode.innerHTML = WALK_SVG;
-    this.btnNavMode.setAttribute("aria-label", "Canviar a mode avió");
-    this.btnNavMode.title = "Canviar a mode avió (F)";
-    this.btnNavMode.onmouseover = () => this.btnNavMode.style.background = "var(--button-hover)";
-    this.btnNavMode.onmouseout = () => {
-      this.btnNavMode.style.background = this.currentNavMode === "walk"
-        ? "var(--button-bg)"
-        : "var(--button-checked-bg)";
-    };
-    this.btnNavMode.onclick = () => this.callbacks.onToggleNavigationMode?.();
+    const modeLabel = document.createElement("span");
+    modeLabel.textContent = "Mode:";
+    modeLabel.style.cssText = "font-size: 11px; color: var(--color-text-dim);";
+
+    const modeRight = document.createElement("div");
+    modeRight.style.cssText = "display: flex; align-items: center; gap: 6px;";
 
     this.navModeLabel = document.createElement("div");
-    this.navModeLabel.style.cssText = "font-size: 11px; color: var(--color-text); font-weight: 600;";
+    this.navModeLabel.style.cssText = "font-size: 11px; font-weight: 600;";
     this.navModeLabel.textContent = "Caminar";
 
-    modeRow.appendChild(this.btnNavMode);
-    modeRow.appendChild(this.navModeLabel);
-    navSection.appendChild(modeRow);
-
-    // Reset button
-    this.btnReset = document.createElement("button");
-    this.btnReset.textContent = "Tornar a l'origen";
-    this.btnReset.style.cssText = `
-      width: 100%;
-      height: 26px;
-      background: var(--color-surface-raised);
-      border: 1px solid var(--color-border);
+    this.btnNavMode = document.createElement("button");
+    this.btnNavMode.style.cssText = `
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px;
+      background: var(--button-bg);
+      border: 1px solid var(--button-border);
       border-radius: var(--border-radius-sm);
       color: var(--color-text);
       cursor: pointer;
-      font-weight: 500;
-      font-size: 10px;
-      transition: all 0.2s ease;
+      padding: 4px;
     `;
-    this.btnReset.onmouseover = () => this.btnReset.style.background = "var(--button-hover)";
-    this.btnReset.onmouseout = () => this.btnReset.style.background = "var(--color-surface-raised)";
-    this.btnReset.onclick = () => this.callbacks.onResetToOrigin?.();
-    navSection.appendChild(this.btnReset);
+    this.btnNavMode.innerHTML = WALK_SVG;
+    this.btnNavMode.onclick = () => {
+      console.log("MGP: Frontend (LocationPage.ts:211: Canvi de Mode -> Commutar Caminar/Avió)");
+      this.callbacks.onToggleNavigationMode?.();
+    };
 
-    // Navigation indicators
+    modeRight.appendChild(this.navModeLabel);
+    modeRight.appendChild(this.btnNavMode);
+    modeRow.appendChild(modeLabel);
+    modeRow.appendChild(modeRight);
+    navSection.appendChild(modeRow);
+
     this.navPositionLabel = this.createInfoLabel(navSection, "Posició: E 0.0 | N 0.0");
     this.navHeightLabel = this.createInfoLabel(navSection, "Altura: 0.0 m");
     this.navSpeedLabel = this.createInfoLabel(navSection, "Velocitat: 0.0 m/s");
-    this.navZoneLabel = this.createInfoLabel(navSection, "Zona: --");
+    this.navZoneLabel = this.createInfoLabel(navSection, "Zona: ready");
+
+    this.btnReset = document.createElement("button");
+    this.btnReset.textContent = "Restablir origen";
+    this.btnReset.style.cssText = `
+      background: var(--button-bg);
+      color: var(--button-text);
+      border: 1px solid var(--button-border);
+      border-radius: var(--border-radius-sm);
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 4px;
+      transition: all 0.2s ease;
+    `;
+    this.btnReset.onclick = () => {
+      console.log("MGP: Frontend (LocationPage.ts:237: Restablir origen -> Retornar càmera a l'origen)");
+      this.callbacks.onResetToOrigin?.();
+    };
+    navSection.appendChild(this.btnReset);
 
     this.element.appendChild(navSection);
 
-    // Separator
     this.element.appendChild(this.createSeparator());
 
-    // ── 4. Visualització (Phase 4) ──────────────────────────────────
+    // ── 4. Visualització i Capes ────────────────────────────────────
     const vizSection = document.createElement("div");
-    vizSection.style.cssText = "display: flex; flex-direction: column; gap: 6px;";
+    vizSection.style.cssText = "display: flex; flex-direction: column; gap: 8px;";
 
     const vizTitle = document.createElement("div");
-    vizTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px;";
-    vizTitle.textContent = "Visualització";
+    vizTitle.style.cssText = "font-weight: 600; color: var(--color-gold); font-size: 11px; margin-bottom: 2px;";
+    vizTitle.textContent = "Superposicions visuals";
     vizSection.appendChild(vizTitle);
 
-    const overlayToggles: Array<{ key: string; label: string; checked: boolean }> = [
-      { key: "grid", label: "Grid azimut-altitud", checked: true },
-      { key: "compass", label: "Brúixola (N/E/S/O)", checked: true },
-      { key: "labels", label: "Etiquetes angulars", checked: true },
-      { key: "equator", label: "Equador celeste", checked: true },
-      { key: "bounds", label: "Límits de navegació (vermell)", checked: false },
-      { key: "hud", label: "HUD", checked: true },
+    const toggles = [
+      { key: "hud", label: "HUD de vol / navegació", initial: true },
+      { key: "speedVector", label: "Vector de velocitat", initial: true },
+      { key: "compass", label: "Rosa dels vents / Brúixola", initial: true },
+      { key: "altitudeTape", label: "Cinta d'altitud", initial: true },
     ];
 
-    for (const toggle of overlayToggles) {
+    for (const toggle of toggles) {
       const row = document.createElement("label");
-      row.style.cssText = "display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 11px; color: var(--color-text-dim);";
+      row.style.cssText = "display: flex; align-items: center; gap: 6px; font-size: 11px; cursor: pointer;";
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.checked = toggle.checked;
-      checkbox.id = `overlay-toggle-${toggle.key}`;
-      checkbox.style.cssText = "accent-color: var(--color-gold); cursor: pointer;";
+      checkbox.checked = toggle.initial;
       checkbox.onchange = () => {
+        console.log(`MGP: Frontend (LocationPage.ts:269: Superposició ${toggle.key} -> Commutar a ${checkbox.checked})`);
         if (toggle.key === "hud") {
           this.callbacks.onHudToggle?.(checkbox.checked);
         } else {

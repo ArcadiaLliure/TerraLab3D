@@ -13,6 +13,7 @@ export class FocusTrackingController {
     private readonly resolver: TrackingTargetResolver
   ) {
     this.cameraRig.onUserInteraction(() => {
+      console.log("[DEBUG EVENT] FocusTrackingController received onUserInteraction. Current state:", this.state);
       // Cancel·lar el seguiment automàtic si l'usuari interactua (fa pan)
       if (this.state !== "inactive") {
         this.stopTracking();

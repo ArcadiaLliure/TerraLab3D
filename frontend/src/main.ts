@@ -256,9 +256,15 @@ function main(): void {
     onRegenerate: (settings) => {
       sceneHost.getHorizonOcclusionState().setEnabled(settings.enabled);
       bridge.sendHorizonSettings(settings);
-      bridge.recalculateHorizon();
+      bridge.sendRecalculateHorizon();
     },
-    onCancel: () => bridge.cancelHorizon(),
+    onCancel: () => bridge.sendCancelHorizon(),
+    onSurfaceMode: (mode) => bridge.sendSetSurfaceMode(mode),
+    onSurfaceSource: (sourceId) => bridge.sendSetSurfaceSource(sourceId),
+    onLocalSurfaceModeSwitch: (mode) => {
+      // Aplicar el canvi de shader IMMEDIATAMENT al renderer, sense esperar resposta WS
+      sceneHost.getDemTerrainLayerRenderer().setSurfaceMode(mode);
+    },
   });
   const earthContainer = shell.getPageContainer("earth");
   if (earthContainer) earthPage.mount(earthContainer);
@@ -281,25 +287,25 @@ function main(): void {
 
   const locationHUD = new LocationHUD({
     onCenter: () => {
-       const state = selectionController.getState();
-       if (state.selectedTarget) {
-         const resolved = trackingResolver.resolve(state.selectedTarget);
-         if (resolved) {
-           cameraRig.animateTo(resolved.azimuthDeg, resolved.altitudeDeg, cameraRig.pose().horizontalFovDeg, 600);
-         }
-       }
+      const state = selectionController.getState();
+      if (state.selectedTarget) {
+        const resolved = trackingResolver.resolve(state.selectedTarget);
+        if (resolved) {
+          cameraRig.animateTo(resolved.azimuthDeg, resolved.altitudeDeg, cameraRig.pose().horizontalFovDeg, 600);
+        }
+      }
     },
     onFollow: () => {
-       const state = selectionController.getState();
-       if (state.selectedTarget) {
-         focusTrackingController.startTracking(state.selectedTarget);
-       }
+      const state = selectionController.getState();
+      if (state.selectedTarget) {
+        focusTrackingController.startTracking(state.selectedTarget);
+      }
     },
     onRelease: () => {
-       focusTrackingController.stopTracking();
+      focusTrackingController.stopTracking();
     },
     onClear: () => {
-       selectionController.clearSelection();
+      selectionController.clearSelection();
     },
   });
 
@@ -371,14 +377,14 @@ function main(): void {
   selectionController.subscribe((state) => {
     const model = buildInspectionModel(state, sceneHost);
     locationHUD.updateInspection(model);
-    
+
     // Auto-track si prové de search o pick
     if (state.selectedTarget) {
-        if (state.source === "search" || state.source === "pick") {
-           focusTrackingController.startTracking(state.selectedTarget);
-        }
+      if (state.source === "search" || state.source === "pick") {
+        focusTrackingController.startTracking(state.selectedTarget);
+      }
     } else {
-        focusTrackingController.stopTracking();
+      focusTrackingController.stopTracking();
     }
   });
 
@@ -394,6 +400,7 @@ function main(): void {
     camera: sceneHost.camera,
     getTerrainMeshes: () => sceneHost.getDemTerrainLayerRenderer().getGotoTargetMeshes(),
     getTerrainWorldAnchor: () => terrainWorldAnchor,
+    getTerrainLegendName: (classId) => earthPage.getLegendName(classId),
     onGoto: (destination) => {
       cameraRig.gotoFlightTo(
         destination.eastM,
@@ -432,12 +439,12 @@ function main(): void {
 
   // 4. Bridge ↔ Camera wiring
   cameraRig.onPoseChanged((pose) => {
-    bridge.sendCameraChanged(
-      pose.azimuthDeg,
+    bridge.sendCameraPose(pose.azimuthDeg,
       pose.altitudeDeg,
       pose.horizontalFovDeg,
       pose.rollDeg,
     );
+
     // Phase 4: Update FOV for grid LOD switching
     sceneHost.setCurrentFov(pose.horizontalFovDeg);
   });
@@ -540,8 +547,12 @@ function main(): void {
           navigationWorld.setStreamingDemTerrainMeshes(
             demTerrain.getStreamingNavigationLayers(),
           );
-          earthPage.updateTerrainSurface(metadata);
         }
+        return;
+      }
+      if (metadata.role === "surface_resource") {
+        const demTerrain = sceneHost.getDemTerrainLayerRenderer();
+        demTerrain.applyBinaryResource(metadata, bufferPayload);
         return;
       }
       if (metadata.role === "solar_system_orbit") {
@@ -564,23 +575,33 @@ function main(): void {
     onHorizonStatus(status) {
       earthPage.updateHorizonStatus(status);
     },
+    onSurfaceCatalog(catalog) {
+      earthPage.updateSurfaceCatalog(catalog);
+    },
+    onSurfaceLegend(entries) {
+      earthPage.updateSurfaceLegend(entries);
+    },
+    onSurfaceStatus(status) {
+      earthPage.updateSurfaceStatus(status);
+      sceneHost.getDemTerrainLayerRenderer().setSurfaceMode(status.mode as "base" | "categorical_original");
+    },
     onStarPickResolved(msg) {
       if (!msg.star) return;
       pickingController.handleResolveResponse(msg as any);
       // Actualitzar l'Inspector amb la nova info de l'estrella resolta
       const state = selectionController.getState();
       if (state.selectedTarget?.kind === "star" && state.selectedTarget.sourceId === msg.star.sourceId) {
-         // Re-render
-         const model = buildInspectionModel(state, sceneHost);
-         // Empeltem algunes dades que venen de msg.star (ex: BP-RP, magnitut refinada, sourceRole)
-         if (model && model.fields) {
-            model.fields.magnitude = msg.star.magnitude;
-            model.fields.bpRp = msg.star.bpRp;
-            model.fields.sourceRole = msg.star.sourceRole;
-            model.fields.raDeg = msg.star.raDeg;
-            model.fields.decDeg = msg.star.decDeg;
-         }
-         locationHUD.updateInspection(model);
+        // Re-render
+        const model = buildInspectionModel(state, sceneHost);
+        // Empeltem algunes dades que venen de msg.star (ex: BP-RP, magnitut refinada, sourceRole)
+        if (model && model.fields) {
+          model.fields.magnitude = msg.star.magnitude;
+          model.fields.bpRp = msg.star.bpRp;
+          model.fields.sourceRole = msg.star.sourceRole;
+          model.fields.raDeg = msg.star.raDeg;
+          model.fields.decDeg = msg.star.decDeg;
+        }
+        locationHUD.updateInspection(model);
       }
     },
     onSkyEnvironmentSnapshot(snapshot) {
@@ -665,8 +686,7 @@ function main(): void {
       toolsPage.dispose();
       resourceManagerModal.dispose();
       locationHUD.dispose();
-      bridge.dispose();
-    },
+      },
   };
 
   bridge.addMessageListener(backendListener);
@@ -823,7 +843,7 @@ function main(): void {
       if (width > 0 && height > 0) {
         sceneHost.resize(width, height);
         cameraRig.resize(width, height);
-        bridge.sendViewportResized(width, height, window.devicePixelRatio);
+        bridge.sendViewportSize(width, height, window.devicePixelRatio);
       }
     }
   });
@@ -840,8 +860,7 @@ function main(): void {
     sceneHost.dispose();
     diagnostics.dispose();
     resourceManagerModal.dispose();
-    bridge.dispose();
-  });
+    });
 }
 
 // Run when DOM is ready
@@ -850,3 +869,4 @@ if (document.readyState === "loading") {
 } else {
   main();
 }
+

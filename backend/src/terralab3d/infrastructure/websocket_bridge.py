@@ -99,7 +99,7 @@ class WebSocketBridge:
         """Gestiona una connexió WebSocket."""
         ws = aiohttp.web.WebSocketResponse(heartbeat=10)
         await ws.prepare(request)
-        log.info("WebSocket connectat")
+        log.debug("WebSocket connectat")
 
         # Llegim el primer missatge (ha de ser frontend_ready) per validar la versió
         msg = await ws.receive()
@@ -144,7 +144,7 @@ class WebSocketBridge:
             log.exception("Error a WebSocket")
         finally:
             self._clients.discard(ws)
-            log.info("WebSocket desconnectat (clients actius: %d)", len(self._clients))
+            log.debug("WebSocket desconnectat (clients actius: %d)", len(self._clients))
 
         return ws
 
@@ -180,7 +180,7 @@ class WebSocketBridge:
                 except Exception:
                     self._clients.discard(ws)
         self._binary_bytes_sent += len(message)
-        log.info(
+        log.debug(
             "Recurs binari enviat: %s v%s (%d bytes header + %d bytes payload)",
             resource_id, version, header_len, len(buffer),
         )
@@ -190,10 +190,7 @@ class WebSocketBridge:
         await self.send(status)
 
     async def send_celestial_frame_transform(self, transform: dict[str, Any]) -> None:
-        """Envia la transformació equatorial→ENU al frontend.
-
-        Només quan canvia LST/latitud. NO per frame visual.
-        """
+        """Envia la transformació equatorial→ENU al frontend."""
         await self.send(transform)
 
     async def send_star_pick_resolved(
@@ -203,10 +200,7 @@ class WebSocketBridge:
         status: str,
         star_data: dict[str, Any] | None = None,
     ) -> None:
-        """Envia la resolució d'un pick estel·lar al frontend (Pas 6).
-
-        source_id es serialitza com string decimal per preservar int64.
-        """
+        """Envia la resolució d'un pick estel·lar al frontend (Pas 6)."""
         payload: dict[str, Any] = {
             "type": "star_pick_resolved",
             "requestId": request_id,
@@ -217,14 +211,12 @@ class WebSocketBridge:
             payload["star"] = star_data
         await self.send(payload)
 
-    # ─── Astronomical Search (Pas 12) ──────────────────────────────────
-
     async def send_astronomical_search_result(
         self,
         request_id: str,
         generation: int,
         status: str,
-        results: list[dict[str, Any]]
+        results: list[dict[str, Any]],
     ) -> None:
         await self.send({
             "type": "astronomical_search_result",
@@ -233,7 +225,6 @@ class WebSocketBridge:
             "status": status,
             "results": results,
         })
-
 
     async def send_set_camera_pose(
         self,
@@ -292,7 +283,6 @@ class WebSocketBridge:
         longitude_deg: float,
     ) -> None:
         """Publish GPS coordinates without waiting for a DEM height lookup."""
-
         await self.send({
             "type": "navigation_coordinates_changed",
             "lat": latitude_deg,
@@ -336,7 +326,6 @@ class WebSocketBridge:
 
     async def send_lighting_environment_snapshot(self, snapshot: Any) -> int:
         """Send the compact Step 8.7 DTO; it never contains GPU assets."""
-
         payload = snapshot.to_dict()
         payload["type"] = "lighting_environment_snapshot"
         byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
@@ -368,7 +357,6 @@ class WebSocketBridge:
 
     async def send_moon_surface_resource(self, descriptor: Any) -> None:
         """Send only the small local resource descriptor, never texture bytes."""
-
         payload = descriptor.to_dict()
         payload["type"] = "moon_surface_resource"
         await self.send(payload)
@@ -422,6 +410,15 @@ class WebSocketBridge:
             "message": message,
         })
 
+    async def send_surface_status(self, status: dict[str, Any]) -> None:
+        await self.send(status)
+
+    async def send_surface_catalog(self, catalog: dict[str, Any]) -> None:
+        await self.send(catalog)
+
+    async def send_surface_legend(self, entries: list[dict[str, object]]) -> None:
+        await self.send({"type": "surface_legend", "entries": entries})
+
     async def request_shutdown(self) -> None:
         """Demana al frontend que netegi recursos i confirmi amb shutdown_complete."""
         await self.send({"type": "shutdown_requested"})
@@ -434,15 +431,12 @@ class WebSocketBridge:
             log.warning("Missatge sense tipus: %s", data)
             return
 
-        if msg_type not in ("camera_changed", "set_simulation_time", "camera_pose_changed"):
-            log.info("S'ha rebut missatge de tipus: %s", msg_type)
-        else:
-            log.debug("S'ha rebut missatge de tipus: %s", msg_type)
+        log.debug("S'ha rebut missatge de tipus: %s", msg_type)
 
         if msg_type == "frontend_ready":
             await self._handle_handshake(data)
         elif msg_type == "shutdown_complete":
-            log.info("El frontend ha confirmat el tancament")
+            log.debug("El frontend ha confirmat el tancament")
             self._shutdown_event.set()
         
         handlers = self._handlers.get(msg_type, [])
@@ -456,7 +450,7 @@ class WebSocketBridge:
 
     async def _handle_handshake(self, _data: dict[str, Any]) -> None:
         self._connected = True
-        log.info("Handshake completat — sessió %s", self._session_id)
+        log.debug("Handshake completat — sessió %s", self._session_id)
         await self.send({
             "type": "handshake_ack",
             "sessionId": self._session_id,

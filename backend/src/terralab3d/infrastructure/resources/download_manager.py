@@ -64,7 +64,7 @@ class DownloadJobManager:
         job_id = f"{resource_id}_{variant_id}"
         
         if job_id in self._active_tasks and not self._active_tasks[job_id].done():
-            log.info("MGP: [DownloadManager] [El job %s ja està actiu]", job_id)
+            log.debug("MGP: [DownloadManager] [El job %s ja està actiu]", job_id)
             return job_id
 
         self._cancelled_jobs.discard(job_id)
@@ -170,7 +170,7 @@ class DownloadJobManager:
             await self._bridge.send_download_job_snapshot(snapshot)
 
     async def _download_worker(self, job_id: str, resource_id: ResourceId, variant_id: VariantId) -> None:
-        log.info("MGP: [DownloadManager] [Iniciant job %s]", job_id)
+        log.debug("MGP: [DownloadManager] [Iniciant job %s]", job_id)
         descriptor = self._catalog.get_descriptor(resource_id)
         if not descriptor:
             await self._fail_job(job_id, resource_id, variant_id, "NOT_FOUND", "Recurs no trobat al catàleg")
@@ -253,7 +253,7 @@ class DownloadJobManager:
                     with open(temp_path, mode) as f:
                         async for chunk in response.content.iter_chunked(1024 * 64):
                             if job_id in self._cancelled_jobs:
-                                log.info("MGP: [DownloadManager] [Descàrrega %s cancel·lada]", job_id)
+                                log.debug("MGP: [DownloadManager] [Descàrrega %s cancel·lada]", job_id)
                                 return # La tasca surt silenciosament per cancel·lació
                             
                             f.write(chunk)
@@ -297,10 +297,10 @@ class DownloadJobManager:
                 job_id, resource_id, variant_id, final_path, filename,
                 downloaded, total_bytes, content_sha256,
             )
-            log.info("MGP: [DownloadManager] [Descàrrega %s completada i verificada]", job_id)
+            log.debug("MGP: [DownloadManager] [Descàrrega %s completada i verificada]", job_id)
             
         except asyncio.CancelledError:
-            log.info("MGP: [DownloadManager] [Descàrrega %s pausada/cancel·lada via task.cancel()]", job_id)
+            log.debug("MGP: [DownloadManager] [Descàrrega %s pausada/cancel·lada via task.cancel()]", job_id)
         except ResourceProcessingError as exc:
             log.error("MGP: [DownloadManager] [Error processant %s: %s]", job_id, exc)
             await self._fail_job(job_id, resource_id, variant_id, "PROCESSING_ERROR", str(exc))

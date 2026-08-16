@@ -91,7 +91,7 @@ class ManagedMoonSurfaceAssets:
                 normal_map=assets.get("normal_4k"),
                 credits=tuple(str(value) for value in payload["credits"]),
             )
-            log.info(
+            log.debug(
                 "Managed Moon layer ready: %s files=%d directory=%s",
                 descriptor.label,
                 len(self._files),

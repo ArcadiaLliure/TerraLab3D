@@ -1,8 +1,11 @@
 import * as THREE from "three";
 import type { TerrainNavigationSampling } from "../terrain/TechnicalTerrainSampler";
+import { TerrainDistanceFog } from "../terrain/TerrainDistanceFog";
 
 export const DEM_TERRAIN_RENDER_ORDER = -900;
 export const DEM_COVERAGE_FOG_RENDER_ORDER = -899;
+
+export type SurfacePresentationMode = "base" | "categorical_original";
 
 export interface DemTerrainLayerMetrics {
   readonly geometryBuildCount: number;
@@ -11,6 +14,13 @@ export interface DemTerrainLayerMetrics {
   readonly triangleCount: number;
   readonly activeMeshCount: number;
   readonly semanticAttributeBytes: number;
+  // Surface metrics (Pas 17)
+  readonly surfaceResourceApplyCount: number;
+  readonly surfaceStaleResourceCount: number;
+  readonly surfaceActiveResourceCount: number;
+  readonly surfaceModeSwitchCount: number;
+  readonly surfaceGeometryRebuildsCausedByStyle: 0;
+  readonly surfacePaletteUploadBytes: number;
 }
 
 export interface DemTerrainNavigationLayer {
@@ -20,58 +30,47 @@ export interface DemTerrainNavigationLayer {
 }
 
 export interface DemTerrainStreamingCacheOptions {
-  /** Maximum number of completed detail chunks retained in the GPU scene. */
   readonly maxMeshCount?: number;
-  /** Approximate transferred geometry bytes retained by the detail cache. */
   readonly maxGpuBytes?: number;
 }
 
 interface StreamingMeshEntry extends DemTerrainNavigationLayer {
   readonly version: number;
   readonly gpuBytes: number;
+  surfaceVersion?: number;
 }
 
 const DEFAULT_STREAMING_MESH_COUNT = 12;
 const DEFAULT_STREAMING_GPU_BYTES = 256 * 1024 * 1024;
+const MAX_PALETTE_SIZE = 256;
+
+export interface SurfacePaletteItem {
+  readonly paletteIndex: number;
+  readonly classId: number;
+  readonly rgba: readonly [number, number, number, number];
+}
 
 /**
  * Persistent Three.js presentation of the real observer-relative DEM mesh.
  *
- * The horizon curtain remains a separate celestial-depth occluder. This layer
- * is actual world geometry: X=East, Y=Up, Z=-North, with invalid DEM cells
- * omitted by the backend index buffer rather than painted black.
+ * Implements custom shader palette lookup for categorical land cover styles
+ * and terrain-only distance fog without modifying DEM geometry or global scene.fog.
  */
 export class DemTerrainLayerRenderer {
   readonly root = new THREE.Group();
-  private readonly material = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    roughness: 1,
-    metalness: 0,
-    emissive: new THREE.Color(0x07111a),
-    emissiveIntensity: 0.055,
-    side: THREE.FrontSide,
-  });
-  /**
-   * The moving high-detail chunk is rendered over the resident wide mesh.
-   * A tiny polygon offset avoids depth fighting in their overlap while the
-   * vertex buffers themselves remain independent, persistent GPU resources.
-   */
-  private readonly streamingMaterial = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    roughness: 1,
-    metalness: 0,
-    emissive: new THREE.Color(0x07111a),
-    emissiveIntensity: 0.055,
-    side: THREE.FrontSide,
-    polygonOffset: true,
-    polygonOffsetFactor: -1,
-    polygonOffsetUnits: -1,
-  });
-  /**
-   * A translucent world-space boundary, built only from the edge of the
-   * uploaded DEM topology. It marks precisely the same no-coverage frontier
-   * that blocks flight collision; it is not a second terrain surface.
-   */
+  private readonly distanceFog = new TerrainDistanceFog();
+  private currentSurfaceMode: SurfacePresentationMode = "categorical_original";
+
+
+
+  private readonly sharedShaderUniforms = {
+    uSurfaceMode: { value: 1 }, // 0 = base, 1 = categorical_original
+    ...this.distanceFog.uniforms,
+  };
+
+  private readonly material: THREE.MeshStandardMaterial;
+  private readonly streamingMaterial: THREE.MeshStandardMaterial;
+
   private readonly coverageFogMaterial = new THREE.MeshBasicMaterial({
     color: 0x9db2c9,
     side: THREE.DoubleSide,
@@ -80,6 +79,7 @@ export class DemTerrainLayerRenderer {
     depthTest: true,
     depthWrite: false,
   });
+
   private mesh: THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial> | null = null;
   private readonly streamingMeshes = new Map<string, StreamingMeshEntry>();
   private coverageFog: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial> | null = null;
@@ -89,30 +89,60 @@ export class DemTerrainLayerRenderer {
   private navigationSampling: TerrainNavigationSampling | null = null;
   private activeVersion = -1;
   private activeContentKey = "";
+  private activeSurfaceVersion = -1;
   private readonly maxStreamingMeshCount: number;
   private readonly maxStreamingGpuBytes: number;
   private streamingGpuBytes = 0;
   private disposed = false;
+
+  // Metrics
   private geometryBuildCount = 0;
   private geometryUploadBytes = 0;
   private vertexCount = 0;
   private triangleCount = 0;
   private semanticAttributeBytes = 0;
+  private surfaceResourceApplyCount = 0;
+  private surfaceStaleResourceCount = 0;
+  private surfaceModeSwitchCount = 0;
+  private surfacePaletteUploadBytes = 0;
 
   constructor(parent: THREE.Object3D, cache: DemTerrainStreamingCacheOptions = {}) {
-    this.maxStreamingMeshCount = positiveInteger(
-      cache.maxMeshCount,
-      DEFAULT_STREAMING_MESH_COUNT,
-    );
-    this.maxStreamingGpuBytes = positiveInteger(
-      cache.maxGpuBytes,
-      DEFAULT_STREAMING_GPU_BYTES,
-    );
+    this.maxStreamingMeshCount = positiveInteger(cache.maxMeshCount, DEFAULT_STREAMING_MESH_COUNT);
+    this.maxStreamingGpuBytes = positiveInteger(cache.maxGpuBytes, DEFAULT_STREAMING_GPU_BYTES);
+
+
+    this.material = this.createTerrainMaterial(false);
+    this.streamingMaterial = this.createTerrainMaterial(true);
+
     this.root.name = "demTerrainRoot";
     parent.add(this.root);
   }
 
+  getDistanceFog(): TerrainDistanceFog {
+    return this.distanceFog;
+  }
+
+  getSurfaceMode(): SurfacePresentationMode {
+    return this.currentSurfaceMode;
+  }
+
+  /**
+   * Switch visual style between BASE and CATEGORICAL_ORIGINAL without
+   * touching or rebuilding geometry, position, normal or index buffers.
+   */
+  setSurfaceMode(mode: SurfacePresentationMode): void {
+    this.currentSurfaceMode = mode;
+    this.sharedShaderUniforms.uSurfaceMode.value = mode === "categorical_original" ? 1 : 0;
+    this.surfaceModeSwitchCount++;
+  }
+
+  /**
+   * Apply DEM terrain mesh binary resource.
+   */
   applyBinaryResource(metadata: any, payload: ArrayBuffer): boolean {
+    if (metadata?.role === "surface_resource") {
+      return this.applySurfaceResource(metadata, payload);
+    }
     const isStreamingChunk = metadata?.role === "terrain_stream_chunk";
     if (this.disposed || (!isStreamingChunk && metadata?.role !== "terrain_mesh")) return false;
     if (metadata.cleared === true) {
@@ -147,29 +177,29 @@ export class DemTerrainLayerRenderer {
       const position = viewFloat32(payload, layout.position, vertexCount * 3);
       const normal = viewFloat32(payload, layout.normal, vertexCount * 3);
       const color = viewUint8(payload, layout.color, vertexCount * 4);
-      const classId = viewUint16(payload, layout.classId, vertexCount);
-      const sourceId = viewInt16(payload, layout.sourceId, vertexCount);
       const index = viewUint32(payload, layout.index, indexCount);
+
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute("position", new THREE.BufferAttribute(position, 3));
       geometry.setAttribute("normal", new THREE.BufferAttribute(normal, 3));
       geometry.setAttribute("color", new THREE.BufferAttribute(color, 4, true));
-      // Keep semantic identity separate from displayed vertex colour. These
-      // attributes are deliberately non-normalized for category picking.
-      geometry.setAttribute("terrainClassId", new THREE.BufferAttribute(classId, 1, false));
-      geometry.setAttribute("terrainSourceId", new THREE.BufferAttribute(sourceId, 1, false));
+      // UV initialization required by shader, will be updated by surface resource layer
+      geometry.setAttribute("landcoverUV", new THREE.BufferAttribute(new Float32Array(vertexCount * 2), 2, false));
       geometry.setIndex(new THREE.BufferAttribute(index, 1));
       geometry.computeBoundingSphere();
+      geometry.computeBoundingBox();
 
       const replacement = new THREE.Mesh(
         geometry,
         isStreamingChunk ? this.streamingMaterial.clone() : this.material,
       );
       replacement.name = isStreamingChunk ? "demTerrainStreamChunk" : "demTerrainMeshV3";
-      replacement.frustumCulled = false;
+      // Streaming detail chunks benefit from frustum culling
+      replacement.frustumCulled = isStreamingChunk;
       replacement.receiveShadow = true;
       replacement.castShadow = false;
       replacement.renderOrder = DEM_TERRAIN_RENDER_ORDER + Number(isStreamingChunk);
+
       const previous = isStreamingChunk ? activeStream?.mesh ?? null : this.mesh;
       if (isStreamingChunk) {
         if (activeStream) {
@@ -189,10 +219,11 @@ export class DemTerrainLayerRenderer {
         this.navigationSampling = navigationSampling;
         this.activeVersion = version;
         this.activeContentKey = contentKey;
-        // A world mesh replacement changes the global terrain anchor. Its old
-        // moving overlay can no longer be sampled or rendered safely.
         this.clearStreaming();
         this.rebuildCoverageFog(geometry, navigationSampling);
+        if (this.lastSurfaceResource) {
+          this.applySurfaceResource(this.lastSurfaceResource.metadata, this.lastSurfaceResource.payload);
+        }
       }
       this.root.add(replacement);
       previous?.removeFromParent();
@@ -214,6 +245,182 @@ export class DemTerrainLayerRenderer {
     }
   }
 
+  /**
+   * Apply companion categorical surface binary resource.
+   * Updates only semantic class attributes and palette without touching geometry.
+   */
+  private lastSurfaceResource: { metadata: any; payload: ArrayBuffer } | null = null;
+
+  private applySurfaceResource(metadata: any, payload: ArrayBuffer): boolean {
+    const version = Number(metadata.version ?? metadata.generation ?? metadata.compatibleTerrainVersion ?? 0);
+    const contentKey = String(metadata.terrainContentKey ?? metadata.contentKey ?? "");
+    const vertexCount = Number(metadata.vertexCount);
+    if (!Number.isSafeInteger(version) || !Number.isSafeInteger(vertexCount) || vertexCount <= 0) {
+      this.surfaceStaleResourceCount++;
+      return false;
+    }
+
+    this.lastSurfaceResource = { metadata, payload };
+
+    // Locate target mesh (either base mesh or streaming chunk)
+    let targetMesh: THREE.Mesh<THREE.BufferGeometry> | null = null;
+    if (this.mesh && (this.activeContentKey === contentKey || contentKey === "")) {
+      if (version < this.activeSurfaceVersion) {
+        this.surfaceStaleResourceCount++;
+        return false;
+      }
+      this.activeSurfaceVersion = version;
+      targetMesh = this.mesh;
+    } else {
+      const entry = this.streamingMeshes.get(contentKey);
+      if (entry) {
+        if (entry.surfaceVersion && version < entry.surfaceVersion) {
+          this.surfaceStaleResourceCount++;
+          return false;
+        }
+        entry.surfaceVersion = version;
+        targetMesh = entry.mesh;
+      }
+    }
+
+    if (!targetMesh) {
+      this.surfaceStaleResourceCount++;
+      return false;
+    }
+
+    const layout = metadata.bufferLayout;
+    if (!layout?.classId || !layout?.colorRgba) {
+      console.warn("[DemTerrainLayerRenderer] Mismatched layout: ", layout);
+      return false;
+    }
+
+    try {
+      const classIds = viewUint16(payload, layout.classId, vertexCount);
+      const sourceIds = viewInt16(payload, layout.sourceId, vertexCount);
+      const colorsRgba = viewUint8(payload, layout.colorRgba, vertexCount * 4);
+
+      console.log(`[DemTerrainLayerRenderer] Aplicant colors per ${vertexCount} vèrtexs!`);
+
+      const geometry = targetMesh.geometry;
+
+      geometry.setAttribute("terrainClassId", new THREE.BufferAttribute(classIds, 1, false));
+      geometry.setAttribute("terrainSourceId", new THREE.BufferAttribute(sourceIds, 1, false));
+      geometry.setAttribute("customColor", new THREE.BufferAttribute(colorsRgba, 4, true));
+
+      const material = targetMesh.material as THREE.MeshStandardMaterial;
+      if (material.map) {
+         material.map = null;
+         material.needsUpdate = true;
+      }
+
+      this.surfaceResourceApplyCount++;
+      return true;
+    } catch (error) {
+      console.warn("[DemTerrainLayerRenderer] invalid surface resource", error);
+      return false;
+    }
+  }
+
+  private updatePaletteData(palette: readonly SurfacePaletteItem[]): void {
+     // Obsolete amb el CustomColor local
+  }
+
+  private createTerrainMaterial(isStreaming: boolean): THREE.MeshStandardMaterial {
+    const mat = new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      roughness: 1,
+      metalness: 0,
+      emissive: new THREE.Color(0x07111a),
+      emissiveIntensity: 0.055,
+      side: THREE.FrontSide,
+      ...(isStreaming
+        ? {
+            polygonOffset: true,
+            polygonOffsetFactor: -1,
+            polygonOffsetUnits: -1,
+          }
+        : {}),
+    });
+
+    mat.customProgramCacheKey = () => (isStreaming ? "dem_terrain_stream_v1" : "dem_terrain_main_v1");
+
+    const uniforms = this.sharedShaderUniforms;
+
+    mat.onBeforeCompile = (shader) => {
+      // Connect shared uniforms
+      Object.assign(shader.uniforms, uniforms);
+
+      // Vertex shader modifications
+      shader.vertexShader = shader.vertexShader.replace(
+        "#include <common>",
+        `
+        #include <common>
+        attribute vec4 customColor;
+        flat varying vec4 vCustomColor;
+        varying float vWorldDistance;
+        `,
+      );
+
+      shader.vertexShader = shader.vertexShader.replace(
+        "#include <begin_vertex>",
+        `
+        #include <begin_vertex>
+        vCustomColor = customColor;
+        vec4 worldPos = modelMatrix * vec4(transformed, 1.0);
+        vWorldDistance = length(worldPos.xyz - cameraPosition);
+        `,
+      );
+
+      // Fragment shader modifications
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <common>",
+        `
+        #include <common>
+        uniform int uSurfaceMode;
+        uniform int uTerrainFogEnabled;
+        uniform vec3 uTerrainFogColor;
+        uniform float uTerrainFogNear;
+        uniform float uTerrainFogFar;
+        flat varying vec4 vCustomColor;
+        varying float vWorldDistance;
+        `,
+      );
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <color_fragment>",
+        `
+        #include <color_fragment>
+        if (uSurfaceMode == 1) {
+            // Mode categòric: usar el color del vertex si és vàlid
+            if (vCustomColor.a > 0.0) {
+                diffuseColor.rgb = vCustomColor.rgb;
+            } else {
+                // Vèrtex sense classe assignada → verd fallback
+                diffuseColor.rgb = vec3(0.15, 0.35, 0.12);
+            }
+        } else {
+            // Mode BASE (relleu): SEMPRE verd, ignorant qualsevol color residual
+            diffuseColor.rgb = vec3(0.15, 0.35, 0.12);
+        }
+        `,
+      );
+
+      // Apply terrain-only distance fog at the end of fragment shader
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "#include <dithering_fragment>",
+        `
+        #include <dithering_fragment>
+        if (uTerrainFogEnabled == 1 && vWorldDistance > uTerrainFogNear) {
+          float fogFactor = clamp((vWorldDistance - uTerrainFogNear) / max(1.0, (uTerrainFogFar - uTerrainFogNear)), 0.0, 1.0);
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, uTerrainFogColor, fogFactor * 0.85);
+        }
+        `,
+      );
+    };
+
+    return mat;
+  }
+
   metrics(): DemTerrainLayerMetrics {
     let streamingVertices = 0;
     let streamingTriangles = 0;
@@ -230,20 +437,23 @@ export class DemTerrainLayerRenderer {
       triangleCount: this.triangleCount + streamingTriangles,
       activeMeshCount: Number(this.mesh !== null) + this.streamingMeshes.size,
       semanticAttributeBytes: this.semanticAttributeBytes + streamingSemanticBytes,
+      surfaceResourceApplyCount: this.surfaceResourceApplyCount,
+      surfaceStaleResourceCount: this.surfaceStaleResourceCount,
+      surfaceActiveResourceCount: Number(this.mesh !== null) + this.streamingMeshes.size,
+      surfaceModeSwitchCount: this.surfaceModeSwitchCount,
+      surfaceGeometryRebuildsCausedByStyle: 0,
+      surfacePaletteUploadBytes: this.surfacePaletteUploadBytes,
     };
   }
 
-  /** The real DEM mesh used by navigation collision; ownership remains here. */
   getNavigationMesh(): THREE.Mesh | null {
     return this.mesh;
   }
 
-  /** Compact topology for collision over the same uploaded DEM attributes. */
   getNavigationSampling(): TerrainNavigationSampling | null {
     return this.navigationSampling;
   }
 
-  /** The high-detail moving chunk used before the resident wide mesh. */
   getStreamingNavigationMesh(): THREE.Mesh | null {
     return this.latestStreamingEntry()?.mesh ?? null;
   }
@@ -252,7 +462,6 @@ export class DemTerrainLayerRenderer {
     return this.latestStreamingEntry()?.sampling ?? null;
   }
 
-  /** All retained detail chunks, oldest to newest; ownership remains here. */
   getStreamingNavigationLayers(): readonly DemTerrainNavigationLayer[] {
     return Array.from(this.streamingMeshes.values(), ({ contentKey, mesh, sampling }) => ({
       contentKey,
@@ -261,7 +470,6 @@ export class DemTerrainLayerRenderer {
     }));
   }
 
-  /** Visible world meshes eligible for a terrain context-click destination. */
   getGotoTargetMeshes(): readonly THREE.Mesh[] {
     const meshes: THREE.Mesh[] = [];
     if (this.mesh) meshes.push(this.mesh);
@@ -269,11 +477,6 @@ export class DemTerrainLayerRenderer {
     return meshes;
   }
 
-  /**
-   * Keep the top of the DEM coverage fog on the observer's geometric
-   * horizontal. This updates a tiny retained vertex buffer, never terrain
-   * geometry or raster data.
-   */
   updateCoverageFogTop(cameraUpM: number): void {
     const fog = this.coverageFog;
     if (!fog || !Number.isFinite(cameraUpM) || Math.abs(cameraUpM - this.coverageFogTopY) < 0.05) return;
@@ -294,6 +497,7 @@ export class DemTerrainLayerRenderer {
     if (this.disposed) return;
     this.disposed = true;
     this.clear();
+    this.paletteTexture.dispose();
     this.material.dispose();
     this.streamingMaterial.dispose();
     this.coverageFogMaterial.dispose();
@@ -308,6 +512,7 @@ export class DemTerrainLayerRenderer {
     this.navigationSampling = null;
     this.activeVersion = -1;
     this.activeContentKey = "";
+    this.activeSurfaceVersion = -1;
     this.vertexCount = 0;
     this.triangleCount = 0;
     this.semanticAttributeBytes = 0;
@@ -395,11 +600,6 @@ interface CoverageFogBoundary {
   readonly bottomHeights: Float32Array<ArrayBufferLike>;
 }
 
-/**
- * Find the first unusable polar cell for each azimuth. The same indexed
- * vertex rule is used by the navigation sampler, so this visible boundary
- * coincides with its collision boundary rather than an inferred raster edge.
- */
 function buildCoverageFogBoundary(
   geometry: THREE.BufferGeometry,
   sampling: TerrainNavigationSampling,
@@ -491,6 +691,7 @@ function semanticBytes(mesh: THREE.Mesh<THREE.BufferGeometry> | null): number {
   return (
     (mesh.geometry.getAttribute("terrainClassId")?.array.byteLength ?? 0)
     + (mesh.geometry.getAttribute("terrainSourceId")?.array.byteLength ?? 0)
+    + (mesh.geometry.getAttribute("paletteIndex")?.array.byteLength ?? 0)
   );
 }
 

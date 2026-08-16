@@ -180,7 +180,10 @@ export class Shell {
         btn.style.background = "var(--button-bg)";
       }
     };
-    btn.onclick = onClick;
+    btn.onclick = () => {
+      console.log(`MGP: Frontend (Shell.ts:183: ${text} -> Botó barra superior accionat)`);
+      onClick();
+    };
     return btn;
   }
 
@@ -195,6 +198,7 @@ export class Shell {
   }
 
   private onRailButtonClick(pageId: string) {
+    console.log(`MGP: Frontend (Shell.ts:198: Pestanya ${pageId} -> Canvi/obertura de pestanya del calaix)`);
     if (this.activePageId === pageId) {
       this.toggleDrawer();
     } else {
@@ -204,6 +208,7 @@ export class Shell {
       }
     }
   }
+
 
   public selectPage(pageId: string) {
     const spec = this.pages.get(pageId);

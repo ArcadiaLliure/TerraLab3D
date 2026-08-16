@@ -17,6 +17,7 @@ import os
 from pathlib import Path
 from typing import Iterator
 
+# pyrefly: ignore [missing-import]
 import numpy as np
 
 from terralab3d.domain.stars.models import (
@@ -124,7 +125,7 @@ def _merge_bright_supplement(
     fb_mask = fb_mags < (min_gaia_mag - 1e-4)
 
     if not np.any(fb_mask):
-        log.info(
+        log.debug(
             "MGP: [catalog] [_merge_bright_supplement] "
             "[Gaia té estrelles fins mag %.2f; no cal suplement]",
             min_gaia_mag,
@@ -139,7 +140,7 @@ def _merge_bright_supplement(
     supp_sid = fallback_arrays["source_id"][fb_mask]
 
     n_supp = supp_ra.size
-    log.info(
+    log.debug(
         "MGP: [catalog] [_merge_bright_supplement] "
         "[Afegint %d estrelles brillants del fallback (mag < %.2f: Sirius, Betelgeuse...)]",
         n_supp, min_gaia_mag,
@@ -222,7 +223,7 @@ class FallbackStarCatalogAdapter:
             raw = _read_tile_npz(self._path)
             self._data = _normalize_arrays(raw)
             n = len(self._data["ra"])
-            log.info(
+            log.debug(
                 "MGP: [FallbackAdapter] [load_fallback_catalog] "
                 "[Fallback carregat: %d estrelles]",
                 n,
@@ -294,7 +295,7 @@ class GaiaStarCatalogAdapter:
             general_npz = self._gaia_dir / "tile_all.npz"
             if general_npz.exists():
                 self._availability = GaiaAvailability.AVAILABLE
-                log.info(
+                log.debug(
                     "MGP: [GaiaAdapter] [__init__] [Gaia disponible sense manifest: %s]",
                     general_npz,
                 )
@@ -311,7 +312,7 @@ class GaiaStarCatalogAdapter:
             self._manifest = TileManifest()
             self._manifest.load(manifest_file)
             self._availability = GaiaAvailability.AVAILABLE
-            log.info(
+            log.debug(
                 "MGP: [GaiaAdapter] [__init__] [Gaia disponible amb manifest a %s: %d deep tiles]",
                 self._gaia_dir,
                 len(self._manifest.deep_tiles),
@@ -380,7 +381,7 @@ class GaiaStarCatalogAdapter:
             self._general_data = normalized
             self._availability = GaiaAvailability.READY
             n = len(normalized["ra"])
-            log.info(
+            log.debug(
                 "MGP: [GaiaAdapter] [load_general_catalog] "
                 "[General carregat: %d estrelles, mag ≤ %.1f]",
                 n, mag_limit,
@@ -443,7 +444,7 @@ class GaiaStarCatalogAdapter:
         self._closed = True
         self._general_data = None
         self._manifest = None
-        log.info("MGP: [GaiaAdapter] [close] [Adapter tancat]")
+        log.debug("MGP: [GaiaAdapter] [close] [Adapter tancat]")
 
 
 # ─── Factory ──────────────────────────────────────────────────────────
@@ -464,7 +465,7 @@ def create_star_catalog_adapter(
         GaiaAvailability.MANIFEST_MISSING,
         GaiaAvailability.MANIFEST_INVALID,
     ):
-        log.info(
+        log.debug(
             "MGP: [create_star_catalog_adapter] [Gaia=%s → fallback]",
             adapter.get_availability().value,
         )

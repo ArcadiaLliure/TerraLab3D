@@ -7,6 +7,7 @@ import hashlib
 import json
 import logging
 import math
+import sys
 import threading
 import time
 from collections import OrderedDict, deque
@@ -22,6 +23,7 @@ from terralab3d.application.terrain_mesh_builder import (
     TerrainMeshBuffers,
     TerrainMeshBuilder,
 )
+from terralab3d.domain.terrain.models import TerrainChunkIdentity
 from terralab3d.domain.elevation.models import ElevationBatchRequest
 from terralab3d.domain.horizon.calculations import (
     adaptive_distances_m,
@@ -57,11 +59,13 @@ class HorizonCoordinator:
         progress_publisher: ProgressPublisher,
         *,
         cache_bytes: int = 32 * 1024 * 1024,
+        land_cover_coordinator: object | None = None,
     ) -> None:
         self._elevation_port = elevation_port
         self._projector = projector
         self._profile_publisher = profile_publisher
         self._progress_publisher = progress_publisher
+        self._land_cover_coordinator = land_cover_coordinator
         self._terrain_mesh_builder = TerrainMeshBuilder(elevation_port, projector)
         self._cache_limit = max(1_048_576, int(cache_bytes))
         self._cache: OrderedDict[str, HorizonProfile] = OrderedDict()
@@ -137,7 +141,7 @@ class HorizonCoordinator:
         await self._publish(profile)
         await self._publish_terrain(profile, None)
         await self._status(request, "fallback", 1.0, profile)
-        log.info(
+        log.debug(
             "MGP: [horizon_coordinator.py] [activate_observer_fallback] "
             "[Perfil pla observer_generation=%d rays=%d]",
             request.observer_generation,
@@ -150,6 +154,10 @@ class HorizonCoordinator:
         if self._cancel_event is not None:
             self._cancel_started_at = time.perf_counter()
             self._cancel_event.set()
+        if self._land_cover_coordinator is not None:
+            cancel_fn = getattr(self._land_cover_coordinator, "cancel", None)
+            if cancel_fn is not None:
+                cancel_fn()
 
     async def wait_idle(self) -> None:
         if self._task is not None:
@@ -197,6 +205,7 @@ class HorizonCoordinator:
 
     def metrics(self) -> dict[str, float | int]:
         dem_metrics = getattr(self._elevation_port, "metrics", lambda: {})()
+        lc_metrics = getattr(self._land_cover_coordinator, "metrics", lambda: {})() if self._land_cover_coordinator else {}
         return {
             "horizonBakeP50Ms": _percentile(sorted(self._bake_ms), 0.50),
             "horizonBakeP95Ms": _percentile(sorted(self._bake_ms), 0.95),
@@ -214,7 +223,9 @@ class HorizonCoordinator:
             "horizonStale": self.stale_count,
             "horizonCancelled": self.cancel_count,
             **dem_metrics,
+            **lc_metrics,
         }
+
 
     async def _drain(self) -> None:
         try:
@@ -229,7 +240,7 @@ class HorizonCoordinator:
                     profile = None if request.force_recalculate else self._cache_get(cache_key)
                     if profile is None:
                         await self._status(request, "sampling", 0.05)
-                        log.info(
+                        log.debug(
                             "MGP: [horizon_coordinator.py] [_drain] "
                             "[Bake iniciat request=%s observer_generation=%d step_deg=%.6f radius_km=%.1f force=%s]",
                             request.request_id,
@@ -321,7 +332,7 @@ class HorizonCoordinator:
                         if elapsed_ms > 0:
                             self._samples_per_second.append(ray_samples / (elapsed_ms / 1000.0))
                         self._cache_put(cache_key, profile)
-                        log.info(
+                        log.debug(
                             "MGP: [horizon_coordinator.py] [_drain] "
                             "[Bake acabat request=%s duration_ms=%.2f rays=%d dem_samples=%d quality=%s]",
                             request.request_id,
@@ -410,6 +421,10 @@ class HorizonCoordinator:
 
                                 loop.call_soon_threadsafe(publish_progress)
 
+                            log.info(
+                                "INTERN: Backend (horizon_coordinator.py:%d: _drain_terrain -> [START] Iniciant construcció de malla 3D de relleu DEM)",
+                                sys._getframe().f_lineno,
+                            )
                             mesh_started_at = time.perf_counter()
                             terrain = await asyncio.to_thread(
                                 self._terrain_mesh_builder.build,
@@ -443,7 +458,7 @@ class HorizonCoordinator:
                     self.cancel_count += 1
                     if self._cancel_started_at is not None:
                         self._cancellation_ms.append((time.perf_counter() - self._cancel_started_at) * 1000.0)
-                    log.info(
+                    log.debug(
                         "MGP: [horizon_coordinator.py] [_drain] [Bake cancel·lat request=%s]",
                         request.request_id,
                     )
@@ -647,7 +662,7 @@ class HorizonCoordinator:
         self.profile_binary_bytes = len(payload)
         self.peak_rss_bytes = max(self.peak_rss_bytes, _current_rss_bytes())
         await self._profile_publisher(metadata, payload)
-        log.info(
+        log.debug(
             "MGP: [horizon_coordinator.py] [_publish] [Perfil swap version=%d quality=%s bytes=%d]",
             profile.version, profile.quality.value, len(payload),
         )
@@ -662,12 +677,32 @@ class HorizonCoordinator:
         self.peak_rss_bytes = max(self.peak_rss_bytes, _current_rss_bytes())
         await self._profile_publisher(metadata, payload)
         log.info(
-            "MGP: [horizon_coordinator.py] [_publish_terrain] "
-            "[Terrain swap version=%d vertices=%d bytes=%d]",
-            profile.version,
+            "INTERN: Backend (horizon_coordinator.py:674: _publish_terrain -> [START] Malla 3D de relleu DEM generada vèrtexs=%d bytes=%d versió=%d [END])",
             0 if terrain is None else terrain.vertex_count,
             len(payload),
+            profile.version,
         )
+        if (
+            terrain is not None
+            and self._land_cover_coordinator is not None
+            and terrain.latitudes_deg is not None
+            and terrain.longitudes_deg is not None
+        ):
+            chunk = TerrainChunkIdentity(
+                content_key=profile.content_key,
+                version=profile.version,
+                vertex_count=terrain.vertex_count,
+                center_east_m=terrain.center_east_m,
+                center_north_m=terrain.center_north_m,
+            )
+            schedule_fn = getattr(self._land_cover_coordinator, "schedule_sampling", None)
+            if schedule_fn is not None:
+                await schedule_fn(
+                    chunk,
+                    terrain.latitudes_deg,
+                    terrain.longitudes_deg,
+                    generation=self._latest_generation,
+                )
 
     async def _status(
         self,
@@ -896,3 +931,4 @@ def _current_rss_bytes() -> int:
     except (AttributeError, OSError):
         pass
     return 0
+

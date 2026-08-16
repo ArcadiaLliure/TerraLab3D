@@ -42,6 +42,8 @@ class ResourceCatalog:
                 "Deep Star Maps 2020 — SVS ID 4851",
             ),
             metadata=(
+                ("domain", "sky"),
+                ("category", "deep_sky"),
                 ("coordinateFrame", "ICRF/J2000"),
                 ("projection", "plate-carree/equirectangular"),
                 ("raAtHorizontalCenterHours", 0.0),
@@ -103,6 +105,8 @@ class ResourceCatalog:
             source_page_url="https://irsa.ipac.caltech.edu/data/Planck/release_2/all-sky-maps/previews/COM_CompMap_Dust-GNILC-Model-Opacity_2048_R2.01/",
             credits=("Planck Collaboration", "NASA/IPAC Infrared Science Archive"),
             metadata=(
+                ("domain", "sky"),
+                ("category", "deep_sky"),
                 ("coordinateFrame", "GALACTIC"),
                 ("projection", "HEALPix"),
                 ("field", "TAU353"),
@@ -130,6 +134,10 @@ class ResourceCatalog:
             source_page_url="https://github.com/mattiaverga/OpenNGC",
             license="CC BY-SA 4.0",
             credits=("Mattia Verga", "OpenNGC Contributors"),
+            metadata=(
+                ("domain", "sky"),
+                ("category", "deep_sky"),
+            ),
             variants=(
                 ResourceVariant(
                     id=VariantId("pinned"),
@@ -147,6 +155,10 @@ class ResourceCatalog:
             acquisition_kind=AcquisitionKind.TAP_QUERY,
             source_page_url="https://gea.esac.esa.int/archive/",
             credits=("ESA/Gaia/DPAC",),
+            metadata=(
+                ("domain", "sky"),
+                ("category", "deep_sky"),
+            ),
             variants=(
                 ResourceVariant(
                     id=VariantId("dr3"),
@@ -162,6 +174,10 @@ class ResourceCatalog:
             provider="NASA / JPL NAIF",
             acquisition_kind=AcquisitionKind.HTTP_BUNDLE,
             source_page_url="https://naif.jpl.nasa.gov/pub/naif/generic_kernels/",
+            metadata=(
+                ("domain", "sky"),
+                ("category", "solar_system"),
+            ),
             variants=(
                 ResourceVariant(
                     id=VariantId("de440"),
@@ -178,6 +194,10 @@ class ResourceCatalog:
             provider="NASA / JPL NAIF",
             acquisition_kind=AcquisitionKind.HTTP_BUNDLE,
             dependencies=(ResourceId("solar.core"),),
+            metadata=(
+                ("domain", "sky"),
+                ("category", "solar_system"),
+            ),
             variants=(
                 ResourceVariant(
                     id=VariantId("default"),
@@ -195,6 +215,10 @@ class ResourceCatalog:
             acquisition_kind=AcquisitionKind.STATIC_FILE,
             source_page_url="https://www6.solarsystemscope.com/textures/",
             license="CC BY 4.0",
+            metadata=(
+                ("domain", "sky"),
+                ("category", "solar_system"),
+            ),
             variants=(
                 ResourceVariant(
                     id=VariantId("2k"),
@@ -205,6 +229,106 @@ class ResourceCatalog:
                     id=VariantId("8k"),
                     title="8K",
                     source_url="https://www6.solarsystemscope.com/textures/download/8k_saturn_ring_alpha.png",
+                ),
+            )
+        ))
+
+        # ─── RECURSOS DE LA TERRA (EARTH) ───────────────────────────────
+
+        # 8. Topografia i Model Digital del Terreny (DEM)
+        self._register(ResourceDescriptor(
+            id=ResourceId("earth.dem.elevation"),
+            title="Topografia i Relleu (DEM)",
+            provider="ICGC / IGN / Copernicus DEM",
+            acquisition_kind=AcquisitionKind.STATIC_FILE,
+            source_page_url="https://www.icgc.cat/ / https://land.copernicus.eu/",
+            license="Open Data / CC BY 4.0",
+            credits=("Institut Cartogràfic i Geològic de Catalunya", "IGN", "Copernicus"),
+            metadata=(
+                ("domain", "earth"),
+                ("category", "dem"),
+                ("dataType", "elevation_raster"),
+            ),
+            variants=(
+                ResourceVariant(
+                    id=VariantId("regional_5m"),
+                    title="MDT Catalunya 5m (NPY / GeoTIFF)",
+                    published_size_label="Local",
+                ),
+                ResourceVariant(
+                    id=VariantId("copernicus_30m"),
+                    title="Copernicus DEM GLO-30",
+                    published_size_label="Global 30m",
+                ),
+            )
+        ))
+
+        # 9. Cobertura del Sòl Categòrica (S2GLC Europe)
+        self._register(ResourceDescriptor(
+            id=ResourceId("earth.surface.s2glc"),
+            title="Cobertura del Sòl Categòrica (S2GLC)",
+            provider="ESA / CBK PAN — Sentinel-2 Global Land Cover",
+            acquisition_kind=AcquisitionKind.STATIC_FILE,
+            source_page_url="http://s2glc.cbk.waw.pl/",
+            license="CC BY 4.0",
+            credits=("European Space Agency (ESA)", "Space Research Centre PAS (CBK PAN)"),
+            metadata=(
+                ("domain", "earth"),
+                ("category", "land_cover"),
+                ("resolution", "10m"),
+                ("dataType", "categorical_raster"),
+                ("legend", "s2glc"),
+            ),
+            variants=(
+                ResourceVariant(
+                    id=VariantId("europe_2017"),
+                    title="S2GLC Europe 2017 v1.2 (10 m)",
+                    published_size_label="~8.4 GB",
+                ),
+            )
+        ))
+
+        # 10. Corine Land Cover (CLC)
+        self._register(ResourceDescriptor(
+            id=ResourceId("earth.surface.clc"),
+            title="Corine Land Cover (CLC)",
+            provider="Copernicus Land Monitoring Service / EEA",
+            acquisition_kind=AcquisitionKind.STATIC_FILE,
+            source_page_url="https://land.copernicus.eu/pan-european/corine-land-cover",
+            license="Copernicus Open Access",
+            credits=("European Environment Agency (EEA)", "Copernicus Programme"),
+            metadata=(
+                ("domain", "earth"),
+                ("category", "land_cover"),
+                ("resolution", "100m"),
+                ("legend", "clc"),
+            ),
+            variants=(
+                ResourceVariant(
+                    id=VariantId("clc_2018"),
+                    title="CLC 2018 (100 m)",
+                    published_size_label="~150 MB",
+                ),
+            )
+        ))
+
+        # 11. Contaminació Lumínica (DVNL / VIIRS)
+        self._register(ResourceDescriptor(
+            id=ResourceId("earth.light_pollution.dvnl"),
+            title="Contaminació Lumínica (DVNL / VIIRS)",
+            provider="Earth Observation Group / NOAA — Colorado School of Mines",
+            acquisition_kind=AcquisitionKind.STATIC_FILE,
+            source_page_url="https://eogdata.mines.edu/products/vnl/",
+            credits=("Earth Observation Group (EOG)", "NOAA National Centers for Environmental Information"),
+            metadata=(
+                ("domain", "earth"),
+                ("category", "light_pollution"),
+            ),
+            variants=(
+                ResourceVariant(
+                    id=VariantId("dvnl_2022"),
+                    title="VIIRS Day/Night Band 2022",
+                    published_size_label="~38 MB",
                 ),
             )
         ))

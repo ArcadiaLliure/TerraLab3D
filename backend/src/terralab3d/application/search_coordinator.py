@@ -32,7 +32,7 @@ class AstronomicalSearchCoordinator:
         ngc_objects: Sequence[Any],
         planets: Sequence[dict[str, Any]],
     ) -> None:
-        log.info(
+        log.debug(
             "MGP: [AstronomicalSearchCoordinator] [build_index] "
             "[stars=%d, ngc=%d, planets=%d]",
             len(named_stars), len(ngc_objects), len(planets)

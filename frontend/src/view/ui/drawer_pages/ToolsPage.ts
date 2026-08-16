@@ -48,7 +48,10 @@ export class ToolsPage {
         cursor: pointer;
         font-size: 11px;
     `;
-    btn.onclick = () => this.onOpenResourceManager();
+    btn.onclick = () => {
+      console.log("MGP: Frontend (ToolsPage.ts:51: Obrir Gestor de Recursos -> Obrir modal del gestor de recursos)");
+      this.onOpenResourceManager();
+    };
     group.appendChild(btn);
 
     this.element.appendChild(group);

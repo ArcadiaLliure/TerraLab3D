@@ -48,4 +48,39 @@ class OrthophotoPort(Protocol):
 
 
 class LandCoverPort(Protocol):
-    def sample(self, request: TerrainTileRequest) -> SurfaceSampleGrid: ...
+    """Infrastructure boundary for categorical land-cover raster data.
+
+    Implementations read configured raster sources, manage CRS transforms,
+    and sample class IDs for terrain vertex coordinates.  This port is
+    completely separate from OrthophotoPort: land-cover sources are never
+    used for photo-realistic rendering.
+    """
+
+    def metadata(self) -> list["LandCoverSourceDescriptor"]:
+        """Return descriptors for all configured land-cover sources."""
+        ...
+
+    def sample_classes(
+        self,
+        request: "LandCoverSamplingRequest",
+    ) -> "LandCoverSampleGrid":
+        """Sample categorical class IDs at the given coordinates."""
+        ...
+
+    def legend(self, legend_id: str) -> "LandCoverLegend":
+        """Retrieve a legend by its identifier."""
+        ...
+
+    def close(self) -> None:
+        """Release any open raster handles."""
+        ...
+
+
+# Deferred imports for type hints used in LandCoverPort
+from terralab3d.domain.surface.models import (  # noqa: E402
+    LandCoverLegend,
+    LandCoverSampleGrid,
+    LandCoverSamplingRequest,
+    LandCoverSourceDescriptor,
+)
+

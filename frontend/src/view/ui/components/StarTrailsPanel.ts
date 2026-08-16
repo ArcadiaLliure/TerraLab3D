@@ -72,7 +72,7 @@ export class StarTrailsPanel {
     this.btnStart.onmouseleave = () => { this.btnStart.style.background = "var(--color-surface, #1a1a1a)"; };
     this.btnStart.addEventListener("click", (e) => {
       e.stopPropagation();
-      console.log("[StarTrails] Botó INICIA premut.");
+      console.log("MGP: Frontend (StarTrailsPanel.ts:75: Inicia -> Iniciar sessió de traces estel·lars)");
       // 24 hours, 60 sec intervals, mag 6.0 and 1.0x playback speed.
       this.bridge.startStarTrails(86400, 60, 6.0, 1.0);
     });
@@ -86,6 +86,7 @@ export class StarTrailsPanel {
     this.btnPauseResume.onmouseleave = () => { this.btnPauseResume.style.background = "var(--color-surface, #1a1a1a)"; };
     this.btnPauseResume.addEventListener("click", (e) => {
       e.stopPropagation();
+      console.log("MGP: Frontend (StarTrailsPanel.ts:88: Pausa/Reprèn -> Commutar pausa de traces estel·lars)");
       if (this.currentState === "running") this.bridge.pauseStarTrails();
       else if (this.currentState === "paused") this.bridge.resumeStarTrails();
     });
@@ -99,6 +100,7 @@ export class StarTrailsPanel {
     this.btnStop.onmouseleave = () => { this.btnStop.style.background = "var(--color-surface, #1a1a1a)"; };
     this.btnStop.addEventListener("click", (e) => {
       e.stopPropagation();
+      console.log("MGP: Frontend (StarTrailsPanel.ts:101: Atura -> Aturar captura de traces estel·lars)");
       this.bridge.stopStarTrails();
     });
     controlsRow.appendChild(this.btnStop);
@@ -111,8 +113,10 @@ export class StarTrailsPanel {
     this.btnClear.onmouseleave = () => { this.btnClear.style.background = "var(--color-surface, #1a1a1a)"; };
     this.btnClear.addEventListener("click", (e) => {
       e.stopPropagation();
+      console.log("MGP: Frontend (StarTrailsPanel.ts:113: Neteja -> Netejar acumulador de traces)");
       this.bridge.clearStarTrails();
     });
+
     controlsRow.appendChild(this.btnClear);
     
     this.element.appendChild(controlsRow);

@@ -73,7 +73,7 @@ class StarPickResolver:
             role=role,
             batch=batch,
         )
-        log.info(
+        log.debug(
             "MGP: [StarPickResolver] [register] "
             "[Taula registrada: %s v%s (%d estrelles)]",
             resource_id, version, len(batch),
@@ -83,7 +83,7 @@ class StarPickResolver:
         """Desregistra un recurs (eviction, replacement)."""
         removed = self._tables.pop(resource_id, None)
         if removed:
-            log.info(
+            log.debug(
                 "MGP: [StarPickResolver] [unregister] "
                 "[Taula desregistrada: %s v%s]",
                 removed.resource_id, removed.version,
@@ -180,7 +180,7 @@ class StarPickResolver:
         self._disposed = True
         count = len(self._tables)
         self._tables.clear()
-        log.info(
+        log.debug(
             "MGP: [StarPickResolver] [shutdown] "
             "[%d taules alliberades]",
             count,

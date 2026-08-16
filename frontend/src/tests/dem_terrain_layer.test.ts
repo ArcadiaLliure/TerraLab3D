@@ -139,8 +139,155 @@ assert(renderer.applyBinaryResource({ ...fixture.metadata, cleared: true, versio
 assert(renderer.metrics().activeMeshCount === 0, "base replacement clears its stale streamed detail too");
 renderer.dispose();
 
+// ─── Pas 17 Surface & Presentation tests ─────────────────────────────
+const surfaceParent = new THREE.Group();
+const surfaceRenderer = new DemTerrainLayerRenderer(surfaceParent);
+const baseTerrainFixture = payload();
+assert(
+  surfaceRenderer.applyBinaryResource(baseTerrainFixture.metadata, baseTerrainFixture.buffer),
+  "base terrain is loaded for surface test",
+);
+const baseMesh = surfaceRenderer.getNavigationMesh()!;
+const initialGeometryBuilds = surfaceRenderer.metrics().geometryBuildCount;
+assert(surfaceRenderer.getSurfaceMode() === "categorical_original", "default surface presentation mode is categorical_original");
+
+// Apply companion categorical surface resource
+const surfacePayload = surfaceResourcePayload(
+  baseTerrainFixture.metadata.contentKey,
+  1,
+  baseTerrainFixture.metadata.vertexCount,
+);
+assert(
+  surfaceRenderer.applyBinaryResource(surfacePayload.metadata, surfacePayload.buffer),
+  "companion categorical surface resource is applied to active DEM mesh",
+);
+assert(
+  surfaceRenderer.metrics().surfaceResourceApplyCount === 1,
+  "surface resource apply count is tracked",
+);
+const classAttr = baseMesh.geometry.getAttribute("terrainClassId");
+const paletteIndexAttr = baseMesh.geometry.getAttribute("paletteIndex");
+assert(classAttr !== undefined && classAttr.count === 4, "classId attribute is present on target mesh");
+assert(paletteIndexAttr !== undefined && paletteIndexAttr.count === 4, "paletteIndex attribute is present on target mesh");
+
+// Mode toggling: Must NOT rebuild geometry or modify vertex/index buffers
+surfaceRenderer.setSurfaceMode("base");
+assert(surfaceRenderer.getSurfaceMode() === "base", "mode toggles to base");
+assert(
+  surfaceRenderer.metrics().geometryBuildCount === initialGeometryBuilds,
+  "CANVIAR L'APARENÇA NO RECONSTRUEIX LA GEOMETRIA (geometryBuildCount unchanged)",
+);
+assert(
+  surfaceRenderer.metrics().surfaceGeometryRebuildsCausedByStyle === 0,
+  "surfaceGeometryRebuildsCausedByStyle is strictly zero",
+);
+assert(
+  surfaceRenderer.metrics().surfaceModeSwitchCount === 1,
+  "surface mode switch count is tracked",
+);
+
+// Toggle back to base
+surfaceRenderer.setSurfaceMode("base");
+assert(surfaceRenderer.getSurfaceMode() === "base", "mode toggles back to base");
+assert(
+  surfaceRenderer.metrics().geometryBuildCount === initialGeometryBuilds,
+  "switching back to base also does NOT rebuild geometry",
+);
+assert(
+  surfaceRenderer.metrics().surfaceModeSwitchCount === 2,
+  "second mode switch is tracked",
+);
+
+// Stale and invalid surface resource rejection
+const staleSurface = surfaceResourcePayload(baseTerrainFixture.metadata.contentKey, 0, 4);
+assert(
+  surfaceRenderer.applyBinaryResource(staleSurface.metadata, staleSurface.buffer) === false,
+  "stale surface resource (version 0 < active 1) is rejected",
+);
+assert(
+  surfaceRenderer.metrics().surfaceStaleResourceCount >= 1,
+  "stale surface resource is recorded in metrics",
+);
+
+const mismatchSurface = surfaceResourcePayload("unknown-content-key", 2, 4);
+assert(
+  surfaceRenderer.applyBinaryResource(mismatchSurface.metadata, mismatchSurface.buffer) === false,
+  "surface resource for unknown/mismatched contentKey is rejected",
+);
+
+// Terrain-only distance fog tests
+const fog = surfaceRenderer.getDistanceFog();
+assert(fog.enabled === true, "terrain distance fog is enabled by default");
+fog.setRange(5_000, 100_000);
+assert(fog.uniforms.uTerrainFogNear.value === 5_000, "fog near distance uniform is updated");
+assert(fog.uniforms.uTerrainFogFar.value === 100_000, "fog far distance uniform is updated");
+fog.enabled = false;
+assert(fog.uniforms.uTerrainFogEnabled.value === 0, "fog enabled uniform flips to 0 without scene.fog");
+
+surfaceRenderer.dispose();
+
 console.log(`DEM terrain layer tests: ${passed} passed, ${failed} failed`);
 if (failed > 0) (globalThis as { process?: { exit(code: number): void } }).process?.exit(1);
+
+function surfaceResourcePayload(
+  contentKey: string,
+  version: number,
+  vertexCount: number,
+): { metadata: any; buffer: ArrayBuffer } {
+  const classIds = new Uint16Array(vertexCount);
+  const sourceIds = new Int16Array(vertexCount);
+  const paletteIndices = new Uint16Array(vertexCount);
+  const provenances = new Uint8Array(vertexCount);
+
+  for (let i = 0; i < vertexCount; i++) {
+    classIds[i] = 10 + i;
+    sourceIds[i] = 0;
+    paletteIndices[i] = i;
+    provenances[i] = 1;
+  }
+
+  const classOffset = 0;
+  const sourceOffset = classOffset + classIds.byteLength;
+  const paletteOffset = sourceOffset + sourceIds.byteLength;
+  const provOffset = paletteOffset + paletteIndices.byteLength;
+  const totalLength = provOffset + provenances.byteLength;
+
+  const buffer = new ArrayBuffer(totalLength);
+  new Uint16Array(buffer, classOffset, vertexCount).set(classIds);
+  new Int16Array(buffer, sourceOffset, vertexCount).set(sourceIds);
+  new Uint16Array(buffer, paletteOffset, vertexCount).set(paletteIndices);
+  new Uint8Array(buffer, provOffset, vertexCount).set(provenances);
+
+  return {
+    buffer,
+    metadata: {
+      role: "surface_resource",
+      resourceId: "earth.terrain.surface",
+      version,
+      terrainContentKey: contentKey,
+      vertexCount,
+      palette: [
+        { paletteIndex: 0, classId: 10, rgba: [50, 150, 50, 255] },
+        { paletteIndex: 1, classId: 11, rgba: [200, 200, 50, 255] },
+        { paletteIndex: 2, classId: 12, rgba: [50, 50, 200, 255] },
+        { paletteIndex: 3, classId: 13, rgba: [100, 100, 100, 255] },
+      ],
+      legend: [
+        { classId: 10, name: "Forest", rgba: [50, 150, 50, 255], isNodata: false },
+        { classId: 11, name: "Agriculture", rgba: [200, 200, 50, 255], isNodata: false },
+        { classId: 12, name: "Water", rgba: [50, 50, 200, 255], isNodata: false },
+        { classId: 13, name: "Urban", rgba: [100, 100, 100, 255], isNodata: false },
+      ],
+      bufferLayout: {
+        terrainClassId: { offset: classOffset, length: classIds.byteLength },
+        terrainSourceId: { offset: sourceOffset, length: sourceIds.byteLength },
+        paletteIndex: { offset: paletteOffset, length: paletteIndices.byteLength },
+        provenance: { offset: provOffset, length: provenances.byteLength },
+      },
+    },
+  };
+}
+
 
 function payload(): { metadata: any; buffer: ArrayBuffer } {
   const positions = new Float32Array([

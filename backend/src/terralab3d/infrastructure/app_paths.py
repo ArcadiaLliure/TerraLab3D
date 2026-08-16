@@ -59,7 +59,7 @@ def resolve_data_root() -> Path:
     env_root = os.getenv(DATA_ROOT_ENV, "").strip()
     if env_root:
         path = Path(env_root).expanduser().resolve(strict=False)
-        log.info("MGP: [app_paths] [resolve_data_root] [Des d'entorn: %s]", path)
+        log.debug("MGP: [app_paths] [resolve_data_root] [Des d'entorn: %s]", path)
         return path
 
     pointer = data_location_pointer_path()
@@ -70,13 +70,13 @@ def resolve_data_root() -> Path:
             raw_root = str(payload.get("data_root", "") or "").strip()
             if raw_root:
                 path = Path(raw_root).expanduser().resolve(strict=False)
-                log.info("MGP: [app_paths] [resolve_data_root] [Des d'apuntador %s: %s]", pointer, path)
+                log.debug("MGP: [app_paths] [resolve_data_root] [Des d'apuntador %s: %s]", pointer, path)
                 return path
         except Exception as exc:
             log.warning("MGP: [app_paths] [resolve_data_root] [Error llegint %s: %s]", pointer, exc)
 
     fallback = application_state_root()
-    log.info("MGP: [app_paths] [resolve_data_root] [Utilitzant fallback: %s]", fallback)
+    log.debug("MGP: [app_paths] [resolve_data_root] [Utilitzant fallback: %s]", fallback)
     return fallback
 
 

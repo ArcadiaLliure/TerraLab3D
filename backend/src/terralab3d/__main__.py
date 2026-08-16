@@ -57,6 +57,7 @@ from terralab3d.domain.eclipses.models import (
 from terralab3d.domain.eclipses.services import AstronomicalEventCalculator
 from terralab3d.infrastructure.adapters.ephemeris.adapter import SkyfieldEphemerisAdapter
 from terralab3d.infrastructure.adapters.ephemeris.spice_adapter import SpiceEphemerisAdapter
+from terralab3d.domain.terrain.models import TerrainChunkIdentity
 
 logging.basicConfig(
     level=logging.INFO,
@@ -128,7 +129,6 @@ async def run() -> int:
     bridge.on("camera_changed", _on_camera_changed)
     bridge.on("viewport_resized", _on_viewport_resized)
     bridge.on("bridge_error", _on_bridge_error)
-    bridge.on("frontend_performance_metrics", _on_frontend_performance_metrics)
 
     # ── 2.5. Gestor Unificat de Recursos ──────────────────────────────
     def _handle_request_catalog_snapshot(data: dict[str, Any]) -> None:
@@ -186,6 +186,9 @@ async def run() -> int:
         decide_visibility_window_refresh,
     )
     from terralab3d.application.horizon_coordinator import HorizonCoordinator, pack_terrain_mesh
+    from terralab3d.application.land_cover_coordinator import LandCoverCoordinator
+    from terralab3d.infrastructure.adapters.landcover.adapter import RasterLandCoverAdapter
+    from terralab3d.domain.surface.models import SurfaceStyle
     from terralab3d.application.terrain_mesh_builder import TerrainMeshBuilder
     from terralab3d.infrastructure.adapters.dem import (
         PyprojAeqdProjector,
@@ -233,12 +236,33 @@ async def run() -> int:
         )
         return len(payload)
 
+    land_cover_adapter = RasterLandCoverAdapter()
+    async def publish_surface_resource(metadata: dict[str, object], payload: bytes) -> int | None:
+        if bridge.connected:
+            await bridge.send_binary_resource(
+                str(metadata.get("resourceId", "earth.terrain.surface")),
+                str(metadata.get("version", metadata.get("generation", 0))),
+                metadata,
+                payload,
+            )
+            return len(payload)
+        return 0
+
+    land_cover_coordinator = LandCoverCoordinator(
+        land_cover_port=land_cover_adapter,
+        surface_publisher=publish_surface_resource,
+        status_publisher=bridge.send_surface_status,
+        legend_publisher=bridge.send_surface_legend,
+    )
+
     horizon_coordinator = HorizonCoordinator(
         elevation_adapter,
         PyprojAeqdProjector(),
         publish_horizon_profile,
         bridge.send_horizon_status,
+        land_cover_coordinator=land_cover_coordinator,
     )
+
     terrain_stream_builder = TerrainMeshBuilder(elevation_adapter, camera_horizon_projector)
     terrain_stream_task: asyncio.Task[None] | None = None
     terrain_stream_cancel: threading.Event | None = None
@@ -876,6 +900,49 @@ async def run() -> int:
     bridge.on("recalculate_horizon", _handle_recalculate_horizon)
     bridge.on("cancel_horizon", _handle_cancel_horizon)
     bridge.on("camera_pose_changed", _handle_camera_pose_changed)
+
+    async def _handle_request_surface_catalog(data: dict[str, Any]) -> None:
+        log.info("MGP: Backend (__main__.py:%d: _handle_request_surface_catalog -> Sol·licitud catàleg superfície)", sys._getframe().f_lineno)
+        catalog = land_cover_adapter.metadata()
+        if bridge.connected:
+            await bridge.send_surface_catalog({
+                "sources": [
+                    {
+                        "id": d.id,
+                        "name": d.name,
+                        "sourceType": d.source_type.value,
+                        "resolutionM": d.resolution_m,
+                        "priority": d.priority,
+                        "attribution": getattr(d, "attribution", ""),
+                        "enabled": True
+                    } for d in catalog
+                ]
+            })
+
+    async def _handle_set_surface_source(data: dict[str, Any]) -> None:
+        source_id = data.get("sourceId")
+        log.info("MGP: Backend (__main__.py:%d: _handle_set_surface_source -> Seleccionar font de cobertura: %s)", sys._getframe().f_lineno, source_id)
+        land_cover_coordinator.set_selected_source(source_id)
+        horizon_coordinator.request(new_horizon_request())
+
+    async def _handle_set_surface_style(data: dict[str, Any]) -> None:
+        mode = data.get("style", data.get("mode"))
+        log.info("MGP: Backend (__main__.py:%d: _handle_set_surface_style -> Mode superfície: %s)", sys._getframe().f_lineno, mode)
+        if mode == "categorical_original":
+            land_cover_coordinator.set_style(SurfaceStyle.CATEGORICAL_ORIGINAL)
+        else:
+            land_cover_coordinator.set_style(SurfaceStyle.BASE)
+        
+        # Enviar confirmació immediata del canvi de mode al frontend
+        status = land_cover_coordinator.status()
+        if bridge.connected:
+            await bridge.send_surface_status(status)
+        
+        horizon_coordinator.request(new_horizon_request())
+
+    bridge.on("request_surface_catalog", _handle_request_surface_catalog)
+    bridge.on("set_surface_source", _handle_set_surface_source)
+    bridge.on("set_surface_mode", _handle_set_surface_style)
 
     from terralab3d.application.star_coordinator import StarCoordinator
     from terralab3d.application.star_pick_resolver import StarPickResolver
@@ -1774,16 +1841,16 @@ async def run() -> int:
         except asyncio.CancelledError:
             pass
     elevation_adapter.close()
-    log.info("MGP: [__main__.py] [shutdown] [Mètriques elevació: %s]", elevation_coordinator.metrics())
-    log.info("MGP: [__main__.py] [shutdown] [Mètriques horitzó: %s]", horizon_coordinator.metrics())
+    log.debug("MGP: [__main__.py] [shutdown] [Mètriques elevació: %s]", elevation_coordinator.metrics())
+    log.debug("MGP: [__main__.py] [shutdown] [Mètriques horitzó: %s]", horizon_coordinator.metrics())
     await ephemeris_coordinator.close()
-    log.info("Mètriques d'efemèrides: %s", ephemeris_coordinator.metrics())
+    log.debug("Mètriques d'efemèrides: %s", ephemeris_coordinator.metrics())
     if event_service is not None:
-        log.info("Mètriques Pas 9 instantànies: %s", event_service.metrics())
+        log.debug("Mètriques Pas 9 instantànies: %s", event_service.metrics())
     if event_search_coordinator is not None:
-        log.info("Mètriques Pas 9 cerques: %s", event_search_coordinator.metrics())
+        log.debug("Mètriques Pas 9 cerques: %s", event_search_coordinator.metrics())
     if trajectory_coordinator is not None:
-        log.info("Mètriques Pas 9 trajectòries: %s", trajectory_coordinator.metrics())
+        log.debug("Mètriques Pas 9 trajectòries: %s", trajectory_coordinator.metrics())
         
     await deep_sky_coordinator.shutdown()
 
@@ -1818,103 +1885,7 @@ async def _on_viewport_resized(data: dict[str, Any]) -> None:
         data.get("heightPx", 0),
         data.get("devicePixelRatio", 1),
     )
-
-
-async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
-    log.info(
-        "Frontend metrics: frame_ms_p50=%.2f frame_ms_p95=%.2f samples=%d "
-        "entities=%d geometries=%d materials=%d snapshots=%d stale=%d bridge_bytes=%d",
-        data.get("frameMsP50", 0.0),
-        data.get("frameMsP95", 0.0),
-        data.get("frameSampleCount", 0),
-        data.get("solarSystemEntityBuildCount", 0),
-        data.get("solarBodyGeometryBuildCount", 0),
-        data.get(
-            "solarBodyMaterialBuildCount",
-            data.get("solarSystemMaterialBuildCount", 0),
-        ),
-        data.get("solarSystemSnapshotApplyCount", 0),
-        data.get("solarSystemStaleSnapshotCount", 0),
-        data.get("solarSystemBridgeBytes", 0),
-    )
-    log.info(
-        "Solar 8.6 metrics: planet_texture_loads=%d texture_upload_bytes=%d "
-        "catalog=%d states=%d ring_geometry=%d ring_material=%d "
-        "orbit_geometry=%d orbit_bridge_bytes=%d gpu_estimate_bytes=%d",
-        data.get("planetTextureLoadCount", 0),
-        data.get("planetTextureUploadBytes", 0),
-        data.get("satelliteCatalogCount", 0),
-        data.get("satelliteStateCountPerTick", 0),
-        data.get("ringGeometryBuildCount", 0),
-        data.get("ringMaterialBuildCount", 0),
-        data.get("orbitGeometryBuildCount", 0),
-        data.get("orbitBridgeBytes", 0),
-        data.get("gpuMemoryEstimateBytes", 0),
-    )
-    log.info(
-        "Moon metrics: geometry=%d material=%d albedo_loads=%d normal_loads=%d "
-        "texture_upload_bytes=%d bridge_texture_bytes=%d",
-        data.get("moonGeometryBuildCount", 0),
-        data.get("moonMaterialBuildCount", 0),
-        data.get("moonAlbedoTextureLoadCount", 0),
-        data.get("moonNormalTextureLoadCount", 0),
-        data.get("moonTextureUploadBytes", 0),
-        data.get("moonBridgeTextureBytes", 0),
-    )
-    log.info(
-        "Galactic metrics: geometry=%d material=%d milky_way_loads=%d "
-        "planck_loads=%d stale=%d active=%d texture_upload_bytes=%d",
-        data.get("galacticGeometryBuildCount", 0),
-        data.get("galacticMaterialBuildCount", 0),
-        data.get("milkyWayTextureLoadCount", 0),
-        data.get("planckTextureLoadCount", 0),
-        data.get("galacticStaleTextureCount", 0),
-        data.get("galacticActiveTextureCount", 0),
-        data.get("galacticTextureUploadBytes", 0),
-    )
-    log.info(
-        "Lighting 8.7 metrics: sun_build=%d moon_build=%d diffuse_build=%d "
-        "pbr_materials=%d snapshots=%d stale=%d bridge_bytes=%d "
-        "sun_shadow_updates=%d moon_shadow_updates=%d shadow_bytes=%d "
-        "renderer_calls=%d renderer_geometries=%d renderer_textures=%d",
-        data.get("sunLightBuildCount", 0),
-        data.get("moonLightBuildCount", 0),
-        data.get("diffuseLightBuildCount", 0),
-        data.get("pbrMaterialBuildCount", 0),
-        data.get("lightingSnapshotCount", 0),
-        data.get("lightingStaleCount", 0),
-        data.get("lightingBridgeBytes", 0),
-        data.get("sunShadowUpdateCount", 0),
-        data.get("moonShadowUpdateCount", 0),
-        data.get("shadowMapEstimateBytes", 0),
-        data.get("rendererRenderCalls", 0),
-        data.get("rendererMemoryGeometries", 0),
-        data.get("rendererMemoryTextures", 0),
-    )
-    log.info(
-        "Shadow timings: off_p50=%.2f off_p95=%.2f "
-        "medium_p50=%.2f medium_p95=%.2f high_p50=%.2f high_p95=%.2f",
-        data.get("shadowOffFrameMsP50", 0.0),
-        data.get("shadowOffFrameMsP95", 0.0),
-        data.get("shadowMediumFrameMsP50", 0.0),
-        data.get("shadowMediumFrameMsP95", 0.0),
-        data.get("shadowHighFrameMsP50", 0.0),
-        data.get("shadowHighFrameMsP95", 0.0),
-    )
-    log.info(
-        "Pas 9 render metrics: trajectory_geometry=%d trajectory_material=%d "
-        "trajectory_applies=%d trajectory_stale=%d trajectory_bytes=%d "
-        "totality_geometry=%d totality_material=%d",
-        data.get("trajectoryGeometryBuildCount", 0),
-        data.get("trajectoryMaterialBuildCount", 0),
-        data.get("trajectoryResourceApplyCount", 0),
-        data.get("trajectoryStaleResourceCount", 0),
-        data.get("trajectoryBridgeBytes", 0),
-        data.get("solarTotalityGeometryBuildCount", 0),
-        data.get("solarTotalityMaterialBuildCount", 0),
-    )
-
-
+    
 async def _on_bridge_error(data: dict[str, Any]) -> None:
     log.error(
         "Error de pont des del frontend: [%s] %s",
@@ -1933,3 +1904,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+

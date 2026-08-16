@@ -781,6 +781,7 @@ export class CameraRigImpl implements CameraRig {
   // ─── Input handlers ────────────────────────────────────────────────
 
   private onPointerDown(e: PointerEvent): void {
+    console.log("[DEBUG EVENT] CameraRigImpl.onPointerDown: e.button=", e.button, " e.target=", e.target);
     if (e.button !== 0) return;
     this.dragging = true;
     this.lastX = e.clientX;
@@ -790,6 +791,7 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private onPointerMove(e: PointerEvent): void {
+    // console.log("[DEBUG EVENT] CameraRigImpl.onPointerMove, dragging=", this.dragging);
     if (!this.dragging) return;
     const dx = e.clientX - this.lastX;
     const dy = e.clientY - this.lastY;
@@ -803,6 +805,7 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private onPointerUp(e: PointerEvent): void {
+    console.log("[DEBUG EVENT] CameraRigImpl.onPointerUp: dragging=", this.dragging);
     if (!this.dragging) return;
     this.dragging = false;
     this.container?.releasePointerCapture(e.pointerId);

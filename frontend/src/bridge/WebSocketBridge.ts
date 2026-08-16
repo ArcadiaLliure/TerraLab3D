@@ -22,6 +22,12 @@ import type {
   CameraMotionStoppedMessage,
   CameraResetCompletedMessage,
   FrontendPerformanceMetricsMessage,
+  ResourceCatalogSnapshotMessage,
+  DownloadJobSnapshotMessage,
+  AstronomicalSearchResultMessage,
+  StarTrailsSnapshotMessage,
+  SurfaceCatalogMessage,
+  SurfaceStatusMessage,
 } from "../contracts/bridge_messages";
 import type { NavigationCameraPose, MotionState } from "../contracts/navigation";
 import type { LightingEnvironmentSnapshot } from "../contracts/lighting_environment_contracts";
@@ -106,11 +112,14 @@ export interface BackendMessageListener {
   onEventSearchResult?(result: AstronomicalEventSearchResult): void;
   onApparentTrajectoryResource?(metadata: ApparentTrajectoryMetadata, bufferPayload: ArrayBuffer): void;
   onAngularSeparationResult?(result: AngularSeparationResult): void;
-  onResourceCatalogSnapshot?(msg: import("../contracts/bridge_messages").ResourceCatalogSnapshotMessage): void;
-  onDownloadJobSnapshot?(msg: import("../contracts/bridge_messages").DownloadJobSnapshotMessage): void;
-  onAstronomicalSearchResult?(msg: import("../contracts/bridge_messages").AstronomicalSearchResultMessage): void;
-  onStarTrailsSnapshot?(snapshot: import("../contracts/bridge_messages").StarTrailsSnapshotMessage): void;
+  onResourceCatalogSnapshot?(msg: ResourceCatalogSnapshotMessage): void;
+  onDownloadJobSnapshot?(msg: DownloadJobSnapshotMessage): void;
+  onAstronomicalSearchResult?(msg: AstronomicalSearchResultMessage): void;
+  onStarTrailsSnapshot?(snapshot: StarTrailsSnapshotMessage): void;
   onHorizonStatus?(status: HorizonStatusMessage): void;
+  onSurfaceCatalog?(msg: SurfaceCatalogMessage): void;
+  onSurfaceStatus?(msg: SurfaceStatusMessage): void;
+  onSurfaceLegend?(entries: Array<{ classId: number; name: string; rgba: [number, number, number, number]; isNodata?: boolean }>): void;
 }
 
 export class WebSocketBridge {
@@ -121,6 +130,7 @@ export class WebSocketBridge {
   private readonly messageListeners: Set<BackendMessageListener> = new Set();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private _disposed = false;
+  private shutdownRequested = false;
 
   get state(): BridgeState {
     return this._state;
@@ -157,6 +167,7 @@ export class WebSocketBridge {
 
     this.ws.onopen = () => {
       this.sendMessage({ type: "frontend_ready", protocolVersion: 2 });
+      this.sendMessage({ type: "request_surface_catalog" });
     };
 
     this.ws.onmessage = (event: MessageEvent) => {
@@ -198,96 +209,84 @@ export class WebSocketBridge {
 
     const headerBytes = new Uint8Array(arrayBuffer, 4, headerLen);
     const decoder = new TextDecoder("utf-8");
-    const headerJsonStr = decoder.decode(headerBytes);
-    const metadata = JSON.parse(headerJsonStr);
+    const headerStr = decoder.decode(headerBytes);
+    let metadata: any;
+    try {
+      metadata = JSON.parse(headerStr);
+    } catch (err) {
+      console.error("[Bridge] Failed to parse binary metadata JSON", err);
+      return;
+    }
 
-    const payloadBuffer = arrayBuffer.slice(4 + headerLen);
+    const payloadOffset = 4 + headerLen;
+    const bufferPayload = arrayBuffer.slice(payloadOffset);
 
     for (const l of this.messageListeners) {
-      if (metadata.role === "apparent_trajectory") {
-        l.onApparentTrajectoryResource?.(metadata as ApparentTrajectoryMetadata, payloadBuffer);
+      if (metadata.role === "star_catalog_data") {
+        l.onStarResourceReady?.(metadata, bufferPayload);
+      } else if (metadata.role === "apparent_trajectory") {
+        l.onApparentTrajectoryResource?.(metadata, bufferPayload);
+      } else if (
+        metadata.role === "horizon_profile"
+        || metadata.role === "terrain_mesh"
+        || metadata.role === "terrain_stream_chunk"
+        || metadata.role === "surface_resource"
+      ) {
+        l.onBinaryResourceReady?.(metadata, bufferPayload);
       }
-      if (l.onBinaryResourceReady) l.onBinaryResourceReady(metadata, payloadBuffer);
-      else l.onStarResourceReady?.(metadata, payloadBuffer);
     }
   }
 
-  sendCameraChanged(
-    azimuthDeg: number,
-    altitudeDeg: number,
-    horizontalFovDeg: number,
-    rollDeg: number,
-  ): void {
-    const msg: CameraChangedMessage = {
+  sendCameraPose(azimuthDeg: number, altitudeDeg: number, horizontalFovDeg: number, rollDeg: number): void {
+    this.sendMessage({
       type: "camera_changed",
       azimuthDeg,
       altitudeDeg,
       horizontalFovDeg,
       rollDeg,
-    };
-    this.sendMessage(msg);
+    });
   }
 
-  sendViewportResized(
-    widthPx: number,
-    heightPx: number,
-    devicePixelRatio: number,
-  ): void {
-    const msg: ViewportResizedMessage = {
+  sendViewportSize(widthPx: number, heightPx: number, devicePixelRatio: number): void {
+    this.sendMessage({
       type: "viewport_resized",
       widthPx,
       heightPx,
       devicePixelRatio,
-    };
-    this.sendMessage(msg);
+    });
   }
 
   sendSetObserverLocation(lat: number, lon: number, extraHeight: number): void {
-    const msg: SetObserverLocationMessage = {
+    this.sendMessage({
       type: "set_observer_location",
       lat,
       lon,
       extraHeight,
-    };
-    this.sendMessage(msg);
+    });
   }
 
   sendHorizonSettings(settings: Omit<HorizonProfileSettingsMessage, "type">): void {
-    this.sendMessage({ type: "set_horizon_settings", ...settings });
+    this.sendMessage({
+      type: "set_horizon_settings",
+      ...settings,
+    });
   }
 
-  recalculateHorizon(): void {
+  sendRecalculateHorizon(): void {
     this.sendMessage({ type: "recalculate_horizon" });
   }
 
-  cancelHorizon(): void {
+  sendCancelHorizon(): void {
     this.sendMessage({ type: "cancel_horizon" });
   }
 
-  private shutdownRequested = false;
-
-  dispose(): void {
-    this._disposed = true;
-    if (this.reconnectTimer !== null) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-    if (this.ws) {
-      // Send shutdown_complete before closing ONLY if the backend explicitly requested shutdown
-      if (this.shutdownRequested) {
-        this.sendMessage({ type: "shutdown_complete" });
-      }
-      this.ws.onclose = null;
-      this.ws.onerror = null;
-      this.ws.onmessage = null;
-      this.ws.close();
-      this.ws = null;
-    }
-    this.stateListeners.clear();
-    this.messageListeners.clear();
+  sendShutdownComplete(): void {
+    this.sendMessage({ type: "shutdown_complete" });
   }
 
-  // ─── Star Picking ──────────────────────────────────────────
+  sendBridgeError(code: string, message: string): void {
+    this.sendMessage({ type: "bridge_error", code, message });
+  }
 
   sendResolveStarPick(
     requestId: string,
@@ -326,6 +325,18 @@ export class WebSocketBridge {
 
   sendSetManualMagnitudeLimit(magnitudeLimit: number): void {
     this.sendMessage({ type: "set_manual_magnitude_limit", magnitudeLimit });
+  }
+
+  public sendSetSurfaceMode(mode: "base" | "categorical_original"): void {
+    this.sendMessage({ type: "set_surface_mode", mode });
+  }
+
+  public sendSetSurfaceSource(sourceId: string | null): void {
+    this.sendMessage({ type: "set_surface_source", sourceId });
+  }
+
+  public sendRequestSurfaceCatalog(): void {
+    this.sendMessage({ type: "request_surface_catalog" });
   }
 
   // ─── Private ────────────────────────────────────────────────────────
@@ -481,6 +492,21 @@ export class WebSocketBridge {
           l.onHorizonStatus?.(msg);
         }
         break;
+      case "surface_catalog":
+        for (const l of this.messageListeners) {
+          l.onSurfaceCatalog?.(msg);
+        }
+        break;
+      case "surface_status":
+        for (const l of this.messageListeners) {
+          l.onSurfaceStatus?.(msg);
+        }
+        break;
+      case "surface_legend":
+        for (const l of this.messageListeners) {
+          l.onSurfaceLegend?.(msg.entries);
+        }
+        break;
       case "navigation_coordinates_changed":
         for (const l of this.messageListeners) {
           l.onNavigationCoordinatesChanged?.(msg.lat, msg.lon);
@@ -491,7 +517,7 @@ export class WebSocketBridge {
     }
   }
 
-  public sendSetSimulationTime(currentTimeIso: string) {
+  public sendSetSimulationTime(currentTimeIso: string): void {
     this.sendMessage({
       type: "set_simulation_time",
       currentTimeIso,
@@ -501,21 +527,21 @@ export class WebSocketBridge {
   public sendSetRealtimeMode(enabled: boolean): void {
     this.sendMessage({
       type: "set_realtime_mode",
-      enabled
+      enabled,
     });
   }
 
   public sendSetTimePlaying(enabled: boolean): void {
     this.sendMessage({
       type: "set_time_playing",
-      enabled
+      enabled,
     });
   }
 
   public sendSetTimeRate(rate: number): void {
     this.sendMessage({
       type: "set_time_rate",
-      rate
+      rate,
     });
   }
 
@@ -533,7 +559,7 @@ export class WebSocketBridge {
   public sendRequestOffsetDay(offsetDays: number): void {
     this.sendMessage({
       type: "request_offset_day",
-      offsetDays
+      offsetDays,
     });
   }
 

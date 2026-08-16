@@ -54,6 +54,8 @@ class TerrainMeshBuffers:
     center_east_m: float
     center_north_m: float
     source_label: str
+    latitudes_deg: np.ndarray | None = None
+    longitudes_deg: np.ndarray | None = None
 
     @property
     def vertex_count(self) -> int:
@@ -115,7 +117,7 @@ class TerrainMeshBuilder:
         near_eastings = _near_patch_axis().astype(np.float64)
         near_northings = near_eastings.copy()
         near_east, near_north = np.meshgrid(near_eastings, near_northings)
-        near_positions, near_valid = self._sample_positions(
+        near_positions, near_valid, near_lats, near_lons = self._sample_positions(
             request,
             near_east + center_east_m,
             near_north + center_north_m,
@@ -137,6 +139,8 @@ class TerrainMeshBuilder:
         n_azimuths = int(azimuths.size)
         polar_positions = np.zeros((n_rings, n_azimuths, 3), dtype=np.float32)
         polar_valid = np.zeros((n_rings, n_azimuths), dtype=bool)
+        polar_lats = np.zeros((n_rings, n_azimuths), dtype=np.float64)
+        polar_lons = np.zeros((n_rings, n_azimuths), dtype=np.float64)
         batch_columns = 32
         for start in range(0, n_azimuths, batch_columns):
             if cancel_event.is_set():
@@ -146,7 +150,7 @@ class TerrainMeshBuilder:
             local_distances = distances[:, None]
             east = center_east_m + np.sin(radians) * local_distances
             north = center_north_m + np.cos(radians) * local_distances
-            sampled_positions, sampled_valid = self._sample_positions(
+            sampled_positions, sampled_valid, s_lats, s_lons = self._sample_positions(
                 request,
                 east,
                 north,
@@ -158,6 +162,8 @@ class TerrainMeshBuilder:
                 n_rings, stop - start, 3,
             )
             polar_valid[:, start:stop] = sampled_valid.reshape(n_rings, stop - start)
+            polar_lats[:, start:stop] = s_lats.reshape(n_rings, stop - start)
+            polar_lons[:, start:stop] = s_lons.reshape(n_rings, stop - start)
             if progress_callback is not None:
                 progress_callback(stop + 1, n_azimuths + 1)
 
@@ -169,6 +175,8 @@ class TerrainMeshBuilder:
         positions = np.concatenate((near_positions, polar_positions.reshape((-1, 3))), axis=0)
         normals = np.concatenate((near_normals, polar_normals.reshape((-1, 3))), axis=0)
         valid = np.concatenate((near_valid.reshape(-1), polar_valid.reshape(-1)))
+        latitudes = np.concatenate((near_lats, polar_lats.reshape(-1)))
+        longitudes = np.concatenate((near_lons, polar_lons.reshape(-1)))
         # DEM-only colour remains continuous through a streamed chunk.  Its
         # palette is measured from the persistent world origin, never from a
         # chunk-local centre, so the overlap cannot form a colour ring.
@@ -203,6 +211,8 @@ class TerrainMeshBuilder:
             center_east_m=float(center_east_m),
             center_north_m=float(center_north_m),
             source_label="Material DEM: paleta de relleu (sense cobertura superficial)",
+            latitudes_deg=latitudes,
+            longitudes_deg=longitudes,
         )
 
     def _sample_positions(
@@ -213,7 +223,7 @@ class TerrainMeshBuilder:
         observer_ground_m: float,
         effective_radius_m: float,
         cancel_event: threading.Event,
-    ) -> tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         if cancel_event.is_set():
             raise DemSamplingCancelled()
         distance = np.hypot(east, north)
@@ -254,7 +264,13 @@ class TerrainMeshBuilder:
             -north.reshape(-1),
         )).astype(np.float32)
         positions[~valid.reshape(-1)] = 0.0
-        return positions, valid.reshape(-1)
+        return (
+            positions,
+            valid.reshape(-1),
+            np.asarray(latitude, dtype=np.float64).reshape(-1),
+            np.asarray(longitude, dtype=np.float64).reshape(-1),
+        )
+
 
 
 def _mesh_azimuth_step(requested_step_deg: float) -> float:
