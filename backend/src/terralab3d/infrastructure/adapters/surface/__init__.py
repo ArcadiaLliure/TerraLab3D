@@ -1,5 +1,13 @@
-"""Configured orthophoto and categorical surface sampling adapters."""
+"""Configured categorical surface source adapters."""
 
-from .adapter import ConfiguredSurfaceSampler, SurfaceVertexSamples
+from .adapter import (
+    ConfiguredSurfaceSampler,
+    ResolvedLandCoverSource,
+    SurfaceVertexSamples,
+)
 
-__all__ = ("ConfiguredSurfaceSampler", "SurfaceVertexSamples")
+__all__ = (
+    "ConfiguredSurfaceSampler",
+    "ResolvedLandCoverSource",
+    "SurfaceVertexSamples",
+)

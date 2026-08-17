@@ -9,3 +9,7 @@ build/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+diff.txt
+
+log.txt
