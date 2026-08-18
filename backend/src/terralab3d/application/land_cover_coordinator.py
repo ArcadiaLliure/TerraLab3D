@@ -10,7 +10,7 @@ from dataclasses import replace
 from typing import Callable
 
 from terralab3d.application.ports.land_cover import LandCoverPort
-from terralab3d.domain.surface.models import LandCoverLegend, LandCoverTile, LandCoverTileRequest
+from terralab3d.domain.surface.land_cover import LandCoverLegend, LandCoverTile, LandCoverTileRequest
 
 
 log = logging.getLogger("terralab3d.land_cover_coordinator")
@@ -120,50 +120,27 @@ class LandCoverCoordinator:
         crs: str,
         source_id: str | None,
     ) -> None:
-        effective_resolution = max(
-            requested_resolution,
-            (radius_m * 2.0) / float(_MAX_COVERAGE_SAMPLES),
-        )
-        tile_span_m = effective_resolution * _TILE_PIXELS
-        min_x = center_x - radius_m
-        min_y = center_y - radius_m
-        max_x = center_x + radius_m
-        max_y = center_y + radius_m
-        global_bounds = [min_x, min_y, max_x, max_y]
-
-        start_col = math.floor(min_x / tile_span_m)
-        end_col = math.ceil(max_x / tile_span_m)
-        start_row = math.floor(min_y / tile_span_m)
-        end_row = math.ceil(max_y / tile_span_m)
-
-        tiles_needed: list[tuple[float, float, float]] = []
-        for column in range(start_col, end_col):
-            for row in range(start_row, end_row):
-                tile_min_x = column * tile_span_m
-                tile_min_y = row * tile_span_m
-                distance = math.hypot(
-                    tile_min_x + tile_span_m * 0.5 - center_x,
-                    tile_min_y + tile_span_m * 0.5 - center_y,
-                )
-                tiles_needed.append((distance, tile_min_x, tile_min_y))
-        tiles_needed.sort(key=lambda item: item[0])
-
-        total_tiles = len(tiles_needed)
-        if total_tiles == 0 or not self._is_current(generation, cancel_event):
+        if not self._is_current(generation, cancel_event):
             return
 
+        # Pas 17 MVP: un solo tile real de 1024x1024 a 10m, centrado en el origen
+        effective_resolution = 10.0
+        tile_span_m = effective_resolution * float(_TILE_PIXELS)
+        
+        # Centrat a l'origen local (0, 0)
+        tile_min_x = -tile_span_m * 0.5
+        tile_min_y = -tile_span_m * 0.5
+        tile_max_x = tile_min_x + tile_span_m
+        tile_max_y = tile_min_y + tile_span_m
+        global_bounds = [tile_min_x, tile_min_y, tile_max_x, tile_max_y]
+
+        total_tiles = 1
         active_source = source_id or "Automàtica"
-        completed = 0
-        valid_tiles = 0
-        empty_tiles = 0
-        failed_tiles = 0
-        valid_pixels = 0
-        legend_sent_for: set[str] = set()
 
         self._notify_progress(
             generation,
             cancel_event,
-            phase="Carregant cobertura...",
+            phase="Carregant tile categòric (MVP)...",
             completed=0,
             total=total_tiles,
             active_source=active_source,
@@ -177,92 +154,68 @@ class LandCoverCoordinator:
         )
 
         source_mode = "manual" if source_id else "automatic"
-        for _, tile_min_x, tile_min_y in tiles_needed:
-            if not self._is_current(generation, cancel_event):
-                return
-
-            cache_key = self._cache_key(
-                source_mode,
-                source_id,
-                crs,
-                tile_min_x,
-                tile_min_y,
-                effective_resolution,
-            )
-            tile = self._cache_get(cache_key)
-            if tile is None:
-                request = LandCoverTileRequest(
-                    min_x=tile_min_x,
-                    min_y=tile_min_y,
-                    max_x=tile_min_x + tile_span_m,
-                    max_y=tile_min_y + tile_span_m,
-                    resolution=effective_resolution,
-                    crs=crs,
-                    source_mode=source_mode,
-                    source_id=source_id,
-                )
-                try:
-                    tile = self._port.read_tile(request)
-                except Exception:
-                    log.exception("Error reading categorical land-cover tile %s", cache_key)
-                    tile = None
-
-            if not self._is_current(generation, cancel_event):
-                return
-
-            completed += 1
-            if tile is None:
-                failed_tiles += 1
-            elif tile.valid_pixels <= 0:
-                empty_tiles += 1
-            else:
-                valid_tiles += 1
-                valid_pixels += int(tile.valid_pixels)
-                active_source = tile.provenance.source_id
-                self._cache_put(cache_key, tile)
-
-                if tile.legend_id not in legend_sent_for and self._legend_callback is not None:
-                    legend = self._port.legend(tile.legend_id)
-                    if legend is not None and self._is_current(generation, cancel_event):
-                        self._legend_callback(legend)
-                        legend_sent_for.add(tile.legend_id)
-
-                if self._tile_callback is not None and self._is_current(generation, cancel_event):
-                    # Binary transports commonly de-duplicate resource id/version
-                    # pairs. Keep cached content immutable but publish a unique
-                    # identity for the current generation.
-                    publication = replace(
-                        tile,
-                        resource_id=f"{tile.resource_id}.g{generation}",
-                        provenance=replace(tile.provenance, version=generation),
-                    )
-                    self._tile_callback(publication)
-
-            phase = "Finalitzant cobertura..." if completed == total_tiles else "Carregant cobertura..."
-            self._notify_progress(
-                generation,
-                cancel_event,
-                phase=phase,
-                completed=completed,
-                total=total_tiles,
-                active_source=active_source,
-                global_bounds=global_bounds,
+        cache_key = self._cache_key(
+            source_mode, source_id, crs, tile_min_x, tile_min_y, effective_resolution
+        )
+        tile = self._cache_get(cache_key)
+        if tile is None:
+            request = LandCoverTileRequest(
+                min_x=tile_min_x,
+                min_y=tile_min_y,
+                max_x=tile_max_x,
+                max_y=tile_max_y,
                 resolution=effective_resolution,
-                completed_state=False,
-                valid_tiles=valid_tiles,
-                empty_tiles=empty_tiles,
-                failed_tiles=failed_tiles,
-                valid_pixels=valid_pixels,
+                crs=crs,
+                source_mode=source_mode,
+                source_id=source_id,
             )
+            try:
+                tile = self._port.read_tile(request)
+            except Exception:
+                log.exception("Error reading categorical land-cover tile %s", cache_key)
+                tile = None
 
         if not self._is_current(generation, cancel_event):
             return
-        if valid_tiles > 0 and valid_pixels > 0:
-            final_phase = "Cobertura carregada"
-        elif failed_tiles > 0:
-            final_phase = "Error carregant cobertura"
+
+        completed = 1
+        failed_tiles = 0
+        empty_tiles = 0
+        valid_tiles = 0
+        valid_pixels = 0
+
+        if tile is None:
+            failed_tiles = 1
+        elif tile.valid_pixels <= 0:
+            empty_tiles = 1
         else:
-            final_phase = "Sense dades de cobertura"
+            valid_tiles = 1
+            valid_pixels = int(tile.valid_pixels)
+            active_source = tile.provenance.source_id
+            self._cache_put(cache_key, tile)
+
+            if self._legend_callback is not None:
+                legend = self._port.legend(tile.legend_id)
+                if legend is not None and self._is_current(generation, cancel_event):
+                    self._legend_callback(legend)
+
+            if self._tile_callback is not None and self._is_current(generation, cancel_event):
+                publication = replace(
+                    tile,
+                    resource_id=f"{tile.resource_id}.g{generation}",
+                    provenance=replace(tile.provenance, version=generation),
+                )
+                self._tile_callback(publication)
+
+        if not self._is_current(generation, cancel_event):
+            return
+
+        if valid_tiles > 0:
+            final_phase = "Tile carregat"
+        elif failed_tiles > 0:
+            final_phase = "Error carregant tile"
+        else:
+            final_phase = "Sense dades al tile"
 
         self._notify_progress(
             generation,
@@ -278,7 +231,7 @@ class LandCoverCoordinator:
             empty_tiles=empty_tiles,
             failed_tiles=failed_tiles,
             valid_pixels=valid_pixels,
-            cleared=final_phase != "Cobertura carregada",
+            cleared=final_phase != "Tile carregat",
         )
 
     def _notify_progress(

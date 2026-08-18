@@ -46,6 +46,3 @@ class RadialCoordinateProjector(Protocol):
 class OrthophotoPort(Protocol):
     def sample(self, request: TerrainTileRequest) -> SurfaceSampleGrid: ...
 
-
-class LandCoverPort(Protocol):
-    def sample(self, request: TerrainTileRequest) -> SurfaceSampleGrid: ...

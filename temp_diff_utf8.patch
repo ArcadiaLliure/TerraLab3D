@@ -1,0 +1,2784 @@
+﻿diff --git a/.gitignore b/.gitignore
+index 890fc31..8062d7e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -9,3 +9,7 @@ build/
+ .pytest_cache/
+ .mypy_cache/
+ .ruff_cache/
++
++diff.txt
++
++log.txt
+diff --git a/backend/src/terralab3d/__main__.py b/backend/src/terralab3d/__main__.py
+index 01813ba..b651277 100644
+--- a/backend/src/terralab3d/__main__.py
++++ b/backend/src/terralab3d/__main__.py
+@@ -239,6 +239,90 @@ async def run() -> int:
+         publish_horizon_profile,
+         bridge.send_horizon_status,
+     )
++
++    from terralab3d.infrastructure.adapters.surface.adapter import ConfiguredSurfaceSampler
++    from terralab3d.infrastructure.adapters.surface.land_cover_port import RasterioLandCoverPort
++    from terralab3d.application.land_cover_coordinator import LandCoverCoordinator
++
++    land_cover_sampler = ConfiguredSurfaceSampler()
++    land_cover_port = RasterioLandCoverPort(land_cover_sampler)
++    land_cover_coordinator = LandCoverCoordinator(land_cover_port)
++
++    async def _publish_land_cover_tile(tile) -> None:
++        metadata = {
++            "role": "land_cover_tile",
++            "resourceId": tile.resource_id,
++            "version": tile.provenance.version,
++            "bounds": [tile.min_x, tile.min_y, tile.max_x, tile.max_y],
++            "width": tile.width,
++            "height": tile.height,
++            "resolution": tile.resolution,
++            "sourceId": tile.provenance.source_id,
++            "legendId": tile.legend_id,
++            "nodataValue": 0,
++            "dtype": "uint16",
++            "validPixels": tile.valid_pixels,
++        }
++        await bridge.send_binary_resource(tile.resource_id, str(tile.provenance.version), metadata, tile.class_buffer)
++
++    async def _publish_land_cover_legend(legend) -> None:
++        await bridge.send({
++            "type": "land_cover_legend",
++            "legendId": legend.legend_id,
++            "entries": [
++                {"classId": entry.class_id, "colorRgba": entry.color_rgba}
++                for entry in legend.entries
++            ],
++        })
++
++    async def _publish_land_cover_status(status) -> None:
++        status["type"] = "surface_progress"
++        await bridge.send(status)
++
++    def _sync_publish_land_cover_tile(tile) -> None:
++        if not bridge.shutdown_event.is_set():
++            asyncio.run_coroutine_threadsafe(_publish_land_cover_tile(tile), loop)
++
++    def _sync_publish_land_cover_legend(legend) -> None:
++        if not bridge.shutdown_event.is_set():
++            asyncio.run_coroutine_threadsafe(_publish_land_cover_legend(legend), loop)
++
++    def _sync_publish_land_cover_status(status) -> None:
++        if not bridge.shutdown_event.is_set():
++            asyncio.run_coroutine_threadsafe(_publish_land_cover_status(status), loop)
++
++    land_cover_coordinator.set_callbacks(
++        progress_callback=_sync_publish_land_cover_status,
++        tile_callback=_sync_publish_land_cover_tile,
++        legend_callback=_sync_publish_land_cover_legend,
++    )
++
++    current_surface_mode = "terrain-fallback"
++
++    async def _handle_set_surface_mode(data: dict[str, Any]) -> None:
++        nonlocal current_surface_mode
++        mode = data.get("mode", "terrain-fallback")
++        current_surface_mode = mode
++        if mode == "terrain-fallback":
++            land_cover_coordinator.cancel()
++            await bridge.send({"type": "surface_progress", "cleared": True})
++        elif mode == "categorical":
++            aeqd_crs = (
++                f"+proj=aeqd +lat_0={terrain_world_observer.location.latitude_deg} "
++                f"+lon_0={terrain_world_observer.location.longitude_deg} "
++                f"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
++            )
++            land_cover_coordinator.request_coverage(
++                center_x=terrain_stream_center_east_m,
++                center_y=terrain_stream_center_north_m,
++                radius_m=max(100.0, terrain_stream_radius_m),
++                resolution_m=10.0,
++                crs=aeqd_crs,
++                mode="categorical",
++            )
++            
++    bridge.on("set_surface_mode", _handle_set_surface_mode)
++
+     terrain_stream_builder = TerrainMeshBuilder(elevation_adapter, camera_horizon_projector)
+     terrain_stream_task: asyncio.Task[None] | None = None
+     terrain_stream_cancel: threading.Event | None = None
+@@ -300,6 +384,8 @@ async def run() -> int:
+         nonlocal terrain_stream_center_east_m, terrain_stream_center_north_m
+         nonlocal terrain_stream_radius_m
+         nonlocal terrain_stream_velocity_east_mps, terrain_stream_velocity_north_mps
++        
++        land_cover_coordinator.cancel()
+         terrain_stream_generation += 1
+         if terrain_stream_cancel is not None:
+             terrain_stream_cancel.set()
+@@ -483,6 +569,21 @@ async def run() -> int:
+             build_and_publish(), name=f"terrain-visual-stream-{generation}",
+         )
+ 
++        if current_surface_mode == "categorical":
++            aeqd_crs = (
++                f"+proj=aeqd +lat_0={terrain_world_observer.location.latitude_deg} "
++                f"+lon_0={terrain_world_observer.location.longitude_deg} "
++                f"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
++            )
++            land_cover_coordinator.request_coverage(
++                center_x=target_east_m,
++                center_y=target_north_m,
++                radius_m=requested_radius_m,
++                resolution_m=10.0,
++                crs=aeqd_crs,
++                mode="categorical",
++            )
++
+     async def broadcast_location(
+         observer: ObserverProfile | None = None,
+         *,
+diff --git a/backend/src/terralab3d/application/land_cover_coordinator.py b/backend/src/terralab3d/application/land_cover_coordinator.py
+new file mode 100644
+index 0000000..da4006f
+--- /dev/null
++++ b/backend/src/terralab3d/application/land_cover_coordinator.py
+@@ -0,0 +1,317 @@
++"""Progressive application coordinator for categorical land-cover tiles."""
++
++from __future__ import annotations
++
++import logging
++import math
++import threading
++from collections import OrderedDict
++from dataclasses import replace
++from typing import Callable
++
++from terralab3d.application.ports.land_cover import LandCoverPort
++from terralab3d.domain.surface.land_cover import LandCoverLegend, LandCoverTile, LandCoverTileRequest
++
++
++log = logging.getLogger("terralab3d.land_cover_coordinator")
++
++# The requested square is represented with at most ~8192 categorical samples
++# per axis. Tiles remain independent GPU-array layers, so this is a coverage
++# memory budget, not a WebGL 2D texture-size workaround.
++_MAX_COVERAGE_SAMPLES = 8192
++_TILE_PIXELS = 1024
++_CACHE_BUDGET_BYTES = 128 * 1024 * 1024
++
++
++class LandCoverCoordinator:
++    """Stream nearest land-cover tiles first without touching DEM geometry."""
++
++    def __init__(self, port: LandCoverPort) -> None:
++        self._port = port
++        self._lock = threading.RLock()
++        self._current_generation = 0
++        self._active_cancel: threading.Event | None = None
++        self._worker_thread: threading.Thread | None = None
++
++        self._progress_callback: Callable[[dict], None] | None = None
++        self._tile_callback: Callable[[LandCoverTile], None] | None = None
++        self._legend_callback: Callable[[LandCoverLegend], None] | None = None
++
++        self._cached_tiles: OrderedDict[str, LandCoverTile] = OrderedDict()
++        self._cached_bytes = 0
++
++    def set_callbacks(
++        self,
++        progress_callback: Callable[[dict], None],
++        tile_callback: Callable[[LandCoverTile], None],
++        legend_callback: Callable[[LandCoverLegend], None],
++    ) -> None:
++        self._progress_callback = progress_callback
++        self._tile_callback = tile_callback
++        self._legend_callback = legend_callback
++
++    def request_coverage(
++        self,
++        center_x: float,
++        center_y: float,
++        radius_m: float,
++        resolution_m: float,
++        crs: str,
++        mode: str,
++        source_id: str | None = None,
++    ) -> None:
++        if mode != "categorical":
++            self.cancel()
++            return
++        if not all(math.isfinite(value) for value in (center_x, center_y, radius_m, resolution_m)):
++            return
++        if radius_m <= 0.0 or resolution_m <= 0.0 or not str(crs).strip():
++            return
++
++        with self._lock:
++            if self._active_cancel is not None:
++                self._active_cancel.set()
++            self._current_generation += 1
++            generation = self._current_generation
++            cancel_event = threading.Event()
++            self._active_cancel = cancel_event
++            worker = threading.Thread(
++                target=self._stream_coverage,
++                args=(
++                    generation,
++                    cancel_event,
++                    float(center_x),
++                    float(center_y),
++                    float(radius_m),
++                    float(resolution_m),
++                    str(crs),
++                    source_id,
++                ),
++                name=f"land-cover-{generation}",
++                daemon=True,
++            )
++            self._worker_thread = worker
++            worker.start()
++
++    def cancel(self) -> None:
++        """Cancel the active generation; an old worker can never revive later."""
++        with self._lock:
++            self._current_generation += 1
++            if self._active_cancel is not None:
++                self._active_cancel.set()
++            self._active_cancel = None
++            self._worker_thread = None
++
++    def close(self) -> None:
++        self.cancel()
++        with self._lock:
++            self._cached_tiles.clear()
++            self._cached_bytes = 0
++        self._port.close()
++
++    def _stream_coverage(
++        self,
++        generation: int,
++        cancel_event: threading.Event,
++        center_x: float,
++        center_y: float,
++        radius_m: float,
++        requested_resolution: float,
++        crs: str,
++        source_id: str | None,
++    ) -> None:
++        if not self._is_current(generation, cancel_event):
++            return
++
++        # Pas 17 MVP: un solo tile real de 1024x1024 a 10m, centrado en el origen
++        effective_resolution = 10.0
++        tile_span_m = effective_resolution * float(_TILE_PIXELS)
++        
++        # Centrat a l'origen local (0, 0)
++        tile_min_x = -tile_span_m * 0.5
++        tile_min_y = -tile_span_m * 0.5
++        tile_max_x = tile_min_x + tile_span_m
++        tile_max_y = tile_min_y + tile_span_m
++        global_bounds = [tile_min_x, tile_min_y, tile_max_x, tile_max_y]
++
++        total_tiles = 1
++        active_source = source_id or "Autom├ática"
++
++        self._notify_progress(
++            generation,
++            cancel_event,
++            phase="Carregant tile categ├▓ric (MVP)...",
++            completed=0,
++            total=total_tiles,
++            active_source=active_source,
++            global_bounds=global_bounds,
++            resolution=effective_resolution,
++            completed_state=False,
++            valid_tiles=0,
++            empty_tiles=0,
++            failed_tiles=0,
++            valid_pixels=0,
++        )
++
++        source_mode = "manual" if source_id else "automatic"
++        cache_key = self._cache_key(
++            source_mode, source_id, crs, tile_min_x, tile_min_y, effective_resolution
++        )
++        tile = self._cache_get(cache_key)
++        if tile is None:
++            request = LandCoverTileRequest(
++                min_x=tile_min_x,
++                min_y=tile_min_y,
++                max_x=tile_max_x,
++                max_y=tile_max_y,
++                resolution=effective_resolution,
++                crs=crs,
++                source_mode=source_mode,
++                source_id=source_id,
++            )
++            try:
++                tile = self._port.read_tile(request)
++            except Exception:
++                log.exception("Error reading categorical land-cover tile %s", cache_key)
++                tile = None
++
++        if not self._is_current(generation, cancel_event):
++            return
++
++        completed = 1
++        failed_tiles = 0
++        empty_tiles = 0
++        valid_tiles = 0
++        valid_pixels = 0
++
++        if tile is None:
++            failed_tiles = 1
++        elif tile.valid_pixels <= 0:
++            empty_tiles = 1
++        else:
++            valid_tiles = 1
++            valid_pixels = int(tile.valid_pixels)
++            active_source = tile.provenance.source_id
++            self._cache_put(cache_key, tile)
++
++            if self._legend_callback is not None:
++                legend = self._port.legend(tile.legend_id)
++                if legend is not None and self._is_current(generation, cancel_event):
++                    self._legend_callback(legend)
++
++            if self._tile_callback is not None and self._is_current(generation, cancel_event):
++                publication = replace(
++                    tile,
++                    resource_id=f"{tile.resource_id}.g{generation}",
++                    provenance=replace(tile.provenance, version=generation),
++                )
++                self._tile_callback(publication)
++
++        if not self._is_current(generation, cancel_event):
++            return
++
++        if valid_tiles > 0:
++            final_phase = "Tile carregat"
++        elif failed_tiles > 0:
++            final_phase = "Error carregant tile"
++        else:
++            final_phase = "Sense dades al tile"
++
++        self._notify_progress(
++            generation,
++            cancel_event,
++            phase=final_phase,
++            completed=completed,
++            total=total_tiles,
++            active_source=active_source,
++            global_bounds=global_bounds,
++            resolution=effective_resolution,
++            completed_state=True,
++            valid_tiles=valid_tiles,
++            empty_tiles=empty_tiles,
++            failed_tiles=failed_tiles,
++            valid_pixels=valid_pixels,
++            cleared=final_phase != "Tile carregat",
++        )
++
++    def _notify_progress(
++        self,
++        generation: int,
++        cancel_event: threading.Event,
++        *,
++        phase: str,
++        completed: int,
++        total: int,
++        active_source: str,
++        global_bounds: list[float],
++        resolution: float,
++        completed_state: bool,
++        valid_tiles: int,
++        empty_tiles: int,
++        failed_tiles: int,
++        valid_pixels: int,
++        cleared: bool = False,
++    ) -> None:
++        callback = self._progress_callback
++        if callback is None or not self._is_current(generation, cancel_event):
++            return
++        progress = completed / max(1, total)
++        callback({
++            "generation": generation,
++            "phase": phase,
++            "completedTiles": completed,
++            "totalTiles": total,
++            "progress01": progress,
++            "percent": int(round(progress * 100.0)),
++            "completed": completed_state,
++            "mode": "categorical",
++            "activeSource": active_source,
++            "globalBounds": global_bounds,
++            "resolution": resolution,
++            "validTiles": valid_tiles,
++            "emptyTiles": empty_tiles,
++            "failedTiles": failed_tiles,
++            "validPixels": valid_pixels,
++            "cleared": cleared,
++        })
++
++    def _is_current(self, generation: int, cancel_event: threading.Event) -> bool:
++        if cancel_event.is_set():
++            return False
++        with self._lock:
++            return generation == self._current_generation and cancel_event is self._active_cancel
++
++    @staticmethod
++    def _cache_key(
++        source_mode: str,
++        source_id: str | None,
++        crs: str,
++        min_x: float,
++        min_y: float,
++        resolution: float,
++    ) -> str:
++        return (
++            f"{source_mode}|{source_id or '*'}|{crs}|"
++            f"{min_x:.3f}|{min_y:.3f}|{resolution:.9f}"
++        )
++
++    def _cache_get(self, key: str) -> LandCoverTile | None:
++        with self._lock:
++            tile = self._cached_tiles.get(key)
++            if tile is not None:
++                self._cached_tiles.move_to_end(key)
++            return tile
++
++    def _cache_put(self, key: str, tile: LandCoverTile) -> None:
++        size = len(tile.class_buffer)
++        if size > _CACHE_BUDGET_BYTES:
++            return
++        with self._lock:
++            previous = self._cached_tiles.pop(key, None)
++            if previous is not None:
++                self._cached_bytes -= len(previous.class_buffer)
++            self._cached_tiles[key] = tile
++            self._cached_bytes += size
++            while self._cached_bytes > _CACHE_BUDGET_BYTES and self._cached_tiles:
++                _, evicted = self._cached_tiles.popitem(last=False)
++                self._cached_bytes -= len(evicted.class_buffer)
+diff --git a/backend/src/terralab3d/application/ports/terrain.py b/backend/src/terralab3d/application/ports/terrain.py
+index 5bbf787..6c822a4 100644
+--- a/backend/src/terralab3d/application/ports/terrain.py
++++ b/backend/src/terralab3d/application/ports/terrain.py
+@@ -46,6 +46,3 @@ class RadialCoordinateProjector(Protocol):
+ class OrthophotoPort(Protocol):
+     def sample(self, request: TerrainTileRequest) -> SurfaceSampleGrid: ...
+ 
+-
+-class LandCoverPort(Protocol):
+-    def sample(self, request: TerrainTileRequest) -> SurfaceSampleGrid: ...
+diff --git a/backend/src/terralab3d/infrastructure/adapters/surface/__init__.py b/backend/src/terralab3d/infrastructure/adapters/surface/__init__.py
+index f87d890..0cef419 100644
+--- a/backend/src/terralab3d/infrastructure/adapters/surface/__init__.py
++++ b/backend/src/terralab3d/infrastructure/adapters/surface/__init__.py
+@@ -1,5 +1,15 @@
+-"""Configured orthophoto and categorical surface sampling adapters."""
++"""Configured categorical surface source adapters."""
+ 
+-from .adapter import ConfiguredSurfaceSampler, SurfaceVertexSamples
++from .adapter import (
++    ConfiguredSurfaceSampler,
++    ResolvedLandCoverSource,
++    SurfaceVertexSamples,
++)
++from .land_cover_port import RasterioLandCoverPort
+ 
+-__all__ = ("ConfiguredSurfaceSampler", "SurfaceVertexSamples")
++__all__ = (
++    "ConfiguredSurfaceSampler",
++    "ResolvedLandCoverSource",
++    "SurfaceVertexSamples",
++    "RasterioLandCoverPort",
++)
+diff --git a/backend/src/terralab3d/infrastructure/adapters/surface/__main__.py b/backend/src/terralab3d/infrastructure/adapters/surface/__main__.py
+new file mode 100644
+index 0000000..ed36aca
+--- /dev/null
++++ b/backend/src/terralab3d/infrastructure/adapters/surface/__main__.py
+@@ -0,0 +1,28 @@
++"""Diagnostic entry point for TerraLab3D's configured land-cover source."""
++
++from __future__ import annotations
++
++from .adapter import ConfiguredSurfaceSampler
++
++
++def main() -> int:
++    source = ConfiguredSurfaceSampler().resolve_land_cover_source()
++    if source is None:
++        print("LAND_COVER_SOURCE=UNAVAILABLE")
++        return 1
++
++    print("LAND_COVER_SOURCE=OK")
++    print(f"SOURCE_ID={source.source_id}")
++    print(f"DISPLAY_NAME={source.display_name}")
++    print(f"CONFIG={source.config_path}")
++    print(f"RASTER={source.raster_paths[0]}")
++    print(f"CRS={source.crs}")
++    print(f"RESOLUTION_M={source.resolution_m}")
++    print(f"NODATA={source.nodata}")
++    print(f"LEGEND_ID={source.legend_id}")
++    print(f"RASTER_COUNT={len(source.raster_paths)}")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/backend/src/terralab3d/infrastructure/adapters/surface/adapter.py b/backend/src/terralab3d/infrastructure/adapters/surface/adapter.py
+index 2612e00..2b0e8ec 100644
+--- a/backend/src/terralab3d/infrastructure/adapters/surface/adapter.py
++++ b/backend/src/terralab3d/infrastructure/adapters/surface/adapter.py
+@@ -1,12 +1,21 @@
+-"""Read TerraLab's configured surface sources without coupling them to DEM geometry."""
++"""Resolve and read TerraLab's configured surface sources.
++
++Land-cover source selection is driven by ``data_sources.json``.  No concrete
++GeoTIFF filename, source id or drive letter is embedded in TerraLab3D.
++
++The categorical renderer introduced after Pas 16 must consume
++``resolve_land_cover_source()`` (or the same configuration contract) instead
++of inventing a second source-discovery path.
++"""
+ 
+ from __future__ import annotations
+ 
+ import json
+ import logging
++import math
+ from dataclasses import dataclass
+ from pathlib import Path
+-from typing import Callable
++from typing import Callable, Iterable
+ 
+ import numpy as np
+ import rasterio
+@@ -16,9 +25,31 @@ from terralab3d.infrastructure.app_paths import application_state_root, resolve_
+ 
+ log = logging.getLogger("terralab3d.surface")
+ 
++_CATEGORICAL_LAYER_TYPES = {
++    "land_cover_categorical",
++    "land_cover_rgb",
++    "surface_categorical",
++}
++_LEGACY_SURFACE_LAYER_TYPES = _CATEGORICAL_LAYER_TYPES | {
++    "surface_rgb",
++}
++_RASTER_SUFFIXES = {
++    ".tif",
++    ".tiff",
++    ".vrt",
++    ".img",
++    ".jp2",
++}
++
+ 
+ @dataclass(frozen=True, slots=True)
+ class SurfaceVertexSamples:
++    """Legacy Pas-16 presentation samples.
++
++    Kept only so the known-good Pas-16 API remains source-compatible while
++    Pas 17 moves categorical appearance out of DEM vertices.
++    """
++
+     rgba_linear: np.ndarray
+     valid: np.ndarray
+     class_ids: np.ndarray
+@@ -26,24 +57,166 @@ class SurfaceVertexSamples:
+     source_label: str
+ 
+ 
++@dataclass(frozen=True, slots=True)
++class ResolvedLandCoverSource:
++    """One fully resolved categorical source selected by TerraLab's library."""
++
++    source_id: str
++    display_name: str
++    config_path: Path
++    raster_paths: tuple[Path, ...]
++    layer_type: str
++    crs: str
++    resolution_m: float
++    nodata: float | int | None
++    legend_id: str | None
++    coverage: tuple[float, float, float, float] | None
++    priority: int
++
++
+ @dataclass(frozen=True, slots=True)
+ class _ConfiguredSource:
+     identifier: str
+     name: str
+-    path: Path
++    raster_paths: tuple[Path, ...]
+     layer_type: str
+     priority: int
+     resolution_m: float
+     coverage: tuple[float, float, float, float] | None
+ 
++    @property
++    def path(self) -> Path:
++        return self.raster_paths[0]
++
+ 
+ class ConfiguredSurfaceSampler:
+-    """Surface appearance authority; never changes DEM heights or validity."""
++    """Configuration authority for land-cover source resolution.
++
++    ``resolve_land_cover_source`` is the Pas-17 source-selection entry point.
++    ``sample`` remains for Pas-16 compatibility and must not be used as the
++    final categorical rendering architecture.
++    """
+ 
+     def __init__(self, config_paths: tuple[Path, ...] | None = None) -> None:
+         self._config_paths = config_paths
+         self._transformers: dict[str, Transformer] = {}
+ 
++    def resolve_land_cover_source(
++        self,
++        override_mode: str | None = None,
++        override_source_id: str | None = None,
++    ) -> ResolvedLandCoverSource | None:
++        """Resolve the configured land-cover source to concrete raster files."""
++
++        payload, config_path = self._load_config_with_path()
++        if config_path is None:
++            log.warning("No s'ha trobat data_sources.json")
++            return None
++
++        raw_sources = payload.get("sources", []) if isinstance(payload, dict) else []
++        if not isinstance(raw_sources, list):
++            return None
++
++        selections = payload.get("selections", {})
++        if not isinstance(selections, dict):
++            selections = {}
++        land_cover = selections.get("land_cover", {})
++        if not isinstance(land_cover, dict):
++            land_cover = {}
++
++        mode = override_mode if override_mode else str(land_cover.get("mode", "automatic")).strip().lower()
++        selected_id = override_source_id if override_source_id is not None else str(land_cover.get("source_id") or "").strip()
++
++        candidates = []
++        for raw in raw_sources:
++            if not isinstance(raw, dict) or not bool(raw.get("enabled", True)):
++                continue
++            layer_type = str(raw.get("layer_type", "")).strip().lower()
++            if layer_type not in _CATEGORICAL_LAYER_TYPES:
++                continue
++            source_id = str(raw.get("id", "")).strip()
++            if not source_id:
++                continue
++            
++            if mode == "manual" and source_id != selected_id:
++                continue
++                
++            candidates.append(raw)
++
++        if mode == "manual" and selected_id and not candidates:
++            log.error("Font manual %s no existeix a %s", selected_id, config_path)
++            return None
++
++        if not candidates:
++            log.warning("Cap font categ├▓rica disponible a %s", config_path)
++            return None
++
++        candidates.sort(key=lambda c: self._source_sort_key(c))
++        selected_raw = candidates[0]
++        source_id = str(selected_raw.get("id", "")).strip()
++        display_name = str(selected_raw.get("display_name") or source_id)
++        layer_type = str(selected_raw.get("layer_type", "")).strip().lower()
++        coverage = self._coverage(selected_raw.get("coverage"))
++        priority = self._int_or(selected_raw.get("priority"), 0)
++        
++        legend_id = self._legend_id(selected_raw)
++        if not legend_id and "s2glc" in source_id.lower():
++            legend_id = "s2glc_europe_2017"
++        
++        raster_paths = self._raster_paths(selected_raw, config_path)
++        if not raster_paths:
++            log.error("Cap fitxer raster resolt per a %s", source_id)
++            return None
++
++        configured_resolution = self._positive_float(selected_raw.get("resolution_m"))
++        selected_raster: Path | None = None
++        selected_crs = ""
++        selected_resolution = configured_resolution
++        selected_nodata = None
++
++        for raster_path in raster_paths:
++            try:
++                with rasterio.open(raster_path) as dataset:
++                    selected_raster = raster_path
++                    selected_crs = str(dataset.crs or "")
++                    selected_nodata = dataset.nodata
++                    if not math.isfinite(selected_resolution):
++                        selected_resolution = self._dataset_resolution_hint(dataset)
++                    break
++            except (OSError, rasterio.errors.RasterioError) as exc:
++                log.warning("No es pot obrir %s: %s", raster_path, exc)
++
++        if selected_raster is None:
++            log.error("Cap raster s'ha pogut obrir per a %s", source_id)
++            return None
++
++        ordered_paths = (selected_raster,) + tuple(p for p in raster_paths if p != selected_raster)
++
++        log.info(
++            "LAND COVER RESOLT: source_id='%s', config='%s', raster='%s', crs='%s', resolution=%.6f, nodata=%s",
++            source_id,
++            config_path,
++            selected_raster,
++            selected_crs,
++            selected_resolution,
++            selected_nodata,
++        )
++
++        return ResolvedLandCoverSource(
++            source_id=source_id,
++            display_name=display_name,
++            config_path=config_path,
++            raster_paths=ordered_paths,
++            layer_type=layer_type,
++            crs=selected_crs,
++            resolution_m=selected_resolution,
++            nodata=selected_nodata,
++            legend_id=legend_id,
++            coverage=coverage,
++            priority=priority,
++        )
++
++
+     def sample(
+         self,
+         latitude_deg: np.ndarray,
+@@ -51,6 +224,13 @@ class ConfiguredSurfaceSampler:
+         *,
+         cancellation_check: Callable[[], bool] | None = None,
+     ) -> SurfaceVertexSamples:
++        """Legacy Pas-16 vertex sampler.
++
++        This method is intentionally retained only to avoid breaking the
++        known-good Pas-16 baseline. Pas 17 must sample categorical rasters as
++        independent grids/tiles, never at DEM vertices.
++        """
++
+         latitude = np.asarray(latitude_deg, dtype=np.float64).reshape(-1)
+         longitude = np.asarray(longitude_deg, dtype=np.float64).reshape(-1)
+         count = latitude.size
+@@ -59,15 +239,20 @@ class ConfiguredSurfaceSampler:
+         classes = np.zeros(count, dtype=np.uint16)
+         source_ids = np.zeros(count, dtype=np.int16)
+         labels: list[str] = []
+-        for ordinal, source in enumerate(self._sources(), start=1):
++
++        for ordinal, source in enumerate(self._legacy_sources(), start=1):
+             if cancellation_check is not None and cancellation_check():
+                 raise InterruptedError("Surface sampling cancelled")
+             unresolved = np.flatnonzero(~valid)
+             if unresolved.size == 0:
+                 break
+-            candidate = unresolved[_within_coverage(
+-                latitude[unresolved], longitude[unresolved], source.coverage,
+-            )]
++            candidate = unresolved[
++                _within_coverage(
++                    latitude[unresolved],
++                    longitude[unresolved],
++                    source.coverage,
++                )
++            ]
+             if candidate.size == 0:
+                 continue
+             try:
+@@ -92,61 +277,256 @@ class ConfiguredSurfaceSampler:
+             classes[accepted] = class_values[sampled_valid]
+             source_ids[accepted] = ordinal
+             labels.append(source.name)
+-        label = "; ".join(dict.fromkeys(labels)) if labels else "TerraLab default terrain palette"
++
++        label = (
++            "; ".join(dict.fromkeys(labels))
++            if labels
++            else "TerraLab default terrain palette"
++        )
+         return SurfaceVertexSamples(rgba, valid, classes, source_ids, label)
+ 
+-    def _sources(self) -> tuple[_ConfiguredSource, ...]:
+-        payload = self._load_config()
++    def _legacy_sources(self) -> tuple[_ConfiguredSource, ...]:
++        payload, config_path = self._load_config_with_path()
++        if config_path is None:
++            return ()
++
+         raw_sources = payload.get("sources", []) if isinstance(payload, dict) else []
+-        selection = payload.get("selections", {}).get("surface", {}) if isinstance(payload, dict) else {}
+-        mode = str(selection.get("mode", "automatic")).strip().lower() if isinstance(selection, dict) else "automatic"
+-        selected_id = str(selection.get("source_id") or "") if isinstance(selection, dict) else ""
++        if not isinstance(raw_sources, list):
++            return ()
++
++        # Prefer the real land-cover selection. Retain the old "surface" key
++        # only for Pas-16 fixtures/configurations that predate surface_model_v3.
++        selection = self._selection(payload, "land_cover")
++        if not selection:
++            selection = self._selection(payload, "surface")
++        mode = str(selection.get("mode", "automatic")).strip().lower()
++        selected_id = str(selection.get("source_id") or "").strip()
++
+         entries: list[_ConfiguredSource] = []
+-        for raw in raw_sources if isinstance(raw_sources, list) else []:
++        for raw in raw_sources:
+             if not isinstance(raw, dict) or not bool(raw.get("enabled", True)):
+                 continue
+             layer_type = str(raw.get("layer_type", "")).strip().lower()
+-            if layer_type not in {"surface_rgb", "orthophoto_rgb", "land_cover_rgb", "land_cover_categorical"}:
++            if layer_type not in _LEGACY_SURFACE_LAYER_TYPES:
+                 continue
+             identifier = str(raw.get("id", "")).strip()
+             if mode == "manual" and identifier != selected_id:
+                 continue
+-            raw_path = str(raw.get("path", "")).strip()
+-            if not raw_path:
++            raster_paths = self._raster_paths(raw, config_path)
++            if not raster_paths:
+                 continue
+-            coverage = raw.get("coverage")
+-            valid_coverage = (
+-                tuple(float(value) for value in coverage)
+-                if isinstance(coverage, list) and len(coverage) == 4
+-                else None
++            entries.append(
++                _ConfiguredSource(
++                    identifier=identifier,
++                    name=str(raw.get("display_name") or identifier),
++                    raster_paths=raster_paths,
++                    layer_type=layer_type,
++                    priority=self._int_or(raw.get("priority"), 0),
++                    resolution_m=self._positive_float(raw.get("resolution_m")),
++                    coverage=self._coverage(raw.get("coverage")),
++                )
++            )
++        return tuple(
++            sorted(
++                entries,
++                key=lambda entry: (
++                    -entry.priority,
++                    entry.resolution_m,
++                    entry.identifier,
++                ),
+             )
+-            entries.append(_ConfiguredSource(
+-                identifier=identifier,
+-                name=str(raw.get("display_name") or identifier),
+-                path=Path(raw_path),
+-                layer_type=layer_type,
+-                priority=int(raw.get("priority", 0)),
+-                resolution_m=float(raw.get("resolution_m") or float("inf")),
+-                coverage=valid_coverage,
+-            ))
+-        return tuple(sorted(entries, key=lambda entry: (-entry.priority, entry.resolution_m, entry.identifier)))
+-
+-    def _load_config(self) -> dict[str, object]:
+-        candidates = self._config_paths or (
+-            application_state_root() / "config" / "data_sources.json",
+-            resolve_data_root() / "config" / "data_sources.json",
+         )
+-        for path in candidates:
++
++    def _load_config_with_path(self) -> tuple[dict[str, object], Path | None]:
++        for path in self._candidate_config_paths():
+             try:
+                 with path.open("r", encoding="utf-8") as handle:
+                     value = json.load(handle)
+                 if isinstance(value, dict):
+-                    return value
++                    return value, path.resolve(strict=False)
+             except FileNotFoundError:
+                 continue
+             except (OSError, json.JSONDecodeError) as exc:
+-                log.warning("MGP: [surface.adapter] [invalid config path=%s error=%s]", path, exc)
+-        return {}
++                log.warning(
++                    "MGP: [surface.adapter] [invalid config path=%s error=%s]",
++                    path,
++                    exc,
++                )
++        return {}, None
++
++    def _candidate_config_paths(self) -> tuple[Path, ...]:
++        if self._config_paths is not None:
++            return tuple(path.resolve(strict=False) for path in self._config_paths)
++
++        # The configured TerraLab data root is authoritative. Application state
++        # is only a compatibility fallback; it must never silently override the
++        # selected external library.
++        candidates = (
++            resolve_data_root() / "config" / "data_sources.json",
++            application_state_root() / "config" / "data_sources.json",
++        )
++        unique: list[Path] = []
++        for path in candidates:
++            resolved = path.resolve(strict=False)
++            if resolved not in unique:
++                unique.append(resolved)
++        return tuple(unique)
++
++    @staticmethod
++    def _selection(payload: dict[str, object], key: str) -> dict[str, object]:
++        selections = payload.get("selections")
++        if not isinstance(selections, dict):
++            return {}
++        value = selections.get(key)
++        return value if isinstance(value, dict) else {}
++
++    def _raster_paths(
++        self,
++        raw: dict[str, object],
++        config_path: Path,
++    ) -> tuple[Path, ...]:
++        base_path = self._resolve_configured_path(raw.get("path"), config_path)
++        candidates: list[Path] = []
++
++        if base_path is not None and base_path.is_file() and self._is_raster_candidate(base_path):
++            candidates.append(base_path)
++
++        metadata = raw.get("metadata")
++        if isinstance(metadata, dict):
++            rasters = metadata.get("rasters")
++            if isinstance(rasters, list):
++                for raster in rasters:
++                    if not isinstance(raster, dict):
++                        continue
++                    paths = raster.get("paths", raster.get("path"))
++                    for raw_path in self._iter_raw_paths(paths):
++                        resolved = self._resolve_configured_path(
++                            raw_path,
++                            config_path,
++                            directory_hint=base_path if base_path and base_path.is_dir() else None,
++                        )
++                        if (
++                            resolved is not None
++                            and resolved.is_file()
++                            and self._is_raster_candidate(resolved)
++                        ):
++                            candidates.append(resolved)
++
++        if base_path is not None and base_path.is_dir() and not candidates:
++            for suffix in ("*.tif", "*.tiff", "*.TIF", "*.TIFF", "*.vrt", "*.VRT"):
++                candidates.extend(
++                    path for path in sorted(base_path.rglob(suffix)) if path.is_file()
++                )
++
++        unique: list[Path] = []
++        for path in candidates:
++            resolved = path.resolve(strict=False)
++            if resolved not in unique:
++                unique.append(resolved)
++        return tuple(unique)
++
++    @staticmethod
++    def _iter_raw_paths(value: object) -> Iterable[object]:
++        if isinstance(value, (str, Path)):
++            yield value
++        elif isinstance(value, list):
++            for item in value:
++                if isinstance(item, (str, Path)):
++                    yield item
++
++    @staticmethod
++    def _is_raster_candidate(path: Path) -> bool:
++        return path.suffix.lower() in _RASTER_SUFFIXES
++
++    @staticmethod
++    def _resolve_configured_path(
++        value: object,
++        config_path: Path,
++        *,
++        directory_hint: Path | None = None,
++    ) -> Path | None:
++        if not isinstance(value, (str, Path)):
++            return None
++        raw = str(value).strip()
++        if not raw:
++            return None
++        path = Path(raw).expanduser()
++        if path.is_absolute():
++            return path.resolve(strict=False)
++
++        candidates: list[Path] = []
++        if directory_hint is not None:
++            candidates.append(directory_hint / path)
++        candidates.extend(
++            (
++                resolve_data_root() / path,
++                config_path.parent / path,
++                config_path.parent.parent / path,
++                path,
++            )
++        )
++        for candidate in candidates:
++            resolved = candidate.expanduser().resolve(strict=False)
++            if resolved.exists():
++                return resolved
++        return candidates[0].expanduser().resolve(strict=False)
++
++    @staticmethod
++    def _coverage(value: object) -> tuple[float, float, float, float] | None:
++        if not isinstance(value, list) or len(value) != 4:
++            return None
++        try:
++            return tuple(float(component) for component in value)  # type: ignore[return-value]
++        except (TypeError, ValueError):
++            return None
++
++    @staticmethod
++    def _positive_float(value: object) -> float:
++        try:
++            number = float(value)  # type: ignore[arg-type]
++        except (TypeError, ValueError):
++            return float("inf")
++        return number if math.isfinite(number) and number > 0.0 else float("inf")
++
++    @staticmethod
++    def _int_or(value: object, fallback: int) -> int:
++        try:
++            return int(value)  # type: ignore[arg-type]
++        except (TypeError, ValueError):
++            return fallback
++
++    @staticmethod
++    def _source_sort_key(raw: dict[str, object]) -> tuple[int, float, str]:
++        try:
++            priority = int(raw.get("priority", 0))
++        except (TypeError, ValueError):
++            priority = 0
++        try:
++            resolution = float(raw.get("resolution_m", float("inf")))
++        except (TypeError, ValueError):
++            resolution = float("inf")
++        if not math.isfinite(resolution) or resolution <= 0:
++            resolution = float("inf")
++        return -priority, resolution, str(raw.get("id", ""))
++
++    @staticmethod
++    def _legend_id(raw: dict[str, object]) -> str | None:
++        direct = raw.get("legend_id")
++        if isinstance(direct, str) and direct.strip():
++            return direct.strip()
++        metadata = raw.get("metadata")
++        if isinstance(metadata, dict):
++            value = metadata.get("legend_id")
++            if isinstance(value, str) and value.strip():
++                return value.strip()
++        return None
++
++    @staticmethod
++    def _dataset_resolution_hint(dataset: rasterio.io.DatasetReader) -> float:
++        x = abs(float(dataset.transform.a))
++        y = abs(float(dataset.transform.e))
++        value = max(x, y)
++        return value if math.isfinite(value) and value > 0.0 else float("inf")
+ 
+     def _sample_source(
+         self,
+@@ -155,15 +535,52 @@ class ConfiguredSurfaceSampler:
+         longitude: np.ndarray,
+         cancellation_check: Callable[[], bool] | None,
+     ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+-        if not source.path.is_file():
+-            raise FileNotFoundError(source.path)
+-        with rasterio.open(source.path) as dataset:
++        if not source.raster_paths:
++            raise FileNotFoundError(source.identifier)
++
++        # Pas-16 compatibility: use the first configured raster containing the
++        # requested points. Pas 17 will replace this with independent grid/tile
++        # reads and nearest-neighbour reprojection.
++        for raster_path in source.raster_paths:
++            sampled = self._sample_one_raster(
++                raster_path,
++                source.layer_type,
++                latitude,
++                longitude,
++                cancellation_check,
++            )
++            if sampled is None:
++                continue
++            rgba, valid, classes = sampled
++            if np.any(valid):
++                return rgba, valid, classes
++
++        return (
++            np.zeros((latitude.size, 4), dtype=np.uint8),
++            np.zeros(latitude.size, dtype=bool),
++            np.zeros(latitude.size, dtype=np.uint16),
++        )
++
++    def _sample_one_raster(
++        self,
++        raster_path: Path,
++        layer_type: str,
++        latitude: np.ndarray,
++        longitude: np.ndarray,
++        cancellation_check: Callable[[], bool] | None,
++    ) -> tuple[np.ndarray, np.ndarray, np.ndarray] | None:
++        with rasterio.open(raster_path) as dataset:
+             if dataset.crs is None:
+-                raise ValueError("surface raster has no CRS")
++                return None
+             transformer = self._transformers.get(str(dataset.crs))
+             if transformer is None:
+-                transformer = Transformer.from_crs("EPSG:4326", dataset.crs, always_xy=True)
++                transformer = Transformer.from_crs(
++                    "EPSG:4326",
++                    dataset.crs,
++                    always_xy=True,
++                )
+                 self._transformers[str(dataset.crs)] = transformer
++
+             x, y = transformer.transform(longitude.tolist(), latitude.tolist())
+             x = np.asarray(x, dtype=np.float64)
+             y = np.asarray(y, dtype=np.float64)
+@@ -171,57 +588,118 @@ class ConfiguredSurfaceSampler:
+             columns = np.floor(inverse.a * x + inverse.b * y + inverse.c).astype(np.int64)
+             rows = np.floor(inverse.d * x + inverse.e * y + inverse.f).astype(np.int64)
+             inside = (
+-                np.isfinite(x) & np.isfinite(y)
+-                & (columns >= 0) & (columns < dataset.width)
+-                & (rows >= 0) & (rows < dataset.height)
++                np.isfinite(x)
++                & np.isfinite(y)
++                & (columns >= 0)
++                & (columns < dataset.width)
++                & (rows >= 0)
++                & (rows < dataset.height)
+             )
++
+             rgba = np.zeros((latitude.size, 4), dtype=np.uint8)
+             valid = np.zeros(latitude.size, dtype=bool)
+             classes = np.zeros(latitude.size, dtype=np.uint16)
+             if not np.any(inside):
+                 return rgba, valid, classes
++
+             query = np.flatnonzero(inside)
+             if cancellation_check is not None and cancellation_check():
+                 raise InterruptedError("Surface sampling cancelled")
+             coordinates = list(zip(x[query].tolist(), y[query].tolist(), strict=True))
+-            if dataset.count >= 3:
+-                sampled = np.asarray(list(dataset.sample(coordinates, indexes=(1, 2, 3))), dtype=np.float64)
+-                rgb = _normalise_rgb(sampled, dataset.dtypes[:3])
++
++            if layer_type in {"surface_rgb", "land_cover_rgb"}:
++                if dataset.count < 3:
++                    return rgba, valid, classes
++                values = np.asarray(
++                    list(dataset.sample(coordinates, indexes=(1, 2, 3))),
++                    dtype=np.float64,
++                )
++                rgb = _normalise_rgb(values, dataset.dtypes[:3])
+                 rgba[query, :3] = rgb
+                 rgba[query, 3] = 255
+                 valid[query] = True
+             else:
+-                sampled = np.asarray(list(dataset.sample(coordinates, indexes=1)), dtype=np.int64).reshape(-1)
+-                colormap = dataset.colormap(1)
+-                for value in np.unique(sampled):
+-                    color = colormap.get(int(value))
+-                    if color is None:
+-                        continue
+-                    selected = query[sampled == value]
+-                    rgba[selected] = np.asarray(color[:4], dtype=np.uint8)
+-                    valid[selected] = int(color[3]) > 0
+-                    classes[selected] = np.uint16(np.clip(value, 0, np.iinfo(np.uint16).max))
++                values = np.asarray(
++                    list(dataset.sample(coordinates, indexes=1)),
++                    dtype=np.int64,
++                ).reshape(-1)
++                nodata = dataset.nodata
++                sample_valid = np.ones(values.shape, dtype=bool)
++                if nodata is not None and np.isfinite(float(nodata)):
++                    sample_valid &= values != int(nodata)
++
++                clipped = np.clip(
++                    values,
++                    0,
++                    np.iinfo(np.uint16).max,
++                ).astype(np.uint16)
++                classes[query] = clipped
++                valid[query] = sample_valid
++
++                try:
++                    colormap = dataset.colormap(1)
++                except (ValueError, rasterio.errors.RasterioError):
++                    colormap = {}
++
++                if colormap:
++                    for value in np.unique(values[sample_valid]):
++                        color = colormap.get(int(value))
++                        if color is None:
++                            continue
++                        selected = query[(values == value) & sample_valid]
++                        rgba[selected] = np.asarray(color[:4], dtype=np.uint8)
++                    # If the raster has a palette, alpha remains authoritative.
++                    valid &= rgba[:, 3] > 0
++                else:
++                    # The real S2GLC raster is categorical even when the file
++                    # does not carry an embedded GDAL colour table. Preserve
++                    # class identity; Pas 17 will colour it through its legend.
++                    rgba[query[sample_valid], 3] = 255
++
+             rgba[:, :3] = _srgb_to_linear_u8(rgba[:, :3])
+             return rgba, valid, classes
+ 
+ 
+-def _within_coverage(latitude: np.ndarray, longitude: np.ndarray, coverage: tuple[float, float, float, float] | None) -> np.ndarray:
++def _within_coverage(
++    latitude: np.ndarray,
++    longitude: np.ndarray,
++    coverage: tuple[float, float, float, float] | None,
++) -> np.ndarray:
+     if coverage is None:
+         return np.ones(latitude.shape, dtype=bool)
+     west, south, east, north = coverage
+-    return (longitude >= west) & (longitude <= east) & (latitude >= south) & (latitude <= north)
++    return (
++        (longitude >= west)
++        & (longitude <= east)
++        & (latitude >= south)
++        & (latitude <= north)
++    )
+ 
+ 
+-def _normalise_rgb(values: np.ndarray, dtypes: tuple[str, ...] | list[str]) -> np.ndarray:
++def _normalise_rgb(
++    values: np.ndarray,
++    dtypes: tuple[str, ...] | list[str],
++) -> np.ndarray:
+     result = np.zeros(values.shape, dtype=np.uint8)
+     for channel in range(3):
+         dtype = np.dtype(dtypes[channel])
+         upper = np.iinfo(dtype).max if np.issubdtype(dtype, np.integer) else 1.0
+-        result[:, channel] = np.rint(np.clip(values[:, channel] / max(1.0, float(upper)), 0.0, 1.0) * 255.0).astype(np.uint8)
++        result[:, channel] = np.rint(
++            np.clip(
++                values[:, channel] / max(1.0, float(upper)),
++                0.0,
++                1.0,
++            )
++            * 255.0
++        ).astype(np.uint8)
+     return result
+ 
+ 
+ def _srgb_to_linear_u8(rgb: np.ndarray) -> np.ndarray:
+     srgb = np.asarray(rgb, dtype=np.float32) / 255.0
+-    linear = np.where(srgb <= 0.04045, srgb / 12.92, ((srgb + 0.055) / 1.055) ** 2.4)
++    linear = np.where(
++        srgb <= 0.04045,
++        srgb / 12.92,
++        ((srgb + 0.055) / 1.055) ** 2.4,
++    )
+     return np.rint(np.clip(linear, 0.0, 1.0) * 255.0).astype(np.uint8)
+diff --git a/backend/tests/test_terrain_surface_step16.py b/backend/tests/test_terrain_surface_step16.py
+index 5fbf738..fdd675e 100644
+--- a/backend/tests/test_terrain_surface_step16.py
++++ b/backend/tests/test_terrain_surface_step16.py
+@@ -10,10 +10,9 @@ from rasterio.transform import from_origin
+ from terralab3d.infrastructure.adapters.surface import ConfiguredSurfaceSampler
+ 
+ 
+-def test_surface_rgb_is_selected_from_config_and_sampled_in_its_native_crs(tmp_path: Path) -> None:
+-    raster = tmp_path / "surface.tif"
++def _write_rgb(path: Path) -> None:
+     with rasterio.open(
+-        raster,
++        path,
+         "w",
+         driver="GTiff",
+         width=2,
+@@ -23,38 +22,214 @@ def test_surface_rgb_is_selected_from_config_and_sampled_in_its_native_crs(tmp_p
+         crs="EPSG:4326",
+         transform=from_origin(0, 2, 1, 1),
+     ) as dataset:
+-        dataset.write(np.asarray([
+-            [[255, 10], [10, 10]],
+-            [[128, 10], [10, 10]],
+-            [[0, 10], [10, 10]],
+-        ], dtype=np.uint8))
++        dataset.write(
++            np.asarray(
++                [
++                    [[255, 10], [10, 10]],
++                    [[128, 10], [10, 10]],
++                    [[0, 10], [10, 10]],
++                ],
++                dtype=np.uint8,
++            )
++        )
++
++
++def _write_categories(
++    path: Path,
++    *,
++    nodata: int | None = None,
++    colormap: bool = True,
++) -> None:
++    with rasterio.open(
++        path,
++        "w",
++        driver="GTiff",
++        width=2,
++        height=2,
++        count=1,
++        dtype="uint8",
++        crs="EPSG:3035",
++        transform=from_origin(3_548_930, 2_059_452, 10, 10),
++        nodata=nodata,
++    ) as dataset:
++        dataset.write(
++            np.asarray(
++                [[[104, 255 if nodata == 255 else 0], [62, 83]]],
++                dtype=np.uint8,
++            )
++        )
++        if colormap:
++            dataset.write_colormap(
++                1,
++                {
++                    104: (141, 139, 0, 255),
++                    62: (210, 0, 0, 255),
++                    83: (35, 152, 0, 255),
++                    0: (0, 0, 0, 0),
++                    255: (0, 0, 0, 0),
++                },
++            )
++
++
++def test_surface_rgb_is_selected_from_legacy_config_and_sampled_in_native_crs(
++    tmp_path: Path,
++) -> None:
++    raster = tmp_path / "surface.tif"
++    _write_rgb(raster)
+     config = tmp_path / "data_sources.json"
+-    config.write_text(json.dumps({
+-        "sources": [{
+-            "id": "surface-fixture",
+-            "display_name": "Fixture RGB",
+-            "layer_type": "surface_rgb",
+-            "path": str(raster),
+-            "priority": 1,
+-            "enabled": True,
+-            "coverage": [0, 0, 2, 2],
+-        }],
+-        "selections": {"surface": {"mode": "automatic", "source_id": None}},
+-    }), encoding="utf-8")
++    config.write_text(
++        json.dumps(
++            {
++                "sources": [
++                    {
++                        "id": "surface-fixture",
++                        "display_name": "Fixture RGB",
++                        "layer_type": "surface_rgb",
++                        "path": str(raster),
++                        "priority": 1,
++                        "enabled": True,
++                        "coverage": [0, 0, 2, 2],
++                    }
++                ],
++                "selections": {
++                    "surface": {
++                        "mode": "automatic",
++                        "source_id": None,
++                    }
++                },
++            }
++        ),
++        encoding="utf-8",
++    )
+ 
+     samples = ConfiguredSurfaceSampler((config,)).sample(
+-        np.asarray([1.5, 5.0]), np.asarray([0.5, 5.0]),
++        np.asarray([1.5, 5.0]),
++        np.asarray([0.5, 5.0]),
+     )
+ 
+     assert samples.valid.tolist() == [True, False]
+-    # Values are linearized exactly once before they become a Three.js colour attribute.
+     assert samples.rgba_linear[0].tolist() == [255, 55, 0, 255]
+     assert samples.class_ids.tolist() == [0, 0]
+     assert samples.source_ids.tolist() == [1, 0]
+     assert samples.source_label == "Fixture RGB"
+ 
+ 
+-def test_palette_surface_keeps_the_discrete_category_id_for_picking(tmp_path: Path) -> None:
++def test_land_cover_selection_resolves_directory_metadata_to_real_geotiff(
++    tmp_path: Path,
++) -> None:
++    raster_dir = tmp_path / "land_cover"
++    raster_dir.mkdir()
++    raster = raster_dir / "categorical.tif"
++    _write_categories(raster, nodata=255, colormap=False)
++    cache = tmp_path / "materialized.npy"
++    np.save(cache, np.zeros((2, 2), dtype=np.uint8))
++
++    config = tmp_path / "data_sources.json"
++    config.write_text(
++        json.dumps(
++            {
++                "version": 3,
++                "sources": [
++                    {
++                        "id": "other-land-cover",
++                        "display_name": "Other",
++                        "layer_type": "land_cover_categorical",
++                        "path": str(raster_dir),
++                        "format": "raster_mosaic",
++                        "crs": "EPSG:3035",
++                        "resolution_m": 20.0,
++                        "priority": 999,
++                        "enabled": True,
++                        "metadata": {
++                            "legend_id": "other",
++                            "rasters": [{"paths": [str(raster)]}],
++                        },
++                    },
++                    {
++                        "id": "selected-land-cover",
++                        "display_name": "Selected categories",
++                        "layer_type": "land_cover_categorical",
++                        "path": str(raster_dir),
++                        "format": "raster_mosaic",
++                        "crs": "EPSG:3035",
++                        "resolution_m": 9.9994162612822,
++                        "coverage": [-33.5, 31.8, 62.1, 72.3],
++                        "priority": 0,
++                        "enabled": True,
++                        "metadata": {
++                            "legend_id": "s2glc_europe_2017",
++                            "rasters": [
++                                {
++                                    "driver": "GTiff",
++                                    "band_count": 1,
++                                    "paths": [
++                                        str(raster),
++                                        str(cache),
++                                    ],
++                                }
++                            ],
++                        },
++                    },
++                ],
++                "selections": {
++                    "land_cover": {
++                        "mode": "manual",
++                        "source_id": "selected-land-cover",
++                    }
++                },
++                "surface_mode": "land_cover",
++            }
++        ),
++        encoding="utf-8",
++    )
++
++    source = ConfiguredSurfaceSampler((config,)).resolve_land_cover_source()
++
++    assert source is not None
++    assert source.source_id == "selected-land-cover"
++    assert source.config_path == config.resolve()
++    assert source.raster_paths == (raster.resolve(),)
++    assert source.crs == "EPSG:3035"
++    assert source.resolution_m == 9.9994162612822
++    assert source.nodata == 255
++    assert source.legend_id == "s2glc_europe_2017"
++
++
++def test_manual_land_cover_does_not_fall_back_to_another_source(
++    tmp_path: Path,
++) -> None:
++    raster = tmp_path / "classes.tif"
++    _write_categories(raster, nodata=255, colormap=False)
++    config = tmp_path / "data_sources.json"
++    config.write_text(
++        json.dumps(
++            {
++                "sources": [
++                    {
++                        "id": "available",
++                        "display_name": "Available",
++                        "layer_type": "land_cover_categorical",
++                        "path": str(raster),
++                        "enabled": True,
++                    }
++                ],
++                "selections": {
++                    "land_cover": {
++                        "mode": "manual",
++                        "source_id": "missing",
++                    }
++                },
++            }
++        ),
++        encoding="utf-8",
++    )
++
++    assert ConfiguredSurfaceSampler((config,)).resolve_land_cover_source() is None
++
++
++def test_categorical_sampling_keeps_class_id_without_embedded_colormap(
++    tmp_path: Path,
++) -> None:
+     raster = tmp_path / "classes.tif"
+     with rasterio.open(
+         raster,
+@@ -66,28 +241,42 @@ def test_palette_surface_keeps_the_discrete_category_id_for_picking(tmp_path: Pa
+         dtype="uint8",
+         crs="EPSG:4326",
+         transform=from_origin(0, 2, 1, 1),
++        nodata=255,
+     ) as dataset:
+-        dataset.write(np.asarray([[[62, 0], [0, 0]]], dtype=np.uint8))
+-        dataset.write_colormap(1, {62: (210, 0, 0, 255), 0: (0, 0, 0, 0)})
++        dataset.write(np.asarray([[[104, 255], [62, 83]]], dtype=np.uint8))
++
+     config = tmp_path / "data_sources.json"
+-    config.write_text(json.dumps({
+-        "sources": [{
+-            "id": "classes-fixture",
+-            "display_name": "Fixture categories",
+-            "layer_type": "land_cover_categorical",
+-            "path": str(raster),
+-            "priority": 1,
+-            "enabled": True,
+-            "coverage": [0, 0, 2, 2],
+-        }],
+-        "selections": {"surface": {"mode": "manual", "source_id": "classes-fixture"}},
+-    }), encoding="utf-8")
++    config.write_text(
++        json.dumps(
++            {
++                "sources": [
++                    {
++                        "id": "classes-fixture",
++                        "display_name": "Fixture categories",
++                        "layer_type": "land_cover_categorical",
++                        "path": str(raster),
++                        "priority": 1,
++                        "enabled": True,
++                        "coverage": [0, 0, 2, 2],
++                    }
++                ],
++                "selections": {
++                    "land_cover": {
++                        "mode": "manual",
++                        "source_id": "classes-fixture",
++                    }
++                },
++            }
++        ),
++        encoding="utf-8",
++    )
+ 
+     samples = ConfiguredSurfaceSampler((config,)).sample(
+-        np.asarray([1.5]), np.asarray([0.5]),
++        np.asarray([1.5]),
++        np.asarray([0.5]),
+     )
+ 
+     assert samples.valid.tolist() == [True]
+-    assert samples.class_ids.tolist() == [62]
++    assert samples.class_ids.tolist() == [104]
+     assert samples.source_ids.tolist() == [1]
+     assert samples.rgba_linear[0, 3] == 255
+diff --git a/frontend/src/bridge/WebSocketBridge.ts b/frontend/src/bridge/WebSocketBridge.ts
+index 10d1886..d8dedad 100644
+--- a/frontend/src/bridge/WebSocketBridge.ts
++++ b/frontend/src/bridge/WebSocketBridge.ts
+@@ -98,6 +98,8 @@ export interface BackendMessageListener {
+   onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
+   onSkyEnvironmentSnapshot?(snapshot: import("../contracts/sky_environment_contracts").SkyEnvironmentSnapshot): void;
+   onSolarSystemSnapshot?(snapshot: SolarSystemSnapshot): void;
++  onSurfaceProgress?(msg: any): void;
++  onLandCoverLegend?(msg: any): void;
+   onLightingEnvironmentSnapshot?(snapshot: LightingEnvironmentSnapshot): void;
+   onMoonSurfaceResource?(resource: MoonSurfaceResourceDescriptor): void;
+   onPlanetTextureManifest?(manifest: PlanetTextureManifest): void;
+@@ -264,6 +266,10 @@ export class WebSocketBridge {
+     this.sendMessage({ type: "cancel_horizon" });
+   }
+ 
++  sendSurfaceMode(mode: string): void {
++    this.sendMessage({ type: "set_surface_mode", mode });
++  }
++
+   private shutdownRequested = false;
+ 
+   dispose(): void {
+@@ -486,6 +492,16 @@ export class WebSocketBridge {
+           l.onNavigationCoordinatesChanged?.(msg.lat, msg.lon);
+         }
+         break;
++      case "surface_progress":
++        for (const l of this.messageListeners) {
++          l.onSurfaceProgress?.(msg);
++        }
++        break;
++      case "land_cover_legend":
++        for (const l of this.messageListeners) {
++          l.onLandCoverLegend?.(msg);
++        }
++        break;
+       default:
+         console.warn("[Bridge] Unknown message payload");
+     }
+diff --git a/frontend/src/main.ts b/frontend/src/main.ts
+index 31de51e..a54df97 100644
+--- a/frontend/src/main.ts
++++ b/frontend/src/main.ts
+@@ -259,6 +259,7 @@ function main(): void {
+       bridge.recalculateHorizon();
+     },
+     onCancel: () => bridge.cancelHorizon(),
++    onSurfaceModeChanged: (mode) => bridge.sendSurfaceMode(mode),
+   });
+   const earthContainer = shell.getPageContainer("earth");
+   if (earthContainer) earthPage.mount(earthContainer);
+@@ -518,6 +519,15 @@ function main(): void {
+     onStarCatalogStatus(status) {
+       skyPage.updateStarCatalogStatus(status);
+     },
++    onSurfaceProgress(msg) {
++      if (msg.cleared === true) {
++        sceneHost.getDemTerrainLayerRenderer().landCoverManager.clear();
++      }
++      earthPage.updateTerrainSurface(msg);
++    },
++    onLandCoverLegend(msg) {
++      sceneHost.getDemTerrainLayerRenderer().landCoverManager.applyLegend(msg);
++    },
+     onCelestialFrameTransform(generation, matrix3x3) {
+       celestialTransformState.update(generation, matrix3x3 as number[]);
+     },
+@@ -544,6 +554,10 @@ function main(): void {
+         }
+         return;
+       }
++      if (metadata.role === "land_cover_tile") {
++        sceneHost.getDemTerrainLayerRenderer().landCoverManager.addTile(metadata, bufferPayload);
++        return;
++      }
+       if (metadata.role === "solar_system_orbit") {
+         sceneHost.getSolarSystemRenderer().registerOrbitResource(metadata, bufferPayload);
+         return;
+diff --git a/frontend/src/view/three/layers/DemTerrainLayerRenderer.ts b/frontend/src/view/three/layers/DemTerrainLayerRenderer.ts
+index e8f0801..1527a51 100644
+--- a/frontend/src/view/three/layers/DemTerrainLayerRenderer.ts
++++ b/frontend/src/view/three/layers/DemTerrainLayerRenderer.ts
+@@ -1,5 +1,6 @@
+ import * as THREE from "three";
+ import type { TerrainNavigationSampling } from "../terrain/TechnicalTerrainSampler";
++import { LandCoverTextureManager } from "../terrain/LandCoverTextureManager";
+ 
+ export const DEM_TERRAIN_RENDER_ORDER = -900;
+ export const DEM_COVERAGE_FOG_RENDER_ORDER = -899;
+@@ -10,7 +11,6 @@ export interface DemTerrainLayerMetrics {
+   readonly vertexCount: number;
+   readonly triangleCount: number;
+   readonly activeMeshCount: number;
+-  readonly semanticAttributeBytes: number;
+ }
+ 
+ export interface DemTerrainNavigationLayer {
+@@ -20,9 +20,7 @@ export interface DemTerrainNavigationLayer {
+ }
+ 
+ export interface DemTerrainStreamingCacheOptions {
+-  /** Maximum number of completed detail chunks retained in the GPU scene. */
+   readonly maxMeshCount?: number;
+-  /** Approximate transferred geometry bytes retained by the detail cache. */
+   readonly maxGpuBytes?: number;
+ }
+ 
+@@ -35,43 +33,26 @@ const DEFAULT_STREAMING_MESH_COUNT = 12;
+ const DEFAULT_STREAMING_GPU_BYTES = 256 * 1024 * 1024;
+ 
+ /**
+- * Persistent Three.js presentation of the real observer-relative DEM mesh.
++ * Persistent Three.js presentation of the observer-relative DEM mesh.
+  *
+- * The horizon curtain remains a separate celestial-depth occluder. This layer
+- * is actual world geometry: X=East, Y=Up, Z=-North, with invalid DEM cells
+- * omitted by the backend index buffer rather than painted black.
++ * BufferGeometry is geometry only: position, normal and index. Surface
++ * appearance is resolved in the fragment shader from independent categorical
++ * texture layers, so changing land cover never rebuilds terrain geometry.
+  */
+ export class DemTerrainLayerRenderer {
+   readonly root = new THREE.Group();
+-  private readonly material = new THREE.MeshStandardMaterial({
+-    vertexColors: true,
+-    roughness: 1,
+-    metalness: 0,
+-    emissive: new THREE.Color(0x07111a),
+-    emissiveIntensity: 0.055,
+-    side: THREE.FrontSide,
+-  });
+-  /**
+-   * The moving high-detail chunk is rendered over the resident wide mesh.
+-   * A tiny polygon offset avoids depth fighting in their overlap while the
+-   * vertex buffers themselves remain independent, persistent GPU resources.
+-   */
+-  private readonly streamingMaterial = new THREE.MeshStandardMaterial({
+-    vertexColors: true,
+-    roughness: 1,
+-    metalness: 0,
+-    emissive: new THREE.Color(0x07111a),
+-    emissiveIntensity: 0.055,
+-    side: THREE.FrontSide,
+-    polygonOffset: true,
+-    polygonOffsetFactor: -1,
+-    polygonOffsetUnits: -1,
+-  });
+-  /**
+-   * A translucent world-space boundary, built only from the edge of the
+-   * uploaded DEM topology. It marks precisely the same no-coverage frontier
+-   * that blocks flight collision; it is not a second terrain surface.
+-   */
++  public readonly landCoverManager = new LandCoverTextureManager();
++
++  private readonly surfaceUniforms = {
++    landCoverTex: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
++    landCoverLUT: { value: this.landCoverManager.emptyPaletteTexture as THREE.Texture },
++    landCoverBounds: { value: new THREE.Vector4(0, 0, 0, 0) },
++    landCoverTileWorldSize: { value: new THREE.Vector2(1, 1) },
++    hasLandCover: { value: 0 },
++    terrainRadiusM: { value: 150_000.0 },
++  };
++
++  private readonly material: THREE.MeshStandardMaterial;
+   private readonly coverageFogMaterial = new THREE.MeshBasicMaterial({
+     color: 0x9db2c9,
+     side: THREE.DoubleSide,
+@@ -80,6 +61,7 @@ export class DemTerrainLayerRenderer {
+     depthTest: true,
+     depthWrite: false,
+   });
++
+   private mesh: THREE.Mesh<THREE.BufferGeometry, THREE.MeshStandardMaterial> | null = null;
+   private readonly streamingMeshes = new Map<string, StreamingMeshEntry>();
+   private coverageFog: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial> | null = null;
+@@ -97,21 +79,34 @@ export class DemTerrainLayerRenderer {
+   private geometryUploadBytes = 0;
+   private vertexCount = 0;
+   private triangleCount = 0;
+-  private semanticAttributeBytes = 0;
+ 
+   constructor(parent: THREE.Object3D, cache: DemTerrainStreamingCacheOptions = {}) {
+-    this.maxStreamingMeshCount = positiveInteger(
+-      cache.maxMeshCount,
+-      DEFAULT_STREAMING_MESH_COUNT,
+-    );
+-    this.maxStreamingGpuBytes = positiveInteger(
+-      cache.maxGpuBytes,
+-      DEFAULT_STREAMING_GPU_BYTES,
+-    );
++    this.material = this.createTerrainMaterial(false);
++    this.landCoverManager.setChangeCallback(() => this.updateShaderUniforms());
++    this.maxStreamingMeshCount = positiveInteger(cache.maxMeshCount, DEFAULT_STREAMING_MESH_COUNT);
++    this.maxStreamingGpuBytes = positiveInteger(cache.maxGpuBytes, DEFAULT_STREAMING_GPU_BYTES);
+     this.root.name = "demTerrainRoot";
+     parent.add(this.root);
+   }
+ 
++  /** Update shared uniforms only; no BufferGeometry or material rebuild. */
++  public updateShaderUniforms(): void {
++    const coverage = this.landCoverManager.activeCoverageTexture;
++    if (coverage !== null) {
++      this.surfaceUniforms.landCoverTex.value = coverage;
++      this.surfaceUniforms.landCoverLUT.value = this.landCoverManager.paletteTexture;
++      this.surfaceUniforms.landCoverBounds.value.copy(this.landCoverManager.activeBounds);
++      this.surfaceUniforms.landCoverTileWorldSize.value.copy(this.landCoverManager.tileWorldSize);
++      this.surfaceUniforms.hasLandCover.value = 1;
++    } else {
++      this.surfaceUniforms.landCoverTex.value = this.landCoverManager.emptyCoverageTexture;
++      this.surfaceUniforms.landCoverLUT.value = this.landCoverManager.emptyPaletteTexture;
++      this.surfaceUniforms.landCoverBounds.value.set(0, 0, 0, 0);
++      this.surfaceUniforms.landCoverTileWorldSize.value.set(1, 1);
++      this.surfaceUniforms.hasLandCover.value = 0;
++    }
++  }
++
+   applyBinaryResource(metadata: any, payload: ArrayBuffer): boolean {
+     const isStreamingChunk = metadata?.role === "terrain_stream_chunk";
+     if (this.disposed || (!isStreamingChunk && metadata?.role !== "terrain_mesh")) return false;
+@@ -120,6 +115,7 @@ export class DemTerrainLayerRenderer {
+       else this.clear();
+       return true;
+     }
++
+     const version = Number(metadata.version);
+     const contentKey = String(metadata.contentKey ?? "");
+     const vertexCount = Number(metadata.vertexCount);
+@@ -132,10 +128,9 @@ export class DemTerrainLayerRenderer {
+       || vertexCount <= 0
+       || indexCount <= 0
+       || !metadata.bufferLayout
+-    ) {
+-      return false;
+-    }
++    ) return false;
+     if (isStreamingChunk && contentKey.length === 0) return false;
++
+     const activeStream = isStreamingChunk ? this.streamingMeshes.get(contentKey) : undefined;
+     if (activeStream && version < activeStream.version) return false;
+     if (activeStream && version === activeStream.version) return true;
+@@ -146,30 +141,30 @@ export class DemTerrainLayerRenderer {
+     try {
+       const position = viewFloat32(payload, layout.position, vertexCount * 3);
+       const normal = viewFloat32(payload, layout.normal, vertexCount * 3);
+-      const color = viewUint8(payload, layout.color, vertexCount * 4);
+-      const classId = viewUint16(payload, layout.classId, vertexCount);
+-      const sourceId = viewInt16(payload, layout.sourceId, vertexCount);
++      
++      const colorOffset = Number(layout.color?.offset);
++      const colorLength = Number(layout.color?.length);
++      if (!Number.isSafeInteger(colorOffset) || colorLength < vertexCount * 4) throw new Error("Invalid color layout");
++      const color = new Uint8Array(payload, colorOffset, vertexCount * 4);
++      
+       const index = viewUint32(payload, layout.index, indexCount);
+       const geometry = new THREE.BufferGeometry();
+       geometry.setAttribute("position", new THREE.BufferAttribute(position, 3));
+       geometry.setAttribute("normal", new THREE.BufferAttribute(normal, 3));
+       geometry.setAttribute("color", new THREE.BufferAttribute(color, 4, true));
+-      // Keep semantic identity separate from displayed vertex colour. These
+-      // attributes are deliberately non-normalized for category picking.
+-      geometry.setAttribute("terrainClassId", new THREE.BufferAttribute(classId, 1, false));
+-      geometry.setAttribute("terrainSourceId", new THREE.BufferAttribute(sourceId, 1, false));
+       geometry.setIndex(new THREE.BufferAttribute(index, 1));
+       geometry.computeBoundingSphere();
+ 
+       const replacement = new THREE.Mesh(
+         geometry,
+-        isStreamingChunk ? this.streamingMaterial.clone() : this.material,
++        isStreamingChunk ? this.createTerrainMaterial(true) : this.material,
+       );
+       replacement.name = isStreamingChunk ? "demTerrainStreamChunk" : "demTerrainMeshV3";
+       replacement.frustumCulled = false;
+       replacement.receiveShadow = true;
+       replacement.castShadow = false;
+       replacement.renderOrder = DEM_TERRAIN_RENDER_ORDER + Number(isStreamingChunk);
++
+       const previous = isStreamingChunk ? activeStream?.mesh ?? null : this.mesh;
+       if (isStreamingChunk) {
+         if (activeStream) {
+@@ -189,11 +184,16 @@ export class DemTerrainLayerRenderer {
+         this.navigationSampling = navigationSampling;
+         this.activeVersion = version;
+         this.activeContentKey = contentKey;
+-        // A world mesh replacement changes the global terrain anchor. Its old
+-        // moving overlay can no longer be sampled or rendered safely.
++        this.surfaceUniforms.terrainRadiusM.value = terrainRadiusFrom(
++          navigationSampling,
++          geometry.boundingSphere?.radius,
++        );
++        // A resident-world replacement changes the terrain anchor. Old moving
++        // overlays are no longer safe to retain or sample.
+         this.clearStreaming();
+         this.rebuildCoverageFog(geometry, navigationSampling);
+       }
++
+       this.root.add(replacement);
+       previous?.removeFromParent();
+       previous?.geometry.dispose();
+@@ -202,9 +202,9 @@ export class DemTerrainLayerRenderer {
+         this.trimStreamingCache(contentKey);
+         this.refreshStreamingDepthBias();
+       }
++
+       this.vertexCount = this.mesh?.geometry.getAttribute("position")?.count ?? 0;
+       this.triangleCount = Math.floor((this.mesh?.geometry.getIndex()?.count ?? 0) / 3);
+-      this.semanticAttributeBytes = semanticBytes(this.mesh);
+       this.geometryUploadBytes += payload.byteLength;
+       this.geometryBuildCount++;
+       return true;
+@@ -217,11 +217,9 @@ export class DemTerrainLayerRenderer {
+   metrics(): DemTerrainLayerMetrics {
+     let streamingVertices = 0;
+     let streamingTriangles = 0;
+-    let streamingSemanticBytes = 0;
+     for (const entry of this.streamingMeshes.values()) {
+       streamingVertices += entry.mesh.geometry.getAttribute("position")?.count ?? 0;
+       streamingTriangles += Math.floor((entry.mesh.geometry.getIndex()?.count ?? 0) / 3);
+-      streamingSemanticBytes += semanticBytes(entry.mesh);
+     }
+     return {
+       geometryBuildCount: this.geometryBuildCount,
+@@ -229,21 +227,17 @@ export class DemTerrainLayerRenderer {
+       vertexCount: this.vertexCount + streamingVertices,
+       triangleCount: this.triangleCount + streamingTriangles,
+       activeMeshCount: Number(this.mesh !== null) + this.streamingMeshes.size,
+-      semanticAttributeBytes: this.semanticAttributeBytes + streamingSemanticBytes,
+     };
+   }
+ 
+-  /** The real DEM mesh used by navigation collision; ownership remains here. */
+   getNavigationMesh(): THREE.Mesh | null {
+     return this.mesh;
+   }
+ 
+-  /** Compact topology for collision over the same uploaded DEM attributes. */
+   getNavigationSampling(): TerrainNavigationSampling | null {
+     return this.navigationSampling;
+   }
+ 
+-  /** The high-detail moving chunk used before the resident wide mesh. */
+   getStreamingNavigationMesh(): THREE.Mesh | null {
+     return this.latestStreamingEntry()?.mesh ?? null;
+   }
+@@ -252,7 +246,6 @@ export class DemTerrainLayerRenderer {
+     return this.latestStreamingEntry()?.sampling ?? null;
+   }
+ 
+-  /** All retained detail chunks, oldest to newest; ownership remains here. */
+   getStreamingNavigationLayers(): readonly DemTerrainNavigationLayer[] {
+     return Array.from(this.streamingMeshes.values(), ({ contentKey, mesh, sampling }) => ({
+       contentKey,
+@@ -261,7 +254,6 @@ export class DemTerrainLayerRenderer {
+     }));
+   }
+ 
+-  /** Visible world meshes eligible for a terrain context-click destination. */
+   getGotoTargetMeshes(): readonly THREE.Mesh[] {
+     const meshes: THREE.Mesh[] = [];
+     if (this.mesh) meshes.push(this.mesh);
+@@ -269,11 +261,6 @@ export class DemTerrainLayerRenderer {
+     return meshes;
+   }
+ 
+-  /**
+-   * Keep the top of the DEM coverage fog on the observer's geometric
+-   * horizontal. This updates a tiny retained vertex buffer, never terrain
+-   * geometry or raster data.
+-   */
+   updateCoverageFogTop(cameraUpM: number): void {
+     const fog = this.coverageFog;
+     if (!fog || !Number.isFinite(cameraUpM) || Math.abs(cameraUpM - this.coverageFogTopY) < 0.05) return;
+@@ -295,11 +282,142 @@ export class DemTerrainLayerRenderer {
+     this.disposed = true;
+     this.clear();
+     this.material.dispose();
+-    this.streamingMaterial.dispose();
+     this.coverageFogMaterial.dispose();
++    this.landCoverManager.setChangeCallback(null);
++    this.landCoverManager.dispose();
+     this.root.removeFromParent();
+   }
+ 
++  private createTerrainMaterial(streaming: boolean): THREE.MeshStandardMaterial {
++    const material = new THREE.MeshStandardMaterial({
++      vertexColors: true,
++      roughness: 1,
++      metalness: 0,
++      emissive: new THREE.Color(0x07111a),
++      emissiveIntensity: 0.055,
++      side: THREE.FrontSide,
++      polygonOffset: streaming,
++      polygonOffsetFactor: streaming ? -1 : 0,
++      polygonOffsetUnits: streaming ? -1 : 0,
++    });
++    material.onBeforeCompile = (shader) => this.patchTerrainShader(shader);
++    material.customProgramCacheKey = () => "terralab3d-terrain-land-cover-v3";
++    return material;
++  }
++
++  private patchTerrainShader(shader: Parameters<THREE.MeshStandardMaterial['onBeforeCompile']>[0]): void {
++    shader.uniforms.landCoverTex = this.surfaceUniforms.landCoverTex;
++    shader.uniforms.landCoverLUT = this.surfaceUniforms.landCoverLUT;
++    shader.uniforms.landCoverBounds = this.surfaceUniforms.landCoverBounds;
++    shader.uniforms.landCoverTileWorldSize = this.surfaceUniforms.landCoverTileWorldSize;
++    shader.uniforms.hasLandCover = this.surfaceUniforms.hasLandCover;
++    shader.uniforms.terrainRadiusM = this.surfaceUniforms.terrainRadiusM;
++
++    shader.vertexShader = shader.vertexShader.replace(
++      "#include <common>",
++      `
++      #include <common>
++      varying vec3 vTerraLabWorldPosition;
++      `,
++    );
++    shader.vertexShader = shader.vertexShader.replace(
++      "#include <worldpos_vertex>",
++      `
++      #include <worldpos_vertex>
++      vTerraLabWorldPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;
++      `,
++    );
++
++    shader.fragmentShader = shader.fragmentShader.replace(
++      "#include <common>",
++      `
++      #include <common>
++      varying vec3 vTerraLabWorldPosition;
++      uniform highp usampler2DArray landCoverTex;
++      uniform sampler2D landCoverLUT;
++      uniform vec4 landCoverBounds;
++      uniform vec2 landCoverTileWorldSize;
++      uniform float hasLandCover;
++
++      vec3 terraLabSrgbToLinear(vec3 value) {
++        vec3 lower = value / 12.92;
++        vec3 higher = pow((value + 0.055) / 1.055, vec3(2.4));
++        return vec3(
++          value.r <= 0.04045 ? lower.r : higher.r,
++          value.g <= 0.04045 ? lower.g : higher.g,
++          value.b <= 0.04045 ? lower.b : higher.b
++        );
++      }
++      `,
++    );
++
++    shader.fragmentShader = shader.fragmentShader.replace(
++      "#include <color_fragment>",
++      `
++      #include <color_fragment>
++
++      if (hasLandCover > 0.5) {
++        float minX = landCoverBounds.x;
++        float minY = landCoverBounds.y;
++        float maxX = landCoverBounds.z;
++        float maxY = landCoverBounds.w;
++        float geoX = vTerraLabWorldPosition.x;
++        float geoY = -vTerraLabWorldPosition.z;
++
++        if (maxX > minX && maxY > minY
++            && landCoverTileWorldSize.x > 0.0 && landCoverTileWorldSize.y > 0.0
++            && geoX >= minX && geoX <= maxX
++            && geoY >= minY && geoY <= maxY) {
++          ivec3 coverageSize = textureSize(landCoverTex, 0);
++          int gridColumns = max(1, int(round((maxX - minX) / landCoverTileWorldSize.x)));
++          int gridRows = max(1, int(round((maxY - minY) / landCoverTileWorldSize.y)));
++          int column = clamp(
++            int(floor((geoX - minX) / landCoverTileWorldSize.x)),
++            0,
++            gridColumns - 1
++          );
++          int row = clamp(
++            int(floor((maxY - geoY) / landCoverTileWorldSize.y)),
++            0,
++            gridRows - 1
++          );
++          int layer = row * gridColumns + column;
++
++          if (layer >= 0 && layer < coverageSize.z) {
++            float tileMinX = minX + float(column) * landCoverTileWorldSize.x;
++            float tileMaxY = maxY - float(row) * landCoverTileWorldSize.y;
++            float localU = clamp(
++              (geoX - tileMinX) / landCoverTileWorldSize.x,
++              0.0,
++              0.99999994
++            );
++            float localV = clamp(
++              (tileMaxY - geoY) / landCoverTileWorldSize.y,
++              0.0,
++              0.99999994
++            );
++            ivec2 coveragePixel = ivec2(
++              min(int(floor(localU * float(coverageSize.x))), coverageSize.x - 1),
++              min(int(floor(localV * float(coverageSize.y))), coverageSize.y - 1)
++            );
++            uint classId = texelFetch(landCoverTex, ivec3(coveragePixel, layer), 0).r;
++            if (classId != 0u) {
++              ivec2 lutPixel = ivec2(
++                int(classId % 256u),
++                int(classId / 256u)
++              );
++              vec4 lutColor = texelFetch(landCoverLUT, lutPixel, 0);
++              if (lutColor.a > 0.0) {
++                diffuseColor.rgb = terraLabSrgbToLinear(lutColor.rgb);
++              }
++            }
++          }
++        }
++      }
++      `,
++    );
++  }
++
+   private clear(): void {
+     this.clearCoverageFog();
+     this.mesh?.removeFromParent();
+@@ -310,7 +428,6 @@ export class DemTerrainLayerRenderer {
+     this.activeContentKey = "";
+     this.vertexCount = 0;
+     this.triangleCount = 0;
+-    this.semanticAttributeBytes = 0;
+     this.clearStreaming();
+   }
+ 
+@@ -395,11 +512,6 @@ interface CoverageFogBoundary {
+   readonly bottomHeights: Float32Array<ArrayBufferLike>;
+ }
+ 
+-/**
+- * Find the first unusable polar cell for each azimuth. The same indexed
+- * vertex rule is used by the navigation sampler, so this visible boundary
+- * coincides with its collision boundary rather than an inferred raster edge.
+- */
+ function buildCoverageFogBoundary(
+   geometry: THREE.BufferGeometry,
+   sampling: TerrainNavigationSampling,
+@@ -409,7 +521,7 @@ function buildCoverageFogBoundary(
+   const nearVertexCount = sampling.nearAxisM.length * sampling.nearAxisM.length;
+   const polarVertexCount = position.count - nearVertexCount;
+   const ringCount = sampling.polarDistanceM.length;
+-  if (polarVertexCount <= 0 || polarVertexCount % ringCount !== 0) return null;
++  if (polarVertexCount <= 0 || ringCount <= 0 || polarVertexCount % ringCount !== 0) return null;
+   const azimuthCount = polarVertexCount / ringCount;
+   if (azimuthCount < 3) return null;
+ 
+@@ -486,14 +598,6 @@ function indexedVertexMask(geometry: THREE.BufferGeometry, vertexCount: number):
+   return mask;
+ }
+ 
+-function semanticBytes(mesh: THREE.Mesh<THREE.BufferGeometry> | null): number {
+-  if (!mesh) return 0;
+-  return (
+-    (mesh.geometry.getAttribute("terrainClassId")?.array.byteLength ?? 0)
+-    + (mesh.geometry.getAttribute("terrainSourceId")?.array.byteLength ?? 0)
+-  );
+-}
+-
+ function disposeStreamingMaterial(mesh: THREE.Mesh): void {
+   const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+   for (const material of materials) material.dispose();
+@@ -506,7 +610,12 @@ function positiveInteger(value: number | undefined, fallback: number): number {
+ function checkedLayout(layout: any, expectedLength: number): number {
+   const offset = Number(layout?.offset);
+   const length = Number(layout?.length);
+-  if (!Number.isSafeInteger(offset) || !Number.isSafeInteger(length) || offset < 0 || length < expectedLength) {
++  if (
++    !Number.isSafeInteger(offset)
++    || !Number.isSafeInteger(length)
++    || offset < 0
++    || length < expectedLength
++  ) {
+     throw new Error("Terrain buffer layout is invalid");
+   }
+   return offset;
+@@ -517,21 +626,6 @@ function viewFloat32(buffer: ArrayBuffer, layout: any, count: number): Float32Ar
+   return new Float32Array(buffer, offset, count);
+ }
+ 
+-function viewUint8(buffer: ArrayBuffer, layout: any, count: number): Uint8Array {
+-  const offset = checkedLayout(layout, count);
+-  return new Uint8Array(buffer, offset, count);
+-}
+-
+-function viewUint16(buffer: ArrayBuffer, layout: any, count: number): Uint16Array {
+-  const offset = checkedLayout(layout, count * Uint16Array.BYTES_PER_ELEMENT);
+-  return new Uint16Array(buffer, offset, count);
+-}
+-
+-function viewInt16(buffer: ArrayBuffer, layout: any, count: number): Int16Array {
+-  const offset = checkedLayout(layout, count * Int16Array.BYTES_PER_ELEMENT);
+-  return new Int16Array(buffer, offset, count);
+-}
+-
+ function viewUint32(buffer: ArrayBuffer, layout: any, count: number): Uint32Array {
+   const offset = checkedLayout(layout, count * Uint32Array.BYTES_PER_ELEMENT);
+   return new Uint32Array(buffer, offset, count);
+@@ -571,3 +665,18 @@ function strictlyIncreasing(values: Float32Array): boolean {
+   }
+   return true;
+ }
++
++function terrainRadiusFrom(
++  sampling: TerrainNavigationSampling | null,
++  boundingRadius: number | undefined,
++): number {
++  const distances = sampling?.polarDistanceM;
++  if (distances && distances.length > 0) {
++    const value = Number(distances[distances.length - 1]);
++    if (Number.isFinite(value) && value > 0) return value;
++  }
++  if (boundingRadius !== undefined && Number.isFinite(boundingRadius) && boundingRadius > 0) {
++    return boundingRadius;
++  }
++  return 150_000.0;
++}
+diff --git a/frontend/src/view/three/terrain/LandCoverTextureManager.ts b/frontend/src/view/three/terrain/LandCoverTextureManager.ts
+new file mode 100644
+index 0000000..b11546b
+--- /dev/null
++++ b/frontend/src/view/three/terrain/LandCoverTextureManager.ts
+@@ -0,0 +1,300 @@
++import * as THREE from "three";
++
++export interface LandCoverTileData {
++  readonly tileKey: string;
++  readonly bounds: [number, number, number, number];
++  readonly width: number;
++  readonly height: number;
++  readonly nodataValue: number;
++  readonly data: Uint16Array;
++}
++
++export interface LandCoverLegendData {
++  readonly legendId: string;
++  readonly entries: Array<{
++    classId: number;
++    colorRgba: [number, number, number, number];
++  }>;
++}
++
++/**
++ * Retained GPU representation of categorical land-cover tiles.
++ *
++ * Each world-aligned tile occupies one layer of an R16UI DataArrayTexture.
++ * Streaming a tile therefore updates exactly one GPU layer; it never rebuilds
++ * DEM geometry and never re-uploads a giant stitched 2D atlas.
++ *
++ * Row 0 is geographic North from Rasterio to texelFetch. flipY stays false.
++ */
++export class LandCoverTextureManager {
++  public readonly activeBounds = new THREE.Vector4(0, 0, 0, 0);
++  public readonly tileWorldSize = new THREE.Vector2(1, 1);
++
++  public readonly emptyCoverageTexture: THREE.DataArrayTexture;
++  public readonly emptyPaletteTexture: THREE.DataTexture;
++  public paletteTexture: THREE.DataTexture;
++  public activeCoverageTexture: THREE.DataArrayTexture | null = null;
++
++  // Compatibility/diagnostic fields used by the current frontend integration.
++  public globalResolution = 0;
++  public globalWidth = 0;
++  public globalHeight = 0;
++
++  private requestedBounds: [number, number, number, number] | null = null;
++  private requestedResolution = 0;
++  private classData: Uint16Array | null = null;
++  private layerWidth = 0;
++  private layerHeight = 0;
++  private gridColumns = 0;
++  private gridRows = 0;
++  private pendingTiles: LandCoverTileData[] = [];
++  private changeCallback: (() => void) | null = null;
++
++  constructor() {
++    this.emptyCoverageTexture = createClassArrayTexture(new Uint16Array([0]), 1, 1, 1, true);
++    this.emptyPaletteTexture = createPaletteTexture(new Uint8Array(256 * 256 * 4));
++    this.paletteTexture = this.emptyPaletteTexture;
++  }
++
++  public setChangeCallback(callback: (() => void) | null): void {
++    this.changeCallback = callback;
++  }
++
++  public updateLegend(legend: LandCoverLegendData): void {
++    const lutData = new Uint8Array(256 * 256 * 4);
++    for (const entry of legend.entries) {
++      const classId = Number(entry.classId);
++      if (!Number.isSafeInteger(classId) || classId < 0 || classId > 0xffff) continue;
++      const offset = classId * 4;
++      lutData[offset] = clampByte(entry.colorRgba[0]);
++      lutData[offset + 1] = clampByte(entry.colorRgba[1]);
++      lutData[offset + 2] = clampByte(entry.colorRgba[2]);
++      lutData[offset + 3] = clampByte(entry.colorRgba[3]);
++    }
++
++    if (this.paletteTexture !== this.emptyPaletteTexture) this.paletteTexture.dispose();
++    this.paletteTexture = createPaletteTexture(lutData);
++    this.changeCallback?.();
++  }
++
++  /**
++   * Start a new coverage generation. Allocation is lazy until the first tile,
++   * because the binary tile itself is authoritative for layer dimensions.
++   */
++  public initGlobalBuffer(bounds: [number, number, number, number], resolution: number): void {
++    if (!validBounds(bounds) || !Number.isFinite(resolution) || resolution <= 0) return;
++    if (
++      this.requestedBounds
++      && sameBounds(this.requestedBounds, bounds)
++      && approximatelyEqual(this.requestedResolution, resolution)
++    ) {
++      return;
++    }
++
++    const pending = this.pendingTiles;
++    this.clearCoverage(false);
++    this.pendingTiles = pending;
++    this.requestedBounds = [...bounds] as [number, number, number, number];
++    this.requestedResolution = resolution;
++    this.globalResolution = resolution;
++    this.globalWidth = Math.max(1, Math.ceil((bounds[2] - bounds[0]) / resolution));
++    this.globalHeight = Math.max(1, Math.ceil((bounds[3] - bounds[1]) / resolution));
++
++    if (this.pendingTiles.length > 0) {
++      const queued = this.pendingTiles;
++      this.pendingTiles = [];
++      for (const tile of queued) this.addTile(tile);
++    }
++    this.changeCallback?.();
++  }
++
++  public addTile(tile: LandCoverTileData): boolean {
++    if (!validTile(tile)) {
++      console.warn("[LandCoverTextureManager] invalid categorical tile", tile.tileKey);
++      return false;
++    }
++
++    const resolutionX = (tile.bounds[2] - tile.bounds[0]) / tile.width;
++    const resolutionY = (tile.bounds[3] - tile.bounds[1]) / tile.height;
++    if (!approximatelyEqual(resolutionX, resolutionY)) {
++      console.warn("[LandCoverTextureManager] non-square categorical pixels", tile.tileKey);
++      return false;
++    }
++
++    if (!this.requestedBounds) {
++      // Normally surface_progress arrives first. Keep an early binary resource
++      // rather than inventing a tile-sized global frame.
++      this.pendingTiles.push(tile);
++      return true;
++    }
++    if (!approximatelyEqual(resolutionX, this.requestedResolution)) {
++      console.warn(
++        "[LandCoverTextureManager] tile/request resolution mismatch",
++        tile.tileKey,
++        resolutionX,
++        this.requestedResolution,
++      );
++      return false;
++    }
++
++    if (!this.activeCoverageTexture) this.allocateTileArray(tile, resolutionX, resolutionY);
++    if (!this.activeCoverageTexture || !this.classData) return false;
++    if (tile.width !== this.layerWidth || tile.height !== this.layerHeight) {
++      console.warn("[LandCoverTextureManager] inconsistent tile dimensions", tile.tileKey);
++      return false;
++    }
++
++    const column = Math.round((tile.bounds[0] - this.activeBounds.x) / this.tileWorldSize.x);
++    const row = Math.round((this.activeBounds.w - tile.bounds[3]) / this.tileWorldSize.y);
++    if (column < 0 || column >= this.gridColumns || row < 0 || row >= this.gridRows) return false;
++
++    const layer = row * this.gridColumns + column;
++    const layerSize = this.layerWidth * this.layerHeight;
++    this.classData.set(tile.data, layer * layerSize);
++
++    // Three.js r179 maps layerUpdates to a single texSubImage3D for the
++    // specified layer. Missing/unloaded layers remain zero => BASE fallback.
++    this.activeCoverageTexture.addLayerUpdate(layer);
++    this.activeCoverageTexture.needsUpdate = true;
++    this.changeCallback?.();
++    return true;
++  }
++
++  public clear(): void {
++    this.clearCoverage(true);
++    this.requestedBounds = null;
++    this.requestedResolution = 0;
++    this.globalResolution = 0;
++    this.globalWidth = 0;
++    this.globalHeight = 0;
++    this.changeCallback?.();
++  }
++
++  public dispose(): void {
++    this.clear();
++    if (this.paletteTexture !== this.emptyPaletteTexture) this.paletteTexture.dispose();
++    this.paletteTexture = this.emptyPaletteTexture;
++    this.emptyCoverageTexture.dispose();
++    this.emptyPaletteTexture.dispose();
++  }
++
++  private allocateTileArray(tile: LandCoverTileData, resolutionX: number, resolutionY: number): void {
++    if (!this.requestedBounds) return;
++    const tileWorldX = resolutionX * tile.width;
++    const tileWorldY = resolutionY * tile.height;
++    if (!(tileWorldX > 0) || !(tileWorldY > 0)) return;
++
++    const gridMinX = Math.floor(this.requestedBounds[0] / tileWorldX) * tileWorldX;
++    const gridMaxX = Math.ceil(this.requestedBounds[2] / tileWorldX) * tileWorldX;
++    const gridMinY = Math.floor(this.requestedBounds[1] / tileWorldY) * tileWorldY;
++    const gridMaxY = Math.ceil(this.requestedBounds[3] / tileWorldY) * tileWorldY;
++    const columns = Math.max(1, Math.round((gridMaxX - gridMinX) / tileWorldX));
++    const rows = Math.max(1, Math.round((gridMaxY - gridMinY) / tileWorldY));
++    const depth = columns * rows;
++
++    this.layerWidth = tile.width;
++    this.layerHeight = tile.height;
++    this.gridColumns = columns;
++    this.gridRows = rows;
++    this.tileWorldSize.set(tileWorldX, tileWorldY);
++    this.activeBounds.set(gridMinX, gridMinY, gridMaxX, gridMaxY);
++
++    const layerSize = tile.width * tile.height;
++    this.classData = new Uint16Array(layerSize * depth);
++    this.activeCoverageTexture = createClassArrayTexture(
++      this.classData,
++      tile.width,
++      tile.height,
++      depth,
++      false,
++    );
++  }
++
++  private clearCoverage(clearPending: boolean): void {
++    this.activeCoverageTexture?.dispose();
++    this.activeCoverageTexture = null;
++    this.classData = null;
++    this.layerWidth = 0;
++    this.layerHeight = 0;
++    this.gridColumns = 0;
++    this.gridRows = 0;
++    this.activeBounds.set(0, 0, 0, 0);
++    this.tileWorldSize.set(1, 1);
++    if (clearPending) this.pendingTiles = [];
++  }
++}
++
++function createClassArrayTexture(
++  data: Uint16Array,
++  width: number,
++  height: number,
++  depth: number,
++  uploadImmediately: boolean,
++): THREE.DataArrayTexture {
++  const texture = new THREE.DataArrayTexture(data, width, height, depth);
++  texture.format = THREE.RedIntegerFormat;
++  texture.type = THREE.UnsignedShortType;
++  texture.internalFormat = "R16UI";
++  texture.minFilter = THREE.NearestFilter;
++  texture.magFilter = THREE.NearestFilter;
++  texture.wrapS = THREE.ClampToEdgeWrapping;
++  texture.wrapT = THREE.ClampToEdgeWrapping;
++  texture.wrapR = THREE.ClampToEdgeWrapping;
++  texture.generateMipmaps = false;
++  texture.flipY = false;
++  texture.unpackAlignment = 1;
++  texture.colorSpace = THREE.NoColorSpace;
++  if (uploadImmediately) texture.needsUpdate = true;
++  return texture;
++}
++
++function createPaletteTexture(data: Uint8Array): THREE.DataTexture {
++  const texture = new THREE.DataTexture(
++    data,
++    256,
++    256,
++    THREE.RGBAFormat,
++    THREE.UnsignedByteType,
++  );
++  texture.minFilter = THREE.NearestFilter;
++  texture.magFilter = THREE.NearestFilter;
++  texture.wrapS = THREE.ClampToEdgeWrapping;
++  texture.wrapT = THREE.ClampToEdgeWrapping;
++  texture.generateMipmaps = false;
++  texture.flipY = false;
++  texture.unpackAlignment = 1;
++  texture.colorSpace = THREE.NoColorSpace;
++  texture.needsUpdate = true;
++  return texture;
++}
++
++function validTile(tile: LandCoverTileData): boolean {
++  return Number.isSafeInteger(tile.width)
++    && Number.isSafeInteger(tile.height)
++    && tile.width > 0
++    && tile.height > 0
++    && tile.data.length === tile.width * tile.height
++    && validBounds(tile.bounds);
++}
++
++function validBounds(bounds: readonly number[]): bounds is [number, number, number, number] {
++  return bounds.length === 4
++    && bounds.every(Number.isFinite)
++    && bounds[2]! > bounds[0]!
++    && bounds[3]! > bounds[1]!;
++}
++
++function sameBounds(a: readonly number[], b: readonly number[]): boolean {
++  return a.length === 4
++    && b.length === 4
++    && a.every((value, index) => approximatelyEqual(value, b[index]!));
++}
++
++function approximatelyEqual(a: number, b: number): boolean {
++  const tolerance = Math.max(1e-6, Math.max(Math.abs(a), Math.abs(b)) * 1e-7);
++  return Math.abs(a - b) <= tolerance;
++}
++
++function clampByte(value: number): number {
++  return Math.max(0, Math.min(255, Math.round(Number(value) || 0)));
++}
+diff --git a/frontend/src/view/ui/drawer_pages/EarthPage.ts b/frontend/src/view/ui/drawer_pages/EarthPage.ts
+index 674780f..d409c08 100644
+--- a/frontend/src/view/ui/drawer_pages/EarthPage.ts
++++ b/frontend/src/view/ui/drawer_pages/EarthPage.ts
+@@ -9,10 +9,22 @@ export interface EarthPageOptions {
+   onHorizonSettings?: (settings: HorizonSettings) => void;
+   onRegenerate?: (settings: HorizonSettings) => void;
+   onCancel?: () => void;
++  onSurfaceModeChanged?: (mode: string) => void;
+ }
+ 
+ const SETTINGS_DEBOUNCE_MS = 2_000;
+ 
++interface ProgressBlock {
++  element: HTMLDivElement;
++  update: (params: {
++    percent: number | null;
++    statusText: string;
++    detailsText: string;
++    isError: boolean;
++    isSuccess: boolean;
++  }) => void;
++}
++
+ /**
+  * Controls and reports the observer-centred terrain profile.
+  *
+@@ -28,11 +40,12 @@ export class EarthPage {
+   private readonly angularStepInput: HTMLInputElement;
+   private readonly angularStepValue: HTMLSpanElement;
+   private readonly observerStatus: HTMLDivElement;
+-  private readonly bakeStatus: HTMLDivElement;
+-  private readonly bakeDetail: HTMLDivElement;
+-  private readonly terrainSurfaceStatus: HTMLDivElement;
+-  private readonly progressBar: HTMLDivElement;
++  private readonly surfaceModeInput: HTMLSelectElement;
+   private readonly cancelButton: HTMLButtonElement;
++  
++  private readonly horizonProgress: ProgressBlock;
++  private readonly surfaceProgress: ProgressBlock;
++
+   private settingsTimer: ReturnType<typeof setTimeout> | null = null;
+ 
+   constructor(private readonly options: EarthPageOptions = {}) {
+@@ -145,36 +158,47 @@ export class EarthPage {
+     actionRow.append(regenerateButton, this.cancelButton);
+     horizonGroup.appendChild(actionRow);
+ 
+-    const progressTrack = document.createElement("div");
+-    progressTrack.style.cssText = `
+-      height: 3px;
+-      overflow: hidden;
+-      border-radius: 2px;
+-      background: var(--color-surface);
+-    `;
+-    this.progressBar = document.createElement("div");
+-    this.progressBar.style.cssText = `
+-      width: 0%;
+-      height: 100%;
+-      background: var(--color-gold);
+-      transition: width 120ms linear;
+-    `;
+-    progressTrack.appendChild(this.progressBar);
+-    horizonGroup.appendChild(progressTrack);
+-
+-    this.bakeStatus = document.createElement("div");
+-    this.bakeStatus.style.cssText = "font-size:10px;color:var(--color-text-bright);";
+-    this.bakeStatus.textContent = "El c├álcul comen├ºar├á autom├áticament quan el DEM estigui disponible.";
+-    this.bakeDetail = document.createElement("div");
+-    this.bakeDetail.style.cssText = "font-size:9px;line-height:1.45;color:var(--color-text-muted);overflow-wrap:anywhere;";
+-    horizonGroup.append(this.bakeStatus, this.bakeDetail);
++    this.horizonProgress = this.createProgressBlock();
++    this.horizonProgress.update({
++      percent: null,
++      statusText: "El c├álcul comen├ºar├á autom├áticament quan el DEM estigui disponible.",
++      detailsText: "",
++      isError: false,
++      isSuccess: false,
++    });
++    horizonGroup.appendChild(this.horizonProgress.element);
++
+     this.element.appendChild(horizonGroup);
+ 
+     const surfaceGroup = this.createGroup("Aspecte de la superf├¡cie");
+-    this.terrainSurfaceStatus = document.createElement("div");
+-    this.terrainSurfaceStatus.style.cssText = "font-size:10px;line-height:1.55;color:var(--color-text-muted);white-space:pre-line;";
+-    this.terrainSurfaceStatus.textContent = "Esperant la capa de superf├¡cie del terrenyÔÇª";
+-    surfaceGroup.appendChild(this.terrainSurfaceStatus);
++
++    const modeRow = this.createRow();
++    const modeLabel = document.createElement("label");
++    modeLabel.htmlFor = "earth-surface-mode";
++    modeLabel.textContent = "Estil visual";
++    this.surfaceModeInput = document.createElement("select");
++    this.surfaceModeInput.id = "earth-surface-mode";
++    this.surfaceModeInput.style.cssText = this.inputStyle();
++    this.surfaceModeInput.innerHTML = `
++      <option value="terrain-fallback" selected>Paleta base del relleu</option>
++      <option value="categorical">Cobertura categ├▓rica</option>
++    `;
++    this.surfaceModeInput.addEventListener("change", () => {
++      this.options.onSurfaceModeChanged?.(this.surfaceModeInput.value);
++    });
++    modeRow.append(modeLabel, this.surfaceModeInput);
++    surfaceGroup.appendChild(modeRow);
++
++    this.surfaceProgress = this.createProgressBlock();
++    this.surfaceProgress.update({
++      percent: null,
++      statusText: "Malla base (sense cobertura categ├▓rica).",
++      detailsText: "",
++      isError: false,
++      isSuccess: false,
++    });
++    surfaceGroup.appendChild(this.surfaceProgress.element);
++
+     this.element.appendChild(surfaceGroup);
+ 
+     this.updateControlLabels();
+@@ -204,9 +228,8 @@ export class EarthPage {
+   }
+ 
+   public updateHorizonStatus(status: HorizonStatusMessage): void {
+-    const progress = status.progress === null ? null : Math.max(0, Math.min(1, status.progress));
+-    this.progressBar.style.width = `${(progress ?? 0) * 100}%`;
+-
++    const progress = status.progress === null ? null : Math.max(0, Math.min(1, status.progress)) * 100;
++    
+     const phaseLabels: Record<HorizonStatusMessage["phase"], string> = {
+       queued: "C├álcul programat",
+       opening_source: "Obrint el terreny configurat",
+@@ -218,13 +241,6 @@ export class EarthPage {
+       fallback: "Sense DEM: perfil pla provisional",
+       error: "No sÔÇÖha pogut calcular el perfil",
+     };
+-    const percent = progress === null || status.phase === "completed"
+-      ? ""
+-      : ` ┬À ${(progress * 100).toFixed(0)}%`;
+-    this.bakeStatus.textContent = `${phaseLabels[status.phase]}${percent}`;
+-    this.bakeStatus.style.color = status.phase === "error"
+-      ? "#ff8a80"
+-      : status.phase === "completed" ? "#4ade80" : "var(--color-text-bright)";
+ 
+     const details: string[] = [];
+     if (status.quality) details.push(this.qualityLabel(status.quality));
+@@ -241,24 +257,62 @@ export class EarthPage {
+       details.push(`${status.sourceIds[0]}${status.sourceIds.length > 1 ? ` +${status.sourceIds.length - 1} fonts` : ""}`);
+     }
+     if (status.message) details.push(status.message);
+-    this.bakeDetail.textContent = details.join(" ┬À ");
++
++    this.horizonProgress.update({
++      percent: progress,
++      statusText: phaseLabels[status.phase],
++      detailsText: details.join(" ┬À "),
++      isError: status.phase === "error",
++      isSuccess: status.phase === "completed",
++    });
+ 
+     const busy = ["queued", "opening_source", "sampling", "reducing", "publishing"].includes(status.phase);
+     this.cancelButton.disabled = !busy;
+   }
+ 
+   /** Reports the configured appearance layer; it is separate from the DEM. */
+-  public updateTerrainSurface(metadata: { surfaceSource?: unknown; surfaceMode?: unknown; cleared?: unknown }): void {
+-    if (metadata.cleared === true) {
+-      this.terrainSurfaceStatus.textContent = "Sense malla DEM visible.";
++  public updateTerrainSurface(status: {
++    activeSource?: string;
++    phase?: string;
++    percent?: number;
++    cleared?: boolean;
++    completed?: boolean;
++    validTiles?: number;
++    emptyTiles?: number;
++    failedTiles?: number;
++    validPixels?: number;
++  }): void {
++    if (status.cleared === true) {
++      this.surfaceProgress.update({
++        percent: null,
++        statusText: "Malla base (sense cobertura categ├▓rica).",
++        detailsText: "",
++        isError: false,
++        isSuccess: false,
++      });
+       return;
+     }
+-    const source = String(metadata.surfaceSource ?? "Paleta base TerraLab");
+-    const categorical = metadata.surfaceMode === "categorical"
+-      || /clc|s2glc|land[ _-]?cover/i.test(source);
+-    this.terrainSurfaceStatus.textContent = categorical
+-      ? `Font: ${source}\nColors: classes de cobertura del s├▓l (no elevaci├│ ni il┬Àluminaci├│)`
+-      : `Font: ${source}\nColors: paleta base del terreny`;
++    
++    const isError = status.phase?.toLowerCase().includes("error") ?? false;
++    const isSuccess = status.completed === true 
++      && status.percent === 100 
++      && (status.validTiles ?? 0) > 0 
++      && (status.validPixels ?? 0) > 0 
++      && (status.failedTiles ?? 0) === 0;
++
++    const details: string[] = [];
++    if (status.activeSource) details.push(`Font: ${status.activeSource}`);
++    if (status.validTiles) details.push(`Tessel┬Àles: ${status.validTiles}`);
++    if (status.failedTiles) details.push(`Errors: ${status.failedTiles}`);
++    if (status.emptyTiles) details.push(`Buides: ${status.emptyTiles}`);
++
++    this.surfaceProgress.update({
++      percent: status.percent ?? null,
++      statusText: status.phase ? `Estat: ${status.phase}` : "Esperant dades...",
++      detailsText: details.join(" ┬À "),
++      isError: isError,
++      isSuccess: isSuccess,
++    });
+   }
+ 
+   public dispose(): void {
+@@ -361,4 +415,46 @@ export class EarthPage {
+   private inputStyle(): string {
+     return "background:var(--color-surface);color:var(--color-text-bright);border:1px solid var(--color-border);border-radius:4px;padding:2px 4px;font-size:10px;";
+   }
++
++  private createProgressBlock(): ProgressBlock {
++    const container = document.createElement("div");
++    container.style.cssText = "display:flex;flex-direction:column;gap:4px;margin-top:6px;";
++    
++    const statusLabel = document.createElement("div");
++    statusLabel.style.cssText = "font-size:10px;color:var(--color-text-bright);";
++    
++    const track = document.createElement("div");
++    track.style.cssText = "height:3px;overflow:hidden;border-radius:2px;background:var(--color-surface);margin-top:2px;";
++    
++    const progressBar = document.createElement("div");
++    progressBar.style.cssText = "width:0%;height:100%;background:var(--color-gold);transition:width 120ms linear;";
++    track.appendChild(progressBar);
++
++    const detailsLabel = document.createElement("div");
++    detailsLabel.style.cssText = "font-size:9px;line-height:1.45;color:var(--color-text-muted);overflow-wrap:anywhere;";
++    
++    container.append(statusLabel, track, detailsLabel);
++
++    return {
++      element: container,
++      update: (params) => {
++        let text = params.statusText;
++        if (params.percent !== null && params.percent < 100 && !params.isError && !params.isSuccess) {
++          text += ` ┬À ${params.percent.toFixed(0)}%`;
++        }
++        statusLabel.textContent = text;
++        statusLabel.style.color = params.isError ? "#ff8a80" : (params.isSuccess ? "#4ade80" : "var(--color-text-bright)");
++        detailsLabel.textContent = params.detailsText;
++        
++        progressBar.style.width = `${params.percent ?? 0}%`;
++        if (params.isError || params.percent === null) {
++          progressBar.style.background = "transparent";
++        } else if (params.isSuccess) {
++          progressBar.style.background = "#4ade80";
++        } else {
++          progressBar.style.background = "var(--color-gold)";
++        }
++      }
++    };
++  }
+ }

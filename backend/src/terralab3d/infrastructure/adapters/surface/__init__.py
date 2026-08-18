@@ -5,9 +5,11 @@ from .adapter import (
     ResolvedLandCoverSource,
     SurfaceVertexSamples,
 )
+from .land_cover_port import RasterioLandCoverPort
 
 __all__ = (
     "ConfiguredSurfaceSampler",
     "ResolvedLandCoverSource",
     "SurfaceVertexSamples",
+    "RasterioLandCoverPort",
 )

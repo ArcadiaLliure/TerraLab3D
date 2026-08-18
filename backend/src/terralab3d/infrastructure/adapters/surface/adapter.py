@@ -101,34 +101,33 @@ class ConfiguredSurfaceSampler:
         self._config_paths = config_paths
         self._transformers: dict[str, Transformer] = {}
 
-    def resolve_land_cover_source(self) -> ResolvedLandCoverSource | None:
-        """Resolve the configured land-cover source to concrete raster files.
-
-        Selection contract:
-        1. Read ``<data_root>/config/data_sources.json`` first.
-        2. Read ``selections.land_cover``.
-        3. In manual mode, use exactly its ``source_id``.
-        4. Resolve ``metadata.rasters[*].paths`` and/or the configured path.
-        5. Inspect the actual raster with Rasterio.
-
-        ``selections.surface`` is intentionally *not* consulted here: that is a
-        legacy Pas-16 key and would make land-cover selection ambiguous.
-        """
+    def resolve_land_cover_source(
+        self,
+        override_mode: str | None = None,
+        override_source_id: str | None = None,
+    ) -> ResolvedLandCoverSource | None:
+        """Resolve the configured land-cover source to concrete raster files."""
 
         payload, config_path = self._load_config_with_path()
         if config_path is None:
-            log.warning("MGP: [surface.adapter] [No s'ha trobat data_sources.json]")
+            log.warning("No s'ha trobat data_sources.json")
             return None
 
         raw_sources = payload.get("sources", []) if isinstance(payload, dict) else []
         if not isinstance(raw_sources, list):
             return None
 
-        selection = self._selection(payload, "land_cover")
-        mode = str(selection.get("mode", "automatic")).strip().lower()
-        selected_id = str(selection.get("source_id") or "").strip()
+        selections = payload.get("selections", {})
+        if not isinstance(selections, dict):
+            selections = {}
+        land_cover = selections.get("land_cover", {})
+        if not isinstance(land_cover, dict):
+            land_cover = {}
 
-        candidates: list[tuple[dict[str, object], tuple[Path, ...]]] = []
+        mode = override_mode if override_mode else str(land_cover.get("mode", "automatic")).strip().lower()
+        selected_id = override_source_id if override_source_id is not None else str(land_cover.get("source_id") or "").strip()
+
+        candidates = []
         for raw in raw_sources:
             if not isinstance(raw, dict) or not bool(raw.get("enabled", True)):
                 continue
@@ -138,42 +137,42 @@ class ConfiguredSurfaceSampler:
             source_id = str(raw.get("id", "")).strip()
             if not source_id:
                 continue
+            
             if mode == "manual" and source_id != selected_id:
                 continue
-            raster_paths = self._raster_paths(raw, config_path)
-            if not raster_paths:
-                continue
-            candidates.append((raw, raster_paths))
+                
+            candidates.append(raw)
 
         if mode == "manual" and selected_id and not candidates:
-            log.error(
-                "MGP: [surface.adapter] [Land cover manual no resolt source_id=%s config=%s]",
-                selected_id,
-                config_path,
-            )
+            log.error("Font manual %s no existeix a %s", selected_id, config_path)
             return None
 
         if not candidates:
-            log.warning(
-                "MGP: [surface.adapter] [Cap font categòrica utilitzable config=%s]",
-                config_path,
-            )
+            log.warning("Cap font categòrica disponible a %s", config_path)
             return None
 
-        candidates.sort(key=lambda item: self._source_sort_key(item[0]))
-        raw, raster_paths = candidates[0]
-        source_id = str(raw.get("id", "")).strip()
-        display_name = str(raw.get("display_name") or source_id)
-        layer_type = str(raw.get("layer_type", "")).strip().lower()
-        coverage = self._coverage(raw.get("coverage"))
-        priority = self._int_or(raw.get("priority"), 0)
-        legend_id = self._legend_id(raw)
+        candidates.sort(key=lambda c: self._source_sort_key(c))
+        selected_raw = candidates[0]
+        source_id = str(selected_raw.get("id", "")).strip()
+        display_name = str(selected_raw.get("display_name") or source_id)
+        layer_type = str(selected_raw.get("layer_type", "")).strip().lower()
+        coverage = self._coverage(selected_raw.get("coverage"))
+        priority = self._int_or(selected_raw.get("priority"), 0)
+        
+        legend_id = self._legend_id(selected_raw)
+        if not legend_id and "s2glc" in source_id.lower():
+            legend_id = "s2glc_europe_2017"
+        
+        raster_paths = self._raster_paths(selected_raw, config_path)
+        if not raster_paths:
+            log.error("Cap fitxer raster resolt per a %s", source_id)
+            return None
 
-        configured_resolution = self._positive_float(raw.get("resolution_m"))
+        configured_resolution = self._positive_float(selected_raw.get("resolution_m"))
         selected_raster: Path | None = None
         selected_crs = ""
         selected_resolution = configured_resolution
-        selected_nodata: float | int | None = None
+        selected_nodata = None
 
         for raster_path in raster_paths:
             try:
@@ -185,24 +184,25 @@ class ConfiguredSurfaceSampler:
                         selected_resolution = self._dataset_resolution_hint(dataset)
                     break
             except (OSError, rasterio.errors.RasterioError) as exc:
-                log.warning(
-                    "MGP: [surface.adapter] [Raster categòric no obrible path=%s error=%s]",
-                    raster_path,
-                    exc,
-                )
+                log.warning("No es pot obrir %s: %s", raster_path, exc)
 
         if selected_raster is None:
-            log.error(
-                "MGP: [surface.adapter] [Cap raster categòric obrible source_id=%s config=%s]",
-                source_id,
-                config_path,
-            )
+            log.error("Cap raster s'ha pogut obrir per a %s", source_id)
             return None
 
-        ordered_paths = (selected_raster,) + tuple(
-            path for path in raster_paths if path != selected_raster
+        ordered_paths = (selected_raster,) + tuple(p for p in raster_paths if p != selected_raster)
+
+        log.info(
+            "LAND COVER RESOLT: source_id='%s', config='%s', raster='%s', crs='%s', resolution=%.6f, nodata=%s",
+            source_id,
+            config_path,
+            selected_raster,
+            selected_crs,
+            selected_resolution,
+            selected_nodata,
         )
-        resolved = ResolvedLandCoverSource(
+
+        return ResolvedLandCoverSource(
             source_id=source_id,
             display_name=display_name,
             config_path=config_path,
@@ -215,18 +215,7 @@ class ConfiguredSurfaceSampler:
             coverage=coverage,
             priority=priority,
         )
-        log.info(
-            "MGP: [surface.adapter] [Land cover seleccionat "
-            "id=%s config=%s raster=%s crs=%s resolution_m=%.6f nodata=%s legend=%s]",
-            resolved.source_id,
-            resolved.config_path,
-            resolved.raster_paths[0],
-            resolved.crs or "desconegut",
-            resolved.resolution_m,
-            resolved.nodata,
-            resolved.legend_id or "sense-llegenda",
-        )
-        return resolved
+
 
     def sample(
         self,

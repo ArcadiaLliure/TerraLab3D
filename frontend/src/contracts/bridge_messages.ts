@@ -43,6 +43,11 @@ export interface FrontendReadyMessage {
   readonly protocolVersion: 2;
 }
 
+export interface SetSurfaceModeMessage {
+  readonly type: "set_surface_mode";
+  readonly mode: string;
+}
+
 export interface CameraChangedMessage {
   readonly type: "camera_changed";
   readonly azimuthDeg: number;
@@ -189,6 +194,21 @@ export interface CameraResetCompletedMessage {
 }
 
 // ─── Star Picking messages (Pas 6) ───────────────────────────────────
+
+export interface SurfaceProgressMessage {
+  readonly type: "surface_progress";
+  readonly tilesAvailable: number;
+  readonly tilesLoaded: number;
+}
+
+export interface LandCoverLegendMessage {
+  readonly type: "land_cover_legend";
+  readonly legendId: string;
+  readonly entries: Array<{
+    classId: number;
+    colorRgba: [number, number, number, number];
+  }>;
+}
 
 export interface ResolveStarPickMessage {
   readonly type: "resolve_star_pick";
@@ -356,6 +376,7 @@ export interface ClearStarTrailsMessage {
 
 export type FrontendMessage =
   | FrontendReadyMessage
+  | SetSurfaceModeMessage
   | CameraChangedMessage
   | ViewportResizedMessage
   | ShutdownCompleteMessage
@@ -625,7 +646,9 @@ export type BackendMessage =
   | ResourceCatalogSnapshotMessage
   | AstronomicalSearchResultMessage
   | StarTrailsSnapshotMessage
-  | HorizonStatusMessage;
+  | HorizonStatusMessage
+  | SurfaceProgressMessage
+  | LandCoverLegendMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

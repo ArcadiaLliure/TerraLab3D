@@ -206,7 +206,7 @@ export class LandCoverTextureManager {
       tile.width,
       tile.height,
       depth,
-      false,
+      true,
     );
   }
 
@@ -231,7 +231,7 @@ function createClassArrayTexture(
   depth: number,
   uploadImmediately: boolean,
 ): THREE.DataArrayTexture {
-  const texture = new THREE.DataArrayTexture(data, width, height, depth);
+  const texture = new THREE.DataArrayTexture(data as any, width, height, depth);
   texture.format = THREE.RedIntegerFormat;
   texture.type = THREE.UnsignedShortType;
   texture.internalFormat = "R16UI";
@@ -239,7 +239,7 @@ function createClassArrayTexture(
   texture.magFilter = THREE.NearestFilter;
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
-  texture.wrapR = THREE.ClampToEdgeWrapping;
+  texture.wrapR = THREE.ClampToEdgeWrapping as any;
   texture.generateMipmaps = false;
   texture.flipY = false;
   texture.unpackAlignment = 1;

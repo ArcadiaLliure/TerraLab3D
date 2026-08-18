@@ -98,6 +98,8 @@ export interface BackendMessageListener {
   onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
   onSkyEnvironmentSnapshot?(snapshot: import("../contracts/sky_environment_contracts").SkyEnvironmentSnapshot): void;
   onSolarSystemSnapshot?(snapshot: SolarSystemSnapshot): void;
+  onSurfaceProgress?(msg: any): void;
+  onLandCoverLegend?(msg: any): void;
   onLightingEnvironmentSnapshot?(snapshot: LightingEnvironmentSnapshot): void;
   onMoonSurfaceResource?(resource: MoonSurfaceResourceDescriptor): void;
   onPlanetTextureManifest?(manifest: PlanetTextureManifest): void;
@@ -262,6 +264,10 @@ export class WebSocketBridge {
 
   cancelHorizon(): void {
     this.sendMessage({ type: "cancel_horizon" });
+  }
+
+  sendSurfaceMode(mode: string): void {
+    this.sendMessage({ type: "set_surface_mode", mode });
   }
 
   private shutdownRequested = false;
@@ -484,6 +490,16 @@ export class WebSocketBridge {
       case "navigation_coordinates_changed":
         for (const l of this.messageListeners) {
           l.onNavigationCoordinatesChanged?.(msg.lat, msg.lon);
+        }
+        break;
+      case "surface_progress":
+        for (const l of this.messageListeners) {
+          l.onSurfaceProgress?.(msg);
+        }
+        break;
+      case "land_cover_legend":
+        for (const l of this.messageListeners) {
+          l.onLandCoverLegend?.(msg);
         }
         break;
       default:

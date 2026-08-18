@@ -9,9 +9,21 @@ export interface EarthPageOptions {
   onHorizonSettings?: (settings: HorizonSettings) => void;
   onRegenerate?: (settings: HorizonSettings) => void;
   onCancel?: () => void;
+  onSurfaceModeChanged?: (mode: string) => void;
 }
 
 const SETTINGS_DEBOUNCE_MS = 2_000;
+
+interface ProgressBlock {
+  element: HTMLDivElement;
+  update: (params: {
+    percent: number | null;
+    statusText: string;
+    detailsText: string;
+    isError: boolean;
+    isSuccess: boolean;
+  }) => void;
+}
 
 /**
  * Controls and reports the observer-centred terrain profile.
@@ -28,11 +40,12 @@ export class EarthPage {
   private readonly angularStepInput: HTMLInputElement;
   private readonly angularStepValue: HTMLSpanElement;
   private readonly observerStatus: HTMLDivElement;
-  private readonly bakeStatus: HTMLDivElement;
-  private readonly bakeDetail: HTMLDivElement;
-  private readonly terrainSurfaceStatus: HTMLDivElement;
-  private readonly progressBar: HTMLDivElement;
+  private readonly surfaceModeInput: HTMLSelectElement;
   private readonly cancelButton: HTMLButtonElement;
+  
+  private readonly horizonProgress: ProgressBlock;
+  private readonly surfaceProgress: ProgressBlock;
+
   private settingsTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private readonly options: EarthPageOptions = {}) {
@@ -145,36 +158,47 @@ export class EarthPage {
     actionRow.append(regenerateButton, this.cancelButton);
     horizonGroup.appendChild(actionRow);
 
-    const progressTrack = document.createElement("div");
-    progressTrack.style.cssText = `
-      height: 3px;
-      overflow: hidden;
-      border-radius: 2px;
-      background: var(--color-surface);
-    `;
-    this.progressBar = document.createElement("div");
-    this.progressBar.style.cssText = `
-      width: 0%;
-      height: 100%;
-      background: var(--color-gold);
-      transition: width 120ms linear;
-    `;
-    progressTrack.appendChild(this.progressBar);
-    horizonGroup.appendChild(progressTrack);
+    this.horizonProgress = this.createProgressBlock();
+    this.horizonProgress.update({
+      percent: null,
+      statusText: "El càlcul començarà automàticament quan el DEM estigui disponible.",
+      detailsText: "",
+      isError: false,
+      isSuccess: false,
+    });
+    horizonGroup.appendChild(this.horizonProgress.element);
 
-    this.bakeStatus = document.createElement("div");
-    this.bakeStatus.style.cssText = "font-size:10px;color:var(--color-text-bright);";
-    this.bakeStatus.textContent = "El càlcul començarà automàticament quan el DEM estigui disponible.";
-    this.bakeDetail = document.createElement("div");
-    this.bakeDetail.style.cssText = "font-size:9px;line-height:1.45;color:var(--color-text-muted);overflow-wrap:anywhere;";
-    horizonGroup.append(this.bakeStatus, this.bakeDetail);
     this.element.appendChild(horizonGroup);
 
     const surfaceGroup = this.createGroup("Aspecte de la superfície");
-    this.terrainSurfaceStatus = document.createElement("div");
-    this.terrainSurfaceStatus.style.cssText = "font-size:10px;line-height:1.55;color:var(--color-text-muted);white-space:pre-line;";
-    this.terrainSurfaceStatus.textContent = "Esperant la capa de superfície del terreny…";
-    surfaceGroup.appendChild(this.terrainSurfaceStatus);
+
+    const modeRow = this.createRow();
+    const modeLabel = document.createElement("label");
+    modeLabel.htmlFor = "earth-surface-mode";
+    modeLabel.textContent = "Estil visual";
+    this.surfaceModeInput = document.createElement("select");
+    this.surfaceModeInput.id = "earth-surface-mode";
+    this.surfaceModeInput.style.cssText = this.inputStyle();
+    this.surfaceModeInput.innerHTML = `
+      <option value="terrain-fallback" selected>Paleta base del relleu</option>
+      <option value="categorical">Cobertura categòrica</option>
+    `;
+    this.surfaceModeInput.addEventListener("change", () => {
+      this.options.onSurfaceModeChanged?.(this.surfaceModeInput.value);
+    });
+    modeRow.append(modeLabel, this.surfaceModeInput);
+    surfaceGroup.appendChild(modeRow);
+
+    this.surfaceProgress = this.createProgressBlock();
+    this.surfaceProgress.update({
+      percent: null,
+      statusText: "Malla base (sense cobertura categòrica).",
+      detailsText: "",
+      isError: false,
+      isSuccess: false,
+    });
+    surfaceGroup.appendChild(this.surfaceProgress.element);
+
     this.element.appendChild(surfaceGroup);
 
     this.updateControlLabels();
@@ -204,9 +228,8 @@ export class EarthPage {
   }
 
   public updateHorizonStatus(status: HorizonStatusMessage): void {
-    const progress = status.progress === null ? null : Math.max(0, Math.min(1, status.progress));
-    this.progressBar.style.width = `${(progress ?? 0) * 100}%`;
-
+    const progress = status.progress === null ? null : Math.max(0, Math.min(1, status.progress)) * 100;
+    
     const phaseLabels: Record<HorizonStatusMessage["phase"], string> = {
       queued: "Càlcul programat",
       opening_source: "Obrint el terreny configurat",
@@ -218,13 +241,6 @@ export class EarthPage {
       fallback: "Sense DEM: perfil pla provisional",
       error: "No s’ha pogut calcular el perfil",
     };
-    const percent = progress === null || status.phase === "completed"
-      ? ""
-      : ` · ${(progress * 100).toFixed(0)}%`;
-    this.bakeStatus.textContent = `${phaseLabels[status.phase]}${percent}`;
-    this.bakeStatus.style.color = status.phase === "error"
-      ? "#ff8a80"
-      : status.phase === "completed" ? "#4ade80" : "var(--color-text-bright)";
 
     const details: string[] = [];
     if (status.quality) details.push(this.qualityLabel(status.quality));
@@ -241,24 +257,62 @@ export class EarthPage {
       details.push(`${status.sourceIds[0]}${status.sourceIds.length > 1 ? ` +${status.sourceIds.length - 1} fonts` : ""}`);
     }
     if (status.message) details.push(status.message);
-    this.bakeDetail.textContent = details.join(" · ");
+
+    this.horizonProgress.update({
+      percent: progress,
+      statusText: phaseLabels[status.phase],
+      detailsText: details.join(" · "),
+      isError: status.phase === "error",
+      isSuccess: status.phase === "completed",
+    });
 
     const busy = ["queued", "opening_source", "sampling", "reducing", "publishing"].includes(status.phase);
     this.cancelButton.disabled = !busy;
   }
 
   /** Reports the configured appearance layer; it is separate from the DEM. */
-  public updateTerrainSurface(metadata: { surfaceSource?: unknown; surfaceMode?: unknown; cleared?: unknown }): void {
-    if (metadata.cleared === true) {
-      this.terrainSurfaceStatus.textContent = "Sense malla DEM visible.";
+  public updateTerrainSurface(status: {
+    activeSource?: string;
+    phase?: string;
+    percent?: number;
+    cleared?: boolean;
+    completed?: boolean;
+    validTiles?: number;
+    emptyTiles?: number;
+    failedTiles?: number;
+    validPixels?: number;
+  }): void {
+    if (status.cleared === true) {
+      this.surfaceProgress.update({
+        percent: null,
+        statusText: "Malla base (sense cobertura categòrica).",
+        detailsText: "",
+        isError: false,
+        isSuccess: false,
+      });
       return;
     }
-    const source = String(metadata.surfaceSource ?? "Paleta base TerraLab");
-    const categorical = metadata.surfaceMode === "categorical"
-      || /clc|s2glc|land[ _-]?cover/i.test(source);
-    this.terrainSurfaceStatus.textContent = categorical
-      ? `Font: ${source}\nColors: classes de cobertura del sòl (no elevació ni il·luminació)`
-      : `Font: ${source}\nColors: paleta base del terreny`;
+    
+    const isError = status.phase?.toLowerCase().includes("error") ?? false;
+    const isSuccess = status.completed === true 
+      && status.percent === 100 
+      && (status.validTiles ?? 0) > 0 
+      && (status.validPixels ?? 0) > 0 
+      && (status.failedTiles ?? 0) === 0;
+
+    const details: string[] = [];
+    if (status.activeSource) details.push(`Font: ${status.activeSource}`);
+    if (status.validTiles) details.push(`Tessel·les: ${status.validTiles}`);
+    if (status.failedTiles) details.push(`Errors: ${status.failedTiles}`);
+    if (status.emptyTiles) details.push(`Buides: ${status.emptyTiles}`);
+
+    this.surfaceProgress.update({
+      percent: status.percent ?? null,
+      statusText: status.phase ? `Estat: ${status.phase}` : "Esperant dades...",
+      detailsText: details.join(" · "),
+      isError: isError,
+      isSuccess: isSuccess,
+    });
   }
 
   public dispose(): void {
@@ -360,5 +414,47 @@ export class EarthPage {
 
   private inputStyle(): string {
     return "background:var(--color-surface);color:var(--color-text-bright);border:1px solid var(--color-border);border-radius:4px;padding:2px 4px;font-size:10px;";
+  }
+
+  private createProgressBlock(): ProgressBlock {
+    const container = document.createElement("div");
+    container.style.cssText = "display:flex;flex-direction:column;gap:4px;margin-top:6px;";
+    
+    const statusLabel = document.createElement("div");
+    statusLabel.style.cssText = "font-size:10px;color:var(--color-text-bright);";
+    
+    const track = document.createElement("div");
+    track.style.cssText = "height:3px;overflow:hidden;border-radius:2px;background:var(--color-surface);margin-top:2px;";
+    
+    const progressBar = document.createElement("div");
+    progressBar.style.cssText = "width:0%;height:100%;background:var(--color-gold);transition:width 120ms linear;";
+    track.appendChild(progressBar);
+
+    const detailsLabel = document.createElement("div");
+    detailsLabel.style.cssText = "font-size:9px;line-height:1.45;color:var(--color-text-muted);overflow-wrap:anywhere;";
+    
+    container.append(statusLabel, track, detailsLabel);
+
+    return {
+      element: container,
+      update: (params) => {
+        let text = params.statusText;
+        if (params.percent !== null && params.percent < 100 && !params.isError && !params.isSuccess) {
+          text += ` · ${params.percent.toFixed(0)}%`;
+        }
+        statusLabel.textContent = text;
+        statusLabel.style.color = params.isError ? "#ff8a80" : (params.isSuccess ? "#4ade80" : "var(--color-text-bright)");
+        detailsLabel.textContent = params.detailsText;
+        
+        progressBar.style.width = `${params.percent ?? 0}%`;
+        if (params.isError || params.percent === null) {
+          progressBar.style.background = "transparent";
+        } else if (params.isSuccess) {
+          progressBar.style.background = "#4ade80";
+        } else {
+          progressBar.style.background = "var(--color-gold)";
+        }
+      }
+    };
   }
 }

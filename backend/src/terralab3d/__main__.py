@@ -239,6 +239,90 @@ async def run() -> int:
         publish_horizon_profile,
         bridge.send_horizon_status,
     )
+
+    from terralab3d.infrastructure.adapters.surface.adapter import ConfiguredSurfaceSampler
+    from terralab3d.infrastructure.adapters.surface.land_cover_port import RasterioLandCoverPort
+    from terralab3d.application.land_cover_coordinator import LandCoverCoordinator
+
+    land_cover_sampler = ConfiguredSurfaceSampler()
+    land_cover_port = RasterioLandCoverPort(land_cover_sampler)
+    land_cover_coordinator = LandCoverCoordinator(land_cover_port)
+
+    async def _publish_land_cover_tile(tile) -> None:
+        metadata = {
+            "role": "land_cover_tile",
+            "resourceId": tile.resource_id,
+            "version": tile.provenance.version,
+            "bounds": [tile.min_x, tile.min_y, tile.max_x, tile.max_y],
+            "width": tile.width,
+            "height": tile.height,
+            "resolution": tile.resolution,
+            "sourceId": tile.provenance.source_id,
+            "legendId": tile.legend_id,
+            "nodataValue": 0,
+            "dtype": "uint16",
+            "validPixels": tile.valid_pixels,
+        }
+        await bridge.send_binary_resource(tile.resource_id, str(tile.provenance.version), metadata, tile.class_buffer)
+
+    async def _publish_land_cover_legend(legend) -> None:
+        await bridge.send({
+            "type": "land_cover_legend",
+            "legendId": legend.legend_id,
+            "entries": [
+                {"classId": entry.class_id, "colorRgba": entry.color_rgba}
+                for entry in legend.entries
+            ],
+        })
+
+    async def _publish_land_cover_status(status) -> None:
+        status["type"] = "surface_progress"
+        await bridge.send(status)
+
+    def _sync_publish_land_cover_tile(tile) -> None:
+        if not bridge.shutdown_event.is_set():
+            asyncio.run_coroutine_threadsafe(_publish_land_cover_tile(tile), loop)
+
+    def _sync_publish_land_cover_legend(legend) -> None:
+        if not bridge.shutdown_event.is_set():
+            asyncio.run_coroutine_threadsafe(_publish_land_cover_legend(legend), loop)
+
+    def _sync_publish_land_cover_status(status) -> None:
+        if not bridge.shutdown_event.is_set():
+            asyncio.run_coroutine_threadsafe(_publish_land_cover_status(status), loop)
+
+    land_cover_coordinator.set_callbacks(
+        progress_callback=_sync_publish_land_cover_status,
+        tile_callback=_sync_publish_land_cover_tile,
+        legend_callback=_sync_publish_land_cover_legend,
+    )
+
+    current_surface_mode = "terrain-fallback"
+
+    async def _handle_set_surface_mode(data: dict[str, Any]) -> None:
+        nonlocal current_surface_mode
+        mode = data.get("mode", "terrain-fallback")
+        current_surface_mode = mode
+        if mode == "terrain-fallback":
+            land_cover_coordinator.cancel()
+            await bridge.send({"type": "surface_progress", "cleared": True})
+        elif mode == "categorical":
+            aeqd_crs = (
+                f"+proj=aeqd +lat_0={terrain_world_observer.location.latitude_deg} "
+                f"+lon_0={terrain_world_observer.location.longitude_deg} "
+                f"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+            )
+            land_cover_coordinator.request_coverage(
+                center_x=terrain_stream_center_east_m,
+                center_y=terrain_stream_center_north_m,
+                radius_m=max(100.0, terrain_stream_radius_m),
+                resolution_m=10.0,
+                crs=aeqd_crs,
+                mode="categorical",
+            )
+            
+    bridge.on("set_surface_mode", _handle_set_surface_mode)
+
     terrain_stream_builder = TerrainMeshBuilder(elevation_adapter, camera_horizon_projector)
     terrain_stream_task: asyncio.Task[None] | None = None
     terrain_stream_cancel: threading.Event | None = None
@@ -300,6 +384,8 @@ async def run() -> int:
         nonlocal terrain_stream_center_east_m, terrain_stream_center_north_m
         nonlocal terrain_stream_radius_m
         nonlocal terrain_stream_velocity_east_mps, terrain_stream_velocity_north_mps
+        
+        land_cover_coordinator.cancel()
         terrain_stream_generation += 1
         if terrain_stream_cancel is not None:
             terrain_stream_cancel.set()
@@ -482,6 +568,21 @@ async def run() -> int:
         terrain_stream_task = asyncio.create_task(
             build_and_publish(), name=f"terrain-visual-stream-{generation}",
         )
+
+        if current_surface_mode == "categorical":
+            aeqd_crs = (
+                f"+proj=aeqd +lat_0={terrain_world_observer.location.latitude_deg} "
+                f"+lon_0={terrain_world_observer.location.longitude_deg} "
+                f"+x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+            )
+            land_cover_coordinator.request_coverage(
+                center_x=target_east_m,
+                center_y=target_north_m,
+                radius_m=requested_radius_m,
+                resolution_m=10.0,
+                crs=aeqd_crs,
+                mode="categorical",
+            )
 
     async def broadcast_location(
         observer: ObserverProfile | None = None,

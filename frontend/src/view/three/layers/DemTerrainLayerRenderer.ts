@@ -298,7 +298,7 @@ export class DemTerrainLayerRenderer {
     return material;
   }
 
-  private patchTerrainShader(shader: THREE.Shader): void {
+  private patchTerrainShader(shader: Parameters<THREE.MeshStandardMaterial['onBeforeCompile']>[0]): void {
     shader.uniforms.landCoverTex = this.surfaceUniforms.landCoverTex;
     shader.uniforms.landCoverLUT = this.surfaceUniforms.landCoverLUT;
     shader.uniforms.landCoverBounds = this.surfaceUniforms.landCoverBounds;

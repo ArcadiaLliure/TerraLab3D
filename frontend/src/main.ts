@@ -259,6 +259,7 @@ function main(): void {
       bridge.recalculateHorizon();
     },
     onCancel: () => bridge.cancelHorizon(),
+    onSurfaceModeChanged: (mode) => bridge.sendSurfaceMode(mode),
   });
   const earthContainer = shell.getPageContainer("earth");
   if (earthContainer) earthPage.mount(earthContainer);
@@ -518,6 +519,15 @@ function main(): void {
     onStarCatalogStatus(status) {
       skyPage.updateStarCatalogStatus(status);
     },
+    onSurfaceProgress(msg) {
+      if (msg.cleared === true) {
+        sceneHost.getDemTerrainLayerRenderer().landCoverManager.clear();
+      }
+      earthPage.updateTerrainSurface(msg);
+    },
+    onLandCoverLegend(msg) {
+      sceneHost.getDemTerrainLayerRenderer().landCoverManager.updateLegend(msg);
+    },
     onCelestialFrameTransform(generation, matrix3x3) {
       celestialTransformState.update(generation, matrix3x3 as number[]);
     },
@@ -542,6 +552,13 @@ function main(): void {
           );
           earthPage.updateTerrainSurface(metadata);
         }
+        return;
+      }
+      if (metadata.role === "land_cover_tile") {
+        sceneHost.getDemTerrainLayerRenderer().landCoverManager.addTile({
+          ...metadata,
+          data: new Uint16Array(bufferPayload),
+        } as any);
         return;
       }
       if (metadata.role === "solar_system_orbit") {
