@@ -33,11 +33,13 @@ class RasterioLandCoverPort(LandCoverPort):
         self._sampler = sampler
 
     def read_tile(self, request: LandCoverTileRequest) -> LandCoverTile | None:
+        log.info("MGP: RasterioLandCoverPort.read_tile [INICI]")
         resolved = self._sampler.resolve_land_cover_source(
             override_mode=request.source_mode,
             override_source_id=request.source_id,
         )
         if not resolved or not resolved.raster_paths:
+            log.info("MGP: RasterioLandCoverPort.read_tile [FI]")
             return None
 
         # Definim l'espai de destinació
@@ -62,10 +64,17 @@ class RasterioLandCoverPort(LandCoverPort):
         
         valid_pixels = 0
         
+        log.debug("MGP: [land_cover_port] Resolved %d raster paths for source %s", len(resolved.raster_paths), resolved.source_id)
+        log.debug("MGP: [land_cover_port] Destination bounding box: (%.2f, %.2f, %.2f, %.2f) with shape (%d, %d)",
+                 request.min_x, request.min_y, request.max_x, request.max_y, height, width)
+
         for raster_path in resolved.raster_paths:
             try:
                 with rasterio.open(raster_path) as src:
                     src_nodata = src.nodata
+                    log.debug("MGP: [land_cover_port] Reading %s with nodata=%s. Dest CRS='%s'",
+                             raster_path, src_nodata, request.crs)
+                    
                     # Reproject només Resampling.nearest per preservar IDs categòrics
                     reproject(
                         source=rasterio.band(src, 1),
@@ -93,7 +102,7 @@ class RasterioLandCoverPort(LandCoverPort):
                 
         valid_pixels = int(np.count_nonzero(dst_array))
         
-        return LandCoverTile(
+        tile = LandCoverTile(
             resource_id=f"landcover_{resolved.source_id}",
             provenance=LandCoverProvenance(
                 source_id=resolved.source_id,
@@ -111,30 +120,36 @@ class RasterioLandCoverPort(LandCoverPort):
             valid_pixels=valid_pixels,
             class_buffer=dst_array.tobytes(),
         )
+        log.info("MGP: RasterioLandCoverPort.read_tile [FI]")
+        return tile
 
     def legend(self, legend_id: str) -> LandCoverLegend | None:
+        log.info("MGP: RasterioLandCoverPort.legend [INICI]")
         if legend_id != "s2glc_europe_2017":
+            log.info("MGP: RasterioLandCoverPort.legend [FI]")
             return None
 
-        return LandCoverLegend(
+        res = LandCoverLegend(
             legend_id=legend_id,
             entries=(
-                LandCoverLegendEntry(class_id=0, color_rgba=(0, 0, 0, 0)),
-                LandCoverLegendEntry(class_id=62, color_rgba=(210, 0, 0, 255)),
-                LandCoverLegendEntry(class_id=73, color_rgba=(253, 211, 39, 255)),
-                LandCoverLegendEntry(class_id=82, color_rgba=(176, 91, 16, 255)),
-                LandCoverLegendEntry(class_id=83, color_rgba=(35, 152, 0, 255)),
-                LandCoverLegendEntry(class_id=102, color_rgba=(8, 98, 0, 255)),
-                LandCoverLegendEntry(class_id=103, color_rgba=(128, 255, 0, 255)),
-                LandCoverLegendEntry(class_id=104, color_rgba=(141, 139, 0, 255)),
-                LandCoverLegendEntry(class_id=105, color_rgba=(95, 53, 7, 255)),
-                LandCoverLegendEntry(class_id=106, color_rgba=(43, 115, 149, 255)),
-                LandCoverLegendEntry(class_id=121, color_rgba=(79, 79, 79, 255)),
-                LandCoverLegendEntry(class_id=123, color_rgba=(204, 204, 204, 255)),
-                LandCoverLegendEntry(class_id=162, color_rgba=(255, 255, 255, 255)),
-                LandCoverLegendEntry(class_id=211, color_rgba=(0, 50, 200, 255)),
+                LandCoverLegendEntry(class_id=0, name="Sense dades", color_rgba=(0, 0, 0, 0)),
+                LandCoverLegendEntry(class_id=62, name="Superfícies artificials", color_rgba=(210, 0, 0, 255)),
+                LandCoverLegendEntry(class_id=73, name="Terres de conreu", color_rgba=(253, 211, 39, 255)),
+                LandCoverLegendEntry(class_id=82, name="Bosc de frondoses", color_rgba=(176, 91, 16, 255)),
+                LandCoverLegendEntry(class_id=83, name="Bosc de coníferes", color_rgba=(35, 152, 0, 255)),
+                LandCoverLegendEntry(class_id=102, name="Vegetació herbàcia", color_rgba=(8, 98, 0, 255)),
+                LandCoverLegendEntry(class_id=103, name="Matollars i landes", color_rgba=(128, 255, 0, 255)),
+                LandCoverLegendEntry(class_id=104, name="Pastius i pastures", color_rgba=(141, 139, 0, 255)),
+                LandCoverLegendEntry(class_id=105, name="Torberes", color_rgba=(95, 53, 7, 255)),
+                LandCoverLegendEntry(class_id=106, name="Aiguamolls", color_rgba=(43, 115, 149, 255)),
+                LandCoverLegendEntry(class_id=121, name="Sòl nu", color_rgba=(79, 79, 79, 255)),
+                LandCoverLegendEntry(class_id=123, name="Espais amb vegetació esparsa", color_rgba=(204, 204, 204, 255)),
+                LandCoverLegendEntry(class_id=162, name="Neu i glaceres", color_rgba=(255, 255, 255, 255)),
+                LandCoverLegendEntry(class_id=211, name="Masses d'aigua", color_rgba=(0, 50, 200, 255)),
             ),
         )
+        log.info("MGP: RasterioLandCoverPort.legend [FI]")
+        return res
 
     def close(self) -> None:
         pass

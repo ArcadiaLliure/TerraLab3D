@@ -137,7 +137,7 @@ class HorizonCoordinator:
         await self._publish(profile)
         await self._publish_terrain(profile, None)
         await self._status(request, "fallback", 1.0, profile)
-        log.info(
+        log.debug(
             "MGP: [horizon_coordinator.py] [activate_observer_fallback] "
             "[Perfil pla observer_generation=%d rays=%d]",
             request.observer_generation,
@@ -229,7 +229,7 @@ class HorizonCoordinator:
                     profile = None if request.force_recalculate else self._cache_get(cache_key)
                     if profile is None:
                         await self._status(request, "sampling", 0.05)
-                        log.info(
+                        log.debug(
                             "MGP: [horizon_coordinator.py] [_drain] "
                             "[Bake iniciat request=%s observer_generation=%d step_deg=%.6f radius_km=%.1f force=%s]",
                             request.request_id,
@@ -321,7 +321,7 @@ class HorizonCoordinator:
                         if elapsed_ms > 0:
                             self._samples_per_second.append(ray_samples / (elapsed_ms / 1000.0))
                         self._cache_put(cache_key, profile)
-                        log.info(
+                        log.debug(
                             "MGP: [horizon_coordinator.py] [_drain] "
                             "[Bake acabat request=%s duration_ms=%.2f rays=%d dem_samples=%d quality=%s]",
                             request.request_id,
@@ -443,7 +443,7 @@ class HorizonCoordinator:
                     self.cancel_count += 1
                     if self._cancel_started_at is not None:
                         self._cancellation_ms.append((time.perf_counter() - self._cancel_started_at) * 1000.0)
-                    log.info(
+                    log.debug(
                         "MGP: [horizon_coordinator.py] [_drain] [Bake cancel·lat request=%s]",
                         request.request_id,
                     )
@@ -647,7 +647,7 @@ class HorizonCoordinator:
         self.profile_binary_bytes = len(payload)
         self.peak_rss_bytes = max(self.peak_rss_bytes, _current_rss_bytes())
         await self._profile_publisher(metadata, payload)
-        log.info(
+        log.debug(
             "MGP: [horizon_coordinator.py] [_publish] [Perfil swap version=%d quality=%s bytes=%d]",
             profile.version, profile.quality.value, len(payload),
         )
@@ -661,7 +661,7 @@ class HorizonCoordinator:
         self.terrain_binary_bytes = len(payload)
         self.peak_rss_bytes = max(self.peak_rss_bytes, _current_rss_bytes())
         await self._profile_publisher(metadata, payload)
-        log.info(
+        log.debug(
             "MGP: [horizon_coordinator.py] [_publish_terrain] "
             "[Terrain swap version=%d vertices=%d bytes=%d]",
             profile.version,

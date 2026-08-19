@@ -107,14 +107,17 @@ class ConfiguredSurfaceSampler:
         override_source_id: str | None = None,
     ) -> ResolvedLandCoverSource | None:
         """Resolve the configured land-cover source to concrete raster files."""
+        log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [INICI]")
 
         payload, config_path = self._load_config_with_path()
         if config_path is None:
             log.warning("No s'ha trobat data_sources.json")
+            log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
             return None
 
         raw_sources = payload.get("sources", []) if isinstance(payload, dict) else []
         if not isinstance(raw_sources, list):
+            log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
             return None
 
         selections = payload.get("selections", {})
@@ -145,10 +148,12 @@ class ConfiguredSurfaceSampler:
 
         if mode == "manual" and selected_id and not candidates:
             log.error("Font manual %s no existeix a %s", selected_id, config_path)
+            log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
             return None
 
         if not candidates:
             log.warning("Cap font categòrica disponible a %s", config_path)
+            log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
             return None
 
         candidates.sort(key=lambda c: self._source_sort_key(c))
@@ -166,6 +171,7 @@ class ConfiguredSurfaceSampler:
         raster_paths = self._raster_paths(selected_raw, config_path)
         if not raster_paths:
             log.error("Cap fitxer raster resolt per a %s", source_id)
+            log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
             return None
 
         configured_resolution = self._positive_float(selected_raw.get("resolution_m"))
@@ -188,11 +194,12 @@ class ConfiguredSurfaceSampler:
 
         if selected_raster is None:
             log.error("Cap raster s'ha pogut obrir per a %s", source_id)
+            log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
             return None
 
         ordered_paths = (selected_raster,) + tuple(p for p in raster_paths if p != selected_raster)
 
-        log.info(
+        log.debug(
             "LAND COVER RESOLT: source_id='%s', config='%s', raster='%s', crs='%s', resolution=%.6f, nodata=%s",
             source_id,
             config_path,
@@ -202,7 +209,7 @@ class ConfiguredSurfaceSampler:
             selected_nodata,
         )
 
-        return ResolvedLandCoverSource(
+        res = ResolvedLandCoverSource(
             source_id=source_id,
             display_name=display_name,
             config_path=config_path,
@@ -215,6 +222,8 @@ class ConfiguredSurfaceSampler:
             coverage=coverage,
             priority=priority,
         )
+        log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
+        return res
 
 
     def sample(

@@ -4,3 +4,12 @@ Version: 0.1.0
 Summary: Scientific, application and scene contracts for TerraLab3D
 Requires-Python: >=3.12
 Requires-Dist: aiohttp>=3.9
+Requires-Dist: astropy>=6.1
+Requires-Dist: hpgeom>=1.3
+Requires-Dist: numpy>=2.0
+Requires-Dist: skyfield==1.55
+Requires-Dist: skyfield-data==7.0.0
+Requires-Dist: spiceypy==7.0.0
+Requires-Dist: Pillow>=10
+Requires-Dist: rasterio>=1.4
+Requires-Dist: pyproj>=3.7

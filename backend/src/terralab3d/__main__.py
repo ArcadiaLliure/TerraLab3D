@@ -249,6 +249,7 @@ async def run() -> int:
     land_cover_coordinator = LandCoverCoordinator(land_cover_port)
 
     async def _publish_land_cover_tile(tile) -> None:
+        log.info("MGP: __main__._publish_land_cover_tile [INICI]")
         metadata = {
             "role": "land_cover_tile",
             "resourceId": tile.resource_id,
@@ -264,20 +265,25 @@ async def run() -> int:
             "validPixels": tile.valid_pixels,
         }
         await bridge.send_binary_resource(tile.resource_id, str(tile.provenance.version), metadata, tile.class_buffer)
+        log.info("MGP: __main__._publish_land_cover_tile [FI]")
 
     async def _publish_land_cover_legend(legend) -> None:
+        log.info("MGP: __main__._publish_land_cover_legend [INICI]")
         await bridge.send({
             "type": "land_cover_legend",
             "legendId": legend.legend_id,
             "entries": [
-                {"classId": entry.class_id, "colorRgba": entry.color_rgba}
+                {"classId": entry.class_id, "label": entry.name, "colorRgba": entry.color_rgba}
                 for entry in legend.entries
             ],
         })
+        log.info("MGP: __main__._publish_land_cover_legend [FI]")
 
     async def _publish_land_cover_status(status) -> None:
+        log.info("MGP: __main__._publish_land_cover_status [INICI]")
         status["type"] = "surface_progress"
         await bridge.send(status)
+        log.info("MGP: __main__._publish_land_cover_status [FI]")
 
     def _sync_publish_land_cover_tile(tile) -> None:
         if not bridge.shutdown_event.is_set():
@@ -300,6 +306,7 @@ async def run() -> int:
     current_surface_mode = "terrain-fallback"
 
     async def _handle_set_surface_mode(data: dict[str, Any]) -> None:
+        log.info("MGP: __main__._handle_set_surface_mode [INICI]")
         nonlocal current_surface_mode
         mode = data.get("mode", "terrain-fallback")
         current_surface_mode = mode
@@ -320,6 +327,7 @@ async def run() -> int:
                 crs=aeqd_crs,
                 mode="categorical",
             )
+        log.info("MGP: __main__._handle_set_surface_mode [FI]")
             
     bridge.on("set_surface_mode", _handle_set_surface_mode)
 
@@ -454,7 +462,7 @@ async def run() -> int:
                 decision_reason = continuation.reason
             active_task = terrain_stream_task
             cancel_visual_stream(reset_center=False)
-            log.info(
+            log.debug(
                 "MGP: [__main__.py] [visual_stream] "
                 "[cancel·lat chunk inservible reason=%s]",
                 decision_reason,
@@ -552,7 +560,7 @@ async def run() -> int:
             terrain_stream_center_east_m = target_east_m
             terrain_stream_center_north_m = target_north_m
             terrain_stream_radius_m = requested_radius_m
-            log.info(
+            log.debug(
                 "MGP: [__main__.py] [visual_stream] "
                 "[chunk=%d reason=%s radius_km=%.1f center_east_m=%.1f "
                 "center_north_m=%.1f lead_m=%.1f vertices=%d]",
@@ -643,7 +651,7 @@ async def run() -> int:
                 horizon_settings,
                 current_observer.effective_height_m + OBSERVER_EYE_HEIGHT_M,
             )
-        log.info(
+        log.debug(
             "MGP: [__main__.py] [resolve_current_elevation] "
             "[Elevació DEM real elevation_m=%.2f source=%s observer_generation=%d duration_ms=%.2f]",
             sample.elevation_m,
@@ -686,7 +694,7 @@ async def run() -> int:
                 resolve_current_elevation(current_observer),
                 name="bare-elevation-latest-wins",
             )
-            log.info(
+            log.debug(
                 "Ubicació de l'observador actualitzada a: %.4f, %.4f (alt: %.1f)",
                 current_observer.location.latitude_deg,
                 current_observer.location.longitude_deg,
@@ -957,7 +965,7 @@ async def run() -> int:
         terrain_horizon_generation += 1
         if horizon_enabled:
             horizon_coordinator.request(new_horizon_request(build_terrain_mesh=False))
-        log.info(
+        log.debug(
             "MGP: [__main__.py] [navigation_horizon] "
             "[perfil predictiu mode=%s reason=%s lead_m=%.1f east_m=%.1f "
             "north_m=%.1f eye_m=%.1f radius_km=%.1f]",
@@ -1036,6 +1044,13 @@ async def run() -> int:
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
         await bridge.send_planet_texture_manifest(solar_system_assets.descriptor)
         await bridge.send_satellite_catalog_manifest(solar_system_assets.descriptor)
+        
+        catalog_payload = {
+            "descriptors": [d.to_dict() for d in resource_catalog.get_all_descriptors()],
+            "installedStates": resource_repo.snapshot(),
+        }
+        await bridge.send_resource_catalog_snapshot(catalog_payload)
+        
         await broadcast_time(force_celestial_transform=True)
         if current_observer.location.elevation_m is None and (
             elevation_task is None or elevation_task.done()
@@ -1204,7 +1219,7 @@ async def run() -> int:
             bridge.send_apparent_trajectory,
         )
     metadata = ephemeris_adapter.metadata
-    log.info(
+    log.debug(
         "Efemèride: provider=%s kernel=%s generation=%s sha256=%s",
         metadata.provider,
         metadata.kernel_name or "fallback",
@@ -1269,7 +1284,7 @@ async def run() -> int:
             sample_count,
             metadata.kernel_generation or "unknown",
         )
-        log.info(
+        log.debug(
             "MGP: [OrbitSampler] [sample] [body=%s samples=%d duration_ms=%.3f cache_hits=%d]",
             body_id,
             sample_count,
@@ -1702,7 +1717,7 @@ async def run() -> int:
             "segmentCount": 0,
             "gpuBytes": 0,
         }
-        log.info(
+        log.debug(
             "Star trails iniciat: %s (mag<=%.1f, rate=%.1fx)",
             sess_id,
             config.magnitude_limit,
@@ -1791,7 +1806,7 @@ async def run() -> int:
 
     # ── 4. Iniciar servidor ───────────────────────────────────────────
     url = await server.start()
-    log.info("TerraLab3D a punt a %s", url)
+    log.debug("TerraLab3D a punt a %s", url)
 
     # ── 5. Obrir navegador ────────────────────────────────────────────
     if os.getenv("TERRALAB3D_NO_BROWSER") != "1":
@@ -1800,7 +1815,7 @@ async def run() -> int:
     # ── 6. Esperar tancament ──────────────────────────────────────────
     # Configurar el manegador de Ctrl-C
     def handle_signal() -> None:
-        log.info("Senyal rebut — aturant l'aplicació")
+        log.debug("Senyal rebut — aturant l'aplicació")
         shutdown_requested.set()
 
     # Registrar manegadors de senyals
@@ -1818,10 +1833,10 @@ async def run() -> int:
         verificar que la comunicació Python → Frontend funciona."""
         while not bridge.connected:
             await asyncio.sleep(0.1)
-        log.info("Pont connectat — sessió %s", bridge.session_id)
+        log.debug("Pont connectat — sessió %s", bridge.session_id)
         await asyncio.sleep(3)
         if bridge.connected:
-            log.info("Enviant set_camera_pose per verificar el pont bidireccional")
+            log.debug("Enviant set_camera_pose per verificar el pont bidireccional")
             await bridge.send_set_camera_pose(
                 az=180.0, alt=30.0, fov=60.0, transition_ms=1200,
             )
@@ -1838,7 +1853,7 @@ async def run() -> int:
     )
 
     # ── 6. Tancament net ──────────────────────────────────────────────
-    log.info("Iniciant tancament...")
+    log.debug("Iniciant tancament...")
 
     # Cancel·lar les tasques
     demo_task.cancel()
@@ -1875,16 +1890,16 @@ async def run() -> int:
         except asyncio.CancelledError:
             pass
     elevation_adapter.close()
-    log.info("MGP: [__main__.py] [shutdown] [Mètriques elevació: %s]", elevation_coordinator.metrics())
-    log.info("MGP: [__main__.py] [shutdown] [Mètriques horitzó: %s]", horizon_coordinator.metrics())
+    log.debug("MGP: [__main__.py] [shutdown] [Mètriques elevació: %s]", elevation_coordinator.metrics())
+    log.debug("MGP: [__main__.py] [shutdown] [Mètriques horitzó: %s]", horizon_coordinator.metrics())
     await ephemeris_coordinator.close()
-    log.info("Mètriques d'efemèrides: %s", ephemeris_coordinator.metrics())
+    log.debug("Mètriques d'efemèrides: %s", ephemeris_coordinator.metrics())
     if event_service is not None:
-        log.info("Mètriques Pas 9 instantànies: %s", event_service.metrics())
+        log.debug("Mètriques Pas 9 instantànies: %s", event_service.metrics())
     if event_search_coordinator is not None:
-        log.info("Mètriques Pas 9 cerques: %s", event_search_coordinator.metrics())
+        log.debug("Mètriques Pas 9 cerques: %s", event_search_coordinator.metrics())
     if trajectory_coordinator is not None:
-        log.info("Mètriques Pas 9 trajectòries: %s", trajectory_coordinator.metrics())
+        log.debug("Mètriques Pas 9 trajectòries: %s", trajectory_coordinator.metrics())
         
     await deep_sky_coordinator.shutdown()
 
@@ -1896,7 +1911,7 @@ async def run() -> int:
             log.warning("El frontend no ha confirmat el tancament en 3 segons")
 
     await server.stop()
-    log.info("TerraLab3D s'ha aturat netament")
+    log.debug("TerraLab3D s'ha aturat netament")
     return 0
 
 
@@ -1913,7 +1928,7 @@ async def _on_camera_changed(data: dict[str, Any]) -> None:
 
 
 async def _on_viewport_resized(data: dict[str, Any]) -> None:
-    log.info(
+    log.debug(
         "Mida de la finestra canviada: %dx%d @%.1fx",
         data.get("widthPx", 0),
         data.get("heightPx", 0),
@@ -1922,7 +1937,7 @@ async def _on_viewport_resized(data: dict[str, Any]) -> None:
 
 
 async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
-    log.info(
+    log.debug(
         "Frontend metrics: frame_ms_p50=%.2f frame_ms_p95=%.2f samples=%d "
         "entities=%d geometries=%d materials=%d snapshots=%d stale=%d bridge_bytes=%d",
         data.get("frameMsP50", 0.0),
@@ -1938,7 +1953,7 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("solarSystemStaleSnapshotCount", 0),
         data.get("solarSystemBridgeBytes", 0),
     )
-    log.info(
+    log.debug(
         "Solar 8.6 metrics: planet_texture_loads=%d texture_upload_bytes=%d "
         "catalog=%d states=%d ring_geometry=%d ring_material=%d "
         "orbit_geometry=%d orbit_bridge_bytes=%d gpu_estimate_bytes=%d",
@@ -1952,7 +1967,7 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("orbitBridgeBytes", 0),
         data.get("gpuMemoryEstimateBytes", 0),
     )
-    log.info(
+    log.debug(
         "Moon metrics: geometry=%d material=%d albedo_loads=%d normal_loads=%d "
         "texture_upload_bytes=%d bridge_texture_bytes=%d",
         data.get("moonGeometryBuildCount", 0),
@@ -1962,7 +1977,7 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("moonTextureUploadBytes", 0),
         data.get("moonBridgeTextureBytes", 0),
     )
-    log.info(
+    log.debug(
         "Galactic metrics: geometry=%d material=%d milky_way_loads=%d "
         "planck_loads=%d stale=%d active=%d texture_upload_bytes=%d",
         data.get("galacticGeometryBuildCount", 0),
@@ -1973,7 +1988,7 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("galacticActiveTextureCount", 0),
         data.get("galacticTextureUploadBytes", 0),
     )
-    log.info(
+    log.debug(
         "Lighting 8.7 metrics: sun_build=%d moon_build=%d diffuse_build=%d "
         "pbr_materials=%d snapshots=%d stale=%d bridge_bytes=%d "
         "sun_shadow_updates=%d moon_shadow_updates=%d shadow_bytes=%d "
@@ -1992,7 +2007,7 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("rendererMemoryGeometries", 0),
         data.get("rendererMemoryTextures", 0),
     )
-    log.info(
+    log.debug(
         "Shadow timings: off_p50=%.2f off_p95=%.2f "
         "medium_p50=%.2f medium_p95=%.2f high_p50=%.2f high_p95=%.2f",
         data.get("shadowOffFrameMsP50", 0.0),
@@ -2002,7 +2017,7 @@ async def _on_frontend_performance_metrics(data: dict[str, Any]) -> None:
         data.get("shadowHighFrameMsP50", 0.0),
         data.get("shadowHighFrameMsP95", 0.0),
     )
-    log.info(
+    log.debug(
         "Pas 9 render metrics: trajectory_geometry=%d trajectory_material=%d "
         "trajectory_applies=%d trajectory_stale=%d trajectory_bytes=%d "
         "totality_geometry=%d totality_material=%d",

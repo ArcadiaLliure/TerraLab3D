@@ -74,7 +74,7 @@ class ManagedSolarSystemAssets:
                 if len(textures) >= 9
                 else SolarSystemResourceStatus.PARTIAL
             )
-            log.info(
+            log.debug(
                 "MGP: [ManagedSolarSystemAssets.py] [load] "
                 "[Recursos validats textures=%d catalog=%d kernels=%d]",
                 len(textures),

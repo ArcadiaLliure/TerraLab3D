@@ -110,7 +110,7 @@ class TerraLabServer:
             self._actual_port = addr[1]
             break
 
-        log.info("Servidor escoltant a %s", self.url)
+        log.debug("Servidor escoltant a %s", self.url)
         return self.url
 
     async def stop(self) -> None:
@@ -119,7 +119,7 @@ class TerraLabServer:
             await self._site.stop()
         if self._runner:
             await self._runner.cleanup()
-        log.info("Servidor aturat")
+        log.debug("Servidor aturat")
 
     async def _serve_index(
         self, request: aiohttp.web.Request,

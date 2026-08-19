@@ -17,6 +17,7 @@ const PROFILES: Readonly<Record<ShadowQuality, ShadowProfile>> = {
 };
 
 const DIRECTION_INVALIDATION_DEG = 0.15;
+const LOG_PREFIX = "MGP: [ShadowController]";
 
 export interface ShadowQualityTiming {
   readonly p50Ms: number;
@@ -73,9 +74,7 @@ export class ShadowController {
       this.updateAnchor(this.latestCamera, true);
       this.invalidate("quality_changed");
     }
-    console.info(
-      `MGP: [ShadowController.ts] [setQuality] [Qualitat canviada previous=${previous} current=${quality}]`,
-    );
+    console.debug(`${LOG_PREFIX} [setQuality] [Qualitat canviada previous=${previous} current=${quality}]`);
   }
 
   getQuality(): ShadowQuality {

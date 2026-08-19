@@ -30,7 +30,7 @@ class PlanckDustAdapter:
 
     def process(self, source_path: Path, output_dir: Path) -> ProcessedResource:
         output_path = output_dir / f"{source_path.stem}.galactic-opacity.png"
-        log.info(
+        log.debug(
             "MGP: [PlanckDustAdapter] [Convertint %s a %dx%d]",
             source_path.name,
             self._width,

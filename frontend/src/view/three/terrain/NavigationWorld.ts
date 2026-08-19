@@ -112,7 +112,7 @@ export class NavigationWorld {
     this.technicalPresentationVisible = visible;
     this.terrainGroup.visible = visible;
     this.referenceObjects.visible = visible;
-    console.info(
+    console.debug(
       `${LOG_PREFIX} [setTechnicalPresentationVisible] `
       + `[Presentació tècnica ${visible ? "visible" : "oculta; perfil DEM actiu"}]`,
     );
@@ -125,7 +125,7 @@ export class NavigationWorld {
   prepare(worldRoot: THREE.Group): void {
     if (this.disposed) return;
     this.setReadiness("loading");
-    console.info(`${LOG_PREFIX} [prepare] [Construint terreny tècnic]`);
+    console.debug(`${LOG_PREFIX} [prepare] [Construint terreny tècnic]`);
 
     try {
       this.buildTerrain();
@@ -143,7 +143,7 @@ export class NavigationWorld {
         this.sampler.setBaseTerrain(this.terrainMesh);
         this.setReadiness("collision_ready");
         this.setReadiness("navigation_ready");
-        console.info(`${LOG_PREFIX} [prepare] [Zona navegable preparada generation=${this._envelope.generation}]`);
+        console.debug(`${LOG_PREFIX} [prepare] [Zona navegable preparada generation=${this._envelope.generation}]`);
       }
     } catch (err) {
       console.error(`${LOG_PREFIX} [prepare] [Error construint terreny]`, err);

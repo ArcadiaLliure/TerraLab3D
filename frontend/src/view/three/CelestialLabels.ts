@@ -195,7 +195,7 @@ export class CelestialLabels {
       });
     }
 
-    console.info(
+    console.debug(
       `${LOG_PREFIX} [constructor] [${this.labels.length} etiquetes creades]`,
     );
   }
@@ -352,7 +352,7 @@ export class CelestialLabels {
     }
     this.labels.length = 0;
     this.container.remove();
-    console.info(`${LOG_PREFIX} [dispose] [Etiquetes eliminades]`);
+    console.debug(`${LOG_PREFIX} [dispose] [Etiquetes eliminades]`);
   }
 
   // ─── Private ──────────────────────────────────────────────────

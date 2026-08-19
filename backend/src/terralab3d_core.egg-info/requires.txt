@@ -1,1 +1,10 @@
 aiohttp>=3.9
+astropy>=6.1
+hpgeom>=1.3
+numpy>=2.0
+skyfield==1.55
+skyfield-data==7.0.0
+spiceypy==7.0.0
+Pillow>=10
+rasterio>=1.4
+pyproj>=3.7

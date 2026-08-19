@@ -188,10 +188,10 @@ export class ScenePickingController {
 
     if (msg.status !== "ok" || !msg.star) {
       if (msg.status === "stale" || msg.status === "missing") {
-        console.log(`${LOG_PREFIX} [handleResolveResponse] [${purpose} ${msg.status}]`);
+        console.debug(`${LOG_PREFIX} [handleResolveResponse] [${purpose} ${msg.status}]`);
       }
       if (msg.status === "invalid") {
-        console.warn(`${LOG_PREFIX} [handleResolveResponse] [${purpose} invalid: requestId=${msg.requestId}]`);
+        console.error(`${LOG_PREFIX} [handleResolveResponse] [${purpose} invalid: requestId=${msg.requestId}]`);
       }
       return;
     }
@@ -209,7 +209,7 @@ export class ScenePickingController {
          msg.star.catalogIndex,
          msg.star.sourceId
       );
-      console.log(
+      console.debug(
         `${LOG_PREFIX} [handleResolveResponse] [Select resolved: sourceId=${msg.star.sourceId} RA=${msg.star.raDeg.toFixed(4)} Dec=${msg.star.decDeg.toFixed(4)} G=${msg.star.magnitude.toFixed(2)}]`,
       );
     }
@@ -305,15 +305,15 @@ export class ScenePickingController {
           hit.ref.catalogIndex,
           "select",
         );
-        console.log(
+        console.debug(
           `${LOG_PREFIX} [handleTap] [Star: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px mag=${hit.magnitude.toFixed(2)}]`,
         );
       } else if (hit.kind === "deep_sky") {
-        console.log(
+        console.debug(
           `${LOG_PREFIX} [handleTap] [Deep Sky: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px]`
         );
       } else {
-        console.log(
+        console.debug(
           `${LOG_PREFIX} [handleTap] [Solar body: ${hit.bodyId} dist=${hit.screenDistanceCssPx.toFixed(1)}px]`,
         );
       }

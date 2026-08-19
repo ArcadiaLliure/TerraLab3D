@@ -171,7 +171,7 @@ class RasterioElevationAdapter:
             self._source_tiers = _group_sources_by_resolution(self._sources)
             self._build_npy_grids()
             self._opened = True
-            log.info(
+            log.debug(
                 "MGP: [adapter.py] [open] [Fonts DEM descobertes sources=%d root=%s]",
                 len(self._sources), self._source_path,
             )
@@ -417,7 +417,7 @@ class RasterioElevationAdapter:
             self._window_cache_bytes = 0
             self._closed = True
             self._opened = False
-            log.info("MGP: [adapter.py] [close] [Recursos DEM alliberats]")
+            log.debug("MGP: [adapter.py] [close] [Recursos DEM alliberats]")
 
     def _discover_paths(self) -> list[Path]:
         if self._source_path.is_file():

@@ -1,3 +1,4 @@
+import { TerrainPickProvider } from "./view/three/picking/TerrainPickProvider";
 /**
  * Frontend entry point.
  *
@@ -55,7 +56,7 @@ import { TerrainGotoController } from "./view/three/terrain/TerrainGotoControlle
 // ─── Bootstrap ───────────────────────────────────────────────────────
 
 function main(): void {
-  console.info(`[TerraLab3D] main() iniciat a ${new Date().toISOString()}`);
+  console.debug(`[TerraLab3D] main() iniciat a ${new Date().toISOString()}`);
   const container = document.getElementById("scene-container");
   if (!container) {
     console.error("[TerraLab3D] #scene-container not found");
@@ -90,8 +91,8 @@ function main(): void {
   const atmosphereRenderer = new AtmosphereRenderer(sceneHost.getCelestialRoot());
   // Default to true, SkyPage will manage this later
   atmosphereRenderer.setPureColors(false);
-  let enabledSatelliteSystems: readonly string[] = [];
   let satelliteOrbitsVisible = false;
+  let enabledSatelliteSystems: readonly string[] = ["mars", "jupiter", "saturn", "uranus", "neptune", "pluto"];
   let latestSimulationTimeIso = new Date().toISOString();
   let lastEventSearchKey = "";
   const representativeOrbitBody: Readonly<Record<string, { bodyId: string; intervalDays: number }[]>> = {
@@ -385,6 +386,45 @@ function main(): void {
 
   // 2. Mount scene + UI
   const canvasContainer = shell.getCanvasContainer();
+  
+  // Terrain hover tooltip
+  const terrainPickProvider = new TerrainPickProvider({
+    camera: sceneHost.camera,
+    getViewportRect: () => sceneHost.renderer.domElement.getBoundingClientRect(),
+    terrainRenderer: sceneHost.getDemTerrainLayerRenderer(),
+  });
+
+  const terrainTooltip = document.createElement("div");
+  terrainTooltip.style.position = "absolute";
+  terrainTooltip.style.pointerEvents = "none";
+  terrainTooltip.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+  terrainTooltip.style.color = "white";
+  terrainTooltip.style.padding = "4px 8px";
+  terrainTooltip.style.borderRadius = "4px";
+  terrainTooltip.style.fontSize = "12px";
+  terrainTooltip.style.fontFamily = "'Roboto', sans-serif";
+  terrainTooltip.style.display = "none";
+  terrainTooltip.style.zIndex = "1000";
+  terrainTooltip.style.boxShadow = "0 2px 4px rgba(0,0,0,0.5)";
+  
+  canvasContainer.appendChild(terrainTooltip);
+
+  gestureRouter.onHover((x, y) => {
+    const terrainHit = terrainPickProvider.hover(x, y);
+    if (terrainHit) {
+      terrainTooltip.style.display = "block";
+      terrainTooltip.style.left = `${x + 15}px`;
+      terrainTooltip.style.top = `${y + 15}px`;
+      terrainTooltip.textContent = terrainHit.label;
+    } else {
+      terrainTooltip.style.display = "none";
+    }
+  });
+  
+  gestureRouter.onHoverClear(() => {
+    terrainTooltip.style.display = "none";
+  });
+
   sceneHost.mount(canvasContainer);
   diagnostics.mount(canvasContainer);
   locationHUD.mount(canvasContainer);
@@ -520,13 +560,24 @@ function main(): void {
       skyPage.updateStarCatalogStatus(status);
     },
     onSurfaceProgress(msg) {
+      console.info("MGP: main.onSurfaceProgress [INICI]");
+      console.debug("[main.ts] onSurfaceProgress rebut:", msg);
       if (msg.cleared === true) {
         sceneHost.getDemTerrainLayerRenderer().landCoverManager.clear();
+      } else if (msg.globalBounds && msg.resolution) {
+        sceneHost.getDemTerrainLayerRenderer().landCoverManager.initGlobalBuffer(
+          msg.globalBounds as [number, number, number, number],
+          msg.resolution as number
+        );
       }
       earthPage.updateTerrainSurface(msg);
+      console.info("MGP: main.onSurfaceProgress [FI]");
     },
     onLandCoverLegend(msg) {
+      console.info("MGP: main.onLandCoverLegend [INICI]");
+      console.debug("[main.ts] onLandCoverLegend rebut:", msg);
       sceneHost.getDemTerrainLayerRenderer().landCoverManager.updateLegend(msg);
+      console.info("MGP: main.onLandCoverLegend [FI]");
     },
     onCelestialFrameTransform(generation, matrix3x3) {
       celestialTransformState.update(generation, matrix3x3 as number[]);
@@ -550,15 +601,18 @@ function main(): void {
           navigationWorld.setStreamingDemTerrainMeshes(
             demTerrain.getStreamingNavigationLayers(),
           );
-          earthPage.updateTerrainSurface(metadata);
         }
         return;
       }
       if (metadata.role === "land_cover_tile") {
+        console.info("MGP: main.onBinaryResourceReady.land_cover_tile [INICI]");
+        console.debug("[main.ts] onBinaryResourceReady: land_cover_tile rebut!", metadata);
         sceneHost.getDemTerrainLayerRenderer().landCoverManager.addTile({
           ...metadata,
+          tileKey: metadata.tileKey || metadata.resourceId || "land_cover_tile",
           data: new Uint16Array(bufferPayload),
         } as any);
+        console.info("MGP: main.onBinaryResourceReady.land_cover_tile [FI]");
         return;
       }
       if (metadata.role === "solar_system_orbit") {
@@ -693,9 +747,12 @@ function main(): void {
   bridge.addStateListener({
     onBridgeStateChanged(state) {
       if (state === "connected") {
+        resourceManager.requestCatalog();
+        bridge.setSatelliteSystems([...enabledSatelliteSystems]);
+        bridge.sendFrontendReady();
         diagnostics.updateSession(bridge.sessionId);
       }
-    },
+    }
   });
 
   bridge.connect();

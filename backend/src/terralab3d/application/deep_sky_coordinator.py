@@ -33,14 +33,14 @@ class DeepSkyCoordinator:
         # ho fem asíncronament a thread per no bloquejar.
         result = await asyncio.to_thread(self._adapter.load_index)
         if not result:
-            log.info("MGP: [DeepSkyCoordinator] [Catàleg NGC no disponible (probablement no descarregat o processat)]")
+            log.debug("MGP: [DeepSkyCoordinator] [Catàleg NGC no disponible (probablement no descarregat o processat)]")
             return
             
         metadata, data = result
         version = metadata["processedIndexSha256"]  # Utilitzem el hash com a versió immutable
         
         await self._resource_publisher(metadata["resourceId"], version, metadata, data)
-        log.info(
+        log.debug(
             "MGP: [DeepSkyCoordinator] [S'ha publicat l'índex NGC: %d objectes (renderitzables: %d)]", 
             metadata["recordCount"], 
             metadata["renderableCount"]
@@ -48,4 +48,4 @@ class DeepSkyCoordinator:
         
     async def shutdown(self) -> None:
         self._disposed = True
-        log.info("MGP: [DeepSkyCoordinator] [Tancat]")
+        log.debug("MGP: [DeepSkyCoordinator] [Tancat]")

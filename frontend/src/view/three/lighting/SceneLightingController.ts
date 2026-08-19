@@ -76,7 +76,7 @@ export class SceneLightingController {
       this.moonLight,
       this.moonTarget,
     );
-    console.info("MGP: [SceneLightingController.ts] [constructor] [Llums persistents creades]");
+    console.debug("MGP: [SceneLightingController.ts] [constructor] [Llums persistents creades]");
   }
 
   applySnapshot(
@@ -164,7 +164,7 @@ export class SceneLightingController {
     this.disposed = true;
     this.shadowController.dispose();
     this.root.removeFromParent();
-    console.info("MGP: [SceneLightingController.ts] [dispose] [Llums persistents retirades]");
+    console.debug("MGP: [SceneLightingController.ts] [dispose] [Llums persistents retirades]");
   }
 
   private applyState(snapshot: LightingEnvironmentSnapshot): void {

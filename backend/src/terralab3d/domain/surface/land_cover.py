@@ -21,6 +21,7 @@ class LandCoverProvenance:
 @dataclass(frozen=True, slots=True)
 class LandCoverLegendEntry:
     class_id: int
+    name: str
     color_rgba: tuple[int, int, int, int]
 
 @dataclass(frozen=True, slots=True)

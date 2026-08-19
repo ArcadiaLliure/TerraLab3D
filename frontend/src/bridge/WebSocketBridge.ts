@@ -204,6 +204,8 @@ export class WebSocketBridge {
     const metadata = JSON.parse(headerJsonStr);
 
     const payloadBuffer = arrayBuffer.slice(4 + headerLen);
+    const isLandCover = metadata.role === "land_cover_tile";
+    if (isLandCover) console.info("MGP: WebSocketBridge.handleBinaryMessage [INICI]");
 
     for (const l of this.messageListeners) {
       if (metadata.role === "apparent_trajectory") {
@@ -212,6 +214,7 @@ export class WebSocketBridge {
       if (l.onBinaryResourceReady) l.onBinaryResourceReady(metadata, payloadBuffer);
       else l.onStarResourceReady?.(metadata, payloadBuffer);
     }
+    if (isLandCover) console.info("MGP: WebSocketBridge.handleBinaryMessage [FI]");
   }
 
   sendCameraChanged(
@@ -267,7 +270,13 @@ export class WebSocketBridge {
   }
 
   sendSurfaceMode(mode: string): void {
+    console.info("MGP: WebSocketBridge.sendSurfaceMode [INICI]");
     this.sendMessage({ type: "set_surface_mode", mode });
+    console.info("MGP: WebSocketBridge.sendSurfaceMode [FI]");
+  }
+
+  sendFrontendReady(): void {
+    this.sendMessage({ type: "frontend_ready", protocolVersion: 2 });
   }
 
   private shutdownRequested = false;

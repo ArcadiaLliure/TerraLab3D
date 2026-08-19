@@ -81,7 +81,7 @@ export class DeepSkyLabels {
     const count = metadata.renderableCount ?? metadata.recordCount;
     const objectLabels = metadata.objectLabels as string[] | undefined;
     if (!objectLabels || objectLabels.length === 0) {
-      console.warn(`${LOG_PREFIX} No labels provided in metadata`);
+      console.debug(`${LOG_PREFIX} No labels provided in metadata`);
       return;
     }
 

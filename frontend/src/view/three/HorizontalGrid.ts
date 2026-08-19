@@ -104,7 +104,7 @@ export class HorizontalGrid {
     // Start with medium visible
     this.setActiveLOD("medium");
 
-    console.info(
+    console.debug(
       `${LOG_PREFIX} [constructor] [Geometria construïda: ${this._geometryBuildCount} builds, ${this._bufferUploadBytes} bytes]`,
     );
   }
@@ -130,7 +130,7 @@ export class HorizontalGrid {
     if (targetLOD !== this.currentLOD) {
       this.setActiveLOD(targetLOD);
       this._lodSwitchCount++;
-      console.info(
+      console.debug(
         `${LOG_PREFIX} [updateLOD] [LOD canviat: ${this.currentLOD} fov=${hFovDeg.toFixed(1)}°]`,
       );
     }
@@ -160,7 +160,7 @@ export class HorizontalGrid {
         }
       }
     });
-    console.info(`${LOG_PREFIX} [dispose] [Recursos alliberats]`);
+    console.debug(`${LOG_PREFIX} [dispose] [Recursos de grid alliberats]`);
   }
 
   // ─── Private ───────────────────────────────────────────────

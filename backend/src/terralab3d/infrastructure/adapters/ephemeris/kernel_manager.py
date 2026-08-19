@@ -64,7 +64,7 @@ class SpiceKernelManager:
                 for kernel in self._kernels:
                     spice.furnsh(str(kernel.path))
                     self.load_count += 1
-                    log.info(
+                    log.debug(
                         "MGP: [KernelManager.py] [load] "
                         "[Kernel carregat type=%s file=%s generation=%s]",
                         kernel.kernel_type,
@@ -89,7 +89,7 @@ class SpiceKernelManager:
             spice.kclear()
             self._handle_to_kernel.clear()
             self._open = False
-            log.info(
+            log.debug(
                 "MGP: [KernelManager.py] [close] [Kernel pool net generation=%s]",
                 self.generation,
             )

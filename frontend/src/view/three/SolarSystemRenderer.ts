@@ -174,7 +174,7 @@ export class SolarSystemRenderer {
   private sunVisible = true;
   private moonVisible = true;
   private planetsVisible = true;
-  private satellitesVisible = false;
+  private satellitesVisible = true;
   private disposed = false;
   private _snapshotApplyCount = 0;
   private _staleSnapshotCount = 0;

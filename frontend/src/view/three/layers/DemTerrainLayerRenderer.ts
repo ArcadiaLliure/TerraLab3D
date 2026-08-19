@@ -44,11 +44,15 @@ export class DemTerrainLayerRenderer {
   public readonly landCoverManager = new LandCoverTextureManager();
 
   private readonly surfaceUniforms = {
-    landCoverTex: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
+    landCoverTex0: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
+    landCoverTex1: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
+    landCoverTex2: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
+    landCoverTex3: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
     landCoverLUT: { value: this.landCoverManager.emptyPaletteTexture as THREE.Texture },
     landCoverBounds: { value: new THREE.Vector4(0, 0, 0, 0) },
     landCoverTileWorldSize: { value: new THREE.Vector2(1, 1) },
     hasLandCover: { value: 0 },
+    landCoverLayersPerBank: { value: LandCoverTextureManager.MAX_LAYERS_PER_BANK },
     terrainRadiusM: { value: 150_000.0 },
   };
 
@@ -89,22 +93,40 @@ export class DemTerrainLayerRenderer {
     parent.add(this.root);
   }
 
+  public raycast(raycaster: THREE.Raycaster, intersects: THREE.Intersection[]): void {
+    if (this.mesh) {
+      this.mesh.raycast(raycaster, intersects);
+    }
+    for (const stream of this.streamingMeshes.values()) {
+      stream.mesh.raycast(raycaster, intersects);
+    }
+  }
+
   /** Update shared uniforms only; no BufferGeometry or material rebuild. */
   public updateShaderUniforms(): void {
-    const coverage = this.landCoverManager.activeCoverageTexture;
-    if (coverage !== null) {
-      this.surfaceUniforms.landCoverTex.value = coverage;
+    console.info("MGP: DemTerrainLayerRenderer.updateShaderUniforms [INICI]");
+    const banks = this.landCoverManager.banks;
+    if (banks.length > 0) {
+      this.surfaceUniforms.landCoverTex0.value = banks[0]?.texture ?? this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverTex1.value = banks[1]?.texture ?? this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverTex2.value = banks[2]?.texture ?? this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverTex3.value = banks[3]?.texture ?? this.landCoverManager.emptyCoverageTexture;
       this.surfaceUniforms.landCoverLUT.value = this.landCoverManager.paletteTexture;
       this.surfaceUniforms.landCoverBounds.value.copy(this.landCoverManager.activeBounds);
       this.surfaceUniforms.landCoverTileWorldSize.value.copy(this.landCoverManager.tileWorldSize);
+      this.surfaceUniforms.landCoverLayersPerBank.value = LandCoverTextureManager.MAX_LAYERS_PER_BANK;
       this.surfaceUniforms.hasLandCover.value = 1;
     } else {
-      this.surfaceUniforms.landCoverTex.value = this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverTex0.value = this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverTex1.value = this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverTex2.value = this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverTex3.value = this.landCoverManager.emptyCoverageTexture;
       this.surfaceUniforms.landCoverLUT.value = this.landCoverManager.emptyPaletteTexture;
       this.surfaceUniforms.landCoverBounds.value.set(0, 0, 0, 0);
       this.surfaceUniforms.landCoverTileWorldSize.value.set(1, 1);
       this.surfaceUniforms.hasLandCover.value = 0;
     }
+    console.info("MGP: DemTerrainLayerRenderer.updateShaderUniforms [FI]");
   }
 
   applyBinaryResource(metadata: any, payload: ArrayBuffer): boolean {
@@ -202,7 +224,7 @@ export class DemTerrainLayerRenderer {
       this.geometryBuildCount++;
       return true;
     } catch (error) {
-      console.warn("[DemTerrainLayerRenderer] invalid terrain mesh resource", error);
+      console.error("[DemTerrainLayerRenderer] invalid terrain mesh resource", error);
       return false;
     }
   }
@@ -299,11 +321,15 @@ export class DemTerrainLayerRenderer {
   }
 
   private patchTerrainShader(shader: Parameters<THREE.MeshStandardMaterial['onBeforeCompile']>[0]): void {
-    shader.uniforms.landCoverTex = this.surfaceUniforms.landCoverTex;
+    shader.uniforms.landCoverTex0 = this.surfaceUniforms.landCoverTex0;
+    shader.uniforms.landCoverTex1 = this.surfaceUniforms.landCoverTex1;
+    shader.uniforms.landCoverTex2 = this.surfaceUniforms.landCoverTex2;
+    shader.uniforms.landCoverTex3 = this.surfaceUniforms.landCoverTex3;
     shader.uniforms.landCoverLUT = this.surfaceUniforms.landCoverLUT;
     shader.uniforms.landCoverBounds = this.surfaceUniforms.landCoverBounds;
     shader.uniforms.landCoverTileWorldSize = this.surfaceUniforms.landCoverTileWorldSize;
     shader.uniforms.hasLandCover = this.surfaceUniforms.hasLandCover;
+    shader.uniforms.landCoverLayersPerBank = this.surfaceUniforms.landCoverLayersPerBank;
     shader.uniforms.terrainRadiusM = this.surfaceUniforms.terrainRadiusM;
 
     shader.vertexShader = shader.vertexShader.replace(
@@ -326,11 +352,15 @@ export class DemTerrainLayerRenderer {
       `
       #include <common>
       varying vec3 vTerraLabWorldPosition;
-      uniform highp usampler2DArray landCoverTex;
+      uniform highp usampler2DArray landCoverTex0;
+      uniform highp usampler2DArray landCoverTex1;
+      uniform highp usampler2DArray landCoverTex2;
+      uniform highp usampler2DArray landCoverTex3;
       uniform sampler2D landCoverLUT;
       uniform vec4 landCoverBounds;
       uniform vec2 landCoverTileWorldSize;
       uniform int hasLandCover;
+      uniform int landCoverLayersPerBank;
       uniform float terrainRadiusM;
 
       vec3 terraLabSrgbToLinear(vec3 value) {
@@ -385,7 +415,6 @@ export class DemTerrainLayerRenderer {
             && landCoverTileWorldSize.x > 0.0 && landCoverTileWorldSize.y > 0.0
             && geoX >= minX && geoX <= maxX
             && geoY >= minY && geoY <= maxY) {
-          ivec3 coverageSize = textureSize(landCoverTex, 0);
           int gridColumns = max(1, int(round((maxX - minX) / landCoverTileWorldSize.x)));
           int gridRows = max(1, int(round((maxY - minY) / landCoverTileWorldSize.y)));
           int column = clamp(
@@ -398,35 +427,71 @@ export class DemTerrainLayerRenderer {
             0,
             gridRows - 1
           );
-          int layer = row * gridColumns + column;
+          int globalLayer = row * gridColumns + column;
+          int layersPerBank = landCoverLayersPerBank > 0 ? landCoverLayersPerBank : 256;
+          int bank = globalLayer / layersPerBank;
+          int localLayer = globalLayer % layersPerBank;
 
-          if (layer >= 0 && layer < coverageSize.z) {
-            float tileMinX = minX + float(column) * landCoverTileWorldSize.x;
-            float tileMaxY = maxY - float(row) * landCoverTileWorldSize.y;
-            float localU = clamp(
-              (geoX - tileMinX) / landCoverTileWorldSize.x,
-              0.0,
-              0.99999994
-            );
-            float localV = clamp(
-              (tileMaxY - geoY) / landCoverTileWorldSize.y,
-              0.0,
-              0.99999994
-            );
-            ivec2 coveragePixel = ivec2(
-              min(int(floor(localU * float(coverageSize.x))), coverageSize.x - 1),
-              min(int(floor(localV * float(coverageSize.y))), coverageSize.y - 1)
-            );
-            uint classId = texelFetch(landCoverTex, ivec3(coveragePixel, layer), 0).r;
-            if (classId != 0u) {
-              ivec2 lutPixel = ivec2(
-                int(classId & 255u),
-                int((classId >> 8u) & 255u)
+          float tileMinX = minX + float(column) * landCoverTileWorldSize.x;
+          float tileMaxY = maxY - float(row) * landCoverTileWorldSize.y;
+          float localU = clamp(
+            (geoX - tileMinX) / landCoverTileWorldSize.x,
+            0.0,
+            0.99999994
+          );
+          float localV = clamp(
+            (tileMaxY - geoY) / landCoverTileWorldSize.y,
+            0.0,
+            0.99999994
+          );
+
+          uint classId = 0u;
+          if (bank == 0) {
+            ivec3 covSize = textureSize(landCoverTex0, 0);
+            if (localLayer >= 0 && localLayer < covSize.z) {
+              ivec2 covPixel = ivec2(
+                min(int(floor(localU * float(covSize.x))), covSize.x - 1),
+                min(int(floor(localV * float(covSize.y))), covSize.y - 1)
               );
-              vec4 lutColor = texelFetch(landCoverLUT, lutPixel, 0);
-              if (lutColor.a > 0.0) {
-                diffuseColor.rgb = terraLabSrgbToLinear(lutColor.rgb);
-              }
+              classId = texelFetch(landCoverTex0, ivec3(covPixel, localLayer), 0).r;
+            }
+          } else if (bank == 1) {
+            ivec3 covSize = textureSize(landCoverTex1, 0);
+            if (localLayer >= 0 && localLayer < covSize.z) {
+              ivec2 covPixel = ivec2(
+                min(int(floor(localU * float(covSize.x))), covSize.x - 1),
+                min(int(floor(localV * float(covSize.y))), covSize.y - 1)
+              );
+              classId = texelFetch(landCoverTex1, ivec3(covPixel, localLayer), 0).r;
+            }
+          } else if (bank == 2) {
+            ivec3 covSize = textureSize(landCoverTex2, 0);
+            if (localLayer >= 0 && localLayer < covSize.z) {
+              ivec2 covPixel = ivec2(
+                min(int(floor(localU * float(covSize.x))), covSize.x - 1),
+                min(int(floor(localV * float(covSize.y))), covSize.y - 1)
+              );
+              classId = texelFetch(landCoverTex2, ivec3(covPixel, localLayer), 0).r;
+            }
+          } else if (bank == 3) {
+            ivec3 covSize = textureSize(landCoverTex3, 0);
+            if (localLayer >= 0 && localLayer < covSize.z) {
+              ivec2 covPixel = ivec2(
+                min(int(floor(localU * float(covSize.x))), covSize.x - 1),
+                min(int(floor(localV * float(covSize.y))), covSize.y - 1)
+              );
+              classId = texelFetch(landCoverTex3, ivec3(covPixel, localLayer), 0).r;
+            }
+          }
+
+          if (classId != 0u) {
+            ivec2 lutPixel = ivec2(
+              int(classId & 255u),
+              int((classId >> 8u) & 255u)
+            );
+            vec4 lutColor = texelFetch(landCoverLUT, lutPixel, 0);
+            if (lutColor.a > 0.0) {
+              diffuseColor.rgb = terraLabSrgbToLinear(lutColor.rgb);
             }
           }
         }

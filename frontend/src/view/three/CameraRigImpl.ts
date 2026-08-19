@@ -222,7 +222,7 @@ export class CameraRigImpl implements CameraRig {
   ): void {
     this.terrainSampler = sampler;
     this.groundFollower = follower;
-    console.info(`${LOG_PREFIX} [setTerrainDependencies] [Dependències de terreny connectades]`);
+    console.debug(`${LOG_PREFIX} [setTerrainDependencies] [Dependències de terreny connectades]`);
   }
 
   /** Called each frame from the render loop with timestampMs. */
@@ -256,9 +256,9 @@ export class CameraRigImpl implements CameraRig {
 
     // Motion state tracking for coalesced bridge events
     if (isMoving && !this.wasMoving) {
-      console.info(`${LOG_PREFIX} [startMotion] [Moviment iniciat mode=${this.navigationMode}]`);
+      console.debug(`${LOG_PREFIX} [startMotion] [Moviment iniciat mode=${this.navigationMode}]`);
     } else if (!isMoving && this.wasMoving) {
-      console.info(
+      console.debug(
         `${LOG_PREFIX} [stopMotion] [Moviment finalitzat east_m=${this.positionEastM.toFixed(1)} north_m=${this.positionNorthM.toFixed(1)} up_m=${this.positionUpM.toFixed(1)}]`,
       );
       // Publish final snapshot when motion stops
@@ -274,7 +274,7 @@ export class CameraRigImpl implements CameraRig {
   setNavigationMode(mode: NavigationMode): void {
     if (mode === this.navigationMode) return;
     if (this.gotoTarget) {
-      console.info(`${LOG_PREFIX} [setNavigationMode] [Canvi de mode ignorat durant un trajecte Goto actiu]`);
+      console.debug(`${LOG_PREFIX} [setNavigationMode] [Canvi de mode ignorat durant un trajecte Goto actiu]`);
       return;
     }
     const prev = this.navigationMode;
@@ -308,7 +308,7 @@ export class CameraRigImpl implements CameraRig {
     this.applyToCamera();
     this.navigationModeCallback?.(mode);
     this.publishNavigationPose();
-    console.info(`${LOG_PREFIX} [setNavigationMode] [Mode canviat ${prev} → ${mode}]`);
+    console.debug(`${LOG_PREFIX} [setNavigationMode] [Mode canviat ${prev} → ${mode}]`);
   }
 
   toggleNavigationMode(): void {
@@ -317,7 +317,7 @@ export class CameraRigImpl implements CameraRig {
 
   resetToOrigin(): void {
     if (this.gotoTarget) {
-      console.info(`${LOG_PREFIX} [resetToOrigin] [Restabliment ignorat durant un trajecte Goto actiu]`);
+      console.debug(`${LOG_PREFIX} [resetToOrigin] [Restabliment ignorat durant un trajecte Goto actiu]`);
       return;
     }
     this.positionEastM = 0;
@@ -343,7 +343,7 @@ export class CameraRigImpl implements CameraRig {
     this.visualSmoother.reset(this.positionUpM);
     this.applyToCamera();
     this.publishNavigationPose();
-    console.info(`${LOG_PREFIX} [resetToOrigin] [Càmera restablerta a l'origen]`);
+    console.debug(`${LOG_PREFIX} [resetToOrigin] [Càmera restablerta a l'origen]`);
   }
 
   getNavigationPose(): NavigationCameraPose {
@@ -430,7 +430,7 @@ export class CameraRigImpl implements CameraRig {
       ...gotoTarget,
       speedMps: distanceM / GOTO_FLIGHT_DURATION_S,
     };
-    console.info(
+    console.debug(
       `${LOG_PREFIX} [gotoFlightTo] [Destino DEM east_m=${targetEastM.toFixed(1)} north_m=${targetNorthM.toFixed(1)} duration_s=${GOTO_FLIGHT_DURATION_S} speed_mps=${this.gotoTarget.speedMps.toFixed(1)}]`,
     );
     return true;
@@ -442,7 +442,7 @@ export class CameraRigImpl implements CameraRig {
     this.velocityEast = 0;
     this.velocityNorth = 0;
     this.velocityUp = 0;
-    console.info(`${LOG_PREFIX} [cancelGotoFlight] [Trajecte Goto cancelÂ·lat]`);
+    console.debug(`${LOG_PREFIX} [cancelGotoFlight] [Trajecte Goto cancelÂ·lat]`);
   }
 
   // ─── Extended API ──────────────────────────────────────────────────
@@ -767,15 +767,16 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private finishGotoFlight(target: FlightGotoTarget): void {
+    this.gotoTarget = null;
     this.positionEastM = target.eastM;
     this.positionNorthM = target.northM;
     this.positionUpM = target.upM;
-    this.gotoTarget = null;
     this.velocityEast = 0;
     this.velocityNorth = 0;
     this.velocityUp = 0;
+    this.applyToCamera();
     this.publishNavigationPose();
-    console.info(`${LOG_PREFIX} [finishGotoFlight] [Destino Goto alcanzado]`);
+    console.debug(`${LOG_PREFIX} [finishGotoFlight] [Trajecte Goto finalitzat amb Ã¨xit]`);
   }
 
   // ─── Input handlers ────────────────────────────────────────────────

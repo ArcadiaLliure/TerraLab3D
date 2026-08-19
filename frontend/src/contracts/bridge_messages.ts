@@ -206,6 +206,7 @@ export interface LandCoverLegendMessage {
   readonly legendId: string;
   readonly entries: Array<{
     classId: number;
+    label: string;
     colorRgba: [number, number, number, number];
   }>;
 }

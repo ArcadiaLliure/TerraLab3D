@@ -137,7 +137,7 @@ class TileManifest:
 
         self._deep_tiles = deep_entries
         self._tiles_by_id = {entry.tile_id: entry for entry in self._deep_tiles}
-        log.info(
+        log.debug(
             "MGP: [tile_manifest] [load] [Manifest carregat: %d deep tiles, general=%s]",
             len(self._deep_tiles),
             general_tile_id,

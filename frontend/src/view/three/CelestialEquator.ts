@@ -55,7 +55,7 @@ export class CelestialEquator {
     this.root.add(this.equatorLine);
 
     this._geometryBuildCount++;
-    console.info(`${LOG_PREFIX} [constructor] [Geometria de l'equador celeste construïda]`);
+    console.debug(`${LOG_PREFIX} [constructor] [Geometria de l'equador celeste construïda]`);
   }
 
   // ─── Public API ─────────────────────────────────────────────
@@ -105,7 +105,7 @@ export class CelestialEquator {
     } else {
       this.equatorLine.material.dispose();
     }
-    console.info(`${LOG_PREFIX} [dispose] [Recursos alliberats]`);
+    console.debug(`${LOG_PREFIX} [dispose] [Recursos alliberats]`);
   }
 
   // ─── Private ──────────────────────────────────────────────────

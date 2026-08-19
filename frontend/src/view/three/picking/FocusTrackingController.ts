@@ -49,7 +49,7 @@ export class FocusTrackingController {
         this.state = "inactive";
         this.currentTarget = null;
         this.cameraRig.setTrackingState(false);
-        console.info("MGP: [FocusTrackingController] Tracking aturat");
+        console.debug("MGP: [FocusTrackingController] Tracking aturat");
     }
   }
 

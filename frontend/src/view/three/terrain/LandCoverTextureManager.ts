@@ -1,7 +1,8 @@
 import * as THREE from "three";
 
 export interface LandCoverTileData {
-  readonly tileKey: string;
+  readonly tileKey?: string;
+  readonly resourceId?: string;
   readonly bounds: [number, number, number, number];
   readonly width: number;
   readonly height: number;
@@ -13,42 +14,61 @@ export interface LandCoverLegendData {
   readonly legendId: string;
   readonly entries: Array<{
     classId: number;
+    label: string;
     colorRgba: [number, number, number, number];
   }>;
 }
 
+export interface CoverageBank {
+  readonly bankIndex: number;
+  readonly depth: number;
+  readonly classData: Uint16Array;
+  readonly texture: THREE.DataArrayTexture;
+}
+
 /**
- * Retained GPU representation of categorical land-cover tiles.
+ * Retained GPU representation of categorical land-cover tiles using banked 2D texture arrays.
  *
- * Each world-aligned tile occupies one layer of an R16UI DataArrayTexture.
- * Streaming a tile therefore updates exactly one GPU layer; it never rebuilds
- * DEM geometry and never re-uploads a giant stitched 2D atlas.
+ * WebGL2 implementations guarantee at least 256 layers per 2D array texture.
+ * To support large radii (e.g. 150 km = 30x30 = 900 tiles) without exceeding
+ * GPU driver limits or requiring gigabyte-sized single texture allocations,
+ * tiles are partitioned across a small set of DataArrayTexture banks (e.g. 4 banks of <=256 layers).
  *
- * Row 0 is geographic North from Rasterio to texelFetch. flipY stays false.
+ * Streaming a tile updates exactly one layer of the target bank via addLayerUpdate();
+ * it never rebuilds DEM geometry and never re-uploads a giant stitched 2D atlas.
  */
 export class LandCoverTextureManager {
+  public static readonly MAX_LAYERS_PER_BANK = 256;
+  public static readonly MAX_BANKS = 4;
+
   public readonly activeBounds = new THREE.Vector4(0, 0, 0, 0);
   public readonly tileWorldSize = new THREE.Vector2(1, 1);
 
   public readonly emptyCoverageTexture: THREE.DataArrayTexture;
   public readonly emptyPaletteTexture: THREE.DataTexture;
   public paletteTexture: THREE.DataTexture;
-  public activeCoverageTexture: THREE.DataArrayTexture | null = null;
 
-  // Compatibility/diagnostic fields used by the current frontend integration.
+  public banks: CoverageBank[] = [];
+
+  // Compatibility/diagnostic fields
   public globalResolution = 0;
   public globalWidth = 0;
   public globalHeight = 0;
+  public gridColumns = 0;
+  public gridRows = 0;
+  public totalDepth = 0;
+  public layerWidth = 0;
+  public layerHeight = 0;
 
   private requestedBounds: [number, number, number, number] | null = null;
   private requestedResolution = 0;
-  private classData: Uint16Array | null = null;
-  private layerWidth = 0;
-  private layerHeight = 0;
-  private gridColumns = 0;
-  private gridRows = 0;
   private pendingTiles: LandCoverTileData[] = [];
   private changeCallback: (() => void) | null = null;
+  public latestLegend: LandCoverLegendData | null = null;
+
+  public get activeCoverageTexture(): THREE.DataArrayTexture | null {
+    return this.banks[0]?.texture ?? null;
+  }
 
   constructor() {
     this.emptyCoverageTexture = createClassArrayTexture(new Uint16Array([0]), 1, 1, 1, true);
@@ -61,6 +81,8 @@ export class LandCoverTextureManager {
   }
 
   public updateLegend(legend: LandCoverLegendData): void {
+    console.info("MGP: LandCoverTextureManager.updateLegend [INICI]");
+    this.latestLegend = legend;
     const lutData = new Uint8Array(256 * 256 * 4);
     for (const entry of legend.entries) {
       const classId = Number(entry.classId);
@@ -75,6 +97,7 @@ export class LandCoverTextureManager {
     if (this.paletteTexture !== this.emptyPaletteTexture) this.paletteTexture.dispose();
     this.paletteTexture = createPaletteTexture(lutData);
     this.changeCallback?.();
+    console.info("MGP: LandCoverTextureManager.updateLegend [FI]");
   }
 
   /**
@@ -82,12 +105,17 @@ export class LandCoverTextureManager {
    * because the binary tile itself is authoritative for layer dimensions.
    */
   public initGlobalBuffer(bounds: [number, number, number, number], resolution: number): void {
-    if (!validBounds(bounds) || !Number.isFinite(resolution) || resolution <= 0) return;
+    console.info("MGP: LandCoverTextureManager.initGlobalBuffer [INICI]");
+    if (!validBounds(bounds) || !Number.isFinite(resolution) || resolution <= 0) {
+      console.info("MGP: LandCoverTextureManager.initGlobalBuffer [FI]");
+      return;
+    }
     if (
       this.requestedBounds
       && sameBounds(this.requestedBounds, bounds)
       && approximatelyEqual(this.requestedResolution, resolution)
     ) {
+      console.info("MGP: LandCoverTextureManager.initGlobalBuffer [FI]");
       return;
     }
 
@@ -99,65 +127,146 @@ export class LandCoverTextureManager {
     this.globalResolution = resolution;
     this.globalWidth = Math.max(1, Math.ceil((bounds[2] - bounds[0]) / resolution));
     this.globalHeight = Math.max(1, Math.ceil((bounds[3] - bounds[1]) / resolution));
+    console.debug(`[LandCoverTextureManager] initGlobalBuffer: bounds=${bounds.join(",")}, res=${resolution}, dimensions=${this.globalWidth}x${this.globalHeight}`);
 
     if (this.pendingTiles.length > 0) {
       const queued = this.pendingTiles;
       this.pendingTiles = [];
+      console.debug(`[LandCoverTextureManager] descarregant ${queued.length} rajoles pendents acumulades abans de initGlobalBuffer`);
       for (const tile of queued) this.addTile(tile);
     }
     this.changeCallback?.();
+    console.info("MGP: LandCoverTextureManager.initGlobalBuffer [FI]");
   }
 
   public addTile(tile: LandCoverTileData): boolean {
+    console.info("MGP: LandCoverTextureManager.addTile [INICI]");
+    const tileKey = tile.tileKey || tile.resourceId || "unknown";
+    console.debug(`[LandCoverTextureManager] addTile rebut: tileKey=${tileKey}, bounds=${tile.bounds.join(",")}, size=${tile.width}x${tile.height}, dataLen=${tile.data?.length}`);
     if (!validTile(tile)) {
-      console.warn("[LandCoverTextureManager] invalid categorical tile", tile.tileKey);
+      console.error("[LandCoverTextureManager] invalid categorical tile", tileKey);
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
       return false;
     }
 
     const resolutionX = (tile.bounds[2] - tile.bounds[0]) / tile.width;
     const resolutionY = (tile.bounds[3] - tile.bounds[1]) / tile.height;
     if (!approximatelyEqual(resolutionX, resolutionY)) {
-      console.warn("[LandCoverTextureManager] non-square categorical pixels", tile.tileKey);
+      console.warn("[LandCoverTextureManager] non-square categorical pixels", tileKey);
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
       return false;
     }
 
     if (!this.requestedBounds) {
-      // Normally surface_progress arrives first. Keep an early binary resource
-      // rather than inventing a tile-sized global frame.
+      console.debug(`[LandCoverTextureManager] no hi ha requestedBounds encara. Afegint rajola ${tileKey} a pendingTiles (${this.pendingTiles.length + 1} en cua)`);
       this.pendingTiles.push(tile);
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
       return true;
     }
     if (!approximatelyEqual(resolutionX, this.requestedResolution)) {
       console.warn(
         "[LandCoverTextureManager] tile/request resolution mismatch",
-        tile.tileKey,
+        tileKey,
         resolutionX,
         this.requestedResolution,
       );
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
       return false;
     }
 
-    if (!this.activeCoverageTexture) this.allocateTileArray(tile, resolutionX, resolutionY);
-    if (!this.activeCoverageTexture || !this.classData) return false;
+    if (this.banks.length === 0) {
+      this.allocateTileArray(tile, resolutionX, resolutionY);
+    }
+    if (this.banks.length === 0) {
+      console.warn("[LandCoverTextureManager] No s'ha pogut crear/trobar bancs de textura per la rajola", tileKey);
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
+      return false;
+    }
     if (tile.width !== this.layerWidth || tile.height !== this.layerHeight) {
-      console.warn("[LandCoverTextureManager] inconsistent tile dimensions", tile.tileKey);
+      console.warn("[LandCoverTextureManager] inconsistent tile dimensions", tileKey);
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
       return false;
     }
 
     const column = Math.round((tile.bounds[0] - this.activeBounds.x) / this.tileWorldSize.x);
     const row = Math.round((this.activeBounds.w - tile.bounds[3]) / this.tileWorldSize.y);
-    if (column < 0 || column >= this.gridColumns || row < 0 || row >= this.gridRows) return false;
+    if (column < 0 || column >= this.gridColumns || row < 0 || row >= this.gridRows) {
+      console.warn(`[LandCoverTextureManager] rajola fora de la graella: col=${column}/${this.gridColumns}, row=${row}/${this.gridRows}`);
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
+      return false;
+    }
 
-    const layer = row * this.gridColumns + column;
+    const globalLayer = row * this.gridColumns + column;
+    const layersPerBank = LandCoverTextureManager.MAX_LAYERS_PER_BANK;
+    const bankIndex = Math.floor(globalLayer / layersPerBank);
+    const localLayer = globalLayer % layersPerBank;
+
+    if (bankIndex >= this.banks.length) {
+      console.warn(`[LandCoverTextureManager] bankIndex ${bankIndex} fora dels bancs creats (${this.banks.length})`);
+      console.info("MGP: LandCoverTextureManager.addTile [FI]");
+      return false;
+    }
+
+    const bank = this.banks[bankIndex];
     const layerSize = this.layerWidth * this.layerHeight;
-    this.classData.set(tile.data, layer * layerSize);
+    bank.classData.set(tile.data, localLayer * layerSize);
 
-    // Three.js r179 maps layerUpdates to a single texSubImage3D for the
-    // specified layer. Missing/unloaded layers remain zero => BASE fallback.
-    this.activeCoverageTexture.addLayerUpdate(layer);
-    this.activeCoverageTexture.needsUpdate = true;
+    bank.texture.source.dataReady = true;
+    bank.texture.addLayerUpdate(localLayer);
+    bank.texture.needsUpdate = true;
+
+    console.info(`[LandCoverTextureManager] layer ${globalLayer} (bank ${bankIndex}, localLayer ${localLayer}) update requested (col=${column}, row=${row}, tileKey=${tileKey})`);
     this.changeCallback?.();
+    console.info("MGP: LandCoverTextureManager.addTile [FI]");
     return true;
+  }
+
+  public getCategoryAtUv(u: number, v: number): { classId: number; label: string } | null {
+    if (this.banks.length === 0 || !this.requestedBounds || !this.latestLegend) return null;
+
+    const worldX = this.requestedBounds[0] + u * (this.requestedBounds[2] - this.requestedBounds[0]);
+    const worldY = this.requestedBounds[1] + v * (this.requestedBounds[3] - this.requestedBounds[1]);
+
+    if (
+      worldX < this.activeBounds.x || worldX >= this.activeBounds.z
+      || worldY < this.activeBounds.y || worldY >= this.activeBounds.w
+    ) {
+      return null;
+    }
+
+    const col = Math.floor((worldX - this.activeBounds.x) / this.tileWorldSize.x);
+    const row = Math.floor((this.activeBounds.w - worldY) / this.tileWorldSize.y);
+
+    if (col < 0 || col >= this.gridColumns || row < 0 || row >= this.gridRows) return null;
+
+    const globalLayer = row * this.gridColumns + col;
+    const layersPerBank = LandCoverTextureManager.MAX_LAYERS_PER_BANK;
+    const bankIndex = Math.floor(globalLayer / layersPerBank);
+    const localLayer = globalLayer % layersPerBank;
+
+    if (bankIndex >= this.banks.length) return null;
+    const bank = this.banks[bankIndex];
+
+    const tileStartX = this.activeBounds.x + col * this.tileWorldSize.x;
+    const tileStartY = this.activeBounds.w - (row + 1) * this.tileWorldSize.y;
+
+    const localU = Math.max(0, Math.min(0.999999, (worldX - tileStartX) / this.tileWorldSize.x));
+    const localV = Math.max(0, Math.min(0.999999, (tileMaxY_from(this.activeBounds.w, row, this.tileWorldSize.y) - worldY) / this.tileWorldSize.y));
+
+    const pixelX = Math.floor(localU * this.layerWidth);
+    const pixelY = Math.floor(localV * this.layerHeight);
+
+    if (pixelX < 0 || pixelX >= this.layerWidth || pixelY < 0 || pixelY >= this.layerHeight) return null;
+
+    const index = localLayer * (this.layerWidth * this.layerHeight) + pixelY * this.layerWidth + pixelX;
+    const classId = bank.classData[index];
+
+    if (classId === undefined || classId === 0) return null;
+
+    const entry = this.latestLegend.entries.find((e) => e.classId === classId);
+    if (!entry) return null;
+
+    return { classId, label: entry.label };
   }
 
   public clear(): void {
@@ -196,32 +305,55 @@ export class LandCoverTextureManager {
     this.layerHeight = tile.height;
     this.gridColumns = columns;
     this.gridRows = rows;
+    this.totalDepth = depth;
     this.tileWorldSize.set(tileWorldX, tileWorldY);
     this.activeBounds.set(gridMinX, gridMinY, gridMaxX, gridMaxY);
 
+    const layersPerBank = LandCoverTextureManager.MAX_LAYERS_PER_BANK;
+    const bankCount = Math.min(LandCoverTextureManager.MAX_BANKS, Math.ceil(depth / layersPerBank));
     const layerSize = tile.width * tile.height;
-    this.classData = new Uint16Array(layerSize * depth);
-    this.activeCoverageTexture = createClassArrayTexture(
-      this.classData,
-      tile.width,
-      tile.height,
-      depth,
-      true,
+
+    this.banks = [];
+    let remainingLayers = depth;
+    for (let b = 0; b < bankCount; b++) {
+      const bankDepth = Math.min(layersPerBank, remainingLayers);
+      remainingLayers -= bankDepth;
+      const classData = new Uint16Array(layerSize * bankDepth);
+      const texture = createClassArrayTexture(classData, tile.width, tile.height, bankDepth, false);
+      texture.onUpdate = (tex) => {
+        console.info(`[LandCoverTextureManager] GPU upload completed for bank ${b}: version=${tex.version}`);
+      };
+      this.banks.push({
+        bankIndex: b,
+        depth: bankDepth,
+        classData,
+        texture,
+      });
+    }
+
+    console.info(
+      `[LandCoverTextureManager] Allocated ${this.banks.length} texture bank(s) for totalDepth=${depth} (${columns}x${rows} tiles). Total CPU Memory: ${((layerSize * depth * 2) / (1024 * 1024)).toFixed(1)}MB`,
     );
   }
 
   private clearCoverage(clearPending: boolean): void {
-    this.activeCoverageTexture?.dispose();
-    this.activeCoverageTexture = null;
-    this.classData = null;
+    for (const bank of this.banks) {
+      bank.texture.dispose();
+    }
+    this.banks = [];
     this.layerWidth = 0;
     this.layerHeight = 0;
     this.gridColumns = 0;
     this.gridRows = 0;
+    this.totalDepth = 0;
     this.activeBounds.set(0, 0, 0, 0);
     this.tileWorldSize.set(1, 1);
     if (clearPending) this.pendingTiles = [];
   }
+}
+
+function tileMaxY_from(activeBoundsW: number, row: number, tileWorldHeight: number): number {
+  return activeBoundsW - row * tileWorldHeight;
 }
 
 function createClassArrayTexture(
@@ -244,7 +376,8 @@ function createClassArrayTexture(
   texture.flipY = false;
   texture.unpackAlignment = 1;
   texture.colorSpace = THREE.NoColorSpace;
-  if (uploadImmediately) texture.needsUpdate = true;
+
+  texture.needsUpdate = true;
   return texture;
 }
 

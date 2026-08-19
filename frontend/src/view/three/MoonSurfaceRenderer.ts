@@ -96,6 +96,7 @@ export class MoonSurfaceRenderer {
   private basePresentationScale = 1;
   private terrainEnvelopeScale = 1;
   private appliedTerrainLimb: TerrainCorrectedLimbState | null = null;
+  private activeResourceKey: string | null = null;
 
   readonly geometryBuildCount = 1;
   readonly materialBuildCount = 2;
@@ -181,6 +182,12 @@ export class MoonSurfaceRenderer {
 
   configureResource(resource: MoonSurfaceResourceDescriptor, maxTextureSize: number): void {
     if (this.disposed) return;
+    const selectedAlbedo = selectAlbedo(resource, maxTextureSize);
+    const key = `${resource.status}:${resource.label}:${selectedAlbedo?.url ?? "none"}:${resource.normalMap?.url ?? "none"}:${maxTextureSize}`;
+    if (this.activeResourceKey === key && (this._surfaceStatus === "ready" || this._surfaceStatus === "loading")) {
+      return;
+    }
+    this.activeResourceKey = key;
     const revision = ++this.loadRevision;
     this.releaseTextures();
     this._selectedResource = resource.label;
@@ -190,7 +197,6 @@ export class MoonSurfaceRenderer {
       return;
     }
 
-    const selectedAlbedo = selectAlbedo(resource, maxTextureSize);
     if (selectedAlbedo === null) {
       this._selectedResource = "surface unavailable";
       this._surfaceStatus = "unavailable";

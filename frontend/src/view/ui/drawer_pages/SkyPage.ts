@@ -63,7 +63,7 @@ export class SkyPage {
   private solarStatusLabel!: HTMLDivElement;
   private moonSurfaceStatusLabel!: HTMLDivElement;
   private satelliteCatalogStatusLabel!: HTMLDivElement;
-  private readonly enabledSatelliteSystems = new Set<string>();
+  private readonly enabledSatelliteSystems = new Set<string>(["mars", "jupiter", "saturn", "uranus", "neptune", "pluto"]);
 
   private milkyWayRow!: ResourceBackedLayerRow;
   private planckDustRow!: ResourceBackedLayerRow;
@@ -137,7 +137,7 @@ export class SkyPage {
 
     const extendedLabels: ReadonlyArray<["rings" | "satellites" | "orbits" | "trajectories", string, boolean]> = [
       ["rings", "Anells de Saturn", true],
-      ["satellites", "Satèl·lits naturals", false],
+      ["satellites", "Satèl·lits naturals", true],
       ["orbits", "Òrbites SPK", false],
       ["trajectories", "Trajectòries aparents", false],
     ];
@@ -168,6 +168,7 @@ export class SkyPage {
       label.style.cssText = "display:flex;align-items:center;gap:4px;cursor:pointer;";
       const input = document.createElement("input");
       input.type = "checkbox";
+      input.checked = this.enabledSatelliteSystems.has(system);
       input.onchange = () => {
         if (input.checked) this.enabledSatelliteSystems.add(system);
         else this.enabledSatelliteSystems.delete(system);
@@ -214,6 +215,10 @@ export class SkyPage {
     this.solarStatusLabel.textContent = "Efemèride: carregant…";
     group.appendChild(this.solarStatusLabel);
     this.element.appendChild(group);
+
+    setTimeout(() => {
+      this.options.onSatelliteSystemsChanged?.([...this.enabledSatelliteSystems]);
+    }, 0);
   }
 
   private createGroup(titleText: string): [HTMLDivElement, HTMLDivElement] {

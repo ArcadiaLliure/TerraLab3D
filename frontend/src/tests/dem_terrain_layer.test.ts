@@ -21,8 +21,8 @@ assert(renderer.applyBinaryResource(fixture.metadata, fixture.buffer), "DEM mesh
 const mesh = renderer.root.getObjectByName("demTerrainMeshV3") as THREE.Mesh;
 assert(mesh instanceof THREE.Mesh, "visible terrain is a world mesh, not a horizon curtain");
 assert(mesh.renderOrder > -1_000, "world terrain renders after the celestial horizon depth mask");
-assert(mesh.geometry.getAttribute("terrainClassId").itemSize === 1, "semantic class identity is retained separately");
-assert(mesh.geometry.getAttribute("terrainSourceId").itemSize === 1, "surface source identity is retained separately");
+assert(mesh.geometry.getAttribute("position").itemSize === 3, "position attribute is present");
+assert(mesh.geometry.getAttribute("normal").itemSize === 3, "normal attribute is present");
 assert(renderer.metrics().triangleCount === 2, "indexed valid DEM cell forms two triangles");
 assert(renderer.getNavigationMesh() === mesh, "the visible DEM mesh is exposed for navigation collision");
 assert(

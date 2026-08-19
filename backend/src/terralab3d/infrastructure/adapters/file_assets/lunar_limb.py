@@ -153,7 +153,7 @@ class LroLolaLimbProfileProvider:
             image.load()
             self._image = image
             self.load_count += 1
-            log.info("MGP: [LroLolaLimbProfileProvider] [load] [DEM LOLA validat]")
+            log.debug("MGP: [LroLolaLimbProfileProvider] [load] [DEM LOLA validat]")
             return image
         except (ImportError, OSError, ValueError) as exc:
             log.warning("LRO/LOLA limb load failed: %s", exc)

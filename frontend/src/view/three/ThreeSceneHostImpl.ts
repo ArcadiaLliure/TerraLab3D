@@ -151,7 +151,7 @@ export class ThreeSceneHostImpl {
     this.starFieldRenderer.attachToParent(this.celestialRoot);
     this.deepSkyRenderer = new DeepSkyRenderer(this.horizonOcclusionState);
     this.deepSkyRenderer.attachToParent(this.celestialRoot);
-    
+
     this.solarSystemRenderer = new SolarSystemRenderer(
       this.celestialRoot,
       undefined,
@@ -199,7 +199,7 @@ export class ThreeSceneHostImpl {
       this.celestialSphere.add(meridian);
     }
 
-    console.info(`${LOG_PREFIX} [constructor] [Escena inicialitzada amb grid horitzontal, equador celeste i etiquetes]`);
+    console.debug(`${LOG_PREFIX} [constructor] [Escena inicialitzada amb grid horitzontal, equador celeste i etiquetes]`);
   }
 
   // ─── Public access to roots ────────────────────────────────────────
@@ -294,7 +294,7 @@ export class ThreeSceneHostImpl {
     // This eliminates translational parallax for sky objects.
     this.celestialRoot.position.copy(this.camera.position);
     this.horizontalGrid.root.position.y = 0;
-    
+
     this._transformUpdateCount++;
 
     // ─── Phase 4: LOD update based on current FOV ────────────────────
@@ -305,7 +305,7 @@ export class ThreeSceneHostImpl {
     this.celestialEquator.update();
 
   }
-  
+
   renderFrame(): void {
     if (this.disposed) return;
     this.renderer.render(this.scene, this.camera);
@@ -371,7 +371,7 @@ export class ThreeSceneHostImpl {
         break;
     }
 
-    console.info(`${LOG_PREFIX} [setOverlayVisibility] [${key}=${visible}]`);
+    console.debug(`${LOG_PREFIX} [setOverlayVisibility] [${key}=${visible}]`);
   }
 
   getOverlayVisibility(): Readonly<OverlayVisibility> {
@@ -440,6 +440,6 @@ export class ThreeSceneHostImpl {
     this.renderer.dispose();
     this.renderer.domElement.remove();
 
-    console.info(`${LOG_PREFIX} [dispose] [Escena alliberada]`);
+    console.debug(`${LOG_PREFIX} [dispose] [Escena alliberada]`);
   }
 }

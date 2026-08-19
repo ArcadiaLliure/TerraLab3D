@@ -123,7 +123,7 @@ class StarCoordinator:
         self._started = True
 
         availability = self._adapter.get_availability()
-        log.info(
+        log.debug(
             "MGP: [StarCoordinator] [start] "
             "[Gaia=%s, adapter=%s]",
             availability.value,
@@ -228,7 +228,7 @@ class StarCoordinator:
         self._batches.clear()
         if self._pick_resolver:
             self._pick_resolver.shutdown()
-        log.info("MGP: [StarCoordinator] [shutdown] [Coordinador tancat]")
+        log.debug("MGP: [StarCoordinator] [shutdown] [Coordinador tancat]")
 
     # ─── Private ──────────────────────────────────────────────────────
 
@@ -253,7 +253,7 @@ class StarCoordinator:
         )
 
         elapsed_ms = (time.perf_counter() - t0) * 1000
-        log.info(
+        log.debug(
             "MGP: [StarCoordinator] [_load_fallback] "
             "[Fallback publicat: %d estrelles, %.1f ms]",
             len(batch), elapsed_ms,
@@ -295,7 +295,7 @@ class StarCoordinator:
         )
 
         elapsed_ms = (time.perf_counter() - t0) * 1000
-        log.info(
+        log.debug(
             "MGP: [StarCoordinator] [_load_gaia_general] "
             "[General publicat: %d estrelles, %.1f ms]",
             len(batch), elapsed_ms,
@@ -394,7 +394,7 @@ class StarCoordinator:
             }
             await self._resource_publisher(resource_id, version, metadata, buffer)
 
-        log.info(
+        log.debug(
             "MGP: [StarCoordinator] [_build_and_publish_resource] "
             "[%s: %d estrelles, %d bytes, hash=%s]",
             resource_id, n, total_bytes, content_hash,

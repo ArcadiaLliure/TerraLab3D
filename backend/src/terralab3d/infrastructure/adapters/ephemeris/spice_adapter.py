@@ -178,7 +178,7 @@ class SpiceEphemerisAdapter:
         if unknown:
             raise ValueError(f"Unknown satellite system(s): {', '.join(sorted(unknown))}")
         self._active_satellite_systems = requested
-        log.info(
+        log.debug(
             "MGP: [SpiceEphemerisAdapter.py] [set_satellite_systems] [Actius=%s]",
             ",".join(sorted(requested)) or "none",
         )
@@ -426,7 +426,7 @@ class SpiceEphemerisAdapter:
                 positions.append(_vector3(state[:3]))
             self._orbit_generation += 1
             elapsed = (time.perf_counter() - started) * 1000.0
-            log.info(
+            log.debug(
                 "MGP: [OrbitSampler.py] [sample] "
                 "[Òrbita mostrejada body=%s samples=%d duration_ms=%.1f]",
                 definition.name,

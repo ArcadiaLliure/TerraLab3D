@@ -202,5 +202,5 @@ class ResourceInstallationRepository:
                     changed = True
 
         if changed:
-            log.info("MGP: [ResourceInstallationRepository] [Descobriment inicial ha completat noves deteccions]")
+            log.debug("MGP: [ResourceInstallationRepository] [Descobriment inicial ha completat noves deteccions]")
             self.save()

@@ -99,7 +99,7 @@ class WebSocketBridge:
         """Gestiona una connexió WebSocket."""
         ws = aiohttp.web.WebSocketResponse(heartbeat=10)
         await ws.prepare(request)
-        log.info("WebSocket connectat")
+        log.debug("WebSocket connectat")
 
         # Llegim el primer missatge (ha de ser frontend_ready) per validar la versió
         msg = await ws.receive()
@@ -144,7 +144,7 @@ class WebSocketBridge:
             log.exception("Error a WebSocket")
         finally:
             self._clients.discard(ws)
-            log.info("WebSocket desconnectat (clients actius: %d)", len(self._clients))
+            log.debug("WebSocket desconnectat (clients actius: %d)", len(self._clients))
 
         return ws
 
@@ -165,7 +165,12 @@ class WebSocketBridge:
         buffer: bytes,
     ) -> None:
         """Envia un recurs binari als frontends connectats."""
+        is_land_cover = metadata.get("role") == "land_cover_tile"
+        if is_land_cover:
+            log.info("MGP: WebSocketBridge.send_binary_resource [INICI]")
         if not self._clients:
+            if is_land_cover:
+                log.info("MGP: WebSocketBridge.send_binary_resource [FI]")
             return
 
         header_bytes = json.dumps(metadata).encode("utf-8")
@@ -180,10 +185,12 @@ class WebSocketBridge:
                 except Exception:
                     self._clients.discard(ws)
         self._binary_bytes_sent += len(message)
-        log.info(
+        log.debug(
             "Recurs binari enviat: %s v%s (%d bytes header + %d bytes payload)",
             resource_id, version, header_len, len(buffer),
         )
+        if is_land_cover:
+            log.info("MGP: WebSocketBridge.send_binary_resource [FI]")
 
     async def send_star_catalog_status(self, status: dict[str, Any]) -> None:
         """Envia l'estat del catàleg estel·lar a la UI."""
@@ -435,14 +442,14 @@ class WebSocketBridge:
             return
 
         if msg_type not in ("camera_changed", "set_simulation_time", "camera_pose_changed"):
-            log.info("S'ha rebut missatge de tipus: %s", msg_type)
+            log.debug("S'ha rebut missatge de tipus: %s", msg_type)
         else:
             log.debug("S'ha rebut missatge de tipus: %s", msg_type)
 
         if msg_type == "frontend_ready":
             await self._handle_handshake(data)
         elif msg_type == "shutdown_complete":
-            log.info("El frontend ha confirmat el tancament")
+            log.debug("El frontend ha confirmat el tancament")
             self._shutdown_event.set()
         
         handlers = self._handlers.get(msg_type, [])
@@ -456,7 +463,7 @@ class WebSocketBridge:
 
     async def _handle_handshake(self, _data: dict[str, Any]) -> None:
         self._connected = True
-        log.info("Handshake completat — sessió %s", self._session_id)
+        log.debug("Handshake completat — sessió %s", self._session_id)
         await self.send({
             "type": "handshake_ack",
             "sessionId": self._session_id,

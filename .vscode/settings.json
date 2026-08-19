@@ -1,0 +1,8 @@
+{
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/backend/src"
+  ],
+  "python.analysis.pythonPath": "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+  "pyright.pythonPath": "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+  "python.defaultInterpreterPath": "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe"
+}
