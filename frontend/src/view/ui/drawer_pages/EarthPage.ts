@@ -22,6 +22,8 @@ interface ProgressBlock {
     detailsText: string;
     isError: boolean;
     isSuccess: boolean;
+    isActive?: boolean;
+    hideTrack?: boolean;
   }) => void;
 }
 
@@ -41,8 +43,10 @@ export class EarthPage {
   private readonly angularStepValue: HTMLSpanElement;
   private readonly observerStatus: HTMLDivElement;
   private readonly surfaceModeInput: HTMLSelectElement;
+
+  private lastHorizonProgress: number | null = null;
   private readonly cancelButton: HTMLButtonElement;
-  
+
   private readonly horizonProgress: ProgressBlock;
   private readonly surfaceProgress: ProgressBlock;
 
@@ -228,8 +232,13 @@ export class EarthPage {
   }
 
   public updateHorizonStatus(status: HorizonStatusMessage): void {
-    const progress = status.progress === null ? null : Math.max(0, Math.min(1, status.progress)) * 100;
-    
+    if (status.phase === "fallback") {
+      // Ignorar completament el fallback segons la petició de l'usuari
+      return;
+    }
+
+    const progress = status.progress === null ? null : status.progress * 100;
+
     const phaseLabels: Record<HorizonStatusMessage["phase"], string> = {
       queued: "Càlcul programat",
       opening_source: "Obrint el terreny configurat",
@@ -258,15 +267,17 @@ export class EarthPage {
     }
     if (status.message) details.push(status.message);
 
+    const busy = ["queued", "opening_source", "sampling", "reducing", "publishing"].includes(status.phase);
+
     this.horizonProgress.update({
       percent: progress,
       statusText: phaseLabels[status.phase],
       detailsText: details.join(" · "),
       isError: status.phase === "error",
-      isSuccess: status.phase === "completed",
+      isSuccess: status.phase === "completed" || (status.phase === "fallback" && status.progress === 1.0),
+      isActive: busy,
     });
 
-    const busy = ["queued", "opening_source", "sampling", "reducing", "publishing"].includes(status.phase);
     this.cancelButton.disabled = !busy;
   }
 
@@ -292,12 +303,12 @@ export class EarthPage {
       });
       return;
     }
-    
+
     const isError = status.phase?.toLowerCase().includes("error") ?? false;
-    const isSuccess = status.completed === true 
-      && status.percent === 100 
-      && (status.validTiles ?? 0) > 0 
-      && (status.validPixels ?? 0) > 0 
+    const isSuccess = status.completed === true
+      && status.percent === 100
+      && (status.validTiles ?? 0) > 0
+      && (status.validPixels ?? 0) > 0
       && (status.failedTiles ?? 0) === 0;
 
     const details: string[] = [];
@@ -312,6 +323,7 @@ export class EarthPage {
       detailsText: details.join(" · "),
       isError: isError,
       isSuccess: isSuccess,
+      isActive: !isError && !isSuccess && status.phase !== undefined,
     });
   }
 
@@ -419,20 +431,20 @@ export class EarthPage {
   private createProgressBlock(): ProgressBlock {
     const container = document.createElement("div");
     container.style.cssText = "display:flex;flex-direction:column;gap:4px;margin-top:6px;";
-    
+
     const statusLabel = document.createElement("div");
     statusLabel.style.cssText = "font-size:10px;color:var(--color-text-bright);";
-    
+
     const track = document.createElement("div");
     track.style.cssText = "height:3px;overflow:hidden;border-radius:2px;background:var(--color-surface);margin-top:2px;";
-    
+
     const progressBar = document.createElement("div");
     progressBar.style.cssText = "width:0%;height:100%;background:var(--color-gold);transition:width 120ms linear;";
     track.appendChild(progressBar);
 
     const detailsLabel = document.createElement("div");
     detailsLabel.style.cssText = "font-size:9px;line-height:1.45;color:var(--color-text-muted);overflow-wrap:anywhere;";
-    
+
     container.append(statusLabel, track, detailsLabel);
 
     return {
@@ -445,14 +457,25 @@ export class EarthPage {
         statusLabel.textContent = text;
         statusLabel.style.color = params.isError ? "#ff8a80" : (params.isSuccess ? "#4ade80" : "var(--color-text-bright)");
         detailsLabel.textContent = params.detailsText;
-        
-        progressBar.style.width = `${params.percent ?? 0}%`;
-        if (params.isError || params.percent === null) {
+
+        if (params.hideTrack) {
+          progressBar.style.width = "0%";
           progressBar.style.background = "transparent";
+        } else if (params.isError) {
+          progressBar.style.width = "100%";
+          progressBar.style.background = "#ff8a80";
         } else if (params.isSuccess) {
+          progressBar.style.width = "100%";
           progressBar.style.background = "#4ade80";
-        } else {
+        } else if (params.percent !== null) {
+          progressBar.style.width = `${params.percent}%`;
           progressBar.style.background = "var(--color-gold)";
+        } else if (params.isActive) {
+          progressBar.style.width = "0%";
+          progressBar.style.background = "transparent";
+        } else {
+          progressBar.style.width = "0%";
+          progressBar.style.background = "transparent";
         }
       }
     };

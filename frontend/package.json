@@ -10,6 +10,7 @@
     "test": "npm run test:build && node .test-dist/grid.test.js && node .test-dist/navigation.test.js && node .test-dist/terrain_goto.test.js && node .test-dist/solar_system.test.js && node .test-dist/solar_system_step8_6.test.js && node .test-dist/lighting_step8_7.test.js && node .test-dist/astronomical_events_step9.test.js && node .test-dist/galactic_step10.test.js && node .test-dist/tracking_resolver.test.js && node .test-dist/tracking_precision.test.js && node .test-dist/star_trails.test.js && node .test-dist/horizon_step15.test.js && node .test-dist/dem_terrain_layer.test.js && node .test-dist/land_cover_texture.test.js"
   },
   "dependencies": {
+    "puppeteer": "^25.8.0",
     "three": "^0.179.0"
   },
   "devDependencies": {

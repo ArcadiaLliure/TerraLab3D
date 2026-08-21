@@ -49,9 +49,9 @@ export class PointerGestureRouter {
   private hoverRafId = 0;
 
   // ─── Callbacks ─────────────────────────────────────────────────────
-  private tapCallback: TapCallback | null = null;
-  private hoverCallback: HoverCallback | null = null;
-  private hoverClearCallback: HoverClearCallback | null = null;
+  private tapCallbacks: TapCallback[] = [];
+  private hoverCallbacks: HoverCallback[] = [];
+  private hoverClearCallbacks: HoverClearCallback[] = [];
 
   // ─── Bound handlers ────────────────────────────────────────────────
   private readonly onPointerDownBound: (e: PointerEvent) => void;
@@ -68,15 +68,15 @@ export class PointerGestureRouter {
   }
 
   onTap(cb: TapCallback): void {
-    this.tapCallback = cb;
+    this.tapCallbacks.push(cb);
   }
 
   onHover(cb: HoverCallback): void {
-    this.hoverCallback = cb;
+    this.hoverCallbacks.push(cb);
   }
 
   onHoverClear(cb: HoverClearCallback): void {
-    this.hoverClearCallback = cb;
+    this.hoverClearCallbacks.push(cb);
   }
 
   attach(container: HTMLElement): void {
@@ -101,9 +101,9 @@ export class PointerGestureRouter {
 
   dispose(): void {
     this.detach();
-    this.tapCallback = null;
-    this.hoverCallback = null;
-    this.hoverClearCallback = null;
+    this.tapCallbacks = [];
+    this.hoverCallbacks = [];
+    this.hoverClearCallbacks = [];
   }
 
   // ─── Private handlers ──────────────────────────────────────────────
@@ -129,7 +129,7 @@ export class PointerGestureRouter {
       this.hasPendingHover = true;
       this.hoverRafId = requestAnimationFrame(() => {
         this.hasPendingHover = false;
-        this.hoverCallback?.(this.pendingHoverX, this.pendingHoverY);
+        for (const cb of this.hoverCallbacks) cb(this.pendingHoverX, this.pendingHoverY);
       });
     }
   }
@@ -149,7 +149,7 @@ export class PointerGestureRouter {
 
     if (distance <= this.config.clickDragThresholdCssPx) {
       // És un tap
-      this.tapCallback?.(e.clientX, e.clientY);
+      for (const cb of this.tapCallbacks) cb(e.clientX, e.clientY);
     }
     // Si distance > threshold, era drag — CameraRig ja l'ha gestionat
   }
@@ -157,7 +157,7 @@ export class PointerGestureRouter {
   private onPointerLeave(_e: PointerEvent): void {
     this.isPointerDown = false;
     this.cancelHoverRaf();
-    this.hoverClearCallback?.();
+    for (const cb of this.hoverClearCallbacks) cb();
   }
 
   private cancelHoverRaf(): void {

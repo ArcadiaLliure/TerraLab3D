@@ -33,19 +33,29 @@ export class TerrainPickProvider {
 
     const intersects: THREE.Intersection[] = [];
     this.config.terrainRenderer.raycast(this.raycaster, intersects);
+    
+    // console.debug(`MGP: [TerrainPickProvider] intersects: ${intersects.length}`);
 
     if (intersects.length > 0) {
       // Sort by distance
       intersects.sort((a, b) => a.distance - b.distance);
       const hit = intersects[0];
-      if (hit && hit.uv) {
-        const category = this.config.terrainRenderer.landCoverManager.getCategoryAtUv(hit.uv.x, hit.uv.y);
+      if (hit) {
+        // The terrain geometry does not have UVs. We must use the world position.
+        // In the terrain shader, geoX = worldPos.x and geoY = -worldPos.z
+        const geoX = hit.point.x;
+        const geoY = -hit.point.z;
+        const category = this.config.terrainRenderer.landCoverManager.getCategoryAtWorld(geoX, geoY);
+        
         if (category) {
           return {
             classId: category.classId,
             label: category.label,
             worldPoint: hit.point.clone(),
           };
+        } else {
+          // No land cover loaded or mapped at this point
+          // console.debug(`MGP: [TerrainPickProvider] No category found for world: ${geoX}, ${geoY}`);
         }
       }
     }

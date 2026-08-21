@@ -1051,7 +1051,10 @@ async def run() -> int:
         }
         await bridge.send_resource_catalog_snapshot(catalog_payload)
         
-        await broadcast_time(force_celestial_transform=True)
+        try:
+            await broadcast_time(force_celestial_transform=True)
+        except RuntimeError:
+            pass
         if current_observer.location.elevation_m is None and (
             elevation_task is None or elevation_task.done()
         ):
@@ -1240,9 +1243,12 @@ async def run() -> int:
             if not isinstance(systems, list):
                 raise ValueError("systems must be a list")
             ephemeris_adapter.set_satellite_systems(str(item) for item in systems)
-            ephemeris_coordinator.request(
-                sim_time_utc, scientific_observer(), observer_generation
-            )
+            try:
+                ephemeris_coordinator.request(
+                    sim_time_utc, scientific_observer(), observer_generation
+                )
+            except RuntimeError:
+                pass
         except (TypeError, ValueError) as exc:
             await bridge.send({
                 "type": "bridge_error",

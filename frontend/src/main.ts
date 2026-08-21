@@ -406,16 +406,16 @@ function main(): void {
   terrainTooltip.style.display = "none";
   terrainTooltip.style.zIndex = "1000";
   terrainTooltip.style.boxShadow = "0 2px 4px rgba(0,0,0,0.5)";
-  
-  canvasContainer.appendChild(terrainTooltip);
+  document.body.appendChild(terrainTooltip);
 
   gestureRouter.onHover((x, y) => {
     const terrainHit = terrainPickProvider.hover(x, y);
     if (terrainHit) {
+      console.log(`MGP: Terrain hover HIT! classId: ${terrainHit.classId}, label: ${terrainHit.label}`);
       terrainTooltip.style.display = "block";
       terrainTooltip.style.left = `${x + 15}px`;
       terrainTooltip.style.top = `${y + 15}px`;
-      terrainTooltip.textContent = terrainHit.label;
+      terrainTooltip.textContent = `${terrainHit.classId}: ${terrainHit.label}`;
     } else {
       terrainTooltip.style.display = "none";
     }

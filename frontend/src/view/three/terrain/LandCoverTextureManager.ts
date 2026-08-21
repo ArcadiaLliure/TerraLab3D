@@ -221,11 +221,8 @@ export class LandCoverTextureManager {
     return true;
   }
 
-  public getCategoryAtUv(u: number, v: number): { classId: number; label: string } | null {
+  public getCategoryAtWorld(worldX: number, worldY: number): { classId: number; label: string } | null {
     if (this.banks.length === 0 || !this.requestedBounds || !this.latestLegend) return null;
-
-    const worldX = this.requestedBounds[0] + u * (this.requestedBounds[2] - this.requestedBounds[0]);
-    const worldY = this.requestedBounds[1] + v * (this.requestedBounds[3] - this.requestedBounds[1]);
 
     if (
       worldX < this.activeBounds.x || worldX >= this.activeBounds.z
@@ -248,8 +245,7 @@ export class LandCoverTextureManager {
     const bank = this.banks[bankIndex];
 
     const tileStartX = this.activeBounds.x + col * this.tileWorldSize.x;
-    const tileStartY = this.activeBounds.w - (row + 1) * this.tileWorldSize.y;
-
+    
     const localU = Math.max(0, Math.min(0.999999, (worldX - tileStartX) / this.tileWorldSize.x));
     const localV = Math.max(0, Math.min(0.999999, (tileMaxY_from(this.activeBounds.w, row, this.tileWorldSize.y) - worldY) / this.tileWorldSize.y));
 
@@ -267,6 +263,13 @@ export class LandCoverTextureManager {
     if (!entry) return null;
 
     return { classId, label: entry.label };
+  }
+
+  public getCategoryAtUv(u: number, v: number): { classId: number; label: string } | null {
+    if (!this.requestedBounds) return null;
+    const worldX = this.requestedBounds[0] + u * (this.requestedBounds[2] - this.requestedBounds[0]);
+    const worldY = this.requestedBounds[1] + v * (this.requestedBounds[3] - this.requestedBounds[1]);
+    return this.getCategoryAtWorld(worldX, worldY);
   }
 
   public clear(): void {

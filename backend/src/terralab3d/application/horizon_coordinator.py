@@ -136,7 +136,7 @@ class HorizonCoordinator:
         self._active_terrain_profile = None
         await self._publish(profile)
         await self._publish_terrain(profile, None)
-        await self._status(request, "fallback", 1.0, profile)
+        # NO publicar horizon_status="fallback". Este perfil es solamente un placeholder interno de renderizado.
         log.debug(
             "MGP: [horizon_coordinator.py] [activate_observer_fallback] "
             "[Perfil pla observer_generation=%d rays=%d]",

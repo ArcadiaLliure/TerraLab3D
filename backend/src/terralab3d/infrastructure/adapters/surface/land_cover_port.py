@@ -132,20 +132,76 @@ class RasterioLandCoverPort(LandCoverPort):
         res = LandCoverLegend(
             legend_id=legend_id,
             entries=(
-                LandCoverLegendEntry(class_id=0, name="Sense dades", color_rgba=(0, 0, 0, 0)),
-                LandCoverLegendEntry(class_id=62, name="Superfícies artificials", color_rgba=(210, 0, 0, 255)),
-                LandCoverLegendEntry(class_id=73, name="Terres de conreu", color_rgba=(253, 211, 39, 255)),
-                LandCoverLegendEntry(class_id=82, name="Bosc de frondoses", color_rgba=(176, 91, 16, 255)),
-                LandCoverLegendEntry(class_id=83, name="Bosc de coníferes", color_rgba=(35, 152, 0, 255)),
-                LandCoverLegendEntry(class_id=102, name="Vegetació herbàcia", color_rgba=(8, 98, 0, 255)),
-                LandCoverLegendEntry(class_id=103, name="Matollars i landes", color_rgba=(128, 255, 0, 255)),
-                LandCoverLegendEntry(class_id=104, name="Pastius i pastures", color_rgba=(141, 139, 0, 255)),
-                LandCoverLegendEntry(class_id=105, name="Torberes", color_rgba=(95, 53, 7, 255)),
-                LandCoverLegendEntry(class_id=106, name="Aiguamolls", color_rgba=(43, 115, 149, 255)),
-                LandCoverLegendEntry(class_id=121, name="Sòl nu", color_rgba=(79, 79, 79, 255)),
-                LandCoverLegendEntry(class_id=123, name="Espais amb vegetació esparsa", color_rgba=(204, 204, 204, 255)),
-                LandCoverLegendEntry(class_id=162, name="Neu i glaceres", color_rgba=(255, 255, 255, 255)),
-                LandCoverLegendEntry(class_id=211, name="Masses d'aigua", color_rgba=(0, 50, 200, 255)),
+                LandCoverLegendEntry(
+                    class_id=0,
+                    name="Sense dades / núvols",
+                    color_rgba=(0, 0, 0, 0),
+                ),
+                LandCoverLegendEntry(
+                    class_id=62,
+                    name="Superfícies artificials",
+                    color_rgba=(210, 0, 0, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=73,
+                    name="Terres de conreu",
+                    color_rgba=(253, 211, 39, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=75,
+                    name="Vinyes",
+                    color_rgba=(170, 70, 180, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=82,
+                    name="Bosc de frondoses",
+                    color_rgba=(176, 91, 16, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=83,
+                    name="Bosc de coníferes",
+                    color_rgba=(35, 152, 0, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=102,
+                    name="Vegetació herbàcia",
+                    color_rgba=(8, 98, 0, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=103,
+                    name="Matollars i landes",
+                    color_rgba=(128, 255, 0, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=104,
+                    name="Vegetació esclerofil·la",
+                    color_rgba=(141, 139, 0, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=105,
+                    name="Aiguamolls",
+                    color_rgba=(43, 115, 149, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=106,
+                    name="Torberes",
+                    color_rgba=(95, 53, 7, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=121,
+                    name="Superfícies de materials naturals",
+                    color_rgba=(79, 79, 79, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=123,
+                    name="Neu permanent i glaceres",
+                    color_rgba=(255, 255, 255, 255),
+                ),
+                LandCoverLegendEntry(
+                    class_id=162,
+                    name="Masses d'aigua",
+                    color_rgba=(0, 50, 200, 255),
+                ),
             ),
         )
         log.info("MGP: RasterioLandCoverPort.legend [FI]")

@@ -149,7 +149,7 @@ class StarCoordinator:
             return
             
         # Re-enviar recursos carregats (re-construint el buffer des del batch en RAM)
-        for res_id, batch in self._batches.items():
+        for res_id, batch in list(self._batches.items()):
             descriptor = self._resources.get(res_id)
             if descriptor:
                 await self._build_and_publish_resource(
