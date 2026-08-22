@@ -23,6 +23,7 @@ export interface ResourceVariant {
     id: string;
     title: string;
     sourceUrl?: string | null;
+    sourceUrls?: string[] | null;
     format?: string | null;
     mimeType?: string | null;
     width?: number | null;
@@ -32,15 +33,30 @@ export interface ResourceVariant {
     metadata: Record<string, string | number | boolean>;
 }
 
+export type ResourceDomain = "sky" | "earth";
+
+export type ResourceCategory = 
+    | "solar_system" 
+    | "deep_sky" 
+    | "elevation" 
+    | "land_cover" 
+    | "light_pollution";
+
+
 export interface ResourceDescriptor {
     id: string;
-    title: string;
+    name: string;
+    description: string;
+    domain: ResourceDomain;
+    category: ResourceCategory;
     provider: string;
     acquisitionKind: AcquisitionKind;
-    sourcePageUrl?: string | null;
+    citation: string;
+    license: string;
+    originalSourceUrl?: string | null;
+    directUrl?: string | null;
     variants: ResourceVariant[];
     credits: string[];
-    license?: string | null;
     dependencies: string[];
     metadata: Record<string, string | number | boolean>;
 }

@@ -23,7 +23,7 @@ from terralab3d.domain.time.engine import AstronomicalEngine
 from terralab3d.application.star_coordinator import StarCoordinator
 from terralab3d.infrastructure.adapters.file_assets.galactic import ManagedGalacticAssets
 from terralab3d.infrastructure.adapters.planck.converter import convert_planck_fits_to_texture
-from terralab3d.infrastructure.resources.catalog import ResourceCatalog
+from terralab3d.infrastructure.resources.layer_database import LayerDatabase
 from terralab3d.infrastructure.resources.installation_repository import (
     ResourceInstallationRepository,
 )
@@ -77,7 +77,7 @@ def _galactic_plane_inclination_deg(matrix: tuple[float, ...]) -> float:
 
 
 def test_catalog_uses_only_nasa_celestial_milky_way_variants() -> None:
-    descriptor = ResourceCatalog().get_descriptor(ResourceId("sky.milky_way"))
+    descriptor = LayerDatabase().get_descriptor(ResourceId("sky.milky_way"))
     assert descriptor is not None
     assert dict(descriptor.metadata)["coordinateFrame"] == "ICRF/J2000"
     assert dict(descriptor.metadata)["raIncreases"] == "left"
@@ -92,7 +92,7 @@ def test_catalog_uses_only_nasa_celestial_milky_way_variants() -> None:
 
 
 def test_catalog_keeps_planck_fits_as_the_official_source() -> None:
-    descriptor = ResourceCatalog().get_descriptor(ResourceId("sky.planck_dust"))
+    descriptor = LayerDatabase().get_descriptor(ResourceId("sky.planck_dust"))
     assert descriptor is not None
     assert dict(descriptor.metadata)["coordinateFrame"] == "GALACTIC"
     variant = descriptor.variants[0]

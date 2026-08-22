@@ -54,6 +54,7 @@ class ResourceVariant:
     id: VariantId
     title: str
     source_url: str | None = None
+    source_urls: tuple[str, ...] = field(default_factory=tuple)
     format: str | None = None
     mime_type: str | None = None
     width: int | None = None
@@ -69,6 +70,7 @@ class ResourceVariant:
             "id": self.id,
             "title": self.title,
             "sourceUrl": self.source_url,
+            "sourceUrls": list(self.source_urls),
             "format": self.format,
             "mimeType": self.mime_type,
             "width": self.width,
@@ -80,29 +82,54 @@ class ResourceVariant:
         }
 
 
+class ResourceDomain(str, Enum):
+    SKY = "sky"
+    EARTH = "earth"
+
+
+class ResourceCategory(str, Enum):
+    SOLAR_SYSTEM = "solar_system"
+    DEEP_SKY = "deep_sky"
+    ELEVATION = "elevation"
+    LAND_COVER = "land_cover"
+    LIGHT_POLLUTION = "light_pollution"
+
+
+
+
 @dataclass(frozen=True, slots=True)
 class ResourceDescriptor:
     id: ResourceId
-    title: str
+    name: str
+    description: str
+    domain: ResourceDomain
+    category: ResourceCategory
     provider: str
     acquisition_kind: AcquisitionKind
-    source_page_url: str | None = None
+    citation: str
+    license: str
+    original_source_url: str | None = None
+    direct_url: str | None = None
     variants: tuple[ResourceVariant, ...] = field(default_factory=tuple)
     credits: tuple[str, ...] = field(default_factory=tuple)
-    license: str | None = None
     dependencies: tuple[ResourceId, ...] = field(default_factory=tuple)
     metadata: ResourceMetadata = field(default_factory=tuple)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
-            "title": self.title,
+            "name": self.name,
+            "description": self.description,
+            "domain": self.domain.value,
+            "category": self.category.value,
             "provider": self.provider,
             "acquisitionKind": self.acquisition_kind.value,
-            "sourcePageUrl": self.source_page_url,
+            "citation": self.citation,
+            "license": self.license,
+            "originalSourceUrl": self.original_source_url,
+            "directUrl": self.direct_url,
             "variants": [v.to_dict() for v in self.variants],
             "credits": list(self.credits),
-            "license": self.license,
             "dependencies": list(self.dependencies),
             "metadata": dict(self.metadata),
         }

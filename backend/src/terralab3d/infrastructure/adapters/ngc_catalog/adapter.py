@@ -425,7 +425,8 @@ class NgcCatalogAdapter(DeepSkyCatalogPort):
 
     def load_index(self) -> tuple[dict[str, Any], bytes] | None:
         resource_id = ResourceId("sky.ngc")
-        state = self._resource_repo.get_resource_state(resource_id)
+        variant_id = VariantId("pinned")
+        state = self._resource_repo.get_resource_state(resource_id, variant_id)
 
         bin_file = self._resource_repo.resolve_render_asset(resource_id)
 

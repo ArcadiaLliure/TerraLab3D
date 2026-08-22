@@ -29,7 +29,7 @@ export interface PointerGestureRouterConfig {
 }
 
 const DEFAULT_CONFIG: PointerGestureRouterConfig = {
-  clickDragThresholdCssPx: 5,
+  clickDragThresholdCssPx: 15,
 };
 
 export class PointerGestureRouter {

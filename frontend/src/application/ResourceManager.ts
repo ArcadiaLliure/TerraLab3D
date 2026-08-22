@@ -67,10 +67,11 @@ export class ResourceManager {
         return Array.from(this.descriptors.values());
     }
 
-    public getInstallState(resourceId: string): ResourceState {
-        return this.installedStates.get(resourceId) || {
+    public getInstallState(resourceId: string, variantId: string): ResourceState {
+        const key = `${resourceId}::${variantId}`;
+        return this.installedStates.get(key) || {
             status: "NOT_INSTALLED",
-            variantId: null,
+            variantId: variantId,
             downloadedBytes: 0,
             verifiedAt: null,
             error: null,
@@ -110,22 +111,26 @@ export class ResourceManager {
         this.jobStates.set(msg.jobId, msg);
         
         // Optimistic update of local installed state
-        const current = this.getInstallState(msg.resourceId);
-        this.installedStates.set(msg.resourceId, {
-            ...current,
-            status: msg.state,
-            variantId: msg.variantId ?? current.variantId,
-            downloadedBytes: msg.downloadedBytes
-        });
+        if (msg.variantId) {
+            const key = `${msg.resourceId}::${msg.variantId}`;
+            const current = this.getInstallState(msg.resourceId, msg.variantId);
+            this.installedStates.set(key, {
+                ...current,
+                status: msg.state,
+                variantId: msg.variantId,
+                downloadedBytes: msg.downloadedBytes
+            });
+        }
         
         for (const l of this.jobListeners) l(msg);
         for (const l of this.catalogListeners) l(); // Notify UI to refresh rows
     }
 
     private optimisticUpdate(resourceId: string, variantId: string, status: ResourceInstallState): void {
-        const current = this.getInstallState(resourceId);
+        const key = `${resourceId}::${variantId}`;
+        const current = this.getInstallState(resourceId, variantId);
         
-        this.installedStates.set(resourceId, {
+        this.installedStates.set(key, {
             ...current,
             status,
             variantId

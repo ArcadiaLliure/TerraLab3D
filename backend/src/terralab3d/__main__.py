@@ -79,7 +79,7 @@ async def run() -> int:
     from terralab3d.infrastructure.adapters.file_assets.galactic import ManagedGalacticAssets
     from terralab3d.infrastructure.adapters.planck.adapter import PlanckDustAdapter
     from terralab3d.infrastructure.adapters.ngc_catalog.adapter import NgcCatalogPostProcessor, NgcCatalogAdapter
-    from terralab3d.infrastructure.resources.catalog import ResourceCatalog
+    from terralab3d.infrastructure.resources.layer_database import LayerDatabase
     from terralab3d.infrastructure.resources.installation_repository import ResourceInstallationRepository
     from terralab3d.infrastructure.resources.download_manager import DownloadJobManager
     from terralab3d.domain.identifiers import ResourceId, VariantId
@@ -95,7 +95,7 @@ async def run() -> int:
     bridge = WebSocketBridge()
     moon_surface_assets = ManagedMoonSurfaceAssets()
     solar_system_assets = ManagedSolarSystemAssets()
-    resource_catalog = ResourceCatalog()
+    resource_catalog = LayerDatabase()
     resource_repo = ResourceInstallationRepository()
     resource_repo.discover_existing_resources()
     galactic_assets = ManagedGalacticAssets(resource_repo)

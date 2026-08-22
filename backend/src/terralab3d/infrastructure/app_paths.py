@@ -2,10 +2,10 @@
 
 Llegeix la configuració de la llibreria de dades de l'usuari des de:
 1. Variable d'entorn `TERRALAB_DATA_ROOT`
-2. Fitxer apuntador `%APPDATA%/TerraLab/config/data_location.json`
+2. Fitxer apuntador `%APPDATA%/TerraLab3D/config/data_location.json`
 3. Directori local o ruta fallback
 
-Estructura de la llibreria de dades (layout TerraLab):
+Estructura de la llibreria de dades (layout TerraLab3D):
 - root / "data" / "sky" / "gaia"
 - root / "data" / "sky" / "ngc"
 - root / "data" / "sky" / "milky-way"
@@ -40,8 +40,8 @@ def platform_state_base() -> Path:
 
 
 def application_state_root() -> Path:
-    """Retorna el directori d'estat de TerraLab (%APPDATA%/TerraLab)."""
-    return platform_state_base() / "TerraLab"
+    """Retorna el directori d'estat de TerraLab3D (%APPDATA%/TerraLab3D)."""
+    return platform_state_base() / "TerraLab3D"
 
 
 def data_location_pointer_path() -> Path:
@@ -53,8 +53,8 @@ def resolve_data_root() -> Path:
     """Resol l'arrel de la llibreria de dades seleccionada per l'usuari.
 
     1. En primer lloc comprova TERRALAB_DATA_ROOT
-    2. En segon lloc llegeix %APPDATA%/TerraLab/config/data_location.json
-    3. Si no existeix cap dels dos, utilitza %APPDATA%/TerraLab
+    2. En segon lloc llegeix %APPDATA%/TerraLab3D/config/data_location.json
+    3. Si no existeix cap dels dos, utilitza %APPDATA%/TerraLab3D
     """
     env_root = os.getenv(DATA_ROOT_ENV, "").strip()
     if env_root:
@@ -121,9 +121,19 @@ def resolve_download_temp_dir() -> Path:
 def resolve_resource_install_dir(resource_id: str) -> Path:
     """Retorna el directori on s'ha d'instal·lar un recurs basant-se en l'estructura oficial."""
     root = resolve_data_root()
-    if resource_id.startswith("sky.milky_way") or resource_id.startswith("sky.planck_dust"):
+    
+    # Domini TERRA
+    if resource_id.startswith("earth.elevation"):
+        d = root / "data" / "earth" / "elevation" / resource_id.split(".")[-1]
+    elif resource_id.startswith("earth.land_cover"):
+        d = root / "data" / "earth" / "land-cover" / resource_id.split(".")[-1]
+    elif resource_id.startswith("earth.light_pollution"):
+        d = root / "data" / "earth" / "light-pollution" / resource_id.split(".")[-1]
+        
+    # Domini CEL
+    elif resource_id.startswith("sky.milky_way") or resource_id.startswith("sky.planck_dust"):
         d = root / "data" / "sky" / "milky-way"
-    elif resource_id.startswith("celestial.ngc"):
+    elif resource_id.startswith("sky.ngc"):
         d = root / "data" / "sky" / "ngc"
     elif resource_id.startswith("sky.stars") or resource_id.startswith("celestial.gaia"):
         d = root / "data" / "sky" / "gaia"
@@ -132,7 +142,12 @@ def resolve_resource_install_dir(resource_id: str) -> Path:
     elif resource_id.startswith("solar."):
         d = root / "data" / "sky" / "solar-system" / "kernels"
     else:
-        d = root / "data" / "sky" / "managed"
+        # Fallback conservador basat en el domini
+        if resource_id.startswith("earth."):
+            d = root / "data" / "earth" / "managed"
+        else:
+            d = root / "data" / "sky" / "managed"
+            
     d.mkdir(parents=True, exist_ok=True)
     return d
 
