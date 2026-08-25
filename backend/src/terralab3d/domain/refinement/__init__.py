@@ -12,6 +12,7 @@ from .installations import (
 )
 from .licensing import CommercialLicensePolicy, LicenseMetadata, LicenseUseStage
 from .models import ObservationStatus, TlstTranslation, TranslationKind
+from .mosaic import MosaicUpdateResult, RasterRefinementSource, SourcePriority
 from .states import LeafCoverageFacts, SpatialCoverageState
 
 __all__ = [
@@ -22,13 +23,16 @@ __all__ = [
     "LeafCoverageFacts",
     "LicenseMetadata",
     "LicenseUseStage",
+    "MosaicUpdateResult",
     "ObservationStatus",
     "RefinementDataKind",
     "RefinementInstallation",
     "RefinementProduct",
+    "RasterRefinementSource",
     "RefinementValidationError",
     "ResamplingPolicy",
     "SpatialCoverageState",
+    "SourcePriority",
     "TargetGridSpec",
     "TechnicalResourceState",
     "TemporalPolicy",
