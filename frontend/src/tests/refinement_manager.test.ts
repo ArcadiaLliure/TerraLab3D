@@ -101,7 +101,7 @@ const plan: RefinementPlanSummaryMessage = {
     recommendedProductIds: [candidate.candidateId],
   },
   plan: {
-    schemaVersion: 3,
+    schemaVersion: 4,
     planId: "plan-1",
     requestId: current.requestId,
     revision: current.revision,

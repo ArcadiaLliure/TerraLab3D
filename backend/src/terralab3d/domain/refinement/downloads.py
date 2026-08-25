@@ -11,7 +11,7 @@ from typing import Mapping
 from .errors import RefinementValidationError
 
 
-_PLAN_SCHEMA_VERSION = 3
+_PLAN_SCHEMA_VERSION = 4
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,6 +35,7 @@ class FrozenDownloadAsset:
     class_translation: Mapping[int, str]
     nodata_values: tuple[int, ...]
     qualifier_key: str | None
+    class_attribute: str | None = None
 
     def __post_init__(self) -> None:
         required = (
@@ -51,6 +52,8 @@ class FrozenDownloadAsset:
         )
         if any(not value.strip() for value in required) or self.order < 0:
             raise RefinementValidationError("Frozen download asset metadata is incomplete")
+        if self.class_attribute is not None and not self.class_attribute.strip():
+            raise RefinementValidationError("Vector class attribute cannot be blank")
         if (
             PurePosixPath(self.file_name).name != self.file_name
             or PureWindowsPath(self.file_name).name != self.file_name
@@ -124,7 +127,7 @@ class ParametricDownloadPlan:
             payload = json.loads(value)
         except json.JSONDecodeError as exc:
             raise RefinementValidationError("Parametric plan is not valid JSON") from exc
-        if not isinstance(payload, dict) or payload.get("schemaVersion") not in {1, 2, 3}:
+        if not isinstance(payload, dict) or payload.get("schemaVersion") not in {1, 2, 3, 4}:
             raise RefinementValidationError("Unsupported parametric plan schema")
         assets = payload.get("assets")
         if not isinstance(assets, list):
@@ -188,6 +191,7 @@ def _asset_to_dict(asset: FrozenDownloadAsset) -> dict[str, object]:
         },
         "nodataValues": list(asset.nodata_values),
         "qualifierKey": asset.qualifier_key,
+        "classAttribute": asset.class_attribute,
     }
 
 
@@ -228,4 +232,9 @@ def _asset_from_dict(value: object) -> FrozenDownloadAsset:
         },
         nodata_values=tuple(int(item) for item in value.get("nodataValues", [])),
         qualifier_key=str(value["qualifierKey"]) if value.get("qualifierKey") else None,
+        class_attribute=(
+            str(value["classAttribute"])
+            if value.get("classAttribute")
+            else None
+        ),
     )

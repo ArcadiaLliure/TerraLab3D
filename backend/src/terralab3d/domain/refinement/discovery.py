@@ -39,10 +39,13 @@ class RemoteAsset:
     checksum_algorithm: str | None
     checksum_value: str | None
     requires_authentication: bool
+    class_attribute: str | None = None
 
     def __post_init__(self) -> None:
         if not self.asset_id.strip() or not self.download_url.strip() or self.order < 0:
             raise RefinementValidationError("Remote asset metadata is invalid")
+        if self.class_attribute is not None and not self.class_attribute.strip():
+            raise RefinementValidationError("Vector class attribute cannot be blank")
         normalized = json.loads(json.dumps(dict(self.footprint)))
         object.__setattr__(self, "footprint", MappingProxyType(normalized))
 

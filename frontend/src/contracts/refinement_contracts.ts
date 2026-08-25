@@ -68,6 +68,7 @@ export interface RefinementRemoteAsset {
   readonly checksumAlgorithm: "md5" | "sha256" | null;
   readonly checksumValue: string | null;
   readonly requiresAuthentication: boolean;
+  readonly classAttribute: string | null;
 }
 
 export interface RefinementProductCandidate {
@@ -124,7 +125,7 @@ export interface FrozenRefinementAsset extends RefinementRemoteAsset {
 }
 
 export interface RefinementDownloadPlan {
-  readonly schemaVersion: 3;
+  readonly schemaVersion: 4;
   readonly planId: string;
   readonly requestId: string;
   readonly revision: number;

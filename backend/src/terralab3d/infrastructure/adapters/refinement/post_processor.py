@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import json
 import math
 from pathlib import Path
 
 import rasterio
 from pyproj import Transformer
 from rasterio.errors import RasterioError
+from rasterio.features import rasterize
+from rasterio.transform import Affine
 from shapely.geometry import shape
 from shapely.ops import transform
 
@@ -85,7 +88,6 @@ class RefinementPlanPostProcessor:
         self._installation_ids = installation_ids
 
     def process(self, source_path: Path, _output_dir: Path) -> ProcessedResource:
-        sources = self._raster_sources(source_path)
         grid = self._target_grid()
         category_segment = self._plan.category_keys[0].replace(".", "-")
         derived_dir = (
@@ -95,6 +97,7 @@ class RefinementPlanPostProcessor:
             / self._taxonomy.taxonomy_version
             / category_segment
         )
+        sources = self._raster_sources(source_path, grid, derived_dir)
         result = RasterRefinementMosaicProcessor(self._taxonomy).update(
             derived_dir,
             grid,
@@ -124,7 +127,11 @@ class RefinementPlanPostProcessor:
                 verified_geometry=result.verified_geometry,
                 verified_ratio=verified_ratio,
                 file_fingerprints=fingerprints,
-                method=CoverageVerificationMethod.RASTER_VALID_MASK,
+                method=(
+                    CoverageVerificationMethod.VECTOR_GEOMETRY
+                    if any(asset.class_attribute for asset in self._plan.assets)
+                    else CoverageVerificationMethod.RASTER_VALID_MASK
+                ),
             )
         qualifier_metadata = ",".join(
             f"{key}={path}" for key, path in sorted(result.qualifier_paths.items())
@@ -147,6 +154,8 @@ class RefinementPlanPostProcessor:
     def _raster_sources(
         self,
         source_path: Path,
+        grid: TargetGridSpec,
+        derived_dir: Path,
     ) -> tuple[RasterRefinementSource, ...]:
         candidate_by_asset = {
             asset.asset_id: candidate
@@ -164,17 +173,26 @@ class RefinementPlanPostProcessor:
                 if resolved in used_paths:
                     continue
                 used_paths.add(resolved)
+                source_checksum = sha256_file(path)
+                raster_path = path
+                if asset.class_attribute is not None:
+                    raster_path = self._rasterize_vector_asset(
+                        path,
+                        asset,
+                        grid,
+                        derived_dir / "vector-cache",
+                    )
                 sources.append(
                     RasterRefinementSource(
                         source_id=f"{asset.asset_id}:{index}",
                         product=asset.product,
                         version=asset.version,
-                        path=path,
+                        path=raster_path,
                         band=1,
                         translations=asset.class_translation,
                         priority=_source_priority(candidate.provider_id),
                         license=candidate.license,
-                        asset_checksum=sha256_file(path),
+                        asset_checksum=source_checksum,
                         qualifier_key=asset.qualifier_key,
                         invalid_values=asset.nodata_values,
                     )
@@ -185,17 +203,110 @@ class RefinementPlanPostProcessor:
             )
         return tuple(sources)
 
+    def _rasterize_vector_asset(
+        self,
+        path: Path,
+        asset: FrozenDownloadAsset,
+        grid: TargetGridSpec,
+        cache_dir: Path,
+    ) -> Path:
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise RefinementValidationError(
+                f"Vector asset {asset.asset_id} is not readable GeoJSON"
+            ) from exc
+        if not isinstance(document, dict) or document.get("type") != "FeatureCollection":
+            raise RefinementValidationError(
+                f"Vector asset {asset.asset_id} must be a GeoJSON FeatureCollection"
+            )
+        features = document.get("features")
+        if not isinstance(features, list):
+            raise RefinementValidationError(
+                f"Vector asset {asset.asset_id} has no feature array"
+            )
+        source_crs = _geojson_crs(document)
+        transformer = Transformer.from_crs(source_crs, grid.crs, always_xy=True)
+        burn_shapes: list[tuple[object, int]] = []
+        bounds: list[tuple[float, float, float, float]] = []
+        for feature in features:
+            if not isinstance(feature, dict):
+                continue
+            properties = feature.get("properties")
+            geometry = feature.get("geometry")
+            if not isinstance(properties, dict) or not isinstance(geometry, dict):
+                continue
+            raw_class = properties.get(asset.class_attribute or "")
+            try:
+                source_value = int(str(raw_class).strip())
+            except (TypeError, ValueError):
+                continue
+            if source_value not in asset.class_translation:
+                continue
+            projected = transform(transformer.transform, shape(geometry))
+            if projected.is_empty:
+                continue
+            burn_shapes.append((projected, source_value))
+            bounds.append(projected.bounds)
+        if not burn_shapes:
+            raise RefinementValidationError(
+                f"Vector asset {asset.asset_id} contains no mapped features"
+            )
+        min_x = max(grid.min_x, math.floor(min(item[0] for item in bounds) / grid.resolution_x) * grid.resolution_x)
+        min_y = max(grid.min_y, math.floor(min(item[1] for item in bounds) / grid.resolution_y) * grid.resolution_y)
+        max_x = min(grid.max_x, math.ceil(max(item[2] for item in bounds) / grid.resolution_x) * grid.resolution_x)
+        max_y = min(grid.max_y, math.ceil(max(item[3] for item in bounds) / grid.resolution_y) * grid.resolution_y)
+        width = max(1, round((max_x - min_x) / grid.resolution_x))
+        height = max(1, round((max_y - min_y) / grid.resolution_y))
+        target_transform = Affine(
+            grid.resolution_x,
+            0,
+            min_x,
+            0,
+            -grid.resolution_y,
+            max_y,
+        )
+        values = rasterize(
+            burn_shapes,
+            out_shape=(height, width),
+            transform=target_transform,
+            fill=0,
+            dtype="uint16",
+        )
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        safe_asset_id = "".join(
+            character if character.isalnum() or character in {"-", "_"} else "_"
+            for character in asset.asset_id
+        )
+        destination = cache_dir / f"{safe_asset_id}.tif"
+        with rasterio.open(
+            destination,
+            "w",
+            driver="GTiff",
+            width=width,
+            height=height,
+            count=1,
+            dtype="uint16",
+            crs=grid.crs,
+            transform=target_transform,
+            nodata=0,
+            compress="deflate",
+            tiled=width >= 16 and height >= 16,
+        ) as dataset:
+            dataset.write(values, 1)
+        return destination
+
     def _paths_for_asset(
         self,
         source_path: Path,
         asset: FrozenDownloadAsset,
     ) -> tuple[Path, ...]:
         if source_path.is_file() and len(self._plan.assets) == 1:
-            if _is_readable_raster(source_path):
+            if _is_supported_source(source_path, asset):
                 return (source_path,)
         root = source_path if source_path.is_dir() else source_path.parent
         direct = root / asset.file_name
-        if direct.is_file() and _is_readable_raster(direct):
+        if direct.is_file() and _is_supported_source(direct, asset):
             return (direct,)
         extracted = root / Path(asset.file_name).stem
         if not extracted.is_dir():
@@ -204,7 +315,7 @@ class RefinementPlanPostProcessor:
             path
             for path in sorted(extracted.rglob("*"))
             if path.is_file()
-            and _is_readable_raster(path)
+            and _is_supported_source(path, asset)
             and _matches_product(path.name, asset.product)
         )
         return readable
@@ -248,6 +359,23 @@ def _is_readable_raster(path: Path) -> bool:
             return dataset.count > 0 and dataset.crs is not None
     except (OSError, RasterioError):
         return False
+
+
+def _is_supported_source(path: Path, asset: FrozenDownloadAsset) -> bool:
+    if asset.class_attribute is not None:
+        return path.suffix.lower() in {".geojson", ".json"}
+    return _is_readable_raster(path)
+
+
+def _geojson_crs(document: dict[str, object]) -> str:
+    crs = document.get("crs")
+    if isinstance(crs, dict):
+        properties = crs.get("properties")
+        if isinstance(properties, dict):
+            name = properties.get("name")
+            if isinstance(name, str) and name.strip():
+                return name
+    return "EPSG:4326"
 
 
 def _matches_product(file_name: str, product: str) -> bool:

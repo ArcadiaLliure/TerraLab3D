@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 from datetime import date
 from pathlib import Path
 
@@ -21,6 +22,7 @@ from terralab3d.domain.refinement.discovery import (
     DiscoveryRequest,
     RemoteAsset,
 )
+from terralab3d.domain.refinement.downloads import ParametricDownloadPlan
 from terralab3d.domain.refinement.installations import (
     GeometryRecord,
     RefinementDataKind,
@@ -85,6 +87,20 @@ async def _serve(payload: bytes) -> tuple[web.AppRunner, str]:
     await site.start()
     port = site._server.sockets[0].getsockname()[1]
     return runner, f"http://127.0.0.1:{port}/crop-types.tif"
+
+
+async def _serve_vector(payload: bytes) -> tuple[web.AppRunner, str]:
+    async def handler(request: web.Request) -> web.Response:
+        return web.Response(body=payload, content_type="application/geo+json")
+
+    app = web.Application()
+    app.router.add_get("/corine.geojson", handler)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "127.0.0.1", 0)
+    await site.start()
+    port = site._server.sockets[0].getsockname()[1]
+    return runner, f"http://127.0.0.1:{port}/corine.geojson"
 
 
 def _candidate(url: str, payload: bytes) -> DiscoveredRefinementProduct:
@@ -222,4 +238,150 @@ def test_download_job_harmonizes_fixture_and_commits_verified_coverage(
         assert Path(resource_state["manifestData"]["refinementQuality"]).exists()
 
     monkeypatch.setenv("TERRALAB_DATA_ROOT", str(tmp_path / "library"))
+    asyncio.run(scenario())
+
+
+def test_download_job_rasterizes_vector_fixture_and_commits_vector_coverage(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def scenario() -> None:
+        payload = json.dumps(
+            {
+                "type": "FeatureCollection",
+                "features": [
+                    {
+                        "type": "Feature",
+                        "properties": {"Code_18": "211"},
+                        "geometry": _AOI,
+                    }
+                ],
+            }
+        ).encode()
+        runner, url = await _serve_vector(payload)
+        try:
+            license_metadata = LicenseMetadata(
+                license_id="copernicus-clms",
+                official_url="https://land.copernicus.eu/en/faq/data-use-terms-and-conditions",
+                attribution_text="Contains modified Copernicus Service information (2026)",
+                citation="CORINE Land Cover 2018",
+                provider="Copernicus Land Monitoring Service",
+                product="CORINE Land Cover 2018",
+                version="v2020_20u1",
+                checked_at=date(2026, 8, 25),
+                provenance_url="https://land.copernicus.eu/en/products/corine-land-cover/clc2018",
+                asset_fingerprints=("fixture-corine",),
+                commercial_use=True,
+            )
+            asset = RemoteAsset(
+                asset_id="fixture-corine",
+                download_url=url,
+                s3_path=None,
+                footprint=_AOI,
+                order=0,
+                estimated_bytes=len(payload),
+                checksum_algorithm="sha256",
+                checksum_value=hashlib.sha256(payload).hexdigest(),
+                requires_authentication=False,
+                class_attribute="Code_18",
+            )
+            candidate = DiscoveredRefinementProduct(
+                candidate_id="fixture-corine",
+                provider_id="copernicus-corine",
+                provider="Copernicus Land Monitoring Service",
+                product="CORINE Land Cover 2018",
+                version="v2020_20u1",
+                dataset_identifier="corine-land-cover-2018",
+                compatible_tlst_nodes=("agriculture.cropland.arable",),
+                footprint=_AOI,
+                resolution_m=100,
+                temporal_start="2018-01-01",
+                temporal_end="2018-12-31",
+                format="GeoJSON",
+                estimated_bytes=len(payload),
+                license=license_metadata,
+                assets=(asset,),
+                endpoint_verified=True,
+                class_translation={211: "agriculture.cropland.arable.unspecified"},
+            )
+            request = DiscoveryRequest(
+                "vector-pipeline", 1, "agriculture.cropland.arable", _AOI
+            )
+            policy = CommercialLicensePolicy()
+            plan = freeze_parametric_plan(
+                request,
+                (candidate,),
+                (candidate.candidate_id,),
+                policy,
+                plan_id="vector-pipeline-fixture",
+            )
+            assert plan.assets[0].class_attribute == "Code_18"
+            assert ParametricDownloadPlan.from_json(plan.to_json()) == plan
+            descriptor = resource_descriptor_from_plan(plan)
+            variant = descriptor.variants[0]
+            catalog = LayerDatabase(tmp_path / "vector-layers.json")
+            catalog.upsert(descriptor)
+            resource_repository = ResourceInstallationRepository(
+                tmp_path / "vector-resource-state.json"
+            )
+            manager = DownloadJobManager(
+                catalog,
+                resource_repository,
+                WebSocketBridge(),
+            )
+            registry = load_builtin_land_cover_registry()
+            refinement_repository = JsonRefinementInstallationRepository(
+                tmp_path / "vector-refinements.json"
+            )
+            service = RefinementService(
+                registry.taxonomy,
+                refinement_repository,
+                StaticRefinementProductCatalog(),
+                policy,
+                tmp_path,
+            )
+            expected_job_id = f"{descriptor.id}_{variant.id}"
+            installation = service.confirm_product(
+                product=RefinementProduct(
+                    product_id=candidate.candidate_id,
+                    resource_id=str(descriptor.id),
+                    variant_id=str(variant.id),
+                    provider=candidate.provider,
+                    product=candidate.product,
+                    version=candidate.version,
+                    tlst_nodes=candidate.compatible_tlst_nodes,
+                    data_kind=RefinementDataKind.VECTOR,
+                    original_crs="EPSG:4326",
+                    planned_geometry=GeometryRecord("EPSG:4326", _AOI),
+                    license=candidate.license,
+                    provenance_url=candidate.license.provenance_url,
+                ),
+                category_key="agriculture.cropland.arable",
+                aoi_id="vector-pipeline-fixture",
+                job_id=expected_job_id,
+            )
+            processor = RefinementPlanPostProcessorFactory(
+                taxonomy=registry.taxonomy,
+                service=service,
+                geometry=ShapelyGeometryAdapter(),
+                data_root=tmp_path / "vector-library",
+            ).build(plan, (candidate,), (installation.installation_id,))
+            manager.register_post_processor(descriptor.id, processor)
+            job_id = manager.start_download(descriptor.id, variant.id)
+            await manager._active_tasks[job_id]
+        finally:
+            await runner.cleanup()
+
+        resource_state = resource_repository.get_resource_state(
+            descriptor.id, variant.id
+        )
+        verified = refinement_repository.get(installation.installation_id)
+        assert resource_state is not None
+        assert resource_state["status"] == ResourceInstallState.READY.value
+        assert verified is not None
+        assert verified.verified_geometry is not None
+        assert verified.verification_method.value == "vector_geometry"
+        assert Path(resource_state["manifestData"]["refinementMosaic"]).exists()
+
+    monkeypatch.setenv("TERRALAB_DATA_ROOT", str(tmp_path / "vector-library"))
     asyncio.run(scenario())

@@ -69,6 +69,7 @@ def freeze_parametric_plan(
                     class_translation=candidate.class_translation,
                     nodata_values=candidate.nodata_values,
                     qualifier_key=candidate.qualifier_key,
+                    class_attribute=asset.class_attribute,
                 )
             )
     known_sizes = [asset.expected_bytes for asset in frozen_assets]

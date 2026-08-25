@@ -368,7 +368,11 @@ class RefinementBridgeController:
                     product=candidate.product,
                     version=candidate.version,
                     tlst_nodes=candidate.compatible_tlst_nodes,
-                    data_kind=RefinementDataKind.RASTER,
+                    data_kind=(
+                        RefinementDataKind.VECTOR
+                        if any(asset.class_attribute for asset in candidate.assets)
+                        else RefinementDataKind.RASTER
+                    ),
                     original_crs="EPSG:4326",
                     planned_geometry=GeometryRecord(
                         "EPSG:4326", candidate.footprint
@@ -520,6 +524,7 @@ class RefinementBridgeController:
                     "checksumAlgorithm": asset.checksum_algorithm,
                     "checksumValue": asset.checksum_value,
                     "requiresAuthentication": asset.requires_authentication,
+                    "classAttribute": asset.class_attribute,
                 }
                 for asset in candidate.assets
             ],

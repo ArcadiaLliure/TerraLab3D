@@ -103,6 +103,7 @@ class RefinementRemoteAssetPayload(TypedDict):
     checksumAlgorithm: Literal["md5", "sha256"] | None
     checksumValue: str | None
     requiresAuthentication: bool
+    classAttribute: str | None
 
 
 class RefinementCandidatePayload(TypedDict):
@@ -162,7 +163,7 @@ class FrozenRefinementAssetPayload(RefinementRemoteAssetPayload):
 
 
 class RefinementDownloadPlanPayload(TypedDict):
-    schemaVersion: Literal[3]
+    schemaVersion: Literal[4]
     planId: str
     requestId: str
     revision: int
