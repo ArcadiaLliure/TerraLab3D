@@ -23,9 +23,11 @@ export class RefinementManagerView {
   private readonly mapView: RefinementMapView;
   private readonly treePanel = document.createElement("section");
   private readonly productPanel = document.createElement("section");
+  private readonly columns = document.createElement("div");
   private readonly statusRegion = document.createElement("div");
   private readonly unsubscribeManager: () => void;
   private readonly unsubscribeSession: () => void;
+  private readonly layoutObserver: ResizeObserver;
   private readonly expandedKeys = new Set<string>(["artificial", "agriculture", "tree_cover"]);
   private planTimer: ReturnType<typeof setTimeout> | null = null;
   private opened = false;
@@ -56,11 +58,15 @@ export class RefinementManagerView {
       ["#fbbf24", "AOI"],
     ] as const) legend.appendChild(legendItem(color, label));
 
-    const columns = document.createElement("div");
-    columns.className = "refinement-columns";
-    columns.style.cssText = "display:grid;grid-template-columns:minmax(300px,.8fr) minmax(420px,1.2fr);gap:12px;min-height:310px;flex:1";
-    columns.append(this.treePanel, this.productPanel);
-    this.element.append(this.mapView.element, legend, this.statusRegion, columns);
+    this.columns.className = "refinement-columns";
+    this.columns.style.cssText = "display:grid;grid-template-columns:minmax(300px,.8fr) minmax(420px,1.2fr);gap:12px;min-height:310px;flex:1";
+    this.columns.append(this.treePanel, this.productPanel);
+    this.element.append(this.mapView.element, legend, this.statusRegion, this.columns);
+    this.layoutObserver = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? this.element.clientWidth;
+      this.applyResponsiveLayout(width);
+    });
+    this.layoutObserver.observe(this.element);
 
     this.unsubscribeManager = manager.subscribeRefinement((message) => {
       if (this.session.accept(message) && message.type === "refinement_coverage_updated") {
@@ -73,7 +79,7 @@ export class RefinementManagerView {
   }
 
   public open(): void {
-    if (this.opened || this.disposed) return;
+    if (this.disposed) return;
     this.opened = true;
     const snapshot = this.session.begin("workspace");
     this.manager.requestRefinementWorkspace(snapshot.requestId, snapshot.revision, snapshot.aoi ?? undefined);
@@ -91,8 +97,23 @@ export class RefinementManagerView {
     this.planTimer = null;
     this.unsubscribeSession();
     this.unsubscribeManager();
+    this.layoutObserver.disconnect();
     this.mapView.dispose();
     this.element.remove();
+  }
+
+  private applyResponsiveLayout(width: number): void {
+    const compact = width > 0 && width < 780;
+    this.columns.style.gridTemplateColumns = compact
+      ? "minmax(0,1fr)"
+      : "minmax(300px,.8fr) minmax(420px,1.2fr)";
+    this.columns.style.overflowY = compact ? "auto" : "visible";
+    this.treePanel.style.minHeight = compact ? "320px" : "0";
+    this.productPanel.style.minHeight = compact ? "360px" : "0";
+    this.mapView.element.style.gridTemplateRows = compact
+      ? "auto minmax(200px,30vh) auto"
+      : "auto minmax(220px,34vh) auto";
+    this.mapView.updateSize();
   }
 
   private changeAoi(aoi: RefinementSessionSnapshot["aoi"]): void {

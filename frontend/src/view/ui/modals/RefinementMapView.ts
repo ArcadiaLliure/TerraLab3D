@@ -122,6 +122,10 @@ export class RefinementMapView {
     if (remaining) this.addGeometry(this.gapSource, remaining);
   }
 
+  public updateSize(): void {
+    this.map.updateSize();
+  }
+
   public setManualBbox(text: string): void {
     const values = text.split(",").map((value) => Number(value.trim()));
     if (values.length !== 4 || values.some((value) => !Number.isFinite(value))) {
