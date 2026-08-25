@@ -830,6 +830,8 @@ class RasterImportService:
                 shutil.rmtree(target)
         self._installations.remove_resource_state(resource_id, VariantId("local"))
         self._catalog.remove(resource_id)
+        if layer_type != "elevation" and self._refinement_imports is not None:
+            self._refinement_imports.remove_resource(str(resource_id), "local")
         if layer_type == "elevation":
             remaining_order = tuple(
                 str(value)

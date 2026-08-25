@@ -80,6 +80,12 @@ class ManualRefinementImportPort(Protocol):
         request: ManualRefinementImportRequest,
     ) -> tuple[RefinementInstallation, ...]: ...
 
+    def remove_resource(
+        self,
+        resource_id: str,
+        variant_id: str,
+    ) -> tuple[RefinementInstallation, ...]: ...
+
 
 class RefinementProductCatalogPort(Protocol):
     def list_products(self, category_key: str) -> Sequence[RefinementProduct]: ...

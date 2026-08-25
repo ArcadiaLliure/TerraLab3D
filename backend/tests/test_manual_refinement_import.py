@@ -104,6 +104,12 @@ def test_manual_import_is_persisted_ready_with_provenance(tmp_path: Path) -> Non
     assert installation.verification_method.value == "raster_valid_mask"
     assert installation.file_fingerprints == ("blake2b-160:fixture",)
     assert repository.get("manual-installation") == installation
+    removed = ManualRefinementImportRegistrar(service).remove_resource(
+        installation.resource_id,
+        installation.variant_id,
+    )
+    assert removed == (installation,)
+    assert repository.get("manual-installation") is None
 
 
 def test_manual_import_license_gate_is_fail_closed(tmp_path: Path) -> None:

@@ -278,6 +278,23 @@ class RefinementService:
             )
         return current
 
+    def remove_resource_installations(
+        self,
+        resource_id: str,
+        *,
+        variant_id: str | None = None,
+    ) -> tuple[RefinementInstallation, ...]:
+        removed: list[RefinementInstallation] = []
+        for installation in tuple(self._repository.list_installations()):
+            if installation.resource_id != resource_id:
+                continue
+            if variant_id is not None and installation.variant_id != variant_id:
+                continue
+            current = self._repository.remove(installation.installation_id)
+            if current is not None:
+                removed.append(current)
+        return tuple(removed)
+
     def _require_installation(self, installation_id: str) -> RefinementInstallation:
         installation = self._repository.get(installation_id)
         if installation is None:

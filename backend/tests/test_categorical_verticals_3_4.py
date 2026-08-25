@@ -124,6 +124,10 @@ class _RecordingRefinementImports:
         self.requests.append(request)
         return (SimpleNamespace(installation_id="manual-refinement-1"),)
 
+    def remove_resource(self, resource_id, variant_id):
+        self.removed = (resource_id, variant_id)
+        return ()
+
 
 def test_builtin_registry_has_complete_lcm10_and_corine_contracts() -> None:
     registry = _registry()

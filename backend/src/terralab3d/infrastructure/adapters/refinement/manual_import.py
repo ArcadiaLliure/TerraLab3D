@@ -88,6 +88,16 @@ class ManualRefinementImportRegistrar:
             raise
         return tuple(completed)
 
+    def remove_resource(
+        self,
+        resource_id: str,
+        variant_id: str,
+    ) -> tuple[RefinementInstallation, ...]:
+        return self._service.remove_resource_installations(
+            resource_id,
+            variant_id=variant_id,
+        )
+
 
 def verified_mask_geometry(
     path: Path,
