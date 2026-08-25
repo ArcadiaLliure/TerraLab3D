@@ -129,6 +129,8 @@ def resolve_resource_install_dir(resource_id: str) -> Path:
         d = root / "data" / "earth" / "land-cover" / resource_id.split(".")[-1]
     elif resource_id.startswith("earth.light_pollution"):
         d = root / "data" / "earth" / "light-pollution" / resource_id.split(".")[-1]
+    elif resource_id.startswith("earth.refinement"):
+        d = root / "data" / "earth" / "surface" / "refinements" / resource_id.split(".")[-1]
         
     # Domini CEL
     elif resource_id.startswith("sky.milky_way") or resource_id.startswith("sky.planck_dust"):

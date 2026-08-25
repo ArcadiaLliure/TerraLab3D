@@ -277,7 +277,7 @@ def _preferred_checksum(value: object) -> tuple[str | None, str | None]:
         for item in value
         if isinstance(item, dict)
     }
-    for algorithm in ("sha256", "blake3", "md5"):
+    for algorithm in ("sha256", "md5"):
         if checksums.get(algorithm):
             return algorithm, checksums[algorithm]
     return None, None

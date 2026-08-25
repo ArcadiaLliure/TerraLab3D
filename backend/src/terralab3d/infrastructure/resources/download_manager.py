@@ -5,13 +5,10 @@ permet represa (Range) i valida la integritat abans de marcar com a llest.
 """
 
 import asyncio
-import hashlib
 import logging
 import time
 from pathlib import Path
 from typing import Dict, Mapping, Set
-
-import aiohttp
 
 from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.application.ports.resource_processing import ResourcePostProcessor
@@ -22,7 +19,6 @@ from terralab3d.domain.resources.models import (
 from terralab3d.infrastructure.app_paths import (
     resolve_download_temp_dir,
     resolve_resource_install_dir,
-    resolve_derived_resource_dir,
     resolve_data_root,
 )
 from terralab3d.infrastructure.resources.layer_database import LayerDatabase
@@ -34,6 +30,7 @@ from terralab3d.infrastructure.resources.acquirers import (
     HttpBundleAcquirer,
     ParametricRasterAcquirer,
     ResourceAcquirer,
+    resource_variant_downloads,
 )
 
 log = logging.getLogger("terralab3d.resources.downloader")
@@ -137,21 +134,15 @@ class DownloadJobManager:
         if not variant:
             return
             
-        urls = []
-        if variant.source_urls:
-            urls.extend(variant.source_urls)
-        elif variant.source_url:
-            urls.append(variant.source_url)
-            
-        if not urls:
+        downloads = resource_variant_downloads(variant)
+        if not downloads:
             return
             
         temp_dir = resolve_download_temp_dir()
         final_dir = resolve_resource_install_dir(str(resource_id))
         
         candidates = []
-        for url in urls:
-            filename = url.split("/")[-1]
+        for _url, filename in downloads:
             candidates.append(temp_dir / f"{filename}.part")
             candidates.append(final_dir / filename)
         
@@ -223,20 +214,15 @@ class DownloadJobManager:
         if variant is None:
             return None
             
-        urls = []
-        if variant.source_urls:
-            urls.extend(variant.source_urls)
-        elif variant.source_url:
-            urls.append(variant.source_url)
-            
-        if not urls:
+        downloads = resource_variant_downloads(variant)
+        if not downloads:
             return None
             
         temp_dir = resolve_download_temp_dir()
         total_partial = 0
         has_any = False
-        for url in urls:
-            partial = temp_dir / f"{url.rsplit('/', 1)[-1]}.part"
+        for _url, file_name in downloads:
+            partial = temp_dir / f"{file_name}.part"
             if partial.is_file():
                 total_partial += partial.stat().st_size
                 has_any = True

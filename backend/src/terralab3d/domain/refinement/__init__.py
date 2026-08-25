@@ -8,6 +8,7 @@ from .discovery import (
     ProviderDiscoveryFailure,
     RemoteAsset,
 )
+from .downloads import FrozenDownloadAsset, ParametricDownloadPlan
 from .grid import ResamplingPolicy, TargetGridSpec, TemporalPolicy
 from .installations import (
     CoverageVerificationMethod,
@@ -28,6 +29,7 @@ __all__ = [
     "DiscoveredRefinementProduct",
     "DiscoveryRequest",
     "DiscoveryResult",
+    "FrozenDownloadAsset",
     "GeometryRecord",
     "GridAlignmentError",
     "LeafCoverageFacts",
@@ -35,6 +37,7 @@ __all__ = [
     "LicenseUseStage",
     "MosaicUpdateResult",
     "ObservationStatus",
+    "ParametricDownloadPlan",
     "ProviderDiscoveryFailure",
     "RefinementDataKind",
     "RefinementInstallation",
