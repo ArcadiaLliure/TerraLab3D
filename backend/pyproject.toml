@@ -26,6 +26,9 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+terralab3d = ["data/tlst/*.json"]
+
 [tool.pyright]
 pythonPath = "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe"
 pythonVersion = "3.13"

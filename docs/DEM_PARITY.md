@@ -15,6 +15,12 @@ El progreso automático quedaba en 5 % porque `HorizonCoordinator` publicaba la
 fase `sampling` antes del trabajo síncrono de fondo y no comunicaba el avance de
 los bloques de azimut. Se corrige como parte de esta entrega.
 
+## Extensió Vertical 2
+
+El DEM ja no depèn d'una extensió o producte concret. `RasterioRasterReader` publica descriptors neutrals, conserva el dtype font i exposa bandes, subdatasets, màscares, escala, offset, unitats i overviews. L'adaptador d'elevació aplica NoData i màscara abans d'escala/offset i converteix a metres `float32` només a la frontera DEM.
+
+`data_sources.json` governa ara la cadena ordenada: el DEM importat guanya dins la cobertura i les fonts anteriors resolen NoData o exterior. El canvi recarrega un port estable, cancel·la treball obsolet i invalida les caches dependents del fingerprint. La regressió `test_managed_mi_dem_asc_bundle_publishes_real_mesh_source_after_restart` demostra importació, reinici i graella de terreny real.
+
 | Comportamiento observado en TerraLab | Implementación actual de TerraLab3D | Prueba / estado de paridad |
 | --- | --- | --- |
 | Raíz de datos y catálogo configurables | `data_location.json` resuelve la biblioteca; DEM en `data/earth/elevation`. Falta consumir el catálogo de superficies. | `test_horizon_step15.py::test_configured_elevation_directory_comes_from_data_root`; ampliación pendiente para `data_sources.json`. |

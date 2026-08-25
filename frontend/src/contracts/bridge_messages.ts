@@ -1,5 +1,7 @@
 /**
  * Typed bridge messages exchanged over the WebSocket between Python and the
+/**
+ * Typed bridge messages exchanged over the WebSocket between Python and the
  * Three.js frontend.  Every message carries a `type` discriminant so both
  * sides can switch on it safely.
  */
@@ -7,10 +9,12 @@
 import type { SkyEnvironmentSnapshot } from "./sky_environment_contracts";
 import type { LightingEnvironmentSnapshot } from "./lighting_environment_contracts";
 import type {
+  ApparentTrajectoryMetadata,
   AstronomicalEventSearchResult,
   AstronomicalEventSnapshot,
   AngularSeparationResult,
 } from "./astronomical_event_contracts";
+import type { OperationProgressedEvent } from "./events";
 import type {
   MoonSurfaceResourceDescriptor,
   PlanetTextureManifest,
@@ -201,15 +205,7 @@ export interface SurfaceProgressMessage {
   readonly tilesLoaded: number;
 }
 
-export interface LandCoverLegendMessage {
-  readonly type: "land_cover_legend";
-  readonly legendId: string;
-  readonly entries: Array<{
-    classId: number;
-    label: string;
-    colorRgba: [number, number, number, number];
-  }>;
-}
+export type LandCoverLegendMessage = import("./land_cover_contracts").LandCoverLegendData;
 
 export interface ResolveStarPickMessage {
   readonly type: "resolve_star_pick";
@@ -498,7 +494,7 @@ export interface CelestialFrameTransformMessage {
   readonly matrix3x3: readonly number[];
 }
 
-// ─── Star Picking resolved (Pas 6) ──────────────────────────────────
+// ─── Star Picking resolved (Pas 6) ────────────────────────────────
 
 export interface StarPickResolvedPayloadStar {
   readonly kind: "star";
@@ -649,9 +645,9 @@ export type BackendMessage =
   | StarTrailsSnapshotMessage
   | HorizonStatusMessage
   | SurfaceProgressMessage
-  | LandCoverLegendMessage;
+  | LandCoverLegendMessage
+  | OperationProgressedEvent;
 
 // ─── Union of all messages ───────────────────────────────────────────
 
 export type BridgeMessage = FrontendMessage | BackendMessage;
-

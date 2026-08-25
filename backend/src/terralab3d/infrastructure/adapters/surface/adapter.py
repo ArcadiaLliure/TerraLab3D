@@ -22,6 +22,11 @@ import rasterio
 from pyproj import Transformer
 
 from terralab3d.infrastructure.app_paths import application_state_root, resolve_data_root
+from terralab3d.infrastructure.adapters.surface.tlst_catalog import (
+    LandCoverSchemeRegistry,
+    load_builtin_land_cover_registry,
+)
+from terralab3d.domain.surface.tlst import TlstValidationError
 
 log = logging.getLogger("terralab3d.surface")
 
@@ -33,15 +38,6 @@ _CATEGORICAL_LAYER_TYPES = {
 _LEGACY_SURFACE_LAYER_TYPES = _CATEGORICAL_LAYER_TYPES | {
     "surface_rgb",
 }
-_RASTER_SUFFIXES = {
-    ".tif",
-    ".tiff",
-    ".vrt",
-    ".img",
-    ".jp2",
-}
-
-
 @dataclass(frozen=True, slots=True)
 class SurfaceVertexSamples:
     """Legacy Pas-16 presentation samples.
@@ -69,7 +65,11 @@ class ResolvedLandCoverSource:
     crs: str
     resolution_m: float
     nodata: float | int | None
-    legend_id: str | None
+    scheme_key: str
+    scheme_version: str
+    mapping_revision: str
+    source_dtype: str
+    payload_dtype: str
     coverage: tuple[float, float, float, float] | None
     priority: int
 
@@ -97,9 +97,18 @@ class ConfiguredSurfaceSampler:
     final categorical rendering architecture.
     """
 
-    def __init__(self, config_paths: tuple[Path, ...] | None = None) -> None:
+    def __init__(
+        self,
+        config_paths: tuple[Path, ...] | None = None,
+        scheme_registry: LandCoverSchemeRegistry | None = None,
+    ) -> None:
         self._config_paths = config_paths
         self._transformers: dict[str, Transformer] = {}
+        self._scheme_registry = scheme_registry or load_builtin_land_cover_registry()
+
+    @property
+    def scheme_registry(self) -> LandCoverSchemeRegistry:
+        return self._scheme_registry
 
     def resolve_land_cover_source(
         self,
@@ -164,9 +173,19 @@ class ConfiguredSurfaceSampler:
         coverage = self._coverage(selected_raw.get("coverage"))
         priority = self._int_or(selected_raw.get("priority"), 0)
         
-        legend_id = self._legend_id(selected_raw)
-        if not legend_id and "s2glc" in source_id.lower():
-            legend_id = "s2glc_europe_2017"
+        scheme_key, scheme_version, mapping_revision = self._scheme_metadata(selected_raw)
+        legacy_legend_id = self._legend_id(selected_raw)
+        try:
+            scheme_reference = self._scheme_registry.resolve_reference(
+                scheme_key=scheme_key,
+                scheme_version=scheme_version,
+                mapping_revision=mapping_revision,
+                legacy_legend_id=legacy_legend_id,
+            )
+        except TlstValidationError as exc:
+            log.error("Esquema categòric invàlid per a %s: %s", source_id, exc)
+            log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
+            return None
         
         raster_paths = self._raster_paths(selected_raw, config_path)
         if not raster_paths:
@@ -176,19 +195,27 @@ class ConfiguredSurfaceSampler:
 
         configured_resolution = self._positive_float(selected_raw.get("resolution_m"))
         selected_raster: Path | None = None
+        openable_rasters: list[Path] = []
         selected_crs = ""
         selected_resolution = configured_resolution
         selected_nodata = None
+        selected_source_dtype = ""
+        selected_payload_dtype = ""
 
         for raster_path in raster_paths:
             try:
                 with rasterio.open(raster_path) as dataset:
-                    selected_raster = raster_path
-                    selected_crs = str(dataset.crs or "")
-                    selected_nodata = dataset.nodata
-                    if not math.isfinite(selected_resolution):
-                        selected_resolution = self._dataset_resolution_hint(dataset)
-                    break
+                    openable_rasters.append(raster_path)
+                    if selected_raster is None:
+                        selected_raster = raster_path
+                        selected_crs = str(dataset.crs or "")
+                        selected_nodata = dataset.nodata
+                        selected_payload_dtype = dataset.dtypes[0]
+                        selected_source_dtype = str(
+                            selected_raw.get("source_dtype") or selected_payload_dtype
+                        )
+                        if not math.isfinite(selected_resolution):
+                            selected_resolution = self._dataset_resolution_hint(dataset)
             except (OSError, rasterio.errors.RasterioError) as exc:
                 log.warning("No es pot obrir %s: %s", raster_path, exc)
 
@@ -197,7 +224,9 @@ class ConfiguredSurfaceSampler:
             log.info("MGP: ConfiguredSurfaceSampler.resolve_land_cover_source [FI]")
             return None
 
-        ordered_paths = (selected_raster,) + tuple(p for p in raster_paths if p != selected_raster)
+        ordered_paths = (selected_raster,) + tuple(
+            path for path in openable_rasters if path != selected_raster
+        )
 
         log.debug(
             "LAND COVER RESOLT: source_id='%s', config='%s', raster='%s', crs='%s', resolution=%.6f, nodata=%s",
@@ -218,7 +247,11 @@ class ConfiguredSurfaceSampler:
             crs=selected_crs,
             resolution_m=selected_resolution,
             nodata=selected_nodata,
-            legend_id=legend_id,
+            scheme_key=scheme_reference.scheme_key,
+            scheme_version=scheme_reference.scheme_version,
+            mapping_revision=scheme_reference.mapping_revision,
+            source_dtype=selected_source_dtype,
+            payload_dtype=selected_payload_dtype,
             coverage=coverage,
             priority=priority,
         )
@@ -397,7 +430,7 @@ class ConfiguredSurfaceSampler:
         base_path = self._resolve_configured_path(raw.get("path"), config_path)
         candidates: list[Path] = []
 
-        if base_path is not None and base_path.is_file() and self._is_raster_candidate(base_path):
+        if base_path is not None and base_path.is_file():
             candidates.append(base_path)
 
         metadata = raw.get("metadata")
@@ -417,15 +450,11 @@ class ConfiguredSurfaceSampler:
                         if (
                             resolved is not None
                             and resolved.is_file()
-                            and self._is_raster_candidate(resolved)
                         ):
                             candidates.append(resolved)
 
         if base_path is not None and base_path.is_dir() and not candidates:
-            for suffix in ("*.tif", "*.tiff", "*.TIF", "*.TIFF", "*.vrt", "*.VRT"):
-                candidates.extend(
-                    path for path in sorted(base_path.rglob(suffix)) if path.is_file()
-                )
+            candidates.extend(path for path in sorted(base_path.rglob("*")) if path.is_file())
 
         unique: list[Path] = []
         for path in candidates:
@@ -442,10 +471,6 @@ class ConfiguredSurfaceSampler:
             for item in value:
                 if isinstance(item, (str, Path)):
                     yield item
-
-    @staticmethod
-    def _is_raster_candidate(path: Path) -> bool:
-        return path.suffix.lower() in _RASTER_SUFFIXES
 
     @staticmethod
     def _resolve_configured_path(
@@ -529,6 +554,28 @@ class ConfiguredSurfaceSampler:
             if isinstance(value, str) and value.strip():
                 return value.strip()
         return None
+
+    @staticmethod
+    def _scheme_metadata(
+        raw: dict[str, object],
+    ) -> tuple[str | None, str | None, str | None]:
+        metadata = raw.get("metadata")
+        metadata_mapping = metadata if isinstance(metadata, dict) else {}
+        raw_key = raw.get("scheme_key", metadata_mapping.get("scheme_key"))
+        raw_version = raw.get("scheme_version", metadata_mapping.get("scheme_version"))
+        raw_revision = raw.get("mapping_revision", metadata_mapping.get("mapping_revision"))
+        scheme_key = raw_key.strip() if isinstance(raw_key, str) and raw_key.strip() else None
+        scheme_version = (
+            raw_version.strip()
+            if isinstance(raw_version, str) and raw_version.strip()
+            else None
+        )
+        mapping_revision = (
+            raw_revision.strip()
+            if isinstance(raw_revision, str) and raw_revision.strip()
+            else None
+        )
+        return scheme_key, scheme_version, mapping_revision
 
     @staticmethod
     def _dataset_resolution_hint(dataset: rasterio.io.DatasetReader) -> float:

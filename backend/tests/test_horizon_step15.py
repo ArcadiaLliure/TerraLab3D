@@ -199,13 +199,19 @@ def test_predictive_flight_refresh_never_starts_when_stationary() -> None:
 
 def test_stream_visibility_window_obeys_the_live_user_radius() -> None:
     unchanged = decide_visibility_window_refresh(
-        distance_from_loaded_center_m=20_000.0,
+        distance_from_loaded_center_m=20.0,
+        loaded_radius_m=150_000.0,
+        requested_radius_m=150_000.0,
+        lead_distance_m=10_000.0,
+    )
+    detail_moved = decide_visibility_window_refresh(
+        distance_from_loaded_center_m=6_000.0,
         loaded_radius_m=150_000.0,
         requested_radius_m=150_000.0,
         lead_distance_m=10_000.0,
     )
     enlarged = decide_visibility_window_refresh(
-        distance_from_loaded_center_m=20_000.0,
+        distance_from_loaded_center_m=20.0,
         loaded_radius_m=150_000.0,
         requested_radius_m=300_000.0,
         lead_distance_m=10_000.0,
@@ -225,11 +231,12 @@ def test_stream_visibility_window_obeys_the_live_user_radius() -> None:
     )
 
     assert unchanged.should_refresh is False
+    assert detail_moved.should_refresh is True
+    assert detail_moved.reason == "detail-boundary"
     assert enlarged.should_refresh is True
     assert enlarged.requested_radius_m == pytest.approx(300_000.0)
     assert enlarged.reason == "range-changed"
     assert consumed.should_refresh is True
-    assert consumed.remaining_radius_m == pytest.approx(8_000.0)
     assert forced.should_refresh is True
     assert forced.requested_radius_m == pytest.approx(80_000.0)
 

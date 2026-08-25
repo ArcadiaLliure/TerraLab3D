@@ -3,6 +3,7 @@ import type {
     ResourceCatalogSnapshotMessage, 
     DownloadJobSnapshotMessage 
 } from "../contracts/bridge_messages";
+import type { OperationProgressedEvent } from "../contracts/events";
 import type { 
     ResourceDescriptor, 
     ResourceInstallState 
@@ -19,6 +20,7 @@ export interface ResourceState {
 
 export type CatalogUpdateListener = () => void;
 export type JobUpdateListener = (jobSnapshot: DownloadJobSnapshotMessage) => void;
+export type OperationProgressListener = (event: OperationProgressedEvent) => void;
 
 export class ResourceManager {
     private descriptors: Map<string, ResourceDescriptor> = new Map();
@@ -27,11 +29,13 @@ export class ResourceManager {
 
     private catalogListeners: Set<CatalogUpdateListener> = new Set();
     private jobListeners: Set<JobUpdateListener> = new Set();
+    private operationListeners: Set<OperationProgressListener> = new Set();
 
     constructor(private bridge: WebSocketBridge) {
         bridge.addMessageListener({
             onResourceCatalogSnapshot: (msg) => this.handleCatalogSnapshot(msg),
-            onDownloadJobSnapshot: (msg) => this.handleJobSnapshot(msg)
+            onDownloadJobSnapshot: (msg) => this.handleJobSnapshot(msg),
+            onOperationProgressed: (msg) => this.handleOperationProgressed(msg)
         });
     }
 
@@ -91,6 +95,11 @@ export class ResourceManager {
     public subscribeJobs(listener: JobUpdateListener): () => void {
         this.jobListeners.add(listener);
         return () => this.jobListeners.delete(listener);
+    }
+
+    public subscribeOperationProgress(listener: OperationProgressListener): () => void {
+        this.operationListeners.add(listener);
+        return () => this.operationListeners.delete(listener);
     }
 
     private handleCatalogSnapshot(msg: ResourceCatalogSnapshotMessage): void {
@@ -160,5 +169,9 @@ export class ResourceManager {
         
         for (const l of this.jobListeners) l(newJob);
         for (const l of this.catalogListeners) l();
+    }
+
+    private handleOperationProgressed(msg: OperationProgressedEvent): void {
+        for (const l of this.operationListeners) l(msg);
     }
 }

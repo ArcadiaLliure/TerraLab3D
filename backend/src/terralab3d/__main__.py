@@ -82,7 +82,9 @@ async def run() -> int:
     from terralab3d.infrastructure.resources.layer_database import LayerDatabase
     from terralab3d.infrastructure.resources.installation_repository import ResourceInstallationRepository
     from terralab3d.infrastructure.resources.download_manager import DownloadJobManager
+    from terralab3d.infrastructure.resources.data_sources import DataSourceRepository
     from terralab3d.domain.identifiers import ResourceId, VariantId
+    from terralab3d.domain.resources.models import ResourceInstallState
 
     # ── 1. Compilar frontend i inicialitzar assets de dades ───────────
     try:
@@ -98,6 +100,39 @@ async def run() -> int:
     resource_catalog = LayerDatabase()
     resource_repo = ResourceInstallationRepository()
     resource_repo.discover_existing_resources()
+    data_source_repo = DataSourceRepository()
+    missing_external_sources = data_source_repo.refresh_external_validity()
+    if missing_external_sources:
+        log.warning(
+            "Fonts d'elevació externes no accessibles; s'utilitzaran els fallbacks: %s",
+            ", ".join(missing_external_sources),
+        )
+    for record in data_source_repo.elevation_records():
+        if record.get("ownership") != "external" or not record.get("resource_id"):
+            continue
+        resource_repo.set_resource_state(
+            ResourceId(str(record["resource_id"])),
+            (
+                ResourceInstallState.READY
+                if record.get("valid", True)
+                else ResourceInstallState.INVALID
+            ),
+            VariantId("local"),
+            resolved_path=str(record.get("path") or "") or None,
+            error_message=(
+                None if record.get("valid", True) else "La font externa ja no és accessible"
+            ),
+        )
+    for record in data_source_repo.land_cover_records():
+        if record.get("ownership") != "external" or not record.get("resource_id"):
+            continue
+        resource_repo.set_resource_state(
+            ResourceId(str(record["resource_id"])),
+            ResourceInstallState.READY if record.get("valid", True) else ResourceInstallState.INVALID,
+            VariantId("local"),
+            resolved_path=str(record.get("original_path") or record.get("path") or "") or None,
+            error_message=None if record.get("valid", True) else "La font externa ja no Ã©s accessible",
+        )
     galactic_assets = ManagedGalacticAssets(resource_repo)
     download_manager = DownloadJobManager(
         resource_catalog,
@@ -108,6 +143,7 @@ async def run() -> int:
             ResourceId("sky.ngc"): NgcCatalogPostProcessor(),
         },
     )
+    raster_import_service = None
     server = TerraLabServer(
         dist_dir,
         bridge,
@@ -160,7 +196,17 @@ async def run() -> int:
         resource_id = data.get("resourceId")
         variant_id = data.get("variantId")
         if resource_id and variant_id:
-            download_manager.delete_resource(ResourceId(resource_id), VariantId(variant_id))
+            if (
+                str(resource_id).startswith((
+                    "earth.elevation.imported.",
+                    "earth.land_cover.imported.",
+                ))
+                and raster_import_service is not None
+            ):
+                source_id = str(resource_id).removeprefix("earth.")
+                asyncio.create_task(asyncio.to_thread(raster_import_service.remove_resource, source_id))
+            else:
+                download_manager.delete_resource(ResourceId(resource_id), VariantId(variant_id))
 
     bridge.on("request_catalog_snapshot", _handle_request_catalog_snapshot)
     bridge.on("request_resource_download", _handle_request_resource_download)
@@ -192,6 +238,17 @@ async def run() -> int:
         RasterioElevationAdapter,
     )
     from terralab3d.infrastructure.adapters.dem.adapter import DemSamplingCancelled
+    from terralab3d.application.raster_imports import (
+        RasterImportService,
+        elevation_sources_from_repository,
+    )
+    from terralab3d.application.reloadable_elevation import ReloadableElevationPort
+    from terralab3d.infrastructure.adapters.raster import (
+        RasterioCategoricalRasterAdapter,
+        RasterioRasterReader,
+        TextRasterMaterializer,
+    )
+    from terralab3d.infrastructure.app_paths import resolve_data_root
 
     current_observer = ObserverProfile(
         observer_id=ObserverId("default"),
@@ -200,7 +257,11 @@ async def run() -> int:
     )
     observer_generation = 1
     elevation_source = "no disponible — horitzó pla fallback"
-    elevation_adapter = RasterioElevationAdapter.from_configured_library()
+    configured_elevation_sources = elevation_sources_from_repository(data_source_repo)
+    elevation_adapter = ReloadableElevationPort(RasterioElevationAdapter(
+        sources=configured_elevation_sources,
+        include_library_fallback=True,
+    ))
     elevation_coordinator = ElevationCoordinator(elevation_adapter)
     horizon_settings = HorizonProfileSettings()
     horizon_enabled = True
@@ -242,41 +303,45 @@ async def run() -> int:
 
     from terralab3d.infrastructure.adapters.surface.adapter import ConfiguredSurfaceSampler
     from terralab3d.infrastructure.adapters.surface.land_cover_port import RasterioLandCoverPort
+    from terralab3d.infrastructure.adapters.surface.tlst_catalog import (
+        load_builtin_land_cover_registry,
+    )
+    from terralab3d.infrastructure.resources.classification_schemes import (
+        UserClassificationSchemeRepository,
+    )
+    from terralab3d.application.land_cover_publication import (
+        build_land_cover_legend_message,
+        build_land_cover_tile_publication,
+    )
     from terralab3d.application.land_cover_coordinator import LandCoverCoordinator
 
-    land_cover_sampler = ConfiguredSurfaceSampler()
-    land_cover_port = RasterioLandCoverPort(land_cover_sampler)
+    land_cover_scheme_registry = load_builtin_land_cover_registry()
+    user_classification_schemes = UserClassificationSchemeRepository(
+        land_cover_scheme_registry,
+    )
+    land_cover_sampler = ConfiguredSurfaceSampler(
+        scheme_registry=land_cover_scheme_registry,
+    )
+    land_cover_port = RasterioLandCoverPort(
+        land_cover_sampler,
+        land_cover_scheme_registry,
+    )
     land_cover_coordinator = LandCoverCoordinator(land_cover_port)
 
     async def _publish_land_cover_tile(tile) -> None:
         log.info("MGP: __main__._publish_land_cover_tile [INICI]")
-        metadata = {
-            "role": "land_cover_tile",
-            "resourceId": tile.resource_id,
-            "version": tile.provenance.version,
-            "bounds": [tile.min_x, tile.min_y, tile.max_x, tile.max_y],
-            "width": tile.width,
-            "height": tile.height,
-            "resolution": tile.resolution,
-            "sourceId": tile.provenance.source_id,
-            "legendId": tile.legend_id,
-            "nodataValue": 0,
-            "dtype": "uint16",
-            "validPixels": tile.valid_pixels,
-        }
-        await bridge.send_binary_resource(tile.resource_id, str(tile.provenance.version), metadata, tile.class_buffer)
+        metadata, payload = build_land_cover_tile_publication(tile)
+        await bridge.send_binary_resource(
+            tile.resource_id,
+            str(tile.provenance.generation),
+            metadata,
+            payload,
+        )
         log.info("MGP: __main__._publish_land_cover_tile [FI]")
 
     async def _publish_land_cover_legend(legend) -> None:
         log.info("MGP: __main__._publish_land_cover_legend [INICI]")
-        await bridge.send({
-            "type": "land_cover_legend",
-            "legendId": legend.legend_id,
-            "entries": [
-                {"classId": entry.class_id, "label": entry.name, "colorRgba": entry.color_rgba}
-                for entry in legend.entries
-            ],
-        })
+        await bridge.send(build_land_cover_legend_message(legend))
         log.info("MGP: __main__._publish_land_cover_legend [FI]")
 
     async def _publish_land_cover_status(status) -> None:
@@ -432,9 +497,13 @@ async def run() -> int:
         nonlocal terrain_stream_task, terrain_stream_cancel, terrain_stream_generation
         nonlocal terrain_stream_center_east_m, terrain_stream_center_north_m
         nonlocal terrain_stream_radius_m
-        nonlocal terrain_stream_velocity_east_mps, terrain_stream_velocity_north_mps
+        distance_to_center_m = math.hypot(
+            east_m - terrain_stream_center_east_m,
+            north_m - terrain_stream_center_north_m,
+        )
         if not force and speed_mps < VISUAL_STREAM_MIN_SPEED_MPS:
-            return
+            if distance_to_center_m < 80.0:
+                return
         profile = horizon_coordinator.active_profile
         if (
             profile is None
@@ -444,7 +513,11 @@ async def run() -> int:
             return
         observer_eye_m = observer.effective_height_m + OBSERVER_EYE_HEIGHT_M
         requested_radius_m = resolve_visible_radius_m(horizon_settings, observer_eye_m)
-        lead_distance_m = visual_stream_lead_distance_m(speed_mps)
+        lead_distance_m = (
+            visual_stream_lead_distance_m(speed_mps)
+            if speed_mps >= VISUAL_STREAM_MIN_SPEED_MPS
+            else 0.0
+        )
         if terrain_stream_task is not None and not terrain_stream_task.done():
             # A normal sweep keeps useful in-flight work. Explicit regeneration
             # is the exception: it must replace a build made with stale UI settings.
@@ -472,10 +545,6 @@ async def run() -> int:
             except asyncio.CancelledError:
                 pass
 
-        distance_to_center_m = math.hypot(
-            east_m - terrain_stream_center_east_m,
-            north_m - terrain_stream_center_north_m,
-        )
         if terrain_stream_radius_m <= 0.0:
             # The first completed wide mesh is centred at the world origin.
             terrain_stream_radius_m = profile.visible_radius_m
@@ -1419,7 +1488,9 @@ async def run() -> int:
                         indexed_ids.add(defn.body_id)
 
                 # 2. Afegir cossos principals del sistema solar (Sol, Lluna, Planetes, etc.)
-                all_bodies = [latest_solar_system.sun, latest_solar_system.moon]
+                all_bodies = [latest_solar_system.sun]
+                if latest_solar_system.moon is not None:
+                    all_bodies.append(latest_solar_system.moon)
                 if latest_solar_system.planets:
                     all_bodies.extend(latest_solar_system.planets)
                 if latest_solar_system.satellites:
@@ -1808,6 +1879,75 @@ async def run() -> int:
                     except Exception:
                         pass
 
+    async def activate_configured_elevation_sources() -> None:
+        """Atomically swap DEM sources, then invalidate every dependent result."""
+
+        nonlocal terrain_regeneration_task, terrain_regeneration_generation
+        nonlocal elevation_task
+        sources = elevation_sources_from_repository(data_source_repo)
+        await asyncio.to_thread(
+            elevation_adapter.reload,
+            lambda: RasterioElevationAdapter(
+                sources=sources,
+                include_library_fallback=True,
+            ),
+        )
+        elevation_coordinator.invalidate()
+        horizon_coordinator.cancel()
+        cancel_visual_stream(reset_center=True)
+        terrain_regeneration_generation += 1
+        if terrain_regeneration_task is not None and not terrain_regeneration_task.done():
+            terrain_regeneration_task.cancel()
+        if elevation_task is not None and not elevation_task.done():
+            elevation_task.cancel()
+        await horizon_coordinator.activate_observer_fallback(new_horizon_request())
+        elevation_task = asyncio.create_task(
+            resolve_current_elevation(current_observer),
+            name=f"elevation-source-reload-{elevation_adapter.generation}",
+        )
+
+    def activate_configured_elevation_sources_from_worker() -> None:
+        future = asyncio.run_coroutine_threadsafe(
+            activate_configured_elevation_sources(),
+            loop,
+        )
+        future.result(timeout=120.0)
+
+    async def activate_configured_land_cover_source() -> None:
+        """Retire stale categorical tiles and publish the newly active source."""
+
+        land_cover_coordinator.cancel()
+        await bridge.send({"type": "surface_progress", "cleared": True})
+        if current_surface_mode == "categorical":
+            await _handle_set_surface_mode({"mode": "categorical"})
+
+    def activate_configured_land_cover_source_from_worker() -> None:
+        future = asyncio.run_coroutine_threadsafe(
+            activate_configured_land_cover_source(),
+            loop,
+        )
+        future.result(timeout=120.0)
+
+    def publish_raster_import_progress(payload: dict[str, Any]) -> None:
+        loop.call_soon_threadsafe(lambda: asyncio.create_task(bridge.send(payload)))
+
+    raster_import_reader = RasterioRasterReader()
+    raster_import_service = RasterImportService(
+        raster_import_reader,
+        TextRasterMaterializer(),
+        data_source_repo,
+        resource_catalog,
+        resource_repo,
+        data_root=resolve_data_root(),
+        activation_callback=activate_configured_elevation_sources_from_worker,
+        categorical_raster=RasterioCategoricalRasterAdapter(raster_import_reader),
+        scheme_registry=land_cover_scheme_registry,
+        user_schemes=user_classification_schemes,
+        categorical_activation_callback=activate_configured_land_cover_source_from_worker,
+        progress_publisher=publish_raster_import_progress,
+    )
+    server.set_raster_import_service(raster_import_service)
+
     clock_task = asyncio.create_task(clock_ticker())
 
     # ── 4. Iniciar servidor ───────────────────────────────────────────
@@ -1896,6 +2036,7 @@ async def run() -> int:
         except asyncio.CancelledError:
             pass
     elevation_adapter.close()
+    raster_import_reader.close()
     log.debug("MGP: [__main__.py] [shutdown] [Mètriques elevació: %s]", elevation_coordinator.metrics())
     log.debug("MGP: [__main__.py] [shutdown] [Mètriques horitzó: %s]", horizon_coordinator.metrics())
     await ephemeris_coordinator.close()

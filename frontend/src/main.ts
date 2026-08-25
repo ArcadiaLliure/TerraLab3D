@@ -1,4 +1,9 @@
 import { TerrainPickProvider } from "./view/three/picking/TerrainPickProvider";
+import { renderLandCoverTooltip } from "./view/three/terrain/LandCoverTextureManager";
+import {
+  decodeLandCoverTile,
+  type LandCoverTileMetadata,
+} from "./contracts/land_cover_contracts";
 /**
  * Frontend entry point.
  *
@@ -134,8 +139,13 @@ function main(): void {
     resourceId: "sky.milky_way" | "sky.planck_dust",
   ): GalacticTextureResource => {
     const descriptor = resourceManager.getDescriptor(resourceId);
-    const state = resourceManager.getInstallState(resourceId);
-    if (!descriptor || state.status !== "READY" || state.variantId === null) {
+    const readyVariant = descriptor?.variants.find(candidate =>
+      resourceManager.getInstallState(resourceId, candidate.id).status === "READY"
+    );
+    const state = readyVariant
+      ? resourceManager.getInstallState(resourceId, readyVariant.id)
+      : null;
+    if (!descriptor || !state || state.status !== "READY" || state.variantId === null) {
       throw new Error("El recurs encara no està disponible");
     }
     const variant = descriptor.variants.find((candidate) => candidate.id === state.variantId);
@@ -403,6 +413,7 @@ function main(): void {
   terrainTooltip.style.borderRadius = "4px";
   terrainTooltip.style.fontSize = "12px";
   terrainTooltip.style.fontFamily = "'Roboto', sans-serif";
+  terrainTooltip.style.whiteSpace = "pre-line";
   terrainTooltip.style.display = "none";
   terrainTooltip.style.zIndex = "1000";
   terrainTooltip.style.boxShadow = "0 2px 4px rgba(0,0,0,0.5)";
@@ -411,11 +422,14 @@ function main(): void {
   gestureRouter.onHover((x, y) => {
     const terrainHit = terrainPickProvider.hover(x, y);
     if (terrainHit) {
-      console.log(`MGP: Terrain hover HIT! classId: ${terrainHit.classId}, label: ${terrainHit.label}`);
+      console.log(
+        `MGP: Terrain hover HIT! sourceCode: ${terrainHit.observation.sourceCode}, `
+        + `TLST: ${terrainHit.observation.categoryKey ?? "none"}`,
+      );
       terrainTooltip.style.display = "block";
       terrainTooltip.style.left = `${x + 15}px`;
       terrainTooltip.style.top = `${y + 15}px`;
-      terrainTooltip.textContent = `${terrainHit.classId}: ${terrainHit.label}`;
+      renderLandCoverTooltip(terrainTooltip, terrainHit.observation);
     } else {
       terrainTooltip.style.display = "none";
     }
@@ -607,11 +621,12 @@ function main(): void {
       if (metadata.role === "land_cover_tile") {
         console.info("MGP: main.onBinaryResourceReady.land_cover_tile [INICI]");
         console.debug("[main.ts] onBinaryResourceReady: land_cover_tile rebut!", metadata);
-        sceneHost.getDemTerrainLayerRenderer().landCoverManager.addTile({
-          ...metadata,
-          tileKey: metadata.tileKey || metadata.resourceId || "land_cover_tile",
-          data: new Uint16Array(bufferPayload),
-        } as any);
+        try {
+          const tile = decodeLandCoverTile(metadata as LandCoverTileMetadata, bufferPayload);
+          sceneHost.getDemTerrainLayerRenderer().landCoverManager.addTile(tile);
+        } catch (error) {
+          console.error("[main.ts] Invalid land-cover binary resource", error, metadata);
+        }
         console.info("MGP: main.onBinaryResourceReady.land_cover_tile [FI]");
         return;
       }

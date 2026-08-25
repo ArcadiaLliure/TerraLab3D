@@ -1,0 +1,21 @@
+{
+  "scheme_key": "esa_worldcover",
+  "scheme_version": "2021-v200",
+  "display_name": "ESA WorldCover",
+  "taxonomy_key": "TLST",
+  "taxonomy_version": "1.0",
+  "classes": [
+    {"source_code": 0, "source_label": "No data", "source_label_key": "source.worldcover.nodata", "color_rgba": [0, 0, 0, 0], "sample_validity": "nodata"},
+    {"source_code": 10, "source_label": "Tree cover", "source_label_key": "source.worldcover.tree_cover", "color_rgba": [0, 100, 0, 255], "category_key": "tree_cover.unspecified"},
+    {"source_code": 20, "source_label": "Shrubland", "source_label_key": "source.worldcover.shrubland", "color_rgba": [255, 187, 34, 255], "category_key": "low_vegetation.shrub.shrubland"},
+    {"source_code": 30, "source_label": "Grassland", "source_label_key": "source.worldcover.grassland", "color_rgba": [255, 255, 76, 255], "category_key": "low_vegetation.herbaceous.unspecified"},
+    {"source_code": 40, "source_label": "Cropland", "source_label_key": "source.worldcover.cropland", "color_rgba": [240, 150, 255, 255], "category_key": "agriculture.cropland.unspecified"},
+    {"source_code": 50, "source_label": "Built-up", "source_label_key": "source.worldcover.built_up", "color_rgba": [250, 0, 0, 255], "category_key": "artificial.unspecified"},
+    {"source_code": 60, "source_label": "Bare / sparse vegetation", "source_label_key": "source.worldcover.bare_sparse", "color_rgba": [180, 180, 180, 255], "category_key": "bare_sparse.unspecified"},
+    {"source_code": 70, "source_label": "Snow and ice", "source_label_key": "source.worldcover.snow_ice", "color_rgba": [240, 240, 240, 255], "category_key": "snow_ice.unspecified"},
+    {"source_code": 80, "source_label": "Permanent water bodies", "source_label_key": "source.worldcover.permanent_water", "color_rgba": [0, 100, 200, 255], "category_key": "water.unspecified", "qualifiers": {"water_regime": "permanent"}},
+    {"source_code": 90, "source_label": "Herbaceous wetland", "source_label_key": "source.worldcover.herbaceous_wetland", "color_rgba": [0, 150, 160, 255], "category_key": "wetland.herbaceous_wetland"},
+    {"source_code": 95, "source_label": "Mangroves", "source_label_key": "source.worldcover.mangroves", "color_rgba": [0, 207, 117, 255], "category_key": "wetland.coastal.mangrove"},
+    {"source_code": 100, "source_label": "Moss and lichen", "source_label_key": "source.worldcover.moss_lichen", "color_rgba": [250, 230, 160, 255], "category_key": "low_vegetation.moss_lichen"}
+  ]
+}

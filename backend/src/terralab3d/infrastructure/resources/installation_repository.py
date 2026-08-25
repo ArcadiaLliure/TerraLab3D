@@ -15,8 +15,11 @@ log = logging.getLogger("terralab3d.resources.repository")
 class ResourceInstallationRepository:
     """Gestiona l'estat local dels recursos (què està instal·lat, quina variant, on es troba)."""
 
-    def __init__(self) -> None:
-        self._state_file = resolve_resource_state_dir() / "local_installation_state.json"
+    def __init__(self, state_file: Path | None = None) -> None:
+        self._state_file = state_file or (
+            resolve_resource_state_dir() / "local_installation_state.json"
+        )
+        self._state_file.parent.mkdir(parents=True, exist_ok=True)
         self._state: Dict[str, Any] = {}
         self.load()
 
@@ -114,6 +117,15 @@ class ResourceInstallationRepository:
             "verifiedAt": None,
             "error": None,
         }
+        self.save()
+
+    def remove_resource_state(
+        self,
+        resource_id: ResourceId,
+        variant_id: VariantId,
+    ) -> None:
+        key = f"{resource_id}::{variant_id}"
+        self._state.setdefault("resources", {}).pop(key, None)
         self.save()
 
     def resolve_render_asset(self, resource_id: ResourceId) -> Path | None:

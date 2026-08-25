@@ -10,6 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from terralab3d.domain.observer.models import GeoLocation
+from terralab3d.domain.raster.models import RasterDatasetSelection
 
 
 class ElevationStatus(StrEnum):
@@ -18,6 +19,45 @@ class ElevationStatus(StrEnum):
     UNAVAILABLE = "unavailable"
     CANCELLED = "cancelled"
     ERROR = "error"
+
+
+class VerticalUnit(StrEnum):
+    METRE = "metre"
+    INTERNATIONAL_FOOT = "international_foot"
+    US_SURVEY_FOOT = "us_survey_foot"
+    CUSTOM = "custom"
+
+
+@dataclass(frozen=True, slots=True)
+class ElevationRasterSource:
+    source_id: str
+    selection: RasterDatasetSelection
+    vertical_unit: VerticalUnit
+    unit_confirmed: bool
+    custom_unit_to_metre: float | None = None
+
+    def __post_init__(self) -> None:
+        if not self.source_id.strip():
+            raise ValueError("Elevation source id is required")
+        if not self.unit_confirmed:
+            raise ValueError("The vertical unit must be confirmed explicitly")
+        if self.vertical_unit is VerticalUnit.CUSTOM:
+            factor = self.custom_unit_to_metre
+            if factor is None or not np.isfinite(factor) or factor <= 0:
+                raise ValueError("Custom vertical units require a positive metre factor")
+        elif self.custom_unit_to_metre is not None:
+            raise ValueError("A custom metre factor is only valid for custom units")
+
+    @property
+    def unit_to_metre(self) -> float:
+        if self.vertical_unit is VerticalUnit.METRE:
+            return 1.0
+        if self.vertical_unit is VerticalUnit.INTERNATIONAL_FOOT:
+            return 0.3048
+        if self.vertical_unit is VerticalUnit.US_SURVEY_FOOT:
+            return 1200.0 / 3937.0
+        assert self.custom_unit_to_metre is not None
+        return float(self.custom_unit_to_metre)
 
 
 @dataclass(frozen=True, slots=True)

@@ -5805,6 +5805,18 @@ La gestió unificada de preferències i datasets es tanca al pas 23.
 
 L’aplicació disposa d’un gestor de capes i recursos equivalent: instal·lació, fonts externes, progrés, cancel·lació, fallback, visibilitat i restauració de preferències.
 
+### Avenç implementat: TLST Verticals 2–4
+
+La importació raster d'elevació ja disposa de fonts gestionades i externes, transferència HTTP binària, staging cancel·lable, descriptors Rasterio neutrals, persistència separada als tres catàlegs i activació primària amb fallback. El cas `mi_dem.asc` sobreviu al reinici i alimenta la malla DEM real.
+
+La importació categòrica universal també està operativa per enters, paleta i
+RGB/RGBA exactes. El registre versionat tradueix S2GLC, WorldCover, LCM-10,
+CORINE i esquemes d'usuari directament a TLST, conserva la profunditat
+semàntica i exigeix confirmació abans d'activar una font. Tant la font
+estàndard com la personalitzada sobreviuen al reinici. Aquest avenç no dona per
+acabades les tasques de refinament, fusió ni procedural de les verticals
+posteriors.
+
 ### Fonts TerraLab a consultar
 
 - `TerraLab/data/layer_manager.py`

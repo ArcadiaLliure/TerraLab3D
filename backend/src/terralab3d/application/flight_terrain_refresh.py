@@ -114,27 +114,35 @@ def decide_flight_stream_continuation(
     return FlightTerrainStreamDecision(False, "route-diverged")
 
 
+_NEAR_DETAIL_REFRESH_DISTANCE_M = 80.0
+
+
 def decide_visibility_window_refresh(
     *,
     distance_from_loaded_center_m: float,
     loaded_radius_m: float,
     requested_radius_m: float,
     lead_distance_m: float,
+    detail_distance_m: float = _NEAR_DETAIL_REFRESH_DISTANCE_M,
     force: bool = False,
 ) -> FlightVisibilityWindowDecision:
-    """Keep the user-selected radius centred on successive live positions.
+    """Keep the user-selected radius and high-detail rings centred on live positions.
 
-    A range change invalidates the spatial window even while the camera is
-    still well inside the old one. Otherwise the next window starts before
-    the observer consumes the loaded radius. The caller decides whether a
-    stationary observer may launch work (explicit regeneration does; normal
-    streaming does not).
+    A range change or uninitialized state immediately refreshes. Otherwise,
+    a refresh is triggered if the observer has moved beyond the near-detail
+    threshold or approaches the edge of the loaded visible radius.
     """
 
     requested = max(1.0, float(requested_radius_m))
     loaded = max(0.0, float(loaded_radius_m))
     distance = max(0.0, float(distance_from_loaded_center_m))
     lead = max(0.0, float(lead_distance_m))
+    detail_threshold = max(_NEAR_DETAIL_REFRESH_DISTANCE_M, float(detail_distance_m))
+    effective_detail_boundary = (
+        min(lead, max(detail_threshold, lead * 0.5))
+        if lead > 0.0
+        else detail_threshold
+    )
     remaining = max(0.0, loaded - distance)
     if force:
         return FlightVisibilityWindowDecision(True, requested, remaining, "forced")
@@ -143,6 +151,8 @@ def decide_visibility_window_refresh(
     tolerance = max(1.0, requested * 1e-6)
     if abs(loaded - requested) > tolerance:
         return FlightVisibilityWindowDecision(True, requested, remaining, "range-changed")
+    if distance >= effective_detail_boundary:
+        return FlightVisibilityWindowDecision(True, requested, remaining, "detail-boundary")
     if remaining <= lead:
         return FlightVisibilityWindowDecision(True, requested, remaining, "predicted-boundary")
     return FlightVisibilityWindowDecision(False, requested, remaining, "inside-visible-window")

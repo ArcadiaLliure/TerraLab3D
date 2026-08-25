@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.domain.resources.models import (
@@ -23,10 +23,13 @@ def _get_app_data_dir() -> Path:
     return p
 
 class LayerDatabase:
+    STORAGE_SCHEMA_VERSION = 2
+
     """Proporciona accés al catàleg JSON de capes de TerraLab3D."""
 
-    def __init__(self) -> None:
-        self.db_path = _get_app_data_dir() / "layers.json"
+    def __init__(self, db_path: Path | None = None) -> None:
+        self.db_path = db_path or (_get_app_data_dir() / "layers.json")
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._descriptors: Dict[ResourceId, ResourceDescriptor] = {}
         self.load()
 
@@ -38,20 +41,65 @@ class LayerDatabase:
             with open(self.db_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 self._descriptors.clear()
-                for item in data:
+                for item in self._extract_layer_records(data):
                     desc = self._parse_descriptor(item)
                     self._descriptors[desc.id] = desc
 
     def save(self) -> None:
-        data = [d.to_dict() for d in self._descriptors.values()]
-        with open(self.db_path, "w", encoding="utf-8") as f:
+        data = {
+            "schemaVersion": self.STORAGE_SCHEMA_VERSION,
+            "layers": [d.to_dict() for d in self._descriptors.values()],
+        }
+        temp_path = self.db_path.with_suffix(self.db_path.suffix + ".tmp")
+        with open(temp_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+            f.flush()
+            os.fsync(f.fileno())
+        temp_path.replace(self.db_path)
+
+    @staticmethod
+    def _extract_layer_records(data: Any) -> List[dict]:
+        """Accept the current wrapped document and the original list format.
+
+        The frontend/resource tooling persists a versioned document, while
+        older backend installations wrote the layer records directly as a
+        JSON array. Both representations describe the same persistence
+        boundary; neither should leak into descriptor parsing.
+        """
+
+        if isinstance(data, list):
+            records = data
+        elif isinstance(data, dict):
+            records = data.get("layers")
+            if not isinstance(records, list):
+                raise ValueError(
+                    "Invalid layer catalog: wrapped document must contain a 'layers' array"
+                )
+        else:
+            raise ValueError("Invalid layer catalog: root must be an array or an object")
+
+        for index, item in enumerate(records):
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"Invalid layer catalog: layer at index {index} must be an object"
+                )
+        return records
 
     def get_descriptor(self, resource_id: ResourceId) -> ResourceDescriptor | None:
         return self._descriptors.get(resource_id)
 
     def get_all_descriptors(self) -> List[ResourceDescriptor]:
         return list(self._descriptors.values())
+
+    def upsert(self, descriptor: ResourceDescriptor) -> None:
+        self._descriptors[descriptor.id] = descriptor
+        self.save()
+
+    def remove(self, resource_id: ResourceId) -> ResourceDescriptor | None:
+        descriptor = self._descriptors.pop(resource_id, None)
+        if descriptor is not None:
+            self.save()
+        return descriptor
 
     def _parse_descriptor(self, data: dict) -> ResourceDescriptor:
         variants = []

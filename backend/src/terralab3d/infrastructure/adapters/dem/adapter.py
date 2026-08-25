@@ -21,14 +21,21 @@ from rasterio.windows import Window
 
 from terralab3d.domain.elevation.models import (
     ElevationBatch, ElevationBatchRequest, ElevationGrid, ElevationSample,
-    ElevationSourceMetadata, ElevationStatus,
+    ElevationRasterSource, ElevationSourceMetadata, ElevationStatus, VerticalUnit,
 )
 from terralab3d.domain.observer.models import GeoLocation
+from terralab3d.domain.raster.models import (
+    RasterDatasetSelection,
+    RasterMetadataOverride,
+)
 from terralab3d.domain.terrain.models import TerrainTileRequest
+from terralab3d.infrastructure.adapters.raster.reader import (
+    RasterDatasetError,
+    RasterioRasterReader,
+)
 from terralab3d.infrastructure.app_paths import resolve_elevation_data_dir
 
 log = logging.getLogger("terralab3d.dem")
-_RASTER_SUFFIXES = {".asc", ".npy", ".tif", ".tiff", ".tifa"}
 _NPY_TILE_NAME = re.compile(
     r"^Y_\(([-+0-9.]+)_([-+0-9.]+)\)X_\(([-+0-9.]+)_([-+0-9.]+)\)$"
 )
@@ -53,6 +60,7 @@ class _RasterSource:
     index: int
     source_id: str
     path: Path
+    uri: str
     fingerprint: str
     native_crs: str
     resolution_m: float | None
@@ -63,6 +71,12 @@ class _RasterSource:
     transform: Any
     width: int
     height: int
+    band_index: int = 1
+    scale: float = 1.0
+    offset: float = 0.0
+    unit_to_metre: float = 1.0
+    chain_order: int | None = None
+    use_raster_mask: bool = True
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,6 +105,9 @@ class RasterioElevationAdapter:
         self,
         source_path: Path | str | None = None,
         *,
+        sources: tuple[ElevationRasterSource, ...] | None = None,
+        include_library_fallback: bool = False,
+        raster_reader: RasterioRasterReader | None = None,
         local_projected_crs: str = "EPSG:25831",
         local_resolution_m: float = 5.0,
         window_cache_bytes: int = 128 * 1024 * 1024,
@@ -98,6 +115,11 @@ class RasterioElevationAdapter:
         virtual_window_size: int = 128,
     ) -> None:
         self._source_path = Path(source_path) if source_path is not None else resolve_elevation_data_dir()
+        self._source_definitions = sources
+        self._include_library_fallback = bool(include_library_fallback)
+        self._raster_reader = raster_reader or RasterioRasterReader(
+            max_open_datasets=max_open_datasets,
+        )
         self._local_projected_crs = local_projected_crs
         self._local_resolution_m = float(local_resolution_m)
         self._window_cache_limit = max(1_048_576, int(window_cache_bytes))
@@ -129,43 +151,53 @@ class RasterioElevationAdapter:
                 return
             self._closed = False
             sources: list[_RasterSource] = []
-            for path in self._discover_paths():
+            definitions = self._source_definitions
+            explicit_count = len(definitions) if definitions is not None else 0
+            if definitions is None:
+                definitions = tuple(self._legacy_source_definition(path) for path in self._discover_paths())
+            elif self._include_library_fallback:
+                explicit_paths = {
+                    Path(source.selection.uri).resolve(strict=False)
+                    for source in definitions
+                }
+                definitions = (
+                    *definitions,
+                    *(
+                        self._legacy_source_definition(path)
+                        for path in self._discover_paths()
+                        if path.resolve(strict=False) not in explicit_paths
+                    ),
+                )
+            for definition_index, definition in enumerate(definitions):
+                path = Path(definition.selection.uri)
                 try:
                     if path.suffix.lower() == ".npy":
                         source = self._inspect_npy_source(path, len(sources))
                         if source is not None:
-                            sources.append(source)
+                            sources.append(replace(
+                                source,
+                                chain_order=(
+                                    definition_index if definition_index < explicit_count else None
+                                ),
+                            ))
                         continue
-                    with rasterio.open(path) as dataset:
-                        native_crs = str(dataset.crs or (
-                            self._local_projected_crs if path.suffix.lower() == ".asc" else ""
-                        ))
-                        if not native_crs:
-                            log.warning("MGP: [adapter.py] [open] [Font DEM sense CRS source=%s]", path.name)
-                            continue
-                        bounds_native = tuple(float(v) for v in dataset.bounds)
-                        sources.append(_RasterSource(
-                            index=len(sources),
-                            source_id=f"dem:{path.stem}",
-                            path=path,
-                            fingerprint=_path_fingerprint(path),
-                            native_crs=native_crs,
-                            resolution_m=_resolution_metres(dataset, native_crs),
-                            bounds_native=bounds_native,
-                            bounds_wgs84=_transform_bounds(bounds_native, native_crs, "EPSG:4326"),
-                            nodata=float(dataset.nodata) if dataset.nodata is not None else None,
-                            format=dataset.driver,
-                            transform=dataset.transform,
-                            width=int(dataset.width),
-                            height=int(dataset.height),
-                        ))
-                except (OSError, rasterio.errors.RasterioError) as exc:
+                    sources.append(replace(
+                        self._inspect_raster_source(definition, len(sources)),
+                        chain_order=(
+                            definition_index if definition_index < explicit_count else None
+                        ),
+                    ))
+                except (OSError, rasterio.errors.RasterioError, RasterDatasetError, ValueError) as exc:
                     log.warning(
                         "MGP: [adapter.py] [open] [Font DEM invàlida source=%s error=%s]",
                         path.name, exc,
                     )
             sources.sort(key=lambda item: (
-                item.resolution_m is None, item.resolution_m or float("inf"), item.source_id,
+                item.chain_order is None,
+                item.chain_order if item.chain_order is not None else 0,
+                item.resolution_m is None,
+                item.resolution_m or float("inf"),
+                item.source_id,
             ))
             self._sources = tuple(replace(source, index=index) for index, source in enumerate(sources))
             self._source_tiers = _group_sources_by_resolution(self._sources)
@@ -417,6 +449,7 @@ class RasterioElevationAdapter:
             self._window_cache_bytes = 0
             self._closed = True
             self._opened = False
+            self._raster_reader.close()
             log.debug("MGP: [adapter.py] [close] [Recursos DEM alliberats]")
 
     def _discover_paths(self) -> list[Path]:
@@ -424,10 +457,7 @@ class RasterioElevationAdapter:
             return [self._source_path]
         if not self._source_path.is_dir():
             return []
-        candidates = [
-            path for path in self._source_path.rglob("*")
-            if path.is_file() and path.suffix.lower() in _RASTER_SUFFIXES
-        ]
+        candidates = [path for path in self._source_path.rglob("*") if path.is_file()]
         npy_stems = {path.stem for path in candidates if path.suffix.lower() == ".npy"}
         candidates = [
             path for path in candidates
@@ -436,6 +466,63 @@ class RasterioElevationAdapter:
         return sorted(candidates, key=lambda path: (
             path.suffix.lower() not in {".npy", ".asc"}, str(path).casefold(),
         ))
+
+    def _legacy_source_definition(self, path: Path) -> ElevationRasterSource:
+        override = None
+        if path.suffix.lower() == ".asc":
+            override = RasterMetadataOverride(
+                crs=self._local_projected_crs,
+                provenance="legacy-asc-library",
+            )
+        return ElevationRasterSource(
+            source_id=f"dem:{path.stem}",
+            selection=RasterDatasetSelection(str(path), band_index=1, overrides=override),
+            vertical_unit=VerticalUnit.METRE,
+            unit_confirmed=True,
+        )
+
+    def _inspect_raster_source(
+        self,
+        definition: ElevationRasterSource,
+        index: int,
+    ) -> _RasterSource:
+        descriptor = self._raster_reader.validate_selection(definition.selection)
+        if descriptor.crs is None:
+            raise ValueError("Elevation raster has no CRS and no confirmed override")
+        band_index = definition.selection.band_index or 1
+        band = descriptor.bands[band_index - 1]
+        bounds_native = descriptor.bounds
+        path = Path(definition.selection.uri)
+        fingerprint_payload = (
+            f"{_path_fingerprint(path)}|{definition.selection.selected_uri}|{band_index}|"
+            f"{descriptor.crs}|{descriptor.transform}|{band.nodata}|{band.scale}|"
+            f"{band.offset}|{definition.unit_to_metre}"
+        ).encode("utf-8")
+        return _RasterSource(
+            index=index,
+            source_id=definition.source_id,
+            path=path,
+            uri=definition.selection.selected_uri,
+            fingerprint=hashlib.blake2b(fingerprint_payload, digest_size=20).hexdigest(),
+            native_crs=descriptor.crs,
+            resolution_m=_descriptor_resolution_metres(descriptor),
+            bounds_native=bounds_native,
+            bounds_wgs84=_transform_bounds(bounds_native, descriptor.crs, "EPSG:4326"),
+            nodata=float(band.nodata) if band.nodata is not None else None,
+            format=descriptor.driver,
+            transform=Affine(*descriptor.transform),
+            width=descriptor.width,
+            height=descriptor.height,
+            band_index=band_index,
+            scale=band.scale,
+            offset=band.offset,
+            unit_to_metre=definition.unit_to_metre,
+            use_raster_mask=not (
+                definition.selection.overrides is not None
+                and definition.selection.overrides.nodata_is_set
+                and set(band.mask_flags) == {"nodata"}
+            ),
+        )
 
     def _inspect_npy_source(self, path: Path, index: int) -> _RasterSource | None:
         match = _NPY_TILE_NAME.match(path.stem)
@@ -455,6 +542,7 @@ class RasterioElevationAdapter:
             index=index,
             source_id=f"dem:{path.stem}",
             path=path,
+            uri=str(path),
             fingerprint=_path_fingerprint(path),
             native_crs=self._local_projected_crs,
             resolution_m=min(x_resolution, y_resolution),
@@ -473,7 +561,7 @@ class RasterioElevationAdapter:
             dataset = (
                 np.load(source.path, mmap_mode="r", allow_pickle=False)
                 if source.format == "NPY"
-                else rasterio.open(source.path)
+                else rasterio.open(source.uri)
             )
         self._datasets[source.index] = dataset
         while len(self._datasets) > self._max_open_datasets:
@@ -623,11 +711,21 @@ class RasterioElevationAdapter:
                 valid &= values != sentinel
             values = np.where(valid, values, 0.0).astype(np.float32, copy=False)
         else:
-            masked = dataset.read(
-                1, window=Window(col_off, row_off, width, height), masked=True, out_dtype="float32",
+            window = Window(col_off, row_off, width, height)
+            raw = dataset.read(source.band_index, window=window, masked=False)
+            valid = (
+                dataset.read_masks(source.band_index, window=window) != 0
+                if source.use_raster_mask
+                else np.ones(raw.shape, dtype=np.bool_)
             )
-            values = np.asarray(masked.filled(0.0), dtype=np.float32)
-            valid = ~np.ma.getmaskarray(masked) & np.isfinite(values)
+            if source.nodata is not None:
+                if math.isnan(source.nodata):
+                    valid &= ~np.isnan(raw)
+                else:
+                    valid &= raw != source.nodata
+            converted = (raw.astype(np.float64) * source.scale + source.offset) * source.unit_to_metre
+            valid &= np.isfinite(converted)
+            values = np.where(valid, converted, 0.0).astype(np.float32)
         cached = _CachedWindow(values, valid)
         self.raster_bytes_read += cached.bytes
         self._windows[key] = cached
@@ -712,6 +810,28 @@ def _resolution_metres(dataset: Any, native_crs: str) -> float | None:
         center_y = (float(dataset.bounds.bottom) + float(dataset.bounds.top)) * 0.5
         local = Transformer.from_crs(
             native_crs,
+            f"+proj=aeqd +lat_0={center_y} +lon_0={center_x} +datum=WGS84 +units=m +no_defs",
+            always_xy=True,
+        )
+        x0, y0 = local.transform(center_x, center_y)
+        x1, _ = local.transform(center_x + x_resolution, center_y)
+        _, y1 = local.transform(center_x, center_y + y_resolution)
+        return min(abs(x1 - x0), abs(y1 - y0))
+    except (ValueError, RuntimeError):
+        return None
+
+
+def _descriptor_resolution_metres(descriptor: Any) -> float | None:
+    x_resolution, y_resolution = descriptor.resolution
+    try:
+        crs = rasterio.crs.CRS.from_string(descriptor.crs)
+        if crs.is_projected:
+            return min(float(x_resolution), float(y_resolution))
+        west, south, east, north = descriptor.bounds
+        center_x = (west + east) * 0.5
+        center_y = (south + north) * 0.5
+        local = Transformer.from_crs(
+            descriptor.crs,
             f"+proj=aeqd +lat_0={center_y} +lon_0={center_x} +datum=WGS84 +units=m +no_defs",
             always_xy=True,
         )

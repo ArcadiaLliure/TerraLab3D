@@ -251,7 +251,11 @@ class LandCoverCoordinator:
                 active_source = tile.provenance.source_id
                 
                 if not legend_sent and self._legend_callback is not None:
-                    legend = self._port.legend(tile.legend_id)
+                    legend = self._port.legend(
+                        tile.provenance.scheme_key,
+                        tile.provenance.scheme_version,
+                        tile.provenance.mapping_revision,
+                    )
                     if legend is not None and self._is_current(generation, cancel_event):
                         self._legend_callback(legend)
                         legend_sent = True
@@ -261,7 +265,7 @@ class LandCoverCoordinator:
                     publication = replace(
                         tile,
                         resource_id=f"{tile.resource_id}.{t_min_x}_{t_min_y}.g{generation}",
-                        provenance=replace(tile.provenance, version=generation),
+                        provenance=replace(tile.provenance, generation=generation),
                     )
                     self._tile_callback(publication)
             
@@ -379,15 +383,15 @@ class LandCoverCoordinator:
             return tile
 
     def _cache_put(self, key: str, tile: LandCoverTile) -> None:
-        size = len(tile.class_buffer)
+        size = tile.byte_size
         if size > _CACHE_BUDGET_BYTES:
             return
         with self._lock:
             previous = self._cached_tiles.pop(key, None)
             if previous is not None:
-                self._cached_bytes -= len(previous.class_buffer)
+                self._cached_bytes -= previous.byte_size
             self._cached_tiles[key] = tile
             self._cached_bytes += size
             while self._cached_bytes > _CACHE_BUDGET_BYTES and self._cached_tiles:
                 _, evicted = self._cached_tiles.popitem(last=False)
-                self._cached_bytes -= len(evicted.class_buffer)
+                self._cached_bytes -= evicted.byte_size

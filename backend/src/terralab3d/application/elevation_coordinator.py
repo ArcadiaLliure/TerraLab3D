@@ -69,6 +69,12 @@ class ElevationCoordinator:
         if self._cancel_event is not None:
             self._cancel_event.set()
 
+    def invalidate(self) -> None:
+        """Cancel stale work and discard samples tied to an old DEM fingerprint."""
+
+        self.cancel()
+        self._cache.clear()
+
     def metrics(self) -> dict[str, float | int]:
         samples = sorted(self._durations_ms)
         return {

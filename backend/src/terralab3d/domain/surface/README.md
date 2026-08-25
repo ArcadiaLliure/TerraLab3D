@@ -35,6 +35,22 @@ Modelar mostreig, paletes, classes i materials de superfície separats de la geo
 
 El paquet separa `models.py` (tipus i invariants), `calculations.py` (algoritmes científics purs) i `services.py` (composició de regles de domini).
 
+### TLST 1.0
+
+`tlst.py` defineix el contracte pur de la TerraLab Surface Taxonomy:
+
+- `SampleValidity` descriu disponibilitat fisica i no es una categoria;
+- `SingleSurface | CompositeSurface | ObservationState` descriu la interpretacio semantica;
+- una mostra no valida no pot tenir traduccio TLST;
+- les claus textuals TLST son l'unica identitat publica i persistent;
+- els valors raster es resolen sempre mitjançant `scheme_key + scheme_version + mapping_revision`.
+
+El catàleg publicat és `TLST@1.0`. Els JSON de S2GLC, WorldCover, LCM-10 i
+CORINE viuen a `terralab3d/data/tlst`; els esquemes personals es persisteixen
+fora del domini. La representació binària actual usa codis d'execució `uint16`
+i `SampleValidity` en dos bits, però conserva separadament el valor i dtype
+font. `uint16` no forma part del concepte TLST.
+
 ## 7. TODO
 
 - [ ] Definir unitats, dominis, convencions, època de referència i toleràncies de cada valor públic.

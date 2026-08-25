@@ -86,3 +86,35 @@ ResourceDescriptor(
 )
 ```
 Amb això, apareixerà instantàniament al `ResourceManagerModal` per ser descarregat, posat en pausa, i reportar errors sota la mateixa capa de validació.
+
+## 8. Importació raster local d'elevació
+
+La importació local és una operació diferent d'una descàrrega. No crea cap `DownloadJob` i separa tres documents:
+
+- `layers.json`: descriptor publicable del recurs;
+- `local_installation_state.json`: disponibilitat i propietat local;
+- `data_sources.json`: font raster, ordre primària/fallback i selecció activa.
+
+El frontend usa sessions HTTP correlacionades (`POST`, `PUT` binari, `inspect`, `commit`, `DELETE`). Els bundles gestionats es mantenen en staging fins al commit; cancel·lar-los no modifica els catàlegs. Les fonts externes només es registren i mai s'eliminen del disc. Després del commit, el `ReloadableElevationPort` canvia d'adaptador de manera atòmica, conserva lectures en curs i força un nou fingerprint de terreny i horitzó.
+
+La pestanya TERRA queda dividida en `Elevació`, `Categòric` i `Refinament`. La contaminació lumínica existent viu a `Refinament`.
+
+## 9. Importació raster categòrica i esquemes TLST
+
+`Categòric → + Importar` reutilitza les mateixes sessions HTTP locals i els
+mateixos modes `managed`/`external`, però analitza valors discrets sense
+interpolació. Admet una banda entera, índex amb paleta i colors RGB/RGBA
+exactes. El fitxer font es conserva i només es genera una vista indexada
+`uint16` reconstruïble per als hot paths actuals.
+
+TerraLab proposa coincidències del registre només després que la font s'ha
+declarat categòrica. L'usuari ha de revisar i confirmar esquema, versió i
+revisió. El registre incorpora S2GLC, WorldCover, Copernicus LCM-10, CORINE i
+els esquemes personals persistits a `classification_schemes.json`. Un mapping
+personal pot apuntar a qualsevol node TLST; no cal inventar una fulla.
+
+Després del commit, `data_sources.json` conserva el valor i dtype font,
+l'encoding, les bandes, la revisió i el raster derivat. El canvi retira els
+tiles categòrics obsolets i torna a publicar llegenda i cobertura. El picking
+continua mostrant el valor font real, no el codi compacte d'execució quan són
+diferents.

@@ -1,9 +1,9 @@
 import * as THREE from "three";
 import type { DemTerrainLayerRenderer } from "../layers/DemTerrainLayerRenderer";
+import type { LandCoverObservation } from "../terrain/LandCoverTextureManager";
 
 export interface TerrainPickHit {
-  readonly classId: number;
-  readonly label: string;
+  readonly observation: LandCoverObservation;
   readonly worldPoint: THREE.Vector3;
 }
 
@@ -45,12 +45,11 @@ export class TerrainPickProvider {
         // In the terrain shader, geoX = worldPos.x and geoY = -worldPos.z
         const geoX = hit.point.x;
         const geoY = -hit.point.z;
-        const category = this.config.terrainRenderer.landCoverManager.getCategoryAtWorld(geoX, geoY);
+        const observation = this.config.terrainRenderer.landCoverManager.getObservationAtWorld(geoX, geoY);
         
-        if (category) {
+        if (observation) {
           return {
-            classId: category.classId,
-            label: category.label,
+            observation,
             worldPoint: hit.point.clone(),
           };
         } else {

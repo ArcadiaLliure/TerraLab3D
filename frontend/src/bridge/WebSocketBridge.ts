@@ -113,6 +113,7 @@ export interface BackendMessageListener {
   onAstronomicalSearchResult?(msg: import("../contracts/bridge_messages").AstronomicalSearchResultMessage): void;
   onStarTrailsSnapshot?(snapshot: import("../contracts/bridge_messages").StarTrailsSnapshotMessage): void;
   onHorizonStatus?(status: HorizonStatusMessage): void;
+  onOperationProgressed?(msg: import("../contracts/events").OperationProgressedEvent): void;
 }
 
 export class WebSocketBridge {
@@ -509,6 +510,11 @@ export class WebSocketBridge {
       case "land_cover_legend":
         for (const l of this.messageListeners) {
           l.onLandCoverLegend?.(msg);
+        }
+        break;
+      case "operation_progressed":
+        for (const l of this.messageListeners) {
+          l.onOperationProgressed?.(msg as any);
         }
         break;
       default:

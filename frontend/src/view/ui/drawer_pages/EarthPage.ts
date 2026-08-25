@@ -274,7 +274,7 @@ export class EarthPage {
       statusText: phaseLabels[status.phase],
       detailsText: details.join(" · "),
       isError: status.phase === "error",
-      isSuccess: status.phase === "completed" || (status.phase === "fallback" && status.progress === 1.0),
+      isSuccess: status.phase === "completed",
       isActive: busy,
     });
 

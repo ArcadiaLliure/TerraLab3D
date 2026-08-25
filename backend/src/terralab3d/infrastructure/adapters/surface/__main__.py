@@ -19,7 +19,8 @@ def main() -> int:
     print(f"CRS={source.crs}")
     print(f"RESOLUTION_M={source.resolution_m}")
     print(f"NODATA={source.nodata}")
-    print(f"LEGEND_ID={source.legend_id}")
+    print(f"SCHEME={source.scheme_key}@{source.scheme_version}")
+    print(f"SOURCE_DTYPE={source.source_dtype}")
     print(f"RASTER_COUNT={len(source.raster_paths)}")
     return 0
 

@@ -48,6 +48,10 @@ export class DemTerrainLayerRenderer {
     landCoverTex1: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
     landCoverTex2: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
     landCoverTex3: { value: this.landCoverManager.emptyCoverageTexture as THREE.Texture },
+    landCoverValidityTex0: { value: this.landCoverManager.emptyValidityTexture as THREE.Texture },
+    landCoverValidityTex1: { value: this.landCoverManager.emptyValidityTexture as THREE.Texture },
+    landCoverValidityTex2: { value: this.landCoverManager.emptyValidityTexture as THREE.Texture },
+    landCoverValidityTex3: { value: this.landCoverManager.emptyValidityTexture as THREE.Texture },
     landCoverLUT: { value: this.landCoverManager.emptyPaletteTexture as THREE.Texture },
     landCoverBounds: { value: new THREE.Vector4(0, 0, 0, 0) },
     landCoverTileWorldSize: { value: new THREE.Vector2(1, 1) },
@@ -111,6 +115,10 @@ export class DemTerrainLayerRenderer {
       this.surfaceUniforms.landCoverTex1.value = banks[1]?.texture ?? this.landCoverManager.emptyCoverageTexture;
       this.surfaceUniforms.landCoverTex2.value = banks[2]?.texture ?? this.landCoverManager.emptyCoverageTexture;
       this.surfaceUniforms.landCoverTex3.value = banks[3]?.texture ?? this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverValidityTex0.value = banks[0]?.validityTexture ?? this.landCoverManager.emptyValidityTexture;
+      this.surfaceUniforms.landCoverValidityTex1.value = banks[1]?.validityTexture ?? this.landCoverManager.emptyValidityTexture;
+      this.surfaceUniforms.landCoverValidityTex2.value = banks[2]?.validityTexture ?? this.landCoverManager.emptyValidityTexture;
+      this.surfaceUniforms.landCoverValidityTex3.value = banks[3]?.validityTexture ?? this.landCoverManager.emptyValidityTexture;
       this.surfaceUniforms.landCoverLUT.value = this.landCoverManager.paletteTexture;
       this.surfaceUniforms.landCoverBounds.value.copy(this.landCoverManager.activeBounds);
       this.surfaceUniforms.landCoverTileWorldSize.value.copy(this.landCoverManager.tileWorldSize);
@@ -121,6 +129,10 @@ export class DemTerrainLayerRenderer {
       this.surfaceUniforms.landCoverTex1.value = this.landCoverManager.emptyCoverageTexture;
       this.surfaceUniforms.landCoverTex2.value = this.landCoverManager.emptyCoverageTexture;
       this.surfaceUniforms.landCoverTex3.value = this.landCoverManager.emptyCoverageTexture;
+      this.surfaceUniforms.landCoverValidityTex0.value = this.landCoverManager.emptyValidityTexture;
+      this.surfaceUniforms.landCoverValidityTex1.value = this.landCoverManager.emptyValidityTexture;
+      this.surfaceUniforms.landCoverValidityTex2.value = this.landCoverManager.emptyValidityTexture;
+      this.surfaceUniforms.landCoverValidityTex3.value = this.landCoverManager.emptyValidityTexture;
       this.surfaceUniforms.landCoverLUT.value = this.landCoverManager.emptyPaletteTexture;
       this.surfaceUniforms.landCoverBounds.value.set(0, 0, 0, 0);
       this.surfaceUniforms.landCoverTileWorldSize.value.set(1, 1);
@@ -316,7 +328,7 @@ export class DemTerrainLayerRenderer {
       polygonOffsetUnits: streaming ? -1 : 0,
     });
     material.onBeforeCompile = (shader) => this.patchTerrainShader(shader);
-    material.customProgramCacheKey = () => "terralab3d-terrain-land-cover-v3";
+    material.customProgramCacheKey = () => "terralab3d-terrain-land-cover-v4";
     return material;
   }
 
@@ -325,6 +337,10 @@ export class DemTerrainLayerRenderer {
     shader.uniforms.landCoverTex1 = this.surfaceUniforms.landCoverTex1;
     shader.uniforms.landCoverTex2 = this.surfaceUniforms.landCoverTex2;
     shader.uniforms.landCoverTex3 = this.surfaceUniforms.landCoverTex3;
+    shader.uniforms.landCoverValidityTex0 = this.surfaceUniforms.landCoverValidityTex0;
+    shader.uniforms.landCoverValidityTex1 = this.surfaceUniforms.landCoverValidityTex1;
+    shader.uniforms.landCoverValidityTex2 = this.surfaceUniforms.landCoverValidityTex2;
+    shader.uniforms.landCoverValidityTex3 = this.surfaceUniforms.landCoverValidityTex3;
     shader.uniforms.landCoverLUT = this.surfaceUniforms.landCoverLUT;
     shader.uniforms.landCoverBounds = this.surfaceUniforms.landCoverBounds;
     shader.uniforms.landCoverTileWorldSize = this.surfaceUniforms.landCoverTileWorldSize;
@@ -356,6 +372,10 @@ export class DemTerrainLayerRenderer {
       uniform highp usampler2DArray landCoverTex1;
       uniform highp usampler2DArray landCoverTex2;
       uniform highp usampler2DArray landCoverTex3;
+      uniform highp usampler2DArray landCoverValidityTex0;
+      uniform highp usampler2DArray landCoverValidityTex1;
+      uniform highp usampler2DArray landCoverValidityTex2;
+      uniform highp usampler2DArray landCoverValidityTex3;
       uniform sampler2D landCoverLUT;
       uniform vec4 landCoverBounds;
       uniform vec2 landCoverTileWorldSize;
@@ -446,6 +466,7 @@ export class DemTerrainLayerRenderer {
           );
 
           uint classId = 0u;
+          uint sampleValidity = 0u;
           if (bank == 0) {
             ivec3 covSize = textureSize(landCoverTex0, 0);
             if (localLayer >= 0 && localLayer < covSize.z) {
@@ -454,6 +475,12 @@ export class DemTerrainLayerRenderer {
                 min(int(floor(localV * float(covSize.y))), covSize.y - 1)
               );
               classId = texelFetch(landCoverTex0, ivec3(covPixel, localLayer), 0).r;
+              uint packedValidity = texelFetch(
+                landCoverValidityTex0,
+                ivec3(covPixel.x / 4, covPixel.y, localLayer),
+                0
+              ).r;
+              sampleValidity = (packedValidity >> uint((covPixel.x % 4) * 2)) & 3u;
             }
           } else if (bank == 1) {
             ivec3 covSize = textureSize(landCoverTex1, 0);
@@ -463,6 +490,12 @@ export class DemTerrainLayerRenderer {
                 min(int(floor(localV * float(covSize.y))), covSize.y - 1)
               );
               classId = texelFetch(landCoverTex1, ivec3(covPixel, localLayer), 0).r;
+              uint packedValidity = texelFetch(
+                landCoverValidityTex1,
+                ivec3(covPixel.x / 4, covPixel.y, localLayer),
+                0
+              ).r;
+              sampleValidity = (packedValidity >> uint((covPixel.x % 4) * 2)) & 3u;
             }
           } else if (bank == 2) {
             ivec3 covSize = textureSize(landCoverTex2, 0);
@@ -472,6 +505,12 @@ export class DemTerrainLayerRenderer {
                 min(int(floor(localV * float(covSize.y))), covSize.y - 1)
               );
               classId = texelFetch(landCoverTex2, ivec3(covPixel, localLayer), 0).r;
+              uint packedValidity = texelFetch(
+                landCoverValidityTex2,
+                ivec3(covPixel.x / 4, covPixel.y, localLayer),
+                0
+              ).r;
+              sampleValidity = (packedValidity >> uint((covPixel.x % 4) * 2)) & 3u;
             }
           } else if (bank == 3) {
             ivec3 covSize = textureSize(landCoverTex3, 0);
@@ -481,10 +520,16 @@ export class DemTerrainLayerRenderer {
                 min(int(floor(localV * float(covSize.y))), covSize.y - 1)
               );
               classId = texelFetch(landCoverTex3, ivec3(covPixel, localLayer), 0).r;
+              uint packedValidity = texelFetch(
+                landCoverValidityTex3,
+                ivec3(covPixel.x / 4, covPixel.y, localLayer),
+                0
+              ).r;
+              sampleValidity = (packedValidity >> uint((covPixel.x % 4) * 2)) & 3u;
             }
           }
 
-          if (classId != 0u) {
+          if (sampleValidity == 1u) {
             ivec2 lutPixel = ivec2(
               int(classId & 255u),
               int((classId >> 8u) & 255u)

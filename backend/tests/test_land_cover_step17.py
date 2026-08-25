@@ -7,6 +7,7 @@ from rasterio.transform import from_origin
 from terralab3d.infrastructure.adapters.surface.adapter import ConfiguredSurfaceSampler
 from terralab3d.infrastructure.adapters.surface.land_cover_port import RasterioLandCoverPort
 from terralab3d.domain.surface.land_cover import LandCoverTileRequest
+from terralab3d.domain.surface.tlst import SampleValidity, unpack_sample_validity
 
 
 def test_land_cover_resolution_and_port():
@@ -49,8 +50,10 @@ def test_land_cover_resolution_and_port():
                     "layer_type": "land_cover_categorical",
                     "enabled": True,
                     "path": str(temp_dir_path),  # Directory path
-                    "metadata": {
-                        "rasters": [
+                        "metadata": {
+                            "scheme_key": "s2glc_europe",
+                            "scheme_version": "2017-v1.2",
+                            "rasters": [
                             {"paths": ["test_data.tif"]}
                         ]
                     }
@@ -79,6 +82,9 @@ def test_land_cover_resolution_and_port():
         assert resolved.source_id == "test_lc"
         assert resolved.crs == "EPSG:3035"
         assert resolved.nodata == 255
+        assert resolved.source_dtype == "uint8"
+        assert resolved.scheme_key == "s2glc_europe"
+        assert resolved.scheme_version == "2017-v1.2"
         assert len(resolved.raster_paths) == 1
         assert resolved.raster_paths[0].name == "test_data.tif"
         
@@ -98,14 +104,18 @@ def test_land_cover_resolution_and_port():
         tile_exact = port.read_tile(request_exact)
         assert tile_exact is not None
         
-        buffer_exact = np.frombuffer(tile_exact.class_buffer, dtype=np.uint16).reshape(2, 2)
+        buffer_exact = np.frombuffer(tile_exact.source_code_buffer, dtype=np.uint16).reshape(2, 2)
+        validity_exact = np.frombuffer(
+            unpack_sample_validity(tile_exact.sample_validity_buffer, 2, 2),
+            dtype=np.uint8,
+        ).reshape(2, 2)
         
-        # Nearest neighbour sampling and Nodata 255 -> 0 mapping.
-        # Raster original data: [[255, 104], [104, 255]] (2x2)
-        assert buffer_exact[0, 0] == 0
         assert buffer_exact[0, 1] == 104
         assert buffer_exact[1, 0] == 104
-        assert buffer_exact[1, 1] == 0
+        assert validity_exact.tolist() == [
+            [SampleValidity.NODATA, SampleValidity.VALID],
+            [SampleValidity.VALID, SampleValidity.NODATA],
+        ]
         
         # Empty tile
         request_empty = LandCoverTileRequest(
@@ -122,7 +132,12 @@ def test_land_cover_resolution_and_port():
         assert tile_empty is not None
         assert tile_empty.valid_pixels == 0
         
-        buffer_empty = np.frombuffer(tile_empty.class_buffer, dtype=np.uint16)
+        buffer_empty = np.frombuffer(tile_empty.source_code_buffer, dtype=np.uint16)
         assert np.all(buffer_empty == 0)
+        validity_empty = np.frombuffer(
+            unpack_sample_validity(tile_empty.sample_validity_buffer, 2, 2),
+            dtype=np.uint8,
+        )
+        assert np.all(validity_empty == SampleValidity.OUTSIDE_COVERAGE)
         
         port.close()

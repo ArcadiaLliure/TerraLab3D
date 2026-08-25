@@ -1,0 +1,23 @@
+{
+  "scheme_key": "s2glc_europe",
+  "scheme_version": "2017-v1.2",
+  "display_name": "S2GLC Europe",
+  "taxonomy_key": "TLST",
+  "taxonomy_version": "1.0",
+  "classes": [
+    {"source_code": 0, "source_label": "Clouds", "source_label_key": "source.s2glc.clouds", "color_rgba": [0, 0, 0, 0], "sample_validity": "masked"},
+    {"source_code": 62, "source_label": "Artificial surfaces", "source_label_key": "source.s2glc.artificial_surfaces", "color_rgba": [210, 0, 0, 255], "category_key": "artificial.unspecified"},
+    {"source_code": 73, "source_label": "Cultivated areas", "source_label_key": "source.s2glc.cultivated_areas", "color_rgba": [253, 211, 39, 255], "category_key": "agriculture.cropland.unspecified"},
+    {"source_code": 75, "source_label": "Vineyards", "source_label_key": "source.s2glc.vineyards", "color_rgba": [176, 91, 16, 255], "category_key": "agriculture.cropland.permanent_crop.vineyard"},
+    {"source_code": 82, "source_label": "Broadleaf tree cover", "source_label_key": "source.s2glc.broadleaf_tree_cover", "color_rgba": [35, 152, 0, 255], "category_key": "tree_cover.broadleaf"},
+    {"source_code": 83, "source_label": "Coniferous tree cover", "source_label_key": "source.s2glc.coniferous_tree_cover", "color_rgba": [8, 98, 0, 255], "category_key": "tree_cover.needleleaf"},
+    {"source_code": 102, "source_label": "Herbaceous vegetation", "source_label_key": "source.s2glc.herbaceous_vegetation", "color_rgba": [249, 150, 39, 255], "category_key": "low_vegetation.herbaceous.unspecified"},
+    {"source_code": 103, "source_label": "Moors and heathland", "source_label_key": "source.s2glc.moors_heathland", "color_rgba": [141, 139, 0, 255], "category_key": "low_vegetation.shrub.unspecified"},
+    {"source_code": 104, "source_label": "Sclerophyllous vegetation", "source_label_key": "source.s2glc.sclerophyllous_vegetation", "color_rgba": [95, 53, 6, 255], "category_key": "low_vegetation.shrub.sclerophyllous"},
+    {"source_code": 105, "source_label": "Marshes", "source_label_key": "source.s2glc.marshes", "color_rgba": [149, 107, 196, 255], "category_key": "wetland.marsh"},
+    {"source_code": 106, "source_label": "Peatbogs", "source_label_key": "source.s2glc.peatbogs", "color_rgba": [77, 37, 106, 255], "category_key": "wetland.inland.peat_bog"},
+    {"source_code": 121, "source_label": "Natural material surfaces", "source_label_key": "source.s2glc.natural_material_surfaces", "color_rgba": [154, 154, 154, 255], "category_key": "bare_sparse.unspecified"},
+    {"source_code": 123, "source_label": "Permanent snow cover", "source_label_key": "source.s2glc.permanent_snow_cover", "color_rgba": [106, 255, 255, 255], "category_key": "snow_ice.permanent.unspecified"},
+    {"source_code": 162, "source_label": "Water bodies", "source_label_key": "source.s2glc.water_bodies", "color_rgba": [20, 69, 249, 255], "category_key": "water.unspecified"}
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "scheme_key": "copernicus_lcm10",
+  "scheme_version": "2020-v100",
+  "display_name": "Copernicus Global Land Cover 10 m",
+  "source_semantics": "land_cover",
+  "mapping_revision": "official-pum-i1.1-tlst1",
+  "taxonomy_key": "TLST",
+  "taxonomy_version": "1.0",
+  "classes": [
+    {"source_code": 10, "source_label": "Tree cover", "color_rgba": [0, 100, 0, 255], "category_key": "tree_cover.unspecified"},
+    {"source_code": 20, "source_label": "Shrubland", "color_rgba": [255, 187, 34, 255], "category_key": "low_vegetation.shrub.shrubland"},
+    {"source_code": 30, "source_label": "Grassland", "color_rgba": [255, 255, 76, 255], "category_key": "low_vegetation.herbaceous.unspecified"},
+    {"source_code": 40, "source_label": "Cropland", "color_rgba": [240, 150, 255, 255], "category_key": "agriculture.cropland.arable.annual_crop"},
+    {"source_code": 50, "source_label": "Herbaceous wetland", "color_rgba": [0, 150, 160, 255], "category_key": "wetland.herbaceous_wetland"},
+    {"source_code": 60, "source_label": "Mangroves", "color_rgba": [0, 207, 117, 255], "category_key": "wetland.coastal.mangrove"},
+    {"source_code": 70, "source_label": "Moss and lichen", "color_rgba": [250, 230, 160, 255], "category_key": "low_vegetation.moss_lichen"},
+    {"source_code": 80, "source_label": "Bare / sparse vegetation", "color_rgba": [180, 180, 180, 255], "category_key": "bare_sparse.unspecified"},
+    {"source_code": 90, "source_label": "Built-up", "color_rgba": [250, 0, 0, 255], "category_key": "artificial.unspecified"},
+    {"source_code": 100, "source_label": "Permanent water bodies", "color_rgba": [0, 100, 200, 255], "category_key": "water.unspecified", "qualifiers": {"water_regime": "permanent"}},
+    {"source_code": 110, "source_label": "Snow and ice", "color_rgba": [240, 240, 240, 255], "category_key": "snow_ice.permanent.unspecified"},
+    {"source_code": 254, "source_label": "Unclassifiable", "color_rgba": [10, 10, 10, 255], "classification_status": "unclassified"},
+    {"source_code": 255, "source_label": "No Data", "color_rgba": [0, 0, 0, 0], "sample_validity": "nodata"}
+  ]
+}

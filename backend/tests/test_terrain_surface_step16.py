@@ -192,7 +192,9 @@ def test_land_cover_selection_resolves_directory_metadata_to_real_geotiff(
     assert source.crs == "EPSG:3035"
     assert source.resolution_m == 9.9994162612822
     assert source.nodata == 255
-    assert source.legend_id == "s2glc_europe_2017"
+    assert source.scheme_key == "s2glc_europe"
+    assert source.scheme_version == "2017-v1.2"
+    assert source.source_dtype == "uint8"
 
 
 def test_manual_land_cover_does_not_fall_back_to_another_source(
