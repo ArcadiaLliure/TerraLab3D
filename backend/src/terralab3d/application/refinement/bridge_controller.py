@@ -58,6 +58,8 @@ class RefinementDownloadJobs(Protocol):
 
     def delete_resource(self, resource_id: ResourceId, variant_id: VariantId) -> None: ...
 
+    def cancel_download(self, resource_id: ResourceId, variant_id: VariantId) -> None: ...
+
     def register_post_processor(
         self,
         resource_id: ResourceId,
@@ -84,6 +86,18 @@ class _DiscoverySession:
 class _PlannedSession:
     plan: ParametricDownloadPlan
     candidates: tuple[DiscoveredRefinementProduct, ...]
+
+
+@dataclass(frozen=True, slots=True)
+class _ActiveDownload:
+    request_id: str
+    revision: int
+    plan_id: str
+    job_id: str
+    resource_id: ResourceId
+    variant_id: VariantId
+    installation_ids: tuple[str, ...]
+    total_bytes: int | None
 
 
 class RefinementBridgeController:
@@ -116,6 +130,7 @@ class RefinementBridgeController:
         self._query_task: asyncio.Task[None] | None = None
         self._discoveries: dict[tuple[str, int], _DiscoverySession] = {}
         self._plans: dict[str, _PlannedSession] = {}
+        self._active_downloads: dict[str, _ActiveDownload] = {}
 
     def request_workspace(self, message: Mapping[str, object]) -> None:
         asyncio.create_task(self._publish_workspace(message))
@@ -135,6 +150,9 @@ class RefinementBridgeController:
 
     def confirm_download(self, message: Mapping[str, object]) -> None:
         asyncio.create_task(self._confirm_download(message))
+
+    def cancel_download(self, message: Mapping[str, object]) -> None:
+        asyncio.create_task(self._cancel_download(message))
 
     def remove_installation(self, message: Mapping[str, object]) -> None:
         asyncio.create_task(self._remove_installation(message))
@@ -398,6 +416,16 @@ class RefinementBridgeController:
             job_id = self._download_jobs.start_download(descriptor.id, variant.id)
             if job_id != expected_job_id:
                 raise RefinementValidationError("Download manager returned an unexpected job id")
+            self._active_downloads[plan.plan_id] = _ActiveDownload(
+                request_id=request_id,
+                revision=revision,
+                plan_id=plan.plan_id,
+                job_id=job_id,
+                resource_id=descriptor.id,
+                variant_id=variant.id,
+                installation_ids=tuple(installation_ids),
+                total_bytes=plan.estimated_bytes,
+            )
             await self._publisher.send(
                 {
                     "type": "refinement_download_progress",
@@ -416,6 +444,40 @@ class RefinementBridgeController:
             )
         except Exception as exc:
             await self._send_error(request_id, revision, "confirm", exc)
+
+    async def _cancel_download(self, message: Mapping[str, object]) -> None:
+        request_id, revision = _request_marker(message)
+        try:
+            plan_id = _required_string(message, "planId")
+            active = self._active_downloads.get(plan_id)
+            if (
+                active is None
+                or active.request_id != request_id
+                or active.revision != revision
+            ):
+                raise RefinementValidationError("Unknown or stale active refinement download")
+            self._download_jobs.cancel_download(active.resource_id, active.variant_id)
+            for installation_id in active.installation_ids:
+                self._service.cancel_operation(installation_id)
+            self._active_downloads.pop(plan_id, None)
+            await self._publisher.send(
+                {
+                    "type": "refinement_download_progress",
+                    "requestId": request_id,
+                    "revision": revision,
+                    "planId": plan_id,
+                    "jobId": active.job_id,
+                    "state": TechnicalResourceState.CANCELLED.value,
+                    "downloadedBytes": 0,
+                    "totalBytes": active.total_bytes,
+                    "progress": None,
+                    "currentFile": None,
+                    "outputs": _empty_outputs(),
+                    "error": None,
+                }
+            )
+        except Exception as exc:
+            await self._send_error(request_id, revision, "cancel", exc)
 
     async def _remove_installation(self, message: Mapping[str, object]) -> None:
         request_id, revision = _request_marker(message)

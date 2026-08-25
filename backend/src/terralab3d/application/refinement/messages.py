@@ -46,6 +46,13 @@ class ConfirmRefinementDownloadMessage(TypedDict):
     largeDownloadConfirmed: bool
 
 
+class CancelRefinementDownloadMessage(TypedDict):
+    type: Literal["cancel_refinement_download"]
+    requestId: str
+    revision: int
+    planId: str
+
+
 class RemoveRefinementInstallationMessage(TypedDict):
     type: Literal["remove_refinement_installation"]
     requestId: str
@@ -231,7 +238,7 @@ class RefinementOperationErrorMessage(TypedDict):
     type: Literal["refinement_operation_error"]
     requestId: str
     revision: int
-    operation: Literal["workspace", "query", "plan", "confirm", "remove"]
+    operation: Literal["workspace", "query", "plan", "confirm", "cancel", "remove"]
     code: str
     message: str
     providerId: NotRequired[str]

@@ -68,6 +68,7 @@ class _Jobs:
         self.started = []
         self.deleted = []
         self.processors = []
+        self.cancelled = []
 
     def start_download(self, resource_id, variant_id) -> str:
         self.started.append((resource_id, variant_id))
@@ -75,6 +76,9 @@ class _Jobs:
 
     def delete_resource(self, resource_id, variant_id) -> None:
         self.deleted.append((resource_id, variant_id))
+
+    def cancel_download(self, resource_id, variant_id) -> None:
+        self.cancelled.append((resource_id, variant_id))
 
     def register_post_processor(self, resource_id, processor) -> None:
         self.processors.append((resource_id, processor))
@@ -221,6 +225,22 @@ def test_bridge_flow_workspace_discovery_plan_confirmation_and_removal(
         assert len(jobs.started) == 1
         installation = repository.list_installations()[0]
         assert installation.job_id == progress["jobId"]
+
+        controller.cancel_download(
+            {
+                "requestId": "query-1",
+                "revision": 3,
+                "planId": plan["planId"],
+            }
+        )
+        for _ in range(100):
+            if jobs.cancelled:
+                break
+            await asyncio.sleep(0.01)
+        assert len(jobs.cancelled) == 1
+        cancelled = repository.get(installation.installation_id)
+        assert cancelled is not None
+        assert cancelled.technical_state is TechnicalResourceState.CANCELLED
 
         controller.remove_installation(
             {

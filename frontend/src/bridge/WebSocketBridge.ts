@@ -43,6 +43,7 @@ import type {
 } from "../contracts/solar_system_contracts";
 import type {
   CalculateRefinementPlanMessage,
+  CancelRefinementDownloadMessage,
   CancelRefinementQueryMessage,
   ConfirmRefinementDownloadMessage,
   QueryRefinementProductsMessage,
@@ -682,6 +683,10 @@ export class WebSocketBridge {
   }
 
   public confirmRefinementDownload(message: ConfirmRefinementDownloadMessage): void {
+    this.sendMessage(message);
+  }
+
+  public cancelRefinementDownload(message: CancelRefinementDownloadMessage): void {
     this.sendMessage(message);
   }
 

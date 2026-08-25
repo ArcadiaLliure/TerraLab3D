@@ -405,6 +405,18 @@ export class RefinementManagerView {
     track.appendChild(fill);
     const file = note(progress.currentFile ?? progress.error ?? "Preparant fitxers…");
     section.append(header, track, file);
+    if (!["READY", "ERROR", "CANCELLED"].includes(progress.state)) {
+      const cancel = actionButton("Cancel·lar descàrrega", false);
+      cancel.onclick = () => {
+        if (!window.confirm("Cancel·lar la descàrrega? Els parcials es conservaran per reprendre-la.")) return;
+        this.manager.cancelRefinementDownload(
+          snapshot.requestId,
+          snapshot.revision,
+          progress.planId,
+        );
+      };
+      section.appendChild(cancel);
+    }
     return section;
   }
 

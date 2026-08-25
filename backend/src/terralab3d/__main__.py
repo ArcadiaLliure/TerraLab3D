@@ -295,6 +295,7 @@ async def run() -> int:
     bridge.on("cancel_refinement_query", refinement_bridge.cancel_query)
     bridge.on("calculate_refinement_plan", refinement_bridge.calculate_plan)
     bridge.on("confirm_refinement_download", refinement_bridge.confirm_download)
+    bridge.on("cancel_refinement_download", refinement_bridge.cancel_download)
     bridge.on("remove_refinement_installation", refinement_bridge.remove_installation)
 
     # ── 3. Lògica d'Ubicació (Fase 2) ─────────────────────────────────

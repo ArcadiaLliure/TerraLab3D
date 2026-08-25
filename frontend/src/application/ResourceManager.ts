@@ -10,6 +10,7 @@ import type {
 } from "../contracts/resource_manager_contracts";
 import type {
     RefinementBackendMessage,
+    RefinementDownloadProgressMessage,
     RefinementGeometry,
     RefinementWorkspace,
 } from "../contracts/refinement_contracts";
@@ -38,6 +39,7 @@ export class ResourceManager {
     private operationListeners: Set<OperationProgressListener> = new Set();
     private refinementListeners: Set<RefinementUpdateListener> = new Set();
     private refinementWorkspace: RefinementWorkspace | null = null;
+    private refinementJobs: Map<string, RefinementDownloadProgressMessage> = new Map();
 
     constructor(private bridge: WebSocketBridge) {
         bridge.addMessageListener({
@@ -113,6 +115,16 @@ export class ResourceManager {
             revision,
             planId,
             largeDownloadConfirmed,
+        });
+    }
+
+    public cancelRefinementDownload(
+        requestId: string,
+        revision: number,
+        planId: string,
+    ): void {
+        this.bridge.cancelRefinementDownload({
+            type: "cancel_refinement_download", requestId, revision, planId,
         });
     }
 
@@ -221,6 +233,31 @@ export class ResourceManager {
         
         for (const l of this.jobListeners) l(msg);
         for (const l of this.catalogListeners) l(); // Notify UI to refresh rows
+        const refinement = this.refinementJobs.get(msg.jobId);
+        const state = refinementTechnicalState(msg.state);
+        if (refinement && state) {
+            const progress: RefinementDownloadProgressMessage = {
+                ...refinement,
+                state,
+                downloadedBytes: msg.downloadedBytes,
+                totalBytes: msg.totalBytes,
+                progress: msg.progress,
+                currentFile: msg.currentFile,
+                error: msg.errorMessage,
+            };
+            this.publishRefinement(progress);
+            if (state === "READY") {
+                this.bridge.requestRefinementWorkspace({
+                    type: "request_refinement_workspace",
+                    requestId: progress.requestId,
+                    revision: progress.revision,
+                    ...(this.refinementWorkspace?.aoi ? { aoi: this.refinementWorkspace.aoi } : {}),
+                });
+            }
+            if (state === "READY" || state === "ERROR" || state === "CANCELLED") {
+                this.refinementJobs.delete(msg.jobId);
+            }
+        }
     }
 
     private optimisticUpdate(resourceId: string, variantId: string, status: ResourceInstallState): void {
@@ -264,6 +301,22 @@ export class ResourceManager {
     }
 
     private publishRefinement(msg: RefinementBackendMessage): void {
+        if (msg.type === "refinement_download_progress") {
+            if (msg.state === "QUEUED" || msg.state === "DOWNLOADING") {
+                this.refinementJobs.set(msg.jobId, msg);
+            } else if (msg.state === "READY" || msg.state === "ERROR" || msg.state === "CANCELLED") {
+                this.refinementJobs.delete(msg.jobId);
+            }
+        }
         for (const listener of this.refinementListeners) listener(msg);
     }
+}
+
+function refinementTechnicalState(state: ResourceInstallState): RefinementDownloadProgressMessage["state"] | null {
+    if (state === "QUEUED" || state === "DOWNLOADING" || state === "VERIFYING" || state === "PROCESSING" || state === "READY" || state === "ERROR") {
+        return state;
+    }
+    if (state === "INVALID") return "ERROR";
+    if (state === "PARTIAL" || state === "PAUSED" || state === "NOT_INSTALLED") return "CANCELLED";
+    return null;
 }

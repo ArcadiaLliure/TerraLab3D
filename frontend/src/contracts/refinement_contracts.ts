@@ -186,6 +186,13 @@ export interface ConfirmRefinementDownloadMessage {
   readonly largeDownloadConfirmed: boolean;
 }
 
+export interface CancelRefinementDownloadMessage {
+  readonly type: "cancel_refinement_download";
+  readonly requestId: string;
+  readonly revision: number;
+  readonly planId: string;
+}
+
 export interface RemoveRefinementInstallationMessage {
   readonly type: "remove_refinement_installation";
   readonly requestId: string;
@@ -258,7 +265,7 @@ export interface RefinementOperationErrorMessage {
   readonly type: "refinement_operation_error";
   readonly requestId: string;
   readonly revision: number;
-  readonly operation: "workspace" | "query" | "plan" | "confirm" | "remove";
+  readonly operation: "workspace" | "query" | "plan" | "confirm" | "cancel" | "remove";
   readonly code: string;
   readonly message: string;
   readonly providerId?: string;
@@ -270,6 +277,7 @@ export type RefinementFrontendMessage =
   | CancelRefinementQueryMessage
   | CalculateRefinementPlanMessage
   | ConfirmRefinementDownloadMessage
+  | CancelRefinementDownloadMessage
   | RemoveRefinementInstallationMessage;
 
 export type RefinementBackendMessage =
