@@ -12,7 +12,7 @@ from dataclasses import dataclass, replace
 from datetime import date, datetime, timezone
 from pathlib import Path, PurePosixPath
 from threading import RLock
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from terralab3d.application.ports.persistence import (
     DataSourceRepositoryPort,
@@ -38,10 +38,12 @@ from terralab3d.domain.elevation.models import ElevationRasterSource, VerticalUn
 from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.domain.refinement.licensing import LicenseMetadata
 from terralab3d.domain.raster.models import (
+    BoundsTuple,
     RasterDatasetError,
     RasterDatasetSelection,
     RasterMetadataOverride,
     TextRasterOptions,
+    TransformTuple,
 )
 from terralab3d.domain.surface.categorical import (
     CategoricalEncoding,
@@ -1058,7 +1060,10 @@ def _categorical_analysis_from_payload(payload: dict[str, Any]) -> CategoricalRa
                 source_value=item["sourceValue"],
                 pixel_count=int(item["pixelCount"]),
                 color_rgba=(
-                    tuple(int(channel) for channel in item["colorRgba"])
+                    cast(
+                        tuple[int, int, int, int],
+                        tuple(int(channel) for channel in item["colorRgba"]),
+                    )
                     if item.get("colorRgba") is not None else None
                 ),
             )
@@ -1077,7 +1082,10 @@ def _text_options(payload: dict[str, Any]) -> TextRasterOptions:
         delimiter=payload.get("delimiter"),
         has_header=payload.get("hasHeader"),
         crs=payload.get("crs"),
-        transform=tuple(float(value) for value in transform) if transform is not None else None,
+        transform=(
+            cast(TransformTuple, tuple(float(value) for value in transform))
+            if transform is not None else None
+        ),
         nodata=payload.get("nodata"),
     )
 
@@ -1089,8 +1097,14 @@ def _metadata_overrides(payload: Any) -> RasterMetadataOverride | None:
     bounds = payload.get("bounds")
     return RasterMetadataOverride(
         crs=payload.get("crs"),
-        transform=tuple(float(value) for value in transform) if transform is not None else None,
-        bounds=tuple(float(value) for value in bounds) if bounds is not None else None,
+        transform=(
+            cast(TransformTuple, tuple(float(value) for value in transform))
+            if transform is not None else None
+        ),
+        bounds=(
+            cast(BoundsTuple, tuple(float(value) for value in bounds))
+            if bounds is not None else None
+        ),
         nodata=payload.get("nodata"),
         nodata_is_set="nodata" in payload,
         provenance=str(payload.get("provenance") or "import-confirmation"),

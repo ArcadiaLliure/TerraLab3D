@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import rasterio
+from rasterio.errors import RasterioError
 from rasterio.features import shapes
 from shapely.geometry import mapping, shape
 from shapely.ops import unary_union
@@ -123,7 +124,7 @@ def verified_mask_geometry(
                 if value == 1
             ]
             crs = dataset.crs.to_string()
-    except (OSError, rasterio.errors.RasterioError) as exc:
+    except (OSError, RasterioError) as exc:
         raise RefinementValidationError(
             "The committed manual refinement raster cannot be verified"
         ) from exc
