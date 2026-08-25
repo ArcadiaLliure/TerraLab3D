@@ -1,8 +1,8 @@
 # TLST i sistema universal de capes Terra
 
-## Estat implementat de les quatre primeres verticals
+## Estat implementat
 
-El contracte general d'aquest document continua sent l'autoritat. A data de 2026-08-24, el codi real incorpora TLST 1.0, el lector universal d'elevació i les verticals categòriques 3 i 4:
+El contracte general d'aquest document continua sent l'autoritat. A data de 2026-08-25, el codi real incorpora TLST 1.0, el lector universal d'elevació, les verticals categòriques i el gestor de refinaments:
 
 - TLST manté `categoryKey` com a identitat estable, amb presentació catalana separada mitjançant `categoryLabelKey`;
 - el tooltip mostra el nom descriptiu, la font/versionament subratllats, el codi i l'etiqueta font, sense exposar la clau tècnica;
@@ -14,8 +14,10 @@ El contracte general d'aquest document continua sent l'autoritat. A data de 2026
 - S2GLC, WorldCover, Copernicus LCM-10 i CORINE són membres del mateix registre versionat d'esquemes;
 - cada equivalència publica node TLST, profunditat resolta i descendents no afirmats;
 - les classificacions d'usuari es persisteixen i es reutilitzen amb identitat `scheme_key + scheme_version + mapping_revision`.
+- el gestor de refinaments cobreix AOI, descoberta multiproveïdor, llicències comercials, harmonització ràster/vector, mosaic TLST incremental, cobertura verificada, persistència i UI;
+- ICGC MCSC, CORINE i vuit famílies CLMS estan habilitades; la resta de proveïdors tenen un estat explícit, mai ambigu. Vegeu [tlst-refinement-manager.md](tlst-refinement-manager.md).
 
-Les verticals de refinament, fusió d'evidències i procedural continuen fora d'aquest lliurament.
+La generació procedural continua fora d'aquest lliurament.
 
 **Principi arquitectònic per a les verticals següents:** TLST 1.0 és la lingua franca semàntica. Cada estàndard extern es tradueix directament a TLST fins al node més profund que la seva llegenda permet demostrar. El refinament no torna a classificar el territori des de zero: només intenta resoldre descendents TLST que han quedat oberts després de la traducció inicial. Si no hi ha evidència suficient, el sistema s'atura sense inventar precisió.
 

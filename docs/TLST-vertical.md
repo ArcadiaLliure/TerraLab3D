@@ -1,12 +1,13 @@
 # Pla mestre per verticals
 
-## Estat executat — 2026-08-24
+## Estat executat — 2026-08-25
 
 - **Vertical 1 completada:** TLST 1.0 versionat, S2GLC i WorldCover, `SampleValidity`, buffers categòrics, picking i tooltip català descriptiu. La clau TLST es conserva al contracte d’auditoria però no es mostra al tooltip ordinari.
 - **Vertical 2 completada:** descriptor raster neutral, port únic Rasterio, selecció explícita de banda/subdataset, adaptador TXT/CSV/XYZ regular, importació `managed`/`external`, persistència ordenada a `data_sources.json`, fallback DEM, recàrrega segura del port d’elevació i regeneració de terreny/horitzó.
 - **Vertical 3 completada:** importació categòrica enter/paleta/RGB/RGBA sense interpolació, registre versionat, mappings exhaustius S2GLC, WorldCover, Copernicus LCM-10 i CORINE, revisió obligatòria, auditoria de profunditat i activació raster real.
 - **Vertical 4 completada:** esquemes d’usuari persistents i reutilitzables, mapping de cada valor a qualsevol node TLST o estat admissible, i revisió immutable identificada per `scheme_key + scheme_version + mapping_revision`.
-- **Verticals 5–18 no implementades:** continuen sent context d’extensibilitat i no es documenten com a funcionalitat disponible.
+- **Gestor de refinaments implementat:** AOI, jerarquia, descoberta multiproveïdor, llicències fail-closed, plans congelats, descàrrega, harmonització TLST, mosaic incremental, cobertura verificada, importació manual i UI. La matriu exacta és a [tlst-refinement-manager.md](tlst-refinement-manager.md).
+- **Procedural i verticals posteriors no implementades:** continuen sent context d’extensibilitat i no es documenten com a funcionalitat disponible.
 
 La prova de sortida de la Vertical 2 importa un bundle `mi_dem.asc`, reinicia els repositoris, torna a obrir la font registrada i obté una graella de terreny amb elevació real.
 

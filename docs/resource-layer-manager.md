@@ -118,3 +118,21 @@ l'encoding, les bandes, la revisió i el raster derivat. El canvi retira els
 tiles categòrics obsolets i torna a publicar llegenda i cobertura. El picking
 continua mostrant el valor font real, no el codi compacte d'execució quan són
 diferents.
+
+## 10. Refinaments TLST
+
+`TERRA → Refinament` és una capacitat vertical del mateix gestor. Defineix una
+AOI en un mapa OpenLayers autònom, consulta tots els adaptadors habilitats,
+calcula cobertura local/planificada/pendent i congela els assets seleccionats en
+un pla paramètric reproduïble. Els jobs reutilitzen pausa, represa, verificació i
+cancel·lació del `DownloadJobManager`; el progrés tècnic es tradueix a missatges
+de refinament sense crear un segon motor de descàrregues.
+
+La descàrrega no es considera instal·lada fins que el postprocessador ha traduït
+les classes a TLST, les ha alineat a la graella canònica, ha actualitzat el
+mosaic incremental i ha calculat cobertura des dels píxels vàlids. La importació
+manual iniciada des d'un node segueix el mateix principi i exigeix metadades de
+llicència comercial abans de registrar cobertura verificada.
+
+La matriu actual de productes, llicències, proveïdors desactivats i buits de
+cobertura es manté a [tlst-refinement-manager.md](tlst-refinement-manager.md).
