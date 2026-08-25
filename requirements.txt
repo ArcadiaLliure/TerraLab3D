@@ -13,3 +13,4 @@ spiceypy==7.0.0
 Pillow>=10
 rasterio>=1.4
 pyproj>=3.7
+shapely>=2.0
