@@ -176,6 +176,9 @@ async def run() -> int:
     from terralab3d.infrastructure.adapters.refinement.post_processor import (
         RefinementPlanPostProcessorFactory,
     )
+    from terralab3d.infrastructure.adapters.refinement.manual_import import (
+        ManualRefinementImportRegistrar,
+    )
     from terralab3d.infrastructure.adapters.refinement.repository import (
         JsonRefinementInstallationRepository,
     )
@@ -2039,6 +2042,7 @@ async def run() -> int:
         user_schemes=user_classification_schemes,
         categorical_activation_callback=activate_configured_land_cover_source_from_worker,
         progress_publisher=publish_raster_import_progress,
+        refinement_imports=ManualRefinementImportRegistrar(refinement_service),
     )
     server.set_raster_import_service(raster_import_service)
 

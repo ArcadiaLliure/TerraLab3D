@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Mapping, Protocol, Sequence
 
 from terralab3d.domain.refinement.coverage import CoverageGeometry, MetricGeometry
@@ -13,6 +15,21 @@ from terralab3d.domain.refinement.installations import (
     RefinementInstallation,
     RefinementProduct,
 )
+from terralab3d.domain.refinement.licensing import LicenseMetadata
+
+
+@dataclass(frozen=True, slots=True)
+class ManualRefinementImportRequest:
+    category_key: str
+    category_codes: tuple[tuple[str, tuple[int, ...]], ...]
+    resource_id: str
+    variant_id: str
+    source_id: str
+    name: str
+    indexed_path: Path
+    original_crs: str
+    fingerprint: str
+    license: LicenseMetadata
 
 
 class GeometryPort(CoverageGeometry, Protocol):
@@ -55,6 +72,13 @@ class RefinementCoverageRepositoryPort(Protocol):
 
 class RefinementProcessorPort(Protocol):
     def verify_and_process(self, operation: object) -> object: ...
+
+
+class ManualRefinementImportPort(Protocol):
+    def register(
+        self,
+        request: ManualRefinementImportRequest,
+    ) -> tuple[RefinementInstallation, ...]: ...
 
 
 class RefinementProductCatalogPort(Protocol):

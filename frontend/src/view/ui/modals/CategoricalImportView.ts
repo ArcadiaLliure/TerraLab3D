@@ -117,6 +117,13 @@ export class CategoricalImportView {
   private customName = "Classificació personalitzada";
   private customVersion = "1.0";
   private mappingConfirmed = false;
+  private refinementLicenseId = "CC-BY-4.0";
+  private refinementLicenseUrl = refinementLicenseUrl("CC-BY-4.0");
+  private refinementAttribution = "";
+  private refinementProvider = "";
+  private refinementVersion = "1.0";
+  private refinementProvenanceUrl = "";
+  private refinementCommercialUseConfirmed = false;
 
   constructor(private readonly callbacks: CategoricalImportCallbacks) {
     this.element.style.cssText = "display:flex;flex-direction:column;gap:10px";
@@ -320,6 +327,7 @@ export class CategoricalImportView {
     checkbox.onchange = () => { this.mappingConfirmed = checkbox.checked; };
     confirmation.append(checkbox, document.createTextNode("He revisat els valors, l'esquema, la versió i el mapping TLST i en confirmo l'aplicació."));
     box.appendChild(confirmation);
+    if (this.callbacks.initialCategoryKey) box.appendChild(this.renderRefinementLicense());
     const advanced = document.createElement("details");
     advanced.open = !this.inspection?.crs;
     const summary = document.createElement("summary");
@@ -336,6 +344,60 @@ export class CategoricalImportView {
     nodata.input.oninput = () => { this.nodata = nodata.input.value; };
     advanced.append(summary, crs.root, transform.root, nodata.root);
     box.appendChild(advanced);
+    return box;
+  }
+
+  private renderRefinementLicense(): HTMLElement {
+    const box = document.createElement("fieldset");
+    box.style.cssText = `${panelStyle()};margin-top:10px`;
+    const legend = document.createElement("legend");
+    legend.textContent = "Llicència i procedència del refinament";
+    legend.style.cssText = "padding:0 6px;font-size:12px;color:var(--color-gold,#facc15)";
+    box.appendChild(legend);
+    box.appendChild(note(
+      "Només es registrarà cobertura verificada si la llicència permet ús comercial i derivats. La procedència quedarà desada amb el recurs.",
+    ));
+
+    const license = labelledSelect("Llicència", [
+      ["CC-BY-4.0", "Creative Commons Reconeixement 4.0"],
+      ["CC0-1.0", "CC0 1.0"],
+      ["public-domain", "Domini públic"],
+      ["Copernicus-CLMS", "Política Copernicus CLMS"],
+    ]);
+    license.select.value = this.refinementLicenseId;
+    license.select.onchange = () => {
+      this.refinementLicenseId = license.select.value;
+      this.refinementLicenseUrl = refinementLicenseUrl(this.refinementLicenseId);
+      this.render();
+    };
+    const officialUrl = labelledInput("URL oficial de la llicència", "url", "https://...");
+    officialUrl.input.value = this.refinementLicenseUrl;
+    officialUrl.input.oninput = () => { this.refinementLicenseUrl = officialUrl.input.value; };
+    const provider = labelledInput("Font o proveïdor", "text", "Organització que publica les dades");
+    provider.input.value = this.refinementProvider;
+    provider.input.oninput = () => { this.refinementProvider = provider.input.value; };
+    const version = labelledInput("Versió del producte", "text", "2024-v1");
+    version.input.value = this.refinementVersion;
+    version.input.oninput = () => { this.refinementVersion = version.input.value; };
+    const provenance = labelledInput("URL de procedència del dataset", "url", "https://...");
+    provenance.input.value = this.refinementProvenanceUrl;
+    provenance.input.oninput = () => { this.refinementProvenanceUrl = provenance.input.value; };
+    const attribution = labelledInput("Text d'atribució o citació", "text", "Font, producte i any");
+    attribution.input.value = this.refinementAttribution;
+    attribution.input.oninput = () => { this.refinementAttribution = attribution.input.value; };
+    box.append(license.root, officialUrl.root, provider.root, version.root, provenance.root, attribution.root);
+
+    const commercial = document.createElement("label");
+    commercial.style.cssText = "display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-size:12px;color:#fff";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = this.refinementCommercialUseConfirmed;
+    checkbox.onchange = () => { this.refinementCommercialUseConfirmed = checkbox.checked; };
+    commercial.append(
+      checkbox,
+      document.createTextNode("Confirmo que aquesta font permet l'ús comercial, la transformació i la generació de productes derivats."),
+    );
+    box.appendChild(commercial);
     return box;
   }
 
@@ -592,6 +654,22 @@ export class CategoricalImportView {
         mappingRevision: candidate.mappingRevision,
       });
     }
+    if (this.callbacks.initialCategoryKey) {
+      if (!this.refinementCommercialUseConfirmed) {
+        throw new Error("Cal confirmar els drets d'ús comercial i de generació de derivats.");
+      }
+      confirmation.refinementContext = {
+        categoryKey: this.callbacks.initialCategoryKey,
+        licenseId: this.refinementLicenseId,
+        officialUrl: this.refinementLicenseUrl.trim(),
+        attribution: this.refinementAttribution.trim(),
+        citation: this.refinementAttribution.trim(),
+        provider: this.refinementProvider.trim(),
+        version: this.refinementVersion.trim(),
+        provenanceUrl: this.refinementProvenanceUrl.trim(),
+        commercialUseConfirmed: true,
+      };
+    }
     await requestJson(`/api/raster-imports/${this.importId}/commit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -622,6 +700,16 @@ export class CategoricalImportView {
   private showError(error: unknown): void {
     window.alert(error instanceof Error ? error.message : String(error));
   }
+}
+
+function refinementLicenseUrl(licenseId: string): string {
+  const urls: Readonly<Record<string, string>> = {
+    "CC-BY-4.0": "https://creativecommons.org/licenses/by/4.0/",
+    "CC0-1.0": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "public-domain": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "Copernicus-CLMS": "https://land.copernicus.eu/en/faq/data-use-terms-and-conditions",
+  };
+  return urls[licenseId] ?? "";
 }
 
 function candidateIdentity(value: Pick<SchemeCandidate | SchemeAudit, "schemeKey" | "schemeVersion" | "mappingRevision">): string {

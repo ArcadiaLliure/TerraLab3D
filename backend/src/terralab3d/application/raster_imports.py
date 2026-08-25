@@ -9,7 +9,7 @@ import shutil
 import uuid
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, replace
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path, PurePosixPath
 from threading import RLock
 from typing import Any, Callable
@@ -18,6 +18,10 @@ from terralab3d.application.ports.persistence import (
     DataSourceRepositoryPort,
     ResourceCatalogWriterPort,
     ResourceInstallationWriterPort,
+)
+from terralab3d.application.ports.refinement import (
+    ManualRefinementImportPort,
+    ManualRefinementImportRequest,
 )
 from terralab3d.application.ports.raster import RasterReaderPort, TextRasterMaterializerPort
 from terralab3d.application.ports.categorical_raster import CategoricalRasterPort
@@ -32,6 +36,7 @@ from terralab3d.application.categorical_imports import (
 )
 from terralab3d.domain.elevation.models import ElevationRasterSource, VerticalUnit
 from terralab3d.domain.identifiers import ResourceId, VariantId
+from terralab3d.domain.refinement.licensing import LicenseMetadata
 from terralab3d.domain.raster.models import (
     RasterDatasetError,
     RasterDatasetSelection,
@@ -43,7 +48,12 @@ from terralab3d.domain.surface.categorical import (
     CategoricalRasterAnalysis,
     CategoricalValueCount,
 )
-from terralab3d.domain.surface.tlst import TlstValidationError
+from terralab3d.domain.surface.tlst import (
+    CompositeSurface,
+    SingleSurface,
+    SourceScheme,
+    TlstValidationError,
+)
 from terralab3d.domain.resources.models import (
     AcquisitionKind,
     ResourceCategory,
@@ -88,6 +98,7 @@ class RasterImportService:
         user_schemes: UserClassificationSchemeWriterPort | None = None,
         categorical_activation_callback: Callable[[], None] | None = None,
         progress_publisher: Callable[[dict[str, Any]], None] | None = None,
+        refinement_imports: ManualRefinementImportPort | None = None,
     ) -> None:
         self._reader = raster_reader
         self._text_materializer = text_materializer
@@ -113,6 +124,7 @@ class RasterImportService:
         self._user_schemes = user_schemes
         self._categorical_activation_callback = categorical_activation_callback
         self._progress_publisher = progress_publisher
+        self._refinement_imports = refinement_imports
         self._lock = RLock()
 
     def create(
@@ -518,6 +530,10 @@ class RasterImportService:
             )
         except (TlstValidationError, ValueError, KeyError) as exc:
             raise RasterImportError(str(exc)) from exc
+        refinement_context = _refinement_context(
+            confirmation.get("refinementContext"),
+            self._refinement_imports,
+        )
 
         source_id = str(
             payload.get("pendingSourceId")
@@ -622,6 +638,7 @@ class RasterImportService:
 
         indexed_descriptor = self._reader.inspect(str(indexed_path))
         fingerprint = _source_fingerprint(original_path, confirmation)
+        refinement_installation_ids: tuple[str, ...] = ()
         source_record = {
             "id": source_id,
             "display_name": name,
@@ -708,6 +725,32 @@ class RasterImportService:
             self._publish_land_cover_role(source_id)
             if self._categorical_activation_callback is not None:
                 self._categorical_activation_callback()
+            if refinement_context is not None:
+                assert self._refinement_imports is not None
+                registered = self._refinement_imports.register(
+                    ManualRefinementImportRequest(
+                        category_key=refinement_context["categoryKey"],
+                        category_codes=_scheme_category_codes(
+                            scheme,
+                            tuple(code_by_value.values()),
+                        ),
+                        resource_id=str(resource_id),
+                        variant_id=str(variant_id),
+                        source_id=source_id,
+                        name=name,
+                        indexed_path=indexed_path,
+                        original_crs=str(indexed_descriptor.crs),
+                        fingerprint=fingerprint,
+                        license=_manual_refinement_license(
+                            refinement_context,
+                            name=name,
+                            fingerprint=fingerprint,
+                        ),
+                    )
+                )
+                refinement_installation_ids = tuple(
+                    installation.installation_id for installation in registered
+                )
         except Exception:
             self._data_sources.remove(source_id)
             self._data_sources.restore_land_cover_source(old_source_id)
@@ -737,6 +780,7 @@ class RasterImportService:
             "schemeVersion": scheme.scheme_version,
             "mappingRevision": scheme.mapping_revision,
             "fingerprint": fingerprint,
+            "refinementInstallationIds": list(refinement_installation_ids),
         }
 
     def cancel(self, import_id: str) -> None:
@@ -1102,6 +1146,81 @@ def _source_fingerprint(path: Path, confirmation: dict[str, Any]) -> str:
         f"{json.dumps(confirmation, sort_keys=True, ensure_ascii=False)}"
     ).encode("utf-8")
     return hashlib.blake2b(payload, digest_size=20).hexdigest()
+
+
+def _refinement_context(
+    value: Any,
+    importer: ManualRefinementImportPort | None,
+) -> dict[str, Any] | None:
+    if value is None:
+        return None
+    if importer is None:
+        raise RasterImportError("Manual refinement registration is not configured")
+    if not isinstance(value, dict):
+        raise RasterImportError("Refinement import metadata is invalid")
+    required = (
+        "categoryKey",
+        "licenseId",
+        "officialUrl",
+        "attribution",
+        "provider",
+        "version",
+        "provenanceUrl",
+    )
+    normalized = {key: str(value.get(key, "")).strip() for key in required}
+    if any(not normalized[key] for key in required):
+        raise RasterImportError("Refinement imports require complete license provenance")
+    for key in ("officialUrl", "provenanceUrl"):
+        if not normalized[key].startswith(("https://", "http://")):
+            raise RasterImportError("Refinement license and provenance URLs must be absolute")
+    if value.get("commercialUseConfirmed") is not True:
+        raise RasterImportError(
+            "Commercial use and derivative rights must be confirmed explicitly"
+        )
+    normalized["citation"] = str(value.get("citation") or normalized["attribution"]).strip()
+    return normalized
+
+
+def _manual_refinement_license(
+    context: dict[str, Any],
+    *,
+    name: str,
+    fingerprint: str,
+) -> LicenseMetadata:
+    return LicenseMetadata(
+        license_id=context["licenseId"],
+        official_url=context["officialUrl"],
+        attribution_text=context["attribution"],
+        citation=context["citation"],
+        provider=context["provider"],
+        product=name,
+        version=context["version"],
+        checked_at=date.today(),
+        provenance_url=context["provenanceUrl"],
+        asset_fingerprints=(f"blake2b-160:{fingerprint}",),
+        commercial_use=True,
+    )
+
+
+def _scheme_category_codes(
+    scheme: SourceScheme,
+    observed_codes: tuple[int, ...],
+) -> tuple[tuple[str, tuple[int, ...]], ...]:
+    codes_by_key: dict[str, set[int]] = {}
+    for code in observed_codes:
+        definition = scheme.class_definition(code)
+        translation = definition.translation
+        if isinstance(translation, SingleSurface):
+            codes_by_key.setdefault(translation.category_key, set()).add(code)
+        elif isinstance(translation, CompositeSurface):
+            for component in translation.components:
+                codes_by_key.setdefault(component.surface.category_key, set()).add(code)
+    if not codes_by_key:
+        raise RasterImportError("A refinement import must map at least one value to TLST")
+    return tuple(
+        (category_key, tuple(sorted(codes)))
+        for category_key, codes in sorted(codes_by_key.items())
+    )
 
 
 def _relocate_inspected_path(

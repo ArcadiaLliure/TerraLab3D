@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import asyncio
 from pathlib import Path
+from types import SimpleNamespace
 from types import MappingProxyType
 
 import numpy as np
@@ -85,7 +86,7 @@ def _upload(service: RasterImportService, import_id: str, source: Path) -> None:
     )
 
 
-def _service(tmp_path: Path):
+def _service(tmp_path: Path, refinement_imports=None):
     root = tmp_path / "library"
     registry = _registry()
     user_schemes = UserClassificationSchemeRepository(
@@ -110,8 +111,18 @@ def _service(tmp_path: Path):
         scheme_registry=registry,
         user_schemes=user_schemes,
         categorical_activation_callback=lambda: activated.append(True),
+        refinement_imports=refinement_imports,
     )
     return service, data_sources, registry, user_schemes, activated
+
+
+class _RecordingRefinementImports:
+    def __init__(self) -> None:
+        self.requests = []
+
+    def register(self, request):
+        self.requests.append(request)
+        return (SimpleNamespace(installation_id="manual-refinement-1"),)
 
 
 def test_builtin_registry_has_complete_lcm10_and_corine_contracts() -> None:
@@ -311,6 +322,90 @@ def test_custom_scheme_accepts_any_tlst_node_and_is_reusable(tmp_path: Path) -> 
     )
     with pytest.raises(TlstValidationError, match="cannot be changed silently"):
         repository.upsert(altered)
+
+
+def test_refinement_import_requires_commercial_provenance_and_registers_verified_request(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "refinement.tif"
+    _write_raster(source, np.asarray([[1, 1], [1, 1]], dtype=np.uint8))
+    recorder = _RecordingRefinementImports()
+    service, _, _, _, _ = _service(tmp_path, recorder)
+    session = service.create(
+        ownership="managed",
+        name="Aiguamoll local",
+        file_count=1,
+        semantic_kind="categorical",
+    )
+    _upload(service, session.import_id, source)
+    service.inspect(session.import_id, {"fileOrdinal": 0})
+    confirmation = {
+        "mappingConfirmed": True,
+        "customScheme": {
+            "displayName": "Aiguamoll verificat",
+            "schemeVersion": "1",
+            "classes": [
+                {
+                    "sourceValue": 1,
+                    "sourceLabel": "Aiguamoll",
+                    "categoryKey": "wetland.inland.herbaceous_wetland",
+                }
+            ],
+        },
+        "refinementContext": {
+            "categoryKey": "wetland",
+            "licenseId": "CC-BY-4.0",
+            "officialUrl": "https://creativecommons.org/licenses/by/4.0/",
+            "attribution": "Font local de prova",
+            "provider": "Institut de prova",
+            "version": "2026.1",
+            "provenanceUrl": "https://example.test/dataset",
+            "commercialUseConfirmed": True,
+        },
+    }
+    committed = service.commit(session.import_id, confirmation)
+    assert committed["refinementInstallationIds"] == ["manual-refinement-1"]
+    request = recorder.requests[0]
+    assert request.category_key == "wetland"
+    assert request.category_codes == (("wetland.inland.herbaceous_wetland", (1,)),)
+    assert request.indexed_path.is_file()
+    assert request.license.license_id == "CC-BY-4.0"
+    assert request.license.commercial_use is True
+
+
+def test_refinement_import_rejects_unconfirmed_commercial_rights(tmp_path: Path) -> None:
+    source = tmp_path / "blocked-refinement.tif"
+    _write_raster(source, np.asarray([[1]], dtype=np.uint8))
+    service, _, _, _, _ = _service(tmp_path, _RecordingRefinementImports())
+    session = service.create(
+        ownership="managed", name="Sense drets", file_count=1, semantic_kind="categorical"
+    )
+    _upload(service, session.import_id, source)
+    service.inspect(session.import_id, {"fileOrdinal": 0})
+    with pytest.raises(RasterImportError, match="Commercial use"):
+        service.commit(
+            session.import_id,
+            {
+                "mappingConfirmed": True,
+                "customScheme": {
+                    "displayName": "Sense drets",
+                    "schemeVersion": "1",
+                    "classes": [
+                        {"sourceValue": 1, "sourceLabel": "Aigua", "categoryKey": "water"}
+                    ],
+                },
+                "refinementContext": {
+                    "categoryKey": "water",
+                    "licenseId": "CC-BY-4.0",
+                    "officialUrl": "https://creativecommons.org/licenses/by/4.0/",
+                    "attribution": "Font",
+                    "provider": "Institut",
+                    "version": "1",
+                    "provenanceUrl": "https://example.test/dataset",
+                    "commercialUseConfirmed": False,
+                },
+            },
+        )
 
 
 def test_rgb_import_preserves_exact_source_values_behind_compact_codes(tmp_path: Path) -> None:
