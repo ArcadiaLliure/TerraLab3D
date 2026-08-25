@@ -55,7 +55,7 @@ def freeze_parametric_plan(
                     product=candidate.product,
                     version=candidate.version,
                     download_url=asset.download_url,
-                    file_name=_asset_file_name(asset.s3_path, asset.download_url, asset.asset_id),
+                    file_name=asset_file_name(asset.s3_path, asset.download_url, asset.asset_id),
                     footprint=asset.footprint,
                     order=len(frozen_assets),
                     expected_bytes=asset.estimated_bytes,
@@ -136,7 +136,7 @@ def _safe_id(value: str) -> str:
     return normalized
 
 
-def _asset_file_name(s3_path: str | None, download_url: str, asset_id: str) -> str:
+def asset_file_name(s3_path: str | None, download_url: str, asset_id: str) -> str:
     candidates = (
         PurePosixPath(s3_path).name if s3_path else "",
         PurePosixPath(urlsplit(download_url).path).name,

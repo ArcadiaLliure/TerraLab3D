@@ -143,6 +143,59 @@ async def run() -> int:
             ResourceId("sky.ngc"): NgcCatalogPostProcessor(),
         },
     )
+    from terralab3d.application.refinement.bridge_controller import (
+        RefinementBridgeController,
+    )
+    from terralab3d.application.refinement.discovery import (
+        RefinementDiscoveryCoordinator,
+    )
+    from terralab3d.application.refinement.service import RefinementService
+    from terralab3d.domain.refinement.licensing import CommercialLicensePolicy
+    from terralab3d.infrastructure.adapters.refinement.catalog import (
+        StaticRefinementProductCatalog,
+    )
+    from terralab3d.infrastructure.adapters.refinement.geometry import (
+        ShapelyGeometryAdapter,
+    )
+    from terralab3d.infrastructure.adapters.refinement.providers.clms import (
+        ClmsODataAdapter,
+        clms_refinement_products,
+    )
+    from terralab3d.infrastructure.adapters.refinement.repository import (
+        JsonRefinementInstallationRepository,
+    )
+    from terralab3d.infrastructure.adapters.surface.tlst_catalog import (
+        load_builtin_land_cover_registry,
+    )
+    from terralab3d.infrastructure.app_paths import resolve_data_root
+
+    tlst_registry = load_builtin_land_cover_registry()
+    refinement_license_policy = CommercialLicensePolicy()
+    refinement_repository = JsonRefinementInstallationRepository()
+    refinement_service = RefinementService(
+        tlst_registry.taxonomy,
+        refinement_repository,
+        StaticRefinementProductCatalog(clms_refinement_products()),
+        refinement_license_policy,
+        resolve_data_root(),
+        labels={
+            key: tlst_registry.category_presentation(key).label
+            for key in tlst_registry.taxonomy.category_keys
+        },
+    )
+    refinement_bridge = RefinementBridgeController(
+        publisher=bridge,
+        discovery=RefinementDiscoveryCoordinator(
+            (ClmsODataAdapter(),),
+            refinement_license_policy,
+        ),
+        service=refinement_service,
+        geometry=ShapelyGeometryAdapter(),
+        license_policy=refinement_license_policy,
+        resource_catalog=resource_catalog,
+        download_jobs=download_manager,
+        data_root=resolve_data_root(),
+    )
     raster_import_service = None
     server = TerraLabServer(
         dist_dir,
@@ -213,6 +266,12 @@ async def run() -> int:
     bridge.on("pause_download", _handle_pause_download)
     bridge.on("cancel_download", _handle_cancel_download)
     bridge.on("delete_resource", _handle_delete_resource)
+    bridge.on("request_refinement_workspace", refinement_bridge.request_workspace)
+    bridge.on("query_refinement_products", refinement_bridge.query_products)
+    bridge.on("cancel_refinement_query", refinement_bridge.cancel_query)
+    bridge.on("calculate_refinement_plan", refinement_bridge.calculate_plan)
+    bridge.on("confirm_refinement_download", refinement_bridge.confirm_download)
+    bridge.on("remove_refinement_installation", refinement_bridge.remove_installation)
 
     # ── 3. Lògica d'Ubicació (Fase 2) ─────────────────────────────────
     from terralab3d.domain.observer.models import GeoLocation, ObserverProfile

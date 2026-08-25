@@ -103,6 +103,8 @@ class RefinementService:
         for category in ordered:
             direct = direct_installations.get(category.key, [])
             direct_states = [item.spatial_state for item in direct]
+            if category.key in known_nodes and not direct_states:
+                direct_states.append(SpatialCoverageState.ABSENT)
             child_states = [
                 state_by_key[child]
                 for child in self._taxonomy.direct_children(category.key)
@@ -134,6 +136,22 @@ class RefinementService:
             nodes=nodes,
         )
 
+    def installations_for(
+        self,
+        category_key: str,
+    ) -> tuple[RefinementInstallation, ...]:
+        canonical = self._taxonomy.canonical_category_key(category_key)
+        return tuple(
+            installation
+            for installation in self._repository.list_installations()
+            if any(
+                node == canonical
+                or node.startswith(f"{canonical}.")
+                or canonical.startswith(f"{node}.")
+                for node in installation.tlst_nodes
+            )
+        )
+
     def confirm_operation(
         self,
         *,
@@ -148,18 +166,42 @@ class RefinementService:
             raise RefinementValidationError(
                 f"Product {product_id!r} cannot refine {canonical!r}"
             )
-        self._license_policy.require_allowed(
-            product.license,
-            stage=LicenseUseStage.JOB_START,
-        )
-        installation_id = self._id_factory()
-        local_path = build_refinement_install_path(
-            self._data_root,
+        return self.confirm_product(
+            product=product,
             category_key=canonical,
-            provider=product.provider,
-            product=product.product,
-            version=product.version,
             aoi_id=aoi_id,
+            job_id=job_id,
+        )
+
+    def confirm_product(
+        self,
+        *,
+        product: RefinementProduct,
+        category_key: str,
+        aoi_id: str,
+        job_id: str,
+        local_path: Path | None = None,
+    ) -> RefinementInstallation:
+        """Persist a queued discovered product after the second license gate."""
+
+        canonical = self._taxonomy.canonical_category_key(category_key)
+        if not self._is_compatible(canonical, product):
+            raise RefinementValidationError(
+                f"Product {product.product_id!r} cannot refine {canonical!r}"
+            )
+        self._license_policy.require_allowed(product.license, stage=LicenseUseStage.JOB_START)
+        installation_id = self._id_factory()
+        resolved_path = (
+            local_path
+            if local_path is not None
+            else build_refinement_install_path(
+                self._data_root,
+                category_key=canonical,
+                provider=product.provider,
+                product=product.product,
+                version=product.version,
+                aoi_id=aoi_id,
+            )
         )
         installation = RefinementInstallation(
             installation_id=installation_id,
@@ -170,7 +212,7 @@ class RefinementService:
             version=product.version,
             tlst_nodes=product.tlst_nodes,
             data_kind=product.data_kind,
-            local_path=str(local_path),
+            local_path=str(resolved_path),
             planned_geometry=product.planned_geometry,
             verified_geometry=None,
             original_crs=product.original_crs,
@@ -227,6 +269,14 @@ class RefinementService:
         )
         self._repository.upsert(updated)
         return updated
+
+    def remove_installation(self, installation_id: str) -> RefinementInstallation:
+        current = self._repository.remove(installation_id)
+        if current is None:
+            raise RefinementValidationError(
+                f"Unknown refinement installation: {installation_id!r}"
+            )
+        return current
 
     def _require_installation(self, installation_id: str) -> RefinementInstallation:
         installation = self._repository.get(installation_id)

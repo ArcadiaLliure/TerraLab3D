@@ -18,6 +18,11 @@ from terralab3d.domain.refinement.discovery import (
     RemoteAsset,
 )
 from terralab3d.domain.refinement.errors import RefinementError, RefinementValidationError
+from terralab3d.domain.refinement.installations import (
+    GeometryRecord,
+    RefinementDataKind,
+    RefinementProduct,
+)
 from terralab3d.domain.refinement.licensing import LicenseMetadata
 
 
@@ -96,6 +101,41 @@ _CLMS_DATASETS = (
         endpoint_verified=False,
     ),
 )
+
+
+def clms_refinement_products() -> tuple[RefinementProduct, ...]:
+    """Return catalog templates; actual assets are always discovered for the AOI."""
+
+    europe = GeometryRecord(
+        "EPSG:4326",
+        {
+            "type": "Polygon",
+            "coordinates": (
+                ((-31.5, 24.0), (45.0, 24.0), (45.0, 72.0), (-31.5, 72.0), (-31.5, 24.0)),
+            ),
+        },
+    )
+    return tuple(
+        RefinementProduct(
+            product_id=dataset.dataset_identifier,
+            resource_id=f"earth.refinement.clms.{dataset.dataset_identifier}",
+            variant_id="discover-for-aoi",
+            provider="Copernicus Land Monitoring Service",
+            product=dataset.product,
+            version=dataset.version,
+            tlst_nodes=dataset.compatible_nodes,
+            data_kind=RefinementDataKind.RASTER,
+            original_crs="EPSG:4326",
+            planned_geometry=europe,
+            license=_clms_license(dataset, dataset.dataset_identifier),
+            provenance_url=(
+                "https://documentation.dataspace.copernicus.eu/Data/"
+                "CopernicusServices/CLMS.html"
+            ),
+            priority=30,
+        )
+        for dataset in _CLMS_DATASETS
+    )
 
 
 class ClmsODataAdapter:

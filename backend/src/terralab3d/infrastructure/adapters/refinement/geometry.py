@@ -61,8 +61,21 @@ class ShapelyGeometryAdapter:
             raise RefinementValidationError("Projected coverage geometry is invalid")
         return MetricGeometry(projected, target_crs)
 
-    def to_geojson(self, geometry: MetricGeometry) -> dict[str, object]:
-        return dict(mapping(self._shape(geometry)))
+    def to_geojson(
+        self,
+        geometry: MetricGeometry,
+        *,
+        target_crs: str | None = None,
+    ) -> dict[str, object]:
+        concrete = self._shape(geometry)
+        if target_crs is not None:
+            transformer = Transformer.from_crs(
+                geometry.crs,
+                target_crs,
+                always_xy=True,
+            )
+            concrete = transform(transformer.transform, concrete)
+        return dict(mapping(concrete))
 
     def reproject(self, geometry: MetricGeometry, target_crs: str) -> MetricGeometry:
         self._require_metric_crs(geometry.crs)
