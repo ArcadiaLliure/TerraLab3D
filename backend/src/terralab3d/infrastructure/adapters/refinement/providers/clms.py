@@ -240,6 +240,7 @@ def clms_refinement_products() -> tuple[RefinementProduct, ...]:
             priority=30,
         )
         for dataset in _CLMS_DATASETS
+        if dataset.endpoint_verified
     )
 
 
@@ -257,7 +258,8 @@ class ClmsODataAdapter:
         datasets = tuple(
             dataset
             for dataset in _CLMS_DATASETS
-            if _dataset_supports_category(dataset, request.category_key)
+            if dataset.endpoint_verified
+            and _dataset_supports_category(dataset, request.category_key)
         )
         if not datasets:
             return ()

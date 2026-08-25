@@ -191,7 +191,7 @@ class RefinementPlanPostProcessor:
                         path=raster_path,
                         band=1,
                         translations=asset.class_translation,
-                        priority=_source_priority(candidate.provider_id),
+                        priority=_source_priority(candidate),
                         license=candidate.license,
                         asset_checksum=source_checksum,
                         qualifier_key=asset.qualifier_key,
@@ -397,9 +397,13 @@ def _matches_product(file_name: str, product: str) -> bool:
     return True
 
 
-def _source_priority(provider_id: str) -> SourcePriority:
-    if provider_id.startswith("icgc-"):
+def _source_priority(candidate: DiscoveredRefinementProduct) -> SourcePriority:
+    if candidate.provider_id.startswith("icgc-"):
         return SourcePriority.LOCAL_OFFICIAL
-    if provider_id == "copernicus-clms":
+    if candidate.provider_id in {"copernicus-clms", "copernicus-water-wetness"}:
+        if candidate.dataset_identifier == "lcm_global_10m_yearly_v1":
+            return SourcePriority.GENERAL_LAND_COVER
+        return SourcePriority.THEMATIC_REFINEMENT
+    if candidate.provider_id == "copernicus-corine":
         return SourcePriority.EUROPEAN_HIGH_RESOLUTION
     return SourcePriority.GENERAL_LAND_COVER

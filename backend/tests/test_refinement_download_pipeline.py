@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 
@@ -30,6 +31,7 @@ from terralab3d.domain.refinement.installations import (
     TechnicalResourceState,
 )
 from terralab3d.domain.refinement.licensing import CommercialLicensePolicy, LicenseMetadata
+from terralab3d.domain.refinement.mosaic import SourcePriority
 from terralab3d.domain.resources.models import ResourceInstallState
 from terralab3d.infrastructure.adapters.refinement.catalog import (
     StaticRefinementProductCatalog,
@@ -37,6 +39,7 @@ from terralab3d.infrastructure.adapters.refinement.catalog import (
 from terralab3d.infrastructure.adapters.refinement.geometry import ShapelyGeometryAdapter
 from terralab3d.infrastructure.adapters.refinement.post_processor import (
     RefinementPlanPostProcessorFactory,
+    _source_priority,
 )
 from terralab3d.infrastructure.adapters.refinement.repository import (
     JsonRefinementInstallationRepository,
@@ -148,6 +151,20 @@ def _candidate(url: str, payload: bytes) -> DiscoveredRefinementProduct:
         class_translation={1140: "agriculture.cropland.arable.rice"},
         nodata_values=(0,),
     )
+
+
+def test_provider_priority_distinguishes_local_thematic_european_and_global_sources() -> None:
+    candidate = _candidate("https://example.test/crop.tif", b"fixture")
+    assert _source_priority(candidate) is SourcePriority.THEMATIC_REFINEMENT
+    assert _source_priority(
+        replace(candidate, provider_id="icgc-mcsc")
+    ) is SourcePriority.LOCAL_OFFICIAL
+    assert _source_priority(
+        replace(candidate, provider_id="copernicus-corine")
+    ) is SourcePriority.EUROPEAN_HIGH_RESOLUTION
+    assert _source_priority(
+        replace(candidate, dataset_identifier="lcm_global_10m_yearly_v1")
+    ) is SourcePriority.GENERAL_LAND_COVER
 
 
 def test_download_job_harmonizes_fixture_and_commits_verified_coverage(

@@ -281,6 +281,10 @@ def test_all_clms_template_nodes_are_canonical_tlst_keys() -> None:
     taxonomy = load_builtin_land_cover_registry().taxonomy
     nodes = {node for product in clms_refinement_products() for node in product.tlst_nodes}
     assert nodes <= set(taxonomy.category_keys)
+    assert all(
+        product.product != "High Resolution Layer Water and Wetness"
+        for product in clms_refinement_products()
+    )
 
 
 def test_grassland_mapping_preserves_mixed_grassland_semantics() -> None:

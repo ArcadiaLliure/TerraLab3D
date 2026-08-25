@@ -169,6 +169,10 @@ async def run() -> int:
         IcgcLandCoverAdapter,
         icgc_refinement_products,
     )
+    from terralab3d.infrastructure.adapters.refinement.providers.water_wetness import (
+        WaterWetnessImageServerAdapter,
+        water_wetness_refinement_products,
+    )
     from terralab3d.infrastructure.adapters.refinement.post_processor import (
         RefinementPlanPostProcessorFactory,
     )
@@ -191,6 +195,7 @@ async def run() -> int:
                 *icgc_refinement_products(),
                 *clms_refinement_products(),
                 *corine_refinement_products(),
+                *water_wetness_refinement_products(),
             )
         ),
         refinement_license_policy,
@@ -204,7 +209,12 @@ async def run() -> int:
     refinement_bridge = RefinementBridgeController(
         publisher=bridge,
         discovery=RefinementDiscoveryCoordinator(
-            (IcgcLandCoverAdapter(), ClmsODataAdapter(), CorineLandCoverAdapter()),
+            (
+                IcgcLandCoverAdapter(),
+                ClmsODataAdapter(),
+                CorineLandCoverAdapter(),
+                WaterWetnessImageServerAdapter(),
+            ),
             refinement_license_policy,
         ),
         service=refinement_service,
