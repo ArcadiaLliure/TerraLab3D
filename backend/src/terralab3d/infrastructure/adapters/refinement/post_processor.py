@@ -172,7 +172,7 @@ class RefinementPlanPostProcessor:
                         path=path,
                         band=1,
                         translations=asset.class_translation,
-                        priority=SourcePriority.EUROPEAN_HIGH_RESOLUTION,
+                        priority=_source_priority(candidate.provider_id),
                         license=candidate.license,
                         asset_checksum=sha256_file(path),
                         qualifier_key=asset.qualifier_key,
@@ -264,3 +264,11 @@ def _matches_product(file_name: str, product: str) -> bool:
     if "water and wetness" in normalized_product:
         return "waw" in lowered or "water" in lowered or "wet" in lowered
     return True
+
+
+def _source_priority(provider_id: str) -> SourcePriority:
+    if provider_id.startswith("icgc-"):
+        return SourcePriority.LOCAL_OFFICIAL
+    if provider_id == "copernicus-clms":
+        return SourcePriority.EUROPEAN_HIGH_RESOLUTION
+    return SourcePriority.GENERAL_LAND_COVER

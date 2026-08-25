@@ -161,6 +161,10 @@ async def run() -> int:
         ClmsODataAdapter,
         clms_refinement_products,
     )
+    from terralab3d.infrastructure.adapters.refinement.providers.icgc import (
+        IcgcLandCoverAdapter,
+        icgc_refinement_products,
+    )
     from terralab3d.infrastructure.adapters.refinement.post_processor import (
         RefinementPlanPostProcessorFactory,
     )
@@ -178,7 +182,9 @@ async def run() -> int:
     refinement_service = RefinementService(
         tlst_registry.taxonomy,
         refinement_repository,
-        StaticRefinementProductCatalog(clms_refinement_products()),
+        StaticRefinementProductCatalog(
+            (*icgc_refinement_products(), *clms_refinement_products())
+        ),
         refinement_license_policy,
         resolve_data_root(),
         labels={
@@ -190,7 +196,7 @@ async def run() -> int:
     refinement_bridge = RefinementBridgeController(
         publisher=bridge,
         discovery=RefinementDiscoveryCoordinator(
-            (ClmsODataAdapter(),),
+            (IcgcLandCoverAdapter(), ClmsODataAdapter()),
             refinement_license_policy,
         ),
         service=refinement_service,
