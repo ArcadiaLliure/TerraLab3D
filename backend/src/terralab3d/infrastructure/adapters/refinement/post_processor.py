@@ -87,7 +87,8 @@ class RefinementPlanPostProcessor:
         self._candidates = candidates
         self._installation_ids = installation_ids
 
-    def process(self, source_path: Path, _output_dir: Path) -> ProcessedResource:
+    def process(self, source_path: Path, output_dir: Path) -> ProcessedResource:
+        del output_dir
         grid = self._target_grid()
         category_segment = self._plan.category_keys[0].replace(".", "-")
         derived_dir = (

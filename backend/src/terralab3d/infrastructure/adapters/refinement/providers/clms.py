@@ -383,6 +383,8 @@ class ClmsODataAdapter:
 
 
 def _dataset_supports_category(dataset: _ClmsDataset, category_key: str) -> bool:
+    if category_key == "surface":
+        return True
     return any(
         node == category_key
         or node.startswith(f"{category_key}.")

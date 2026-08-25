@@ -161,6 +161,10 @@ async def run() -> int:
         ClmsODataAdapter,
         clms_refinement_products,
     )
+    from terralab3d.infrastructure.adapters.refinement.providers.corine import (
+        CorineLandCoverAdapter,
+        corine_refinement_products,
+    )
     from terralab3d.infrastructure.adapters.refinement.providers.icgc import (
         IcgcLandCoverAdapter,
         icgc_refinement_products,
@@ -183,7 +187,11 @@ async def run() -> int:
         tlst_registry.taxonomy,
         refinement_repository,
         StaticRefinementProductCatalog(
-            (*icgc_refinement_products(), *clms_refinement_products())
+            (
+                *icgc_refinement_products(),
+                *clms_refinement_products(),
+                *corine_refinement_products(),
+            )
         ),
         refinement_license_policy,
         resolve_data_root(),
@@ -196,7 +204,7 @@ async def run() -> int:
     refinement_bridge = RefinementBridgeController(
         publisher=bridge,
         discovery=RefinementDiscoveryCoordinator(
-            (IcgcLandCoverAdapter(), ClmsODataAdapter()),
+            (IcgcLandCoverAdapter(), ClmsODataAdapter(), CorineLandCoverAdapter()),
             refinement_license_policy,
         ),
         service=refinement_service,

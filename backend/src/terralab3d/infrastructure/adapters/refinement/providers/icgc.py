@@ -169,6 +169,8 @@ def icgc_refinement_products() -> tuple[RefinementProduct, ...]:
 
 
 def _supports_category(category_key: str) -> bool:
+    if category_key == "surface":
+        return True
     return any(
         node == category_key
         or node.startswith(f"{category_key}.")
