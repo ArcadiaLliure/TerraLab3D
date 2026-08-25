@@ -218,6 +218,43 @@ def test_semantically_specific_lower_resolution_source_beats_general_high_resolu
         assert np.all(dataset.read(1) == broadleaf)
 
 
+def test_icgc_local_official_pixel_wins_over_clms_global_fallback(tmp_path) -> None:
+    clms_path = tmp_path / "clms-global.tif"
+    icgc_path = tmp_path / "icgc-local.tif"
+    _write_raster(clms_path, np.full((16, 32), 10, dtype=np.uint8), west=0)
+    _write_raster(icgc_path, np.full((16, 32), 8, dtype=np.uint8), west=0)
+
+    result = RasterRefinementMosaicProcessor(
+        load_builtin_land_cover_registry().taxonomy
+    ).update(
+        tmp_path / "derived-cross-provider",
+        _grid(),
+        (
+            _source(
+                "clms-global-dynamic",
+                clms_path,
+                {10: "tree_cover.unspecified"},
+                SourcePriority.GENERAL_LAND_COVER,
+            ),
+            _source(
+                "icgc-mcsc-2024",
+                icgc_path,
+                {8: "tree_cover.broadleaf"},
+                SourcePriority.LOCAL_OFFICIAL,
+            ),
+        ),
+    )
+
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    broadleaf = manifest["taxonomy"]["categoryCodes"]["tree_cover.broadleaf"]
+    with rasterio.open(result.mosaic_path) as dataset:
+        assert np.all(dataset.read(1) == broadleaf)
+    assert result.conflict_pixels == _grid().width * _grid().height
+    priorities = {item["sourceId"]: item["priority"] for item in manifest["sources"]}
+    assert priorities["icgc-mcsc-2024"] == "LOCAL_OFFICIAL"
+    assert priorities["clms-global-dynamic"] == "GENERAL_LAND_COVER"
+
+
 def test_incremental_update_reprocesses_only_intersecting_block(tmp_path) -> None:
     base_path = tmp_path / "base.tif"
     right_path = tmp_path / "right.tif"
