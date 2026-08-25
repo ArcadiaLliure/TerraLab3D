@@ -11,6 +11,9 @@ from typing import Mapping
 from .errors import RefinementValidationError
 
 
+_PLAN_SCHEMA_VERSION = 2
+
+
 @dataclass(frozen=True, slots=True)
 class FrozenDownloadAsset:
     asset_id: str
@@ -61,6 +64,7 @@ class ParametricDownloadPlan:
     request_id: str
     revision: int
     category_keys: tuple[str, ...]
+    product_ids: tuple[str, ...]
     aoi_geojson: Mapping[str, object]
     assets: tuple[FrozenDownloadAsset, ...]
     processing_options: Mapping[str, str | int | float | bool]
@@ -73,6 +77,7 @@ class ParametricDownloadPlan:
             or not self.request_id.strip()
             or self.revision < 0
             or not self.category_keys
+            or not self.product_ids
             or not self.assets
         ):
             raise RefinementValidationError("Parametric download plan is incomplete")
@@ -92,11 +97,12 @@ class ParametricDownloadPlan:
 
     def to_dict(self) -> dict[str, object]:
         return {
-            "schemaVersion": 1,
+            "schemaVersion": _PLAN_SCHEMA_VERSION,
             "planId": self.plan_id,
             "requestId": self.request_id,
             "revision": self.revision,
             "categoryKeys": list(self.category_keys),
+            "productIds": list(self.product_ids),
             "aoi": dict(self.aoi_geojson),
             "assets": [_asset_to_dict(asset) for asset in self.assets],
             "processingOptions": dict(self.processing_options),
@@ -110,7 +116,7 @@ class ParametricDownloadPlan:
             payload = json.loads(value)
         except json.JSONDecodeError as exc:
             raise RefinementValidationError("Parametric plan is not valid JSON") from exc
-        if not isinstance(payload, dict) or payload.get("schemaVersion") != 1:
+        if not isinstance(payload, dict) or payload.get("schemaVersion") not in {1, 2}:
             raise RefinementValidationError("Unsupported parametric plan schema")
         assets = payload.get("assets")
         if not isinstance(assets, list):
@@ -119,11 +125,19 @@ class ParametricDownloadPlan:
         options = payload.get("processingOptions", {})
         if not isinstance(aoi, dict) or not isinstance(options, dict):
             raise RefinementValidationError("Parametric plan AOI or options are invalid")
+        product_ids = payload.get("productIds")
+        if not isinstance(product_ids, list):
+            product_ids = [
+                item.get("assetId")
+                for item in assets
+                if isinstance(item, dict) and item.get("assetId")
+            ]
         return cls(
             plan_id=str(payload.get("planId", "")),
             request_id=str(payload.get("requestId", "")),
             revision=int(payload.get("revision", -1)),
             category_keys=tuple(str(item) for item in payload.get("categoryKeys", [])),
+            product_ids=tuple(dict.fromkeys(str(item) for item in product_ids)),
             aoi_geojson=aoi,
             assets=tuple(_asset_from_dict(item) for item in assets),
             processing_options={

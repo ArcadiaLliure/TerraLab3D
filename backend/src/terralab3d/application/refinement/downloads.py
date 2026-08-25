@@ -79,6 +79,7 @@ def freeze_parametric_plan(
         request_id=request.request_id,
         revision=request.revision,
         category_keys=(request.category_key,),
+        product_ids=selected_ids,
         aoi_geojson=request.aoi_geojson,
         assets=tuple(frozen_assets),
         processing_options=dict(processing_options or {}),

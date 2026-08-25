@@ -30,6 +30,10 @@ import type {
   HorizonProfileSettingsMessage,
   HorizonStatusMessage,
 } from "./horizon_contracts";
+import type {
+  RefinementBackendMessage,
+  RefinementFrontendMessage,
+} from "./refinement_contracts";
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
@@ -416,7 +420,8 @@ export type FrontendMessage =
   | ClearStarTrailsMessage
   | HorizonProfileSettingsMessage
   | RecalculateHorizonMessage
-  | CancelHorizonMessage;
+  | CancelHorizonMessage
+  | RefinementFrontendMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -646,7 +651,8 @@ export type BackendMessage =
   | HorizonStatusMessage
   | SurfaceProgressMessage
   | LandCoverLegendMessage
-  | OperationProgressedEvent;
+  | OperationProgressedEvent
+  | RefinementBackendMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 
