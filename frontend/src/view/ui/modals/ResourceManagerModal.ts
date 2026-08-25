@@ -1,6 +1,7 @@
 import { ResourceManager } from "../../../application/ResourceManager";
 import type { ResourceDescriptor, ResourceVariant } from "../../../contracts/resource_manager_contracts";
 import { CategoricalImportView } from "./CategoricalImportView";
+import { RefinementManagerView } from "./RefinementManagerView";
 
 type EarthTab = "elevation" | "categorical" | "refinement";
 type ResourceDomain = "sky" | "earth";
@@ -28,8 +29,8 @@ export function resourceImportAction(
     };
   }
   return {
-    available: false,
-    title: "La importació de refinaments encara no està disponible",
+    available: true,
+    title: "Importar una classificació i assignar-la a una categoria TLST",
   };
 }
 
@@ -77,6 +78,9 @@ export class ResourceManagerModal {
   private importFiles: File[] = [];
   private importBusy = false;
   private categoricalImport: CategoricalImportView | null = null;
+  private refinementView: RefinementManagerView | null = null;
+  private categoricalInitialCategoryKey: string | undefined;
+  private categoricalReturnTab: EarthTab | null = null;
   private elevationImportForm: HTMLDivElement | null = null;
   private importAbortController: AbortController | null = null;
 
@@ -170,6 +174,8 @@ export class ResourceManagerModal {
   public dispose(): void {
     if (this.importId) void this.cancelImportSession();
     void this.releaseCategoricalImport();
+    this.refinementView?.dispose();
+    this.refinementView = null;
     this.element.remove();
     this.unsubCatalog();
     this.unsubJobs();
@@ -214,7 +220,7 @@ export class ResourceManagerModal {
   private renderFooter(): void {
     const earth = this.activeDomain === "earth";
     const action = resourceImportAction(this.activeDomain, this.activeCategoryEarth);
-    this.importButton.style.display = earth ? "inline-block" : "none";
+    this.importButton.style.display = earth && this.activeCategoryEarth !== "refinement" ? "inline-block" : "none";
     this.importButton.disabled = !action.available || this.importVisible;
     this.importButton.style.opacity = this.importButton.disabled ? ".45" : "1";
     this.importButton.title = action.title;
@@ -222,6 +228,10 @@ export class ResourceManagerModal {
 
   private renderList(): void {
     this.listContainer.replaceChildren();
+    const refinementActive = this.activeDomain === "earth" && this.activeCategoryEarth === "refinement" && !this.importVisible;
+    this.contentBox.style.width = refinementActive ? "1180px" : "760px";
+    this.listContainer.style.padding = refinementActive ? "12px 16px" : "16px 20px";
+    this.listContainer.style.overflowY = refinementActive ? "hidden" : "auto";
     if (this.importVisible) {
       if (this.activeCategoryEarth === "categorical") {
         if (!this.categoricalImport) {
@@ -229,16 +239,25 @@ export class ResourceManagerModal {
             onCommitted: () => {
               this.categoricalImport = null;
               this.importVisible = false;
+              if (this.categoricalReturnTab) this.activeCategoryEarth = this.categoricalReturnTab;
+              this.categoricalReturnTab = null;
+              this.categoricalInitialCategoryKey = undefined;
               this.manager.requestCatalog();
+              this.renderTabs();
               this.renderFooter();
               this.renderList();
             },
             onBack: () => {
               void this.releaseCategoricalImport();
               this.importVisible = false;
+              if (this.categoricalReturnTab) this.activeCategoryEarth = this.categoricalReturnTab;
+              this.categoricalReturnTab = null;
+              this.categoricalInitialCategoryKey = undefined;
+              this.renderTabs();
               this.renderFooter();
               this.renderList();
             },
+            ...(this.categoricalInitialCategoryKey ? { initialCategoryKey: this.categoricalInitialCategoryKey } : {}),
           });
         }
         this.listContainer.appendChild(this.categoricalImport.element);
@@ -250,6 +269,16 @@ export class ResourceManagerModal {
         }
         this.listContainer.appendChild(this.elevationImportForm);
       }
+      return;
+    }
+    if (refinementActive) {
+      if (!this.refinementView) {
+        this.refinementView = new RefinementManagerView(this.manager, {
+          onImportRequested: (categoryKey) => this.openCategoricalImportForRefinement(categoryKey),
+        });
+      }
+      this.listContainer.appendChild(this.refinementView.element);
+      this.refinementView.open();
       return;
     }
     const descriptors = this.manager.getAllDescriptors();
@@ -695,6 +724,17 @@ export class ResourceManagerModal {
     const view = this.categoricalImport;
     this.categoricalImport = null;
     if (view) await view.cancel();
+  }
+
+  private openCategoricalImportForRefinement(categoryKey: string): void {
+    this.categoricalReturnTab = "refinement";
+    this.categoricalInitialCategoryKey = categoryKey;
+    this.activeDomain = "earth";
+    this.activeCategoryEarth = "categorical";
+    this.importVisible = true;
+    this.renderTabs();
+    this.renderFooter();
+    this.renderList();
   }
 }
 

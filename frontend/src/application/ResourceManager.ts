@@ -8,6 +8,11 @@ import type {
     ResourceDescriptor, 
     ResourceInstallState 
 } from "../contracts/resource_manager_contracts";
+import type {
+    RefinementBackendMessage,
+    RefinementGeometry,
+    RefinementWorkspace,
+} from "../contracts/refinement_contracts";
 
 export interface ResourceState {
     status: ResourceInstallState;
@@ -21,6 +26,7 @@ export interface ResourceState {
 export type CatalogUpdateListener = () => void;
 export type JobUpdateListener = (jobSnapshot: DownloadJobSnapshotMessage) => void;
 export type OperationProgressListener = (event: OperationProgressedEvent) => void;
+export type RefinementUpdateListener = (event: RefinementBackendMessage) => void;
 
 export class ResourceManager {
     private descriptors: Map<string, ResourceDescriptor> = new Map();
@@ -30,17 +36,94 @@ export class ResourceManager {
     private catalogListeners: Set<CatalogUpdateListener> = new Set();
     private jobListeners: Set<JobUpdateListener> = new Set();
     private operationListeners: Set<OperationProgressListener> = new Set();
+    private refinementListeners: Set<RefinementUpdateListener> = new Set();
+    private refinementWorkspace: RefinementWorkspace | null = null;
 
     constructor(private bridge: WebSocketBridge) {
         bridge.addMessageListener({
             onResourceCatalogSnapshot: (msg) => this.handleCatalogSnapshot(msg),
             onDownloadJobSnapshot: (msg) => this.handleJobSnapshot(msg),
-            onOperationProgressed: (msg) => this.handleOperationProgressed(msg)
+            onOperationProgressed: (msg) => this.handleOperationProgressed(msg),
+            onRefinementWorkspaceSnapshot: (msg) => {
+                this.refinementWorkspace = msg.workspace;
+                this.publishRefinement(msg);
+            },
+            onRefinementCandidates: (msg) => this.publishRefinement(msg),
+            onRefinementPlanSummary: (msg) => this.publishRefinement(msg),
+            onRefinementDownloadProgress: (msg) => this.publishRefinement(msg),
+            onRefinementCoverageUpdated: (msg) => this.publishRefinement(msg),
+            onRefinementInstallationRemoved: (msg) => this.publishRefinement(msg),
+            onRefinementOperationError: (msg) => this.publishRefinement(msg),
         });
     }
 
     public requestCatalog(): void {
         this.bridge.requestCatalogSnapshot();
+    }
+
+    public getRefinementWorkspace(): RefinementWorkspace | null {
+        return this.refinementWorkspace;
+    }
+
+    public requestRefinementWorkspace(requestId: string, revision: number, aoi?: RefinementGeometry): void {
+        this.bridge.requestRefinementWorkspace({
+            type: "request_refinement_workspace",
+            requestId,
+            revision,
+            ...(aoi ? { aoi } : {}),
+        });
+    }
+
+    public queryRefinementProducts(
+        requestId: string,
+        revision: number,
+        categoryKey: string,
+        aoi: RefinementGeometry,
+    ): void {
+        this.bridge.queryRefinementProducts({
+            type: "query_refinement_products", requestId, revision, categoryKey, aoi,
+        });
+    }
+
+    public cancelRefinementQuery(requestId: string, revision: number): void {
+        this.bridge.cancelRefinementQuery({ type: "cancel_refinement_query", requestId, revision });
+    }
+
+    public calculateRefinementPlan(
+        requestId: string,
+        revision: number,
+        categoryKey: string,
+        aoi: RefinementGeometry,
+        productIds: readonly string[],
+    ): void {
+        this.bridge.calculateRefinementPlan({
+            type: "calculate_refinement_plan", requestId, revision, categoryKey, aoi, productIds,
+        });
+    }
+
+    public confirmRefinementDownload(
+        requestId: string,
+        revision: number,
+        planId: string,
+        largeDownloadConfirmed: boolean,
+    ): void {
+        this.bridge.confirmRefinementDownload({
+            type: "confirm_refinement_download",
+            requestId,
+            revision,
+            planId,
+            largeDownloadConfirmed,
+        });
+    }
+
+    public removeRefinementInstallation(
+        requestId: string,
+        revision: number,
+        installationId: string,
+    ): void {
+        this.bridge.removeRefinementInstallation({
+            type: "remove_refinement_installation", requestId, revision, installationId,
+        });
     }
 
     public startDownload(resourceId: string, variantId: string): void {
@@ -100,6 +183,11 @@ export class ResourceManager {
     public subscribeOperationProgress(listener: OperationProgressListener): () => void {
         this.operationListeners.add(listener);
         return () => this.operationListeners.delete(listener);
+    }
+
+    public subscribeRefinement(listener: RefinementUpdateListener): () => void {
+        this.refinementListeners.add(listener);
+        return () => this.refinementListeners.delete(listener);
     }
 
     private handleCatalogSnapshot(msg: ResourceCatalogSnapshotMessage): void {
@@ -173,5 +261,9 @@ export class ResourceManager {
 
     private handleOperationProgressed(msg: OperationProgressedEvent): void {
         for (const l of this.operationListeners) l(msg);
+    }
+
+    private publishRefinement(msg: RefinementBackendMessage): void {
+        for (const listener of this.refinementListeners) listener(msg);
     }
 }

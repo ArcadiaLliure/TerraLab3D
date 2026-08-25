@@ -88,6 +88,7 @@ interface RasterInspection {
 interface CategoricalImportCallbacks {
   readonly onCommitted: () => void;
   readonly onBack: () => void;
+  readonly initialCategoryKey?: string;
 }
 
 /** Progressive categorical import surface shared by standard and user schemes. */
@@ -142,7 +143,7 @@ export class CategoricalImportView {
       track.style.display = "block";
     }
     const fill = document.getElementById("categorical-import-progress-fill");
-    const percent = Math.floor(event.progressFraction * 100);
+    const percent = Math.floor((event.progressFraction ?? 0) * 100);
     if (fill) {
       fill.style.width = `${percent}%`;
     }
@@ -383,6 +384,9 @@ export class CategoricalImportView {
         ["validity:masked", "Validesa: emmascarat"],
         ["validity:outside_coverage", "Validesa: fora de cobertura"],
       ], `categorical-outcome-${index}`);
+      if (this.callbacks.initialCategoryKey && categoryOptions.some(([optionValue]) => optionValue === `category:${this.callbacks.initialCategoryKey}`)) {
+        outcome.select.value = `category:${this.callbacks.initialCategoryKey}`;
+      }
       row.append(identity, label.root, outcome.root);
       box.appendChild(row);
     }
@@ -508,7 +512,7 @@ export class CategoricalImportView {
         externalPath: this.externalPath.trim() || null,
         fileCount: Math.max(1, this.files.length),
       }),
-      signal: this.abortController?.signal,
+      signal: this.abortController?.signal ?? null,
     }) as { importId: string };
     this.importId = String(created.importId);
     for (let ordinal = 0; ordinal < this.files.length; ordinal++) {
@@ -540,7 +544,7 @@ export class CategoricalImportView {
     this.inspection = await requestJson(`/api/raster-imports/${this.importId}/inspect`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      signal: this.abortController?.signal,
+      signal: this.abortController?.signal ?? null,
       body: JSON.stringify(request),
     }) as RasterInspection;
     const suggestion = this.inspection.metadataSuggestions;
@@ -591,7 +595,7 @@ export class CategoricalImportView {
     await requestJson(`/api/raster-imports/${this.importId}/commit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      signal: this.abortController?.signal,
+      signal: this.abortController?.signal ?? null,
       body: JSON.stringify(confirmation),
     });
   }

@@ -41,6 +41,21 @@ import type {
   SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "../contracts/solar_system_contracts";
+import type {
+  CalculateRefinementPlanMessage,
+  CancelRefinementQueryMessage,
+  ConfirmRefinementDownloadMessage,
+  QueryRefinementProductsMessage,
+  RefinementCandidatesMessage,
+  RefinementCoverageUpdatedMessage,
+  RefinementDownloadProgressMessage,
+  RefinementInstallationRemovedMessage,
+  RefinementOperationErrorMessage,
+  RefinementPlanSummaryMessage,
+  RefinementWorkspaceSnapshotMessage,
+  RemoveRefinementInstallationMessage,
+  RequestRefinementWorkspaceMessage,
+} from "../contracts/refinement_contracts";
 
 export type BridgeState = "connecting" | "connected" | "disconnected" | "error";
 
@@ -114,6 +129,13 @@ export interface BackendMessageListener {
   onStarTrailsSnapshot?(snapshot: import("../contracts/bridge_messages").StarTrailsSnapshotMessage): void;
   onHorizonStatus?(status: HorizonStatusMessage): void;
   onOperationProgressed?(msg: import("../contracts/events").OperationProgressedEvent): void;
+  onRefinementWorkspaceSnapshot?(msg: RefinementWorkspaceSnapshotMessage): void;
+  onRefinementCandidates?(msg: RefinementCandidatesMessage): void;
+  onRefinementPlanSummary?(msg: RefinementPlanSummaryMessage): void;
+  onRefinementDownloadProgress?(msg: RefinementDownloadProgressMessage): void;
+  onRefinementCoverageUpdated?(msg: RefinementCoverageUpdatedMessage): void;
+  onRefinementInstallationRemoved?(msg: RefinementInstallationRemovedMessage): void;
+  onRefinementOperationError?(msg: RefinementOperationErrorMessage): void;
 }
 
 export class WebSocketBridge {
@@ -517,6 +539,27 @@ export class WebSocketBridge {
           l.onOperationProgressed?.(msg as any);
         }
         break;
+      case "refinement_workspace_snapshot":
+        for (const l of this.messageListeners) l.onRefinementWorkspaceSnapshot?.(msg);
+        break;
+      case "refinement_candidates":
+        for (const l of this.messageListeners) l.onRefinementCandidates?.(msg);
+        break;
+      case "refinement_plan_summary":
+        for (const l of this.messageListeners) l.onRefinementPlanSummary?.(msg);
+        break;
+      case "refinement_download_progress":
+        for (const l of this.messageListeners) l.onRefinementDownloadProgress?.(msg);
+        break;
+      case "refinement_coverage_updated":
+        for (const l of this.messageListeners) l.onRefinementCoverageUpdated?.(msg);
+        break;
+      case "refinement_installation_removed":
+        for (const l of this.messageListeners) l.onRefinementInstallationRemoved?.(msg);
+        break;
+      case "refinement_operation_error":
+        for (const l of this.messageListeners) l.onRefinementOperationError?.(msg);
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -620,6 +663,30 @@ export class WebSocketBridge {
 
   public requestCatalogSnapshot(): void {
     this.sendMessage({ type: "request_catalog_snapshot" });
+  }
+
+  public requestRefinementWorkspace(message: RequestRefinementWorkspaceMessage): void {
+    this.sendMessage(message);
+  }
+
+  public queryRefinementProducts(message: QueryRefinementProductsMessage): void {
+    this.sendMessage(message);
+  }
+
+  public cancelRefinementQuery(message: CancelRefinementQueryMessage): void {
+    this.sendMessage(message);
+  }
+
+  public calculateRefinementPlan(message: CalculateRefinementPlanMessage): void {
+    this.sendMessage(message);
+  }
+
+  public confirmRefinementDownload(message: ConfirmRefinementDownloadMessage): void {
+    this.sendMessage(message);
+  }
+
+  public removeRefinementInstallation(message: RemoveRefinementInstallationMessage): void {
+    this.sendMessage(message);
   }
 
   // ─── Astronomical Search (Pas 12) ──────────────────────────────────
