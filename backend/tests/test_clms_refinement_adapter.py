@@ -25,7 +25,7 @@ def _request(request_id: str = "request-1", revision: int = 1) -> DiscoveryReque
     return DiscoveryRequest(
         request_id=request_id,
         revision=revision,
-        category_key="agriculture.cropland",
+        category_key="agriculture.cropland.permanent_crop.vineyard",
         aoi_geojson={
             "type": "Polygon",
             "coordinates": (((2.0, 41.0), (2.2, 41.0), (2.2, 41.2), (2.0, 41.2), (2.0, 41.0)),),
@@ -233,6 +233,38 @@ def test_provider_failure_does_not_hide_other_provider_results() -> None:
     assert result.failures[0].code == "provider_error"
 
 
+def test_global_dynamic_land_cover_mapping_is_available_without_overinterpretation() -> None:
+    async def scenario() -> None:
+        filters: list[str] = []
+
+        async def handler(request: web.Request) -> web.Response:
+            filters.append(request.query["$filter"])
+            return web.json_response({"value": [_record("global-tile")]})
+
+        runner, url = await _serve(handler)
+        try:
+            adapter = ClmsODataAdapter(
+                ClmsProviderConfiguration(catalogue_url=url, retry_count=0)
+            )
+            request = DiscoveryRequest(
+                "global",
+                1,
+                "snow_ice",
+                _request().aoi_geojson,
+            )
+            products = await adapter.discover(request)
+        finally:
+            await runner.cleanup()
+
+        assert len(products) == 1
+        assert "lcm_global_10m_yearly_v1" in filters[0]
+        assert products[0].class_translation[110] == "snow_ice.unspecified"
+        assert products[0].class_translation[80] == "bare_sparse.unspecified"
+        assert products[0].endpoint_verified is True
+
+    asyncio.run(scenario())
+
+
 @pytest.mark.skipif(
     os.getenv("TERRALAB_RUN_CLMS_SMOKE") != "1",
     reason="manual smoke test against the official CLMS OData catalogue",
@@ -247,6 +279,29 @@ def test_official_clms_odata_smoke() -> None:
         assert products[0].dataset_identifier == (
             "clms_vlcc_crop-types_europe_10m_yearly_v1"
         )
+        assert products[0].endpoint_verified
+
+    asyncio.run(scenario())
+
+
+@pytest.mark.skipif(
+    os.getenv("TERRALAB_RUN_CLMS_SMOKE") != "1",
+    reason="manual smoke test against the official CLMS OData catalogue",
+)
+def test_official_global_lcm_odata_smoke() -> None:
+    async def scenario() -> None:
+        adapter = ClmsODataAdapter(
+            ClmsProviderConfiguration(page_size=1, max_pages=1, timeout_seconds=30)
+        )
+        request = DiscoveryRequest(
+            "global-smoke",
+            1,
+            "artificial.built",
+            _request().aoi_geojson,
+        )
+        products = await adapter.discover(request)
+        assert products
+        assert products[0].dataset_identifier == "lcm_global_10m_yearly_v1"
         assert products[0].endpoint_verified
 
     asyncio.run(scenario())
