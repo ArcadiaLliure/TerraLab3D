@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import Mapping, Protocol, Sequence
 
 from terralab3d.domain.refinement.coverage import CoverageGeometry, MetricGeometry
+from terralab3d.domain.refinement.discovery import (
+    DiscoveredRefinementProduct,
+    DiscoveryRequest,
+)
 from terralab3d.domain.refinement.installations import (
     RefinementInstallation,
     RefinementProduct,
@@ -26,7 +30,12 @@ class GeometryPort(CoverageGeometry, Protocol):
 
 
 class RefinementProviderPort(Protocol):
-    def discover(self, category_key: str, aoi: Mapping[str, object]) -> Sequence[object]: ...
+    provider_id: str
+
+    async def discover(
+        self,
+        request: DiscoveryRequest,
+    ) -> Sequence[DiscoveredRefinementProduct]: ...
 
 
 class RefinementCoverageRepositoryPort(Protocol):

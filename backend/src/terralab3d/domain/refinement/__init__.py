@@ -1,6 +1,13 @@
 """Pure domain contracts for hierarchical TLST refinements."""
 
 from .errors import GridAlignmentError, RefinementValidationError
+from .discovery import (
+    DiscoveredRefinementProduct,
+    DiscoveryRequest,
+    DiscoveryResult,
+    ProviderDiscoveryFailure,
+    RemoteAsset,
+)
 from .grid import ResamplingPolicy, TargetGridSpec, TemporalPolicy
 from .installations import (
     CoverageVerificationMethod,
@@ -18,6 +25,9 @@ from .states import LeafCoverageFacts, SpatialCoverageState
 __all__ = [
     "CommercialLicensePolicy",
     "CoverageVerificationMethod",
+    "DiscoveredRefinementProduct",
+    "DiscoveryRequest",
+    "DiscoveryResult",
     "GeometryRecord",
     "GridAlignmentError",
     "LeafCoverageFacts",
@@ -25,10 +35,12 @@ __all__ = [
     "LicenseUseStage",
     "MosaicUpdateResult",
     "ObservationStatus",
+    "ProviderDiscoveryFailure",
     "RefinementDataKind",
     "RefinementInstallation",
     "RefinementProduct",
     "RasterRefinementSource",
+    "RemoteAsset",
     "RefinementValidationError",
     "ResamplingPolicy",
     "SpatialCoverageState",
