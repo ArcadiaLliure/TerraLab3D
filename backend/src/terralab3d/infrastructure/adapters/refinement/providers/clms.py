@@ -123,6 +123,17 @@ _CLMS_DATASETS = (
         nodata_values=(0, 65535),
     ),
     _ClmsDataset(
+        "clms_vlcc_grassland_europe_10m_yearly_v1",
+        "High Resolution Layer Grassland",
+        "v1",
+        10,
+        ("low_vegetation.herbaceous.unspecified",),
+        class_translation=(
+            (1, "low_vegetation.herbaceous.unspecified"),
+        ),
+        nodata_values=(0, 255),
+    ),
+    _ClmsDataset(
         "clms_vlcc_tree-cover-density_europe_10m_yearly_v1",
         "High Resolution Layer Tree Cover Density",
         "v1",

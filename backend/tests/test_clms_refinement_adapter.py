@@ -278,6 +278,42 @@ def test_all_clms_template_nodes_are_canonical_tlst_keys() -> None:
     assert nodes <= set(taxonomy.category_keys)
 
 
+def test_grassland_mapping_preserves_mixed_grassland_semantics() -> None:
+    async def scenario() -> None:
+        filters: list[str] = []
+
+        async def handler(request: web.Request) -> web.Response:
+            filters.append(request.query["$filter"])
+            return web.json_response({"value": [_record("grass-tile")]})
+
+        runner, url = await _serve(handler)
+        try:
+            products = await ClmsODataAdapter(
+                ClmsProviderConfiguration(catalogue_url=url, retry_count=0)
+            ).discover(
+                DiscoveryRequest(
+                    "grass",
+                    1,
+                    "low_vegetation.herbaceous.unspecified",
+                    _request().aoi_geojson,
+                )
+            )
+        finally:
+            await runner.cleanup()
+
+        grass = next(
+            product
+            for product in products
+            if product.dataset_identifier
+            == "clms_vlcc_grassland_europe_10m_yearly_v1"
+        )
+        assert any("clms_vlcc_grassland_europe_10m_yearly_v1" in item for item in filters)
+        assert grass.class_translation == {1: "low_vegetation.herbaceous.unspecified"}
+        assert grass.nodata_values == (0, 255)
+
+    asyncio.run(scenario())
+
+
 @pytest.mark.skipif(
     os.getenv("TERRALAB_RUN_CLMS_SMOKE") != "1",
     reason="manual smoke test against the official CLMS OData catalogue",
@@ -316,5 +352,30 @@ def test_official_global_lcm_odata_smoke() -> None:
         assert products
         assert products[0].dataset_identifier == "lcm_global_10m_yearly_v1"
         assert products[0].endpoint_verified
+
+    asyncio.run(scenario())
+
+
+@pytest.mark.skipif(
+    os.getenv("TERRALAB_RUN_CLMS_SMOKE") != "1",
+    reason="manual smoke test against the official CLMS OData catalogue",
+)
+def test_official_grassland_odata_smoke() -> None:
+    async def scenario() -> None:
+        adapter = ClmsODataAdapter(
+            ClmsProviderConfiguration(page_size=1, max_pages=1, timeout_seconds=30)
+        )
+        request = DiscoveryRequest(
+            "grassland-smoke",
+            1,
+            "low_vegetation.herbaceous.unspecified",
+            _request().aoi_geojson,
+        )
+        products = await adapter.discover(request)
+        assert any(
+            product.dataset_identifier
+            == "clms_vlcc_grassland_europe_10m_yearly_v1"
+            for product in products
+        )
 
     asyncio.run(scenario())
