@@ -1,5 +1,9 @@
 import { buildRefinementTree, RefinementSession } from "../application/RefinementSession";
-import { extractRefinementGeometry } from "../view/ui/modals/RefinementMapView";
+import {
+  buildBasemapLandFeatures,
+  extractRefinementGeometry,
+  splitAntimeridianGeometry,
+} from "../view/ui/modals/RefinementMapView";
 import type {
   RefinementCandidatesMessage,
   RefinementGeometry,
@@ -130,5 +134,38 @@ try {
   rejected = true;
 }
 assert(rejected, "Unsupported or invalid GeoJSON is rejected");
+
+const datelineLand = splitAntimeridianGeometry({
+  type: "Polygon",
+  coordinates: [[[170, 60], [-175, 62], [-170, 50], [170, 50], [170, 60]]],
+});
+assert(datelineLand.type === "MultiPolygon", "Land crossing the antimeridian is split into visible fragments");
+if (datelineLand.type === "MultiPolygon") {
+  const rings = datelineLand.coordinates.flatMap((polygon) => polygon);
+  assert(rings.length === 2, "The dateline cut creates one fragment on either side");
+  assert(rings.every((ring) => ring.every((position, index) => (
+    index === 0 || Math.abs(position[0]! - ring[index - 1]![0]!) <= 180
+  ))), "No projected land edge crosses the world horizontally");
+}
+
+const basemapLand = buildBasemapLandFeatures();
+const visibleDatelineJumps: number[] = [];
+for (const feature of basemapLand.features) {
+  if (feature.geometry.type !== "Polygon" && feature.geometry.type !== "MultiPolygon") continue;
+  const polygons = feature.geometry.type === "Polygon"
+    ? [feature.geometry.coordinates]
+    : feature.geometry.coordinates;
+  for (const polygon of polygons) {
+    for (const ring of polygon) {
+      ring.forEach((position, index) => {
+        const previous = ring[index - 1];
+        if (previous && Math.abs(position[0]! - previous[0]!) > 180 && Math.max(position[1]!, previous[1]!) > -85) {
+          visibleDatelineJumps.push(index);
+        }
+      });
+    }
+  }
+}
+assert(visibleDatelineJumps.length === 0, "The bundled basemap has no visible antimeridian fill strip");
 
 console.log("refinement_manager.test.ts: all tests passed");

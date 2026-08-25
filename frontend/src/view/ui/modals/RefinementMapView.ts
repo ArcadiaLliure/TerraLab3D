@@ -20,7 +20,13 @@ import { getDistance } from "ol/sphere.js";
 import { createStringXY } from "ol/coordinate.js";
 import { feature as topologyFeature } from "topojson-client";
 import landTopology from "world-atlas/land-110m.json";
-import type { Feature as GeoJsonFeature, Geometry as GeoJsonGeometry } from "geojson";
+import type {
+  FeatureCollection as GeoJsonFeatureCollection,
+  Geometry as GeoJsonGeometry,
+  MultiPolygon as GeoJsonMultiPolygon,
+  Polygon as GeoJsonPolygon,
+  Position,
+} from "geojson";
 import type { RefinementGeometry, RefinementProductCandidate, RefinementWorkspace } from "../../../contracts/refinement_contracts";
 
 type DrawMode = "rectangle" | "polygon" | "circle";
@@ -55,10 +61,7 @@ export class RefinementMapView {
     this.mapTarget.style.cssText = "position:relative;min-height:220px;border:1px solid var(--color-border,#3a4350);border-radius:6px;overflow:hidden;background:#07111d";
     this.mapTarget.setAttribute("aria-label", "Mapa per definir l'àrea d'interès");
 
-    const land = topologyFeature(
-      landTopology,
-      landTopology.objects["land"]!,
-    ) as GeoJsonFeature<GeoJsonGeometry>;
+    const land = buildBasemapLandFeatures();
     const landSource = new VectorSource({
       features: geoJson.readFeatures(land, { featureProjection: "EPSG:3857" }),
       wrapX: true,
@@ -252,6 +255,168 @@ export class RefinementMapView {
     const extent = this.aoiSource.getExtent();
     if (extent) this.map.getView().fit(extent, { padding: [32, 32, 32, 32], maxZoom: 12, duration: 250 });
   }
+}
+
+export function buildBasemapLandFeatures(): GeoJsonFeatureCollection<GeoJsonGeometry> {
+  const rawLand = topologyFeature(
+    landTopology,
+    landTopology.objects["land"]!,
+  ) as unknown as GeoJsonFeatureCollection<GeoJsonGeometry>;
+  return {
+    ...rawLand,
+    features: rawLand.features.map((feature) => ({
+      ...feature,
+      geometry: splitAntimeridianGeometry(feature.geometry),
+    })),
+  };
+}
+
+/**
+ * Cut polygons at +/-180 before Web Mercator projection.
+ *
+ * OpenLayers projects each longitude independently. A ring such as the
+ * Eurasian landmass therefore turns a short 180E -> 180W edge into a line
+ * across the whole map, painting a false horizontal strip of land. Keeping
+ * each output ring inside one longitude world removes that projection
+ * ambiguity while preserving the wrapped vector layer.
+ */
+export function splitAntimeridianGeometry(geometry: GeoJsonGeometry): GeoJsonGeometry {
+  if (geometry.type === "Polygon") {
+    return polygonsToGeometry(splitPolygonAtAntimeridian(geometry.coordinates));
+  }
+  if (geometry.type === "MultiPolygon") {
+    return polygonsToGeometry(
+      geometry.coordinates.flatMap((polygon) => splitPolygonAtAntimeridian(polygon)),
+    );
+  }
+  return geometry;
+}
+
+function polygonsToGeometry(
+  polygons: Position[][][],
+): GeoJsonPolygon | GeoJsonMultiPolygon {
+  return polygons.length === 1
+    ? { type: "Polygon", coordinates: polygons[0]! }
+    : { type: "MultiPolygon", coordinates: polygons };
+}
+
+function splitPolygonAtAntimeridian(polygon: Position[][]): Position[][][] {
+  const outer = polygon[0];
+  if (!outer || !ringCrossesAntimeridian(outer)) return [polygon];
+
+  const unwrappedOuter = closePolarRing(unwrapRing(outer));
+  const [minimumLongitude, maximumLongitude] = longitudeBounds(unwrappedOuter);
+  const firstWorld = Math.ceil((-180 - maximumLongitude) / 360);
+  const lastWorld = Math.floor((180 - minimumLongitude) / 360);
+  const fragments: Position[][][] = [];
+
+  for (let world = firstWorld; world <= lastWorld; world += 1) {
+    const longitudeOffset = world * 360;
+    const shiftedOuter = unwrappedOuter.map((position) => shiftLongitude(position, longitudeOffset));
+    const clippedOuter = clipRingToWorld(shiftedOuter);
+    if (clippedOuter.length < 4) continue;
+
+    const fragment: Position[][] = [clippedOuter];
+    for (const hole of polygon.slice(1)) {
+      const shiftedHole = unwrapRing(hole).map((position) => shiftLongitude(position, longitudeOffset));
+      const clippedHole = clipRingToWorld(shiftedHole);
+      if (clippedHole.length >= 4 && pointInRing(clippedHole[0]!, clippedOuter)) fragment.push(clippedHole);
+    }
+    fragments.push(fragment);
+  }
+  return fragments.length ? fragments : [polygon];
+}
+
+function ringCrossesAntimeridian(ring: Position[]): boolean {
+  return ring.some((position, index) => (
+    index > 0 && Math.abs(position[0]! - ring[index - 1]![0]!) > 180
+  ));
+}
+
+function unwrapRing(ring: Position[]): Position[] {
+  const result: Position[] = [];
+  for (const position of ring) {
+    let longitude = position[0]!;
+    const previous = result.at(-1)?.[0];
+    if (previous !== undefined) {
+      while (longitude - previous > 180) longitude -= 360;
+      while (longitude - previous < -180) longitude += 360;
+    }
+    result.push([longitude, ...position.slice(1)]);
+  }
+  return result;
+}
+
+function closePolarRing(ring: Position[]): Position[] {
+  const first = ring[0];
+  const last = ring.at(-1);
+  if (!first || !last || Math.abs(last[0]! - first[0]!) < 359.999) return ring;
+  const averageLatitude = ring.reduce((sum, position) => sum + position[1]!, 0) / ring.length;
+  const pole = averageLatitude < 0 ? -90 : 90;
+  return [...ring, [last[0]!, pole], [first[0]!, pole], [...first]];
+}
+
+function longitudeBounds(ring: Position[]): [number, number] {
+  const longitudes = ring.map((position) => position[0]!);
+  return [Math.min(...longitudes), Math.max(...longitudes)];
+}
+
+function shiftLongitude(position: Position, offset: number): Position {
+  return [position[0]! + offset, ...position.slice(1)];
+}
+
+function clipRingToWorld(ring: Position[]): Position[] {
+  return clipRingAtLongitude(
+    clipRingAtLongitude(ring, -180, true),
+    180,
+    false,
+  );
+}
+
+function clipRingAtLongitude(ring: Position[], boundary: number, keepGreater: boolean): Position[] {
+  if (ring.length < 3) return [];
+  const vertices = positionsEqual(ring[0]!, ring.at(-1)!) ? ring.slice(0, -1) : [...ring];
+  if (!vertices.length) return [];
+  const output: Position[] = [];
+  let previous = vertices.at(-1)!;
+  let previousInside = longitudeInside(previous[0]!, boundary, keepGreater);
+
+  for (const current of vertices) {
+    const currentInside = longitudeInside(current[0]!, boundary, keepGreater);
+    if (currentInside !== previousInside) output.push(intersectionAtLongitude(previous, current, boundary));
+    if (currentInside) output.push(current);
+    previous = current;
+    previousInside = currentInside;
+  }
+  if (output.length >= 3 && !positionsEqual(output[0]!, output.at(-1)!)) output.push([...output[0]!]);
+  return output;
+}
+
+function longitudeInside(longitude: number, boundary: number, keepGreater: boolean): boolean {
+  return keepGreater ? longitude >= boundary : longitude <= boundary;
+}
+
+function intersectionAtLongitude(start: Position, end: Position, longitude: number): Position {
+  const denominator = end[0]! - start[0]!;
+  const ratio = denominator === 0 ? 0 : (longitude - start[0]!) / denominator;
+  return [longitude, start[1]! + ((end[1]! - start[1]!) * ratio)];
+}
+
+function positionsEqual(left: Position, right: Position): boolean {
+  return left[0] === right[0] && left[1] === right[1];
+}
+
+function pointInRing(point: Position, ring: Position[]): boolean {
+  let inside = false;
+  for (let index = 0, previous = ring.length - 1; index < ring.length; previous = index, index += 1) {
+    const currentPosition = ring[index]!;
+    const previousPosition = ring[previous]!;
+    const crosses = (currentPosition[1]! > point[1]!) !== (previousPosition[1]! > point[1]!);
+    const edgeLongitude = ((previousPosition[0]! - currentPosition[0]!) * (point[1]! - currentPosition[1]!))
+      / (previousPosition[1]! - currentPosition[1]!) + currentPosition[0]!;
+    if (crosses && point[0]! < edgeLongitude) inside = !inside;
+  }
+  return inside;
 }
 
 export function extractRefinementGeometry(value: unknown): RefinementGeometry {
