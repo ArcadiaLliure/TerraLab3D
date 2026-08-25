@@ -10,6 +10,9 @@ from terralab3d.infrastructure.adapters.refinement.providers.icgc import (
     IcgcLandCoverConfiguration,
     icgc_refinement_products,
 )
+from terralab3d.infrastructure.adapters.surface.tlst_catalog import (
+    load_builtin_land_cover_registry,
+)
 
 
 CATALONIA_AOI = {
@@ -50,7 +53,9 @@ def test_icgc_rejects_aoi_outside_catalonia_and_unsupported_node() -> None:
     }
     assert not asyncio.run(adapter.discover(DiscoveryRequest("r", 0, "water", outside)))
     assert not asyncio.run(
-        adapter.discover(DiscoveryRequest("r", 0, "snow_ice.glacier_ice", CATALONIA_AOI))
+        adapter.discover(
+            DiscoveryRequest("r", 0, "snow_ice.permanent.glacier_ice", CATALONIA_AOI)
+        )
     )
 
 
@@ -69,3 +74,5 @@ def test_icgc_catalog_and_mapping_cover_relevant_tlst_families() -> None:
     template = icgc_refinement_products()[0]
     assert template.priority == 0
     assert set(template.tlst_nodes) == translated
+    taxonomy = load_builtin_land_cover_registry().taxonomy
+    assert translated <= set(taxonomy.category_keys)

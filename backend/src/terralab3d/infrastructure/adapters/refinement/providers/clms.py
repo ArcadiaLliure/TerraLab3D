@@ -66,7 +66,7 @@ _CLMS_DATASETS = (
         "2020-v1-beta",
         10,
         (
-            "artificial.built.unspecified",
+            "artificial.built",
             "agriculture.cropland.unspecified",
             "tree_cover.unspecified",
             "low_vegetation.shrub.shrubland",
@@ -87,7 +87,7 @@ _CLMS_DATASETS = (
             (60, "wetland.coastal.mangrove"),
             (70, "low_vegetation.moss_lichen"),
             (80, "bare_sparse.unspecified"),
-            (90, "artificial.built.unspecified"),
+            (90, "artificial.built"),
             (100, "water.unspecified"),
             (110, "snow_ice.unspecified"),
         ),

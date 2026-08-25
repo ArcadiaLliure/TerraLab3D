@@ -19,6 +19,9 @@ from terralab3d.infrastructure.adapters.refinement.providers.clms import (
     ClmsODataAdapter,
     ClmsProviderConfiguration,
 )
+from terralab3d.infrastructure.adapters.surface.tlst_catalog import (
+    load_builtin_land_cover_registry,
+)
 
 
 def _request(request_id: str = "request-1", revision: int = 1) -> DiscoveryRequest:
@@ -263,6 +266,16 @@ def test_global_dynamic_land_cover_mapping_is_available_without_overinterpretati
         assert products[0].endpoint_verified is True
 
     asyncio.run(scenario())
+
+
+def test_all_clms_template_nodes_are_canonical_tlst_keys() -> None:
+    from terralab3d.infrastructure.adapters.refinement.providers.clms import (
+        clms_refinement_products,
+    )
+
+    taxonomy = load_builtin_land_cover_registry().taxonomy
+    nodes = {node for product in clms_refinement_products() for node in product.tlst_nodes}
+    assert nodes <= set(taxonomy.category_keys)
 
 
 @pytest.mark.skipif(
