@@ -257,3 +257,41 @@ def test_incremental_update_reprocesses_only_intersecting_block(tmp_path) -> Non
     with rasterio.open(result.mosaic_path) as dataset:
         left_after = dataset.read(1, window=rasterio.windows.Window(0, 0, 16, 16))
     assert np.array_equal(left_after, left_before)
+
+
+def test_continuous_qualifier_is_written_outside_categorical_tlst_band(tmp_path) -> None:
+    density_path = tmp_path / "tree-density.tif"
+    density = np.full((16, 32), 64, dtype=np.uint8)
+    density[:, 0] = 254
+    _write_raster(density_path, density, west=0, nodata=255)
+    source = _source(
+        "tree-cover-density",
+        density_path,
+        {value: "tree_cover.unspecified" for value in range(1, 101)},
+        SourcePriority.EUROPEAN_HIGH_RESOLUTION,
+    )
+    source = RasterRefinementSource(
+        source_id=source.source_id,
+        product=source.product,
+        version=source.version,
+        path=source.path,
+        band=source.band,
+        translations=source.translations,
+        priority=source.priority,
+        license=source.license,
+        asset_checksum=source.asset_checksum,
+        qualifier_key="canopy_cover",
+        invalid_values=(0, 254, 255),
+    )
+
+    result = RasterRefinementMosaicProcessor(
+        load_builtin_land_cover_registry().taxonomy
+    ).update(tmp_path / "derived", _grid(), (source,))
+
+    qualifier_path = result.qualifier_paths["canopy_cover"]
+    with rasterio.open(qualifier_path) as dataset:
+        values = dataset.read(1)
+        assert values[0, 1] == pytest.approx(64)
+        assert values[0, 0] == dataset.nodata
+    manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["outputs"]["qualifiers"]["canopy_cover"] == qualifier_path.name

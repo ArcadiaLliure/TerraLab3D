@@ -11,7 +11,7 @@ from typing import Mapping
 from .errors import RefinementValidationError
 
 
-_PLAN_SCHEMA_VERSION = 2
+_PLAN_SCHEMA_VERSION = 3
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +32,9 @@ class FrozenDownloadAsset:
     attribution: str
     provenance_url: str
     requires_authentication: bool
+    class_translation: Mapping[int, str]
+    nodata_values: tuple[int, ...]
+    qualifier_key: str | None
 
     def __post_init__(self) -> None:
         required = (
@@ -56,6 +59,11 @@ class FrozenDownloadAsset:
             raise RefinementValidationError("Frozen asset filename is unsafe")
         normalized = json.loads(json.dumps(dict(self.footprint)))
         object.__setattr__(self, "footprint", MappingProxyType(normalized))
+        object.__setattr__(
+            self,
+            "class_translation",
+            MappingProxyType(dict(self.class_translation)),
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -116,7 +124,7 @@ class ParametricDownloadPlan:
             payload = json.loads(value)
         except json.JSONDecodeError as exc:
             raise RefinementValidationError("Parametric plan is not valid JSON") from exc
-        if not isinstance(payload, dict) or payload.get("schemaVersion") not in {1, 2}:
+        if not isinstance(payload, dict) or payload.get("schemaVersion") not in {1, 2, 3}:
             raise RefinementValidationError("Unsupported parametric plan schema")
         assets = payload.get("assets")
         if not isinstance(assets, list):
@@ -174,12 +182,21 @@ def _asset_to_dict(asset: FrozenDownloadAsset) -> dict[str, object]:
         "attribution": asset.attribution,
         "provenanceUrl": asset.provenance_url,
         "requiresAuthentication": asset.requires_authentication,
+        "classTranslation": {
+            str(source_value): category_key
+            for source_value, category_key in asset.class_translation.items()
+        },
+        "nodataValues": list(asset.nodata_values),
+        "qualifierKey": asset.qualifier_key,
     }
 
 
 def _asset_from_dict(value: object) -> FrozenDownloadAsset:
     if not isinstance(value, dict) or not isinstance(value.get("footprint"), dict):
         raise RefinementValidationError("Invalid frozen asset")
+    translation = value.get("classTranslation", {})
+    if not isinstance(translation, dict):
+        raise RefinementValidationError("Invalid frozen asset translation")
     return FrozenDownloadAsset(
         asset_id=str(value.get("assetId", "")),
         provider_id=str(value.get("providerId", "")),
@@ -205,4 +222,10 @@ def _asset_from_dict(value: object) -> FrozenDownloadAsset:
         attribution=str(value.get("attribution", "")),
         provenance_url=str(value.get("provenanceUrl", "")),
         requires_authentication=bool(value.get("requiresAuthentication", False)),
+        class_translation={
+            int(source_value): str(category_key)
+            for source_value, category_key in translation.items()
+        },
+        nodata_values=tuple(int(item) for item in value.get("nodataValues", [])),
+        qualifier_key=str(value["qualifierKey"]) if value.get("qualifierKey") else None,
     )

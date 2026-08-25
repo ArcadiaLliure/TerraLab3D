@@ -55,6 +55,8 @@ class _ClmsDataset:
     compatible_nodes: tuple[str, ...]
     endpoint_verified: bool = True
     qualifier_key: str | None = None
+    class_translation: tuple[tuple[int, str], ...] = ()
+    nodata_values: tuple[int, ...] = ()
 
 
 _CLMS_DATASETS = (
@@ -64,6 +66,28 @@ _CLMS_DATASETS = (
         "v1",
         10,
         ("agriculture.cropland",),
+        class_translation=(
+            (1110, "agriculture.cropland.arable.annual_crop"),
+            (1120, "agriculture.cropland.arable.annual_crop"),
+            (1130, "agriculture.cropland.arable.annual_crop"),
+            (1140, "agriculture.cropland.arable.rice"),
+            (1150, "agriculture.cropland.arable.annual_crop"),
+            (1210, "agriculture.cropland.arable.annual_crop"),
+            (1220, "agriculture.cropland.arable.annual_crop"),
+            (1310, "agriculture.cropland.arable.annual_crop"),
+            (1320, "agriculture.cropland.arable.annual_crop"),
+            (1410, "agriculture.cropland.arable.annual_crop"),
+            (1420, "agriculture.cropland.arable.annual_crop"),
+            (1430, "agriculture.cropland.arable.annual_crop"),
+            (1440, "agriculture.cropland.arable.annual_crop"),
+            (2100, "agriculture.cropland.permanent_crop.vineyard"),
+            (2200, "agriculture.cropland.permanent_crop.olive_grove"),
+            (2310, "agriculture.cropland.permanent_crop.orchard.fruit_trees"),
+            (2320, "agriculture.cropland.permanent_crop.orchard"),
+            (3100, "agriculture.cropland.arable.unspecified"),
+            (3200, "agriculture.cropland.permanent_crop.other"),
+        ),
+        nodata_values=(0, 65535),
     ),
     _ClmsDataset(
         "clms_vlcc_tree-cover-density_europe_10m_yearly_v1",
@@ -72,6 +96,10 @@ _CLMS_DATASETS = (
         10,
         ("tree_cover",),
         qualifier_key="canopy_cover",
+        class_translation=tuple(
+            (value, "tree_cover.unspecified") for value in range(1, 101)
+        ),
+        nodata_values=(0, 254, 255),
     ),
     _ClmsDataset(
         "clms_vlcc_dominant-leaf-type_europe_10m_yearly_v1",
@@ -79,6 +107,11 @@ _CLMS_DATASETS = (
         "v1",
         10,
         ("tree_cover.broadleaf", "tree_cover.needleleaf"),
+        class_translation=(
+            (1, "tree_cover.broadleaf"),
+            (2, "tree_cover.needleleaf"),
+        ),
+        nodata_values=(0, 254, 255),
     ),
     _ClmsDataset(
         "clms_vlcc_forest-type_europe_10m_3yearly_v1",
@@ -91,6 +124,12 @@ _CLMS_DATASETS = (
             "tree_cover.mixed",
             "tree_cover.unspecified",
         ),
+        class_translation=(
+            (1, "tree_cover.broadleaf"),
+            (2, "tree_cover.needleleaf"),
+            (3, "tree_cover.mixed"),
+        ),
+        nodata_values=(0, 254, 255),
     ),
     _ClmsDataset(
         "clms_hrl_water-wetness_europe_10m_2018_v1",
@@ -99,6 +138,14 @@ _CLMS_DATASETS = (
         10,
         ("water", "wetland"),
         endpoint_verified=False,
+        class_translation=(
+            (1, "water.unspecified"),
+            (2, "water.unspecified"),
+            (3, "wetland.unspecified"),
+            (4, "wetland.unspecified"),
+            (5, "water.marine.sea_ocean"),
+        ),
+        nodata_values=(0, 254, 255),
     ),
 )
 
@@ -297,6 +344,8 @@ class ClmsODataAdapter:
             assets=(asset,),
             endpoint_verified=dataset.endpoint_verified,
             qualifier_key=dataset.qualifier_key,
+            class_translation=dict(dataset.class_translation),
+            nodata_values=dataset.nodata_values,
         )
 
 

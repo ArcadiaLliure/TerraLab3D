@@ -73,6 +73,15 @@ class DownloadJobManager:
         self._active_tasks[job_id] = task
         return job_id
 
+    def register_post_processor(
+        self,
+        resource_id: ResourceId,
+        processor: ResourcePostProcessor,
+    ) -> None:
+        """Attach processing to a dynamically planned resource before its job starts."""
+
+        self._post_processors[resource_id] = processor
+
     def cancel_download(self, resource_id: ResourceId, variant_id: VariantId) -> None:
         job_id = f"{resource_id}_{variant_id}"
         self._cancelled_jobs.add(job_id)

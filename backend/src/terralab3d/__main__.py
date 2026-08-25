@@ -161,6 +161,9 @@ async def run() -> int:
         ClmsODataAdapter,
         clms_refinement_products,
     )
+    from terralab3d.infrastructure.adapters.refinement.post_processor import (
+        RefinementPlanPostProcessorFactory,
+    )
     from terralab3d.infrastructure.adapters.refinement.repository import (
         JsonRefinementInstallationRepository,
     )
@@ -183,6 +186,7 @@ async def run() -> int:
             for key in tlst_registry.taxonomy.category_keys
         },
     )
+    refinement_geometry = ShapelyGeometryAdapter()
     refinement_bridge = RefinementBridgeController(
         publisher=bridge,
         discovery=RefinementDiscoveryCoordinator(
@@ -190,11 +194,17 @@ async def run() -> int:
             refinement_license_policy,
         ),
         service=refinement_service,
-        geometry=ShapelyGeometryAdapter(),
+        geometry=refinement_geometry,
         license_policy=refinement_license_policy,
         resource_catalog=resource_catalog,
         download_jobs=download_manager,
         data_root=resolve_data_root(),
+        processor_factory=RefinementPlanPostProcessorFactory(
+            taxonomy=tlst_registry.taxonomy,
+            service=refinement_service,
+            geometry=refinement_geometry,
+            data_root=resolve_data_root(),
+        ),
     )
     raster_import_service = None
     server = TerraLabServer(

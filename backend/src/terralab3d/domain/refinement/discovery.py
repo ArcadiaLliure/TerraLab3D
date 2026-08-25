@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Mapping
 
@@ -66,12 +66,19 @@ class DiscoveredRefinementProduct:
     assets: tuple[RemoteAsset, ...]
     endpoint_verified: bool
     qualifier_key: str | None = None
+    class_translation: Mapping[int, str] = field(default_factory=dict)
+    nodata_values: tuple[int, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.candidate_id.strip() or not self.assets:
             raise RefinementValidationError("Discovered product requires an id and assets")
         normalized = json.loads(json.dumps(dict(self.footprint)))
         object.__setattr__(self, "footprint", MappingProxyType(normalized))
+        object.__setattr__(
+            self,
+            "class_translation",
+            MappingProxyType(dict(self.class_translation)),
+        )
 
 
 @dataclass(frozen=True, slots=True)

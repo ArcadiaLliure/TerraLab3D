@@ -156,10 +156,13 @@ class FrozenRefinementAssetPayload(RefinementRemoteAssetPayload):
     licenseUrl: str
     attribution: str
     provenanceUrl: str
+    classTranslation: dict[str, str]
+    nodataValues: list[int]
+    qualifierKey: str | None
 
 
 class RefinementDownloadPlanPayload(TypedDict):
-    schemaVersion: Literal[2]
+    schemaVersion: Literal[3]
     planId: str
     requestId: str
     revision: int

@@ -118,10 +118,13 @@ export interface FrozenRefinementAsset extends RefinementRemoteAsset {
   readonly licenseUrl: string;
   readonly attribution: string;
   readonly provenanceUrl: string;
+  readonly classTranslation: Readonly<Record<string, string>>;
+  readonly nodataValues: readonly number[];
+  readonly qualifierKey: string | null;
 }
 
 export interface RefinementDownloadPlan {
-  readonly schemaVersion: 2;
+  readonly schemaVersion: 3;
   readonly planId: string;
   readonly requestId: string;
   readonly revision: number;

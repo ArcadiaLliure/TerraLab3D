@@ -90,7 +90,15 @@ class RasterRefinementMosaicProcessor:
             source_codes,
             updated_windows,
         )
+        qualifier_paths = self._update_qualifiers(
+            output_dir,
+            grid,
+            transform,
+            sources,
+            updated_windows,
+        )
         self._build_overviews(target_paths)
+        self._build_overviews({f"qualifier:{key}": path for key, path in qualifier_paths.items()})
         for key, target in target_paths.items():
             target.replace(final_paths[key])
 
@@ -113,6 +121,7 @@ class RasterRefinementMosaicProcessor:
             verified_geometry=verified,
             updated_windows=tuple(_window_tuple(window) for window in updated_windows),
             conflict_pixels=conflict_pixels,
+            qualifier_paths=qualifier_paths,
         )
 
     @staticmethod
@@ -264,6 +273,84 @@ class RasterRefinementMosaicProcessor:
         return max(1, min(255, priority_base + semantic - confidence_penalty))
 
     @staticmethod
+    def _update_qualifiers(
+        output_dir: Path,
+        grid: TargetGridSpec,
+        transform: Affine,
+        sources: tuple[RasterRefinementSource, ...],
+        windows: tuple[Window, ...],
+    ) -> dict[str, Path]:
+        qualifier_sources: dict[str, list[RasterRefinementSource]] = {}
+        for source in sources:
+            if source.qualifier_key:
+                qualifier_sources.setdefault(source.qualifier_key, []).append(source)
+        results: dict[str, Path] = {}
+        for qualifier_key, candidates in qualifier_sources.items():
+            safe_key = qualifier_key.replace(".", "_").replace("/", "_")
+            final_path = output_dir / f"refinement_qualifier_{safe_key}.tif"
+            target_path = final_path.with_suffix(final_path.suffix + ".next")
+            target_path.unlink(missing_ok=True)
+            if final_path.exists():
+                shutil.copy2(final_path, target_path)
+            else:
+                block_x = 16 if grid.width <= 256 else 256
+                block_y = 16 if grid.height <= 256 else 256
+                with rasterio.open(
+                    target_path,
+                    "w",
+                    driver="GTiff",
+                    width=grid.width,
+                    height=grid.height,
+                    count=1,
+                    crs=grid.crs,
+                    transform=transform,
+                    dtype="float32",
+                    nodata=-9999.0,
+                    tiled=True,
+                    blockxsize=block_x,
+                    blockysize=block_y,
+                    compress="DEFLATE",
+                    bigtiff="IF_SAFER",
+                ) as dataset:
+                    dataset.write(
+                        np.full((grid.height, grid.width), -9999.0, dtype=np.float32),
+                        1,
+                    )
+            ordered = sorted(candidates, key=lambda item: (item.priority, item.source_id))
+            with rasterio.open(target_path, "r+") as destination:
+                for window in windows:
+                    values = np.full(
+                        (int(window.height), int(window.width)),
+                        -9999.0,
+                        dtype=np.float32,
+                    )
+                    filled = np.zeros(values.shape, dtype=np.bool_)
+                    for source in ordered:
+                        with rasterio.open(source.path) as dataset:
+                            with WarpedVRT(
+                                dataset,
+                                crs=grid.crs,
+                                transform=transform,
+                                width=grid.width,
+                                height=grid.height,
+                                resampling=Resampling.bilinear,
+                                src_nodata=dataset.nodata,
+                                nodata=dataset.nodata,
+                            ) as aligned:
+                                raw = aligned.read(source.band, window=window, masked=True)
+                        data = np.asarray(raw.data, dtype=np.float32)
+                        valid = ~np.ma.getmaskarray(raw)
+                        for invalid in source.invalid_values:
+                            valid &= data != invalid
+                        wins = valid & ~filled
+                        values[wins] = data[wins]
+                        filled[wins] = True
+                    destination.write(values, 1, window=window)
+            target_path.replace(final_path)
+            results[qualifier_key] = final_path
+        return results
+
+    @staticmethod
     def _build_overviews(paths: dict[str, Path]) -> None:
         for key, path in paths.items():
             with rasterio.open(path, "r+") as dataset:
@@ -324,6 +411,8 @@ class RasterRefinementMosaicProcessor:
                     str(value): category
                     for value, category in source.translations.items()
                 },
+                "qualifierKey": source.qualifier_key,
+                "invalidValues": list(source.invalid_values),
             }
         return {
             "schemaVersion": 1,
@@ -333,7 +422,17 @@ class RasterRefinementMosaicProcessor:
                 "categoryCodes": self._category_codes,
             },
             "targetGrid": _grid_json(grid),
-            "outputs": dict(self._OUTPUT_NAMES),
+            "outputs": {
+                **self._OUTPUT_NAMES,
+                "qualifiers": {
+                    source.qualifier_key: (
+                        "refinement_qualifier_"
+                        f"{source.qualifier_key.replace('.', '_').replace('/', '_')}.tif"
+                    )
+                    for source in sources
+                    if source.qualifier_key
+                },
+            },
             "sources": [previous_sources[key] for key in sorted(previous_sources)],
             "updatedWindows": [_window_tuple(window) for window in windows],
             "conflictPixelsInUpdatedWindows": conflict_pixels,

@@ -11,6 +11,7 @@ from typing import Protocol
 from uuid import uuid4
 
 from terralab3d.application.ports.refinement import GeometryPort
+from terralab3d.application.ports.resource_processing import ResourcePostProcessor
 from terralab3d.application.refinement.discovery import RefinementDiscoveryCoordinator
 from terralab3d.application.refinement.downloads import (
     asset_file_name,
@@ -57,6 +58,21 @@ class RefinementDownloadJobs(Protocol):
 
     def delete_resource(self, resource_id: ResourceId, variant_id: VariantId) -> None: ...
 
+    def register_post_processor(
+        self,
+        resource_id: ResourceId,
+        processor: ResourcePostProcessor,
+    ) -> None: ...
+
+
+class RefinementProcessorFactory(Protocol):
+    def build(
+        self,
+        plan: ParametricDownloadPlan,
+        candidates: tuple[DiscoveredRefinementProduct, ...],
+        installation_ids: tuple[str, ...],
+    ) -> ResourcePostProcessor: ...
+
 
 @dataclass(frozen=True, slots=True)
 class _DiscoverySession:
@@ -86,6 +102,7 @@ class RefinementBridgeController:
         resource_catalog: RefinementResourceCatalog,
         download_jobs: RefinementDownloadJobs,
         data_root: Path,
+        processor_factory: RefinementProcessorFactory | None = None,
     ) -> None:
         self._publisher = publisher
         self._discovery = discovery
@@ -95,6 +112,7 @@ class RefinementBridgeController:
         self._resource_catalog = resource_catalog
         self._download_jobs = download_jobs
         self._data_root = data_root
+        self._processor_factory = processor_factory
         self._query_task: asyncio.Task[None] | None = None
         self._discoveries: dict[tuple[str, int], _DiscoverySession] = {}
         self._plans: dict[str, _PlannedSession] = {}
@@ -331,7 +349,7 @@ class RefinementBridgeController:
             descriptor = resource_descriptor_from_plan(plan)
             self._resource_catalog.upsert(descriptor)
             variant = descriptor.variants[0]
-            job_id = self._download_jobs.start_download(descriptor.id, variant.id)
+            expected_job_id = f"{descriptor.id}_{variant.id}"
             install_path = (
                 self._data_root
                 / "data"
@@ -340,6 +358,7 @@ class RefinementBridgeController:
                 / "refinements"
                 / descriptor.id.rsplit(".", 1)[-1]
             )
+            installation_ids: list[str] = []
             for candidate in planned.candidates:
                 product = RefinementProduct(
                     product_id=candidate.candidate_id,
@@ -357,13 +376,24 @@ class RefinementBridgeController:
                     license=candidate.license,
                     provenance_url=candidate.license.provenance_url,
                 )
-                self._service.confirm_product(
+                installation = self._service.confirm_product(
                     product=product,
                     category_key=plan.category_keys[0],
                     aoi_id=plan.plan_id,
-                    job_id=job_id,
+                    job_id=expected_job_id,
                     local_path=install_path,
                 )
+                installation_ids.append(installation.installation_id)
+            if self._processor_factory is not None:
+                processor = self._processor_factory.build(
+                    plan,
+                    planned.candidates,
+                    tuple(installation_ids),
+                )
+                self._download_jobs.register_post_processor(descriptor.id, processor)
+            job_id = self._download_jobs.start_download(descriptor.id, variant.id)
+            if job_id != expected_job_id:
+                raise RefinementValidationError("Download manager returned an unexpected job id")
             await self._publisher.send(
                 {
                     "type": "refinement_download_progress",

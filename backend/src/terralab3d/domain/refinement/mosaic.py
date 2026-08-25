@@ -33,6 +33,7 @@ class RasterRefinementSource:
     asset_checksum: str
     confidence: int = 100
     qualifier_key: str | None = None
+    invalid_values: tuple[int, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.source_id.strip() or not self.product.strip() or not self.version.strip():

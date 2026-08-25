@@ -67,13 +67,17 @@ class _Jobs:
     def __init__(self) -> None:
         self.started = []
         self.deleted = []
+        self.processors = []
 
     def start_download(self, resource_id, variant_id) -> str:
         self.started.append((resource_id, variant_id))
-        return "fixture-job"
+        return f"{resource_id}_{variant_id}"
 
     def delete_resource(self, resource_id, variant_id) -> None:
         self.deleted.append((resource_id, variant_id))
+
+    def register_post_processor(self, resource_id, processor) -> None:
+        self.processors.append((resource_id, processor))
 
 
 def _candidate() -> DiscoveredRefinementProduct:
@@ -216,7 +220,7 @@ def test_bridge_flow_workspace_discovery_plan_confirmation_and_removal(
         assert len(catalog.descriptors) == 1
         assert len(jobs.started) == 1
         installation = repository.list_installations()[0]
-        assert installation.job_id == "fixture-job"
+        assert installation.job_id == progress["jobId"]
 
         controller.remove_installation(
             {
