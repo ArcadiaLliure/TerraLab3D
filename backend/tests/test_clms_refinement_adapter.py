@@ -259,11 +259,16 @@ def test_global_dynamic_land_cover_mapping_is_available_without_overinterpretati
         finally:
             await runner.cleanup()
 
-        assert len(products) == 1
-        assert "lcm_global_10m_yearly_v1" in filters[0]
-        assert products[0].class_translation[110] == "snow_ice.unspecified"
-        assert products[0].class_translation[80] == "bare_sparse.unspecified"
-        assert products[0].endpoint_verified is True
+        assert len(products) == 2
+        assert any("lcm_global_10m_yearly_v1" in item for item in filters)
+        global_product = next(
+            product
+            for product in products
+            if product.dataset_identifier == "lcm_global_10m_yearly_v1"
+        )
+        assert global_product.class_translation[110] == "snow_ice.unspecified"
+        assert global_product.class_translation[80] == "bare_sparse.unspecified"
+        assert global_product.endpoint_verified is True
 
     asyncio.run(scenario())
 
@@ -310,6 +315,40 @@ def test_grassland_mapping_preserves_mixed_grassland_semantics() -> None:
         assert any("clms_vlcc_grassland_europe_10m_yearly_v1" in item for item in filters)
         assert grass.class_translation == {1: "low_vegetation.herbaceous.unspecified"}
         assert grass.nodata_values == (0, 255)
+
+    asyncio.run(scenario())
+
+
+def test_snow_phenology_separates_seasonal_from_full_year_snow() -> None:
+    async def scenario() -> None:
+        async def handler(request: web.Request) -> web.Response:
+            return web.json_response({"value": [_record("snow-tile")]})
+
+        runner, url = await _serve(handler)
+        try:
+            products = await ClmsODataAdapter(
+                ClmsProviderConfiguration(catalogue_url=url, retry_count=0)
+            ).discover(
+                DiscoveryRequest(
+                    "snow",
+                    1,
+                    "snow_ice.seasonal",
+                    _request().aoi_geojson,
+                )
+            )
+        finally:
+            await runner.cleanup()
+
+        snow = next(
+            product
+            for product in products
+            if product.dataset_identifier
+            == "clms_wsi_snow-phenology-s2_europe_utm_20m_yearly_v1"
+        )
+        assert snow.class_translation[1] == "snow_ice.seasonal"
+        assert snow.class_translation[364] == "snow_ice.seasonal"
+        assert snow.class_translation[365] == "snow_ice.permanent.snow"
+        assert snow.qualifier_key == "snow_cover_duration_days"
 
     asyncio.run(scenario())
 
@@ -375,6 +414,31 @@ def test_official_grassland_odata_smoke() -> None:
         assert any(
             product.dataset_identifier
             == "clms_vlcc_grassland_europe_10m_yearly_v1"
+            for product in products
+        )
+
+    asyncio.run(scenario())
+
+
+@pytest.mark.skipif(
+    os.getenv("TERRALAB_RUN_CLMS_SMOKE") != "1",
+    reason="manual smoke test against the official CLMS OData catalogue",
+)
+def test_official_snow_phenology_odata_smoke() -> None:
+    async def scenario() -> None:
+        products = await ClmsODataAdapter(
+            ClmsProviderConfiguration(page_size=1, max_pages=1, timeout_seconds=30)
+        ).discover(
+            DiscoveryRequest(
+                "snow-smoke",
+                1,
+                "snow_ice.seasonal",
+                _request().aoi_geojson,
+            )
+        )
+        assert any(
+            product.dataset_identifier
+            == "clms_wsi_snow-phenology-s2_europe_utm_20m_yearly_v1"
             for product in products
         )
 

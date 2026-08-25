@@ -392,6 +392,8 @@ def _matches_product(file_name: str, product: str) -> bool:
         return "tcd" in lowered or "density" in lowered
     if "water and wetness" in normalized_product:
         return "waw" in lowered or "water" in lowered or "wet" in lowered
+    if "snow phenology" in normalized_product:
+        return "scd" in lowered and "qa" not in lowered
     return True
 
 

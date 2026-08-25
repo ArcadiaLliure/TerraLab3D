@@ -134,6 +134,20 @@ _CLMS_DATASETS = (
         nodata_values=(0, 255),
     ),
     _ClmsDataset(
+        "clms_wsi_snow-phenology-s2_europe_utm_20m_yearly_v1",
+        "Snow Phenology Sentinel-2",
+        "v1",
+        20,
+        ("snow_ice.seasonal", "snow_ice.permanent.snow"),
+        qualifier_key="snow_cover_duration_days",
+        class_translation=(
+            *tuple((value, "snow_ice.seasonal") for value in range(1, 365)),
+            (365, "snow_ice.permanent.snow"),
+            (366, "snow_ice.permanent.snow"),
+        ),
+        nodata_values=(0, 420, 65535),
+    ),
+    _ClmsDataset(
         "clms_vlcc_tree-cover-density_europe_10m_yearly_v1",
         "High Resolution Layer Tree Cover Density",
         "v1",
