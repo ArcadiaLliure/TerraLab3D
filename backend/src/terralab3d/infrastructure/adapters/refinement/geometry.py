@@ -6,8 +6,8 @@ from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
 from pyproj import CRS, Transformer
-from shapely.geometry import GeometryCollection, LineString, mapping, shape
-from shapely.geometry.base import BaseGeometry
+from shapely.geometry import GeometryCollection, LineString, Polygon, mapping, shape
+from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import split, transform, unary_union
 
 from terralab3d.domain.refinement.coverage import MetricGeometry
@@ -119,12 +119,11 @@ def _has_dateline_jump(geometry: BaseGeometry) -> bool:
     def ring_jumps(coordinates: Sequence[tuple[float, ...]]) -> bool:
         return any(abs(current[0] - previous[0]) > 180 for previous, current in zip(coordinates, coordinates[1:]))
 
-    if geometry.geom_type == "Polygon":
-        polygon = geometry
-        return ring_jumps(list(polygon.exterior.coords)) or any(
-            ring_jumps(list(ring.coords)) for ring in polygon.interiors
+    if isinstance(geometry, Polygon):
+        return ring_jumps(list(geometry.exterior.coords)) or any(
+            ring_jumps(list(ring.coords)) for ring in geometry.interiors
         )
-    if hasattr(geometry, "geoms"):
+    if isinstance(geometry, BaseMultipartGeometry):
         return any(_has_dateline_jump(item) for item in geometry.geoms)
     return False
 

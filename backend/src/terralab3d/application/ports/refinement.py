@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import Mapping, Protocol, Sequence
 
 from terralab3d.domain.refinement.coverage import CoverageGeometry, MetricGeometry
+from terralab3d.domain.refinement.installations import (
+    RefinementInstallation,
+    RefinementProduct,
+)
 
 
 class GeometryPort(CoverageGeometry, Protocol):
@@ -26,9 +30,11 @@ class RefinementProviderPort(Protocol):
 
 
 class RefinementCoverageRepositoryPort(Protocol):
-    def list_installations(self) -> Sequence[object]: ...
+    def list_installations(self) -> Sequence[RefinementInstallation]: ...
 
-    def upsert(self, installation: object) -> None: ...
+    def get(self, installation_id: str) -> RefinementInstallation | None: ...
+
+    def upsert(self, installation: RefinementInstallation) -> None: ...
 
 
 class RefinementProcessorPort(Protocol):
@@ -36,4 +42,8 @@ class RefinementProcessorPort(Protocol):
 
 
 class RefinementProductCatalogPort(Protocol):
-    def list_products(self, category_key: str) -> Sequence[object]: ...
+    def list_products(self, category_key: str) -> Sequence[RefinementProduct]: ...
+
+    def list_all_products(self) -> Sequence[RefinementProduct]: ...
+
+    def get_product(self, product_id: str) -> RefinementProduct | None: ...
