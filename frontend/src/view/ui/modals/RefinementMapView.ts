@@ -125,6 +125,23 @@ export class RefinementMapView {
     if (remaining) this.addGeometry(this.gapSource, remaining);
   }
 
+  public setInstalled(installations: readonly { footprint?: RefinementGeometry | null }[]): void {
+    const features: Feature[] = [];
+    const format = new GeoJSONFormat();
+    for (const inst of installations) {
+      if (inst.footprint) {
+        try {
+          features.push(new Feature({
+            geometry: format.readGeometry(inst.footprint, { featureProjection: 'EPSG:3857' })
+          }));
+        } catch (e) {
+          console.error("Invalid footprint GeoJSON", e);
+        }
+      }
+    }
+    this.localSource.addFeatures(features);
+  }
+
   public updateSize(): void {
     this.map.updateSize();
   }

@@ -130,6 +130,14 @@ def refinement_provider_rollout() -> tuple[ProviderRollout, ...]:
             "Official global fallback identifier, 11-class legend and live endpoint verified.",
         ),
         ProviderRollout(
+            "esa-worldcover-2021",
+            ("ESA WorldCover 10m 2021 v200",),
+            ProviderRolloutState.ENABLED,
+            "CC-BY-4.0 verified",
+            ("surface",),
+            "Global land cover with compatible classes and STAC/COG endpoints verified.",
+        ),
+        ProviderRollout(
             "nasa-usgs-fallback",
             ("NASA/USGS global and national land-cover products",),
             ProviderRolloutState.DISABLED,

@@ -134,6 +134,41 @@ async def run() -> int:
             error_message=None if record.get("valid", True) else "La font externa ja no Ã©s accessible",
         )
     galactic_assets = ManagedGalacticAssets(resource_repo)
+    
+    from terralab3d.infrastructure.adapters.refinement.providers.cdse_identity import CdseIdentityAdapter
+    from terralab3d.infrastructure.adapters.refinement.keyring_store import OsCredentialStoreAdapter
+    from terralab3d.application.refinement.auth_coordinator import AuthenticationCoordinator
+    from terralab3d.domain.refinement.authentication import CdseCredentials
+
+    def _request_cdse_auth() -> None:
+        logging.getLogger(__name__).info("MGP: Sending cdse_auth_required message to frontend")
+        asyncio.create_task(bridge.send({"type": "cdse_auth_required"}))
+
+    auth_coordinator = AuthenticationCoordinator(
+        auth_port=CdseIdentityAdapter(),
+        credential_store=OsCredentialStoreAdapter(),
+        request_credentials_callback=_request_cdse_auth,
+    )
+
+    async def _on_submit_cdse_credentials(msg: dict) -> None:
+        username = msg.get("username")
+        password = msg.get("password")
+        totp = msg.get("totp")
+        remember = msg.get("remember", False)
+        totp_value = str(totp).strip() if isinstance(totp, str) else None
+        creds = (
+            CdseCredentials(username, password, totp_value or None)
+            if username and password
+            else None
+        )
+        await auth_coordinator.submit_credentials(creds, remember)
+
+    async def _on_forget_cdse_credentials(msg: dict) -> None:
+        auth_coordinator.forget_credentials()
+
+    bridge.on("submit_cdse_credentials", _on_submit_cdse_credentials)
+    bridge.on("forget_cdse_credentials", _on_forget_cdse_credentials)
+
     download_manager = DownloadJobManager(
         resource_catalog,
         resource_repo,
@@ -142,6 +177,7 @@ async def run() -> int:
             ResourceId("sky.planck_dust"): PlanckDustAdapter(),
             ResourceId("sky.ngc"): NgcCatalogPostProcessor(),
         },
+        auth_coordinator=auth_coordinator,
     )
     from terralab3d.application.refinement.bridge_controller import (
         RefinementBridgeController,
@@ -173,6 +209,10 @@ async def run() -> int:
         WaterWetnessImageServerAdapter,
         water_wetness_refinement_products,
     )
+    from terralab3d.infrastructure.adapters.refinement.providers.worldcover import (
+        WorldCoverCogAdapter,
+        worldcover_refinement_products,
+    )
     from terralab3d.infrastructure.adapters.refinement.post_processor import (
         RefinementPlanPostProcessorFactory,
     )
@@ -199,6 +239,7 @@ async def run() -> int:
                 *clms_refinement_products(),
                 *corine_refinement_products(),
                 *water_wetness_refinement_products(),
+                *worldcover_refinement_products(),
             )
         ),
         refinement_license_policy,
@@ -217,6 +258,7 @@ async def run() -> int:
                 ClmsODataAdapter(),
                 CorineLandCoverAdapter(),
                 WaterWetnessImageServerAdapter(),
+                WorldCoverCogAdapter(),
             ),
             refinement_license_policy,
         ),

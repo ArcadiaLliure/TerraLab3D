@@ -69,7 +69,7 @@ def _product(**overrides: object) -> RefinementProduct:
         provider="Fixture provider",
         product="Fixture vineyard",
         version="1.0",
-        tlst_nodes=("agriculture.cropland.permanent_crop.vineyard",),
+        tlst_nodes=("agriculture.cropland.vineyard",),
         data_kind=RefinementDataKind.RASTER,
         original_crs="EPSG:3035",
         planned_geometry=_geometry(),
@@ -113,7 +113,7 @@ def test_workspace_loads_all_103_categories_from_the_canonical_source(tmp_path) 
     vineyard = next(
         node
         for node in workspace.nodes
-        if node.category_key == "agriculture.cropland.permanent_crop.vineyard"
+        if node.category_key == "agriculture.cropland.vineyard"
     )
     assert vineyard.label == "Vinya"
     assert vineyard.state is SpatialCoverageState.ABSENT
@@ -262,7 +262,7 @@ def test_workspace_propagates_verified_state_through_applicable_ancestors(tmp_pa
 
     states = {node.category_key: node.state for node in service.workspace().nodes}
 
-    assert states["agriculture.cropland.permanent_crop.vineyard"] is SpatialCoverageState.COMPLETE
+    assert states["agriculture.cropland.vineyard"] is SpatialCoverageState.COMPLETE
     assert states["agriculture.cropland.permanent_crop"] is SpatialCoverageState.COMPLETE
     assert states["agriculture.cropland"] is SpatialCoverageState.COMPLETE
     assert states["agriculture"] is SpatialCoverageState.COMPLETE

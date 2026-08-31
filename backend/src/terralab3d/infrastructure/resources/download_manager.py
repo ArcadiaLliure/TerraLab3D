@@ -45,11 +45,13 @@ class DownloadJobManager:
         repository: ResourceInstallationRepository,
         bridge: WebSocketBridge,
         post_processors: Mapping[ResourceId, ResourcePostProcessor] | None = None,
+        auth_coordinator=None,
     ) -> None:
         self._catalog = catalog
         self._repository = repository
         self._bridge = bridge
         self._post_processors = dict(post_processors or {})
+        self._auth_coordinator = auth_coordinator
         self._active_tasks: Dict[str, asyncio.Task] = {}
         self._cancelled_jobs: Set[str] = set()
         self._last_snapshot_time: Dict[str, float] = {}
@@ -57,7 +59,7 @@ class DownloadJobManager:
         self._acquirers: Dict[str, ResourceAcquirer] = {
             "STATIC_FILE": StaticFileAcquirer(self, self._repository, self._bridge, self._post_processors),
             "HTTP_BUNDLE": HttpBundleAcquirer(self, self._repository, self._bridge, self._post_processors),
-            "PARAMETRIC_DOWNLOAD": ParametricRasterAcquirer(self, self._repository, self._bridge, self._post_processors),
+            "PARAMETRIC_DOWNLOAD": ParametricRasterAcquirer(self, self._repository, self._bridge, self._post_processors, self._auth_coordinator),
         }
 
     def start_download(self, resource_id: ResourceId, variant_id: VariantId) -> str:

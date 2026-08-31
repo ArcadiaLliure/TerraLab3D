@@ -137,6 +137,7 @@ export interface BackendMessageListener {
   onRefinementCoverageUpdated?(msg: RefinementCoverageUpdatedMessage): void;
   onRefinementInstallationRemoved?(msg: RefinementInstallationRemovedMessage): void;
   onRefinementOperationError?(msg: RefinementOperationErrorMessage): void;
+  onCdseAuthRequired?(): void;
 }
 
 export class WebSocketBridge {
@@ -351,6 +352,14 @@ export class WebSocketBridge {
     this.sendMessage({ type: "set_atmosphere_enabled", enabled });
   }
 
+  sendSubmitCdseCredentials(payload: any): void {
+    this.sendMessage({ type: "submit_cdse_credentials", ...payload });
+  }
+
+  sendForgetCdseCredentials(): void {
+    this.sendMessage({ type: "forget_cdse_credentials" });
+  }
+
   sendSetLightPollutionEnabled(enabled: boolean): void {
     this.sendMessage({ type: "set_light_pollution_enabled", enabled });
   }
@@ -375,6 +384,11 @@ export class WebSocketBridge {
         const ack = msg as HandshakeAckMessage;
         this._sessionId = ack.sessionId;
         this.setState("connected");
+        const pending = [...this.pendingMessages];
+        this.pendingMessages = [];
+        for (const p of pending) {
+          this.sendMessage(p);
+        }
         break;
       }
       case "set_camera_pose":
@@ -401,6 +415,11 @@ export class WebSocketBridge {
         this.shutdownRequested = true;
         for (const l of this.messageListeners) {
           l.onShutdownRequested?.();
+        }
+        break;
+      case "cdse_auth_required":
+        for (const l of this.messageListeners) {
+          l.onCdseAuthRequired?.();
         }
         break;
       case "observer_location_changed":
@@ -812,9 +831,13 @@ export class WebSocketBridge {
     this.sendMessage({ type: "clear_star_trails" });
   }
 
+  private pendingMessages: FrontendMessage[] = [];
+
   private sendMessage(msg: FrontendMessage): void {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(msg));
+    } else {
+      this.pendingMessages.push(msg);
     }
   }
 

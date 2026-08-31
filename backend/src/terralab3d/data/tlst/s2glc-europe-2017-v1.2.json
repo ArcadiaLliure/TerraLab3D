@@ -8,7 +8,7 @@
     {"source_code": 0, "source_label": "Clouds", "source_label_key": "source.s2glc.clouds", "color_rgba": [0, 0, 0, 0], "sample_validity": "masked"},
     {"source_code": 62, "source_label": "Artificial surfaces", "source_label_key": "source.s2glc.artificial_surfaces", "color_rgba": [210, 0, 0, 255], "category_key": "artificial.unspecified"},
     {"source_code": 73, "source_label": "Cultivated areas", "source_label_key": "source.s2glc.cultivated_areas", "color_rgba": [253, 211, 39, 255], "category_key": "agriculture.cropland.unspecified"},
-    {"source_code": 75, "source_label": "Vineyards", "source_label_key": "source.s2glc.vineyards", "color_rgba": [176, 91, 16, 255], "category_key": "agriculture.cropland.permanent_crop.vineyard"},
+    {"source_code": 75, "source_label": "Vineyards", "source_label_key": "source.s2glc.vineyards", "color_rgba": [176, 91, 16, 255], "category_key": "agriculture.cropland.vineyard"},
     {"source_code": 82, "source_label": "Broadleaf tree cover", "source_label_key": "source.s2glc.broadleaf_tree_cover", "color_rgba": [35, 152, 0, 255], "category_key": "tree_cover.broadleaf"},
     {"source_code": 83, "source_label": "Coniferous tree cover", "source_label_key": "source.s2glc.coniferous_tree_cover", "color_rgba": [8, 98, 0, 255], "category_key": "tree_cover.needleleaf"},
     {"source_code": 102, "source_label": "Herbaceous vegetation", "source_label_key": "source.s2glc.herbaceous_vegetation", "color_rgba": [249, 150, 39, 255], "category_key": "low_vegetation.herbaceous.unspecified"},

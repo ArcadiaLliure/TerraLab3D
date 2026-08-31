@@ -127,7 +127,7 @@ def test_mosaic_generates_four_outputs_translated_to_tlst_on_canonical_grid(tmp_
             _source(
                 "crop-types",
                 thematic_path,
-                {2: "agriculture.cropland.permanent_crop.vineyard"},
+                {2: "agriculture.cropland.vineyard"},
                 SourcePriority.THEMATIC_REFINEMENT,
             ),
         ),
@@ -147,7 +147,7 @@ def test_mosaic_generates_four_outputs_translated_to_tlst_on_canonical_grid(tmp_
     manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
     agriculture = manifest["taxonomy"]["categoryCodes"]["agriculture"]
     vineyard = manifest["taxonomy"]["categoryCodes"][
-        "agriculture.cropland.permanent_crop.vineyard"
+        "agriculture.cropland.vineyard"
     ]
     with rasterio.open(result.mosaic_path) as dataset:
         values = dataset.read(1)

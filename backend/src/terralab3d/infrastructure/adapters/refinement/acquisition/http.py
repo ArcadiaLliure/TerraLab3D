@@ -90,7 +90,7 @@ class AsyncHttpRangeClient:
                 "HEAD",
                 url,
                 allowed_missing=True,
-                allowed_statuses={405},
+                allowed_statuses={200, 405},
             )
             async with response:
                 if response.status in {404, 410}:

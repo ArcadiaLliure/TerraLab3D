@@ -8,10 +8,12 @@ from datetime import date
 from pathlib import Path
 
 import pytest
+import aiohttp
 from aiohttp import web
 
 from terralab3d.application.refinement.downloads import (
     freeze_parametric_plan,
+    refinement_resource_id,
     resource_descriptor_from_plan,
 )
 from terralab3d.domain.refinement.discovery import (
@@ -20,6 +22,7 @@ from terralab3d.domain.refinement.discovery import (
     RemoteAsset,
 )
 from terralab3d.domain.refinement.downloads import ParametricDownloadPlan
+from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.domain.refinement.licensing import (
     CommercialLicensePolicy,
     LicenseMetadata,
@@ -60,6 +63,16 @@ class _Manager:
     ) -> None:
         del job_id, resource_id, variant_id
         self.failures.append((code, message))
+
+
+class _AuthCoordinator:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    async def get_valid_token(self, interactive: bool = True) -> str:
+        assert interactive is True
+        self.calls += 1
+        return "fixture-token"
 
 
 def _request() -> DiscoveryRequest:
@@ -143,6 +156,7 @@ def test_freezes_roundtrips_and_describes_exact_plan() -> None:
     assert restored.assets[0].file_name == "fixture.tif"
     assert restored.estimated_bytes == len(payload)
     assert descriptor.acquisition_kind.value == "PARAMETRIC_DOWNLOAD"
+    assert descriptor.id == refinement_resource_id(plan.plan_id)
     assert descriptor.variants[0].source_urls == (candidate.assets[0].download_url,)
 
 
@@ -183,6 +197,67 @@ def test_parametric_acquirer_downloads_verifies_and_persists_fixture(
     asyncio.run(scenario())
 
 
+def test_parametric_acquirer_starts_independent_assets_in_parallel(
+    tmp_path: Path,
+) -> None:
+    async def scenario() -> None:
+        payload = b"parallel"
+        first = _candidate("https://download.test/first", payload)
+        second_asset = replace(
+            first.assets[0],
+            asset_id="fixture-asset-second",
+            download_url="https://download.test/second",
+            s3_path="/eodata/second.tif",
+        )
+        second = replace(
+            first,
+            candidate_id="fixture-product-second",
+            assets=(second_asset,),
+        )
+        plan = freeze_parametric_plan(
+            _request(),
+            (first, second),
+            (first.candidate_id, second.candidate_id),
+            CommercialLicensePolicy(),
+            plan_id="parallel-plan",
+        )
+        manager = _Manager()
+        acquirer = ParametricRasterAcquirer(manager, None, None, {})
+        started: list[str] = []
+        release = asyncio.Event()
+
+        async def fake_download_asset(**kwargs) -> int:
+            started.append(kwargs["file_name"])
+            await release.wait()
+            await kwargs["progress_reporter"](kwargs["file_name"], len(payload))
+            return len(payload)
+
+        acquirer._download_asset = fake_download_asset  # type: ignore[method-assign]
+        async with aiohttp.ClientSession() as session:
+            task = asyncio.create_task(
+                acquirer._download_assets_in_parallel(
+                    session=session,
+                    job_id="parallel-job",
+                    resource_id=ResourceId("earth.parallel"),
+                    variant_id=VariantId("local"),
+                    plan=plan,
+                    final_paths=(tmp_path / "first.tif", tmp_path / "second.tif"),
+                    token="",
+                    temp_dir=tmp_path,
+                    active_tasks={"parallel-job"},
+                )
+            )
+            for _ in range(10):
+                if len(started) == 2:
+                    break
+                await asyncio.sleep(0)
+            assert len(started) == 2
+            release.set()
+            assert await task == len(payload) * 2
+
+    asyncio.run(scenario())
+
+
 def test_parametric_acquirer_requires_external_token_for_authenticated_asset() -> None:
     async def scenario() -> None:
         payload = b"fixture"
@@ -202,6 +277,58 @@ def test_parametric_acquirer_requires_external_token_for_authenticated_asset() -
         )
         assert manager.failures[0][0] == "CONFIG_REQUIRED"
 
+    asyncio.run(scenario())
+
+
+def test_authenticated_download_reports_authentication_before_transfer(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    async def scenario() -> None:
+        payload = b"authenticated-fixture"
+        runner, url = await _serve(payload)
+        try:
+            candidate = _candidate(url, payload, authenticated=True)
+            plan = freeze_parametric_plan(
+                _request(),
+                (candidate,),
+                (candidate.candidate_id,),
+                CommercialLicensePolicy(),
+                plan_id="authenticated-plan",
+            )
+            descriptor = resource_descriptor_from_plan(plan)
+            manager = _Manager()
+            repository = ResourceInstallationRepository(tmp_path / "state.json")
+            auth = _AuthCoordinator()
+            acquirer = ParametricRasterAcquirer(
+                manager,
+                repository,
+                None,
+                {},
+                auth,
+            )
+            await acquirer.acquire(
+                "job-authenticated",
+                descriptor,
+                descriptor.variants[0],
+                {"job-authenticated"},
+            )
+        finally:
+            await runner.cleanup()
+
+        states = [snapshot.state for snapshot in manager.snapshots]
+        assert auth.calls == 1
+        assert states[0] is ResourceInstallState.AUTHENTICATING
+        assert ResourceInstallState.DOWNLOADING in states
+        authenticating = manager.snapshots[0]
+        assert authenticating.downloaded_bytes == 0
+        assert authenticating.total_bytes == len(payload)
+        assert authenticating.progress == 0.0
+        assert states.index(ResourceInstallState.AUTHENTICATING) < states.index(
+            ResourceInstallState.DOWNLOADING
+        )
+
+    monkeypatch.setenv("TERRALAB_DATA_ROOT", str(tmp_path / "library"))
     asyncio.run(scenario())
 
 

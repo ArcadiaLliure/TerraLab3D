@@ -33,7 +33,7 @@ class ClmsDiscoveryError(RefinementError):
 @dataclass(frozen=True, slots=True)
 class ClmsProviderConfiguration:
     catalogue_url: str = "https://catalogue.dataspace.copernicus.eu/odata/v1/Products"
-    download_url: str = "https://download.dataspace.copernicus.eu/odata/v1"
+    download_url: str = "https://zipper.dataspace.copernicus.eu/odata/v1"
     timeout_seconds: float = 30.0
     retry_count: int = 2
     retry_backoff_seconds: float = 0.25
@@ -98,27 +98,46 @@ _CLMS_DATASETS = (
         "High Resolution Layer Crop Types",
         "v1",
         10,
-        ("agriculture.cropland",),
+        (
+            "agriculture.cropland.wheat",
+            "agriculture.cropland.barley",
+            "agriculture.cropland.maize",
+            "agriculture.cropland.rice",
+            "agriculture.cropland.other_cereals",
+            "agriculture.cropland.fresh_vegetables",
+            "agriculture.cropland.dry_pulses",
+            "agriculture.cropland.potatoes",
+            "agriculture.cropland.sugar_beet",
+            "agriculture.cropland.sunflower",
+            "agriculture.cropland.soybeans",
+            "agriculture.cropland.rapeseed",
+            "agriculture.cropland.flax_cotton_hemp",
+            "agriculture.cropland.vineyard",
+            "agriculture.cropland.olive_grove",
+            "agriculture.cropland.fruit_trees",
+            "agriculture.cropland.nuts",
+            "agriculture.cropland.unspecified",
+        ),
         class_translation=(
-            (1110, "agriculture.cropland.arable.annual_crop"),
-            (1120, "agriculture.cropland.arable.annual_crop"),
-            (1130, "agriculture.cropland.arable.annual_crop"),
-            (1140, "agriculture.cropland.arable.rice"),
-            (1150, "agriculture.cropland.arable.annual_crop"),
-            (1210, "agriculture.cropland.arable.annual_crop"),
-            (1220, "agriculture.cropland.arable.annual_crop"),
-            (1310, "agriculture.cropland.arable.annual_crop"),
-            (1320, "agriculture.cropland.arable.annual_crop"),
-            (1410, "agriculture.cropland.arable.annual_crop"),
-            (1420, "agriculture.cropland.arable.annual_crop"),
-            (1430, "agriculture.cropland.arable.annual_crop"),
-            (1440, "agriculture.cropland.arable.annual_crop"),
-            (2100, "agriculture.cropland.permanent_crop.vineyard"),
-            (2200, "agriculture.cropland.permanent_crop.olive_grove"),
-            (2310, "agriculture.cropland.permanent_crop.orchard.fruit_trees"),
-            (2320, "agriculture.cropland.permanent_crop.orchard"),
-            (3100, "agriculture.cropland.arable.unspecified"),
-            (3200, "agriculture.cropland.permanent_crop.other"),
+            (1110, "agriculture.cropland.wheat"),
+            (1120, "agriculture.cropland.barley"),
+            (1130, "agriculture.cropland.maize"),
+            (1140, "agriculture.cropland.rice"),
+            (1150, "agriculture.cropland.other_cereals"),
+            (1210, "agriculture.cropland.fresh_vegetables"),
+            (1220, "agriculture.cropland.dry_pulses"),
+            (1310, "agriculture.cropland.potatoes"),
+            (1320, "agriculture.cropland.sugar_beet"),
+            (1410, "agriculture.cropland.sunflower"),
+            (1420, "agriculture.cropland.soybeans"),
+            (1430, "agriculture.cropland.rapeseed"),
+            (1440, "agriculture.cropland.flax_cotton_hemp"),
+            (2100, "agriculture.cropland.vineyard"),
+            (2200, "agriculture.cropland.olive_grove"),
+            (2310, "agriculture.cropland.fruit_trees"),
+            (2320, "agriculture.cropland.nuts"),
+            (3100, "agriculture.cropland.unspecified"),
+            (3200, "agriculture.cropland.unspecified"),
         ),
         nodata_values=(0, 65535),
     ),
@@ -266,6 +285,8 @@ class ClmsODataAdapter:
         aoi = shape(dict(request.aoi_geojson))
         if aoi.is_empty or not aoi.is_valid:
             raise RefinementValidationError("CLMS discovery AOI is invalid")
+        from shapely import wkt
+        aoi_wkt = wkt.dumps(aoi.envelope)
         cache_key = json.dumps(
             [request.category_key, dict(request.aoi_geojson)],
             sort_keys=True,
@@ -279,11 +300,18 @@ class ClmsODataAdapter:
         timeout = aiohttp.ClientTimeout(total=self._configuration.timeout_seconds)
         async with aiohttp.ClientSession(timeout=timeout) as session:
             batches = await asyncio.gather(
-                *(self._discover_dataset(session, dataset, aoi.wkt) for dataset in datasets)
+                *(self._discover_dataset(session, dataset, aoi_wkt) for dataset in datasets)
             )
+        seen_ids = set()
+        unique_candidates = []
+        for batch in batches:
+            for candidate in batch:
+                if candidate.candidate_id not in seen_ids:
+                    seen_ids.add(candidate.candidate_id)
+                    unique_candidates.append(candidate)
         candidates = tuple(
             sorted(
-                (candidate for batch in batches for candidate in batch),
+                unique_candidates,
                 key=lambda item: (item.dataset_identifier, item.temporal_start or "", item.candidate_id),
             )
         )

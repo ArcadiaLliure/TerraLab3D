@@ -31,7 +31,7 @@ class RefinementWorkspaceNode:
     parent_key: str | None
     label: str
     state: SpatialCoverageState
-    installation_ids: tuple[str, ...]
+    installations: tuple[RefinementInstallation, ...]
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,31 +80,42 @@ class RefinementService:
         return tuple(sorted(result, key=lambda value: (value.priority, value.product_id)))
 
     def workspace(self) -> RefinementWorkspace:
+        import time, logging
+        logger = logging.getLogger(__name__)
+        t0 = time.monotonic()
+        
         installations = tuple(self._repository.list_installations())
+        t1 = time.monotonic()
+        
         known_nodes = {
             node
             for product in self._product_catalog.list_all_products()
             for node in product.tlst_nodes
             if node in self._taxonomy.category_keys
         }
-        direct_installations: dict[str, list[RefinementInstallation]] = {}
-        for installation in installations:
-            for node in installation.tlst_nodes:
-                if node in self._taxonomy.category_keys:
-                    direct_installations.setdefault(node, []).append(installation)
+        t2 = time.monotonic()
+        t3 = time.monotonic()
 
         state_by_key: dict[str, SpatialCoverageState] = {}
-        ids_by_key: dict[str, tuple[str, ...]] = {}
+        insts_by_key: dict[str, tuple[RefinementInstallation, ...]] = {}
         ordered = sorted(
             self._taxonomy.categories,
             key=lambda item: item.key.count("."),
             reverse=True,
         )
         for category in ordered:
-            direct = direct_installations.get(category.key, [])
-            direct_states = [item.spatial_state for item in direct]
+            cat_installations = []
+            for inst in installations:
+                if any(
+                    n == category.key or n.startswith(f"{category.key}.") or category.key.startswith(f"{n}.")
+                    for n in inst.tlst_nodes
+                ):
+                    cat_installations.append(inst)
+
+            direct_states = [item.spatial_state for item in cat_installations]
             if category.key in known_nodes and not direct_states:
                 direct_states.append(SpatialCoverageState.ABSENT)
+            
             child_states = [
                 state_by_key[child]
                 for child in self._taxonomy.direct_children(category.key)
@@ -117,7 +128,8 @@ class RefinementService:
             else:
                 state = SpatialCoverageState.NOT_APPLICABLE
             state_by_key[category.key] = state
-            ids_by_key[category.key] = tuple(sorted(item.installation_id for item in direct))
+            insts_by_key[category.key] = tuple(sorted(cat_installations, key=lambda i: i.installation_id))
+        t4 = time.monotonic()
 
         nodes = tuple(
             RefinementWorkspaceNode(
@@ -125,16 +137,19 @@ class RefinementService:
                 parent_key=category.parent_key,
                 label=self._labels.get(category.key, category.key),
                 state=state_by_key[category.key],
-                installation_ids=ids_by_key[category.key],
+                installations=insts_by_key[category.key],
             )
             for category in self._taxonomy.categories
         )
-        return RefinementWorkspace(
+        ws = RefinementWorkspace(
             taxonomy_key=self._taxonomy.taxonomy_key,
             taxonomy_version=self._taxonomy.taxonomy_version,
             virtual_root="surface",
             nodes=nodes,
         )
+        t5 = time.monotonic()
+        logger.info(f"MGP: workspace() took {t5-t0:.4f}s. list_inst: {t1-t0:.4f}s, list_prod: {t2-t1:.4f}s, dict: {t3-t2:.4f}s, agg: {t4-t3:.4f}s, build: {t5-t4:.4f}s")
+        return ws
 
     def installations_for(
         self,
@@ -269,6 +284,21 @@ class RefinementService:
         )
         self._repository.upsert(updated)
         return updated
+
+    def cancel_resource_operation(
+        self,
+        resource_id: str,
+        variant_id: str,
+    ) -> tuple[RefinementInstallation, ...]:
+        """Cancel persisted refinement installations after a controller restart."""
+
+        return tuple(
+            self.cancel_operation(installation.installation_id)
+            for installation in self._repository.list_installations()
+            if installation.resource_id == resource_id
+            and installation.variant_id == variant_id
+            and installation.technical_state is not TechnicalResourceState.CANCELLED
+        )
 
     def remove_installation(self, installation_id: str) -> RefinementInstallation:
         current = self._repository.remove(installation_id)

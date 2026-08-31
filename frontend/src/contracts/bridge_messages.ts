@@ -421,9 +421,27 @@ export type FrontendMessage =
   | HorizonProfileSettingsMessage
   | RecalculateHorizonMessage
   | CancelHorizonMessage
-  | RefinementFrontendMessage;
+  | RefinementFrontendMessage
+  | SubmitCdseCredentialsMessage
+  | ForgetCdseCredentialsMessage;
+
+export interface SubmitCdseCredentialsMessage {
+  readonly type: "submit_cdse_credentials";
+  readonly username?: string;
+  readonly password?: string;
+  readonly totp?: string;
+  readonly remember?: boolean;
+}
+
+export interface ForgetCdseCredentialsMessage {
+  readonly type: "forget_cdse_credentials";
+}
 
 // ─── Python → Frontend ───────────────────────────────────────────────
+
+export interface CdseAuthRequiredMessage {
+  readonly type: "cdse_auth_required";
+}
 
 export interface HandshakeAckMessage {
   readonly type: "handshake_ack";
@@ -652,7 +670,8 @@ export type BackendMessage =
   | SurfaceProgressMessage
   | LandCoverLegendMessage
   | OperationProgressedEvent
-  | RefinementBackendMessage;
+  | RefinementBackendMessage
+  | CdseAuthRequiredMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

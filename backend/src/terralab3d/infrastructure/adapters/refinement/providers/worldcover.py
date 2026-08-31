@@ -64,9 +64,9 @@ class WorldCoverConfiguration:
     )
     version: str = "2021-v200"
     tile_size_degrees: int = 3
-    maximum_tiles_per_request: int = 128
+    maximum_tiles_per_request: int = 1024
     timeout_seconds: float = 30.0
-    maximum_concurrency: int = 8
+    maximum_concurrency: int = 32
 
     def __post_init__(self) -> None:
         if self.tile_size_degrees <= 0 or 180 % self.tile_size_degrees:

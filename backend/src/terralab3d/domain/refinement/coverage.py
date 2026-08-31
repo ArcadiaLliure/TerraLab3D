@@ -16,8 +16,12 @@ class CoverageGeometry(Protocol):
     def intersection(self, left: MetricGeometry, right: MetricGeometry) -> MetricGeometry: ...
 
     def difference(self, left: MetricGeometry, right: MetricGeometry) -> MetricGeometry: ...
+    
+    def intersects(self, left: MetricGeometry, right: MetricGeometry) -> bool: ...
 
     def area(self, geometry: MetricGeometry) -> float: ...
+
+    def land_area(self, geometry: MetricGeometry) -> float: ...
 
     def is_empty(self, geometry: MetricGeometry) -> bool: ...
 
@@ -96,19 +100,21 @@ def calculate_coverage(
         local_union,
     )
     planned = geometry.intersection(aoi, local_and_products)
-    remaining = geometry.difference(aoi, local_and_products)
-    aoi_area = geometry.area(aoi)
+    remaining_gap = geometry.difference(aoi, local_and_products)
+
+    aoi_area = geometry.land_area(aoi)
     if aoi_area <= 0:
-        raise RefinementValidationError("AOI must have positive metric area")
+        return CoverageResult(existing, new_effective, planned, remaining_gap, 0, 0, 0, 0)
+
     return CoverageResult(
         existing=existing,
         new_effective=new_effective,
         planned=planned,
-        remaining_gap=remaining,
-        existing_ratio=_ratio(geometry.area(existing), aoi_area),
-        new_effective_ratio=_ratio(geometry.area(new_effective), aoi_area),
-        planned_ratio=_ratio(geometry.area(planned), aoi_area),
-        remaining_ratio=_ratio(geometry.area(remaining), aoi_area),
+        remaining_gap=remaining_gap,
+        existing_ratio=geometry.land_area(existing) / aoi_area,
+        new_effective_ratio=geometry.land_area(new_effective) / aoi_area,
+        planned_ratio=geometry.land_area(planned) / aoi_area,
+        remaining_ratio=geometry.land_area(remaining_gap) / aoi_area,
     )
 
 
@@ -117,36 +123,43 @@ def evaluate_product_contributions(
     local_verified: Sequence[MetricGeometry],
     products: Sequence[ProductFootprint],
     geometry: CoverageGeometry,
+    progress_callback: Callable[[float, str], None] | None = None,
 ) -> tuple[ProductContribution, ...]:
     """Evaluate products in caller priority order without double counting gains."""
 
-    _require_same_crs((aoi, *local_verified, *(product.geometry for product in products)))
-    aoi_area = geometry.area(aoi)
-    if aoi_area <= 0:
-        raise RefinementValidationError("AOI must have positive metric area")
+    _require_same_crs((aoi, *local_verified, *(p.geometry for p in products)))
     local_union = _union_or_empty(aoi, local_verified, geometry)
-    previous = geometry.difference(aoi, aoi)
-    occupied = local_union
+    aoi_area = geometry.land_area(aoi)
+    if aoi_area <= 0:
+        return ()
+
+    import logging
+    import time
+    logger = logging.getLogger(__name__)
+    t_start = time.monotonic()
+    
+    total = len(products)
     contributions: list[ProductContribution] = []
-    for product in products:
+
+    for idx, product in enumerate(products):
+        if progress_callback is not None and idx % 20 == 0:
+            progress_callback(idx / max(1, total), f"{idx}/{total}")
+
         available = geometry.intersection(aoi, product.geometry)
         local_overlap = geometry.intersection(available, local_union)
-        previous_overlap = geometry.intersection(available, previous)
-        new_effective = geometry.difference(available, occupied)
+        new_effective = geometry.difference(available, local_union)
+
         contributions.append(
             ProductContribution(
                 product_id=product.product_id,
-                available_ratio=_ratio(geometry.area(available), aoi_area),
-                already_local_ratio=_ratio(geometry.area(local_overlap), aoi_area),
-                new_effective_ratio=_ratio(geometry.area(new_effective), aoi_area),
-                previous_selection_overlap_ratio=_ratio(
-                    geometry.area(previous_overlap),
-                    aoi_area,
-                ),
+                available_ratio=_ratio(geometry.land_area(available), aoi_area),
+                already_local_ratio=_ratio(geometry.land_area(local_overlap), aoi_area),
+                new_effective_ratio=_ratio(geometry.land_area(new_effective), aoi_area),
+                previous_selection_overlap_ratio=0.0,
             )
         )
-        previous = geometry.union((previous, available))
-        occupied = geometry.union((occupied, available))
+        
+    logger.info("MGP: evaluate_product_contributions took %.2f seconds", time.monotonic() - t_start)
     return tuple(contributions)
 
 
@@ -157,43 +170,75 @@ def greedy_coverage_plan(
     geometry: CoverageGeometry,
     *,
     target_ratio: float = 0.995,
+    progress_callback: Callable[[float, str], None] | None = None,
 ) -> CoveragePlan:
     """Greedy set-cover extension point with deterministic tie breaking."""
 
     if target_ratio <= 0 or target_ratio > 1:
         raise RefinementValidationError("Coverage target ratio must satisfy 0 < target <= 1")
     _require_same_crs((aoi, *local_verified, *(product.geometry for product in products)))
-    aoi_area = geometry.area(aoi)
+    aoi_area = geometry.land_area(aoi)
     if aoi_area <= 0:
-        raise RefinementValidationError("AOI must have positive metric area")
-    occupied = geometry.intersection(
+        return CoveragePlan((), 0.0, 0.0)
+        
+    local_occupied = geometry.intersection(
         aoi,
         _union_or_empty(aoi, local_verified, geometry),
     )
-    remaining = list(products)
+    
+    occupied_union = local_occupied
+    total_occupied_area = geometry.land_area(local_occupied) if not geometry.is_empty(local_occupied) else 0.0
+
+    import logging
+    import time
+    import heapq
+    logger = logging.getLogger(__name__)
+    logger.info("MGP: Starting greedy_coverage_plan for %d products", len(products))
+    
+    remaining_items = []
+    for product in products:
+        gain = geometry.difference(
+            geometry.intersection(aoi, product.geometry),
+            occupied_union
+        )
+        area = geometry.land_area(gain)
+        if area >= 1.0:
+            remaining_items.append([-area, product.priority, product.product_id, gain, product, 0])
+
+    heapq.heapify(remaining_items)
+    
     selected: list[str] = []
-    while _ratio(geometry.area(occupied), aoi_area) < target_ratio and remaining:
-        ranked: list[tuple[float, int, str, ProductFootprint, MetricGeometry]] = []
-        for product in remaining:
-            available = geometry.intersection(aoi, product.geometry)
-            gain = geometry.difference(available, occupied)
-            ranked.append(
-                (
-                    geometry.area(gain),
-                    product.priority,
-                    product.product_id,
-                    product,
-                    available,
-                )
-            )
-        ranked.sort(key=lambda value: (-value[0], value[1], value[2]))
-        gain_area, _, _, winner, available = ranked[0]
-        if gain_area <= 0:
-            break
-        selected.append(winner.product_id)
-        occupied = geometry.union((occupied, available))
-        remaining = [item for item in remaining if item.product_id != winner.product_id]
-    planned_ratio = _ratio(geometry.area(occupied), aoi_area)
+    selected_gains: list[MetricGeometry] = []
+    iteration = 0
+    max_iterations = len(products)
+    
+    t_start = time.monotonic()
+    while _ratio(total_occupied_area, aoi_area) < target_ratio and remaining_items:
+        item = heapq.heappop(remaining_items)
+        neg_area, priority, product_id, gain, product, last_update = item
+        
+        if last_update < len(selected_gains):
+            for i in range(last_update, len(selected_gains)):
+                gain = geometry.difference(gain, selected_gains[i])
+                if geometry.is_empty(gain):
+                    break
+            
+            true_area = geometry.land_area(gain)
+            if true_area >= 1.0:
+                heapq.heappush(remaining_items, [-true_area, priority, product_id, gain, product, len(selected_gains)])
+            continue
+            
+        iteration += 1
+        if progress_callback is not None:
+            progress_callback(iteration / max(1, max_iterations), f"{iteration}/{max_iterations}")
+            
+        logger.info("MGP: greedy_coverage_plan iteration %d picked %s in %.2fs. Total pieces: %d. Gain: %.4f", iteration, product_id, time.monotonic() - t_start, len(selected), -neg_area)
+        selected.append(product_id)
+        selected_gains.append(gain)
+        total_occupied_area += -neg_area
+        t_start = time.monotonic()
+        
+    planned_ratio = _ratio(total_occupied_area, aoi_area)
     return CoveragePlan(
         selected_product_ids=tuple(selected),
         planned_ratio=planned_ratio,

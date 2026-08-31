@@ -140,15 +140,10 @@ export class ResourceManagerModal {
     this.element.appendChild(this.contentBox);
 
     this.unsubCatalog = this.manager.subscribeCatalog(() => {
-      this.renderTabs();
-      if (!this.importVisible) {
-        this.renderList();
-      }
+      if (!this.importVisible && !this.isRefinementActive()) this.renderList(true);
     });
     this.unsubJobs = this.manager.subscribeJobs(() => {
-      if (!this.importVisible) {
-        this.renderList();
-      }
+      if (!this.importVisible && !this.isRefinementActive()) this.renderList(true);
     });
     this.unsubOperation = this.manager.subscribeOperationProgress((msg) => {
       if (this.categoricalImport) {
@@ -226,79 +221,95 @@ export class ResourceManagerModal {
     this.importButton.title = action.title;
   }
 
-  private renderList(): void {
-    this.listContainer.replaceChildren();
-    const refinementActive = this.activeDomain === "earth" && this.activeCategoryEarth === "refinement" && !this.importVisible;
-    this.contentBox.style.width = refinementActive ? "1180px" : "760px";
-    this.listContainer.style.padding = refinementActive ? "12px 16px" : "16px 20px";
-    this.listContainer.style.overflowY = refinementActive ? "hidden" : "auto";
-    if (this.importVisible) {
-      if (this.activeCategoryEarth === "categorical") {
-        if (!this.categoricalImport) {
-          this.categoricalImport = new CategoricalImportView({
-            onCommitted: () => {
-              this.categoricalImport = null;
-              this.importVisible = false;
-              if (this.categoricalReturnTab) this.activeCategoryEarth = this.categoricalReturnTab;
-              this.categoricalReturnTab = null;
-              this.categoricalInitialCategoryKey = undefined;
-              this.manager.requestCatalog();
-              this.renderTabs();
-              this.renderFooter();
-              this.renderList();
-            },
-            onBack: () => {
-              void this.releaseCategoricalImport();
-              this.importVisible = false;
-              if (this.categoricalReturnTab) this.activeCategoryEarth = this.categoricalReturnTab;
-              this.categoricalReturnTab = null;
-              this.categoricalInitialCategoryKey = undefined;
-              this.renderTabs();
-              this.renderFooter();
-              this.renderList();
-            },
-            ...(this.categoricalInitialCategoryKey ? { initialCategoryKey: this.categoricalInitialCategoryKey } : {}),
+  private isRefinementActive(): boolean {
+    return this.activeDomain === "earth"
+      && this.activeCategoryEarth === "refinement"
+      && !this.importVisible;
+  }
+
+  private renderList(preserveScroll = false): void {
+    const scrollTop = preserveScroll ? this.listContainer.scrollTop : 0;
+    try {
+      this.listContainer.replaceChildren();
+      const refinementActive = this.isRefinementActive();
+      this.contentBox.style.width = refinementActive ? "1180px" : "760px";
+      this.listContainer.style.padding = refinementActive ? "12px 16px" : "16px 20px";
+      this.listContainer.style.overflowY = refinementActive ? "hidden" : "auto";
+      if (this.importVisible) {
+        if (this.activeCategoryEarth === "categorical") {
+          if (!this.categoricalImport) {
+            this.categoricalImport = new CategoricalImportView({
+              onCommitted: () => {
+                this.categoricalImport = null;
+                this.importVisible = false;
+                if (this.categoricalReturnTab) this.activeCategoryEarth = this.categoricalReturnTab;
+                this.categoricalReturnTab = null;
+                this.categoricalInitialCategoryKey = undefined;
+                this.manager.requestCatalog();
+                this.renderTabs();
+                this.renderFooter();
+                this.renderList();
+              },
+              onBack: () => {
+                void this.releaseCategoricalImport();
+                this.importVisible = false;
+                if (this.categoricalReturnTab) this.activeCategoryEarth = this.categoricalReturnTab;
+                this.categoricalReturnTab = null;
+                this.categoricalInitialCategoryKey = undefined;
+                this.renderTabs();
+                this.renderFooter();
+                this.renderList();
+              },
+              ...(this.categoricalInitialCategoryKey ? { initialCategoryKey: this.categoricalInitialCategoryKey } : {}),
+            });
+          }
+          this.listContainer.appendChild(this.categoricalImport.element);
+          return;
+        } else if (this.activeCategoryEarth === "elevation") {
+          if (!this.elevationImportForm) {
+            this.elevationImportForm = document.createElement("div");
+            this.renderImportForm(this.elevationImportForm);
+          }
+          this.listContainer.appendChild(this.elevationImportForm);
+        }
+        return;
+      }
+      if (refinementActive) {
+        if (!this.refinementView) {
+          this.refinementView = new RefinementManagerView(this.manager, {
+            onImportRequested: (categoryKey) => this.openCategoricalImportForRefinement(categoryKey),
           });
         }
-        this.listContainer.appendChild(this.categoricalImport.element);
+        this.listContainer.appendChild(this.refinementView.element);
+        this.refinementView.open();
         return;
-      } else if (this.activeCategoryEarth === "elevation") {
-        if (!this.elevationImportForm) {
-          this.elevationImportForm = document.createElement("div");
-          this.renderImportForm(this.elevationImportForm);
-        }
-        this.listContainer.appendChild(this.elevationImportForm);
       }
-      return;
-    }
-    if (refinementActive) {
-      if (!this.refinementView) {
-        this.refinementView = new RefinementManagerView(this.manager, {
-          onImportRequested: (categoryKey) => this.openCategoricalImportForRefinement(categoryKey),
+      const descriptors = this.manager.getAllDescriptors();
+      if (descriptors.length === 0) {
+        this.listContainer.appendChild(message("Carregant catàleg…"));
+        return;
+      }
+      const category = this.activeDomain === "sky"
+        ? this.activeCategorySky
+        : this.activeCategoryEarth === "categorical"
+          ? "land_cover"
+          : this.activeCategoryEarth === "refinement"
+            ? "light_pollution"
+            : "elevation";
+      const filtered = descriptors.filter(value => value.domain === this.activeDomain && value.category === category);
+      if (filtered.length === 0) {
+        this.listContainer.appendChild(message("No hi ha recursos en aquesta categoria."));
+        return;
+      }
+      for (const descriptor of filtered) this.listContainer.appendChild(this.resourceCard(descriptor));
+    } finally {
+      if (preserveScroll) {
+        this.listContainer.scrollTop = scrollTop;
+        requestAnimationFrame(() => {
+          if (this.listContainer.isConnected) this.listContainer.scrollTop = scrollTop;
         });
       }
-      this.listContainer.appendChild(this.refinementView.element);
-      this.refinementView.open();
-      return;
     }
-    const descriptors = this.manager.getAllDescriptors();
-    if (descriptors.length === 0) {
-      this.listContainer.appendChild(message("Carregant catàleg…"));
-      return;
-    }
-    const category = this.activeDomain === "sky"
-      ? this.activeCategorySky
-      : this.activeCategoryEarth === "categorical"
-        ? "land_cover"
-        : this.activeCategoryEarth === "refinement"
-          ? "light_pollution"
-          : "elevation";
-    const filtered = descriptors.filter(value => value.domain === this.activeDomain && value.category === category);
-    if (filtered.length === 0) {
-      this.listContainer.appendChild(message("No hi ha recursos en aquesta categoria."));
-      return;
-    }
-    for (const descriptor of filtered) this.listContainer.appendChild(this.resourceCard(descriptor));
   }
 
   private resourceCard(descriptor: ResourceDescriptor): HTMLElement {
@@ -326,7 +337,8 @@ export class ResourceManagerModal {
       identity.appendChild(role);
     }
     const states = descriptor.variants.map(variant => this.manager.getInstallState(descriptor.id, variant.id).status);
-    const status = states.includes("DOWNLOADING") ? "DOWNLOADING"
+    const status = states.includes("AUTHENTICATING") ? "AUTHENTICATING"
+      : states.includes("DOWNLOADING") ? "DOWNLOADING"
       : states.includes("ERROR") ? "ERROR"
         : states.includes("READY") ? "READY" : "NOT_INSTALLED";
     const badge = document.createElement("span");
@@ -373,6 +385,11 @@ export class ResourceManagerModal {
         }
       };
       actions.append(ready, remove);
+    } else if (state.status === "AUTHENTICATING") {
+      const waiting = message("Esperant autenticació de Copernicus…");
+      const cancel = actionButton("Cancel·lar");
+      cancel.onclick = () => this.manager.cancelDownload(descriptor.id, variant.id);
+      actions.append(waiting, cancel);
     } else if (["DOWNLOADING", "PAUSED"].includes(state.status)) {
       const toggle = actionButton(state.status === "PAUSED" ? "Reprendre" : "Pausar");
       toggle.onclick = () => state.status === "PAUSED"

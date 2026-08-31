@@ -87,7 +87,12 @@ class RefinementPlanPostProcessor:
         self._candidates = candidates
         self._installation_ids = installation_ids
 
-    def process(self, source_path: Path, output_dir: Path) -> ProcessedResource:
+    def process(
+        self,
+        source_path: Path,
+        output_dir: Path,
+        progress_callback: Callable[[int, int, str], None] | None = None,
+    ) -> ProcessedResource:
         del output_dir
         grid = self._target_grid()
         category_segment = self._plan.category_keys[0].replace(".", "-")
@@ -98,11 +103,14 @@ class RefinementPlanPostProcessor:
             / self._taxonomy.taxonomy_version
             / category_segment
         )
+        if progress_callback:
+            progress_callback(0, 0, "Indexant ràsters i calculant empremtes...")
         sources = self._raster_sources(source_path, grid, derived_dir)
         result = RasterRefinementMosaicProcessor(self._taxonomy).update(
             derived_dir,
             grid,
             sources,
+            progress_callback=progress_callback,
         )
         aoi = self._geometry.from_geojson(
             self._plan.aoi_geojson,
@@ -311,7 +319,10 @@ class RefinementPlanPostProcessor:
             return (direct,)
         extracted = root / Path(asset.file_name).stem
         if not extracted.is_dir():
-            return ()
+            if direct.is_dir():
+                extracted = direct
+            else:
+                return ()
         readable = tuple(
             path
             for path in sorted(extracted.rglob("*"))
@@ -354,7 +365,14 @@ class RefinementPlanPostProcessor:
         )
 
 
+_SUPPORTED_RASTER_EXTENSIONS = frozenset(
+    {".tif", ".tiff", ".vrt", ".nc", ".jp2", ".img", ".h5", ".hdf"}
+)
+
+
 def _is_readable_raster(path: Path) -> bool:
+    if path.suffix.lower() not in _SUPPORTED_RASTER_EXTENSIONS or path.name.endswith(".aux.xml"):
+        return False
     try:
         with rasterio.open(path) as dataset:
             return dataset.count > 0 and dataset.crs is not None

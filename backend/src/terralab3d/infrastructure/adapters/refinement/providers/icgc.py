@@ -38,11 +38,11 @@ _CATALONIA = {
 # Official 41-class raster legend. Ambiguous mixed classes are deliberately
 # mapped only to an unspecified parent instead of inventing a false leaf.
 ICGC_MCSC_2024_TRANSLATION: dict[int, str] = {
-    1: "agriculture.cropland.arable.annual_crop",
-    2: "agriculture.cropland.arable.annual_crop",
-    3: "agriculture.cropland.permanent_crop.vineyard",
-    4: "agriculture.cropland.permanent_crop.olive_grove",
-    5: "agriculture.cropland.permanent_crop.other",
+    1: "agriculture.cropland.arable",
+    2: "agriculture.cropland.arable",
+    3: "agriculture.cropland.vineyard",
+    4: "agriculture.cropland.olive_grove",
+    5: "agriculture.cropland.permanent_crop",
     6: "agriculture.cropland.unspecified",
     7: "tree_cover.needleleaf",
     8: "tree_cover.broadleaf",

@@ -148,7 +148,7 @@ def _candidate(url: str, payload: bytes) -> DiscoveredRefinementProduct:
         license=license_metadata,
         assets=(asset,),
         endpoint_verified=True,
-        class_translation={1140: "agriculture.cropland.arable.rice"},
+        class_translation={1140: "agriculture.cropland.rice"},
         nodata_values=(0,),
     )
 
@@ -319,7 +319,7 @@ def test_download_job_rasterizes_vector_fixture_and_commits_vector_coverage(
                 license=license_metadata,
                 assets=(asset,),
                 endpoint_verified=True,
-                class_translation={211: "agriculture.cropland.arable.unspecified"},
+                class_translation={211: "agriculture.cropland.unspecified"},
             )
             request = DiscoveryRequest(
                 "vector-pipeline", 1, "agriculture.cropland.arable", _AOI
@@ -401,4 +401,154 @@ def test_download_job_rasterizes_vector_fixture_and_commits_vector_coverage(
         assert Path(resource_state["manifestData"]["refinementMosaic"]).exists()
 
     monkeypatch.setenv("TERRALAB_DATA_ROOT", str(tmp_path / "vector-library"))
+    asyncio.run(scenario())
+
+
+def test_download_job_extracts_unextended_zip_archive_fixture_and_commits_coverage(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import io
+    import zipfile
+
+    async def scenario() -> None:
+        tif_bytes = _write_fixture(tmp_path / "source.tif")
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("CLMS_HRLVLCC_FIXTURE/CLMS_HRLVLCC_FIXTURE.tif", tif_bytes)
+        zip_payload = buf.getvalue()
+
+        async def handler(request: web.Request) -> web.Response:
+            return web.Response(body=zip_payload, content_type="application/zip")
+
+        app = web.Application()
+        app.router.add_get("/CLMS_HRLVLCC_FIXTURE", handler)
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, "127.0.0.1", 0)
+        await site.start()
+        port = site._server.sockets[0].getsockname()[1]
+        url = f"http://127.0.0.1:{port}/CLMS_HRLVLCC_FIXTURE"
+
+        try:
+            license_metadata = LicenseMetadata(
+                license_id="copernicus-clms",
+                official_url="https://land.copernicus.eu/en/faq/data-use-terms-and-conditions",
+                attribution_text="Contains modified Copernicus Service information (2026)",
+                citation="Copernicus Land Monitoring Service",
+                provider="Copernicus Land Monitoring Service",
+                product="High Resolution Layer Crop Types",
+                version="v1",
+                checked_at=date(2026, 8, 25),
+                provenance_url="https://documentation.dataspace.copernicus.eu/Data/CopernicusServices/CLMS.html",
+                asset_fingerprints=("fixture-crop-types-zip",),
+                commercial_use=True,
+            )
+            asset = RemoteAsset(
+                asset_id="fixture-crop-types-zip",
+                download_url=url,
+                s3_path="/eodata/CLMS_HRLVLCC_FIXTURE",
+                footprint=_AOI,
+                order=0,
+                estimated_bytes=len(zip_payload),
+                checksum_algorithm="sha256",
+                checksum_value=hashlib.sha256(zip_payload).hexdigest(),
+                requires_authentication=False,
+            )
+            candidate = DiscoveredRefinementProduct(
+                candidate_id="fixture-crop-types-zip",
+                provider_id="copernicus-clms",
+                provider="Copernicus Land Monitoring Service",
+                product="High Resolution Layer Crop Types",
+                version="v1",
+                dataset_identifier="fixture-crop-types-zip",
+                compatible_tlst_nodes=("agriculture.cropland",),
+                footprint=_AOI,
+                resolution_m=10,
+                temporal_start="2024-01-01",
+                temporal_end="2024-12-31",
+                format="application/zip",
+                estimated_bytes=len(zip_payload),
+                license=license_metadata,
+                assets=(asset,),
+                endpoint_verified=True,
+                class_translation={1140: "agriculture.cropland.rice"},
+                nodata_values=(0,),
+            )
+            request = DiscoveryRequest("zip-pipeline", 1, "agriculture.cropland", _AOI)
+            policy = CommercialLicensePolicy()
+            plan = freeze_parametric_plan(
+                request,
+                (candidate,),
+                (candidate.candidate_id,),
+                policy,
+                plan_id="zip-pipeline-fixture",
+                processing_options={"extractArchives": True},
+            )
+            descriptor = resource_descriptor_from_plan(plan)
+            variant = descriptor.variants[0]
+            catalog = LayerDatabase(tmp_path / "zip-layers.json")
+            catalog.upsert(descriptor)
+            resource_repository = ResourceInstallationRepository(
+                tmp_path / "zip-resource-state.json"
+            )
+            bridge = WebSocketBridge()
+            manager = DownloadJobManager(catalog, resource_repository, bridge)
+
+            registry = load_builtin_land_cover_registry()
+            refinement_repository = JsonRefinementInstallationRepository(
+                tmp_path / "zip-refinements.json"
+            )
+            service = RefinementService(
+                registry.taxonomy,
+                refinement_repository,
+                StaticRefinementProductCatalog(),
+                policy,
+                tmp_path,
+            )
+            expected_job_id = f"{descriptor.id}_{variant.id}"
+            installation = service.confirm_product(
+                product=RefinementProduct(
+                    product_id=candidate.candidate_id,
+                    resource_id=str(descriptor.id),
+                    variant_id=str(variant.id),
+                    provider=candidate.provider,
+                    product=candidate.product,
+                    version=candidate.version,
+                    tlst_nodes=candidate.compatible_tlst_nodes,
+                    data_kind=RefinementDataKind.RASTER,
+                    original_crs="EPSG:4326",
+                    planned_geometry=GeometryRecord("EPSG:4326", _AOI),
+                    license=candidate.license,
+                    provenance_url=candidate.license.provenance_url,
+                ),
+                category_key="agriculture.cropland",
+                aoi_id="zip-pipeline-fixture",
+                job_id=expected_job_id,
+            )
+            processor = RefinementPlanPostProcessorFactory(
+                taxonomy=registry.taxonomy,
+                service=service,
+                geometry=ShapelyGeometryAdapter(),
+                data_root=tmp_path / "zip-library",
+            ).build(plan, (candidate,), (installation.installation_id,))
+            manager.register_post_processor(descriptor.id, processor)
+
+            job_id = manager.start_download(descriptor.id, variant.id)
+            await manager._active_tasks[job_id]
+        finally:
+            await runner.cleanup()
+
+        resource_state = resource_repository.get_resource_state(
+            descriptor.id, variant.id
+        )
+        verified = refinement_repository.get(installation.installation_id)
+        assert resource_state is not None
+        assert resource_state["status"] == ResourceInstallState.READY.value
+        assert verified is not None
+        assert verified.technical_state is TechnicalResourceState.READY
+        assert verified.verified_geometry is not None
+        assert Path(resource_state["manifestData"]["refinementMosaic"]).exists()
+
+    monkeypatch.setenv("TERRALAB_DATA_ROOT", str(tmp_path / "zip-library"))
     asyncio.run(scenario())

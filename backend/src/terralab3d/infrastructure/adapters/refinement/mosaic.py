@@ -55,6 +55,7 @@ class RasterRefinementMosaicProcessor:
         output_dir: Path,
         grid: TargetGridSpec,
         sources: tuple[RasterRefinementSource, ...],
+        progress_callback: Callable[[int, int, str], None] | None = None,
     ) -> MosaicUpdateResult:
         if not sources:
             raise RefinementValidationError("At least one refinement source is required")
@@ -75,12 +76,17 @@ class RasterRefinementMosaicProcessor:
         existing = all(path.exists() for path in final_paths.values())
         source_codes = _source_code_registry(previous_manifest, sources)
         target_paths = self._prepare_targets(final_paths, grid, transform, existing)
+
+        if progress_callback:
+            progress_callback(0, len(sources), "Indexant límits espacials de les fonts...")
+        source_bounds = self._source_bounds(sources, grid.crs)
         updated_windows = self._affected_windows(
             target_paths["mosaic"],
             grid,
             transform,
             sources,
-            process_all=not existing,
+            source_bounds=source_bounds,
+            process_all=False,
         )
         conflict_pixels = self._process_windows(
             target_paths,
@@ -89,6 +95,8 @@ class RasterRefinementMosaicProcessor:
             sources,
             source_codes,
             updated_windows,
+            source_bounds=source_bounds,
+            progress_callback=progress_callback,
         )
         qualifier_paths = self._update_qualifiers(
             output_dir,
@@ -96,13 +104,23 @@ class RasterRefinementMosaicProcessor:
             transform,
             sources,
             updated_windows,
+            source_bounds=source_bounds,
+            progress_callback=progress_callback,
         )
-        self._build_overviews(target_paths)
-        self._build_overviews({f"qualifier:{key}": path for key, path in qualifier_paths.items()})
+        self._build_overviews(target_paths, progress_callback=progress_callback)
+        self._build_overviews(
+            {f"qualifier:{key}": path for key, path in qualifier_paths.items()},
+            progress_callback=progress_callback,
+        )
         for key, target in target_paths.items():
             target.replace(final_paths[key])
 
-        verified = self._verified_geometry(final_paths["mosaic"], grid.crs)
+        verified = self._verified_geometry(
+            final_paths["mosaic"],
+            grid.crs,
+            updated_windows,
+            progress_callback=progress_callback,
+        )
         manifest = self._build_manifest(
             grid,
             sources,
@@ -155,13 +173,25 @@ class RasterRefinementMosaicProcessor:
             "blockxsize": block_x,
             "blockysize": block_y,
             "compress": "DEFLATE",
-            "bigtiff": "IF_SAFER",
+            "bigtiff": "YES",
         }
         for key, path in target_paths.items():
             dtype = "uint8" if key in {"quality", "conflict"} else "uint16"
-            with rasterio.open(path, "w", **base_profile, dtype=dtype, nodata=0) as dataset:
-                dataset.write(np.zeros((grid.height, grid.width), dtype=dtype), 1)
+            with rasterio.open(path, "w", **base_profile, dtype=dtype, nodata=0):
+                pass
         return target_paths
+
+    @staticmethod
+    def _source_bounds(
+        sources: tuple[RasterRefinementSource, ...],
+        target_crs: str,
+    ) -> list[tuple[RasterRefinementSource, tuple[float, float, float, float]]]:
+        result: list[tuple[RasterRefinementSource, tuple[float, float, float, float]]] = []
+        for source in sources:
+            with rasterio.open(source.path) as dataset:
+                bounds = transform_bounds(dataset.crs, target_crs, *dataset.bounds, densify_pts=21)
+                result.append((source, bounds))
+        return result
 
     @staticmethod
     def _affected_windows(
@@ -169,23 +199,27 @@ class RasterRefinementMosaicProcessor:
         grid: TargetGridSpec,
         transform: Affine,
         sources: tuple[RasterRefinementSource, ...],
+        source_bounds: list[tuple[RasterRefinementSource, tuple[float, float, float, float]]] | None = None,
         *,
-        process_all: bool,
+        process_all: bool = False,
     ) -> tuple[Window, ...]:
         with rasterio.open(mosaic_path) as destination:
             blocks = tuple(window for _, window in destination.block_windows(1))
         if process_all:
             return blocks
-        source_bounds: list[tuple[float, float, float, float]] = []
-        for source in sources:
-            with rasterio.open(source.path) as dataset:
-                source_bounds.append(
-                    transform_bounds(dataset.crs, grid.crs, *dataset.bounds, densify_pts=21)
-                )
+        if source_bounds:
+            raw_bounds = [b for _, b in source_bounds]
+        else:
+            raw_bounds = []
+            for source in sources:
+                with rasterio.open(source.path) as dataset:
+                    raw_bounds.append(
+                        transform_bounds(dataset.crs, grid.crs, *dataset.bounds, densify_pts=21)
+                    )
         affected = []
         for window in blocks:
             bounds = window_bounds(window, transform)
-            if any(_bounds_intersect(bounds, candidate) for candidate in source_bounds):
+            if any(_bounds_intersect(bounds, candidate) for candidate in raw_bounds):
                 affected.append(window)
         return tuple(affected)
 
@@ -197,21 +231,37 @@ class RasterRefinementMosaicProcessor:
         sources: tuple[RasterRefinementSource, ...],
         source_codes: dict[str, int],
         windows: tuple[Window, ...],
+        source_bounds: list[tuple[RasterRefinementSource, tuple[float, float, float, float]]] | None = None,
+        progress_callback: Callable[[int, int, str], None] | None = None,
     ) -> int:
         ordered_sources = tuple(sorted(sources, key=lambda item: (item.priority, item.source_id)))
+        bounds_lookup = {s.source_id: b for s, b in source_bounds} if source_bounds else None
         conflict_pixels = 0
+        total = len(windows)
         with (
             rasterio.open(paths["mosaic"], "r+") as mosaic_ds,
             rasterio.open(paths["source"], "r+") as source_ds,
             rasterio.open(paths["quality"], "r+") as quality_ds,
             rasterio.open(paths["conflict"], "r+") as conflict_ds,
         ):
-            for window in windows:
+            for idx, window in enumerate(windows, start=1):
+                if progress_callback and (idx % 10 == 0 or idx == 1 or idx == total):
+                    progress_callback(idx, total, "Harmonitzant tessel·les del mosaic")
+                window_box = window_bounds(window, transform)
+                if bounds_lookup:
+                    intersecting_sources = [
+                        s for s in ordered_sources
+                        if _bounds_intersect(window_box, bounds_lookup[s.source_id])
+                    ]
+                else:
+                    intersecting_sources = list(ordered_sources)
+                if not intersecting_sources:
+                    continue
                 mosaic = mosaic_ds.read(1, window=window)
                 winner_source = source_ds.read(1, window=window)
                 quality = quality_ds.read(1, window=window)
                 conflict = conflict_ds.read(1, window=window)
-                for source in ordered_sources:
+                for source in intersecting_sources:
                     translated, candidate_quality = self._read_translated_window(
                         source,
                         grid,
@@ -279,12 +329,15 @@ class RasterRefinementMosaicProcessor:
         transform: Affine,
         sources: tuple[RasterRefinementSource, ...],
         windows: tuple[Window, ...],
+        source_bounds: list[tuple[RasterRefinementSource, tuple[float, float, float, float]]] | None = None,
+        progress_callback: Callable[[int, int, str], None] | None = None,
     ) -> dict[str, Path]:
         qualifier_sources: dict[str, list[RasterRefinementSource]] = {}
         for source in sources:
             if source.qualifier_key:
                 qualifier_sources.setdefault(source.qualifier_key, []).append(source)
         results: dict[str, Path] = {}
+        bounds_lookup = {s.source_id: b for s, b in source_bounds} if source_bounds else None
         for qualifier_key, candidates in qualifier_sources.items():
             safe_key = qualifier_key.replace(".", "_").replace("/", "_")
             final_path = output_dir / f"refinement_qualifier_{safe_key}.tif"
@@ -310,22 +363,32 @@ class RasterRefinementMosaicProcessor:
                     blockxsize=block_x,
                     blockysize=block_y,
                     compress="DEFLATE",
-                    bigtiff="IF_SAFER",
-                ) as dataset:
-                    dataset.write(
-                        np.full((grid.height, grid.width), -9999.0, dtype=np.float32),
-                        1,
-                    )
+                    bigtiff="YES",
+                ):
+                    pass
             ordered = sorted(candidates, key=lambda item: (item.priority, item.source_id))
+            total_q = len(windows)
             with rasterio.open(target_path, "r+") as destination:
-                for window in windows:
+                for idx, window in enumerate(windows, start=1):
+                    if progress_callback and (idx % 25 == 0 or idx == 1 or idx == total_q):
+                        progress_callback(idx, total_q, f"Processant qualificador {qualifier_key}")
+                    window_box = window_bounds(window, transform)
+                    if bounds_lookup:
+                        intersecting = [
+                            s for s in ordered
+                            if _bounds_intersect(window_box, bounds_lookup[s.source_id])
+                        ]
+                    else:
+                        intersecting = list(ordered)
+                    if not intersecting:
+                        continue
                     values = np.full(
                         (int(window.height), int(window.width)),
                         -9999.0,
                         dtype=np.float32,
                     )
                     filled = np.zeros(values.shape, dtype=np.bool_)
-                    for source in ordered:
+                    for source in intersecting:
                         with rasterio.open(source.path) as dataset:
                             with WarpedVRT(
                                 dataset,
@@ -351,28 +414,46 @@ class RasterRefinementMosaicProcessor:
         return results
 
     @staticmethod
-    def _build_overviews(paths: dict[str, Path]) -> None:
-        for key, path in paths.items():
-            with rasterio.open(path, "r+") as dataset:
-                factors = [factor for factor in (2, 4, 8, 16) if min(dataset.width, dataset.height) // factor >= 1]
-                if factors:
-                    resampling = Resampling.nearest
-                    dataset.build_overviews(factors, resampling)
-                    dataset.update_tags(ns="rio_overview", resampling="nearest")
+    def _build_overviews(
+        paths: dict[str, Path],
+        progress_callback: Callable[[int, int, str], None] | None = None,
+    ) -> None:
+        if progress_callback:
+            progress_callback(0, 0, "Construint piràmides de resolució (Overviews)...")
+        with rasterio.Env(BIGTIFF_OVERVIEW="YES", GDAL_TIFF_OVR_BLOCKSIZE="256"):
+            for key, path in paths.items():
+                with rasterio.open(path, "r+") as dataset:
+                    factors = [factor for factor in (2, 4, 8, 16) if min(dataset.width, dataset.height) // factor >= 1]
+                    if factors:
+                        resampling = Resampling.nearest
+                        dataset.build_overviews(factors, resampling)
+                        dataset.update_tags(ns="rio_overview", resampling="nearest")
 
     @staticmethod
-    def _verified_geometry(mosaic_path: Path, crs: str) -> GeometryRecord:
+    def _verified_geometry(
+        mosaic_path: Path,
+        crs: str,
+        windows: tuple[Window, ...] | None = None,
+        progress_callback: Callable[[int, int, str], None] | None = None,
+    ) -> GeometryRecord:
+        if progress_callback:
+            progress_callback(0, 0, "Calculant cobertura vectorial verificada...")
         with rasterio.open(mosaic_path) as dataset:
-            valid = dataset.read(1) != 0
-            polygons = [
-                shape(geometry)
+            target_windows = windows or tuple(window for _, window in dataset.block_windows(1))
+            polygons = []
+            for window in target_windows:
+                data = dataset.read(1, window=window)
+                valid = data != 0
+                if not np.any(valid):
+                    continue
+                window_transform = dataset.window_transform(window)
                 for geometry, value in shapes(
                     valid.astype(np.uint8),
                     mask=valid,
-                    transform=dataset.transform,
-                )
-                if value == 1
-            ]
+                    transform=window_transform,
+                ):
+                    if value == 1:
+                        polygons.append(shape(geometry))
         geometry = unary_union(polygons)
         if geometry.is_empty:
             raise RefinementValidationError("Derived mosaic contains no verified valid pixels")

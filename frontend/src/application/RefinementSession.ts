@@ -24,6 +24,7 @@ export interface RefinementSessionSnapshot {
   readonly selectedProductIds: ReadonlySet<string>;
   readonly planSummary: RefinementPlanSummaryMessage | null;
   readonly progress: RefinementDownloadProgressMessage | null;
+  readonly operationProgress: { fraction: number; message: string } | null;
   readonly busyOperation: "workspace" | "query" | "plan" | "confirm" | "remove" | null;
   readonly error: string | null;
 }
@@ -42,6 +43,7 @@ export class RefinementSession {
   private selectedProductIds = new Set<string>();
   private planSummary: RefinementPlanSummaryMessage | null = null;
   private progress: RefinementDownloadProgressMessage | null = null;
+  private operationProgress: { fraction: number; message: string } | null = null;
   private busyOperation: RefinementSessionSnapshot["busyOperation"] = null;
   private error: string | null = null;
   private readonly listeners = new Set<SessionListener>();
@@ -58,6 +60,7 @@ export class RefinementSession {
       selectedProductIds: new Set(this.selectedProductIds),
       planSummary: this.planSummary,
       progress: this.progress,
+      operationProgress: this.operationProgress,
       busyOperation: this.busyOperation,
       error: this.error,
     };
@@ -70,6 +73,7 @@ export class RefinementSession {
 
   public begin(operation: NonNullable<RefinementSessionSnapshot["busyOperation"]>): RefinementSessionSnapshot {
     this.busyOperation = operation;
+    this.operationProgress = null;
     this.error = null;
     this.publish();
     return this.snapshot();
@@ -103,12 +107,25 @@ export class RefinementSession {
     return this.snapshot();
   }
 
+  public setProductsSelected(productIds: string[], selected: boolean): RefinementSessionSnapshot {
+    for (const productId of productIds) {
+      if (selected) this.selectedProductIds.add(productId);
+      else this.selectedProductIds.delete(productId);
+    }
+    this.planSummary = null;
+    this.progress = null;
+    this.error = null;
+    this.publish();
+    return this.snapshot();
+  }
+
   public accept(message: RefinementBackendMessage): boolean {
     if (message.revision !== this.revision || message.requestId !== this.requestId) return false;
     switch (message.type) {
       case "refinement_workspace_snapshot":
         this.workspace = message.workspace;
         this.busyOperation = null;
+        this.operationProgress = null;
         break;
       case "refinement_candidates":
         if (message.categoryKey !== this.selectedCategoryKey) return false;
@@ -121,11 +138,13 @@ export class RefinementSession {
         );
         this.planSummary = null;
         this.busyOperation = null;
+        this.operationProgress = null;
         break;
       case "refinement_plan_summary":
         if (message.categoryKey !== this.selectedCategoryKey) return false;
         this.planSummary = message;
         this.busyOperation = null;
+        this.operationProgress = null;
         break;
       case "refinement_download_progress":
         this.progress = message;
@@ -136,10 +155,16 @@ export class RefinementSession {
       case "refinement_coverage_updated":
       case "refinement_installation_removed":
         this.busyOperation = null;
+        this.operationProgress = null;
+        break;
+      case "refinement_operation_progress":
+        if (message.operation !== this.busyOperation) return false;
+        this.operationProgress = { fraction: message.progressFraction, message: message.message };
         break;
       case "refinement_operation_error":
         this.error = message.message;
         this.busyOperation = null;
+        this.operationProgress = null;
         break;
     }
     this.publish();
@@ -155,6 +180,7 @@ export class RefinementSession {
     this.revision += 1;
     this.requestId = `refinement-${Date.now().toString(36)}-${this.revision}`;
     this.busyOperation = null;
+    this.operationProgress = null;
     this.error = null;
   }
 
@@ -164,6 +190,7 @@ export class RefinementSession {
     this.selectedProductIds.clear();
     this.planSummary = null;
     this.progress = null;
+    this.operationProgress = null;
   }
 
   private publish(): void {

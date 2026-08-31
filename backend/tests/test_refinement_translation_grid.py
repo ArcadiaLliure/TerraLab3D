@@ -53,7 +53,7 @@ def _grid(*, origin_x: float = 0.0, min_x: float = 0.0) -> TargetGridSpec:
         "agriculture",
         "agriculture.cropland",
         "agriculture.cropland.permanent_crop",
-        "agriculture.cropland.permanent_crop.vineyard",
+        "agriculture.cropland.vineyard",
     ],
 )
 def test_single_translation_preserves_deepest_justified_tlst_node(category_key: str) -> None:

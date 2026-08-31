@@ -2,6 +2,7 @@ export type ResourceInstallState =
     | "NOT_INSTALLED"
     | "PARTIAL"
     | "QUEUED"
+    | "AUTHENTICATING"
     | "DOWNLOADING"
     | "PAUSED"
     | "VERIFYING"
@@ -72,4 +73,11 @@ export interface DownloadJobSnapshot {
     currentFile: string | null;
     errorCode: string | null;
     errorMessage: string | null;
+    assetProgress: readonly DownloadAssetProgress[];
+}
+
+export interface DownloadAssetProgress {
+    fileName: string;
+    downloadedBytes: number;
+    totalBytes: number | null;
 }

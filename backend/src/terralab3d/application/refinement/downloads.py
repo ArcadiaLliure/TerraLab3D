@@ -96,7 +96,7 @@ def freeze_parametric_plan(
 
 
 def resource_descriptor_from_plan(plan: ParametricDownloadPlan) -> ResourceDescriptor:
-    resource_id = ResourceId(f"earth.refinement.{_safe_id(plan.plan_id)}")
+    resource_id = refinement_resource_id(plan.plan_id)
     variant_id = VariantId(f"plan-r{plan.revision}")
     providers = sorted({asset.provider_id for asset in plan.assets})
     licenses = sorted({asset.license_id for asset in plan.assets})
@@ -128,6 +128,12 @@ def resource_descriptor_from_plan(plan: ParametricDownloadPlan) -> ResourceDescr
             ("requiresLargeDownloadConfirmation", plan.requires_large_download_confirmation),
         ),
     )
+
+
+def refinement_resource_id(plan_id: str) -> ResourceId:
+    """Return the stable resource identity used by a frozen refinement plan."""
+
+    return ResourceId(f"earth.refinement.{_safe_id(plan_id)}")
 
 
 def _safe_id(value: str) -> str:

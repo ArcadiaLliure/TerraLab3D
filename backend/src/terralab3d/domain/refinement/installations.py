@@ -21,6 +21,7 @@ class RefinementDataKind(str, Enum):
 
 class TechnicalResourceState(str, Enum):
     QUEUED = "QUEUED"
+    AUTHENTICATING = "AUTHENTICATING"
     DOWNLOADING = "DOWNLOADING"
     VERIFYING = "VERIFYING"
     PROCESSING = "PROCESSING"

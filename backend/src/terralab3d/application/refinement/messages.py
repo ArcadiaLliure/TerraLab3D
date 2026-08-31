@@ -60,6 +60,13 @@ class RemoveRefinementInstallationMessage(TypedDict):
     installationId: str
 
 
+class RefinementInstallationPayload(TypedDict):
+    installationId: str
+    provider: str
+    product: str
+    version: str
+
+
 class RefinementWorkspaceNodePayload(TypedDict):
     categoryKey: str
     parentKey: str | None
@@ -68,7 +75,7 @@ class RefinementWorkspaceNodePayload(TypedDict):
     state: str
     verifiedPercent: float
     plannedPercent: float
-    installationIds: list[str]
+    installations: list[RefinementInstallationPayload]
     applicable: bool
 
 
@@ -133,6 +140,7 @@ class RefinementCandidatePayload(TypedDict):
     endpointVerified: bool
     license: RefinementLicensePayload
     assets: list[RefinementRemoteAssetPayload]
+    installationId: str | None
 
 
 class RefinementCandidatesMessage(TypedDict):
@@ -212,6 +220,7 @@ class RefinementDownloadProgressMessage(TypedDict):
     totalBytes: int | None
     progress: float | None
     currentFile: str | None
+    assetProgress: list[dict[str, object]]
     outputs: RefinementOutputsPayload
     error: str | None
 

@@ -8,6 +8,7 @@ export type RefinementCoverageState =
 
 export type RefinementTechnicalState =
   | "QUEUED"
+  | "AUTHENTICATING"
   | "DOWNLOADING"
   | "VERIFYING"
   | "PROCESSING"
@@ -31,6 +32,14 @@ export interface GeoJsonMultiPolygon {
 
 export type RefinementGeometry = GeoJsonPolygon | GeoJsonMultiPolygon;
 
+export interface RefinementInstallationSnapshot {
+  readonly installationId: string;
+  readonly provider: string;
+  readonly product: string;
+  readonly version: string;
+  readonly footprint?: RefinementGeometry | null;
+}
+
 export interface RefinementWorkspaceNode {
   readonly categoryKey: string;
   readonly parentKey: string | null;
@@ -39,7 +48,7 @@ export interface RefinementWorkspaceNode {
   readonly state: RefinementCoverageState;
   readonly verifiedPercent: number;
   readonly plannedPercent: number;
-  readonly installationIds: readonly string[];
+  readonly installations: readonly RefinementInstallationSnapshot[];
   readonly applicable: boolean;
 }
 
@@ -91,6 +100,7 @@ export interface RefinementProductCandidate {
   readonly endpointVerified: boolean;
   readonly license: RefinementLicenseSummary;
   readonly assets: readonly RefinementRemoteAsset[];
+  readonly installationId: string | null;
 }
 
 export interface RefinementProviderFailure {
@@ -241,6 +251,7 @@ export interface RefinementDownloadProgressMessage {
   readonly currentFile: string | null;
   readonly outputs: RefinementDerivedOutputs;
   readonly error: string | null;
+  readonly assetProgress: readonly { readonly fileName: string; readonly downloadedBytes: number; readonly totalBytes: number | null }[];
 }
 
 export interface RefinementCoverageUpdatedMessage {
@@ -271,6 +282,15 @@ export interface RefinementOperationErrorMessage {
   readonly providerId?: string;
 }
 
+export interface RefinementOperationProgressMessage {
+  readonly type: "refinement_operation_progress";
+  readonly requestId: string;
+  readonly revision: number;
+  readonly operation: "workspace" | "query" | "plan";
+  readonly progressFraction: number;
+  readonly message: string;
+}
+
 export type RefinementFrontendMessage =
   | RequestRefinementWorkspaceMessage
   | QueryRefinementProductsMessage
@@ -287,4 +307,5 @@ export type RefinementBackendMessage =
   | RefinementDownloadProgressMessage
   | RefinementCoverageUpdatedMessage
   | RefinementInstallationRemovedMessage
-  | RefinementOperationErrorMessage;
+  | RefinementOperationErrorMessage
+  | RefinementOperationProgressMessage;

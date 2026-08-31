@@ -56,7 +56,31 @@ export class ResourceManager {
             onRefinementCoverageUpdated: (msg) => this.publishRefinement(msg),
             onRefinementInstallationRemoved: (msg) => this.publishRefinement(msg),
             onRefinementOperationError: (msg) => this.publishRefinement(msg),
+            onCdseAuthRequired: () => this.handleCdseAuthRequired(),
         });
+    }
+
+    private async handleCdseAuthRequired(): Promise<void> {
+        console.warn("MGP: [ResourceManager] Received cdse_auth_required! Launching CdseLoginDialog");
+        // Dynamically import to avoid circular dependencies
+        const { CdseLoginDialog } = await import("../view/ui/modals/CdseLoginDialog");
+        const dialog = new CdseLoginDialog();
+        const result = await dialog.prompt();
+        if (result.action === "submit") {
+            this.bridge.sendSubmitCdseCredentials({
+                username: result.username,
+                password: result.password,
+                totp: result.totp,
+                remember: result.remember,
+            });
+        } else if (result.action === "forget") {
+            this.bridge.sendForgetCdseCredentials();
+            // Also submit cancel to resume any pending Future with False
+            this.bridge.sendSubmitCdseCredentials({ username: "", password: "", remember: false });
+        } else {
+            // Cancel
+            this.bridge.sendSubmitCdseCredentials({ username: "", password: "", remember: false });
+        }
     }
 
     public requestCatalog(): void {
@@ -244,6 +268,7 @@ export class ResourceManager {
                 progress: msg.progress,
                 currentFile: msg.currentFile,
                 error: msg.errorMessage,
+                assetProgress: msg.assetProgress,
             };
             this.publishRefinement(progress);
             if (state === "READY") {
@@ -287,7 +312,8 @@ export class ResourceManager {
             progress: null,
             currentFile: null,
             errorCode: null,
-            errorMessage: null
+            errorMessage: null,
+            assetProgress: [],
         };
         
         this.jobStates.set(jobId, newJob);
@@ -302,7 +328,7 @@ export class ResourceManager {
 
     private publishRefinement(msg: RefinementBackendMessage): void {
         if (msg.type === "refinement_download_progress") {
-            if (msg.state === "QUEUED" || msg.state === "DOWNLOADING") {
+            if (msg.state === "QUEUED" || msg.state === "AUTHENTICATING" || msg.state === "DOWNLOADING") {
                 this.refinementJobs.set(msg.jobId, msg);
             } else if (msg.state === "READY" || msg.state === "ERROR" || msg.state === "CANCELLED") {
                 this.refinementJobs.delete(msg.jobId);
@@ -313,7 +339,7 @@ export class ResourceManager {
 }
 
 function refinementTechnicalState(state: ResourceInstallState): RefinementDownloadProgressMessage["state"] | null {
-    if (state === "QUEUED" || state === "DOWNLOADING" || state === "VERIFYING" || state === "PROCESSING" || state === "READY" || state === "ERROR") {
+    if (state === "QUEUED" || state === "AUTHENTICATING" || state === "DOWNLOADING" || state === "VERIFYING" || state === "PROCESSING" || state === "READY" || state === "ERROR") {
         return state;
     }
     if (state === "INVALID") return "ERROR";

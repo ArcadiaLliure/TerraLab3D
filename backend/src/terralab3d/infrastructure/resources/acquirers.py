@@ -3,13 +3,12 @@
 import asyncio
 import hashlib
 import logging
-import os
 import shutil
 import tempfile
 import time
 import zipfile
 from abc import ABC, abstractmethod
-from collections.abc import Collection
+from collections.abc import Awaitable, Callable, Collection
 from pathlib import Path
 from typing import Mapping
 from urllib.parse import urlsplit
@@ -18,8 +17,10 @@ import aiohttp
 
 from terralab3d.domain.refinement.downloads import ParametricDownloadPlan
 from terralab3d.domain.refinement.errors import RefinementValidationError
+from terralab3d.application.refinement.auth_coordinator import AuthenticationRequiredError
 from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.domain.resources.models import (
+    DownloadAssetProgress,
     ResourceInstallState,
     DownloadJobSnapshot,
     ResourceDescriptor,
@@ -57,8 +58,10 @@ def safe_extract_zip(archive: Path, destination: Path) -> tuple[Path, ...]:
     destination_parent.mkdir(parents=True, exist_ok=True)
     if destination.resolve(strict=False).parent != destination_parent:
         raise ResourceVerificationError("ZIP destination is outside its staging parent")
-    if destination.exists():
+    if destination.is_dir():
         return tuple(path for path in destination.rglob("*") if path.is_file())
+    if destination.is_file():
+        destination.unlink(missing_ok=True)
 
     staging = Path(tempfile.mkdtemp(prefix=".extract-", dir=destination_parent))
     extracted: list[Path] = []
@@ -173,7 +176,8 @@ class ResourceAcquirer(ABC):
         }
         if manifest_metadata:
             manifest_data.update(manifest_metadata)
-        if processor is not None:
+
+        if processor:
             self.repository.set_resource_state(
                 resource_id,
                 ResourceInstallState.PROCESSING,
@@ -181,14 +185,39 @@ class ResourceAcquirer(ABC):
                 resolved_path=str(source_path),
                 downloaded_bytes=downloaded_bytes,
             )
-            await self._send_snapshot(DownloadJobSnapshot(
-                job_id=job_id, resource_id=resource_id, variant_id=variant_id,
-                state=ResourceInstallState.PROCESSING,
-                downloaded_bytes=downloaded_bytes, total_bytes=total_bytes,
-                progress=1.0, current_file=filename,
-                error_code=None, error_message=None,
-            ), force=True)
+            loop = asyncio.get_running_loop()
+
+            async def _send_processing_progress(current_file: str, progress_ratio: float | None = None) -> None:
+                await self._send_snapshot(
+                    DownloadJobSnapshot(
+                        job_id=job_id,
+                        resource_id=resource_id,
+                        variant_id=variant_id,
+                        state=ResourceInstallState.PROCESSING,
+                        downloaded_bytes=downloaded_bytes,
+                        total_bytes=total_bytes,
+                        progress=progress_ratio if progress_ratio is not None else 1.0,
+                        current_file=current_file,
+                        error_code=None,
+                        error_message=None,
+                    ),
+                    force=True,
+                )
+
+            def _on_mosaic_progress(current: int, total: int, phase: str) -> None:
+                ratio = current / total if total > 0 else 0.0
+                msg = f"{phase} ({current}/{total} - {ratio * 100:.0f}%)" if total > 0 else phase
+                asyncio.run_coroutine_threadsafe(_send_processing_progress(msg, ratio), loop)
+
+            await _send_processing_progress("Iniciant harmonització del mosaic...", 0.0)
             try:
+                processed = await asyncio.to_thread(
+                    processor.process,
+                    source_path,
+                    resolve_derived_resource_dir(str(resource_id)),
+                    _on_mosaic_progress,
+                )
+            except TypeError:
                 processed = await asyncio.to_thread(
                     processor.process,
                     source_path,
@@ -362,7 +391,11 @@ class StaticFileAcquirer(HttpBundleAcquirer):
 class ParametricRasterAcquirer(ResourceAcquirer):
     """Execute an immutable, user-reviewed plan with the shared job manager."""
 
-    _TOKEN_ENV = "COPERNICUS_CDSE_TOKEN"
+    _MAX_PARALLEL_ASSET_DOWNLOADS = 4
+
+    def __init__(self, manager_callback, repository, bridge, post_processors, auth_coordinator=None):
+        super().__init__(manager_callback, repository, bridge, post_processors)
+        self._auth_coordinator = auth_coordinator
 
     @staticmethod
     def _plan_from_variant(variant: ResourceVariant) -> ParametricDownloadPlan:
@@ -377,8 +410,9 @@ class ParametricRasterAcquirer(ResourceAcquirer):
             raise ResourcePlanError("Frozen assets no longer match the resource variant URLs")
         if len({asset.file_name for asset in plan.assets}) != len(plan.assets):
             raise ResourcePlanError("Frozen assets must have unique file names")
-        if any(asset.checksum_algorithm not in {None, "md5", "sha256"} for asset in plan.assets):
-            raise ResourcePlanError("The plan contains an unsupported checksum algorithm")
+        invalid_algos = [a.checksum_algorithm for a in plan.assets if a.checksum_algorithm and str(a.checksum_algorithm).strip().lower() not in {"md5", "sha256", "etag"}]
+        if invalid_algos:
+            raise ResourcePlanError(f"The plan contains an unsupported checksum algorithm: {invalid_algos}")
         return plan
 
     async def acquire(
@@ -399,10 +433,12 @@ class ParametricRasterAcquirer(ResourceAcquirer):
                 raise ResourceConfigurationError(
                     "This large download requires explicit confirmation"
                 )
-            token = os.getenv(self._TOKEN_ENV, "").strip()
-            if any(asset.requires_authentication for asset in plan.assets) and not token:
+            requires_authentication = any(
+                asset.requires_authentication for asset in plan.assets
+            )
+            if requires_authentication and not self._auth_coordinator:
                 raise ResourceConfigurationError(
-                    f"Set {self._TOKEN_ENV} before downloading authenticated CLMS assets"
+                    "Authentication required but no coordinator provided"
                 )
 
             temp_dir = resolve_download_temp_dir()
@@ -412,11 +448,60 @@ class ParametricRasterAcquirer(ResourceAcquirer):
                 self._existing_bytes(temp_dir, asset.file_name, final_path)
                 for asset, final_path in zip(plan.assets, final_paths, strict=True)
             )
+
+            token = ""
+            if requires_authentication:
+                self.repository.set_resource_state(
+                    resource_id,
+                    ResourceInstallState.AUTHENTICATING,
+                    variant_id,
+                    downloaded_bytes=total_downloaded,
+                )
+                await self._send_snapshot(
+                    DownloadJobSnapshot(
+                        job_id=job_id,
+                        resource_id=resource_id,
+                        variant_id=variant_id,
+                        state=ResourceInstallState.AUTHENTICATING,
+                        downloaded_bytes=total_downloaded,
+                        total_bytes=plan.estimated_bytes,
+                        progress=(
+                            total_downloaded / plan.estimated_bytes
+                            if plan.estimated_bytes
+                            else None
+                        ),
+                        current_file="Copernicus Data Space Ecosystem",
+                        error_code=None,
+                        error_message=None,
+                    ),
+                    force=True,
+                )
+                token = await self._auth_coordinator.get_valid_token(interactive=True)
+
             self.repository.set_resource_state(
                 resource_id,
                 ResourceInstallState.DOWNLOADING,
                 variant_id,
                 downloaded_bytes=total_downloaded,
+            )
+            await self._send_snapshot(
+                DownloadJobSnapshot(
+                    job_id=job_id,
+                    resource_id=resource_id,
+                    variant_id=variant_id,
+                    state=ResourceInstallState.DOWNLOADING,
+                    downloaded_bytes=total_downloaded,
+                    total_bytes=plan.estimated_bytes,
+                    progress=(
+                        total_downloaded / plan.estimated_bytes
+                        if plan.estimated_bytes
+                        else None
+                    ),
+                    current_file=plan.assets[0].file_name,
+                    error_code=None,
+                    error_message=None,
+                ),
+                force=True,
             )
 
             timeout = aiohttp.ClientTimeout(
@@ -426,24 +511,17 @@ class ParametricRasterAcquirer(ResourceAcquirer):
                 sock_read=120.0,
             )
             async with aiohttp.ClientSession(timeout=timeout) as session:
-                for asset, final_path in zip(plan.assets, final_paths, strict=True):
-                    if final_path.exists():
-                        continue
-                    total_downloaded = await self._download_asset(
-                        session=session,
-                        job_id=job_id,
-                        resource_id=resource_id,
-                        variant_id=variant_id,
-                        url=asset.download_url,
-                        file_name=asset.file_name,
-                        requires_authentication=asset.requires_authentication,
-                        token=token,
-                        total_downloaded=total_downloaded,
-                        overall_total_bytes=plan.estimated_bytes,
-                        temp_dir=temp_dir,
-                        final_path=final_path,
-                        active_tasks=active_tasks,
-                    )
+                total_downloaded = await self._download_assets_in_parallel(
+                    session=session,
+                    job_id=job_id,
+                    resource_id=resource_id,
+                    variant_id=variant_id,
+                    plan=plan,
+                    final_paths=final_paths,
+                    token=token,
+                    temp_dir=temp_dir,
+                    active_tasks=active_tasks,
+                )
 
             if job_id not in active_tasks:
                 return
@@ -511,14 +589,104 @@ class ParametricRasterAcquirer(ResourceAcquirer):
             await self._fail_job(job_id, resource_id, variant_id, "PROCESSING_ERROR", str(exc))
         except ResourceVerificationError as exc:
             await self._fail_job(job_id, resource_id, variant_id, "VERIFY_ERROR", str(exc))
+        except AuthenticationRequiredError as exc:
+            log.warning("MGP: [ParametricRasterAcquirer] Job %s missing CDSE auth", job_id)
+            await self._fail_job(job_id, resource_id, variant_id, "AUTH_REQUIRED", str(exc))
         except Exception as exc:
             log.exception("MGP: [ParametricRasterAcquirer] [Job %s failed]", job_id)
             await self._fail_job(job_id, resource_id, variant_id, "NETWORK_ERROR", str(exc))
 
+    async def _download_assets_in_parallel(
+        self,
+        *,
+        session: aiohttp.ClientSession,
+        job_id: str,
+        resource_id: ResourceId,
+        variant_id: VariantId,
+        plan: ParametricDownloadPlan,
+        final_paths: tuple[Path, ...],
+        token: str,
+        temp_dir: Path,
+        active_tasks: Collection[str],
+    ) -> int:
+        """Download independent plan assets concurrently with aggregate progress."""
+
+        downloaded_by_file = {
+            asset.file_name: self._existing_bytes(temp_dir, asset.file_name, final_path)
+            for asset, final_path in zip(plan.assets, final_paths, strict=True)
+        }
+        semaphore = asyncio.Semaphore(self._MAX_PARALLEL_ASSET_DOWNLOADS)
+        total_by_file = {asset.file_name: asset.expected_bytes for asset in plan.assets}
+
+        async def report_progress(file_name: str, downloaded: int) -> None:
+            downloaded_by_file[file_name] = downloaded
+            aggregate_downloaded = sum(downloaded_by_file.values())
+            await self._send_snapshot(
+                DownloadJobSnapshot(
+                    job_id=job_id,
+                    resource_id=resource_id,
+                    variant_id=variant_id,
+                    state=ResourceInstallState.DOWNLOADING,
+                    downloaded_bytes=aggregate_downloaded,
+                    total_bytes=plan.estimated_bytes,
+                    progress=(
+                        aggregate_downloaded / plan.estimated_bytes
+                        if plan.estimated_bytes
+                        else None
+                    ),
+                    current_file=file_name,
+                    error_code=None,
+                    error_message=None,
+                    asset_progress=tuple(
+                        DownloadAssetProgress(
+                            file_name,
+                            downloaded,
+                            total_by_file[file_name],
+                        )
+                        for file_name, downloaded in downloaded_by_file.items()
+                    ),
+                )
+            )
+
+        async def download(asset, final_path: Path) -> None:
+            if (
+                final_path.is_file()
+                or final_path.is_dir()
+                or final_path.with_name(f"{final_path.name}.zip").is_file()
+            ):
+                return
+            async with semaphore:
+                await self._download_asset(
+                    session=session,
+                    job_id=job_id,
+                    resource_id=resource_id,
+                    variant_id=variant_id,
+                    url=asset.download_url,
+                    file_name=asset.file_name,
+                    requires_authentication=asset.requires_authentication,
+                    token=token,
+                    total_downloaded=downloaded_by_file[asset.file_name],
+                    overall_total_bytes=plan.estimated_bytes,
+                    temp_dir=temp_dir,
+                    final_path=final_path,
+                    active_tasks=active_tasks,
+                    progress_reporter=report_progress,
+                )
+
+        await asyncio.gather(
+            *(download(asset, final_path) for asset, final_path in zip(plan.assets, final_paths, strict=True))
+        )
+        return sum(downloaded_by_file.values())
+
     @staticmethod
     def _existing_bytes(temp_dir: Path, file_name: str, final_path: Path) -> int:
-        if final_path.exists():
+        if final_path.is_file():
             return final_path.stat().st_size
+        zip_cand = final_path.with_name(f"{final_path.name}.zip")
+        if zip_cand.is_file():
+            return zip_cand.stat().st_size
+        if final_path.is_dir():
+            return sum(p.stat().st_size for p in final_path.rglob("*") if p.is_file())
         partial = temp_dir / f"{file_name}.part"
         return partial.stat().st_size if partial.exists() else 0
 
@@ -529,19 +697,30 @@ class ParametricRasterAcquirer(ResourceAcquirer):
     ) -> dict[str, str]:
         hashes: dict[str, str] = {}
         for asset, final_path in zip(plan.assets, final_paths, strict=True):
-            actual_size = final_path.stat().st_size
+            target_path = final_path
+            if not target_path.exists():
+                zip_cand = final_path.with_name(f"{final_path.name}.zip")
+                if zip_cand.exists():
+                    target_path = zip_cand
+                elif final_path.is_dir():
+                    # For directories, compute hash of inner files
+                    hashes[asset.file_name] = "extracted"
+                    continue
+            actual_size = target_path.stat().st_size
             if asset.expected_bytes is not None and actual_size != asset.expected_bytes:
                 raise ResourceVerificationError(
                     f"Size mismatch for {asset.file_name}: expected "
                     f"{asset.expected_bytes}, got {actual_size}"
                 )
-            hashes[asset.file_name] = await self._hash_file(final_path, "sha256")
+            hashes[asset.file_name] = await self._hash_file(target_path, "sha256")
             if asset.checksum_algorithm and asset.checksum_value:
-                calculated = await self._hash_file(final_path, asset.checksum_algorithm)
-                if calculated.lower() != asset.checksum_value.lower():
-                    raise ResourceVerificationError(
-                        f"Checksum mismatch for {asset.file_name}"
-                    )
+                algo = asset.checksum_algorithm.lower()
+                if algo != "etag":
+                    calculated = await self._hash_file(target_path, asset.checksum_algorithm)
+                    if calculated.lower() != asset.checksum_value.lower():
+                        raise ResourceVerificationError(
+                            f"Checksum mismatch for {asset.file_name}"
+                        )
         return hashes
 
     @staticmethod
@@ -550,14 +729,37 @@ class ParametricRasterAcquirer(ResourceAcquirer):
     ) -> tuple[Path, ...]:
         unpacked: list[Path] = []
         for final_path in final_paths:
-            if zipfile.is_zipfile(final_path):
+            if not final_path.exists():
+                zip_candidate = final_path.with_name(f"{final_path.name}.zip")
+                if zip_candidate.is_file() and zipfile.is_zipfile(zip_candidate):
+                    unpacked.extend(
+                        await asyncio.to_thread(
+                            safe_extract_zip,
+                            zip_candidate,
+                            final_path,
+                        )
+                    )
+                    continue
+                if final_path.is_dir():
+                    unpacked.extend(path for path in final_path.rglob("*") if path.is_file())
+                    continue
+            if final_path.is_file() and zipfile.is_zipfile(final_path):
+                if final_path.suffix.lower() == ".zip":
+                    archive_path = final_path
+                    dest_path = final_path.with_suffix("")
+                else:
+                    archive_path = final_path.with_name(f"{final_path.name}.zip")
+                    final_path.rename(archive_path)
+                    dest_path = final_path
                 unpacked.extend(
                     await asyncio.to_thread(
                         safe_extract_zip,
-                        final_path,
-                        final_path.with_suffix(""),
+                        archive_path,
+                        dest_path,
                     )
                 )
+            elif final_path.is_dir():
+                unpacked.extend(path for path in final_path.rglob("*") if path.is_file())
             else:
                 unpacked.append(final_path)
         return tuple(unpacked)
@@ -578,6 +780,7 @@ class ParametricRasterAcquirer(ResourceAcquirer):
         temp_dir: Path,
         final_path: Path,
         active_tasks: Collection[str],
+        progress_reporter: Callable[[str, int], Awaitable[None]] | None = None,
     ) -> int:
         temp_path = temp_dir / f"{file_name}.part"
         existing_bytes = temp_path.stat().st_size if temp_path.exists() else 0
@@ -592,7 +795,19 @@ class ParametricRasterAcquirer(ResourceAcquirer):
                     if response.status == 200 and existing_bytes:
                         total_downloaded -= existing_bytes
                         existing_bytes = 0
-                        temp_path.unlink(missing_ok=True)
+                        if progress_reporter is not None:
+                            await progress_reporter(file_name, total_downloaded)
+                    elif response.status == 401 and requires_authentication:
+                        if hasattr(self, "_auth_coordinator") and self._auth_coordinator:
+                            self._auth_coordinator.invalidate_session()
+                            token = await self._auth_coordinator.get_valid_token(interactive=True)
+                        raise aiohttp.ClientResponseError(
+                            response.request_info,
+                            response.history,
+                            status=response.status,
+                            message="Token expired, retrying",
+                            headers=response.headers,
+                        )
                     elif response.status not in (200, 206):
                         raise aiohttp.ClientResponseError(
                             response.request_info,
@@ -612,24 +827,27 @@ class ParametricRasterAcquirer(ResourceAcquirer):
                                 return total_downloaded
                             output.write(chunk)
                             total_downloaded += len(chunk)
-                            await self._send_snapshot(
-                                DownloadJobSnapshot(
-                                    job_id=job_id,
-                                    resource_id=resource_id,
-                                    variant_id=variant_id,
-                                    state=ResourceInstallState.DOWNLOADING,
-                                    downloaded_bytes=total_downloaded,
-                                    total_bytes=overall_total_bytes,
-                                    progress=(
-                                        total_downloaded / overall_total_bytes
-                                        if overall_total_bytes
-                                        else None
-                                    ),
-                                    current_file=file_name,
-                                    error_code=None,
-                                    error_message=None,
+                            if progress_reporter is not None:
+                                await progress_reporter(file_name, total_downloaded)
+                            else:
+                                await self._send_snapshot(
+                                    DownloadJobSnapshot(
+                                        job_id=job_id,
+                                        resource_id=resource_id,
+                                        variant_id=variant_id,
+                                        state=ResourceInstallState.DOWNLOADING,
+                                        downloaded_bytes=total_downloaded,
+                                        total_bytes=overall_total_bytes,
+                                        progress=(
+                                            total_downloaded / overall_total_bytes
+                                            if overall_total_bytes
+                                            else None
+                                        ),
+                                        current_file=file_name,
+                                        error_code=None,
+                                        error_message=None,
+                                    )
                                 )
-                            )
                 temp_path.replace(final_path)
                 return total_downloaded
             except ResourceVerificationError:

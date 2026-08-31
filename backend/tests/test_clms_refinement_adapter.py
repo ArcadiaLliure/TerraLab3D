@@ -28,7 +28,7 @@ def _request(request_id: str = "request-1", revision: int = 1) -> DiscoveryReque
     return DiscoveryRequest(
         request_id=request_id,
         revision=revision,
-        category_key="agriculture.cropland.permanent_crop.vineyard",
+        category_key="agriculture.cropland.vineyard",
         aoi_geojson={
             "type": "Polygon",
             "coordinates": (((2.0, 41.0), (2.2, 41.0), (2.2, 41.2), (2.0, 41.2), (2.0, 41.0)),),

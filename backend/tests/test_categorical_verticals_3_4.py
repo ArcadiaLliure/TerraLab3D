@@ -145,7 +145,7 @@ def test_builtin_registry_has_complete_lcm10_and_corine_contracts() -> None:
     corine = registry.get("corine_land_cover", "2018-v2020_20u1")
     assert len(corine.classes) == 45
     assert corine.resolve_observation(221).translation.category_key == (
-        "agriculture.cropland.permanent_crop.vineyard"
+        "agriculture.cropland.vineyard"
     )
     assert corine.resolve_observation(412).translation.category_key == "wetland.inland.peat_bog"
     assert corine.resolve_observation(523).translation.category_key == "water.marine.sea_ocean"

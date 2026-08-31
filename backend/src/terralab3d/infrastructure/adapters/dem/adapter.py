@@ -457,7 +457,10 @@ class RasterioElevationAdapter:
             return [self._source_path]
         if not self._source_path.is_dir():
             return []
-        candidates = [path for path in self._source_path.rglob("*") if path.is_file()]
+        candidates = [
+            path for path in self._source_path.rglob("*") 
+            if path.is_file() and not path.name.lower().endswith(".json")
+        ]
         npy_stems = {path.stem for path in candidates if path.suffix.lower() == ".npy"}
         candidates = [
             path for path in candidates

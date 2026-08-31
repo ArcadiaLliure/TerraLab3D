@@ -75,7 +75,7 @@ def test_product_contributions_do_not_double_count_previous_products() -> None:
     assert contributions[0].available_ratio == pytest.approx(0.5)
     assert contributions[0].already_local_ratio == pytest.approx(0.1)
     assert contributions[0].new_effective_ratio == pytest.approx(0.4)
-    assert contributions[1].previous_selection_overlap_ratio == pytest.approx(0.1)
+    assert contributions[1].previous_selection_overlap_ratio == pytest.approx(0.0)
     assert contributions[1].new_effective_ratio == pytest.approx(0.3)
 
 

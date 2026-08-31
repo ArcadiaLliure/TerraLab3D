@@ -40,7 +40,7 @@ def test_tlst_catalog_is_frozen_and_uses_canonical_public_keys() -> None:
     assert catalog.taxonomy_key == "TLST"
     assert catalog.taxonomy_version == "1.0"
     assert "agriculture.cropland.unspecified" in catalog.category_keys
-    assert "agriculture.cropland.permanent_crop.vineyard" in catalog.category_keys
+    assert "agriculture.cropland.vineyard" in catalog.category_keys
     assert "agriculture.cropland_unspecified" not in catalog.category_keys
     assert "low_vegetation.shrub.unspecified" in catalog.category_keys
     assert "snow_ice.permanent.unspecified" in catalog.category_keys
@@ -126,7 +126,7 @@ def test_invalid_sample_cannot_have_translation_and_valid_sample_requires_one() 
         SurfaceObservation(
             source,
             SampleValidity.MASKED,
-            SingleSurface("agriculture.cropland.permanent_crop.vineyard"),
+            SingleSurface("agriculture.cropland.vineyard"),
         )
     with pytest.raises(TlstValidationError, match="requires"):
         SurfaceObservation(source, SampleValidity.VALID, None)
@@ -157,7 +157,7 @@ def test_source_code_zero_depends_on_scheme_and_never_reaches_semantic_mapper() 
     ("code", "expected_category"),
     [
         (73, "agriculture.cropland.unspecified"),
-        (75, "agriculture.cropland.permanent_crop.vineyard"),
+        (75, "agriculture.cropland.vineyard"),
         (103, "low_vegetation.shrub.unspecified"),
         (123, "snow_ice.permanent.unspecified"),
     ],
@@ -178,7 +178,7 @@ def test_s2glc_mapping_is_exhaustive() -> None:
         0: SampleValidity.MASKED,
         62: "artificial.unspecified",
         73: "agriculture.cropland.unspecified",
-        75: "agriculture.cropland.permanent_crop.vineyard",
+        75: "agriculture.cropland.vineyard",
         82: "tree_cover.broadleaf",
         83: "tree_cover.needleleaf",
         102: "low_vegetation.herbaceous.unspecified",
@@ -378,9 +378,9 @@ def test_bridge_publication_keeps_source_buffers_and_tlst_lookup_separate() -> N
     message = build_land_cover_legend_message(legend)
     vineyard = next(entry for entry in message["entries"] if entry["sourceCode"] == 75)
     assert vineyard["sourceLabel"] == "Vineyards"
-    assert vineyard["categoryKey"] == "agriculture.cropland.permanent_crop.vineyard"
+    assert vineyard["categoryKey"] == "agriculture.cropland.vineyard"
     assert vineyard["categoryLabelKey"] == (
-        "tlst.category.agriculture.cropland.permanent_crop.vineyard"
+        "tlst.category.agriculture.cropland.vineyard"
     )
     assert vineyard["categoryLabel"] == "Vinya"
     assert message["taxonomyVersion"] == "1.0"

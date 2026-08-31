@@ -23,7 +23,7 @@ from terralab3d.infrastructure.adapters.surface.tlst_catalog import (
 
 def test_every_provider_family_has_an_explicit_unambiguous_rollout_state() -> None:
     records = refinement_provider_rollout()
-    assert len(records) == 15
+    assert len(records) == 16
     assert len({record.provider_key for record in records}) == len(records)
     assert all(record.datasets and record.reason and record.license_status for record in records)
     assert all(record.state in ProviderRolloutState for record in records)

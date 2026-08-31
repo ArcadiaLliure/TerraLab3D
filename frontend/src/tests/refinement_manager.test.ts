@@ -4,8 +4,10 @@ import {
   extractRefinementGeometry,
   splitAntimeridianGeometry,
 } from "../view/ui/modals/RefinementMapView";
+import { refinementRenderImpact } from "../view/ui/modals/RefinementManagerView";
 import type {
   RefinementCandidatesMessage,
+  RefinementDownloadProgressMessage,
   RefinementGeometry,
   RefinementPlanSummaryMessage,
   RefinementProductCandidate,
@@ -27,8 +29,8 @@ const workspace: RefinementWorkspace = {
   virtualRoot: "surface",
   aoi,
   nodes: [
-    { categoryKey: "agriculture", parentKey: "surface", label: "Agricultura", depth: 1, state: "partial", verifiedPercent: 40, plannedPercent: 40, installationIds: [], applicable: true },
-    { categoryKey: "agriculture.arable", parentKey: "agriculture", label: "Conreus herbacis", depth: 2, state: "complete", verifiedPercent: 100, plannedPercent: 100, installationIds: ["installed-1"], applicable: true },
+    { categoryKey: "agriculture", parentKey: "surface", label: "Agricultura", depth: 1, state: "partial", verifiedPercent: 40, plannedPercent: 40, installations: [], applicable: true },
+    { categoryKey: "agriculture.arable", parentKey: "agriculture", label: "Conreus herbacis", depth: 2, state: "complete", verifiedPercent: 100, plannedPercent: 100, installations: [{ installationId: "installed-1", provider: "Test", product: "Test", version: "1.0" }], applicable: true },
   ],
 };
 
@@ -121,9 +123,47 @@ const plan: RefinementPlanSummaryMessage = {
 assert(session.accept(plan), "A plan for the current selection is accepted");
 assert(session.snapshot().planSummary?.coverage.plannedPercent === 100, "Plan coverage is retained");
 
+const beforeConfirm = session.snapshot();
+const confirming = session.begin("confirm");
+const busyImpact = refinementRenderImpact(beforeConfirm, confirming);
+assert(!busyImpact.tree && !busyImpact.products, "Starting a background operation preserves stable panels");
+
+const queuedProgress: RefinementDownloadProgressMessage = {
+  type: "refinement_download_progress",
+  requestId: confirming.requestId,
+  revision: confirming.revision,
+  planId: "plan-1",
+  jobId: "job-1",
+  state: "QUEUED",
+  downloadedBytes: 0,
+  totalBytes: 1024,
+  progress: 0,
+  currentFile: null,
+  assetProgress: [],
+  outputs: { manifest: null, mosaic: null, source: null, quality: null, conflict: null },
+  error: null,
+};
+assert(session.accept(queuedProgress), "Queued download progress is accepted");
+const queued = session.snapshot();
+const queuedImpact = refinementRenderImpact(confirming, queued);
+assert(
+  !queuedImpact.tree && !queuedImpact.products && !queuedImpact.mapAoi && !queuedImpact.mapCandidates,
+  "Download progress updates only live feedback and does not remount interactive regions",
+);
+const downloadingProgress: RefinementDownloadProgressMessage = {
+  ...queuedProgress,
+  state: "DOWNLOADING",
+  downloadedBytes: 512,
+  progress: 0.5,
+  currentFile: "crop-2022.tif",
+};
+assert(session.accept(downloadingProgress), "Quantitative download progress is accepted");
+const downloadImpact = refinementRenderImpact(queued, session.snapshot());
+assert(!downloadImpact.tree && !downloadImpact.products, "Progress ticks preserve tree and product scroll state");
+
 const tree = buildRefinementTree(workspace.nodes);
 assert(tree.length === 1 && tree[0]?.children.length === 1, "The flat TLST workspace becomes a hierarchy");
-assert(tree[0]?.children[0]?.installationIds[0] === "installed-1", "Installation state remains attached to the leaf");
+assert(tree[0]?.children[0]?.installations[0]?.installationId === "installed-1", "Installation state remains attached to the leaf");
 
 const featureGeometry = extractRefinementGeometry({ type: "Feature", properties: {}, geometry: aoi });
 assert(featureGeometry.type === "Polygon", "GeoJSON Feature geometry is accepted");

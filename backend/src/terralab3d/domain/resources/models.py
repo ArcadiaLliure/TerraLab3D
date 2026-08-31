@@ -30,6 +30,7 @@ class ResourceInstallState(str, Enum):
     NOT_INSTALLED = "NOT_INSTALLED"
     PARTIAL = "PARTIAL"
     QUEUED = "QUEUED"
+    AUTHENTICATING = "AUTHENTICATING"
     DOWNLOADING = "DOWNLOADING"
     PAUSED = "PAUSED"
     VERIFYING = "VERIFYING"
@@ -136,6 +137,20 @@ class ResourceDescriptor:
 
 
 @dataclass(frozen=True, slots=True)
+class DownloadAssetProgress:
+    file_name: str
+    downloaded_bytes: int
+    total_bytes: int | None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "fileName": self.file_name,
+            "downloadedBytes": self.downloaded_bytes,
+            "totalBytes": self.total_bytes,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class DownloadJobSnapshot:
     job_id: str
     resource_id: ResourceId
@@ -147,6 +162,7 @@ class DownloadJobSnapshot:
     current_file: str | None
     error_code: str | None
     error_message: str | None
+    asset_progress: tuple[DownloadAssetProgress, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -160,4 +176,5 @@ class DownloadJobSnapshot:
             "currentFile": self.current_file,
             "errorCode": self.error_code,
             "errorMessage": self.error_message,
+            "assetProgress": [item.to_dict() for item in self.asset_progress],
         }

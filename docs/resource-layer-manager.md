@@ -37,9 +37,12 @@ sequenceDiagram
 
 Els estats estan enumerats a `ResourceInstallState`:
 - `NOT_INSTALLED`: Recurs inexistent al disc o corrupte.
+- `QUEUED`: Petició acceptada, encara sense transferència de dades.
+- `AUTHENTICATING`: Esperant una sessió vàlida del proveïdor; encara no s'estan rebent bytes.
 - `DOWNLOADING`: Descarregant via HTTP (suporta streams i `Range`).
 - `PAUSED`: L'usuari (o un error) ha aturat el flux. Es pot reprendre sense perdre els bytes descarregats.
 - `VERIFYING`: Fent check criptogràfic (MD5/SHA256) contra el manifest.
+- `PROCESSING`: Generant els derivats locals després de verificar la descàrrega.
 - `ERROR`: Problema insalvable (connexió refusada, HTTP 404).
 - `PARTIAL`: (Per a bundles) Alguns fitxers existeixen però no la totalitat.
 - `READY`: Descarregat, validat i disponible per muntar a memòria.

@@ -68,7 +68,7 @@ def test_icgc_catalog_and_mapping_cover_relevant_tlst_families() -> None:
     translated = set(ICGC_MCSC_2024_TRANSLATION.values())
     assert {
         "artificial.transport.airport",
-        "agriculture.cropland.permanent_crop.vineyard",
+        "agriculture.cropland.vineyard",
         "tree_cover.needleleaf",
         "low_vegetation.shrub.shrubland",
         "wetland.inland.forested_wetland",
