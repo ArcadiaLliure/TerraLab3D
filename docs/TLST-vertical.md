@@ -1,13 +1,22 @@
 # Pla mestre per verticals
 
-## Estat executat — 2026-08-25
+## Estat executat — 2026-08-31
 
-- **Vertical 1 completada:** TLST 1.0 versionat, S2GLC i WorldCover, `SampleValidity`, buffers categòrics, picking i tooltip català descriptiu. La clau TLST es conserva al contracte d’auditoria però no es mostra al tooltip ordinari.
-- **Vertical 2 completada:** descriptor raster neutral, port únic Rasterio, selecció explícita de banda/subdataset, adaptador TXT/CSV/XYZ regular, importació `managed`/`external`, persistència ordenada a `data_sources.json`, fallback DEM, recàrrega segura del port d’elevació i regeneració de terreny/horitzó.
+En preparar aquesta revisió, el HEAD observat de `gestor_capes` és:
+
+```text
+418006ba5c0339ca10d61784542590df8caf06ea
+Avenç de Pas 23: Gestor de capes. Parcialment funcional
+```
+
+Si existeixen commits posteriors, preval sempre el codi real.
+
+- **Vertical 1 completada:** TLST 1.0 versionat, S2GLC i WorldCover, `SampleValidity`, buffers categòrics, picking i tooltip català descriptiu. La clau TLST es conserva al contracte d'auditoria però no es mostra al tooltip ordinari.
+- **Vertical 2 completada:** descriptor raster neutral, port únic Rasterio per a fonts raster externes, selecció explícita de banda/subdataset, adaptador TXT/CSV/XYZ regular, importació `managed`/`external`, persistència ordenada a `data_sources.json`, fallback DEM, recàrrega segura del port d'elevació i regeneració de terreny/horitzó.
 - **Vertical 3 completada:** importació categòrica enter/paleta/RGB/RGBA sense interpolació, registre versionat, mappings exhaustius S2GLC, WorldCover, Copernicus LCM-10 i CORINE, revisió obligatòria, auditoria de profunditat i activació raster real.
-- **Vertical 4 completada:** esquemes d’usuari persistents i reutilitzables, mapping de cada valor a qualsevol node TLST o estat admissible, i revisió immutable identificada per `scheme_key + scheme_version + mapping_revision`.
-- **Gestor de refinaments implementat:** AOI, jerarquia, descoberta multiproveïdor, llicències fail-closed, plans congelats, descàrrega, harmonització TLST, mosaic incremental, cobertura verificada, importació manual i UI. La matriu exacta és a [tlst-refinement-manager.md](tlst-refinement-manager.md).
-- **Procedural i verticals posteriors no implementades:** continuen sent context d’extensibilitat i no es documenten com a funcionalitat disponible.
+- **Vertical 4 completada:** esquemes d'usuari persistents i reutilitzables, mapping de cada valor a qualsevol node TLST o estat admissible, i revisió immutable identificada per `scheme_key + scheme_version + mapping_revision`.
+- **Gestor d'adquisició de refinaments implementat / WIP:** AOI, jerarquia, descoberta multiproveïdor, llicències fail-closed, plans congelats, descàrrega, cancel·lació, autenticació CDSE, harmonització TLST, mosaic incremental de les instal·lacions, cobertura verificada, importació manual i UI. La matriu exacta és a [tlst-refinement-manager.md](tlst-refinement-manager.md).
+- **Governador, resolver global, caché TLST canònica, SpatialPatch i procedural no implementats:** són les següents verticals d'aquest pla i no s'han de documentar com a funcionalitat disponible.
 
 La prova de sortida de la Vertical 2 importa un bundle `mi_dem.asc`, reinicia els repositoris, torna a obrir la font registrada i obté una graella de terreny amb elevació real.
 
@@ -25,7 +34,7 @@ Els estàndards externs no competeixen amb TLST ni es tradueixen entre ells.
 S2GLC ───────────────┐
 WorldCover ──────────┤
 CORINE ──────────────┤
-CLC+ ────────────────┤
+LCM-10 ──────────────┤
 Dynamic World ───────┤
 CGLS-LC100 ──────────┤
 ESA CCI ─────────────┤
@@ -51,7 +60,7 @@ Estàndard A
 agriculture.cropland
 ```
 
-Si l’estàndard no diferencia què hi ha sota:
+Si l'estàndard no diferencia què hi ha sota:
 
 ```text
 agriculture.cropland
@@ -63,53 +72,47 @@ agriculture.cropland
 └── ...
 ```
 
-la traducció s’atura.
+la traducció s'atura.
 
-No s’inventa cap fill.
+No s'inventa cap fill.
 
-A partir d’aquest punt entra el **refinament**.
-
-```text
-estàndard
-    ↓
-traducció TLST
-    ↓
-node TLST més profund demostrable
-    ↓
-queden fills sense resoldre?
-    │
- ┌──┴───┐
- NO     SÍ
- │       │
- │       ▼
- │   refinaments
- │       │
- └───┬───┘
-     ▼
-interpretació final
-```
-
-Per tant:
-
-> **Un refinament no serveix per tornar a classificar des de zero. Serveix per intentar resoldre una bifurcació TLST que les evidències anteriors no han pogut resoldre.**
-
-I un refinament també pot quedar-se a mig camí.
+A partir d'aquí cal distingir dues decisions:
 
 ```text
-tree_cover
-    ↓
-tree_cover.broadleaf
-    ↓
-STOP
+QUINA FONT BASE DESCRIU AQUESTA POSICIÓ?
+→ governador espacial
+
+FINS A QUIN DESCENDENT TLST PODEM ARRIBAR?
+→ refinament semàntic
 ```
 
-és un resultat completament vàlid si no hi ha evidència per continuar.
+La cadena revisada és:
+
+```text
+categòrics generals actius
+        ↓
+governador per posició
+        ↓
+node TLST base
+        ↓
+refinaments compatibles
+        ↓
+resolver determinista
+        ↓
+TLST final
+        ↓
+caché TLST canònica
+        ↓
+SpatialPatch
+        ↓
+procedural
+```
 
 ---
 
 # Regles invariants
 
-## 1. TLST és l’autoritat semàntica
+## 1. TLST és l'autoritat semàntica
 
 Cap identificador extern passa al domini procedural com a categoria canònica.
 
@@ -149,7 +152,7 @@ CORINE ──────→ TLST
 
 ---
 
-## 3. La traducció arriba només fins on arriba l’estàndard
+## 3. La traducció arriba només fins on arriba l'estàndard
 
 No es força una fulla TLST.
 
@@ -169,39 +172,91 @@ o una fulla més profunda.
 
 ---
 
-## 4. El refinament opera sobre una pregunta concreta
+## 4. Sense categòric general actiu no hi ha refinament
 
-No:
+El categòric general sol continua sent una interpretació vàlida.
 
-```text
-refina aquest píxel
-```
-
-sinó conceptualment:
+Els refinaments són opcionals, però necessiten una base.
 
 ```text
-actual = tree_cover
-
-pregunta:
-quin dels fills de tree_cover
-podem demostrar?
-```
-
-Després:
-
-```text
-actual = tree_cover.broadleaf
-
-pregunta:
-podem discriminar algun fill
-de broadleaf?
+TERRA
+├── Elevació
+├── Categòric
+│   └── almenys una font general activa
+└── Refinament
+    └── disponible després de tenir base
 ```
 
 ---
 
-## 5. No resoldre també és informació
+## 5. El governador és una decisió espacial
 
-Per cada bifurcació podem tenir:
+Per cada posició:
+
+```text
+fonts BASE_CATEGORICAL actives
+→ ordenar per menor mida de cel·la
+→ primera amb dada semàntica vàlida
+→ TLST base
+```
+
+En empat de resolució s'utilitza la prioritat persistent.
+
+`NoData`, `unknown` i `unclassified` activen fallback a la següent font.
+
+---
+
+## 6. El refinament no pot contradir el governador
+
+Un refinament només pot mantenir o aprofundir la branca TLST del node actual.
+
+```text
+candidate == current
+```
+
+o:
+
+```text
+candidate descendant_of current
+```
+
+Una altra branca és `NOT_APPLICABLE`.
+
+---
+
+## 7. L'ordre entre refinaments és determinista
+
+Entre refinaments compatibles:
+
+```text
+1. major profunditat TLST
+2. major precisió espacial
+3. prioritat persistent
+4. stable ID només com a últim tie-break tècnic
+```
+
+TerraLab3D no calcula un `trust score` o una puntuació subjectiva de fiabilitat dels datasets.
+
+---
+
+## 8. Ignorar no és eliminar
+
+Una font pot estar:
+
+```text
+ACTIVA
+IGNORADA
+```
+
+sense perdre els fitxers, la llicència ni la procedència.
+
+L'estat ha de persistir i la reactivació no ha d'obligar a redescàrrega.
+
+---
+
+## 9. No resoldre també és informació
+
+Per una bifurcació podem tenir:
 
 ```text
 RESOLVED
@@ -209,7 +264,7 @@ UNRESOLVED
 NOT_APPLICABLE
 ```
 
-Això és independent de:
+Això és diferent de:
 
 ```text
 nodata
@@ -221,7 +276,7 @@ que continuen sent `ObservationState` i no categories TLST.
 
 ---
 
-## 6. El raster original mai es modifica
+## 10. El raster original mai es modifica
 
 Sempre es conserva:
 
@@ -232,10 +287,10 @@ source_code
 source_value
 mapping_revision
 TLST result
-refinement trace
+resolution trace
 ```
 
-La classificació refinada és una interpretació derivada.
+La classificació resolta és una interpretació derivada.
 
 ---
 
@@ -249,7 +304,7 @@ La classificació refinada és una interpretació derivada.
 
 La precaució continua sent la mateixa:
 
-`uint16`, màscara de 2 bits, `R8UI`, etc. són decisions d’implementació d’aquesta vertical, no propietats universals de TLST.
+`uint16`, màscara de 2 bits, `R8UI`, etc. són decisions d'implementació d'aquesta vertical, no propietats universals de TLST.
 
 ## Pipeline existent
 
@@ -284,15 +339,11 @@ Inclou:
 - JSON versionat;
 - tooltip científic.
 
-## Nova consideració arquitectònica
-
-Els mappings S2GLC i WorldCover implementats aquí passen a ser els **dos primers membres del registre general d’equivalències de la Vertical 3**.
-
-No són casos arquitectònicament especials.
+Els mappings S2GLC i WorldCover implementats aquí són membres del registre general d'equivalències de la Vertical 3. No són casos arquitectònicament especials.
 
 ---
 
-# Vertical 2 — Lector raster universal + importació d’elevació
+# Vertical 2 — Lector raster universal + importació d'elevació
 
 ## Estat
 
@@ -313,7 +364,7 @@ format de fitxer
 ## Arquitectura
 
 ```text
-fitxer raster
+fitxer raster extern
       ↓
 Rasterio
       ↓
@@ -326,7 +377,7 @@ ElevationSampler
 pipeline DEM existent
 ```
 
-Suporta els formats disponibles a la instal·lació GDAL/Rasterio, inclosos GeoTIFF, COG, VRT, AAIGrid, ENVI, BIL/BIP/BSQ, IMG, JP2, NetCDF, HDF, GRIB, SAGA, PCRaster, Idrisi, Surfer, Zarr, etc.
+Suporta els formats disponibles a la instal·lació GDAL/Rasterio, inclosos GeoTIFF, COG, VRT, AAIGrid, ENVI, BIL/BIP/BSQ, IMG, JP2, NetCDF, HDF, GRIB, SAGA, PCRaster, Idrisi, Surfer, Zarr quan Rasterio/GDAL l'ofereixi, etc.
 
 També:
 
@@ -371,45 +422,31 @@ ElevationSampler
 terreny real
 ```
 
+No reobrir aquesta vertical per implementar la caché TLST. La caché interna Zarr és una responsabilitat diferent de la façana Rasterio d'entrada.
+
 ---
 
-# Vertical 3 — Categòric universal + registre d’estàndards + equivalències TLST
+# Vertical 3 — Categòric universal + registre d'estàndards + equivalències TLST
 
 ## Estat
 
 **COMPLETADA**
 
-El lector universal analitza finestres exactes d'enters, paleta, RGB o RGBA i
-materialitza una vista indexada `uint16` reconstruïble només després de la
-confirmació. El valor font, el dtype, l'esquema, la versió i la revisió del
-mapping continuen sent l'autoritat d'auditoria. Els IDs compactes no són
-identitat pública.
+El lector universal analitza finestres exactes d'enters, paleta, RGB o RGBA i materialitza una vista indexada reconstruïble només després de la confirmació. El valor font, dtype, esquema, versió i revisió del mapping continuen sent l'autoritat d'auditoria. Els IDs compactes no són identitat pública.
 
-El registre inicial conté S2GLC, WorldCover 2020/2021, Copernicus LCM-10 i les
-44 classes CORINE, més el seu NoData declarat. La llegenda publicada inclou el
-camí resolt, la profunditat semàntica i els fills que una classe genèrica deixa
-oberts.
+El registre inicial conté S2GLC, WorldCover 2020/2021, Copernicus LCM-10 i les 44 classes CORINE, més els seus NoData declarats.
 
-Aquesta vertical passa a ser molt més important del que plantejava el pla inicial.
-
-No consisteix només a poder obrir qualsevol raster categòric.
-
-Consisteix a construir la **capa universal de traducció entre classificacions externes i TLST 1.0**.
-
----
+Aquesta vertical construeix la capa universal de traducció entre classificacions externes i TLST 1.0.
 
 ## 3.1 Importació categòrica universal
-
-Flux:
 
 ```text
 TERRA
 → Categòric
 → + Importar
 → raster
-→ tipus = categòric
 → lectura de codificació
-→ selecció/detecció d’esquema
+→ selecció/detecció d'esquema
 → mapping
 → TLST
 ```
@@ -425,38 +462,19 @@ RGBA
 
 Sense interpolació categòrica.
 
----
+## 3.2 Detecció d'esquema
 
-## 3.2 Detecció d’esquema
-
-Només després que l’usuari hagi declarat:
+Només després que l'usuari hagi declarat:
 
 ```text
 tipus = categòric
 ```
 
-TerraLab pot intentar reconèixer un esquema.
+TerraLab3D pot intentar reconèixer l'esquema a partir de dades objectives.
 
-Per exemple:
+Mai intenta deduir si el raster "sembla bosc" o "sembla un DEM".
 
-```text
-Els codis coincideixen amb:
-S2GLC Europe 2017 v1.2
-
-[ Utilitzar aquest esquema ]
-[ Seleccionar-ne un altre ]
-```
-
-Mai:
-
-```text
-"sembla vegetació"
-"sembla un DEM"
-```
-
----
-
-## 3.3 Registre universal d’estàndards
+## 3.3 Registre universal
 
 Cada esquema conegut defineix:
 
@@ -469,34 +487,9 @@ mapping_revision
 TLST mappings
 ```
 
-Exemples progressius:
+## 3.4 Matriu estàndard → TLST
 
-```text
-S2GLC
-ESA WorldCover
-Copernicus LCM-10
-CORINE Land Cover
-CLC+
-Dynamic World
-CGLS-LC100
-ESA CCI Land Cover
-MODIS MCD12Q1
-GlobeLand30
-GLC_FCS30D
-NLCD
-Urban Atlas
-...
-```
-
----
-
-# 3.4 Matriu d’equivalències estàndard → TLST
-
-Aquest és el canvi principal.
-
-Per **cada classe de cada estàndard suportat** s’ha de documentar fins on pot arribar dins TLST.
-
-Exemple conceptual:
+Per cada classe externa es documenta el node TLST màxim justificat.
 
 | Estàndard | Classe externa | TLST màxim justificat |
 |---|---|---|
@@ -504,57 +497,11 @@ Exemple conceptual:
 | Estàndard B | Permanent crops | `agriculture.cropland.permanent_crop` |
 | Estàndard C | Vineyards | `agriculture.cropland.permanent_crop.vineyard` |
 
-El sistema no exigeix que tots arribin a la mateixa profunditat.
-
----
+No s'obliga totes les fonts a arribar a la mateixa profunditat.
 
 ## 3.5 Cobertura jeràrquica
 
-A partir dels mappings es pot derivar una matriu de cobertura.
-
-Exemple:
-
-```text
-agriculture
-└── cropland
-    └── permanent_crop
-        ├── vineyard
-        ├── orchard
-        └── ...
-```
-
-Una font podria cobrir:
-
-```text
-agriculture                  ✓
-cropland                     ✓
-permanent_crop               ?
-vineyard                     ?
-orchard                      ?
-```
-
-Una altra:
-
-```text
-agriculture                  ✓
-cropland                     ✓
-permanent_crop               ✓
-vineyard                     ?
-orchard                      ?
-```
-
-I una tercera:
-
-```text
-agriculture                  ✓
-cropland                     ✓
-permanent_crop               ✓
-vineyard                     ✓
-```
-
-Aquesta informació serà la base directa de la Vertical 5.
-
----
+A partir dels mappings es pot derivar quins nodes resol directament cada esquema i quines bifurcacions deixa obertes. Aquesta informació serà consumida pel futur resolver i pel futur planificador automàtic de refinaments.
 
 ## 3.6 Tipus de mapping
 
@@ -566,49 +513,7 @@ composite
 observation_state
 ```
 
-Però el mapping ha d’incloure també la seva profunditat semàntica real.
-
-Exemple:
-
-```text
-source class
-    ↓
-SingleSurface
-    ↓
-TLST node
-    ↓
-no afirma res sobre descendents
-```
-
----
-
-## 3.7 Resultat observable
-
-Seleccionar un píxel permet auditar:
-
-```text
-Font:
-CORINE Land Cover
-
-Codi:
-311
-
-Mapping revision:
-...
-
-TLST:
-tree_cover...
-
-Profunditat resolta:
-...
-
-Jerarquia pendent:
-...
-```
-
-No cal mostrar tota aquesta informació al tooltip ordinari.
-
-Ha d’estar disponible al contracte científic/auditoria.
+Un mapping a un node pare no afirma res sobre els descendents.
 
 ---
 
@@ -618,13 +523,9 @@ Ha d’estar disponible al contracte científic/auditoria.
 
 **COMPLETADA**
 
-Una classificació creada per l'usuari entra al mateix registre que els
-estàndards. Es persisteix atòmicament a `classification_schemes.json`, es torna
-a carregar en reiniciar i no permet sobreescriure silenciosament una revisió
-existent. El selector mostra tota la jerarquia TLST i admet nodes estructurals,
-`unknown`, `unclassified` i les valideses no semàntiques declarables.
+Una classificació creada per l'usuari entra al mateix registre que els estàndards. Es persisteix atòmicament a `classification_schemes.json`, es torna a carregar en reiniciar i no permet sobreescriure silenciosament una revisió existent.
 
-Les classificacions creades pels usuaris són simplement **un altre esquema extern**.
+L'usuari pot mapar honestament a un node intermedi.
 
 Exemple:
 
@@ -637,34 +538,14 @@ mapa_manel.tif
 22 = aigua
 ```
 
-UI:
-
 ```text
-1  → [node TLST ▼]
-2  → [node TLST ▼]
-7  → [node TLST ▼]
-22 → [node TLST ▼]
+1  → tree_cover
+2  → [node agrícola justificat]
+7  → ...olive_grove
+22 → water...
 ```
 
-L’usuari no està obligat a seleccionar una fulla.
-
-Pot indicar honestament:
-
-```text
-1 → tree_cover
-```
-
-si aquesta és tota la informació que conté el seu raster.
-
-O:
-
-```text
-7 → agriculture...olive_grove
-```
-
-si el seu esquema realment ho especifica.
-
-## Persistència
+Persistència:
 
 ```text
 scheme_key
@@ -673,487 +554,412 @@ mapping_revision
 class mappings
 ```
 
-Exemple:
-
-```text
-"Mapa Manel v1"
-```
-
-A partir d’aquí funciona exactament igual que qualsevol estàndard oficial.
+A partir d'aquí funciona igual que qualsevol altre esquema extern.
 
 ---
 
-# Vertical 5 — Refinaments com a resolutors de jerarquia TLST
+# Gestor d'adquisició de refinaments — infraestructura existent
 
-Aquesta vertical canvia conceptualment de manera important.
+## Estat
 
-Un refinament **no pertany simplement a una categoria grossa**.
+**IMPLEMENTAT / PARCIALMENT FUNCIONAL**
 
-Pertany a una o més **preguntes de discriminació dins l’arbre TLST**.
+Aquesta peça no és una nova vertical pendent de crear.
 
----
+Ja existeixen:
 
-## Exemple forestal
+- AOI;
+- arbre TLST;
+- descoberta multiproveïdor;
+- filtre comercial fail-closed;
+- plans immutables;
+- descàrrega;
+- cancel·lació;
+- autenticació CDSE;
+- traducció source → TLST;
+- postprocessat;
+- mosaic de la instal·lació;
+- cobertura verificada;
+- importació manual;
+- persistència;
+- UI.
 
-Situació inicial:
+El seu paper és proporcionar fonts locals normalitzades al sistema de resolució que es construeix a V5–V7.
 
-```text
-tree_cover
-```
+Els artefactes actuals `refinement_mosaic.tif`, `refinement_source.tif`, `refinement_quality.tif`, `refinement_conflict.tif` i manifest es conserven com a derivats de les instal·lacions/planes actuals.
 
-Pregunta:
-
-```text
-podem discriminar entre els fills de tree_cover?
-```
-
-Possible refinament:
-
-```text
-Dominant Leaf Type
-```
-
-Resultat:
-
-```text
-tree_cover.broadleaf
-```
-
-Després pot existir una nova pregunta:
-
-```text
-podem discriminar els fills de broadleaf?
-```
-
-Una altra evidència pot permetre continuar.
-
-O no.
+No són encara la caché territorial global definitiva.
 
 ---
 
-## Exemple agrícola
+# Vertical 5 — Ràster governador + `Actiu/Ignorat` + prioritat persistent
 
-Inicial:
+## Estat
 
-```text
-agriculture.cropland
-```
+**PENDENT — pròxima vertical recomanada**
 
-Refinament:
+## Objectiu
 
-```text
-EuroCrops
-```
-
-Pot arribar a:
+Formalitzar quin categòric general governa cada posició i separar:
 
 ```text
-agriculture.cropland.permanent_crop.vineyard
+BASE_CATEGORICAL
 ```
 
-si la font ho demostra.
-
----
-
-## Exemple artificial
-
-Inicial:
+de:
 
 ```text
-artificial
+SEMANTIC_REFINEMENT
 ```
 
-OSM podria aportar:
+## Dependència funcional
+
+No s'apliquen refinaments si no existeix almenys un categòric general actiu.
+
+## Activació
+
+Reutilitzar el concepte `enabled` ja existent on sigui possible.
+
+Una font pot quedar:
 
 ```text
-building footprint
+ACTIVA
+IGNORADA
 ```
 
-Això pot:
+sense ser eliminada.
 
-- refinar semàntica;
-- aportar geometria autoritativa;
-- aportar atributs;
+Persistir també l'ordre de prioritat necessari per desempatar fonts equivalents.
 
-segons el cas.
+## Algoritme del governador
 
-No totes les evidències han d’alterar la categoria TLST.
-
----
-
-# Catàleg inicial de refinaments
-
-## Artificial / urbà
+Per cada posició:
 
 ```text
-OpenStreetMap
-imperviousness
-Urban Atlas
-DEM
-clima
+1. BASE_CATEGORICAL actius que cobreixen la posició
+2. resolution ASC
+3. priority DESC en empat
+4. sample
+5. si NoData/unknown/unclassified → següent
+6. primera dada semàntica vàlida → governador
 ```
-
-## Agricultura
-
-```text
-EuroCrops
-SIGPAC quan procedeixi
-HR-VPP
-DEM
-clima
-fenologia
-```
-
-## Boscos
-
-```text
-Tree Cover Density
-Dominant Leaf Type
-HR-VPP
-DEM
-clima
-```
-
-## Grassland
-
-```text
-Copernicus Grassland
-HR-VPP
-DEM
-clima
-```
-
-## Shrub / heath / sclerophyllous
-
-```text
-SoilGrids
-clima
-DEM
-cobertura vegetal futura
-```
-
-## Wetland
-
-```text
-Water & Wetness
-DEM
-clima
-```
-
-## Peat bog
-
-```text
-Water & Wetness
-SoilGrids
-DEM
-```
-
-## Mangrove
-
-```text
-Water & Wetness
-context costaner
-clima
-DEM
-```
-
-## Bare / sparse
-
-```text
-SoilGrids
-DEM
-clima
-```
-
-## Water
-
-```text
-Water & Wetness
-OSM
-DEM
-```
-
-## Snow / ice
-
-```text
-Copernicus Snow
-DEM
-clima
-estació
-```
-
-## Context transversal
-
-```text
-latitud
-longitud
-DEM
-pendent
-orientació
-Köppen-Geiger / equivalent
-data
-estació
-```
-
-Tots opcionals.
-
----
-
-# Vertical 6 — Evidències normalitzades + procedència + capacitat semàntica
-
-Els proveïdors no arriben directament al procedural ni modifiquen directament TLST.
-
-Produiran evidències.
-
-Exemples:
-
-```text
-OSM building
-→ BuildingFootprintEvidence
-```
-
-```text
-OSM road
-→ RoadGeometryEvidence
-```
-
-```text
-EuroCrops vineyard
-→ CropTypeEvidence
-```
-
-```text
-Tree Cover Density 76 %
-→ TreeCoverDensityEvidence
-```
-
-```text
-Dominant Leaf Type
-→ LeafTypeEvidence
-```
-
-```text
-SoilGrids
-→ SoilEvidence
-```
-
----
-
-## Contracte mínim
-
-Cada evidència conserva:
-
-```text
-source
-source_version
-source_role
-
-spatial_precision
-semantic_precision
-confidence
-temporal_validity
-
-provenance
-```
-
-I, quan és semànticament aplicable:
-
-```text
-supports_tlst_node
-discriminates_from_node
-candidate_child
-```
-
-No totes les evidències necessiten aquests tres camps.
-
-Per exemple el DEM normalment aporta context, no classificació TLST.
-
----
-
-## SourceRole
-
-Es mantenen rols com:
-
-```text
-AuthoritativeGeometry
-AttributeOverride
-AttributeRefinement
-ContextOnly
-FallbackOnly
-```
-
-Una mateixa font pot produir evidències amb rols diferents.
-
----
-
-# Vertical 7 — Hierarchical InterpretationResolver
-
-Aquesta vertical deixa de ser simplement:
-
-```text
-categoria + evidències → categoria millor
-```
-
-i passa explícitament a ser un **resolver jeràrquic TLST**.
-
----
-
-## Pipeline
-
-```text
-observació categòrica
-      ↓
-mapper de l’estàndard
-      ↓
-node TLST més profund justificat
-      ↓
-HierarchyResolver
-      │
-      ├─ evidències
-      ├─ refinaments
-      ├─ DEM
-      └─ context
-      ↓
-intenta resoldre el següent nivell
-      ↓
-resolt?
-   ┌──┴──┐
-  sí    no
-  │      │
-  ▼      ▼
-continua STOP
-```
-
----
 
 ## Exemple
 
-Base:
+```text
+Categòric A 1 m → artificial.built
+Categòric B 10 m → agriculture.cropland
+
+→ A governa
+```
 
 ```text
+Categòric A 1 m → NoData
+Categòric B 10 m → agriculture.cropland
+
+→ B governa
+```
+
+## Reutilitzar
+
+- `data_sources.json`;
+- `enabled` categòric actual;
+- `ConfiguredSurfaceSampler` o contracte equivalent real;
+- registry TLST;
+- mappings;
+- `RefinementInstallation`;
+- repositoris de recursos;
+- footprints verificats;
+- UI existent.
+
+## No fer
+
+- nou sistema de descàrrega;
+- nous providers només per aquesta vertical;
+- nova taxonomia;
+- quality/trust score;
+- caché global encara;
+- SpatialPatch.
+
+## Proves mínimes
+
+```text
+1 m vàlid + 10 m vàlid → 1 m governa
+1 m NoData + 10 m vàlid → 10 m governa
+1 m ignored + 10 m actiu → 10 m governa
+empat resolució → prioritat
+reinici → enabled/priority persisteixen
+```
+
+---
+
+# Vertical 6 — Resolver TLST determinista + ResolutionTrace
+
+## Estat
+
+**PENDENT**
+
+## Objectiu
+
+Aplicar refinaments actius sense permetre que contradiguin la branca establerta pel governador.
+
+## Contribució normalitzada mínima
+
+El resolver ha de rebre un descriptor equivalent a:
+
+```text
+source_id
+source_version
+source_role
+coverage
+spatial_resolution
+mapping_revision
+source_value
+candidate_tlst
+provenance
+temporal_validity?      # quan aplica
+source_confidence?      # només si la font el publica
+```
+
+No és necessari crear una subclasse `Evidence` distinta per cada proveïdor si un contracte data-driven resol el problema.
+
+## Compatibilitat
+
+Un refinament només participa si:
+
+```text
+candidate_tlst == current_tlst
+```
+
+o:
+
+```text
+candidate_tlst descendant_of current_tlst
+```
+
+Una altra branca s'ignora per aquella posició.
+
+## Ordre
+
+```text
+compatibilitat
+→ profunditat TLST DESC
+→ resolució espacial ASC
+→ prioritat DESC
+→ stable ID
+```
+
+TerraLab3D no calcula una confiança pròpia.
+
+## Exemple compatible
+
+```text
+base:
 agriculture.cropland
+
+Crop Types:
+vineyard
+
+→ aprofundir fins a vineyard segons el mapping TLST real
 ```
 
-EuroCrops:
+## Exemple incompatible
 
 ```text
-crop_type = vineyard
+base 1 m:
+artificial.built
+
+Crop Types 10 m:
+vineyard
+
+→ ignorar Crop Types
 ```
-
-Resultat:
-
-```text
-agriculture.cropland.permanent_crop.vineyard
-```
-
-Traça:
-
-```text
-S2GLC
-→ agriculture.cropland
-
-EuroCrops
-→ permanent_crop
-→ vineyard
-```
-
-La classificació inicial continua intacta i auditable.
-
----
-
-## Un altre exemple
-
-Base:
-
-```text
-tree_cover
-```
-
-Dominant Leaf Type:
-
-```text
-broadleaf
-```
-
-Resultat:
-
-```text
-tree_cover.broadleaf
-```
-
-No hi ha evidència suficient per continuar:
-
-```text
-STOP
-```
-
-Resultat final:
-
-```text
-tree_cover.broadleaf
-```
-
-No:
-
-```text
-tree_cover.broadleaf.<fill inventat>
-```
-
----
 
 ## ResolutionTrace
 
-Cada resolució ha de conservar conceptualment:
-
 ```text
-initial_observation
+governing_source
+governing_source_value
+governing_mapping_revision
 initial_tlst_node
 
 steps:
-  - evidence
-  - previous_node
-  - resolved_node
-  - confidence
-  - provenance
+  - source_id
+  - source_value
+  - mapped_tlst
+  - previous_tlst
+  - resulting_tlst
+  - spatial_resolution
+  - priority
 
 final_tlst_node
-unresolved_children
 ```
 
-Això serà fonamental per al Mode Científic.
+## Resultat observable
+
+El mode d'auditoria ha de poder explicar per què un refinament s'ha aplicat o s'ha descartat sense exposar complexitat innecessària al tooltip ordinari.
 
 ---
 
-# Vertical 8 — SpatialPatch + halo + cache espacial
+# Vertical 7 — Caché TLST canònica progressiva i multiresolució
 
-Un cop resolta la semàntica ja podem deixar de pensar només en samples.
+## Estat
 
-Creem:
+**PENDENT — crítica abans de SpatialPatch**
 
-```text
-SpatialPatch
-```
+## Objectiu
 
-Molts píxels espacialment relacionats:
+Materialitzar el resultat del governador + resolver en una representació ràpida i regenerable que el runtime pugui consultar sense reinterpretar totes les fonts en cada accés.
 
 ```text
-████████
-██████████
-  ███████
-   █████
+sources
+→ governor
+→ resolver
+→ canonical TLST cache
+→ surface runtime
 ```
 
-es converteixen en:
+## Format lògic
 
 ```text
-polígon irregular
+<cache-id>.tlstcache/
+├── manifest.json
+└── data.zarr/
 ```
+
+Zarr és un backend intern darrere un port propi. Rasterio continua sent la façana de fonts raster externes.
+
+L'exportació a GeoTIFF/COG queda fora d'aquesta vertical.
+
+## Multiresolució
+
+No existeix una sola matriu amb píxels de mida variable.
+
+```text
+resolution_1m/
+resolution_10m/
+resolution_100m/
+...
+```
+
+Cada array té resolució fixa.
+
+Només es generen els chunks necessaris.
+
+## Contingut dens mínim
+
+```text
+tlst_code
+validity
+```
+
+`categoryKey` continua sent la identitat pública.
+
+`uint16` pot ser l'encoding intern actual mentre TLST hi càpiga.
+
+Traçabilitat preferent:
+
+```text
+diccionari de traces per chunk
+trace_id opcional
+metadata de procedència
+```
+
+No duplicar automàticament `source_id`, `quality` o `confidence` a cada cel·la si no és necessari.
+
+## Chunking i compressió
+
+Benchmarkar com a mínim:
+
+```text
+512 × 512
+1024 × 1024
+```
+
+amb:
+
+```text
+Zstd
+Blosc + Zstd
+```
+
+No hardcodejar el guanyador sense mesura.
+
+## Invalidació
+
+Fingerprint mínim:
+
+```text
+TLST version
+resolver version
+active sources
+source roles
+enabled/ignored
+priority
+source fingerprints
+scheme/version/mapping_revision
+CRS/grid/resolution
+cache schema version
+```
+
+Canvis semàntics invaliden la caché.
+
+Quan existeix footprint fiable, invalidar només chunks solapats.
+
+Si la invalidació parcial no és demostrablement segura, invalidació completa.
+
+## Estimació d'espai
+
+Mida bruta:
+
+```text
+cells × bytes obligatoris
+```
+
+Mida comprimida estimada:
+
+```text
+sample chunks
+→ compressor
+→ ratio mesurada
+→ extrapolació
+```
+
+La UI pot informar brut, comprimit estimat i espai lliure, indicant que la mida final pot variar.
+
+## Integració
+
+El consumer de superfície evoluciona de:
+
+```text
+esquema concret
+```
+
+a:
+
+```text
+TLST cache
+```
+
+sense reconstruir la geometria DEM.
 
 ---
 
-## Contracte
+# Vertical 8 — SpatialPatch + halo
 
-Cada patch conté:
+## Estat
+
+**PENDENT**
+
+La caché TLST és raster/IO. `SpatialPatch` és una unitat semàntica i procedural.
+
+```text
+caché TLST
+→ regions espacialment coherents
+→ SpatialPatch
+```
+
+## Contracte conceptual
 
 ```text
 category
@@ -1161,18 +967,13 @@ polygon
 area
 centroid
 neighbours
-
 terrain_stats
-evidences
-resolution_trace
 provenance
-
+resolution_trace_ref
 seed
 ```
 
-La categoria és la **interpretació TLST disponible per al patch**, no necessàriament una fulla.
-
----
+La traça completa es pot referenciar; no cal duplicar-la íntegrament dins de cada patch.
 
 ## Halo
 
@@ -1216,9 +1017,15 @@ context
 procedural
 ```
 
+Un patch pot travessar tiles.
+
 ---
 
 # Vertical 9 — Primer generador procedural: agricultura
+
+## Estat
+
+**PENDENT**
 
 Agricultura continua sent el millor primer generador complet perquè prova:
 
@@ -1226,7 +1033,7 @@ Agricultura continua sent el millor primer generador complet perquè prova:
 - DEM;
 - orientació;
 - clipping;
-- repetició d’assets;
+- repetició d'assets;
 - refinament;
 - determinisme.
 
@@ -1235,14 +1042,12 @@ Exemple:
 ```text
 TLST:
 ...vineyard
-
 +
 SpatialPatch
 +
 DEM
 +
 context
-
 ↓
 VineyardGenerator
 ```
@@ -1251,16 +1056,11 @@ Pipeline:
 
 ```text
 vineyard patch
-      ↓
-orientació de les files
-      ↓
-línies paral·leles
-      ↓
-clip al polígon
-      ↓
-passadissos
-      ↓
-distribució de plantes
+→ orientació de files
+→ línies paral·leles
+→ clip al polígon
+→ passadissos
+→ distribució de plantes
 ```
 
 Python calcula:
@@ -1281,15 +1081,17 @@ Si TLST només ha arribat a:
 agriculture.cropland
 ```
 
-no s’executa arbitràriament un generador de vinya.
-
-S’utilitza un generador compatible amb aquesta precisió o un fallback explícit.
+no s'executa arbitràriament un generador de vinya. S'utilitza un generador compatible amb aquella profunditat o un fallback explícit.
 
 ---
 
 # Vertical 10 — Boscos, matorral i herbàcies
 
-Aquesta vertical demostra que el contracte procedural no pressuposa files ni agricultura.
+## Estat
+
+**PENDENT**
+
+Demostra que el contracte procedural no pressuposa files ni agricultura.
 
 ## Bosc
 
@@ -1321,32 +1123,31 @@ densitat variable
 ## Grassland
 
 ```text
-FAR
-→ material
-
-MID
-→ geometria simplificada
-
-NEAR
-→ instàncies
+FAR  → material
+MID  → geometria simplificada
+NEAR → instàncies
 ```
 
-El generador seleccionat depèn de la **profunditat TLST realment resolta**.
+El generador depèn de la profunditat TLST realment resolta.
 
 ---
 
-# Vertical 11 — Built-up + OSM
+# Vertical 11 — Built-up i geometria vectorial
 
-Vertical procedural especialment complexa.
+## Estat
+
+**PENDENT**
+
+Vertical procedural complexa.
+
+La necessitat arquitectònica és:
 
 ```text
 TLST artificial
 +
-OSM buildings
+geometries vectorials autoritzades
 +
-OSM roads
-+
-landuse
+atributs
 +
 DEM
 +
@@ -1356,6 +1157,8 @@ BuiltUpInterpreter
         ↓
 UrbanGenerator
 ```
+
+No assumir OSM com a font oficial ja integrada: la política comercial actual exclou ODbL/llinatge OSM del catàleg oficial. El motor pot ser compatible amb dades importades externament amb llicència/procedència separades, però això no converteix OSM en dependència oficial.
 
 Separació obligatòria:
 
@@ -1369,31 +1172,15 @@ de:
 COM ES VEU
 ```
 
-Exemple:
-
-```text
-building_type = industrial
-```
-
-pot ser evidència semàntica.
-
-Mentre:
-
-```text
-architectural_profile:
-    mediterranean = 0.7
-    central_european = 0.3
-```
-
-és representació/context visual.
-
-Un footprint OSM autoritatiu es conserva.
-
-No es reemplaça per una caixa procedural si tenim geometria millor.
+Una geometria autoritativa disponible es conserva; no es reemplaça per una caixa procedural si existeix una geometria millor.
 
 ---
 
 # Vertical 12 — Aigua, humedals, neu, gel i bare surfaces
+
+## Estat
+
+**PENDENT**
 
 Completa les famílies principals.
 
@@ -1401,26 +1188,14 @@ Completa les famílies principals.
 
 ```text
 aigua
-barro
+fang
 vegetació
 transicions
 ```
 
 ## Water
 
-Només es distingeix:
-
-```text
-river
-canal
-reservoir
-standing water
-...
-```
-
-quan TLST + evidències ho permeten.
-
-No pel simple fet que el generador conegui aquests conceptes.
+Només es distingeix river/canal/reservoir/standing water quan TLST + refinaments ho permeten.
 
 ## Snow / Ice
 
@@ -1444,7 +1219,11 @@ procedural variation
 
 ---
 
-# Vertical 13 — Sistema d’assets i materials
+# Vertical 13 — Sistema d'assets i materials
+
+## Estat
+
+**PENDENT**
 
 Separar definitivament:
 
@@ -1473,30 +1252,17 @@ Selector:
 asset affinity matching
 ```
 
-Els assets poden tenir múltiples afinitats:
-
-```text
-mediterranean = 0.8
-mountain = 0.6
-rural = 0.9
-```
-
-Afegir un asset nou no obliga a recalcular:
-
-```text
-mapping
-refinement
-TLST
-patches
-```
+Afegir un asset nou no obliga a recalcular mappings, TLST, caché ni patches si la semàntica territorial no ha canviat.
 
 ---
 
 # Vertical 14 — LOD procedural complet
 
-Una única identitat semàntica.
+## Estat
 
-Diverses representacions.
+**PENDENT**
+
+Una única identitat semàntica, diverses representacions:
 
 ```text
 FAR
@@ -1504,7 +1270,7 @@ MID
 NEAR
 ```
 
-## Arbre
+Arbre:
 
 ```text
 FAR  → canopy mass
@@ -1512,7 +1278,7 @@ MID  → impostor
 NEAR → mesh
 ```
 
-## Edifici
+Edifici:
 
 ```text
 FAR  → volum
@@ -1520,7 +1286,7 @@ MID  → footprint + roof
 NEAR → façade detail
 ```
 
-## Cultiu
+Cultiu:
 
 ```text
 FAR  → material
@@ -1533,6 +1299,10 @@ Canviar de LOD mai modifica TLST.
 ---
 
 # Vertical 15 — Estacions i estat temporal
+
+## Estat
+
+**PENDENT**
 
 No existeixen quatre mons independents.
 
@@ -1553,24 +1323,25 @@ colors
 wetness
 ```
 
-No modifica arbitràriament:
+No modifica arbitràriament carreteres, edificis, posicions estructurals o parcel·les.
 
-```text
-roads
-buildings
-tree positions
-parcel boundaries
-```
+L'estat temporal visual no inventa una classificació TLST més precisa.
 
-I, especialment:
-
-> l’estat temporal visual no pot inventar una classificació TLST més precisa.
+Si en el futur un dataset temporal real canvia semàntica territorial, aquesta dependència haurà d'entrar explícitament al fingerprint del resolver/cache corresponent; no es dedueix d'una simple animació estacional.
 
 ---
 
-# Vertical 16 — Refinement Cache automàtic
+# Vertical 16 — Planificador automàtic de refinaments guiat pels buits TLST
 
-Aquesta vertical automatitza el sistema construït a V3–V7.
+## Estat
+
+**PENDENT**
+
+Aquesta vertical substitueix l'antic concepte de "Refinement Cache automàtic".
+
+La caché TLST canònica ja existeix des de V7.
+
+V16 automatitza la selecció de refinaments útils.
 
 No pregunta simplement:
 
@@ -1582,89 +1353,82 @@ Pregunta:
 
 ```text
 quines parts de TLST
-queden sense resoldre
+continuen massa genèriques
 en aquesta àrea?
 ```
-
----
 
 ## Pipeline
 
 ```text
-AOI
+TLST cache
++
+ResolutionTrace
  ↓
-classificacions disponibles
+detectar nodes encara genèrics
  ↓
-mappings estàndard → TLST
+quins refinadors poden aportar profunditat nova?
  ↓
-nodes assolits
+reutilitzar discovery del gestor existent
  ↓
-detectar bifurcacions no resoltes
+filtre de llicència
  ↓
-buscar refinadors compatibles
+pla
  ↓
-què tenim?
-què falta?
+descàrrega/importació
  ↓
-descàrrega
+instal·lació
  ↓
-clip
+invalidar chunks afectats
  ↓
-normalització
- ↓
-Evidence
- ↓
-HierarchyResolver
- ↓
-cache
+reconstruir cache
 ```
 
-Això permet que el sistema digui conceptualment:
+Exemple:
 
 ```text
 Aquí ja sé:
 tree_cover.broadleaf
 
 No necessito:
-un altre dataset que només distingeixi tree_cover
+un altre producte que només distingeixi tree_cover
 
 Sí em pot servir:
-un dataset capaç de discriminar
-els fills encara no resolts de broadleaf
+un producte capaç de discriminar descendents encara oberts
 ```
 
-Aquesta és una diferència fonamental respecte a descarregar indiscriminadament totes les fonts disponibles.
+La descoberta, llicències, plans i downloads no es tornen a implementar: es reutilitza el gestor existent.
 
 ---
 
 # Vertical 17 — Mode Científic / Mode Observador complets
 
+## Estat
+
+**PENDENT**
+
 ## Mode Científic
 
-Mostra:
+Mostra o permet auditar:
 
 ```text
 font original
 versió
 codi original
-
 mapping
 TLST inicial
-
-evidències
-refinaments
-
+governador
+refinaments aplicats/ignorats
 ResolutionTrace
-
 TLST final
+cache generation
 nivells no resolts
-
 procedència
-confiança
-precisió
+precisió espacial
 ```
 
-Representació visual:
+Si una font publica una confiança pròpia es pot mostrar com a metadata de font. No hi ha una "confiança TerraLab" inventada.
+
+Representació conceptual:
 
 ```text
 OBSERVAT
@@ -1673,10 +1437,6 @@ REFINAT
 INFERIT
 PROCEDURAL
 ```
-
-Aquests conceptes no s’han de confondre.
-
----
 
 ## Mode Observador
 
@@ -1696,7 +1456,11 @@ Però qualsevol element pot remetre a la seva traça científica.
 
 # Vertical 18 — Procedural Lab independent
 
-Aplicació/laboratori per desenvolupar els generadors sense dependre necessàriament d’una classificació raster externa.
+## Estat
+
+**PENDENT**
+
+Aplicació/laboratori per desenvolupar generadors sense dependre necessàriament d'una classificació raster externa.
 
 ```text
 DEM
@@ -1728,11 +1492,9 @@ LOD descriptors
 
 que TerraLab3D.
 
----
-
 ## Procedural urbà experimental
 
-La mida de l’àrea pot governar:
+La mida de l'àrea pot governar:
 
 ```text
 casa
@@ -1762,68 +1524,61 @@ Això permet desenvolupar i provar generació procedural encara que no existeixi
 # Vista completa revisada
 
 ```text
-V1  TLST 1.0
+V1  TLST 1.0                         COMPLET
     + S2GLC
     + WorldCover
     + auditoria E2E
  │
-V2  Raster universal
-    + elevació importable
+V2  Raster universal + DEM           COMPLET
  │
-V3  Categòric universal
+V3  Categòric universal              COMPLET
     + registre d'estàndards
-    + equivalències estàndard → TLST
+    + mappings estàndard → TLST
     + cobertura jeràrquica
  │
-V4  Esquemes categòrics personalitzats
+V4  Esquemes personalitzats          COMPLET
     + mapping manual → TLST
  │
-V5  Refinaments orientats
-    a bifurcacions TLST no resoltes
+    Gestor d'adquisició refinaments  IMPLEMENTAT / WIP
  │
-V6  Evidències normalitzades
-    + procedència
-    + precisió semàntica
+V5  Governador + enabled/ignored     PENDENT
  │
-V7  Hierarchical InterpretationResolver
+V6  Resolver TLST determinista       PENDENT
     + ResolutionTrace
  │
-V8  SpatialPatch
-    + halo
-    + cache espacial
+V7  Caché TLST canònica              PENDENT
+    + Zarr intern
+    + chunks
+    + multiresolució
+    + invalidació
  │
-V9  Procedural agricultura
+V8  SpatialPatch + halo              PENDENT
  │
-V10 Boscos
-    + shrub
-    + grass
+V9  Procedural agricultura           PENDENT
  │
-V11 Built-up
-    + OSM
+V10 Boscos + shrub + grass            PENDENT
  │
-V12 Aigua
-    + wetlands
-    + snow/ice
-    + bare
+V11 Built-up / vectors                PENDENT
  │
-V13 Assets
-    + materials
+V12 Aigua + wetlands + snow/bare      PENDENT
  │
-V14 LOD procedural
+V13 Assets + materials                PENDENT
  │
-V15 Estat temporal
-    + estacions
+V14 LOD procedural                    PENDENT
  │
-V16 Refinement Cache automàtic
+V15 Estat temporal                    PENDENT
+ │
+V16 Planificador auto refinaments     PENDENT
     guiat pels buits TLST
  │
-V17 Mode Científic
-    + Mode Observador
+V17 Mode Científic + Observador       PENDENT
  │
-V18 Procedural Lab
+V18 Procedural Lab                    PENDENT
 ```
 
-# Flux global final
+---
+
+# Flux global final revisat
 
 ```text
                     DADES DE COBERTURA
@@ -1840,27 +1595,27 @@ V18 Procedural Lab
                 SourceSchemeTranslator
                            │
                            ▼
-              TLST més profund demostrable
+             fonts categòriques generals
                            │
                            ▼
-                Què queda sense resoldre?
-                           │
-                    ┌──────┴──────┐
-                    │             │
-                  res          no resolt
-                    │             │
-                    │             ▼
-                    │      RefinementRegistry
-                    │             │
-                    │             ▼
-                    │          Evidence
-                    │             │
-                    └──────┬──────┘
-                           ▼
-              HierarchicalInterpretationResolver
+                Ràster Governador
+            resolució + fallback NoData
                            │
                            ▼
-               SurfaceInterpretation TLST
+                  node TLST base
+                           │
+                           ▼
+               refinaments compatibles
+                           │
+                           ▼
+               TLST Resolver determinista
+        profunditat → resolució → prioritat
+                           │
+                           ▼
+                    ResolutionTrace
+                           │
+                           ▼
+                 Caché TLST canònica
                            │
                            ▼
                      SpatialPatch
@@ -1878,21 +1633,26 @@ V18 Procedural Lab
                       Three.js
 ```
 
+---
+
 # Regla final del sistema
 
 La classificació territorial segueix aquesta prioritat conceptual:
 
 ```text
-1. Observar.
-2. Traduir.
-3. Determinar fins on sabem.
-4. Identificar què no sabem.
-5. Buscar evidència específica per resoldre-ho.
-6. Refinar només quan l'evidència ho permet.
-7. Aturar-se quan deixa d'haver-hi evidència.
-8. Generar només amb la precisió realment assolida.
+1. Observar les fonts categòriques generals actives.
+2. Traduir cada font directament a TLST.
+3. Escollir el governador espacial més precís amb dada vàlida.
+4. Aplicar fallback quan el governador candidat té NoData.
+5. Fixar la branca TLST base.
+6. Considerar només refinaments compatibles amb aquella branca.
+7. Guanyar per profunditat semàntica, després resolució i després prioritat.
+8. Conservar una ResolutionTrace determinista.
+9. Materialitzar el resultat en una caché TLST canònica progressiva.
+10. Construir SpatialPatch sobre la caché quan arribi la vertical corresponent.
+11. Generar només amb la precisió TLST realment assolida.
 ```
 
 Per tant:
 
-> **TLST defineix tot allò que TerraLab3D és capaç d’expressar; els estàndards determinen quina part d’aquesta jerarquia podem observar directament; els refinaments intenten completar únicament els nivells que continuen sense resoldre; i el procedural representa el resultat sense fabricar precisió semàntica inexistent.**
+> **TLST defineix tot allò que TerraLab3D és capaç d'expressar; el categòric governador determina quina branca descriu espacialment cada posició; els refinaments només poden aprofundir aquesta branca; la caché TLST materialitza el resultat de forma eficient; i el procedural representa la interpretació assolida sense fabricar precisió semàntica inexistent.**

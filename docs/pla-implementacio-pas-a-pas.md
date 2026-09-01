@@ -5803,69 +5803,97 @@ La gestió unificada de preferències i datasets es tanca al pas 23.
 
 ### Resultat funcional palpable
 
-L’aplicació disposa d’un gestor de capes i recursos equivalent: instal·lació, fonts externes, progrés, cancel·lació, fallback, visibilitat i restauració de preferències.
+L’aplicació disposa d’un gestor de capes i recursos equivalent: instal·lació, fonts externes, progrés, cancel·lació, fallback, visibilitat i restauració de preferències. La interpretació del territori passa a ser guiada per un governador espacial i un resolver TLST determinista que consoliden múltiples fonts en una caché canònica multiresolució.
 
-### Avenç implementat: TLST Verticals 2–4
+### Avenç implementat: TLST Verticals 1–4 i Gestor d'Adquisició
 
-La importació raster d'elevació ja disposa de fonts gestionades i externes, transferència HTTP binària, staging cancel·lable, descriptors Rasterio neutrals, persistència separada als tres catàlegs i activació primària amb fallback. El cas `mi_dem.asc` sobreviu al reinici i alimenta la malla DEM real.
-
-La importació categòrica universal també està operativa per enters, paleta i
-RGB/RGBA exactes. El registre versionat tradueix S2GLC, WorldCover, LCM-10,
-CORINE i esquemes d'usuari directament a TLST, conserva la profunditat
-semàntica i exigeix confirmació abans d'activar una font. Tant la font
-estàndard com la personalitzada sobreviuen al reinici. Aquest avenç no dona per
-acabades les tasques de refinament, fusió ni procedural de les verticals
-posteriors.
+La infraestructura base ja és operativa:
+- **V1 TLST 1.0**: `[x]` COMPLET. Identitat canònica (`categoryKey`), picking, observation states i datasets base.
+- **V2 Raster universal + DEM**: `[x]` COMPLET. Descriptors Rasterio, selecció de banda, fallback DEM, regeneració segura.
+- **V3 Categòric universal**: `[x]` COMPLET. RGB/A exactes, mappings versionats, S2GLC, WorldCover, LCM-10, CORINE.
+- **V4 Esquemes personalitzats**: `[x]` COMPLET. Mapping manual, persistència (`scheme_key`, `mapping_revision`).
+- **Gestor d'adquisició/normalització de refinaments**: `[/]` IMPLEMENTAT / WIP. Descoberta, verificació de llicència, descàrregues CDSE, mosaics, manifest, persistència i UI. Els mosaics de refinament actuals serveixen com a artefactes normalitzats d'instal·lació, no com a interpretació territorial global.
 
 ### Fonts TerraLab a consultar
 
-- `TerraLab/data/layer_manager.py`
-- `TerraLab/data/assets_manager.py` i `data/assets/*`
+- `TerraLab/data/layer_manager.py` i `data/assets_manager.py`
 - `TerraLab/data/source_catalog.py`
-- `TerraLab/ui/asset_onboarding.py` o assistent equivalent
-- `TerraLab/common/utils.py` i configuració
-- `TerraLab/ui/widget_controls_builder.py` — badges i progrés
+- `TerraLab/ui/asset_onboarding.py`
+- `TerraLab/common/utils.py`
+- `TerraLab/ui/widget_controls_builder.py`
 
 ### Objectiu
 
-Completar aquesta vertical funcional de punta a punta, mantenint la separació de responsabilitats i sense anticipar funcionalitats posteriors que no siguin imprescindibles.
+Completar el pipeline d'interpretació territorial: separar l'adquisició de dades de la interpretació semàntica. S'implementa un governador espacial que fixa la branca semàntica base, un resolver TLST que aprofundeix mitjançant refinaments estrictament compatibles, i una caché canònica Zarr que nodreix el runtime de superfície (`SpatialPatch` i procedurals).
 
-### Tasques
+### Tasques: Evolució del sistema categòric i TLST
 
-- [ ] Definir els IDs de capa i descriptors de cel/terra amb fills del sistema solar.
-- [ ] Separar visibilitat de disponibilitat de dades.
-- [ ] Definir estats ready, partial, missing, invalid, planned, downloading, paused, extracting i error.
-- [ ] Definir manifests amb versió, mida, checksum, llicència, procedència i requisit.
-- [ ] Implementar biblioteca de dades configurable i estructura de directoris.
-- [ ] Implementar fonts administrades i fonts externes sense assumir-ne propietat.
-- [ ] Implementar descàrrega reanudable, pausa, cancel·lació i instal·lació atòmica.
-- [ ] Implementar checksum i validació després d’instal·lar.
-- [ ] Implementar selecció automàtica/manual de font i fallback.
-- [ ] Crear assistent funcional de dades i capes.
-- [ ] Mostrar progrés Gaia, terreny, Via Làctia, Planck, NGC i altres recursos.
-- [ ] Mostrar badges de fallback amb estabilització anti-flicker.
-- [ ] Persistir visibilitat de capes, ubicació, Bortle, terreny, superfície, scope i estils.
-- [ ] Versionar l’esquema de preferències i implementar migracions.
-- [ ] Restaurar sessió sense iniciar descàrregues automàtiques no sol·licitades.
-- [ ] Implementar errors accionables amb opció d’obrir l’assistent.
-- [ ] Preservar pressupostos de caché per bytes i neteja segura.
-- [ ] Comparar descriptors, defaults i fallbacks amb TerraLab.
+**Arquitectura i Rols de Fonts**
+- `[x]` Distingir rols de fonts: `BASE_CATEGORICAL`, `SEMANTIC_REFINEMENT`, `CONTEXT`, `AUTHORITATIVE_GEOMETRY`.
+- `[x]` Garantir l'existència d'almenys una `BASE_CATEGORICAL` activa. Si no n'hi ha cap, no es poden aplicar refinaments semàntics.
+- `[x]` Separar l'activació semàntica de la instal·lació: permetre que una font estigui instal·lada però `IGNORADA` (no governa, no refina, no participa a la caché).
+- `[x]` Implementar una política de llicències fail-closed per defecte al catàleg automàtic (evitar CC BY-SA, ODbL, NC).
+
+**V5 Governador + enabled/ignored**
+- `[x]` Seleccionar el dataset governador per a cada posició espacial basant-se en la **precisió espacial** (menor mida de cel·la primer) d'entre les fonts `BASE_CATEGORICAL` actives.
+- `[x]` Gestionar empats de resolució mitjançant la prioritat configurada (`priority`) i després de forma determinista (`stable_id`).
+- `[x]` Implementar el fallback de `NoData`, `unknown` i `unclassified` al següent dataset base disponible. No interpolar mai categories.
+
+**V6 Resolver TLST determinista**
+- `[ ]` Implementar el mapeig (valor natiu + scheme + scheme_version + mapping_revision -> TLST) abans de qualsevol comparació semàntica.
+- `[ ]` Garantir que el refinament només actua per aprofundir (`same-or-descendant`) dins la branca semàntica fixada pel governador. Refinaments en branques divergents o contradictòries s'han d'ignorar per a aquella cel·la.
+- `[ ]` Resoldre conflictes entre refinaments germans (incompatibles entre ells però vàlids per al governador) exclusivament per `priority` configurada, sense inventar heurístiques o quality scores.
+- `[ ]` Definir un contracte normalitzat mínim per a l'Evidence, incloent `coverage`, `spatial_resolution`, i IDs versionats.
+- `[ ]` Generar i exposar una `ResolutionTrace` explicable que contingui governador, TLST inicial, passes d'avaluació i node final.
+
+**V7 Caché TLST canònica**
+- `[ ]` Crear una caché TLST canònica materialitzada progressiva per no calcular jerarquies al runtime continu. Utilitzar un format propi lògic `.tlstcache` amb backend Zarr.
+- `[ ]` Estructurar la caché en grups per resolució (multiresolució) usant chunking (ex. 512x512) i compressió (ex. Zstd o Blosc+Zstd).
+- `[ ]` Guardar densament només `tlst_code` i `validity` (com a `uint16`, apuntant al `categoryKey` al manifest). La traça de procedència es guarda per chunk en lloc de per cel·la.
+- `[ ]` Implementar estimació de mida de caché abans de construir-la, generant mostreig de compressió per chunks representatius.
+- `[ ]` Invalidar caché (fingerprint determinista o invalidació espacial parcial per chunks) davant canvis de fonts, prioritats o esquemes, però no per moviments de càmera/UI. Realitzar escriptures atòmiques.
+- `[ ]` Connectar el consumidor del runtime i `SpatialPatch` a la caché canònica en lloc dels datasets natius directes. (Nota: `SpatialPatch` va després de la caché).
+
+**Planificació i UI**
+- `[ ]` Integrar a la UI del gestor (Pestanyes: Elevació, Categòric, Refinament) els estats `ACTIU` i `IGNORAT`, separats de l'acció d'Eliminar.
+- `[ ]` Definir la propera `V16` com a "Planificador automàtic de refinaments" basat en els buits TLST reportats de la caché, utilitzant el gestor d'adquisició actual.
+- `[ ]` Migrar el runtime actual sense big-bang rewrite: (Fase A) verificar el nou resolver paral·lelament a l'antic; (Fase B) connectar runtime a la caché TLST; (Fase C) retirar dependències a codis natius (S2GLC, WorldCover, CORINE) al frontend.
+
+### Tasques Generals de la Vertical
+- `[ ]` Definir els IDs de capa i descriptors de cel/terra amb fills del sistema solar.
+- `[ ]` Separar visibilitat de disponibilitat de dades.
+- `[ ]` Definir estats ready, partial, missing, invalid, planned, downloading, paused, extracting i error.
+- `[ ]` Definir manifests amb versió, mida, checksum, llicència, procedència i requisit.
+- `[ ]` Implementar biblioteca de dades configurable i estructura de directoris.
+- `[ ]` Implementar fonts administrades i fonts externes sense assumir-ne propietat.
+- `[ ]` Implementar descàrrega reanudable, pausa, cancel·lació i instal·lació atòmica.
+- `[ ]` Implementar checksum i validació després d’instal·lar.
+- `[ ]` Mostrar progrés Gaia, terreny, Via Làctia, Planck, NGC i altres recursos.
+- `[ ]` Mostrar badges de fallback amb estabilització anti-flicker.
+- `[ ]` Persistir visibilitat de capes, ubicació, Bortle, terreny, superfície, scope i estils.
+- `[ ]` Versionar l’esquema de preferències i implementar migracions.
+- `[ ]` Restaurar sessió sense iniciar descàrregues automàtiques no sol·licitades.
+- `[ ]` Implementar errors accionables amb opció d’obrir l’assistent.
+- `[ ]` Preservar pressupostos de caché per bytes i neteja segura.
 
 ### Criteri de sortida
 
-Totes les capes de l’inventari es poden activar o expliquen exactament quin recurs falta; les descàrregues són controlables; les preferències i documents es restauren després de reiniciar.
+La infraestructura de capes distingeix l'adquisició de dades de la interpretació semàntica. El runtime final es nodreix d'una caché TLST Zarr determinista generada per un governador (segons resolució) i uns refinaments (segons profunditat semàntica vàlida). Totes les capes es poden activar/ignorar i les descàrregues són controlables; les preferències i documents es restauren després de reiniciar sense corrupció.
 
 ### Evidència obligatòria
 
-- [ ] Prova de biblioteca buida, parcial i completa.
-- [ ] Prova de descàrrega pausada/cancel·lada/reanudada.
-- [ ] Prova de checksum incorrecte.
-- [ ] Round-trip de preferències i migració d’esquema.
-- [ ] Vídeo de l’assistent i dels estats de capa.
+- `[ ]` Proves de Governador: (1) 1m vàlid + 10m vàlid -> 1m; (2) 1m NoData + 10m vàlid -> 10m; (3) 1m IGNORAT + 10m ACTIU -> 10m.
+- `[ ]` Proves de Refinament compatible (`cropland` + `vineyard` -> `vineyard`), descendent (`permanent_crop` + `vineyard` -> `vineyard`) i conflicte entre germans (`vineyard` vs `olive_grove` -> `priority`).
+- `[ ]` Prova de Refinament incompatible (`artificial` + `vineyard` -> `artificial`).
+- `[ ]` Prova de `NoData` en refinament (`current TLST` + `NoData` -> `current TLST`).
+- `[ ]` Prova de Caché: canvi de mapping invalida; canvi de camera NO invalida. Mateixos inputs donen el mateix resultat i fingerprint.
+- `[ ]` Prova de persistència de rols, `enabled`, `priority` i mappings.
+- `[ ]` Prova de biblioteca buida, parcial, completa; descàrregues pausades, i bad checksum.
+- `[ ]` Vídeo de l’assistent de capes, estats (ACTIU/IGNORAT) i estimació de caché.
 
 ### Fora d’abast del pas
 
-El pas final endureix, mesura i homologa el conjunt complet.
+El pas no s'ha de convertir en una reescriptura (big-bang) de les passades verticals V1-V4, ni en la creació d'un nou sistema d'autenticació o gestor paral·lel. Tampoc s'aborden els sistemes procedurals o `SpatialPatch` massius, sinó la preparació canònica que els alimentarà. El pas final (Pas 24) endureix, mesura i homologa el conjunt complet.
 
 ## Pas 24 — Homologació integral, recuperació, rendiment i independència de producte
 
