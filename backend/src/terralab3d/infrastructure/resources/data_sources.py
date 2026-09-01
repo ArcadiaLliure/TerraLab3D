@@ -9,11 +9,12 @@ from pathlib import Path
 from threading import RLock
 from typing import Any
 
+from terralab3d.domain.datasets.models import FontTerritorial, SourceRole
 from terralab3d.infrastructure.app_paths import resolve_data_root
 
 
 class DataSourceRepository:
-    SCHEMA_VERSION = 5
+    SCHEMA_VERSION = 6
 
     def __init__(self, path: Path | None = None) -> None:
         self.path = path or (resolve_data_root() / "config" / "data_sources.json")
@@ -81,6 +82,56 @@ class DataSourceRepository:
         value = selection.get("source_id")
         return str(value) if value else None
 
+    def territorial_sources(self) -> tuple[FontTerritorial, ...]:
+        """Llegeix la participacio semantica sense confondre-la amb la UI."""
+
+        with self._lock:
+            result: list[FontTerritorial] = []
+            for item in self._document.get("sources", []):
+                if not isinstance(item, dict) or "source_role" not in item:
+                    continue
+                result.append(FontTerritorial(
+                    stable_id=str(item.get("id", "")),
+                    source_role=SourceRole(str(item["source_role"])),
+                    installed=True,
+                    enabled=item.get("enabled", True),
+                    priority=item.get("priority", 0),
+                    spatial_resolution_m=item.get("resolution_m"),
+                    available=bool(item.get("valid", True)),
+                ))
+            return tuple(sorted(result, key=lambda value: value.stable_id))
+
+    def configure_semantic_source(
+        self,
+        source_id: str,
+        *,
+        source_role: SourceRole,
+        enabled: bool,
+        priority: int,
+    ) -> None:
+        """Activa o ignora una font instal.lada i persisteix el seu desempat."""
+
+        if not isinstance(source_role, SourceRole):
+            raise ValueError("source_role ha de ser un SourceRole")
+        if not isinstance(enabled, bool):
+            raise ValueError("enabled ha de ser un boolean")
+        if isinstance(priority, bool) or not isinstance(priority, int):
+            raise ValueError("priority ha de ser un enter")
+        with self._lock:
+            record = next(
+                (
+                    item for item in self._document.setdefault("sources", [])
+                    if isinstance(item, dict) and str(item.get("id")) == source_id
+                ),
+                None,
+            )
+            if record is None:
+                raise KeyError(f"Font de dades inexistent: {source_id!r}")
+            record["source_role"] = source_role.value
+            record["enabled"] = enabled
+            record["priority"] = priority
+            self.save()
+
     def activate_elevation(self, source: dict[str, Any]) -> tuple[str, ...]:
         source_id = str(source.get("id", "")).strip()
         if not source_id:
@@ -124,6 +175,8 @@ class DataSourceRepository:
         record["id"] = source_id
         record["layer_type"] = "land_cover_categorical"
         record.setdefault("enabled", True)
+        record.setdefault("source_role", SourceRole.BASE_CATEGORICAL.value)
+        record.setdefault("priority", 0)
         with self._lock:
             items = self._document.setdefault("sources", [])
             index = next(
@@ -237,5 +290,35 @@ class DataSourceRepository:
         self._document.setdefault("sources", [])
         self._document.setdefault("selections", {})
         self._land_cover_selection()
+        for item in self._document["sources"]:
+            if not isinstance(item, dict):
+                continue
+            layer_type = str(item.get("layer_type", "")).strip().lower()
+            is_categorical = layer_type in {
+                "land_cover_categorical",
+                "land_cover_rgb",
+                "surface_categorical",
+            }
+            if is_categorical and "source_role" not in item:
+                item["source_role"] = SourceRole.BASE_CATEGORICAL.value
+                changed = True
+            if "source_role" not in item:
+                continue
+            try:
+                SourceRole(str(item["source_role"]))
+            except ValueError as exc:
+                raise ValueError(
+                    f"Rol de font territorial invalid per a {item.get('id')!r}"
+                ) from exc
+            if "enabled" not in item:
+                item["enabled"] = True
+                changed = True
+            elif not isinstance(item["enabled"], bool):
+                raise ValueError(f"enabled invalid per a {item.get('id')!r}")
+            if "priority" not in item:
+                item["priority"] = 0
+                changed = True
+            elif isinstance(item["priority"], bool) or not isinstance(item["priority"], int):
+                raise ValueError(f"priority invalida per a {item.get('id')!r}")
         self._document["schemaVersion"] = self.SCHEMA_VERSION
         return changed

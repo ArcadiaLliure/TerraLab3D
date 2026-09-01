@@ -7,6 +7,7 @@ from datetime import UTC, date, datetime
 import pytest
 
 from terralab3d.application.refinement.service import RefinementService
+from terralab3d.domain.datasets.models import SourceRole
 from terralab3d.domain.refinement.errors import (
     LicenseRejectedError,
     RefinementPersistenceError,
@@ -199,6 +200,38 @@ def test_ready_installation_round_trip_preserves_full_provenance(tmp_path) -> No
     assert reloaded.file_fingerprints == ("sha256:downloaded-file",)
 
 
+def test_refinement_installed_state_is_independent_from_semantic_participation(
+    tmp_path,
+) -> None:
+    service, repository = _service(tmp_path, (_product(priority=7),))
+    installed = service.confirm_operation(
+        product_id="fixture-vineyard",
+        category_key="agriculture",
+        aoi_id="cat-test",
+        job_id="job-1",
+    )
+
+    assert installed.source_role is SourceRole.SEMANTIC_REFINEMENT
+    assert installed.enabled is True
+    # La prioritat de descoberta del producte no es la prioritat semantica V5/V6.
+    assert installed.priority == 0
+
+    ignored = service.configurar_participacio(
+        "installation-1",
+        enabled=False,
+        priority=19,
+    )
+    reloaded = JsonRefinementInstallationRepository(repository.path).get(
+        "installation-1"
+    )
+
+    assert ignored.technical_state is TechnicalResourceState.QUEUED
+    assert reloaded is not None
+    assert reloaded.enabled is False
+    assert reloaded.priority == 19
+    assert reloaded.source_role is SourceRole.SEMANTIC_REFINEMENT
+
+
 def test_atomic_failure_keeps_previous_file_and_in_memory_state(tmp_path, monkeypatch) -> None:
     service, repository = _service(tmp_path, (_product(),))
     first = service.confirm_operation(
@@ -240,7 +273,7 @@ def test_schema_zero_is_migrated_to_current_document(tmp_path) -> None:
 
     assert migrated.get("installation-1") is not None
     document = json.loads(repository.path.read_text(encoding="utf-8"))
-    assert document["schemaVersion"] == 1
+    assert document["schemaVersion"] == 2
     assert "installations" in document
 
 

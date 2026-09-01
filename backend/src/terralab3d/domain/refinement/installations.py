@@ -9,6 +9,8 @@ from enum import Enum
 from types import MappingProxyType
 from typing import Mapping
 
+from terralab3d.domain.datasets.models import SourceRole
+
 from .errors import RefinementValidationError
 from .licensing import LicenseMetadata
 from .states import SpatialCoverageState
@@ -106,6 +108,9 @@ class RefinementInstallation:
     file_fingerprints: tuple[str, ...] = field(default_factory=tuple)
     verification_method: CoverageVerificationMethod | None = None
     aoi_id: str = "default"
+    source_role: SourceRole = SourceRole.SEMANTIC_REFINEMENT
+    enabled: bool = True
+    priority: int = 0
 
     def __post_init__(self) -> None:
         required = (
@@ -122,6 +127,14 @@ class RefinementInstallation:
         )
         if any(not value.strip() for value in required) or not self.tlst_nodes:
             raise RefinementValidationError("Refinement installation metadata is incomplete")
+        if self.source_role is not SourceRole.SEMANTIC_REFINEMENT:
+            raise RefinementValidationError(
+                "A refinement installation must use SEMANTIC_REFINEMENT"
+            )
+        if not isinstance(self.enabled, bool):
+            raise RefinementValidationError("Refinement enabled state must be boolean")
+        if isinstance(self.priority, bool) or not isinstance(self.priority, int):
+            raise RefinementValidationError("Refinement priority must be an integer")
         if self.technical_state is TechnicalResourceState.READY:
             if self.verified_geometry is None or self.installed_at is None:
                 raise RefinementValidationError(

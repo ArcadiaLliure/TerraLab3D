@@ -126,7 +126,7 @@ def test_data_sources_migrates_order_and_preserves_unknown_fields(tmp_path: Path
     )
     repository = DataSourceRepository(path)
     snapshot = repository.snapshot()
-    assert snapshot["schemaVersion"] == 5
+    assert snapshot["schemaVersion"] == 6
     assert snapshot["futureRoot"] == 7
     assert snapshot["sources"][0]["futureField"] == "kept"
     assert snapshot["selections"]["elevation"]["source_ids"] == ["old"]

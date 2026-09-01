@@ -285,6 +285,24 @@ class RefinementService:
         self._repository.upsert(updated)
         return updated
 
+    def configurar_participacio(
+        self,
+        installation_id: str,
+        *,
+        enabled: bool,
+        priority: int,
+    ) -> RefinementInstallation:
+        """Separa l'estat instal.lat de la participacio semantica del refinament."""
+
+        if not isinstance(enabled, bool):
+            raise RefinementValidationError("enabled ha de ser un boolean")
+        if isinstance(priority, bool) or not isinstance(priority, int):
+            raise RefinementValidationError("priority ha de ser un enter")
+        current = self._require_installation(installation_id)
+        updated = replace(current, enabled=enabled, priority=priority)
+        self._repository.upsert(updated)
+        return updated
+
     def cancel_resource_operation(
         self,
         resource_id: str,

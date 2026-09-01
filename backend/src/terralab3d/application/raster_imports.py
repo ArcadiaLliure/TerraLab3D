@@ -35,6 +35,7 @@ from terralab3d.application.categorical_imports import (
     scheme_catalog_payload,
 )
 from terralab3d.domain.elevation.models import ElevationRasterSource, VerticalUnit
+from terralab3d.domain.datasets.models import SourceRole
 from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.domain.refinement.licensing import LicenseMetadata
 from terralab3d.domain.raster.models import (
@@ -645,7 +646,9 @@ class RasterImportService:
             "id": source_id,
             "display_name": name,
             "layer_type": "land_cover_categorical",
+            "source_role": SourceRole.BASE_CATEGORICAL.value,
             "enabled": True,
+            "priority": 0,
             "valid": True,
             "resource_id": str(resource_id),
             "path": str(indexed_path),

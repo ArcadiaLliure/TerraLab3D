@@ -9,6 +9,7 @@ from pathlib import Path
 from threading import RLock
 from typing import Any
 
+from terralab3d.domain.datasets.models import SourceRole
 from terralab3d.domain.refinement.errors import RefinementPersistenceError
 from terralab3d.domain.refinement.installations import (
     CoverageVerificationMethod,
@@ -23,7 +24,7 @@ from terralab3d.infrastructure.app_paths import resolve_resource_state_dir
 
 
 class JsonRefinementInstallationRepository:
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2
 
     def __init__(self, path: Path | None = None) -> None:
         self.path = path or (resolve_resource_state_dir() / "refinement_installations.json")
@@ -120,7 +121,7 @@ class JsonRefinementInstallationRepository:
             version = payload.get("schemaVersion", 0)
             if version == cls.SCHEMA_VERSION:
                 records = payload.get("installations")
-            elif version == 0:
+            elif version in {0, 1}:
                 records = payload.get("records", payload.get("installations", []))
                 migrated = True
             else:
@@ -227,6 +228,9 @@ def _installation_to_dict(value: RefinementInstallation) -> dict[str, object]:
             value.verification_method.value if value.verification_method else None
         ),
         "aoiId": value.aoi_id,
+        "sourceRole": value.source_role.value,
+        "enabled": value.enabled,
+        "priority": value.priority,
     }
 
 
@@ -259,4 +263,9 @@ def _installation_from_dict(value: dict[str, Any]) -> RefinementInstallation:
         file_fingerprints=tuple(str(item) for item in value.get("fileFingerprints", [])),
         verification_method=CoverageVerificationMethod(str(method)) if method else None,
         aoi_id=str(value.get("aoiId", "default")),
+        source_role=SourceRole(
+            str(value.get("sourceRole", SourceRole.SEMANTIC_REFINEMENT.value))
+        ),
+        enabled=value.get("enabled", True),
+        priority=value.get("priority", 0),
     )
