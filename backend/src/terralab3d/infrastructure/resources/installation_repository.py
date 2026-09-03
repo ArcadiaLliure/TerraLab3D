@@ -116,12 +116,22 @@ class ResourceInstallationRepository:
         }
         self.save()
 
-    def resolve_render_asset(self, resource_id: ResourceId) -> Path | None:
-        """Resol l'asset READY destinat al renderer, cercant entre totes les variants del recurs."""
+    def resolve_render_asset(
+        self,
+        resource_id: ResourceId,
+        variant_id: VariantId | None = None,
+    ) -> Path | None:
+        """Resol l'asset READY del recurs, opcionalment per a una variant exacta."""
         resources = self._state.get("resources", {})
         prefix = f"{resource_id}::"
-        
-        for key, state in resources.items():
+
+        if variant_id is None:
+            candidates = resources.items()
+        else:
+            key = f"{resource_id}::{variant_id}"
+            candidates = ((key, resources.get(key)),)
+
+        for key, state in candidates:
             if not key.startswith(prefix):
                 continue
             if not state or state.get("status") != ResourceInstallState.READY.value:

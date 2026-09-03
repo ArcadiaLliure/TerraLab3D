@@ -180,10 +180,46 @@ def test_latest_wins_discards_stale_result_and_keeps_one_pending(
         await coordinator.wait_idle()
         metrics = coordinator.metrics()
         assert len(port.calls) == 2
-        assert [item.generation for item in published] == [1, 3]
-        assert metrics["ephemeris_stale_count"] == 0
+        assert [item.generation for item in published] == [3]
+        assert metrics["ephemeris_stale_count"] == 1
         assert metrics["ephemeris_coalesced_count"] == 1
         assert metrics["solar_system_bridge_bytes"] == 123
+        await coordinator.close()
+
+    asyncio.run(scenario())
+
+
+def test_ephemeris_preserves_external_temporal_generation(
+    authoritative_snapshot: SolarSystemSnapshot,
+) -> None:
+    class ImmediatePort:
+        metadata = None
+
+        def snapshot(self, utc: datetime, _observer: ScientificObserver) -> SolarSystemSnapshot:
+            return replace(authoritative_snapshot, timestamp_utc=utc)
+
+        def close(self) -> None:
+            pass
+
+    async def scenario() -> None:
+        published: list[SolarSystemSnapshot] = []
+
+        async def publish(snapshot: SolarSystemSnapshot) -> int:
+            published.append(snapshot)
+            return 1
+
+        coordinator = EphemerisCoordinator(ImmediatePort(), publish)
+        observer = ScientificObserver(41.0, 1.0, 0.0)
+        returned = coordinator.request(
+            datetime(2026, 9, 2, tzinfo=timezone.utc),
+            observer,
+            3,
+            generation_id=42,
+        )
+        await coordinator.wait_idle()
+        assert returned == 42
+        assert [snapshot.generation for snapshot in published] == [42]
+        assert published[0].observer_generation == 3
         await coordinator.close()
 
     asyncio.run(scenario())
@@ -247,4 +283,3 @@ def _spherical_separation_deg(lon_a: float, lat_a: float, lon_b: float, lat_b: f
 def _separation_from_directions(first, second) -> float:
     dot = sum(a * b for a, b in zip(first, second, strict=True))
     return math.degrees(math.acos(max(-1.0, min(1.0, dot))))
-

@@ -20,5 +20,6 @@ class AstronomicalEventEphemerisPort(Protocol):
         body_ids: tuple[str, ...] = ("sun", "moon"),
         *,
         include_lunar_shadow_geometry: bool = False,
+        include_body_orientation: bool = True,
+        allow_unknown_radius: bool = False,
     ) -> AstronomicalEventEphemeris: ...
-

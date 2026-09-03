@@ -50,8 +50,13 @@ export class StarFieldRenderer {
 
   /** Shared celestial transform and visibility state. */
   private transformState: CelestialTransformState | null = null;
+  private appliedTransformRevision = -1;
   private currentVisibilityState: SkyVisibilityState | null = null;
   private readonly horizonUnsubscribe: (() => void) | null;
+  private readonly viewRotation = new THREE.Matrix3();
+  private readonly equatorialToView = new THREE.Matrix3();
+  private readonly viewAnchorEquatorial = new THREE.Vector3();
+  private readonly viewDirection = new THREE.Vector3();
 
   constructor(private readonly horizonState: HorizonOcclusionState | null = null) {
     this.rootGroup.name = "starFieldRoot";
@@ -61,6 +66,7 @@ export class StarFieldRenderer {
   /** Connecta l'estat de transformació celeste compartit. */
   public setTransformState(state: CelestialTransformState): void {
     this.transformState = state;
+    this.appliedTransformRevision = -1;
   }
 
   public attachToParent(parentGroup: THREE.Group): void {
@@ -137,21 +143,51 @@ export class StarFieldRenderer {
     }
   }
 
-  public interpolate(timestampMs: number): void {
-    if (!this.transformState || !this.transformState.isValid) return;
+  /** Consume the shared transform after its owner has advanced it for this frame. */
+  public syncTransform(): boolean {
+    if (!this.transformState || !this.transformState.isValid) return false;
+    if (this.appliedTransformRevision === this.transformState.visualRevision) return false;
 
-    this.transformState.interpolate(timestampMs);
-
-    const mArray = this.transformState.getMatrix3x3Array();
     for (const entry of this.resources.values()) {
       const mat3 = uniform<THREE.Matrix3>(entry.material, "u_equatorialToENUMatrix").value;
-      mat3.set(
-        mArray[0]!, mArray[1]!, mArray[2]!,
-        mArray[3]!, mArray[4]!, mArray[5]!,
-        mArray[6]!, mArray[7]!, mArray[8]!,
-      );
+      mat3.copy(this.transformState.equatorialToThree);
       entry.material.uniformsNeedUpdate = true;
     }
+    this.appliedTransformRevision = this.transformState.visualRevision;
+    return true;
+  }
+
+  /**
+   * Prepare a camera-relative angular projection for the next draw.
+   *
+   * Subtracting the equatorial direction at the centre of the view before the
+   * GPU matrix multiply is the angular equivalent of a floating origin. It
+   * keeps sub-arcsecond offsets representable at telescope FOVs without
+   * rebuilding or transforming the resident catalogue on CPU.
+   */
+  public prepareView(camera: THREE.PerspectiveCamera): boolean {
+    if (!this.transformState?.isValid) return false;
+
+    camera.updateMatrixWorld(true);
+    camera.getWorldDirection(this.viewDirection);
+    this.viewAnchorEquatorial
+      .copy(this.viewDirection)
+      .applyMatrix3(this.transformState.threeToEquatorial)
+      .normalize();
+    this.viewRotation.setFromMatrix4(camera.matrixWorldInverse);
+    this.equatorialToView.multiplyMatrices(
+      this.viewRotation,
+      this.transformState.equatorialToThree,
+    );
+
+    for (const entry of this.resources.values()) {
+      uniform<THREE.Matrix3>(entry.material, "u_equatorialToViewMatrix")
+        .value.copy(this.equatorialToView);
+      uniform<THREE.Vector3>(entry.material, "u_equatorialViewAnchor")
+        .value.copy(this.viewAnchorEquatorial);
+      entry.material.uniformsNeedUpdate = true;
+    }
+    return true;
   }
 
   public registerBinaryResource(metadata: StarResourceMetadata | any, payloadBuffer: ArrayBuffer): void {
@@ -200,21 +236,16 @@ export class StarFieldRenderer {
       floatColors[i] = srgbChannelToLinear(u8Colors[i]! / 255.0);
     }
 
-    // Catalog indices: conservar Uint32Array canònic per al picking
+    // Catalog indices: conservar Uint32Array canònic per al picking.
+    // `payloadBuffer` is an exclusive slice owned by this resource, so the
+    // render attributes and CPU indices can safely share its immutable views.
     const u32Indices = new Uint32Array(payloadBuffer, idxOffset, idxLen / 4);
-
-    // Float32 per a GPU (WebGL attribute) — NOMÉS per render, no per identitat
-    const floatIndices = new Float32Array(starCount);
-    for (let i = 0; i < u32Indices.length; i++) {
-      floatIndices[i] = u32Indices[i]!;
-    }
 
     // Crear BufferGeometry
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute("magnitude", new THREE.BufferAttribute(magnitudes, 1));
     geometry.setAttribute("color", new THREE.BufferAttribute(floatColors, 3));
-    geometry.setAttribute("catalogIndex", new THREE.BufferAttribute(floatIndices, 1));
 
     // Crear Matriu 3x3 inicial des de CelestialTransformState o identitat
     const mat3 = new THREE.Matrix3();
@@ -228,6 +259,8 @@ export class StarFieldRenderer {
       fragmentShader: STAR_FRAGMENT_SHADER,
       uniforms: {
         u_equatorialToENUMatrix: { value: mat3 },
+        u_equatorialToViewMatrix: { value: new THREE.Matrix3() },
+        u_equatorialViewAnchor: { value: new THREE.Vector3(0, 0, -1) },
         u_magnitudeLimit: { value: this.magnitudeLimit },
         u_pointScale: { value: this.pointScale },
         u_devicePixelRatio: { value: window.devicePixelRatio || 1.0 },
@@ -255,11 +288,6 @@ export class StarFieldRenderer {
 
     this.rootGroup.add(points);
 
-    // Conservar Uint32Array canònic, magnituds i posicions per al picking
-    const catalogIndicesCopy = new Uint32Array(u32Indices);
-    const magnitudesCopy = new Float32Array(magnitudes);
-    const positionsCopy = new Float32Array(positions);
-
     const entry: StarResourceEntry = {
       resourceId,
       version,
@@ -268,9 +296,9 @@ export class StarFieldRenderer {
       points,
       geometry,
       material,
-      catalogIndices: catalogIndicesCopy,
-      magnitudesArray: magnitudesCopy,
-      equatorialPositions: positionsCopy,
+      catalogIndices: u32Indices,
+      magnitudesArray: magnitudes,
+      equatorialPositions: positions,
     };
     this.resources.set(resourceId, entry);
 

@@ -5,6 +5,7 @@ import type {
   LunarOrientationState,
   MoonSurfaceResourceDescriptor,
   SolarSystemBodyState,
+  SolarSystemPreviewSnapshot,
   SolarSystemSnapshot,
 } from "../contracts/solar_system_contracts";
 import { threeFromEnu } from "../view/three/celestialCoordinates";
@@ -200,6 +201,8 @@ assert(renderer.metrics().geometryBuildCount === 4, "shared bodies, Moon, Saturn
 assert(renderer.metrics().materialBuildCount === 13, "persistent body, ring and satellite materials are built once");
 
 assert(renderer.updateSnapshot(snapshot(1, "2024-01-01T00:00:00Z"), 2048, 1_000), "first snapshot accepted");
+const firstLabelRevision = renderer.labelRevision;
+assert(firstLabelRevision > 0, "accepted snapshot invalidates solar-system labels");
 assert(renderer.getBodyObject("sun")?.visible === true, "sun above horizon is visible");
 assert(renderer.getBodyObject("moon")?.visible === true, "moon above horizon is visible");
 near(
@@ -210,12 +213,88 @@ near(
 );
 assert(renderer.metrics().lastBridgeBytes === 2048, "compact bridge byte count is retained");
 
+const previewParent = new THREE.Group();
+const previewRenderer = new SolarSystemRenderer(previewParent);
+const previewSatellite: SolarSystemBodyState = {
+  ...body("venus", [0.25, 0.5, 1]),
+  id: "naif-501",
+  type: "natural_satellite",
+  parentBodyId: "jupiter",
+  parentNaifId: 599,
+  naifId: 501,
+};
+previewRenderer.updateSnapshot({
+  ...snapshot(1, "2024-01-01T00:00:00Z"),
+  satellites: [previewSatellite],
+}, 100, 0);
+const preview: SolarSystemPreviewSnapshot = {
+  generation: 1,
+  observerGeneration: 1,
+  bodies: [
+    {
+      id: "sun",
+      directionENU: [0, 0.5, 1],
+      altitudeDeg: 30,
+      azimuthDeg: 0,
+      distanceKm: 149_597_870,
+      angularRadiusDeg: 0.266,
+      illuminationFraction: 1,
+      phaseAngleDeg: 0,
+      apparentMagnitude: -26.74,
+    },
+    {
+      id: "naif-501",
+      directionENU: [-1, 0.25, 0],
+      altitudeDeg: 14,
+      azimuthDeg: 270,
+      distanceKm: 628_000_000,
+      angularRadiusDeg: 0,
+      illuminationFraction: 0.75,
+      phaseAngleDeg: 60,
+      apparentMagnitude: null,
+    },
+  ],
+};
+assert(previewRenderer.updatePreviewSnapshot(preview), "timeline preview is applied immediately");
+near(
+  previewRenderer.getBodyObject("sun")!.position.clone().normalize()
+    .distanceTo(threeFromEnu(preview.bodies[0]!.directionENU).normalize()),
+  0,
+  1e-9,
+  "timeline preview moves the Sun before the authoritative snapshot arrives",
+);
+const previewDisplayed = (
+  previewRenderer as unknown as {
+    displayed: Map<SolarSystemBodyState["id"], SolarSystemBodyState>;
+  }
+).displayed;
+assert(
+  previewDisplayed.get("naif-501")?.directionENU[0] === -1,
+  "timeline preview also moves active natural satellites",
+);
+assert(
+  previewDisplayed.get("naif-501")?.angularRadiusDeg === previewSatellite.angularRadiusDeg,
+  "unknown preview radii do not make natural satellites disappear",
+);
+assert(
+  !previewRenderer.updatePreviewSnapshot(preview),
+  "duplicate timeline preview generations are rejected",
+);
+assert(previewRenderer.metrics().geometryBuildCount === 4, "timeline preview rebuilds no geometry");
+previewRenderer.updateSnapshot(snapshot(2, "2024-01-01T12:00:00Z"), 100, 100);
+assert(
+  previewRenderer.updatePreviewSnapshot(preview),
+  "an authoritative snapshot resets preview sequencing for the next drag",
+);
+previewRenderer.dispose();
+
 const before = renderer.getBodyObject("sun")!.position.clone().normalize();
 const next = snapshot(2, "2024-01-01T00:00:01Z");
 const movedSun = body("sun", [0, 0.5, 1]);
 const moving = { ...next, sun: movedSun };
 renderer.updateSnapshot(moving, 1900, 2_000);
 renderer.update(2_050);
+assert(renderer.labelRevision > firstLabelRevision, "visual interpolation keeps labels synchronized");
 const midway = renderer.getBodyObject("sun")!.position.clone().normalize();
 const target = threeFromEnu(movedSun.directionENU).normalize();
 assert(midway.distanceTo(before) > 0.01 && midway.distanceTo(target) > 0.01, "ordinary updates interpolate");

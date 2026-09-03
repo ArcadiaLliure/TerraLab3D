@@ -17,6 +17,8 @@ const PROFILES: Readonly<Record<ShadowQuality, ShadowProfile>> = {
 };
 
 const DIRECTION_INVALIDATION_DEG = 0.15;
+const SHADOW_FRAME_BUDGET_MS = 24;
+const MAX_SHADOW_DEFER_MS = 750;
 const LOG_PREFIX = "MGP: [ShadowController]";
 
 export interface ShadowQualityTiming {
@@ -28,22 +30,32 @@ export interface ShadowQualityTiming {
 export interface ShadowMetrics {
   readonly quality: ShadowQuality;
   readonly sunShadowUpdateCount: number;
-  readonly moonShadowUpdateCount: 0;
+  readonly moonShadowUpdateCount: number;
   readonly shadowMapEstimateBytes: number;
   readonly timings: Readonly<Record<ShadowQuality, ShadowQualityTiming>>;
 }
 
-/** Renderer-side local shadow policy. It never alters scientific directions. */
+interface ScheduledShadow {
+  readonly light: THREE.DirectionalLight;
+  readonly direction: THREE.Vector3;
+  readonly renderedDirection: THREE.Vector3;
+  active: boolean;
+  photometricImportance: number;
+  dirty: boolean;
+  lastScheduledMs: number;
+  updateCount: number;
+}
+
+/** Derived GPU shadow scheduler. Source photometry and directions remain untouched. */
 export class ShadowController {
   private quality: ShadowQuality = "off";
   private readonly anchor = new THREE.Vector3();
   private readonly latestCamera = new THREE.Vector3();
-  private readonly sunDirection = new THREE.Vector3(0, 1, 0);
-  private readonly moonDirection = new THREE.Vector3(0, 1, 0);
-  private sunActive = false;
+  private readonly sun: ScheduledShadow;
+  private readonly moon: ScheduledShadow;
   private anchorReady = false;
   private disposed = false;
-  private _sunShadowUpdateCount = 0;
+  private lastFrameMs = 0;
   private readonly frameTimes: Record<ShadowQuality, number[]> = {
     off: [], low: [], medium: [], high: [],
   };
@@ -55,8 +67,12 @@ export class ShadowController {
     private readonly moonLight: THREE.DirectionalLight,
     private readonly moonTarget: THREE.Object3D,
   ) {
+    this.sun = scheduledShadow(sunLight);
+    this.moon = scheduledShadow(moonLight);
     this.renderer.shadowMap.autoUpdate = false;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.sunLight.shadow.autoUpdate = false;
+    this.moonLight.shadow.autoUpdate = false;
     this.setQuality("medium");
   }
 
@@ -66,13 +82,13 @@ export class ShadowController {
     this.quality = quality;
     const profile = PROFILES[quality];
     this.renderer.shadowMap.enabled = quality !== "off";
-    this.sunLight.castShadow = quality !== "off" && this.sunActive;
-    // Lunar shadows remain deliberately optional/off in Pas 8.7.
-    this.moonLight.castShadow = false;
+    this.syncCastShadow();
     if (quality !== "off") {
-      this.configureSunShadow(profile);
+      this.configureShadow(this.sunLight, profile);
+      this.configureShadow(this.moonLight, profile);
       this.updateAnchor(this.latestCamera, true);
-      this.invalidate("quality_changed");
+      this.markDirty(this.sun);
+      this.markDirty(this.moon);
     }
     console.debug(`${LOG_PREFIX} [setQuality] [Qualitat canviada previous=${previous} current=${quality}]`);
   }
@@ -81,37 +97,48 @@ export class ShadowController {
     return this.quality;
   }
 
-  applySunDirection(directionToSourceThree: THREE.Vector3, active: boolean): void {
-    if (this.disposed) return;
-    const next = safeDirection(directionToSourceThree, this.sunDirection);
-    const changed = THREE.MathUtils.radToDeg(this.sunDirection.angleTo(next)) >= DIRECTION_INVALIDATION_DEG;
-    const activityChanged = active !== this.sunActive;
-    this.sunDirection.copy(next);
-    this.sunActive = active;
-    this.sunLight.castShadow = this.quality !== "off" && active;
-    this.positionLights();
-    if (changed || activityChanged) this.invalidate("sun_direction_changed");
+  applySunDirection(
+    directionToSourceThree: THREE.Vector3,
+    active: boolean,
+    photometricImportance: number,
+  ): void {
+    this.applyLightState(
+      this.sun,
+      directionToSourceThree,
+      active,
+      photometricImportance,
+    );
   }
 
-  applyMoonDirection(directionToSourceThree: THREE.Vector3): void {
-    if (this.disposed) return;
-    this.moonDirection.copy(safeDirection(directionToSourceThree, this.moonDirection));
-    this.positionLights();
+  applyMoonDirection(
+    directionToSourceThree: THREE.Vector3,
+    active: boolean,
+    photometricImportance: number,
+  ): void {
+    this.applyLightState(
+      this.moon,
+      directionToSourceThree,
+      active,
+      photometricImportance,
+    );
   }
 
-  updateCamera(cameraPosition: THREE.Vector3): void {
+  updateCamera(cameraPosition: THREE.Vector3, timestampMs: number): void {
     if (this.disposed) return;
     this.latestCamera.copy(cameraPosition);
     this.updateAnchor(cameraPosition, false);
+    this.scheduleOneShadow(timestampMs);
   }
 
   invalidateGeometry(): void {
-    this.invalidate("caster_receiver_geometry_changed");
+    this.markDirty(this.sun);
+    this.markDirty(this.moon);
   }
 
   recordFrame(frameMs: number): void {
     if (!Number.isFinite(frameMs) || frameMs <= 0 || frameMs > 1_000) return;
     const samples = this.frameTimes[this.quality];
+    this.lastFrameMs = frameMs;
     samples.push(frameMs);
     if (samples.length > 600) samples.shift();
   }
@@ -120,9 +147,9 @@ export class ShadowController {
     const profile = PROFILES[this.quality];
     return {
       quality: this.quality,
-      sunShadowUpdateCount: this._sunShadowUpdateCount,
-      moonShadowUpdateCount: 0,
-      shadowMapEstimateBytes: profile.mapSize * profile.mapSize * 4,
+      sunShadowUpdateCount: this.sun.updateCount,
+      moonShadowUpdateCount: this.moon.updateCount,
+      shadowMapEstimateBytes: profile.mapSize * profile.mapSize * 4 * 2,
       timings: {
         off: timing(this.frameTimes.off),
         low: timing(this.frameTimes.low),
@@ -143,16 +170,35 @@ export class ShadowController {
     console.info("MGP: [ShadowController.ts] [dispose] [Recursos d'ombres alliberats]");
   }
 
-  private configureSunShadow(profile: ShadowProfile): void {
-    if (this.sunLight.shadow.mapSize.x !== profile.mapSize) {
-      this.sunLight.shadow.map?.dispose();
-      this.sunLight.shadow.map = null;
+  private applyLightState(
+    state: ScheduledShadow,
+    direction: THREE.Vector3,
+    active: boolean,
+    photometricImportance: number,
+  ): void {
+    if (this.disposed) return;
+    const next = safeDirection(direction, state.direction);
+    const activityChanged = active !== state.active;
+    state.direction.copy(next);
+    state.active = active;
+    state.photometricImportance = Math.max(0, photometricImportance);
+    if (activityChanged || angularErrorDeg(state) >= DIRECTION_INVALIDATION_DEG) {
+      this.markDirty(state);
     }
-    this.sunLight.shadow.mapSize.set(profile.mapSize, profile.mapSize);
-    this.sunLight.shadow.bias = profile.bias;
-    this.sunLight.shadow.normalBias = profile.normalBias;
-    this.sunLight.shadow.radius = 1;
-    const camera = this.sunLight.shadow.camera;
+    this.syncCastShadow();
+    this.positionLights();
+  }
+
+  private configureShadow(light: THREE.DirectionalLight, profile: ShadowProfile): void {
+    if (light.shadow.mapSize.x !== profile.mapSize) {
+      light.shadow.map?.dispose();
+      light.shadow.map = null;
+    }
+    light.shadow.mapSize.set(profile.mapSize, profile.mapSize);
+    light.shadow.bias = profile.bias;
+    light.shadow.normalBias = profile.normalBias;
+    light.shadow.radius = 1;
+    const camera = light.shadow.camera;
     camera.left = -profile.localRadiusM;
     camera.right = profile.localRadiusM;
     camera.top = profile.localRadiusM;
@@ -178,25 +224,75 @@ export class ShadowController {
     );
     this.anchorReady = true;
     this.positionLights();
-    this.invalidate("camera_left_shadow_region");
+    this.markDirty(this.sun);
+    this.markDirty(this.moon);
   }
 
   private positionLights(): void {
     const profile = PROFILES[this.quality];
     const distance = Math.max(500, profile.localRadiusM * 3);
     this.sunTarget.position.copy(this.anchor);
-    this.sunLight.position.copy(this.anchor).addScaledVector(this.sunDirection, distance);
+    this.sunLight.position.copy(this.anchor).addScaledVector(this.sun.direction, distance);
     this.moonTarget.position.copy(this.anchor);
-    this.moonLight.position.copy(this.anchor).addScaledVector(this.moonDirection, distance);
+    this.moonLight.position.copy(this.anchor).addScaledVector(this.moon.direction, distance);
     this.sunTarget.updateMatrixWorld();
     this.moonTarget.updateMatrixWorld();
   }
 
-  private invalidate(_reason: string): void {
-    if (this.quality === "off" || !this.sunActive || !this.sunLight.castShadow) return;
+  private scheduleOneShadow(timestampMs: number): void {
+    if (this.quality === "off") return;
+    const candidates = [this.sun, this.moon].filter((state) => state.active && state.dirty);
+    if (candidates.length === 0) return;
+    const oldestAgeMs = Math.max(
+      ...candidates.map((state) => Math.max(0, timestampMs - state.lastScheduledMs)),
+    );
+    if (this.lastFrameMs > SHADOW_FRAME_BUDGET_MS && oldestAgeMs < MAX_SHADOW_DEFER_MS) {
+      return;
+    }
+    candidates.sort((left, right) => shadowPriority(right, timestampMs) - shadowPriority(left, timestampMs));
+    const selected = candidates[0]!;
+    selected.light.shadow.needsUpdate = true;
     this.renderer.shadowMap.needsUpdate = true;
-    this._sunShadowUpdateCount++;
+    selected.renderedDirection.copy(selected.direction);
+    selected.dirty = false;
+    selected.lastScheduledMs = timestampMs;
+    selected.updateCount++;
   }
+
+  private markDirty(state: ScheduledShadow): void {
+    if (!state.active) return;
+    state.dirty = true;
+  }
+
+  private syncCastShadow(): void {
+    const enabled = this.quality !== "off";
+    this.sunLight.castShadow = enabled && this.sun.active;
+    this.moonLight.castShadow = enabled && this.moon.active;
+  }
+}
+
+function scheduledShadow(light: THREE.DirectionalLight): ScheduledShadow {
+  return {
+    light,
+    direction: new THREE.Vector3(0, 1, 0),
+    renderedDirection: new THREE.Vector3(0, 1, 0),
+    active: false,
+    photometricImportance: 0,
+    dirty: false,
+    lastScheduledMs: 0,
+    updateCount: 0,
+  };
+}
+
+function shadowPriority(state: ScheduledShadow, timestampMs: number): number {
+  const ageMs = Math.max(0, timestampMs - state.lastScheduledMs);
+  const starvationBoost = 1 + Math.min(ageMs / 250, 20);
+  return (angularErrorDeg(state) + 0.01) * Math.max(state.photometricImportance, 0.001)
+    * starvationBoost;
+}
+
+function angularErrorDeg(state: ScheduledShadow): number {
+  return THREE.MathUtils.radToDeg(state.renderedDirection.angleTo(state.direction));
 }
 
 function safeDirection(value: THREE.Vector3, fallback: THREE.Vector3): THREE.Vector3 {
@@ -221,5 +317,5 @@ function percentile(samples: readonly number[], fraction: number): number {
   if (samples.length === 0) return 0;
   const sorted = [...samples].sort((a, b) => a - b);
   const index = Math.round((sorted.length - 1) * fraction);
-  return sorted[index]!;
+  return sorted[index] ?? 0;
 }

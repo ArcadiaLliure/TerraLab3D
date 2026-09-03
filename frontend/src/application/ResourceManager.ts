@@ -79,6 +79,29 @@ export class ResourceManager {
         };
     }
 
+    public getEffectiveInstallState(resourceId: string, preferredVariantId?: string): ResourceState {
+        if (preferredVariantId) {
+            return this.getInstallState(resourceId, preferredVariantId);
+        }
+
+        const descriptor = this.getDescriptor(resourceId);
+        const variantStates = descriptor?.variants.map(
+            (variant) => this.getInstallState(resourceId, variant.id),
+        ) ?? [];
+
+        return variantStates.find((state) => state.status === "READY")
+            ?? variantStates.find((state) => state.status !== "NOT_INSTALLED")
+            ?? variantStates[0]
+            ?? {
+                status: "NOT_INSTALLED",
+                variantId: null,
+                downloadedBytes: 0,
+                verifiedAt: null,
+                error: null,
+                manifestData: null,
+            };
+    }
+
     public getJobState(jobId: string): DownloadJobSnapshotMessage | undefined {
         return this.jobStates.get(jobId);
     }

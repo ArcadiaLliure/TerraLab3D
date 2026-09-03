@@ -117,11 +117,16 @@ class WebSocketBridge:
         self._clients.add(ws)
         self._session_id = uuid.uuid4().hex[:16]
 
+        handshake_complete = False
+
         # Despatxa el primer missatge llegit
         if msg.type == aiohttp.WSMsgType.TEXT:
             try:
                 data = json.loads(msg.data)
-                await self._dispatch(data)
+                handshake_complete = await self._dispatch_connection_message(
+                    data,
+                    handshake_complete=handshake_complete,
+                )
             except Exception:
                 pass
 
@@ -133,7 +138,10 @@ class WebSocketBridge:
                     except json.JSONDecodeError:
                         log.warning("JSON no vàlid des del frontend: %s", msg.data[:200])
                         continue
-                    await self._dispatch(data)
+                    handshake_complete = await self._dispatch_connection_message(
+                        data,
+                        handshake_complete=handshake_complete,
+                    )
                 elif msg.type in (
                     aiohttp.WSMsgType.ERROR,
                     aiohttp.WSMsgType.CLOSE,
@@ -341,6 +349,15 @@ class WebSocketBridge:
         await self.send(payload)
         return byte_count
 
+    async def send_temporal_scene_state(self, state: Any) -> int:
+        """Send one atomic visual state for a single simulation instant."""
+
+        payload = state.to_dict()
+        payload["type"] = "temporal_scene_state"
+        byte_count = len(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+        await self.send(payload)
+        return byte_count
+
     async def send_lighting_environment_snapshot(self, snapshot: Any) -> int:
         """Send the compact Step 8.7 DTO; it never contains GPU assets."""
 
@@ -434,6 +451,21 @@ class WebSocketBridge:
         await self.send({"type": "shutdown_requested"})
 
     # ─── Privat ──────────────────────────────────────────────────────
+
+    async def _dispatch_connection_message(
+        self,
+        data: dict[str, Any],
+        *,
+        handshake_complete: bool,
+    ) -> bool:
+        """Dispatch one message while keeping the handshake one-shot per socket."""
+        is_frontend_ready = data.get("type") == "frontend_ready"
+        if is_frontend_ready and handshake_complete:
+            log.warning("S'ha ignorat un frontend_ready duplicat a la mateixa connexió")
+            return True
+
+        await self._dispatch(data)
+        return handshake_complete or is_frontend_ready
 
     async def _dispatch(self, data: dict[str, Any]) -> None:
         msg_type = data.get("type")

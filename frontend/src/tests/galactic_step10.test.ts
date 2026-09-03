@@ -1,6 +1,9 @@
 import * as THREE from "three";
 
 import type { SkyEnvironmentSnapshot } from "../contracts/sky_environment_contracts";
+import type { ResourceCatalogSnapshotMessage } from "../contracts/bridge_messages";
+import { ResourceManager } from "../application/ResourceManager";
+import type { BackendMessageListener, WebSocketBridge } from "../bridge/WebSocketBridge";
 import { CelestialTransformState } from "../view/three/CelestialTransformState";
 import {
   GalacticSkyRenderer,
@@ -44,6 +47,14 @@ class FakeTextureLoader implements GalacticTextureLoader {
   async loadPlanckDust(): Promise<THREE.Texture> {
     this.dustLoads++;
     return new THREE.DataTexture(new Uint8Array([180, 180, 180, 255]), 1, 1);
+  }
+}
+
+class FakeResourceBridge {
+  listener: BackendMessageListener | null = null;
+
+  addMessageListener(listener: BackendMessageListener): void {
+    this.listener = listener;
   }
 }
 
@@ -146,6 +157,58 @@ function transformState(matrix: number[]): CelestialTransformState {
 
 async function run(): Promise<void> {
   console.log("=== TerraLab3D Step 10 galactic tests ===");
+
+  const resourceBridge = new FakeResourceBridge();
+  const resourceManager = new ResourceManager(resourceBridge as unknown as WebSocketBridge);
+  const catalogSnapshot: ResourceCatalogSnapshotMessage = {
+    type: "resource_catalog_snapshot",
+    descriptors: [{
+      id: "sky.milky_way",
+      name: "Via Làctia",
+      description: "",
+      domain: "sky",
+      category: "deep_sky",
+      provider: "NASA SVS",
+      acquisitionKind: "STATIC_FILE",
+      citation: "",
+      license: "",
+      variants: [
+        { id: "4k", title: "4K", metadata: {} },
+        { id: "64k", title: "64K", metadata: {} },
+      ],
+      credits: [],
+      dependencies: [],
+      metadata: {},
+    }],
+    installedStates: {
+      "sky.milky_way::4k": {
+        status: "READY",
+        variantId: "4k",
+        downloadedBytes: 36_436_668,
+        verifiedAt: "v1",
+        error: null,
+        manifestData: null,
+      },
+      "sky.milky_way::64k": {
+        status: "PARTIAL",
+        variantId: "64k",
+        downloadedBytes: 671_901_255,
+        verifiedAt: null,
+        error: null,
+        manifestData: null,
+      },
+    },
+  };
+  resourceBridge.listener?.onResourceCatalogSnapshot?.(catalogSnapshot);
+  const detectedMilkyWay = resourceManager.getEffectiveInstallState("sky.milky_way");
+  check(
+    detectedMilkyWay.status === "READY" && detectedMilkyWay.variantId === "4k",
+    "resource-backed rows detect a READY variant instead of querying an undefined variant",
+  );
+  check(
+    resourceManager.getEffectiveInstallState("sky.milky_way", "64k").status === "PARTIAL",
+    "an explicitly selected resource variant remains authoritative",
+  );
 
   const center = milkyWayUvFromRaDec(0, 0);
   near(center[0], 0.5, 1e-12, "RA=0h is at the horizontal centre");

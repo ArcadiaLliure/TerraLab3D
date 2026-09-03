@@ -17,6 +17,7 @@ import type {
   SatelliteCatalogManifest,
   SolarSystemSnapshot,
 } from "./solar_system_contracts";
+import type { TemporalSceneState } from "./temporal_scene_contracts";
 import type {
   ResourceDescriptor,
   DownloadJobSnapshot,
@@ -496,6 +497,7 @@ export interface CelestialFrameTransformMessage {
   readonly type: "celestial_frame_transform";
   readonly generation: number;
   readonly matrix3x3: readonly number[];
+  readonly transitionMs?: number;
 }
 
 // ─── Star Picking resolved (Pas 6) ──────────────────────────────────
@@ -534,6 +536,10 @@ export interface SolarSystemSnapshotMessage extends SolarSystemSnapshot {
 export interface LightingEnvironmentSnapshotMessage extends LightingEnvironmentSnapshot {
   readonly type: "lighting_environment_snapshot";
 }
+
+export type TemporalSceneStateMessage = TemporalSceneState & {
+  readonly type: "temporal_scene_state";
+};
 
 export interface MoonSurfaceResourceMessage extends MoonSurfaceResourceDescriptor {
   readonly type: "moon_surface_resource";
@@ -637,6 +643,7 @@ export type BackendMessage =
   | SkyEnvironmentSnapshotMessage
   | SolarSystemSnapshotMessage
   | LightingEnvironmentSnapshotMessage
+  | TemporalSceneStateMessage
   | MoonSurfaceResourceMessage
   | PlanetTextureManifestMessage
   | SolarSystemCatalogManifestMessage

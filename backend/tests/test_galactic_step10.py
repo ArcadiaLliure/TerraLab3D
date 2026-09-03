@@ -208,6 +208,7 @@ def test_celestial_frame_is_republished_without_a_fake_generation() -> None:
             41.3874,
             280.0,
             force_publish=True,
+            transition_ms=40.0,
         )
         await coordinator.shutdown()
 
@@ -216,6 +217,8 @@ def test_celestial_frame_is_republished_without_a_fake_generation() -> None:
     assert len(published) == 2
     assert published[0]["generation"] == published[1]["generation"] == 1
     assert published[0]["matrix3x3"] == published[1]["matrix3x3"]
+    assert published[0]["transitionMs"] == 1000.0
+    assert published[1]["transitionMs"] == 40.0
 
 
 def test_planck_only_uses_the_fixed_icrs_to_galactic_transform() -> None:

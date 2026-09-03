@@ -221,8 +221,9 @@ console.log("=== TerraLab3D Step 9 frontend tests ===");
 
 const policy = new CelestialOcclusionPolicy();
 const states = [body("sun", 151_000_000), body("moon", 366_000), body("mars", 300_000_000)];
-const sunRadius = policy.presentationRadius(states[0]!, states);
-const moonRadius = policy.presentationRadius(states[1]!, states);
+policy.prepare(states);
+const sunRadius = policy.preparedPresentationRadius(states[0]!);
+const moonRadius = policy.preparedPresentationRadius(states[1]!);
 assert(moonRadius < sunRadius, "nearer Moon receives the foreground radial layer");
 near(
   policy.apparentRadius(moonRadius, states[1]!.angularRadiusDeg) / moonRadius,
@@ -230,7 +231,10 @@ near(
   1e-15,
   "occlusion policy preserves angular radius exactly",
 );
-assert(policy.renderOrder(states[1]!, states) > policy.renderOrder(states[0]!, states), "foreground renders after background");
+assert(
+  policy.preparedRenderOrder(states[1]!) > policy.preparedRenderOrder(states[0]!),
+  "foreground renders after background",
+);
 
 const trajectoryParent = new THREE.Group();
 const trajectory = new ApparentTrajectoryRenderer(trajectoryParent);

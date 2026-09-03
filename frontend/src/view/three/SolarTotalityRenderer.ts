@@ -64,6 +64,7 @@ export class SolarTotalityRenderer {
   private moon: SolarSystemBodyState | null = null;
   private presentationRadius = 900_000;
   private disposed = false;
+  private previewActive = false;
   readonly geometryBuildCount = 2;
   readonly materialBuildCount = 2;
 
@@ -99,6 +100,15 @@ export class SolarTotalityRenderer {
     this.apply();
   }
 
+  setPreviewActive(active: boolean): void {
+    this.previewActive = active;
+    if (active) {
+      this.root.visible = false;
+    } else {
+      this.apply();
+    }
+  }
+
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
@@ -110,6 +120,10 @@ export class SolarTotalityRenderer {
   }
 
   private apply(): void {
+    if (this.previewActive) {
+      this.root.visible = false;
+      return;
+    }
     if (this.event === null || this.sun === null || this.moon === null) {
       this.root.visible = false;
       return;
