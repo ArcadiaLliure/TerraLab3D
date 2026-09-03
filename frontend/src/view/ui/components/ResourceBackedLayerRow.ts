@@ -124,7 +124,7 @@ export class ResourceBackedLayerRow {
             return;
         }
 
-        const state = this.manager.getInstallState(this.resourceId);
+        const state = this.manager.getEffectiveInstallState(this.resourceId, this.variantId);
         
         // Auto-select variant if none provided
         let targetVariantId = this.variantId || state.variantId;
@@ -232,7 +232,7 @@ export class ResourceBackedLayerRow {
             this.statusText.textContent = error instanceof Error ? error.message : "Error de capa";
             this.statusText.style.color = "var(--color-error, #ff5555)";
         } finally {
-            const state = this.manager.getInstallState(this.resourceId);
+            const state = this.manager.getEffectiveInstallState(this.resourceId, this.variantId);
             this.checkbox.disabled = state.status !== "READY";
         }
     }

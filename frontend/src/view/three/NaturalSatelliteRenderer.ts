@@ -196,7 +196,7 @@ export class NaturalSatelliteRenderer {
   updateStates(
     states: readonly SolarSystemBodyState[],
     allStates: ReadonlyMap<SolarSystemBodyId, SolarSystemBodyState>,
-    occlusion: CelestialOcclusionPolicy,
+    occlusion: Pick<CelestialOcclusionPolicy, "preparedPresentationRadius">,
   ): void {
     if (this.disposed) return;
     for (const item of this.items.values()) item.anchor.visible = false;
@@ -210,7 +210,7 @@ export class NaturalSatelliteRenderer {
       let radius = CELESTIAL_RADIUS;
       const parentState = state.parentBodyId ? allStates.get(state.parentBodyId as SolarSystemBodyId) : undefined;
       if (parentState) {
-        const parentRadius = occlusion.presentationRadius(parentState, allStates.values());
+        const parentRadius = occlusion.preparedPresentationRadius(parentState);
         if (state.distanceKm > parentState.distanceKm) {
           radius = parentRadius + 50; // Darrere (ocultació)
         } else {

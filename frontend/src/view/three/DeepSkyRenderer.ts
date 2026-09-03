@@ -164,6 +164,7 @@ export class DeepSkyRenderer {
   private readonly rootGroup = new THREE.Group();
   private isVisible = true;
   private transformState: CelestialTransformState | null = null;
+  private appliedTransformRevision = -1;
   private currentVisibilityState: SkyVisibilityState | null = null;
   private readonly horizonUnsubscribe: (() => void) | null;
 
@@ -185,6 +186,7 @@ export class DeepSkyRenderer {
 
   public setTransformState(state: CelestialTransformState): void {
     this.transformState = state;
+    this.appliedTransformRevision = -1;
   }
 
   public attachToParent(parentGroup: THREE.Group, overlayParent?: HTMLElement): void {
@@ -242,19 +244,16 @@ export class DeepSkyRenderer {
     return this.material.uniforms["u_equatorialToENUMatrix"]!.value as THREE.Matrix3;
   }
 
-  public interpolate(timestampMs: number, camera?: THREE.PerspectiveCamera): void {
-    if (!this.transformState || !this.transformState.isValid || !this.material) return;
+  /** Consume the shared transform after its owner has advanced it for this frame. */
+  public syncTransform(): boolean {
+    if (!this.transformState || !this.transformState.isValid || !this.material) return false;
+    if (this.appliedTransformRevision === this.transformState.visualRevision) return false;
 
-    this.transformState.interpolate(timestampMs);
-
-    const mArray = this.transformState.getMatrix3x3Array();
     const mat3 = this.material.uniforms["u_equatorialToENUMatrix"]!.value as THREE.Matrix3;
-    mat3.set(
-      mArray[0]!, mArray[1]!, mArray[2]!,
-      mArray[3]!, mArray[4]!, mArray[5]!,
-      mArray[6]!, mArray[7]!, mArray[8]!,
-    );
+    mat3.copy(this.transformState.equatorialToThree);
     this.material.uniformsNeedUpdate = true;
+    this.appliedTransformRevision = this.transformState.visualRevision;
+    return true;
   }
 
   public registerBinaryResource(metadata: any, payloadBuffer: ArrayBuffer): void {

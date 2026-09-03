@@ -8,32 +8,49 @@ import type { SolarSystemBodyState } from "../../contracts/solar_system_contract
  * changing layers cannot change angular size.
  */
 export class CelestialOcclusionPolicy {
+  private readonly orderedStates: Pick<SolarSystemBodyState, "id" | "distanceKm">[] = [];
+  private readonly preparedPresentationRadii = new Map<string, number>();
+  private readonly preparedRenderOrders = new Map<string, number>();
+
   constructor(
     readonly baseRadius = 900_000,
     readonly maximumRadialSpan = 24_000,
   ) {}
 
-  presentationRadius(
-    state: Pick<SolarSystemBodyState, "id" | "distanceKm">,
+  /** Prepare the shared depth ordering once for the current visual frame. */
+  prepare(
     states: Iterable<Pick<SolarSystemBodyState, "id" | "distanceKm">>,
-  ): number {
-    const ordered = [...states]
-      .filter((candidate) => Number.isFinite(candidate.distanceKm))
-      .sort((a, b) => a.distanceKm - b.distanceKm);
-    const rank = Math.max(0, ordered.findIndex((candidate) => candidate.id === state.id));
-    const layersInFront = Math.max(0, ordered.length - 1 - rank);
-    const normalizedDepth = ordered.length <= 1
-      ? 0
-      : layersInFront / (ordered.length - 1);
-    return this.baseRadius - normalizedDepth * this.maximumRadialSpan;
+  ): void {
+    this.orderedStates.length = 0;
+    this.preparedPresentationRadii.clear();
+    this.preparedRenderOrders.clear();
+    for (const state of states) {
+      if (Number.isFinite(state.distanceKm)) this.orderedStates.push(state);
+    }
+    this.orderedStates.sort((a, b) => a.distanceKm - b.distanceKm);
+    const count = this.orderedStates.length;
+    for (let index = 0; index < count; index++) {
+      const state = this.orderedStates[index]!;
+      const layersInFront = count - 1 - index;
+      const normalizedDepth = count <= 1 ? 0 : layersInFront / (count - 1);
+      this.preparedPresentationRadii.set(
+        state.id,
+        this.baseRadius - normalizedDepth * this.maximumRadialSpan,
+      );
+      this.preparedRenderOrders.set(state.id, -200 + layersInFront);
+    }
   }
 
-  renderOrder(
+  preparedPresentationRadius(
     state: Pick<SolarSystemBodyState, "id" | "distanceKm">,
-    states: Iterable<Pick<SolarSystemBodyState, "id" | "distanceKm">>,
   ): number {
-    const ordered = [...states].sort((a, b) => b.distanceKm - a.distanceKm);
-    return -200 + Math.max(0, ordered.findIndex((candidate) => candidate.id === state.id));
+    return this.preparedPresentationRadii.get(state.id) ?? this.baseRadius;
+  }
+
+  preparedRenderOrder(
+    state: Pick<SolarSystemBodyState, "id" | "distanceKm">,
+  ): number {
+    return this.preparedRenderOrders.get(state.id) ?? -200;
   }
 
   apparentRadius(presentationRadius: number, angularRadiusDeg: number): number {

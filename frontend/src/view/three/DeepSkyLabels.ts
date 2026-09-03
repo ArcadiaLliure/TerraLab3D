@@ -44,12 +44,15 @@ export class DeepSkyLabels {
   private currentVisibilityState: SkyVisibilityState | null = null;
   private maxVisibleLabels = 100; // Limit DOM elements for clean view
   private readonly domPool: HTMLDivElement[] = [];
+  private readonly horizonUnsubscribe: (() => void) | null;
+  private _revision = 0;
 
   constructor(private readonly horizonState: HorizonOcclusionState | null = null) {
     this.container = document.createElement("div");
     this.container.className = "deepsky-labels-container";
     this.container.style.cssText =
       "position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:4;";
+    this.horizonUnsubscribe = horizonState?.subscribe(() => { this._revision++; }) ?? null;
 
     // Pre-create DOM pool
     for (let i = 0; i < this.maxVisibleLabels; i++) {
@@ -65,14 +68,18 @@ export class DeepSkyLabels {
 
   updateVisibilityUniforms(state: SkyVisibilityState): void {
     this.currentVisibilityState = state;
+    this._revision++;
   }
 
   setVisible(visible: boolean): void {
+    if (this.isVisible === visible) return;
     this.isVisible = visible;
     this.container.style.display = visible ? "" : "none";
+    this._revision++;
   }
 
   registerLabels(metadata: any, payloadBuffer: ArrayBuffer): void {
+    this._revision++;
     this.labels.length = 0;
     for (const el of this.domPool) {
       el.style.display = "none";
@@ -216,11 +223,16 @@ export class DeepSkyLabels {
   }
 
   dispose(): void {
+    this.horizonUnsubscribe?.();
     for (const el of this.domPool) {
       el.remove();
     }
     this.labels.length = 0;
     this.container.remove();
+  }
+
+  get revision(): number {
+    return this._revision;
   }
 
   private createLabelElement(text: string): HTMLDivElement {

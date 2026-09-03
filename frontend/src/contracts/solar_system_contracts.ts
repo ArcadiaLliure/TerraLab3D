@@ -156,6 +156,25 @@ export interface SolarSystemSnapshot {
   readonly icrfToENUQuaternion?: readonly [number, number, number, number] | null;
 }
 
+export interface SolarSystemPreviewBodyState {
+  readonly id: SolarSystemBodyId;
+  /** Established TerraLab3D wire order: East, Up, North. */
+  readonly directionENU: readonly [number, number, number];
+  readonly altitudeDeg: number;
+  readonly azimuthDeg: number;
+  readonly distanceKm: number;
+  readonly angularRadiusDeg: number;
+  readonly illuminationFraction: number;
+  readonly phaseAngleDeg: number;
+  readonly apparentMagnitude: number | null;
+}
+
+export interface SolarSystemPreviewSnapshot {
+  readonly generation: number;
+  readonly observerGeneration: number;
+  readonly bodies: readonly SolarSystemPreviewBodyState[];
+}
+
 export interface PlanetTextureAsset {
   readonly bodyId: string;
   readonly naifId: number;

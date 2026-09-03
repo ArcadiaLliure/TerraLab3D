@@ -14,6 +14,7 @@ import type {
   SatelliteCatalogManifest,
   SolarSystemBodyId,
   SolarSystemBodyState,
+  SolarSystemPreviewSnapshot,
   SolarSystemSnapshot,
 } from "../../contracts/solar_system_contracts";
 import { threeFromEnu } from "./celestialCoordinates";
@@ -166,10 +167,12 @@ export class SolarSystemRenderer {
   private latestGeneration = 0;
   private latestObserverGeneration = 0;
   private latestTimestampMs = 0;
+  private latestPreviewGeneration = 0;
   private latestEventGeneration = 0;
   private latestSolarEclipse: SolarEclipseState | null = null;
   private latestTerrainLimb: AstronomicalEventSnapshot["totalityAppearance"]["terrainCorrectedLimb"] = null;
   private eventBodySnapEnabled = false;
+  private previewActive = false;
   private masterVisible = true;
   private sunVisible = true;
   private moonVisible = true;
@@ -179,6 +182,7 @@ export class SolarSystemRenderer {
   private _snapshotApplyCount = 0;
   private _staleSnapshotCount = 0;
   private _lastBridgeBytes = 0;
+  private _labelRevision = 0;
   private readonly horizonUnsubscribe: (() => void) | null;
 
   readonly entityBuildCount: number;
@@ -237,14 +241,18 @@ export class SolarSystemRenderer {
     const timestampMs = Date.parse(snapshot.timestampUtc);
     const snap = (
       this.displayed.size === 0
+      || this.previewActive
       || snapshot.observerGeneration !== this.latestObserverGeneration
       || Math.abs(timestampMs - this.latestTimestampMs) > LARGE_TIME_JUMP_SECONDS * 1000
     );
     this.latestGeneration = snapshot.generation;
+    this.latestPreviewGeneration = 0;
     this.latestObserverGeneration = snapshot.observerGeneration;
     this.latestTimestampMs = timestampMs;
     this._lastBridgeBytes = bridgeBytes;
     this._snapshotApplyCount++;
+    this.previewActive = false;
+    this.totality.setPreviewActive(false);
     this.target = next;
     this.hideUnavailable(next);
     this.orbits.updateSnapshot(snapshot);
@@ -255,6 +263,46 @@ export class SolarSystemRenderer {
     } else {
       this.interpolation = { startedMs: nowMs, from: new Map(this.displayed), to: next };
     }
+    return true;
+  }
+
+  updatePreviewSnapshot(snapshot: SolarSystemPreviewSnapshot): boolean {
+    if (
+      this.disposed
+      || this.displayed.size === 0
+      || snapshot.observerGeneration !== this.latestObserverGeneration
+      || snapshot.generation <= this.latestPreviewGeneration
+    ) {
+      return false;
+    }
+    const preview = new Map(this.displayed);
+    for (const body of snapshot.bodies) {
+      const current = this.target.get(body.id) ?? this.displayed.get(body.id);
+      if (current === undefined) continue;
+      const angularRadiusDeg = body.angularRadiusDeg > 0
+        ? body.angularRadiusDeg
+        : current.angularRadiusDeg;
+      preview.set(body.id, {
+        ...current,
+        directionENU: body.directionENU,
+        altitudeDeg: body.altitudeDeg,
+        azimuthDeg: body.azimuthDeg,
+        distanceKm: body.distanceKm,
+        angularRadiusDeg,
+        angularDiameterDeg: angularRadiusDeg * 2,
+        illuminationFraction: body.illuminationFraction,
+        phaseAngleDeg: body.phaseAngleDeg,
+        apparentMagnitude: body.apparentMagnitude ?? current.apparentMagnitude,
+        geometricElevationDeg: body.altitudeDeg,
+        horizonVisible: body.altitudeDeg + angularRadiusDeg >= 0,
+      });
+    }
+    this.latestPreviewGeneration = snapshot.generation;
+    this.previewActive = true;
+    this.interpolation = null;
+    this.displayed = preview;
+    this.totality.setPreviewActive(true);
+    this.applyDisplayed();
     return true;
   }
 
@@ -431,6 +479,10 @@ export class SolarSystemRenderer {
     return state.apparentMagnitude <= this.environment.visibility.zenithMagnitudeLimit;
   }
 
+  get labelRevision(): number {
+    return this._labelRevision;
+  }
+
   metrics(): SolarSystemRenderMetrics {
     let textureLoads = 0;
     let textureBytes = 0;
@@ -512,6 +564,7 @@ export class SolarSystemRenderer {
   private applyDisplayed(): void {
     const sun = this.displayed.get("sun");
     if (sun === undefined) return;
+    this.occlusion.prepare(this.displayed.values());
     const satelliteStates: SolarSystemBodyState[] = [];
     for (const [id, state] of this.displayed) {
       if (state.type === "natural_satellite") {
@@ -520,12 +573,12 @@ export class SolarSystemRenderer {
       }
       if (id === "moon") {
         const direction = threeFromEnu(state.directionENU).normalize();
-        const radius = this.occlusion.presentationRadius(state, this.displayed.values());
+        const radius = this.occlusion.preparedPresentationRadius(state);
         this.moonSurface.root.position.copy(direction).multiplyScalar(radius);
         this.moonSurface.setPresentationScale(
           this.occlusion.apparentRadius(radius, state.angularRadiusDeg),
         );
-        this.moonSurface.setRenderOrder(this.occlusion.renderOrder(state, this.displayed.values()));
+        this.moonSurface.setRenderOrder(this.occlusion.preparedRenderOrder(state));
         const fallbackLight = phaseLightDirectionThree(state, sun);
         this.moonSurface.updateState(
           state,
@@ -537,10 +590,10 @@ export class SolarSystemRenderer {
       }
       if (id === "sun") {
         const direction = threeFromEnu(state.directionENU).normalize();
-        const radius = this.occlusion.presentationRadius(state, this.displayed.values());
+        const radius = this.occlusion.preparedPresentationRadius(state);
         this.sun.mesh.position.copy(direction).multiplyScalar(radius);
         this.sun.mesh.scale.setScalar(this.occlusion.apparentRadius(radius, state.angularRadiusDeg));
-        this.sun.mesh.renderOrder = this.occlusion.renderOrder(state, this.displayed.values());
+        this.sun.mesh.renderOrder = this.occlusion.preparedRenderOrder(state);
         this.totality.updateSun(state, radius);
         this.sun.uniforms.uRenderAlpha.value = 1;
         this.sun.mesh.visible = this.isVisible(id) && this.isAboveTerrainHorizon(state);
@@ -551,22 +604,23 @@ export class SolarSystemRenderer {
       const visual = this.planetVisuals.get(id);
       if (visual === undefined) continue;
       const visibility = this.isVisible(id) && this.isAboveTerrainHorizon(state);
+      const radius = this.occlusion.preparedPresentationRadius(state);
       visual.updateState(
         state,
         this.occlusion.apparentRadius(
-          this.occlusion.presentationRadius(state, this.displayed.values()),
+          radius,
           state.angularRadiusDeg,
         ),
         phaseLightDirectionThree(state, sun),
         visibility,
-        this.occlusion.presentationRadius(state, this.displayed.values()),
+        radius,
       );
-      visual.mesh.renderOrder = this.occlusion.renderOrder(state, this.displayed.values());
+      visual.mesh.renderOrder = this.occlusion.preparedRenderOrder(state);
       if (id === "saturn") this.rings.updateState(state, visibility);
     }
     this.satellites.setEnabled(this.masterVisible && this.satellitesVisible);
     this.satellites.updateStates(satelliteStates, this.displayed, this.occlusion);
-    if (this.latestSolarEclipse !== null) {
+    if (!this.previewActive && this.latestSolarEclipse !== null) {
       const moon = this.displayed.get("moon");
       if (moon !== undefined) {
         this.moonSurface.updateSolarOccultation(
@@ -577,6 +631,7 @@ export class SolarSystemRenderer {
         );
       }
     }
+    this._labelRevision++;
   }
 
   private isVisible(id: SolarSystemBodyId): boolean {

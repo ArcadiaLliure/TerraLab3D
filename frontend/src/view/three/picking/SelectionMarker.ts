@@ -8,7 +8,11 @@
  * - Hidden si l'estrella surt del viewport o el recurs és evicted
  */
 
-const MINIMUM_MARKER_SIZE = 32; // CSS px
+const DEFAULT_MARKER_SIZE = 32; // CSS px
+const MAXIMUM_MARKER_SIZE = 48; // CSS px
+const MINIMUM_ZOOMED_MARKER_SIZE = 16; // CSS px
+const FULL_SIZE_FOV_DEG = 1;
+const EXTREME_ZOOM_FOV_DEG = 0.0001;
 const MARKER_PADDING = 8; // CSS px outside the rendered object
 const MARKER_COLOR = "#f1cd88"; // color gold de TerraLab3D
 
@@ -21,8 +25,8 @@ export class SelectionMarker {
     this.element = document.createElement("div");
     this.element.style.cssText = `
       position: absolute;
-      width: ${MINIMUM_MARKER_SIZE}px;
-      height: ${MINIMUM_MARKER_SIZE}px;
+      width: ${DEFAULT_MARKER_SIZE}px;
+      height: ${DEFAULT_MARKER_SIZE}px;
       pointer-events: none;
       z-index: 50;
       display: none;
@@ -40,13 +44,15 @@ export class SelectionMarker {
   /**
    * Actualitza la posició del marker en coordenades CSS relatives al container.
    */
-  update(x: number, y: number, visualRadiusCssPx = MINIMUM_MARKER_SIZE / 2): void {
+  update(
+    x: number,
+    y: number,
+    visualRadiusCssPx = DEFAULT_MARKER_SIZE / 2,
+    horizontalFovDeg = 60,
+  ): void {
     if (!this.container) return;
 
-    const size = Math.max(
-      MINIMUM_MARKER_SIZE,
-      visualRadiusCssPx * 2 + MARKER_PADDING,
-    );
+    const size = selectionMarkerSizeCssPx(visualRadiusCssPx, horizontalFovDeg);
 
     this.element.style.width = `${size}px`;
     this.element.style.height = `${size}px`;
@@ -108,4 +114,39 @@ export class SelectionMarker {
       <circle cx="20" cy="20" r="2.5" fill="${MARKER_COLOR}" />
     </svg>`;
   }
+}
+
+/**
+ * Screen-space selection policy.
+ *
+ * At ordinary FOVs the reticle remains easy to find and may surround a small
+ * apparent disc. Below 1 degree it progressively contracts on a logarithmic
+ * scale, so telescope zoom never turns the overlay into a screen-sized ring.
+ */
+export function selectionMarkerSizeCssPx(
+  visualRadiusCssPx: number,
+  horizontalFovDeg: number,
+): number {
+  const finiteRadius = Number.isFinite(visualRadiusCssPx)
+    ? Math.max(0, visualRadiusCssPx)
+    : 0;
+  const objectAwareSize = Math.min(
+    MAXIMUM_MARKER_SIZE,
+    Math.max(DEFAULT_MARKER_SIZE, finiteRadius * 2 + MARKER_PADDING),
+  );
+
+  const finiteFov = Number.isFinite(horizontalFovDeg)
+    ? Math.max(EXTREME_ZOOM_FOV_DEG, horizontalFovDeg)
+    : FULL_SIZE_FOV_DEG;
+  const logRange = Math.log10(FULL_SIZE_FOV_DEG / EXTREME_ZOOM_FOV_DEG);
+  const zoomProgress = Math.min(
+    1,
+    Math.max(
+      0,
+      Math.log10(finiteFov / EXTREME_ZOOM_FOV_DEG) / logRange,
+    ),
+  );
+  const zoomCap = MINIMUM_ZOOMED_MARKER_SIZE
+    + (MAXIMUM_MARKER_SIZE - MINIMUM_ZOOMED_MARKER_SIZE) * zoomProgress;
+  return Math.min(objectAwareSize, zoomCap);
 }

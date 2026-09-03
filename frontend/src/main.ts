@@ -14,6 +14,7 @@ import { TerrainPickProvider } from "./view/three/picking/TerrainPickProvider";
 import { WebSocketBridge } from "./bridge/WebSocketBridge";
 import type { BackendMessageListener } from "./bridge/WebSocketBridge";
 import { ResourceManager } from "./application/ResourceManager";
+import { TemporalSceneCoordinator } from "./application/TemporalSceneCoordinator";
 import { CameraRigImpl } from "./view/three/CameraRigImpl";
 import { RenderLoopImpl } from "./view/three/RenderLoopImpl";
 import { ThreeSceneHostImpl } from "./view/three/ThreeSceneHostImpl";
@@ -65,9 +66,9 @@ function main(): void {
 
   // 1. Create subsystems. The bridge connects after all listeners are wired so
   // the initial celestial transform and resource catalogue cannot be lost.
+  const sceneHost = new ThreeSceneHostImpl();
   const bridge = new WebSocketBridge();
   const resourceManager = new ResourceManager(bridge);
-  const sceneHost = new ThreeSceneHostImpl();
   const cameraRig = new CameraRigImpl(sceneHost.camera);
   const renderLoop = new RenderLoopImpl();
   const diagnostics = new DiagnosticsOverlay();
@@ -134,8 +135,10 @@ function main(): void {
     resourceId: "sky.milky_way" | "sky.planck_dust",
   ): GalacticTextureResource => {
     const descriptor = resourceManager.getDescriptor(resourceId);
-    const state = resourceManager.getInstallState(resourceId);
-    if (!descriptor || state.status !== "READY" || state.variantId === null) {
+    const state = descriptor?.variants
+      .map((variant) => resourceManager.getInstallState(resourceId, variant.id))
+      .find((candidate) => candidate.status === "READY");
+    if (!descriptor || !state || state.status !== "READY" || state.variantId === null) {
       throw new Error("El recurs encara no està disponible");
     }
     const variant = descriptor.variants.find((candidate) => candidate.id === state.variantId);
@@ -146,7 +149,7 @@ function main(): void {
     return {
       resourceId,
       version,
-      url: `/managed-galactic-assets/${encodeURIComponent(resourceId)}?v=${encodeURIComponent(version)}`,
+      url: `/managed-galactic-assets/${encodeURIComponent(resourceId)}?variant=${encodeURIComponent(state.variantId)}&v=${encodeURIComponent(version)}`,
       width: renderWidth,
       height: renderHeight,
     };
@@ -308,9 +311,7 @@ function main(): void {
 
   // ─── Picking Initialization (Pas 6) ──────────────────────────────
   const celestialTransformState = new CelestialTransformState();
-  sceneHost.getStarFieldRenderer().setTransformState(celestialTransformState);
-  sceneHost.getDeepSkyRenderer().setTransformState(celestialTransformState);
-  sceneHost.getGalacticSkyRenderer().setTransformState(celestialTransformState);
+  sceneHost.setCelestialTransformState(celestialTransformState);
   starTrailRenderer.setTransformState(celestialTransformState);
 
   const gestureRouter = new PointerGestureRouter();
@@ -485,6 +486,7 @@ function main(): void {
 
   let currentObserverLatitude = 41.38;
   let lastStarTrailsState = "idle";
+  const temporalSceneCoordinator = new TemporalSceneCoordinator();
 
   const backendListener: BackendMessageListener = {
     onSetCameraPose(p) {
@@ -579,8 +581,8 @@ function main(): void {
       sceneHost.getDemTerrainLayerRenderer().landCoverManager.updateLegend(msg);
       console.info("MGP: main.onLandCoverLegend [FI]");
     },
-    onCelestialFrameTransform(generation, matrix3x3) {
-      celestialTransformState.update(generation, matrix3x3 as number[]);
+    onCelestialFrameTransform(generation, matrix3x3, transitionMs) {
+      celestialTransformState.update(generation, matrix3x3 as number[], transitionMs);
     },
     onBinaryResourceReady(metadata, bufferPayload) {
       if (metadata.role === "horizon_profile") {
@@ -672,6 +674,40 @@ function main(): void {
       diagnostics.updateSolarSystem(snapshot, sceneHost.getSolarSystemRenderer().metrics());
       trackingResolver.updateSolarSystemSnapshot(snapshot);
     },
+    onTemporalSceneState(state) {
+      if (!temporalSceneCoordinator.accept(state)) return;
+
+      const solarRenderer = sceneHost.getSolarSystemRenderer();
+      const lighting = sceneHost.getLightingController();
+      const sky = state.skyEnvironment;
+
+      // One synchronous transaction: no animation frame can observe mixed
+      // positions, sky, eclipse photometry and local lights.
+      currentSkyVisibilityState = sky.visibility;
+      atmosphereRenderer.updateEnvironment(sky);
+      solarRenderer.updateEnvironment(sky);
+      sceneHost.getStarFieldRenderer().updateVisibilityUniforms(sky.visibility);
+      sceneHost.getDeepSkyRenderer().updateVisibilityUniforms(sky.visibility);
+      sceneHost.getGalacticSkyRenderer().updateEnvironment(sky);
+      lighting.setEclipseAppearance(state.astronomicalEvent.sceneAppearance);
+
+      if (state.authority === "preview") {
+        solarRenderer.updatePreviewSnapshot(state.solarSystem);
+      } else {
+        const solarBytes = new TextEncoder().encode(JSON.stringify(state.solarSystem)).byteLength;
+        solarRenderer.updateSnapshot(state.solarSystem, solarBytes);
+        solarRenderer.updateEventSnapshot(state.astronomicalEvent);
+      }
+      const lightingBytes = state.authority === "authoritative"
+        ? new TextEncoder().encode(JSON.stringify(state.lightingEnvironment)).byteLength
+        : 0;
+      lighting.applySnapshot(
+        state.lightingEnvironment,
+        lightingBytes,
+        performance.now(),
+        state.authority,
+      );
+    },
     onLightingEnvironmentSnapshot(snapshot) {
       const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
       sceneHost.getLightingController().applySnapshot(snapshot, bridgeBytes);
@@ -747,9 +783,7 @@ function main(): void {
   bridge.addStateListener({
     onBridgeStateChanged(state) {
       if (state === "connected") {
-        resourceManager.requestCatalog();
         bridge.setSatelliteSystems([...enabledSatelliteSystems]);
-        bridge.sendFrontendReady();
         diagnostics.updateSession(bridge.sessionId);
       }
     }
@@ -872,7 +906,7 @@ function main(): void {
       });
     }
 
-    // Phase 4: Update celestial labels EVERY frame to eliminate lag when panning
+    // Project labels only when their camera, viewport, content or scene transform changed.
     sceneHost.updateLabels();
 
     // Update HUD at ~4 Hz (not every frame)

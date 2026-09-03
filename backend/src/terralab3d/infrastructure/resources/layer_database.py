@@ -12,6 +12,8 @@ from terralab3d.domain.resources.models import (
     ResourceCategory,
 )
 
+CATALOG_SCHEMA_VERSION = 2
+
 def _get_app_data_dir() -> Path:
     # Use standard APPDATA on Windows if available, otherwise fallback to ~/.terralab3d
     appdata = os.environ.get("APPDATA")
@@ -36,22 +38,57 @@ class LayerDatabase:
             self.save()
         else:
             with open(self.db_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                self._descriptors.clear()
-                for item in data:
-                    desc = self._parse_descriptor(item)
-                    self._descriptors[desc.id] = desc
+                catalog = json.load(f)
+
+            descriptors: Dict[ResourceId, ResourceDescriptor] = {}
+            for item in self._descriptor_items(catalog):
+                desc = self._parse_descriptor(item)
+                descriptors[desc.id] = desc
+            self._descriptors = descriptors
 
     def save(self) -> None:
-        data = [d.to_dict() for d in self._descriptors.values()]
+        catalog = {
+            "schemaVersion": CATALOG_SCHEMA_VERSION,
+            "layers": [d.to_dict() for d in self._descriptors.values()],
+        }
         with open(self.db_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+            json.dump(catalog, f, indent=2, ensure_ascii=False)
 
     def get_descriptor(self, resource_id: ResourceId) -> ResourceDescriptor | None:
         return self._descriptors.get(resource_id)
 
     def get_all_descriptors(self) -> List[ResourceDescriptor]:
         return list(self._descriptors.values())
+
+    def public_snapshot(self) -> list[dict]:
+        """Return catalog descriptors without backend-only acquisition plans."""
+        snapshot: list[dict] = []
+        for descriptor in self._descriptors.values():
+            public_descriptor = descriptor.to_dict()
+            for variant in public_descriptor.get("variants", []):
+                metadata = variant.get("metadata")
+                if isinstance(metadata, dict):
+                    metadata.pop("parametricPlan", None)
+                if public_descriptor.get("acquisitionKind") == "PARAMETRIC_DOWNLOAD":
+                    variant["sourceUrl"] = None
+                    variant["sourceUrls"] = []
+            snapshot.append(public_descriptor)
+        return snapshot
+
+    @staticmethod
+    def _descriptor_items(catalog: object) -> list[dict]:
+        if isinstance(catalog, list):
+            items = catalog
+        elif isinstance(catalog, dict):
+            items = catalog.get("layers")
+            if not isinstance(items, list):
+                raise ValueError("El catàleg de capes no conté una llista 'layers' vàlida")
+        else:
+            raise ValueError("El catàleg de capes ha de ser una llista o un objecte JSON")
+
+        if not all(isinstance(item, dict) for item in items):
+            raise ValueError("Tots els elements del catàleg de capes han de ser objectes JSON")
+        return items
 
     def _parse_descriptor(self, data: dict) -> ResourceDescriptor:
         variants = []

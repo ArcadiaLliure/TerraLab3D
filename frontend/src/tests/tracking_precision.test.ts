@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { CameraRigImpl } from "../view/three/CameraRigImpl";
 import { TrackingTargetResolver } from "../view/three/picking/TrackingTargetResolver";
+import { selectionMarkerSizeCssPx } from "../view/three/picking/SelectionMarker";
 
 function assert(condition: boolean, message: string): void {
   if (!condition) {
@@ -15,6 +16,53 @@ function assertCloseTo(actual: number, expected: number, tolerance: number, mess
 }
 
 console.log("=== TerraLab3D Tracking Precision & Float32 Emulation Tests ===");
+
+{
+  const wide = selectionMarkerSizeCssPx(400, 60);
+  const telescope = selectionMarkerSizeCssPx(400, 0.01);
+  const extreme = selectionMarkerSizeCssPx(400, 0.0001);
+  assert(wide === 48, "ordinary FOV caps a huge body marker at 48 CSS px");
+  assert(telescope === 32, "telescope zoom contracts the marker");
+  assert(extreme === 16, "extreme zoom contracts the marker to 16 CSS px");
+  assert(wide > telescope && telescope > extreme, "marker size decreases monotonically with zoom");
+}
+
+{
+  // The shader's angular floating origin must keep a tracked Float32 catalogue
+  // direction exactly centred while the celestial transform changes.
+  const catalogueDirection = new THREE.Vector3(
+    ...new Float32Array([
+      Math.cos(0.7) * Math.cos(4.8),
+      Math.cos(0.7) * Math.sin(4.8),
+      Math.sin(0.7),
+    ]),
+  );
+  let maxCentredDelta = 0;
+  for (let index = 0; index < 200; index++) {
+    const celestialQuaternion = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(0.73, 1.1 + index * 0.00001, -0.4, "XYZ"),
+    );
+    const celestial = new THREE.Matrix3().setFromMatrix4(
+      new THREE.Matrix4().makeRotationFromQuaternion(celestialQuaternion),
+    );
+    const displayedDirection = catalogueDirection.clone().applyMatrix3(celestial).normalize();
+    const camera = new THREE.PerspectiveCamera(0.0001, 16 / 9, 0.01, 2_000_000);
+    camera.lookAt(displayedDirection);
+    camera.updateMatrixWorld(true);
+
+    const anchor = camera.getWorldDirection(new THREE.Vector3())
+      .applyMatrix3(celestial.clone().invert())
+      .normalize();
+    const anchorFloat32 = new Float32Array(anchor.toArray());
+    maxCentredDelta = Math.max(
+      maxCentredDelta,
+      Math.abs(catalogueDirection.x - anchorFloat32[0]!),
+      Math.abs(catalogueDirection.y - anchorFloat32[1]!),
+      Math.abs(catalogueDirection.z - anchorFloat32[2]!),
+    );
+  }
+  assert(maxCentredDelta === 0, "tracked catalogue direction stays exact after Float32 upload");
+}
 
 {
   // 1. Emulate WebGL Float32 quantization jitter

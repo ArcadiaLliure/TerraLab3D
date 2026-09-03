@@ -322,6 +322,8 @@ class SpiceEphemerisAdapter:
         body_ids: tuple[str, ...] = ("sun", "moon"),
         *,
         include_lunar_shadow_geometry: bool = False,
+        include_body_orientation: bool = True,
+        allow_unknown_radius: bool = False,
     ) -> AstronomicalEventEphemeris:
         """Return a lightweight topocentric state from the shared CSPICE pool.
 
@@ -358,6 +360,8 @@ class SpiceEphemerisAdapter:
                         observer_position,
                         earth_frame,
                         icrf_to_enu,
+                        include_body_orientation=include_body_orientation,
+                        allow_unknown_radius=allow_unknown_radius,
                     )
                     for body_id in dict.fromkeys(body_ids)
                 )
@@ -453,8 +457,14 @@ class SpiceEphemerisAdapter:
         observer_position: Vector3,
         earth_frame: str,
         icrf_to_enu: Matrix3,
+        *,
+        include_body_orientation: bool = True,
+        allow_unknown_radius: bool = False,
     ) -> ApparentEventBody:
-        naif_id, radius_km, body_frame = self._event_body_definition(body_id)
+        naif_id, radius_km, body_frame = self._event_body_definition(
+            body_id,
+            allow_unknown_radius=allow_unknown_radius,
+        )
         topocentric_state, _ = spice.spkcpo(
             str(naif_id),
             et,
@@ -475,7 +485,7 @@ class SpiceEphemerisAdapter:
         )
         body_to_icrf_quaternion = None
         north_position_angle = None
-        if body_frame is not None:
+        if include_body_orientation and body_frame is not None:
             try:
                 body_to_icrf = _matrix3(spice.pxform(body_frame, "J2000", et))
                 body_to_icrf_quaternion = rotation_matrix_to_quaternion(body_to_icrf)
@@ -502,7 +512,12 @@ class SpiceEphemerisAdapter:
             north_pole_position_angle_deg=north_position_angle,
         )
 
-    def _event_body_definition(self, body_id: str) -> tuple[int, float, str | None]:
+    def _event_body_definition(
+        self,
+        body_id: str,
+        *,
+        allow_unknown_radius: bool = False,
+    ) -> tuple[int, float, str | None]:
         known: dict[str, tuple[int, float, str | None]] = {
             "sun": (10, 695_700.0, "IAU_SUN"),
             "moon": (301, 1_737.4, "MOON_ME_DE421"),
@@ -524,6 +539,8 @@ class SpiceEphemerisAdapter:
         if definition is None or definition.naif_id is None:
             raise ValueError(f"Unknown or unavailable event body: {body_id}")
         if definition.mean_radius_km is None:
+            if allow_unknown_radius:
+                return definition.naif_id, 0.0, definition.body_fixed_frame
             raise ValueError(f"Event body has no validated radius: {body_id}")
         return (
             definition.naif_id,

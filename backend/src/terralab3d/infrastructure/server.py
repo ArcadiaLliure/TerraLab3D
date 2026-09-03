@@ -33,7 +33,7 @@ class TerraLabServer:
         solar_system_assets: SolarSystemAssetPort | None = None,
         galactic_assets: ManagedGalacticAssets | None = None,
         *,
-        host: str = "127.0.0.1",
+        host: str = "0.0.0.0",
         port: int = 14398,
     ) -> None:
         self._dist_dir = dist_dir
@@ -169,7 +169,10 @@ class TerraLabServer:
 
         if self._galactic_assets is None:
             raise aiohttp.web.HTTPNotFound()
-        path = self._galactic_assets.resolve_asset(request.match_info["resource_id"])
+        path = self._galactic_assets.resolve_asset(
+            request.match_info["resource_id"],
+            request.query.get("variant"),
+        )
         if path is None:
             raise aiohttp.web.HTTPNotFound()
         response = aiohttp.web.FileResponse(path)

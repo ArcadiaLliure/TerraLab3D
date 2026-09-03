@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { EclipseSceneAppearance } from "../../../contracts/astronomical_event_contracts";
+import type { TemporalAuthority } from "../../../contracts/temporal_scene_contracts";
 
 import type {
   DiffuseSkyLightState,
@@ -42,6 +43,7 @@ export class SceneLightingController {
   private readonly moonTarget = new THREE.Object3D();
   private readonly shadowController: ShadowController;
   private latestGeneration = 0;
+  private latestAuthority: TemporalAuthority | null = null;
   private latestTimestampMs = 0;
   private displayed: LightingEnvironmentSnapshot | null = null;
   private transition: LightingTransition | null = null;
@@ -83,23 +85,34 @@ export class SceneLightingController {
     snapshot: LightingEnvironmentSnapshot,
     bridgeBytes = 0,
     nowMs = performance.now(),
+    authority: TemporalAuthority = "authoritative",
   ): boolean {
     if (this.disposed) return false;
-    if (snapshot.generation <= this.latestGeneration || !validSnapshot(snapshot)) {
+    const authorityAdvances = snapshot.generation === this.latestGeneration
+      && authorityRank(authority) > authorityRank(this.latestAuthority);
+    if (
+      snapshot.generation < this.latestGeneration
+      || (snapshot.generation === this.latestGeneration && !authorityAdvances)
+      || !validSnapshot(snapshot)
+    ) {
       this._staleSnapshotCount++;
       return false;
     }
+    const previousAuthority = this.latestAuthority;
     const timestampMs = Date.parse(snapshot.timestampUtc);
     const mustSnap = this.displayed === null
+      || authority === "preview"
+      || previousAuthority === "preview"
       || !Number.isFinite(timestampMs)
       || Math.abs(timestampMs - this.latestTimestampMs) > LARGE_TIME_JUMP_MS
       || this.displayed.sun.enabled !== snapshot.sun.enabled
       || this.displayed.moon.enabled !== snapshot.moon.enabled
       || this.displayed.skyDiffuse.enabled !== snapshot.skyDiffuse.enabled;
     this.latestGeneration = snapshot.generation;
+    this.latestAuthority = authority;
     this.latestTimestampMs = timestampMs;
     this._snapshotApplyCount++;
-    this._lastBridgeBytes = bridgeBytes;
+    if (authority === "authoritative") this._lastBridgeBytes = bridgeBytes;
     if (mustSnap || this.displayed === null) {
       this.displayed = snapshot;
       this.transition = null;
@@ -127,7 +140,7 @@ export class SceneLightingController {
       this.applyState(this.displayed);
       if (fraction >= 1) this.transition = null;
     }
-    this.shadowController.updateCamera(cameraPosition);
+    this.shadowController.updateCamera(cameraPosition, timestampMs);
   }
 
   setShadowQuality(quality: ShadowQuality): void {
@@ -175,8 +188,13 @@ export class SceneLightingController {
     this.shadowController.applySunDirection(
       sunDirection,
       snapshot.sun.enabled && snapshot.sun.intensity > 0,
+      snapshot.sun.intensity,
     );
-    this.shadowController.applyMoonDirection(moonDirection);
+    this.shadowController.applyMoonDirection(
+      moonDirection,
+      snapshot.moon.enabled && snapshot.moon.intensity > 0,
+      snapshot.moon.intensity,
+    );
     applyDiffuseLight(this.diffuseSkyLight, snapshot.skyDiffuse);
     if (this.eclipseAppearance !== null) {
       applyVisualEclipseAppearance(
@@ -336,4 +354,10 @@ function validColor(value: readonly [number, number, number]): boolean {
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
+}
+
+function authorityRank(authority: TemporalAuthority | null): number {
+  if (authority === "authoritative") return 2;
+  if (authority === "preview") return 1;
+  return 0;
 }

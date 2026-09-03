@@ -20,7 +20,8 @@ log = logging.getLogger("terralab3d.ephemeris.coordinator")
 
 @dataclass(frozen=True, slots=True)
 class _Request:
-    generation: int
+    sequence: int
+    generation_id: int
     observer_generation: int
     utc: datetime
     observer: ScientificObserver
@@ -58,12 +59,21 @@ class EphemerisCoordinator:
         utc: datetime,
         observer: ScientificObserver,
         observer_generation: int,
+        *,
+        generation_id: int | None = None,
     ) -> int:
         if self._closed:
             raise RuntimeError("EphemerisCoordinator is closed")
         self._generation += 1
         self._latest_requested_generation = self._generation
-        request = _Request(self._generation, observer_generation, utc, observer)
+        effective_generation = self._generation if generation_id is None else generation_id
+        request = _Request(
+            self._generation,
+            effective_generation,
+            observer_generation,
+            utc,
+            observer,
+        )
         self.request_count += 1
         if self._task is not None:
             if self._pending is not None:
@@ -72,7 +82,7 @@ class EphemerisCoordinator:
         else:
             self._pending = request
             self._task = asyncio.create_task(self._drain(), name="ephemeris-latest-wins")
-        return request.generation
+        return request.generation_id
 
     async def wait_idle(self) -> None:
         task = self._task
@@ -135,7 +145,10 @@ class EphemerisCoordinator:
                         request.observer,
                     )
                 except Exception:
-                    log.exception("Ephemeris calculation failed for generation %d", request.generation)
+                    log.exception(
+                        "Ephemeris calculation failed for generation %d",
+                        request.generation_id,
+                    )
                     continue
                 self._compute_ms.append(snapshot.compute_ms)
                 if snapshot.moon is not None and snapshot.moon.orientation is not None:
@@ -148,8 +161,11 @@ class EphemerisCoordinator:
                 self._orientation_batch_compute_ms.append(sum(orientation_times))
                 if self._closed:
                     break
+                if request.sequence < self._latest_requested_generation:
+                    self.stale_count += 1
+                    continue
                 published = snapshot.with_generation(
-                    request.generation,
+                    request.generation_id,
                     request.observer_generation,
                 )
                 profile = self._horizon_profile() if self._horizon_profile is not None else None
@@ -158,7 +174,10 @@ class EphemerisCoordinator:
                 try:
                     byte_count = await self._publisher(published)
                 except Exception:
-                    log.exception("Ephemeris publication failed for generation %d", request.generation)
+                    log.exception(
+                        "Ephemeris publication failed for generation %d",
+                        request.generation_id,
+                    )
                     continue
                 if byte_count is not None:
                     self.last_bridge_bytes = byte_count
