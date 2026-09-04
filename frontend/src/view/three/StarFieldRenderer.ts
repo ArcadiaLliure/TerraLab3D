@@ -23,6 +23,7 @@ import { DEFAULT_SKY_VISIBILITY } from "../../contracts/sky_visibility_defaults"
 import type { CelestialTransformState } from "./CelestialTransformState";
 import type { HorizonOcclusionState } from "./HorizonOcclusionState";
 import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
+import { computeStarFovScale } from "./shaders/starVisualParams";
 
 export interface StarResourceEntry {
   readonly resourceId: string;
@@ -45,6 +46,7 @@ export class StarFieldRenderer {
   private readonly resources = new Map<string, StarResourceEntry>();
   private magnitudeLimit = 8.0;
   private pointScale = 1.0;
+  private fovPointScale = computeStarFovScale(60.0);
   private isVisible = true;
   private trailSuppressed = false;
 
@@ -97,7 +99,7 @@ export class StarFieldRenderer {
   }
 
   public getPointScale(): number {
-    return this.pointScale;
+    return this.pointScale * this.fovPointScale;
   }
 
   public setMagnitudeLimit(limit: number): void {
@@ -166,6 +168,7 @@ export class StarFieldRenderer {
    * rebuilding or transforming the resident catalogue on CPU.
    */
   public prepareView(camera: THREE.PerspectiveCamera): boolean {
+    this.updateCameraFov(horizontalFovDeg(camera));
     if (!this.transformState?.isValid) return false;
 
     camera.updateMatrixWorld(true);
@@ -262,7 +265,7 @@ export class StarFieldRenderer {
         u_equatorialToViewMatrix: { value: new THREE.Matrix3() },
         u_equatorialViewAnchor: { value: new THREE.Vector3(0, 0, -1) },
         u_magnitudeLimit: { value: this.magnitudeLimit },
-        u_pointScale: { value: this.pointScale },
+        u_pointScale: { value: this.getPointScale() },
         u_devicePixelRatio: { value: window.devicePixelRatio || 1.0 },
         u_radius: { value: CELESTIAL_SCENE_RADIUS.distantSky },
         u_horizonTexture: { value: this.horizonState?.gpuUniformValues().texture ?? null },
@@ -310,6 +313,19 @@ export class StarFieldRenderer {
   public updateViewport(dpr: number): void {
     for (const entry of this.resources.values()) {
       uniform<number>(entry.material, "u_devicePixelRatio").value = dpr;
+      entry.material.uniformsNeedUpdate = true;
+    }
+  }
+
+  /** Actualitza només el factor visual; no reconstrueix geometria ni buffers. */
+  public updateCameraFov(horizontalFovDeg: number): void {
+    const nextScale = computeStarFovScale(horizontalFovDeg);
+    if (Math.abs(nextScale - this.fovPointScale) < 1e-6) return;
+
+    this.fovPointScale = nextScale;
+    const effectivePointScale = this.getPointScale();
+    for (const entry of this.resources.values()) {
+      uniform<number>(entry.material, "u_pointScale").value = effectivePointScale;
       entry.material.uniformsNeedUpdate = true;
     }
   }
@@ -370,4 +386,11 @@ export function srgbChannelToLinear(value: number): number {
   return value <= 0.04045
     ? value / 12.92
     : Math.pow((value + 0.055) / 1.055, 2.4);
+}
+
+function horizontalFovDeg(camera: THREE.PerspectiveCamera): number {
+  const verticalFovRad = THREE.MathUtils.degToRad(camera.fov);
+  return THREE.MathUtils.radToDeg(
+    2.0 * Math.atan(Math.tan(verticalFovRad / 2.0) * camera.aspect),
+  );
 }

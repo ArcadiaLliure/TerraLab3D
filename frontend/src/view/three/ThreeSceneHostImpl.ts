@@ -421,6 +421,7 @@ export class ThreeSceneHostImpl {
   /** Called from CameraRig when FOV changes. */
   setCurrentFov(fovDeg: number): void {
     this.currentFovDeg = fovDeg;
+    this.starFieldRenderer.updateCameraFov(fovDeg);
   }
 
   setNavigationWorld(world: { setBoundsVisible(visible: boolean): void }): void {
