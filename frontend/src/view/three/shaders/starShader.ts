@@ -67,9 +67,9 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
       + u_equatorialToViewMatrix * (position - u_equatorialViewAnchor);
     vec4 mvPosition = vec4(viewDirection * u_radius, 1.0);
     gl_Position = projectionMatrix * mvPosition;
-    float baseSize = max(1.8, (7.0 - magnitude) * 1.8 * u_pointScale);
+    float baseSize = max(1.8, (7.0 - magnitude) * 1.8);
     if (magnitude < 1.0) baseSize += (1.0 - magnitude) * 4.0;
-    gl_PointSize = clamp(baseSize * u_devicePixelRatio, 1.0, 64.0);
+    gl_PointSize = clamp(baseSize * u_pointScale * u_devicePixelRatio, 1.0, 64.0);
   }
 `;
 

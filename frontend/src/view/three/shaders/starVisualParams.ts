@@ -24,6 +24,12 @@ export const STAR_VISUAL_PARAMS = {
   maxPointSize: 64.0,
   /** Mida mínima de punt en device px */
   minPointSize: 1.0,
+  /** FOV horitzontal on la mida fotomètrica s'aplica sense compensació */
+  referenceHorizontalFovDeg: 45.0,
+  /** Evita que el gran angular faci desaparèixer les estrelles brillants */
+  minimumFovScale: 0.45,
+  /** Evita discos exagerats amb FOV telescòpics extrems */
+  maximumFovScale: 2.5,
 } as const;
 
 // ─── Paràmetres de hit radius ────────────────────────────────────────
@@ -38,6 +44,27 @@ export const STAR_HIT_PARAMS = {
 // ─── Càlcul de mida de punt ──────────────────────────────────────────
 
 /**
+ * Calcula una compensació perceptiva a partir de l'escala focal de la càmera.
+ *
+ * Les estrelles són fonts puntuals, però una mida fixa en píxels fa que semblin
+ * discos en gran angular i que perdin presència en apropar la vista. L'arrel
+ * quadrada conserva part de la resposta òptica sense aplicar un zoom lineal
+ * excessiu; els límits mantenen estable el resultat als FOV extrems.
+ */
+export function computeStarFovScale(horizontalFovDeg: number): number {
+  const p = STAR_VISUAL_PARAMS;
+  const safeFovDeg = Number.isFinite(horizontalFovDeg)
+    ? Math.max(0.0001, Math.min(179.0, horizontalFovDeg))
+    : p.referenceHorizontalFovDeg;
+  const referenceFocalScale = Math.tan(
+    p.referenceHorizontalFovDeg * Math.PI / 360.0,
+  );
+  const currentFocalScale = Math.tan(safeFovDeg * Math.PI / 360.0);
+  const scale = Math.sqrt(referenceFocalScale / currentFocalScale);
+  return Math.max(p.minimumFovScale, Math.min(p.maximumFovScale, scale));
+}
+
+/**
  * Calcula la mida de punt en device pixels.
  * Idèntica a la fórmula del vertex shader.
  */
@@ -49,12 +76,12 @@ export function computeStarPointSizeDevicePx(
   const p = STAR_VISUAL_PARAMS;
   let baseSize = Math.max(
     p.minBaseSize,
-    (p.baseMagRef - magnitude) * p.scaleFactor * pointScale,
+    (p.baseMagRef - magnitude) * p.scaleFactor,
   );
   if (magnitude < p.brightBoostThreshold) {
     baseSize += (p.brightBoostThreshold - magnitude) * p.brightBoostFactor;
   }
-  const devicePx = baseSize * dpr;
+  const devicePx = baseSize * pointScale * dpr;
   return Math.max(p.minPointSize, Math.min(p.maxPointSize, devicePx));
 }
 
