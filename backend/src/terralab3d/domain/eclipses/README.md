@@ -42,7 +42,7 @@ El paquet separa `models.py` (tipus i invariants), `calculations.py` (algoritmes
 La capacitat està implementada al Pas 9. Les unitats públiques són graus,
 quilòmetres i UTC aware. La classificació no té banda tolerant; les toleràncies
 de `0.25 s`/`1e-8°` són exclusives dels solvers numèrics. La càmera no és cap
-entrada científica. Vegeu `docs/pas-9-validacio.md`.
+entrada científica. Vegeu `docs/completat/pas9.md`.
 
 ## 8. Migració des de TerraLab
 

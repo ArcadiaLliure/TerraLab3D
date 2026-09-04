@@ -26,8 +26,12 @@ def main() -> None:
             errors.append(f"Falta README de domini: {package}")
         if package.is_dir() and not (package / "calculations.py").exists():
             errors.append(f"Falta espai de càlcul científic: {package}")
-    if not (ROOT / "docs/pla-implementacio-pas-a-pas.md").exists():
-        errors.append("Falta el pla d’implementació pas a pas")
+    if not (ROOT / "docs/normes_arquitectura.md").exists():
+        errors.append("Falten les normes d’arquitectura")
+    if not (ROOT / "docs/completat").is_dir():
+        errors.append("Falta el directori de passos completats")
+    if not (ROOT / "docs/pendent").is_dir():
+        errors.append("Falta el directori de passos pendents")
     if errors:
         raise SystemExit("\n".join(errors))
     print("Esquelet TerraLab3D validat correctament")
