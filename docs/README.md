@@ -27,7 +27,7 @@ La documentació es divideix entre normes transversals i passos funcionals. La c
 - [Pas 15 — Elevació real, perfil d’horitzó i oclusió celeste](completat/pas15.md)
 - [Pas 16 — Terreny tridimensional retingut, tiles, LOD i picking de superfície](completat/pas16.md)
 
-## Passos parcialment implementats
+## En progrés
 
 - [Pas 23 — Capes, datasets, assistent de dades, preferències i feedback](pendent/pas23.md)
 
@@ -35,8 +35,8 @@ La documentació es divideix entre normes transversals i passos funcionals. La c
 
 ~~- [Pas 17 — Ortofoto, cobertura categòrica i estils de superfície](pendent/pas17.md)~~ (NO S'INCORPORA A TERRALAB3D)
 - [Pas 18 — Meteorologia real, fallback i efectes atmosfèrics](pendent/pas18.md) (AJORNAT)
-- [Pas 19 — Telescopi, ocular, sensors i enquadrament instrumental](pendent/pas19.md)
-- [Pas 20 — Simulació fotogràfica, senyal, soroll i llarga exposició](pendent/pas20.md)
+- [Pas 19 — Telescopi, ocular, sensors i enquadrament instrumental](pendent/pas19.md) (En estudi d'ampliació)
+- [Pas 20 — Simulació fotogràfica, senyal, soroll i llarga exposició](pendent/pas20.md) (En estudi d'ampliació)
 - [Pas 21 — Regla, quadrat, rectangle i cercle amb edició](pendent/pas21.md)
 - [Pas 22 — Constel·lacions editables amb snapping, grups i persistència](pendent/pas22.md)
 - [Pas 24 — Homologació integral, recuperació, rendiment i independència de producte](pendent/pas24.md)
