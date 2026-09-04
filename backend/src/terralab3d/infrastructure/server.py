@@ -99,68 +99,78 @@ class TerraLabServer:
 
     async def start(self) -> str:
         """Inicia el servidor i retorna l'URL base."""
-        self._app = aiohttp.web.Application(middlewares=[self._remove_csp_middleware])
-        self._app.on_response_prepare.append(self._remove_csp_on_prepare)
-        self._app.router.add_get("/ws", self._bridge.handle_websocket)
+        app = aiohttp.web.Application(middlewares=[self._remove_csp_middleware])
+        self._app = app
+        app.on_response_prepare.append(self._remove_csp_on_prepare)
+        app.router.add_get("/ws", self._bridge.handle_websocket)
         if self._moon_surface_assets is not None:
-            self._app.router.add_get("/moon-assets/{asset_name}", self._serve_moon_asset)
+            app.router.add_get("/moon-assets/{asset_name}", self._serve_moon_asset)
         if self._solar_system_assets is not None:
-            self._app.router.add_get("/planet-assets/{asset_name}", self._serve_planet_asset)
+            app.router.add_get("/planet-assets/{asset_name}", self._serve_planet_asset)
         if self._galactic_assets is not None:
-            self._app.router.add_get(
+            app.router.add_get(
                 "/managed-galactic-assets/{resource_id}",
                 self._serve_galactic_asset,
             )
         if self._raster_imports is not None:
-            self._app.router.add_get(
+            app.router.add_get(
                 "/api/classification-schemes",
                 self._classification_schemes,
             )
-            self._app.router.add_post("/api/raster-imports", self._create_raster_import)
-            self._app.router.add_put(
+            app.router.add_post("/api/raster-imports", self._create_raster_import)
+            app.router.add_put(
                 "/api/raster-imports/{import_id}/files/{ordinal}",
                 self._upload_raster_import_file,
             )
-            self._app.router.add_post(
+            app.router.add_post(
                 "/api/raster-imports/{import_id}/inspect",
                 self._inspect_raster_import,
             )
-            self._app.router.add_post(
+            app.router.add_post(
                 "/api/raster-imports/{import_id}/commit",
                 self._commit_raster_import,
             )
-            self._app.router.add_delete(
+            app.router.add_delete(
                 "/api/raster-imports/{import_id}",
                 self._cancel_raster_import,
             )
-        self._app.router.add_get("/", self._serve_index)
-        self._app.router.add_static(
+        app.router.add_get("/", self._serve_index)
+        app.router.add_static(
             "/", self._dist_dir, show_index=False,
         )
 
-        self._runner = aiohttp.web.AppRunner(
-            self._app,
+        runner = aiohttp.web.AppRunner(
+            app,
             access_log=None,  # suprimeix els registres d'accés sorollosos
         )
-        await self._runner.setup()
+        self._runner = runner
+        await runner.setup()
 
         try:
-            self._site = aiohttp.web.TCPSite(
-                self._runner, self._host, self._port, reuse_address=False,
+            site = aiohttp.web.TCPSite(
+                runner, self._host, self._port, reuse_address=False,
             )
-            await self._site.start()
+            await site.start()
         except OSError:
             # Si el port està ocupat, recaure en port dinàmic del SO (port=0)
-            self._site = aiohttp.web.TCPSite(
-                self._runner, self._host, 0, reuse_address=False,
+            site = aiohttp.web.TCPSite(
+                runner, self._host, 0, reuse_address=False,
             )
-            await self._site.start()
+            await site.start()
+        self._site = site
 
         # Resol el port real (quan port=0, el SO n'assigna un)
-        for sock in self._site._server.sockets:  # type: ignore[union-attr]
-            addr = sock.getsockname()
-            self._actual_port = addr[1]
-            break
+        address = next(
+            (
+                candidate
+                for candidate in runner.addresses
+                if isinstance(candidate, tuple) and len(candidate) >= 2
+            ),
+            None,
+        )
+        if address is None:
+            raise RuntimeError("El servidor HTTP no ha creat cap adreça d'escolta")
+        self._actual_port = int(address[1])
 
         log.debug("Servidor escoltant a %s", self.url)
         return self.url
