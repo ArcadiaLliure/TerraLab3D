@@ -1,10 +1,58 @@
-# Pas 9 — Eclipsis, ocultacions, separacions i trajectòries aparents
+# Pas 9 — Eclipsis, ocultacions, separacions i trajectòries
+
+> Estat: **completat**
+> Classificat mitjançant implementació, proves i validacions del repositori.
+
+## Resultat funcional palpable
+
+La simulació identifica i representa eclipsis solars/lunars, separacions angulars i trajectòries temporals dels cossos.
+
+## Fonts TerraLab a consultar
+
+- `TerraLab/astro/engine.py` — geometria d’eclipsi i separacions
+- `TerraLab/runtime/offscreen_renderer.py` — fallback o composició actual
+- `tests` d’eclipsis, fases i refracció
+
+## Objectiu
+
+Completar aquesta vertical funcional de punta a punta, mantenint la separació de responsabilitats i sense anticipar funcionalitats posteriors que no siguin imprescindibles.
+
+## Tasques
+
+- [ ] Crear un paquet científic específic d’eclipsis i ocultacions.
+- [ ] Implementar separació angular i intersecció de discs aparents.
+- [ ] Implementar magnitud, obscuració i fase instantània d’eclipsi.
+- [ ] Implementar cerca de màxim i contactes dins d’un interval.
+- [ ] Representar l’ombra, penombra o superposició amb geometria/materials adequats.
+- [ ] Mostrar estat de l’esdeveniment i temps fins al contacte al HUD.
+- [ ] Implementar trajectòries opcionals de Sol, Lluna, planetes i satèl·lits naturals seleccionats en un interval.
+- [ ] Versionar la geometria de trajectòria i actualitzar-la només quan canvia l’interval.
+- [ ] Gestionar esdeveniments no visibles des de la ubicació actual.
+- [ ] Afegir toleràncies temporals i angulars explícites.
+- [ ] Comparar esdeveniments coneguts amb TerraLab i una font astronòmica de referència.
+
+## Criteri de sortida
+
+Un cas d’eclipsi conegut es pot reproduir des de la UI temporal, els contactes i magnituds són coherents i les trajectòries no es recalculen per cada frame.
+
+## Evidència obligatòria
+
+- [ ] Fixtures d’eclipsi solar i lunar.
+- [ ] Vídeo de l’esdeveniment a través de la timeline.
+- [ ] Assertions de contactes, separacions i obscuració.
+- [ ] Perfil de cost del càlcul i de la representació.
+
+## Fora d’abast del pas
+
+No inclou encara Via Làctia o NGC.
+
+## Annex: Validació d’eclipsis, ocultacions i trajectòries
 
 Data de validació: 2026-08-10
 
 Base: `ebfc22844229cfb02288aeae7d6b245e794bbee1`
 
-## Estat i autoritat científica
+### Estat i autoritat científica
 
 El Pas 9 està implementat sobre els kernels SPICE gestionats que ja usa el
 sistema solar. No existeix una segona efemèride ni una segona càrrega de
@@ -15,7 +63,7 @@ comparteix `KernelManager`, lock, política d'aberració i lifecycle amb
 La convenció dels contactes és geomètrica i no refractada. C1–C4 es resolen
 sobre limbe esfèric; LOLA només intervé en Perles de Baily i anell de diamant.
 
-## Classificació solar i toleràncies
+### Classificació solar i toleràncies
 
 La classificació local és exactament:
 
@@ -40,14 +88,14 @@ Les toleràncies següents pertanyen exclusivament als algoritmes numèrics:
 Cada `classify_observer()` crea el seu `ScientificObserver` i executa una
 consulta topocèntrica Sol/Lluna independent. No comparteix ni interpola `d`.
 
-## Fixtures 2026
+### Fixtures 2026
 
 El fixture offline és
 `backend/tests/fixtures/eclipses_2026_reference.json`. Desa procedència,
 observador, interval, contactes i toleràncies; NASA/JPL són validació, mentre
 que el runtime continua sent SPICE/DE440.
 
-### Solar total — observador precís sol·licitat, 2026-08-12
+#### Solar total — observador precís sol·licitat, 2026-08-12
 
 Observador: `41.21240330896238°, 0.8072721734579367°`, elevació `330 m`.
 La primera hora és UTC i la segona és hora local CEST (`UTC+2`):
@@ -73,7 +121,7 @@ La prova obligatòria del límit nord usa `41.4498742676°` i
 `total`, el segon `partial`, i el comptador confirma dues consultes SPICE
 topocèntriques independents. També es valida el límit sud.
 
-### Lunar total — 2026-03-03
+#### Lunar total — 2026-03-03
 
 ```text
 P1       08:43:18.134766Z
@@ -89,7 +137,7 @@ magnitud umbral màxima 1.1580646
 L'ombra usa Sol→Terra, eix antisolar, distàncies i radis físics. El factor
 atmosfèric Danjon queda explícit com `1.02` i aproximat.
 
-## Aparença i escena
+### Aparença i escena
 
 - Durant un eclipsi solar, el shader lunar calcula per fragment la direcció
   visual cap al Sol. Només la intersecció Lluna–disc solar força alfa `1` i
@@ -136,7 +184,7 @@ atmosfèric Danjon queda explícit com `1.02` i aproximat.
 - `ApparentTrajectoryRenderer` és independent de `SatelliteOrbitRenderer` i
   manté buffers versionats persistents.
 
-## Bridge i prova integrada
+### Bridge i prova integrada
 
 Missatges nous:
 
@@ -164,7 +212,7 @@ La cerca i la trajectòria són `asyncio.to_thread`, cooperativament cancel·lab
 i latest-wins; el tancament espera totes les tasques encara vives abans de
 tancar l'adaptador SPICE.
 
-## Regressions
+### Regressions
 
 ```text
 backend: 56 passed
@@ -178,7 +226,7 @@ frontend typecheck: passed
 frontend build: passed
 ```
 
-## Evidència visual pendent
+### Evidència visual pendent
 
 La sessió no ha pogut capturar ni inspeccionar honestament imatges: el skill de
 navegador no exposava cap browser i el fallback de Computer Use no trobava el
@@ -187,7 +235,7 @@ mètriques, i la ruta de dades/renderers s'ha validat per tests i bridge, però
 queden pendents les captures i vídeos subjectius enumerats al criteri
 d'evidència del Pas 9. No es declaren observats.
 
-## Fonts de validació
+### Fonts de validació
 
 - NASA, [Total Solar Eclipse on August 12, 2026](https://science.nasa.gov/eclipses/future-eclipses/total-solar-eclipse-on-august-12-2026/)
 - NASA GSFC, [2026 total eclipse path](https://eclipse.gsfc.nasa.gov/SEpath/SEpath2001/SE2026Aug12Tpath.html)

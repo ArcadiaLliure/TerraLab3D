@@ -42,6 +42,8 @@ import { applyRendererColorPolicy } from "./rendererColorPolicy";
 import { HorizonOcclusionState } from "./HorizonOcclusionState";
 import { HorizonLayerRenderer } from "./layers/HorizonLayerRenderer";
 import { DemTerrainLayerRenderer } from "./layers/DemTerrainLayerRenderer";
+import { computeRenderPixelRatio } from "./renderResolutionPolicy";
+import type { CelestialTransformState } from "./CelestialTransformState";
 
 const LOG_PREFIX = "MGP: [ThreeSceneHost]";
 
@@ -91,6 +93,18 @@ export class ThreeSceneHostImpl {
   private container: HTMLElement | null = null;
   private disposed = false;
   private currentFovDeg = 60;
+  private labelsInitialized = false;
+  private labelViewportRevision = 0;
+  private lastLabelViewportRevision = -1;
+  private lastCelestialLabelRevision = -1;
+  private lastSolarLabelRevision = -1;
+  private lastSolarSceneRevision = -1;
+  private lastDeepSkyLabelRevision = -1;
+  private deepSkyTransformAvailable = false;
+  private readonly lastLabelCameraMatrix = new Float64Array(16);
+  private readonly lastLabelProjectionMatrix = new Float64Array(16);
+  private readonly lastDeepSkyTransform = new Float64Array(9);
+  private celestialTransformState: CelestialTransformState | null = null;
 
   private navigationWorld: { setBoundsVisible(visible: boolean): void } | null = null;
 
@@ -127,8 +141,11 @@ export class ThreeSceneHostImpl {
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.01, 2000000);
 
     // Renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: false,
+      powerPreference: "high-performance",
+    });
+    this.renderer.setPixelRatio(computeRenderPixelRatio(window.devicePixelRatio, 1, 1));
     applyRendererColorPolicy(this.renderer);
     this.lightingController = new SceneLightingController(this.scene, this.renderer);
     this.horizonOcclusionState = new HorizonOcclusionState(
@@ -251,9 +268,19 @@ export class ThreeSceneHostImpl {
     return this.lightingController;
   }
 
+  setCelestialTransformState(state: CelestialTransformState): void {
+    this.celestialTransformState = state;
+    this.starFieldRenderer.setTransformState(state);
+    this.deepSkyRenderer.setTransformState(state);
+    this.galacticSkyRenderer.setTransformState(state);
+  }
+
   mount(container: HTMLElement): void {
     this.container = container;
     const rect = container.getBoundingClientRect();
+    this.renderer.setPixelRatio(
+      computeRenderPixelRatio(window.devicePixelRatio, rect.width, rect.height),
+    );
     this.renderer.setSize(rect.width, rect.height);
     container.appendChild(this.renderer.domElement);
 
@@ -264,17 +291,24 @@ export class ThreeSceneHostImpl {
   }
 
   resize(widthPx: number, heightPx: number): void {
+    const renderPixelRatio = computeRenderPixelRatio(
+      window.devicePixelRatio,
+      widthPx,
+      heightPx,
+    );
+    this.renderer.setPixelRatio(renderPixelRatio);
     this.renderer.setSize(widthPx, heightPx);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.starFieldRenderer.updateViewport(window.devicePixelRatio);
+    this.starFieldRenderer.updateViewport(renderPixelRatio);
+    this.labelViewportRevision++;
   }
 
   updateVisualState(timestampMs: number): void {
     if (this.disposed) return;
 
     this.solarSystemRenderer.update(timestampMs);
-    this.starFieldRenderer.interpolate(timestampMs);
-    this.deepSkyRenderer.interpolate(timestampMs, this.camera);
+    this.celestialTransformState?.interpolate(timestampMs);
+    this.starFieldRenderer.syncTransform();
+    this.deepSkyRenderer.syncTransform();
     this.galacticSkyRenderer.syncTransform();
     this.lightingController.update(timestampMs, this.camera.position);
     // This is a retained fog boundary derived from the indexed DEM coverage.
@@ -308,21 +342,69 @@ export class ThreeSceneHostImpl {
 
   renderFrame(): void {
     if (this.disposed) return;
+    this.starFieldRenderer.prepareView(this.camera);
     this.renderer.render(this.scene, this.camera);
   }
 
-  /**
-   * Update labels. Called at ~4 Hz from the render loop, not every frame.
-   */
+  /** Project only label groups invalidated by camera, viewport or scene data. */
   updateLabels(): void {
     if (this.disposed) return;
-    this.celestialLabels.update(this.camera, this.camera.position);
-    this.solarSystemLabels.update(this.camera);
-
+    const firstUpdate = !this.labelsInitialized;
+    const cameraMatrixChanged = copyChangedElements(
+      this.camera.matrixWorld.elements,
+      this.lastLabelCameraMatrix,
+    );
+    const projectionMatrixChanged = copyChangedElements(
+      this.camera.projectionMatrix.elements,
+      this.lastLabelProjectionMatrix,
+    );
+    const cameraChanged = cameraMatrixChanged || projectionMatrixChanged;
+    const viewportChanged = this.labelViewportRevision !== this.lastLabelViewportRevision;
+    const celestialRevision = this.celestialLabels.revision;
+    const solarLabelRevision = this.solarSystemLabels.revision;
+    const solarSceneRevision = this.solarSystemRenderer.labelRevision;
+    const deepSkyLabelRevision = this.deepSkyRenderer.labels.revision;
     const dsMatrix = this.deepSkyRenderer.getTransformMatrix();
-    if (dsMatrix) {
+    let deepSkyTransformChanged = this.deepSkyTransformAvailable;
+    if (dsMatrix !== null) {
+      const matrixChanged = copyChangedElements(dsMatrix.elements, this.lastDeepSkyTransform);
+      deepSkyTransformChanged = !this.deepSkyTransformAvailable || matrixChanged;
+    }
+
+    if (
+      firstUpdate
+      || cameraChanged
+      || viewportChanged
+      || celestialRevision !== this.lastCelestialLabelRevision
+    ) {
+      this.celestialLabels.update(this.camera, this.camera.position);
+    }
+    if (
+      firstUpdate
+      || cameraChanged
+      || viewportChanged
+      || solarLabelRevision !== this.lastSolarLabelRevision
+      || solarSceneRevision !== this.lastSolarSceneRevision
+    ) {
+      this.solarSystemLabels.update(this.camera);
+    }
+    if (dsMatrix && (
+      firstUpdate
+      || cameraChanged
+      || viewportChanged
+      || deepSkyTransformChanged
+      || deepSkyLabelRevision !== this.lastDeepSkyLabelRevision
+    )) {
       this.deepSkyRenderer.labels.update(this.camera, dsMatrix);
     }
+
+    this.labelsInitialized = true;
+    this.lastLabelViewportRevision = this.labelViewportRevision;
+    this.lastCelestialLabelRevision = celestialRevision;
+    this.lastSolarLabelRevision = solarLabelRevision;
+    this.lastSolarSceneRevision = solarSceneRevision;
+    this.lastDeepSkyLabelRevision = deepSkyLabelRevision;
+    this.deepSkyTransformAvailable = dsMatrix !== null;
   }
 
   setSiderealTime(lstDeg: number): void {
@@ -339,6 +421,7 @@ export class ThreeSceneHostImpl {
   /** Called from CameraRig when FOV changes. */
   setCurrentFov(fovDeg: number): void {
     this.currentFovDeg = fovDeg;
+    this.starFieldRenderer.updateCameraFov(fovDeg);
   }
 
   setNavigationWorld(world: { setBoundsVisible(visible: boolean): void }): void {
@@ -442,4 +525,14 @@ export class ThreeSceneHostImpl {
 
     console.debug(`${LOG_PREFIX} [dispose] [Escena alliberada]`);
   }
+}
+
+function copyChangedElements(source: readonly number[], target: Float64Array): boolean {
+  let changed = false;
+  for (let index = 0; index < source.length; index++) {
+    const value = source[index]!;
+    if (target[index] !== value) changed = true;
+    target[index] = value;
+  }
+  return changed;
 }

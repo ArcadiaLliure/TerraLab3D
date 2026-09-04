@@ -127,12 +127,11 @@ export class RefinementMapView {
 
   public setInstalled(installations: readonly { footprint?: RefinementGeometry | null }[]): void {
     const features: Feature[] = [];
-    const format = new GeoJSONFormat();
     for (const inst of installations) {
       if (inst.footprint) {
         try {
           features.push(new Feature({
-            geometry: format.readGeometry(inst.footprint, { featureProjection: 'EPSG:3857' })
+            geometry: geoJson.readGeometry(inst.footprint, { featureProjection: 'EPSG:3857' })
           }));
         } catch (e) {
           console.error("Invalid footprint GeoJSON", e);

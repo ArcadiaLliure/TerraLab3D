@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.domain.resources.models import (
@@ -11,6 +11,9 @@ from terralab3d.domain.resources.models import (
     ResourceDomain,
     ResourceCategory,
 )
+
+CATALOG_SCHEMA_VERSION = 2
+
 
 def _get_app_data_dir() -> Path:
     # Use standard APPDATA on Windows if available, otherwise fallback to ~/.terralab3d
@@ -22,10 +25,11 @@ def _get_app_data_dir() -> Path:
     p.mkdir(parents=True, exist_ok=True)
     return p
 
-class LayerDatabase:
-    STORAGE_SCHEMA_VERSION = 2
 
+class LayerDatabase:
     """Proporciona accés al catàleg JSON de capes de TerraLab3D."""
+
+    STORAGE_SCHEMA_VERSION = CATALOG_SCHEMA_VERSION
 
     def __init__(self, db_path: Path | None = None) -> None:
         self.db_path = db_path or (_get_app_data_dir() / "layers.json")
@@ -39,51 +43,25 @@ class LayerDatabase:
             self.save()
         else:
             with open(self.db_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                self._descriptors.clear()
-                for item in self._extract_layer_records(data):
-                    desc = self._parse_descriptor(item)
-                    self._descriptors[desc.id] = desc
+                catalog = json.load(f)
+
+            descriptors: Dict[ResourceId, ResourceDescriptor] = {}
+            for item in self._descriptor_items(catalog):
+                descriptor = self._parse_descriptor(item)
+                descriptors[descriptor.id] = descriptor
+            self._descriptors = descriptors
 
     def save(self) -> None:
-        data = {
+        catalog = {
             "schemaVersion": self.STORAGE_SCHEMA_VERSION,
             "layers": [d.to_dict() for d in self._descriptors.values()],
         }
         temp_path = self.db_path.with_suffix(self.db_path.suffix + ".tmp")
         with open(temp_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+            json.dump(catalog, f, indent=2, ensure_ascii=False)
             f.flush()
             os.fsync(f.fileno())
         temp_path.replace(self.db_path)
-
-    @staticmethod
-    def _extract_layer_records(data: Any) -> List[dict]:
-        """Accept the current wrapped document and the original list format.
-
-        The frontend/resource tooling persists a versioned document, while
-        older backend installations wrote the layer records directly as a
-        JSON array. Both representations describe the same persistence
-        boundary; neither should leak into descriptor parsing.
-        """
-
-        if isinstance(data, list):
-            records = data
-        elif isinstance(data, dict):
-            records = data.get("layers")
-            if not isinstance(records, list):
-                raise ValueError(
-                    "Invalid layer catalog: wrapped document must contain a 'layers' array"
-                )
-        else:
-            raise ValueError("Invalid layer catalog: root must be an array or an object")
-
-        for index, item in enumerate(records):
-            if not isinstance(item, dict):
-                raise ValueError(
-                    f"Invalid layer catalog: layer at index {index} must be an object"
-                )
-        return records
 
     def get_descriptor(self, resource_id: ResourceId) -> ResourceDescriptor | None:
         return self._descriptors.get(resource_id)
@@ -100,6 +78,42 @@ class LayerDatabase:
         if descriptor is not None:
             self.save()
         return descriptor
+
+    def public_snapshot(self) -> list[dict]:
+        """Retorna descriptors sense els plans d'adquisició interns del backend."""
+        snapshot: list[dict] = []
+        for descriptor in self._descriptors.values():
+            public_descriptor = descriptor.to_dict()
+            for variant in public_descriptor.get("variants", []):
+                metadata = variant.get("metadata")
+                if isinstance(metadata, dict):
+                    metadata.pop("parametricPlan", None)
+                if public_descriptor.get("acquisitionKind") == "PARAMETRIC_DOWNLOAD":
+                    variant["sourceUrl"] = None
+                    variant["sourceUrls"] = []
+            snapshot.append(public_descriptor)
+        return snapshot
+
+    @staticmethod
+    def _descriptor_items(catalog: object) -> list[dict]:
+        if isinstance(catalog, list):
+            items = catalog
+        elif isinstance(catalog, dict):
+            items = catalog.get("layers")
+            if not isinstance(items, list):
+                raise ValueError(
+                    "Invalid layer catalog: el catàleg de capes ha de contenir una llista 'layers' vàlida"
+                )
+        else:
+            raise ValueError(
+                "Invalid layer catalog: l'arrel del catàleg de capes ha de ser una llista o un objecte JSON"
+            )
+
+        if not all(isinstance(item, dict) for item in items):
+            raise ValueError(
+                "Invalid layer catalog: tots els elements del catàleg de capes han de ser objectes JSON"
+            )
+        return items
 
     def _parse_descriptor(self, data: dict) -> ResourceDescriptor:
         variants = []

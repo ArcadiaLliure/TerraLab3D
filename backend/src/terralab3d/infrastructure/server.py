@@ -38,7 +38,7 @@ class TerraLabServer:
         galactic_assets: ManagedGalacticAssets | None = None,
         raster_imports: RasterImportService | None = None,
         *,
-        host: str = "127.0.0.1",
+        host: str = "0.0.0.0",
         port: int = 14398,
     ) -> None:
         self._dist_dir = dist_dir
@@ -56,7 +56,8 @@ class TerraLabServer:
 
     @property
     def url(self) -> str:
-        return f"http://{self._host}:{self._actual_port}"
+        public_host = "127.0.0.1" if self._host in {"0.0.0.0", "::"} else self._host
+        return f"http://{public_host}:{self._actual_port}"
 
     @property
     def actual_port(self) -> int:
@@ -215,7 +216,10 @@ class TerraLabServer:
 
         if self._galactic_assets is None:
             raise aiohttp.web.HTTPNotFound()
-        path = self._galactic_assets.resolve_asset(request.match_info["resource_id"])
+        path = self._galactic_assets.resolve_asset(
+            request.match_info["resource_id"],
+            request.query.get("variant"),
+        )
         if path is None:
             raise aiohttp.web.HTTPNotFound()
         response = aiohttp.web.FileResponse(path)

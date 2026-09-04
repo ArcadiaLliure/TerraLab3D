@@ -233,14 +233,7 @@ export class ResourceBackedLayerRow {
             this.statusText.textContent = error instanceof Error ? error.message : "Error de capa";
             this.statusText.style.color = "var(--color-error, #ff5555)";
         } finally {
-            const descriptor = this.manager.getDescriptor(this.resourceId);
-            const targetVariantId = this.variantId
-                || descriptor?.variants.find(variant =>
-                    this.manager.getInstallState(this.resourceId, variant.id).status === "READY"
-                )?.id
-                || descriptor?.variants[0]?.id
-                || "";
-            const state = this.manager.getInstallState(this.resourceId, targetVariantId);
+            const state = this.manager.getEffectiveInstallState(this.resourceId, this.variantId);
             this.checkbox.disabled = state.status !== "READY";
         }
     }

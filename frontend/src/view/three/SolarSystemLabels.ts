@@ -21,11 +21,7 @@ interface PlanetLabel {
   visible: boolean;
   screenX: number;
   screenY: number;
-}
-
-interface ProjectedLabel {
-  readonly label: PlanetLabel;
-  readonly magnitude: number;
+  magnitude: number;
 }
 
 const LABEL_MARGIN_PX = 8;
@@ -51,7 +47,13 @@ export class SolarSystemLabels {
   private readonly satelliteNames = new Map<SolarSystemBodyId, string>();
   private readonly satelliteRadii = new Map<SolarSystemBodyId, number>();
   private readonly projectedPosition = new THREE.Vector3();
+  private readonly satelliteDirection = new THREE.Vector3();
+  private readonly parentDirection = new THREE.Vector3();
+  private readonly visibleLabels: PlanetLabel[] = [];
+  private readonly occupiedLabels: PlanetLabel[] = [];
+  private readonly bodyIds: SolarSystemBodyId[] = ["moon", ...PLANET_IDS];
   private satelliteLabelsEnabled = true;
+  private _revision = 0;
 
   constructor(private readonly solarSystemRenderer: SolarSystemRenderer) {
     this.container = document.createElement("div");
@@ -78,15 +80,22 @@ export class SolarSystemLabels {
       this.satelliteNames.set(definition.id, definition.displayName);
       this.satelliteRadii.set(definition.id, definition.meanRadiusKm ?? 0);
     }
+    this._revision++;
   }
 
   setSatelliteLabelsEnabled(enabled: boolean): void {
+    if (this.satelliteLabelsEnabled === enabled) return;
     this.satelliteLabelsEnabled = enabled;
     if (!enabled) {
       for (const [id, label] of this.labels) {
         if (id.startsWith("naif-") || id.startsWith("provisional-")) this.hide(label);
       }
     }
+    this._revision++;
+  }
+
+  get revision(): number {
+    return this._revision;
   }
 
   update(camera: THREE.PerspectiveCamera): void {
@@ -95,18 +104,23 @@ export class SolarSystemLabels {
 
     const halfWidth = rect.width / 2;
     const halfHeight = rect.height / 2;
-    const visible: ProjectedLabel[] = [];
+    const fovRad = THREE.MathUtils.degToRad(camera.fov);
+    const pixelsPerRad = rect.height / (2 * Math.tan(fovRad / 2));
+    this.visibleLabels.length = 0;
+    this.occupiedLabels.length = 0;
+    this.bodyIds.length = 1 + PLANET_IDS.length;
     for (const [id, label] of this.labels) {
       if (id.startsWith("naif-") || id.startsWith("provisional-")) this.hide(label);
     }
 
-    const satelliteIds = this.satelliteLabelsEnabled
-      ? this.solarSystemRenderer.getPickableBodies()
-        .filter((item) => item.id.startsWith("naif-") || item.id.startsWith("provisional-"))
-        .map((item) => item.id)
-      : [];
-    const bodies: SolarSystemBodyId[] = ["moon", ...PLANET_IDS, ...satelliteIds];
-    for (const id of bodies) {
+    if (this.satelliteLabelsEnabled) {
+      for (const item of this.solarSystemRenderer.getPickableBodies()) {
+        if (item.id.startsWith("naif-") || item.id.startsWith("provisional-")) {
+          this.bodyIds.push(item.id);
+        }
+      }
+    }
+    for (const id of this.bodyIds) {
       let label = this.labels.get(id);
       if (label === undefined) {
         label = this.createLabel(id, this.satelliteNames.get(id) ?? id);
@@ -120,8 +134,6 @@ export class SolarSystemLabels {
         isVisible = (object !== undefined && object.visible && state !== undefined);
       } else if (id.startsWith("naif-") || id.startsWith("provisional-")) {
         if (object?.visible === true && this.satelliteLabelsEnabled && state !== undefined) {
-          const fovRad = THREE.MathUtils.degToRad(camera.fov);
-          const pixelsPerRad = rect.height / (2 * Math.tan(fovRad / 2));
           const satDiameterPx = THREE.MathUtils.degToRad(state.angularDiameterDeg) * pixelsPerRad;
           const satRadius = this.satelliteRadii.get(id as SolarSystemBodyId) ?? (state.meanRadiusKm ?? 0);
           const isPrimary = satRadius > 100;
@@ -171,8 +183,6 @@ export class SolarSystemLabels {
       }
 
       // Calculate apparent radius in pixels to keep text outside the body
-      const fovRad = THREE.MathUtils.degToRad(camera.fov);
-      const pixelsPerRad = rect.height / (2 * Math.tan(fovRad / 2));
       const radiusRad = THREE.MathUtils.degToRad(state.angularRadiusDeg);
       const radiusPx = radiusRad * pixelsPerRad;
       const textOffset = Math.max(LABEL_MARGIN_PX, radiusPx + 4);
@@ -182,11 +192,10 @@ export class SolarSystemLabels {
         : formatPlanetLabel(id as LabelableBodyId, state.apparentMagnitude);
       
       const diameterKm = state.meanRadiusKm ? state.meanRadiusKm * 2 : 0;
-      if (diameterKm > 0) {
-        label.text.textContent = `${baseName} (Ø ${diameterKm.toLocaleString(undefined, { maximumFractionDigits: 1 })} km)`;
-      } else {
-        label.text.textContent = baseName;
-      }
+      const text = diameterKm > 0
+        ? `${baseName} (Ø ${diameterKm.toLocaleString(undefined, { maximumFractionDigits: 1 })} km)`
+        : baseName;
+      if (label.text.textContent !== text) label.text.textContent = text;
       let isOccluded = false;
       if (id.startsWith("naif-") || id.startsWith("provisional-")) {
         const parentStringId = state.parentNaifId ? naifIdToPlanetId(state.parentNaifId) : (state.parentBodyId as SolarSystemBodyId | undefined);
@@ -194,9 +203,9 @@ export class SolarSystemLabels {
           const parentAnchor = this.solarSystemRenderer.getLabelAnchor(parentStringId);
           const parentState = parentAnchor?.userData.apparentState as SolarSystemBodyState | undefined;
           if (parentState) {
-            const satDir = new THREE.Vector3(...state.directionENU).normalize();
-            const parentDir = new THREE.Vector3(...parentState.directionENU).normalize();
-            const angularSepRad = satDir.angleTo(parentDir);
+            this.satelliteDirection.fromArray(state.directionENU).normalize();
+            this.parentDirection.fromArray(parentState.directionENU).normalize();
+            const angularSepRad = this.satelliteDirection.angleTo(this.parentDirection);
             const parentRadiusRad = THREE.MathUtils.degToRad(parentState.angularRadiusDeg);
             
             if (angularSepRad < parentRadiusRad && state.distanceKm > parentState.distanceKm) {
@@ -217,21 +226,26 @@ export class SolarSystemLabels {
       label.text.style.left = `${textOffset}px`;
       label.screenX = screenX;
       label.screenY = screenY;
+      label.magnitude = state.apparentMagnitude ?? Number.POSITIVE_INFINITY;
       label.visible = true;
-      visible.push({ label, magnitude: state.apparentMagnitude ?? Number.POSITIVE_INFINITY });
+      this.visibleLabels.push(label);
     }
 
     // Keep the brighter tag when planets are visually close together.
-    visible.sort((first, second) => first.magnitude - second.magnitude);
-    const occupied: PlanetLabel[] = [];
-    for (const projected of visible) {
-      const label = projected.label;
-      const overlaps = occupied.some((placed) => (
-        Math.abs(label.screenX - placed.screenX) < 20
-        && Math.abs(label.screenY - placed.screenY) < 20
-      ));
+    this.visibleLabels.sort((first, second) => first.magnitude - second.magnitude);
+    for (const label of this.visibleLabels) {
+      let overlaps = false;
+      for (const placed of this.occupiedLabels) {
+        if (
+          Math.abs(label.screenX - placed.screenX) < 20
+          && Math.abs(label.screenY - placed.screenY) < 20
+        ) {
+          overlaps = true;
+          break;
+        }
+      }
       if (overlaps) this.hide(label);
-      else occupied.push(label);
+      else this.occupiedLabels.push(label);
     }
 
     for (const label of this.labels.values()) {
@@ -276,6 +290,7 @@ export class SolarSystemLabels {
       visible: false,
       screenX: 0,
       screenY: 0,
+      magnitude: Number.POSITIVE_INFINITY,
     };
   }
 

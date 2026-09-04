@@ -24,6 +24,7 @@ import sys
 import threading
 import uuid
 import webbrowser
+from dataclasses import replace
 from typing import Any
 from datetime import datetime, timedelta, timezone
 
@@ -31,13 +32,25 @@ from terralab3d.domain.time.engine import AstronomicalEngine
 from terralab3d.domain.time.models import ClockMode, SimulationInstant, ClockState
 from terralab3d.domain.sky_background.sky_environment import SkyEnvironmentComposer
 from terralab3d.domain.light_pollution.models import LightPollutionMode
-from terralab3d.domain.solar_system.models import ScientificObserver, SolarSystemSnapshot
+from terralab3d.domain.geometry import HorizontalCoordinate
+from terralab3d.domain.solar_system.models import (
+    ApparentBodyState,
+    EphemerisQuality,
+    ScientificObserver,
+    SolarSystemSnapshot,
+)
 from terralab3d.domain.star_trails.models import (
     StarTrailPlaybackConfig,
     clamped_exposure_seconds,
 )
 from terralab3d.domain.lighting.environment import LightingEnvironmentComposer
 from terralab3d.application.ephemeris_coordinator import EphemerisCoordinator
+from terralab3d.application.solar_system_preview import (
+    SolarSystemPreviewBody,
+    SolarSystemPreviewService,
+    SolarSystemPreviewSnapshot,
+)
+from terralab3d.application.temporal_scene import TemporalSceneState
 from terralab3d.application.orbit_sampler import OrbitSampler
 from terralab3d.application.apparent_trajectory import (
     ApparentTrajectoryCoordinator,
@@ -301,7 +314,7 @@ async def run() -> int:
     # ── 2.5. Gestor Unificat de Recursos ──────────────────────────────
     def _handle_request_catalog_snapshot(data: dict[str, Any]) -> None:
         payload = {
-            "descriptors": [d.to_dict() for d in resource_catalog.get_all_descriptors()],
+            "descriptors": resource_catalog.public_snapshot(),
             "installedStates": resource_repo.snapshot(),
         }
         asyncio.create_task(bridge.send_resource_catalog_snapshot(payload))
@@ -1254,7 +1267,7 @@ async def run() -> int:
         await bridge.send_satellite_catalog_manifest(solar_system_assets.descriptor)
         
         catalog_payload = {
-            "descriptors": [d.to_dict() for d in resource_catalog.get_all_descriptors()],
+            "descriptors": resource_catalog.public_snapshot(),
             "installedStates": resource_repo.snapshot(),
         }
         await bridge.send_resource_catalog_snapshot(catalog_payload)
@@ -1294,6 +1307,7 @@ async def run() -> int:
     is_time_playing = True
     time_rate = 1.0
     time_drag_active = False
+    temporal_generation = 0
     latest_solar_system: SolarSystemSnapshot | None = None
     latest_event = None
     event_service: AstronomicalEventService | None = None
@@ -1341,6 +1355,8 @@ async def run() -> int:
     async def publish_solar_system(snapshot: SolarSystemSnapshot) -> int:
         """Publish one coherent science state to bodies, sky and local lighting."""
         nonlocal latest_solar_system, latest_event
+        if time_drag_active:
+            return 0
         latest_solar_system = snapshot
         observer = snapshot.scientific_observer
         if event_service is not None and observer is not None:
@@ -1368,23 +1384,37 @@ async def run() -> int:
                 source_solar_system_generation=snapshot.generation,
             )
         latest_event = event
-        byte_count = await bridge.send_solar_system_snapshot(snapshot)
-        await bridge.send_astronomical_event_snapshot(event)
         sky = sky_composer.compose(
             snapshot.sun,
             snapshot.generation,
             solar_disc_transmission=event.solar.solar_disc_transmission,
             sky_eclipse_dimming_factor=event.sky_eclipse_dimming_factor,
         )
-        await bridge.send_sky_environment_snapshot(sky)
-        await bridge.send_lighting_environment_snapshot(
-            lighting_composer.compose(
-                sky,
-                snapshot,
-                direct_solar_visibility_factor=event.solar.solar_disc_transmission,
-                lunar_direct_visibility_factor=event.lunar.mean_lunar_light_transmission,
-            )
+        lighting = lighting_composer.compose(
+            sky,
+            snapshot,
+            direct_solar_visibility_factor=event.solar.solar_disc_transmission,
+            lunar_direct_visibility_factor=event.lunar.mean_lunar_light_transmission,
+            generation=snapshot.generation,
         )
+        temporal_state = TemporalSceneState(
+            generation_id=snapshot.generation,
+            simulation_time=snapshot.timestamp_utc,
+            observer_generation=snapshot.observer_generation,
+            authority="authoritative",
+            solar_system=snapshot,
+            sky_environment=sky,
+            lighting_environment=lighting,
+            astronomical_event=event,
+        )
+        byte_count = await bridge.send_temporal_scene_state(temporal_state)
+
+        # Legacy snapshots remain available to non-render UI consumers. The
+        # render path applies only the atomic temporal message.
+        await bridge.send_solar_system_snapshot(snapshot)
+        await bridge.send_astronomical_event_snapshot(event)
+        await bridge.send_sky_environment_snapshot(sky)
+        await bridge.send_lighting_environment_snapshot(lighting)
         return byte_count
 
     if (
@@ -1409,6 +1439,11 @@ async def run() -> int:
         ephemeris_adapter,
         publish_solar_system,
         horizon_profile=lambda: horizon_coordinator.active_profile,
+    )
+    preview_service = (
+        SolarSystemPreviewService(ephemeris_adapter)
+        if isinstance(ephemeris_adapter, SpiceEphemerisAdapter)
+        else None
     )
     orbit_sampler = (
         OrbitSampler(ephemeris_adapter)
@@ -1439,6 +1474,7 @@ async def run() -> int:
     )
 
     async def _handle_set_satellite_systems(data: dict[str, Any]) -> None:
+        nonlocal temporal_generation
         if not isinstance(ephemeris_adapter, SpiceEphemerisAdapter):
             await bridge.send({
                 "type": "bridge_error",
@@ -1452,8 +1488,12 @@ async def run() -> int:
                 raise ValueError("systems must be a list")
             ephemeris_adapter.set_satellite_systems(str(item) for item in systems)
             try:
+                temporal_generation += 1
                 ephemeris_coordinator.request(
-                    sim_time_utc, scientific_observer(), observer_generation
+                    sim_time_utc,
+                    scientific_observer(),
+                    observer_generation,
+                    generation_id=temporal_generation,
                 )
             except RuntimeError:
                 pass
@@ -1733,6 +1773,70 @@ async def run() -> int:
             elevation_m=current_observer.effective_height_m,
         )
 
+    def preview_solar_system(
+        preview: SolarSystemPreviewSnapshot,
+    ) -> SolarSystemSnapshot | None:
+        """Patch lightweight values onto the last full model for composers only."""
+
+        if latest_solar_system is None:
+            return None
+        preview_by_id = {body.body_id: body for body in preview.bodies}
+
+        def apply_preview(
+            body: ApparentBodyState,
+            update: SolarSystemPreviewBody | None,
+        ) -> ApparentBodyState:
+            if update is None:
+                return body
+            return replace(
+                body,
+                horizontal=HorizontalCoordinate(
+                    altitude_deg=update.altitude_deg,
+                    azimuth_deg=update.azimuth_deg,
+                ),
+                direction_enu=update.direction_enu,
+                distance_km=update.distance_km,
+                angular_radius_deg=update.angular_radius_deg,
+                illumination_fraction=update.illumination_fraction,
+                phase_angle_deg=update.phase_angle_deg,
+                apparent_magnitude=update.apparent_magnitude,
+                source=preview.source,
+                quality=(
+                    EphemerisQuality.PRECISE
+                    if preview.quality == "scientific"
+                    else EphemerisQuality.FALLBACK
+                ),
+            )
+
+        moon = latest_solar_system.moon
+        return replace(
+            latest_solar_system,
+            generation=preview.generation,
+            timestamp_utc=preview.timestamp_utc,
+            observer_generation=preview.observer_generation,
+            source=preview.source,
+            quality=(
+                EphemerisQuality.PRECISE
+                if preview.quality == "scientific"
+                else EphemerisQuality.FALLBACK
+            ),
+            sun=apply_preview(latest_solar_system.sun, preview_by_id.get("sun")),
+            moon=(
+                apply_preview(moon, preview_by_id.get("moon"))
+                if moon is not None
+                else None
+            ),
+            planets=tuple(
+                apply_preview(body, preview_by_id.get(str(body.body_id)))
+                for body in latest_solar_system.planets
+            ),
+            satellites=tuple(
+                apply_preview(body, preview_by_id.get(str(body.body_id)))
+                for body in latest_solar_system.satellites
+            ),
+            compute_ms=preview.compute_ms,
+        )
+
     async def broadcast_sky_environment() -> None:
         if bridge.connected and latest_solar_system is not None:
             solar_transmission = (
@@ -1767,6 +1871,7 @@ async def run() -> int:
             )
 
     async def broadcast_time(*, force_celestial_transform: bool = False) -> None:
+        nonlocal temporal_generation
         if not bridge.connected:
             return
         # Calculate Astro parameters
@@ -1793,12 +1898,59 @@ async def run() -> int:
             latitude_deg=current_observer.location.latitude_deg,
             lst_deg=lst_deg,
             force_publish=force_celestial_transform,
+            transition_ms=40.0 if time_drag_active else 1000.0,
         )
-        ephemeris_coordinator.request(
-            sim_time_utc,
-            scientific_observer(),
-            observer_generation,
-        )
+        observer = scientific_observer()
+        temporal_generation += 1
+        generation_id = temporal_generation
+        if time_drag_active and preview_service is not None:
+            preview = await asyncio.to_thread(
+                preview_service.calculate,
+                sim_time_utc,
+                observer,
+                generation=generation_id,
+                observer_generation=observer_generation,
+                additional_body_ids=(
+                    tuple(str(body.body_id) for body in latest_solar_system.satellites)
+                    if latest_solar_system is not None
+                    else ()
+                ),
+            )
+            preview_model = preview_solar_system(preview)
+            if preview_model is not None:
+                event = preview.event
+                sky = sky_composer.compose(
+                    preview_model.sun,
+                    generation_id,
+                    solar_disc_transmission=event.solar.solar_disc_transmission,
+                    sky_eclipse_dimming_factor=event.sky_eclipse_dimming_factor,
+                )
+                lighting = lighting_composer.compose(
+                    sky,
+                    preview_model,
+                    direct_solar_visibility_factor=event.solar.solar_disc_transmission,
+                    lunar_direct_visibility_factor=event.lunar.mean_lunar_light_transmission,
+                    generation=generation_id,
+                )
+                await bridge.send_temporal_scene_state(
+                    TemporalSceneState(
+                        generation_id=generation_id,
+                        simulation_time=preview.timestamp_utc,
+                        observer_generation=observer_generation,
+                        authority="preview",
+                        solar_system=preview,
+                        sky_environment=sky,
+                        lighting_environment=lighting,
+                        astronomical_event=event,
+                    )
+                )
+        else:
+            ephemeris_coordinator.request(
+                sim_time_utc,
+                observer,
+                observer_generation,
+                generation_id=generation_id,
+            )
 
     async def _handle_set_simulation_time(data: dict[str, Any]) -> None:
         nonlocal sim_time_utc, is_realtime

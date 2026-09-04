@@ -515,7 +515,10 @@ export class RefinementManagerView {
 
         // Add standalone installations not covered by candidates
         if (this.groupByDataset) {
-          const standaloneGroups = new Map<string, RefinementWorkspaceNode['installations']>();
+          const standaloneGroups = new Map<
+            string,
+            Array<RefinementWorkspaceNode['installations'][number]>
+          >();
           for (const inst of node.installations) {
             const key = `${inst.provider}|${inst.product}|${inst.version}`;
             if (!candidateKeys.has(key)) {

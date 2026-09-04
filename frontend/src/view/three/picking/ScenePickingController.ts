@@ -130,7 +130,12 @@ export class ScenePickingController {
     if (this.selectedHit) {
       const pos = this.deps.pickProvider.reproject(this.selectedHit);
       if (pos) {
-        this.selectionMarker.update(pos.x, pos.y, pos.visualRadiusCssPx);
+        this.selectionMarker.update(
+          pos.x,
+          pos.y,
+          pos.visualRadiusCssPx,
+          horizontalFovDeg(camera),
+        );
         return;
       }
     }
@@ -141,7 +146,7 @@ export class ScenePickingController {
       if (resolved) {
         const pos = this.projectDirectionToScreen(resolved.azimuthDeg, resolved.altitudeDeg, camera);
         if (pos) {
-          this.selectionMarker.update(pos.x, pos.y, 16);
+          this.selectionMarker.update(pos.x, pos.y, 16, horizontalFovDeg(camera));
           return;
         }
       }
@@ -386,4 +391,13 @@ export class ScenePickingController {
       this.hoverDebounceTimer = null;
     }
   }
+}
+
+function horizontalFovDeg(camera: THREE.Camera | undefined): number {
+  if (!camera || !(camera as THREE.PerspectiveCamera).isPerspectiveCamera) return 60;
+  const perspectiveCamera = camera as THREE.PerspectiveCamera;
+  const verticalFovRad = THREE.MathUtils.degToRad(perspectiveCamera.fov);
+  return THREE.MathUtils.radToDeg(
+    2 * Math.atan(Math.tan(verticalFovRad / 2) * perspectiveCamera.aspect),
+  );
 }

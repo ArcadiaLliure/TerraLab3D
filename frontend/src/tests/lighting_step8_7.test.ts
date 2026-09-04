@@ -209,6 +209,29 @@ assert(
   "walk/flight/yaw/pitch/roll rendering causes zero scientific lighting snapshots",
 );
 
+const previewLighting = {
+  ...lightingSnapshot(102, 0.02, "2026-08-09T23:00:00Z"),
+  sun: { ...lightingSnapshot(102).sun, intensity: 0.5 },
+};
+assert(
+  lighting.applySnapshot(previewLighting, 0, 103_000, "preview"),
+  "a newer temporal lighting preview is accepted",
+);
+assert(lighting.sunLight.intensity === 0.5, "preview lighting snaps atomically without a one-second lag");
+const exactLighting = {
+  ...previewLighting,
+  sun: { ...previewLighting.sun, intensity: 0.75, quality: "scientific" as const },
+};
+assert(
+  lighting.applySnapshot(exactLighting, 0, 103_010, "authoritative"),
+  "authoritative lighting promotes the same temporal generation",
+);
+assert(lighting.sunLight.intensity === 0.75, "authoritative reconciliation is atomic");
+assert(
+  !lighting.applySnapshot(lightingSnapshot(101), 0, 103_020, "authoritative"),
+  "late authoritative lighting cannot roll back a newer preview generation",
+);
+
 lighting.setShadowQuality("off");
 assert(!webgl.shadowMap.enabled && !lighting.sunLight.castShadow, "shadow quality off removes shadow rendering cost");
 lighting.setShadowQuality("medium");
@@ -218,7 +241,14 @@ assert(
 );
 lighting.setShadowQuality("high");
 assert(lighting.sunLight.shadow.mapSize.x === 2048, "high shadows use the documented 2048 map");
-assert(!lighting.moonLight.castShadow, "Moon shadows stay optional/off without disabling Moon light");
+assert(lighting.moonLight.castShadow, "Moon and Sun shadow maps can coexist when both lights are active");
+lighting.update(104_000, new THREE.Vector3(10, 2, -20));
+lighting.update(104_017, new THREE.Vector3(10, 2, -20));
+assert(
+  lighting.metrics().shadow.sunShadowUpdateCount > 0
+    && lighting.metrics().shadow.moonShadowUpdateCount > 0,
+  "the budgeted scheduler eventually refreshes both active shadow maps",
+);
 
 const worldRoot = new THREE.Group();
 const navigation = new NavigationWorld();

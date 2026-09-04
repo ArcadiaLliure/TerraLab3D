@@ -195,6 +195,7 @@ state.applyBinaryResource(metadata(7, "REAL"), payload(ridge));
 assert(selection.getState().selectedTarget?.kind === "star", "selection persists after horizon swap");
 
 assert(STAR_VERTEX_SHADER.includes("horizonElevationAtDirection"), "Gaia shader consumes shared horizon helper");
+assert(STAR_VERTEX_SHADER.includes("u_equatorialViewAnchor"), "Gaia shader uses a camera-relative angular anchor");
 assert(!STAR_VERTEX_SHADER.includes("u_cameraHeight"), "camera height is not a scientific horizon authority");
 assert(!STAR_VERTEX_SHADER.includes("dip_angle"), "flat dip authority was removed");
 assert(!STAR_VERTEX_SHADER.includes("abs(h"), "negative-altitude abs regression was removed");

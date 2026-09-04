@@ -57,6 +57,7 @@ import type {
   RemoveRefinementInstallationMessage,
   RequestRefinementWorkspaceMessage,
 } from "../contracts/refinement_contracts";
+import type { TemporalSceneState } from "../contracts/temporal_scene_contracts";
 
 export type BridgeState = "connecting" | "connected" | "disconnected" | "error";
 
@@ -108,12 +109,17 @@ export interface BackendMessageListener {
     deepResidentCount: number;
     errorMessage?: string;
   }): void;
-  onCelestialFrameTransform?(generation: number, matrix3x3: number[]): void;
+  onCelestialFrameTransform?(
+    generation: number,
+    matrix3x3: number[],
+    transitionMs?: number,
+  ): void;
   onStarResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
   onBinaryResourceReady?(metadata: any, bufferPayload: ArrayBuffer): void;
   onStarPickResolved?(msg: BackendMessage & { type: "star_pick_resolved" }): void;
   onSkyEnvironmentSnapshot?(snapshot: import("../contracts/sky_environment_contracts").SkyEnvironmentSnapshot): void;
   onSolarSystemSnapshot?(snapshot: SolarSystemSnapshot): void;
+  onTemporalSceneState?(state: TemporalSceneState): void;
   onSurfaceProgress?(msg: any): void;
   onLandCoverLegend?(msg: any): void;
   onLightingEnvironmentSnapshot?(snapshot: LightingEnvironmentSnapshot): void;
@@ -191,8 +197,7 @@ export class WebSocketBridge {
         if (event.data instanceof ArrayBuffer) {
           this.handleBinaryMessage(event.data);
         } else {
-          const msg = JSON.parse(event.data as string) as BackendMessage;
-          this.handleBackendMessage(msg);
+          this.handleBackendMessage(JSON.parse(event.data as string) as BackendMessage);
         }
       } catch (err) {
         console.error("[Bridge] Failed to parse message:", err);
@@ -298,10 +303,6 @@ export class WebSocketBridge {
     console.info("MGP: WebSocketBridge.sendSurfaceMode [INICI]");
     this.sendMessage({ type: "set_surface_mode", mode });
     console.info("MGP: WebSocketBridge.sendSurfaceMode [FI]");
-  }
-
-  sendFrontendReady(): void {
-    this.sendMessage({ type: "frontend_ready", protocolVersion: 2 });
   }
 
   private shutdownRequested = false;
@@ -461,6 +462,7 @@ export class WebSocketBridge {
           l.onCelestialFrameTransform?.(
             (msg as any).generation,
             [...(msg as any).matrix3x3],
+            (msg as any).transitionMs,
           );
         }
         break;
@@ -477,6 +479,11 @@ export class WebSocketBridge {
       case "solar_system_snapshot":
         for (const l of this.messageListeners) {
           l.onSolarSystemSnapshot?.(msg);
+        }
+        break;
+      case "temporal_scene_state":
+        for (const l of this.messageListeners) {
+          l.onTemporalSceneState?.(msg);
         }
         break;
       case "lighting_environment_snapshot":
@@ -842,6 +849,7 @@ export class WebSocketBridge {
   }
 
   private setState(state: BridgeState, detail?: string): void {
+    if (this._state === state) return;
     this._state = state;
     for (const l of this.stateListeners) {
       l.onBridgeStateChanged(state, detail);

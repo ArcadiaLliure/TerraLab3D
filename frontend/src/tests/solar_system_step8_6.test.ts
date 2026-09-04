@@ -193,12 +193,7 @@ satellites.setEnabled(true);
 const satelliteState = body("naif-10001", "natural_satellite", null);
 const dummyMap = new Map<any, any>();
 const dummyOcclusion = {
-  presentationRadius: () => 0,
-  apparentRadius: () => 0,
-  renderOrder: () => 0,
-  testLineOfSight: () => true,
-  baseRadius: 0,
-  maximumRadialSpan: 0
+  preparedPresentationRadius: () => 0,
 };
 satellites.updateStates([{ ...satelliteState, parentBodyId: "jupiter" }], dummyMap, dummyOcclusion);
 assert(satellites.metrics().catalogCount === 461, "one data-driven catalog keeps all 461 entries");

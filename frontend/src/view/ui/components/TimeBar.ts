@@ -1,6 +1,23 @@
 import { WebSocketBridge } from "../../../bridge/WebSocketBridge";
 import { formatLocalAndUtcTime } from "../timeFormatting";
 
+export function resizeCanvasBackingStore(
+  canvas: Pick<HTMLCanvasElement, "width" | "height">,
+  width: number,
+  height: number,
+): boolean {
+  let resized = false;
+  if (canvas.width !== width) {
+    canvas.width = width;
+    resized = true;
+  }
+  if (canvas.height !== height) {
+    canvas.height = height;
+    resized = true;
+  }
+  return resized;
+}
+
 export class TimeBar {
   private container: HTMLDivElement;
   private playPauseBtn: HTMLButtonElement;
@@ -130,13 +147,15 @@ export class TimeBar {
   private onMouseUp(e: MouseEvent) {
     if (!this.isDragging) return;
     this.isDragging = false;
-    this.updateTimeFromMouse(e);
+    // The finished event carries the authoritative final value. Avoid sending
+    // the same expensive ephemeris request once as set_time and again as finish.
+    this.updateTimeFromMouse(e, false);
     this.bridge.sendTimelineDragFinished(this.currentTime.toISOString());
   }
 
   private lastSentTimeMs = 0;
 
-  private updateTimeFromMouse(e: MouseEvent) {
+  private updateTimeFromMouse(e: MouseEvent, publish = true) {
     const rect = this.canvas.getBoundingClientRect();
     const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
     const fraction = x / rect.width;
@@ -154,7 +173,7 @@ export class TimeBar {
 
     // Throttle WebSocket updates during drag to max 20Hz (50ms)
     const nowMs = performance.now();
-    if (!this.isDragging || nowMs - this.lastSentTimeMs > 50) {
+    if (publish && (!this.isDragging || nowMs - this.lastSentTimeMs > 50)) {
       this.lastSentTimeMs = nowMs;
       this.bridge.sendSetSimulationTime(this.currentTime.toISOString());
     }
@@ -165,8 +184,7 @@ export class TimeBar {
     const h = this.element.clientHeight;
     if (w === 0 || h === 0) return;
 
-    this.canvas.width = w;
-    this.canvas.height = h;
+    resizeCanvasBackingStore(this.canvas, w, h);
 
     this.ctx.clearRect(0, 0, w, h);
 

@@ -167,6 +167,7 @@ class StarCoordinator:
         lst_deg: float,
         *,
         force_publish: bool = False,
+        transition_ms: float = 1000.0,
     ) -> bool:
         """Actualitza la transformació equatorial→ENU.
 
@@ -205,6 +206,7 @@ class StarCoordinator:
                 "type": "celestial_frame_transform",
                 "generation": transform.generation,
                 "matrix3x3": list(transform.matrix_3x3),
+                "transitionMs": max(0.0, float(transition_ms)),
             })
         return True
 

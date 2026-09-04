@@ -60,6 +60,7 @@ const candidate: RefinementProductCandidate = {
     checkedAt: "2026-08-25",
   },
   assets: [],
+  installationId: null,
 };
 
 const session = new RefinementSession();

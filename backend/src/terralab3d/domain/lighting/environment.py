@@ -118,6 +118,7 @@ class LightingEnvironmentComposer:
         *,
         direct_solar_visibility_factor: float = 1.0,
         lunar_direct_visibility_factor: float = 1.0,
+        generation: int | None = None,
     ) -> LightingEnvironmentSnapshot:
         visibility = _finite_clamp01(
             direct_solar_visibility_factor,
@@ -130,7 +131,7 @@ class LightingEnvironmentComposer:
         self._generation += 1
         self.snapshot_count += 1
         return LightingEnvironmentSnapshot(
-            generation=self._generation,
+            generation=self._generation if generation is None else generation,
             timestamp_utc=solar_system.timestamp_utc,
             source_sky_generation=sky.generation,
             source_solar_system_generation=solar_system.generation,

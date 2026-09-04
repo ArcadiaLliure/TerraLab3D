@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from terralab3d.domain.identifiers import ResourceId
+from terralab3d.domain.identifiers import ResourceId, VariantId
 from terralab3d.infrastructure.resources.installation_repository import (
     ResourceInstallationRepository,
 )
@@ -19,7 +19,8 @@ class ManagedGalacticAssets:
     def __init__(self, repository: ResourceInstallationRepository) -> None:
         self._repository = repository
 
-    def resolve_asset(self, resource_id: str) -> Path | None:
+    def resolve_asset(self, resource_id: str, variant_id: str | None = None) -> Path | None:
         if resource_id not in GALACTIC_RESOURCE_IDS:
             return None
-        return self._repository.resolve_render_asset(ResourceId(resource_id))
+        selected_variant = VariantId(variant_id) if variant_id else None
+        return self._repository.resolve_render_asset(ResourceId(resource_id), selected_variant)

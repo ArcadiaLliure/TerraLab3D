@@ -63,6 +63,7 @@ export class GalacticSkyRenderer {
   private readonly emptyMilkyWayTexture = blackTexture();
   private readonly emptyDustTexture = blackTexture();
   private transformState: CelestialTransformState | null = null;
+  private appliedTransformRevision = -1;
   private milkyWay: ResidentTexture | null = null;
   private planckDust: ResidentTexture | null = null;
   private milkyWayRequestedVisible = false;
@@ -110,17 +111,21 @@ export class GalacticSkyRenderer {
 
   setTransformState(state: CelestialTransformState): void {
     this.transformState = state;
+    this.appliedTransformRevision = -1;
     this.syncTransform();
   }
 
-  syncTransform(): void {
+  syncTransform(): boolean {
     if (!this.transformState?.isValid) {
       this.syncLayerVisibility();
-      return;
+      return false;
     }
+    if (this.appliedTransformRevision === this.transformState.visualRevision) return false;
     uniform<THREE.Matrix3>(this.material, "u_equatorialToThree")
       .value.copy(this.transformState.equatorialToThree);
+    this.appliedTransformRevision = this.transformState.visualRevision;
     this.syncLayerVisibility();
+    return true;
   }
 
   updateEnvironment(snapshot: SkyEnvironmentSnapshot): void {

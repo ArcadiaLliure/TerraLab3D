@@ -7,9 +7,10 @@ import {
 export const STAR_VERTEX_SHADER = /* glsl */ `
   attribute float magnitude;
   attribute vec3 color;
-  attribute float catalogIndex;
 
   uniform mat3 u_equatorialToENUMatrix;
+  uniform mat3 u_equatorialToViewMatrix;
+  uniform vec3 u_equatorialViewAnchor;
   uniform float u_magnitudeLimit;
   uniform float u_pointScale;
   uniform float u_devicePixelRatio;
@@ -58,11 +59,17 @@ export const STAR_VERTEX_SHADER = /* glsl */ `
       return;
     }
 
-    vec4 mvPosition = modelViewMatrix * vec4(posWorld * u_radius, 1.0);
+    // Camera-relative angular floating origin. At telescope FOVs, multiplying
+    // the absolute direction by two independent float32 matrices makes the
+    // least-significant bits visible as pixel-scale wobble. The view-centre
+    // anchor makes those operations act on small angular deltas instead.
+    vec3 viewDirection = vec3(0.0, 0.0, -1.0)
+      + u_equatorialToViewMatrix * (position - u_equatorialViewAnchor);
+    vec4 mvPosition = vec4(viewDirection * u_radius, 1.0);
     gl_Position = projectionMatrix * mvPosition;
-    float baseSize = max(1.8, (7.0 - magnitude) * 1.8 * u_pointScale);
+    float baseSize = max(1.8, (7.0 - magnitude) * 1.8);
     if (magnitude < 1.0) baseSize += (1.0 - magnitude) * 4.0;
-    gl_PointSize = clamp(baseSize * u_devicePixelRatio, 1.0, 64.0);
+    gl_PointSize = clamp(baseSize * u_pointScale * u_devicePixelRatio, 1.0, 64.0);
   }
 `;
 

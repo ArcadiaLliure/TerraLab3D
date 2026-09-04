@@ -1,8 +1,60 @@
-# Pas 8 — validació científica i de rendiment
+# Pas 8 — Sol, Lluna i planetes amb posicions i aparença reals
+
+> Estat: **completat**
+> Classificat mitjançant implementació, proves i validacions del repositori.
+
+## Resultat funcional palpable
+
+L’escena mostra Sol, Lluna i planetes en posicions topocèntriques, amb diàmetre aparent, fase, magnitud i toggles equivalents a TerraLab.
+
+## Fonts TerraLab a consultar
+
+- `TerraLab/astro/engine.py`
+- `TerraLab/astro/ephemeris_coordinator.py`
+- `TerraLab/scene/plans/bodies.py` si existeix al checkout
+- `TerraLab/runtime/offscreen_renderer.py` — ruta actual de cossos
+- `TerraLab/data/layer_manager.py` — sistema solar i fills
+
+## Objectiu
+
+Completar aquesta vertical funcional de punta a punta, mantenint la separació de responsabilitats i sense anticipar funcionalitats posteriors que no siguin imprescindibles.
+
+## Tasques
+
+- [ ] Definir IDs i tipus de cos per Sol, Lluna i planetes.
+- [ ] Implementar o adaptar un port d’efemèrides autoritatiu.
+- [ ] Traslladar posició geocèntrica/topocèntrica, distància i coordenades aparents al domini.
+- [ ] Implementar diàmetre angular, fase il·luminada i magnitud aparent.
+- [ ] Crear entitats Three.js persistents amb transforms i materials compartits.
+- [ ] Representar la Lluna amb terminador o paràmetres de fase coherents.
+- [ ] Implementar toggles de sistema solar, Sol/Lluna i planetes.
+- [ ] Aplicar oclusió sota l’horitzó pla actual i preparar la futura oclusió DEM.
+- [ ] Implementar actualització per tick sense recrear geometria o textures.
+- [ ] Mostrar informació bàsica del cos al HUD de diagnòstic.
+- [ ] Definir fallback explícit quan falta l’efemèride principal.
+- [ ] Verificar si hi ha suport executable de satèl·lits al checkout local; no inventar-lo si només apareix documentat.
+- [ ] Comparar posicions, fases, mides i magnituds amb TerraLab.
+
+## Criteri de sortida
+
+Els cossos apareixen i es mouen correctament amb temps i ubicació; les fases i mides són visibles; no hi ha càlculs d’efemèrides al frontend.
+
+## Evidència obligatòria
+
+- [ ] Fixtures per Sol, Lluna i cada planeta.
+- [ ] Captures de diverses fases lunars.
+- [ ] Comparació angular amb TerraLab dins tolerància.
+- [ ] Mesura de deltes per tick.
+
+## Fora d’abast del pas
+
+La superfície lunar especialitzada arriba al Pas 8.5; planetes texturitzats, orientació física, anells i satèl·lits naturals arriben al Pas 8.6; eclipsis, contactes i trajectòries topocèntriques detallades arriben al Pas 9.
+
+## Annex: Validació científica i de rendiment
 
 Data de validació: 2026-08-08. Plataforma: Windows, Python 3.13, Skyfield 1.55 i Three.js 0.179.0.
 
-## Efemèride reproduïble
+### Efemèride reproduïble
 
 - Kernel: `de421.bsp`, resolt des de la biblioteca de dades gestionada (`data/sky/solar-system/de421.bsp`).
 - SHA-256: `a20a7139da04cbc462454634918e9a9ca69127044e2cc9d4f9c16e238d2deedc`.
@@ -14,7 +66,7 @@ Les fixtures offline provenen de NASA/JPL Horizons API 1.2 per a `2024-01-01T00:
 
 La comparació executable amb TerraLab `main` (`1fbcf088a0bfc1f832fc0f2a8ba2808e3e783a7d`) i les mateixes entrades va donar 0° de diferència Alt/Az per a Sol, Lluna i Mercury–Neptune. Els radis de Sol i Lluna difereixen 0,00000303° i 0,00000233° respectivament perquè TerraLab usa `atan(radius/distance)` i TerraLab3D usa el radi esfèric `asin(radius/distance)`.
 
-## Mètriques
+### Mètriques
 
 Benchmark calent de 120 snapshots consecutius amb els nou cossos:
 
@@ -40,7 +92,7 @@ Prova integrada de concurrència i transport:
 - El canvi d'observador va incrementar `observerGeneration` d'1 a 2; els moviments walk/flight/càmera no el modifiquen.
 - El tancament integrat va completar el lifecycle del coordinador, kernel, WebSocket i servidor.
 
-## Verificacions
+### Verificacions
 
 - `python -m pytest backend/tests -q`: 16 tests passats.
 - Tests frontend: 69 de grid, 18 de navegació i 28 del sistema solar, tots passats.

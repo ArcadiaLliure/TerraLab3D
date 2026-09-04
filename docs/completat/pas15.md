@@ -1,8 +1,60 @@
-# Pas 15 — Validació d’elevació, horitzó i oclusió
+# Pas 15 — Elevació real, perfil d’horitzó i oclusió celeste
+
+> Estat: **completat**
+> Classificat mitjançant implementació, proves i validacions del repositori.
+
+## Resultat funcional palpable
+
+A partir de DEM reals, TerraLab3D mostra l’altitud del lloc i una silueta d’horitzó 360° que oculta correctament els objectes celestes.
+
+## Fonts TerraLab a consultar
+
+- `TerraLab/terrain/terrain_coordinator.py`
+- `TerraLab/terrain/worker.py`
+- `TerraLab/terrain/providers/*`
+- `TerraLab/terrain/horizon_baker.py` o kernel equivalent
+- `TerraLab/render/horizon_renderer.py`
+- `TerraLab/data/ray_precision.py` i `visibility_range.py`
+
+## Objectiu
+
+Completar aquesta vertical funcional de punta a punta, mantenint la separació de responsabilitats i sense anticipar funcionalitats posteriors que no siguin imprescindibles.
+
+## Tasques
+
+- [ ] Definir `ElevationPort`, mostres, grids, CRS i errors tipats.
+- [ ] Adaptar els proveïdors DEM sense portar GDAL al domini.
+- [ ] Implementar consulta d’elevació nua per ubicació.
+- [ ] Implementar perfil 360° amb radi visible i pas angular configurables.
+- [ ] Conservar vectorització, cancel·lació i pressupostos de memòria dels kernels útils.
+- [ ] Exposar profunditat d’1 a 530 km i precisió angular equivalent quan sigui aplicable.
+- [ ] Publicar el perfil com a recurs versionat.
+- [ ] Representar la silueta i la màscara d’oclusió a Three.js.
+- [ ] Ocultar estrelles, cossos i NGC per sota de l’horitzó real.
+- [ ] Mostrar progrés, cancel·lació, absència de DEM i horitzó pla fallback.
+- [ ] Invalidar i recalcular només quan canvien ubicació, elevació o paràmetres del perfil.
+- [ ] Comparar elevació, angles i silueta amb TerraLab.
+
+## Criteri de sortida
+
+Una ubicació amb DEM mostra elevació i perfil reals; els objectes celestes queden ocults coherentment; una ubicació sense dades mostra fallback explícit i no bloqueja la UI.
+
+## Evidència obligatòria
+
+- [ ] Fixtures de perfil pla, muntanyós i amb nodata.
+- [ ] Comparació angular amb TerraLab.
+- [ ] Captures de cossos entrant i sortint darrere l’horitzó.
+- [ ] Temps P50/P95, RSS i cancel·lació.
+
+## Fora d’abast del pas
+
+No inclou encara una malla de terreny plena.
+
+## Annex: Validació d’elevació, horitzó i oclusió
 
 Data de validació: 2026-08-14.
 
-## Resultat funcional
+### Resultat funcional
 
 La vertical implementada és:
 
@@ -24,7 +76,7 @@ generar després d’un canvi d’observador o dels paràmetres topogràfics. El
 La refracció atmosfèrica topogràfica conserva internament la paritat de TerraLab
 amb `R_eff = 7/6 R`. No s’exposa com un control críptic a la pàgina principal.
 
-## Configuració, DEM i CRS
+### Configuració, DEM i CRS
 
 La ruta no està codificada al programa. Es resol com:
 
@@ -46,7 +98,7 @@ El CRS mètric de treball és AEQD local centrat en l’observador; el CRS d’e
 el nadiu de cada raster i el de treball són explícits. La convenció radial és
 0° nord, 90° est, 180° sud i 270° oest.
 
-## Mostra real configurada
+### Mostra real configurada
 
 Observador de validació:
 
@@ -60,7 +112,7 @@ font: dem:Y_(4560000.0_4570000.0)X_(308000.0_318000.0)
 El perfil per defecte té 150 km de radi, pas de 0,5°, 720 raigs, qualitat `REAL`,
 cobertura resolta 100% i payload binari de 9.360 bytes.
 
-## Kernel, cobertura i lifecycle
+### Kernel, cobertura i lifecycle
 
 - Distàncies adaptatives amb passos 1×/2×/4×/8× segons distància i resolució.
 - Càlcul angular i reducció del màxim vectoritzats amb NumPy.
@@ -85,7 +137,7 @@ formulació exacta respecte de la paritat, en metres:
 | 150 km | -0,244778 m |
 | 530 km | -38,273427 m |
 
-## Payload i GPU
+### Payload i GPU
 
 Cada perfil publica metadata immutable i quatre blocs contigus:
 
@@ -107,7 +159,7 @@ Gaia i NGC, i enriqueix el Sistema Solar després de l’efemèride. La visibili
 lògica dels discs usa radi angular; la cortina de profunditat en fa el clipping
 parcial.
 
-## Rendiment mesurat
+### Rendiment mesurat
 
 Tres bakes reals independents amb els settings per defecte:
 
@@ -140,7 +192,7 @@ activeMeshCount:             1
 horizonLookupCpuP50/P95:     ~0,0001 ms
 ```
 
-## Comparació amb TerraLab
+### Comparació amb TerraLab
 
 Amb el mateix DEM, observador, radi, pas angular i `7/6 R`, la comparació del
 kernel nou contra la fórmula de TerraLab va donar:
@@ -166,7 +218,7 @@ Mostres cardinals/intercardinals del perfil real:
 
 El pic local principal és a 133,5°: 8,251425°, 955 m i 514,934 m.
 
-## Proves i evidència
+### Proves i evidència
 
 - Backend complet: `97 passed`.
 - Fixtures específiques Pas 15: `22 passed`.

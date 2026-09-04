@@ -11,7 +11,7 @@
  *   - Anti-solapament basat en prioritats
  *   - DPR-aware
  *   - Pool HTML persistent (no crea/destrueix per frame)
- *   - Actualització a ~4 Hz, no cada frame
+ *   - Actualització per invalidació de càmera, viewport o visibilitat
  */
 
 import * as THREE from "three";
@@ -173,6 +173,7 @@ export class CelestialLabels {
   // Visibility toggles
   private showCardinals = true;
   private showTicks = true;
+  private _revision = 0;
 
   constructor() {
     this.container = document.createElement("div");
@@ -206,10 +207,7 @@ export class CelestialLabels {
     parent.appendChild(this.container);
   }
 
-  /**
-   * Update all label positions and visibility.
-   * Call this at ~4 Hz from the render loop, not every frame.
-   */
+  /** Update all label positions and visibility after an explicit invalidation. */
   update(camera: THREE.PerspectiveCamera, cameraPositionWorld: THREE.Vector3): void {
     const rect = this.container.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
@@ -325,15 +323,23 @@ export class CelestialLabels {
   }
 
   setCardinalVisible(visible: boolean): void {
+    if (this.showCardinals === visible) return;
     this.showCardinals = visible;
+    this._revision++;
   }
 
   setTicksVisible(visible: boolean): void {
+    if (this.showTicks === visible) return;
     this.showTicks = visible;
+    this._revision++;
   }
 
   setVisible(visible: boolean): void {
     this.container.style.display = visible ? "" : "none";
+  }
+
+  get revision(): number {
+    return this._revision;
   }
 
   getCounts(): { total: number; visible: number; culled: number } {
