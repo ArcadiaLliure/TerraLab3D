@@ -1,4 +1,4 @@
-"""Models de domini tipats per a la capacitat superfícies, ortofoto i cobertura categòrica."""
+"""Models de domini tipats per a la capacitat de cobertura categòrica."""
 
 
 from dataclasses import dataclass
@@ -6,7 +6,6 @@ from enum import Enum
 from terralab3d.domain.identifiers import ResourceId
 
 class SurfaceSampleKind(str, Enum):
-    RGB = "rgb"
     CATEGORICAL = "categorical"
 
 @dataclass(frozen=True, slots=True)

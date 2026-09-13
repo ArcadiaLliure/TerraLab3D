@@ -10,7 +10,6 @@ from terralab3d.domain.elevation.models import (
     ElevationSourceMetadata,
 )
 from terralab3d.domain.observer.models import GeoLocation
-from terralab3d.domain.surface.models import SurfaceSampleGrid
 from terralab3d.domain.terrain.models import TerrainTileRequest
 
 
@@ -41,8 +40,4 @@ class RadialCoordinateProjector(Protocol):
         azimuth_deg: object,
         distance_m: object,
     ) -> tuple[object, object]: ...
-
-
-class OrthophotoPort(Protocol):
-    def sample(self, request: TerrainTileRequest) -> SurfaceSampleGrid: ...
 

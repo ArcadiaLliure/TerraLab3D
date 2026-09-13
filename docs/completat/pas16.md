@@ -50,7 +50,7 @@ La càmera pot navegar sobre un terreny real sense reconstrucció global per fra
 
 ## Fora d’abast del pas
 
-Els materials d’ortofoto i cobertura arriben al pas següent.
+Els materials de cobertura categòrica arriben al pas següent.
 
 ## Annex de paritat DEM
 
@@ -72,8 +72,8 @@ resident i un fallback visual transparent quan no hi ha autoritat DEM.
   malla DEM resident; aturar-se no inicia nous càlculs.
 - Els chunks detallats es preparen en segon pla, es retenen incrementalment i
   respecten una memòria cau GPU LRU acotada.
-- La geometria DEM no es barreja amb ortofoto o cobertura categòrica; aquestes
-  responsabilitats corresponen al Pas 17.
+- La geometria DEM no es barreja amb la cobertura categòrica; aquesta
+  responsabilitat correspon al Pas 17.
 
 ### Mesura de referència
 

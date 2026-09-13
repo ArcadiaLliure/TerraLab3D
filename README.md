@@ -117,8 +117,6 @@ L’usuari pot:
 
 El relleu es pot recobrir amb diferents tipus d’informació visual:
 
-* imatge aèria;
-* ortofotografia;
 * cobertura del sòl;
 * classificació del territori;
 * masses d’aigua;
@@ -128,7 +126,7 @@ El relleu es pot recobrir amb diferents tipus d’informació visual:
 * terreny natural;
 * altres categories geogràfiques disponibles.
 
-L’usuari pot canviar entre una representació fotogràfica i una representació categòrica del territori.
+L’usuari pot canviar entre la paleta base del relleu i una representació categòrica del territori.
 
 També pot escollir entre:
 
@@ -146,7 +144,6 @@ Entre les capes disponibles hi pot haver:
 * Via Làctia;
 * pols interestel·lar;
 * sistema solar;
-* meteorologia;
 * contaminació lumínica;
 * horitzó;
 * topografia;
@@ -181,19 +178,6 @@ La contaminació lumínica modifica:
 * la visibilitat de la Via Làctia;
 * la visibilitat dels objectes de cel profund;
 * l’aspecte general del firmament.
-
-### Condicions meteorològiques
-
-TerraLab3D pot incorporar les condicions atmosfèriques de la ubicació seleccionada.
-
-La representació meteorològica pot tenir en compte:
-
-* nuvolositat;
-* transparència atmosfèrica;
-* estat general del cel;
-* condicions que afecten l’observació astronòmica.
-
-La capa meteorològica es pot activar o desactivar independentment de la resta de l’escena.
 
 ### Simulació visual
 

@@ -357,7 +357,7 @@ worldRoot
 - [ ] Tractar albedo/color com a dada de color i normals/roughness/metalness/AO com a dades no-color.
 - [ ] Reutilitzar materials i textures persistents.
 - [ ] Actualitzar uniforms o propietats petites; no reconstruir materials quan canvia el Sol.
-- [ ] Preparar la política perquè els Passos 16 i 17 puguin connectar DEM, ortofoto i superfície sense reescriure el motor d’il·luminació.
+- [ ] Preparar la política perquè els Passos 16 i 17 puguin connectar DEM i superfície categòrica sense reescriure el motor d’il·luminació.
 - [ ] No incorporar propietats de material científicament inventades quan el dataset no les proporciona; els defaults visuals han d’estar documentats com a tals.
 
 ### Color management i tone mapping
@@ -489,7 +489,7 @@ En aquest pas encara no s’ha d’anticipar el DEM final, però la il·luminaci
 - [ ] Verificar ombres amb desnivells reals de la malla tècnica.
 - [ ] No implementar encara el pipeline DEM final.
 - [ ] Definir els punts d’extensió perquè el Pas 16 substitueixi la geometria tècnica per topografia real sense canviar `LightingEnvironmentComposer`.
-- [ ] Definir els punts d’extensió perquè el Pas 17 connecti albedo/ortofoto/cobertura a `PBRMaterialPolicy` sense canviar l’efemèride ni les llums.
+- [ ] Definir els punts d’extensió perquè el Pas 17 connecti albedo/cobertura a `PBRMaterialPolicy` sense canviar l’efemèride ni les llums.
 - [ ] No vincular materials PBR a una font concreta de dades.
 
 ### UI i diagnòstic
@@ -708,7 +708,7 @@ El Pas 8.7 no es considera complet fins que:
 Aquest pas no implementa:
 
 - DEM final dels Passos 15–16;
-- ortofoto o superfície final del Pas 17;
+- superfície categòrica final del Pas 17;
 - global illumination completa;
 - path tracing;
 - ray tracing físic complet;
@@ -722,7 +722,7 @@ Aquest pas no implementa:
 - self-shadowing topogràfic lunar d’alta resolució;
 - ombres de cràters calculades científicament a escala lunar;
 - reflexions especulars avançades de masses d’aigua finals;
-- meteorologia volumètrica del Pas 18.
+- meteorologia volumètrica, ara recollida en un [dossier per madurar](../idees-per-madurar/meteorologia.md).
 
 Aquests elements no poden retardar ni contaminar el Pas 9.
 

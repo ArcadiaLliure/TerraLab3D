@@ -2,7 +2,7 @@
 
 ## Propòsit
 
-Implementar els ports definits per l’aplicació: catàlegs, efemèrides, DEM, ortofoto, cobertura, clima, contaminació lumínica, persistència, downloads, caché, workers, telemetria i transport binari.
+Implementar els ports definits per l’aplicació: catàlegs, efemèrides, DEM, cobertura, clima, contaminació lumínica, persistència, downloads, caché, workers, telemetria i transport binari.
 
 ## Regla de dependència
 

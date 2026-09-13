@@ -236,8 +236,6 @@ src/terralab3d/infrastructure/adapters/network/__init__.py
 src/terralab3d/infrastructure/adapters/network/adapter.py
 src/terralab3d/infrastructure/adapters/ngc_catalog/__init__.py
 src/terralab3d/infrastructure/adapters/ngc_catalog/adapter.py
-src/terralab3d/infrastructure/adapters/orthophoto/__init__.py
-src/terralab3d/infrastructure/adapters/orthophoto/adapter.py
 src/terralab3d/infrastructure/adapters/persistence/__init__.py
 src/terralab3d/infrastructure/adapters/persistence/adapter.py
 src/terralab3d/infrastructure/adapters/planck/__init__.py

@@ -1,6 +1,6 @@
 # Pas 38 — Homologació final, recuperació i rendiment
 
-> Estat: **pendent**. És el tancament verificable dels passos 1–37, no un contenidor per afegir funcionalitats noves.
+> Estat: **pendent**. És el tancament verificable de tots els passos executables anteriors (1–17 i 19–37), no un contenidor per afegir funcionalitats noves.
 
 ## Estat actual verificat
 
@@ -36,7 +36,7 @@ TerraLab3D cobreix el pla acordat amb evidència científica, funcional i visual
 
 ## Treball pendent
 
-- [ ] Construir i executar la matriu 1–37 amb escenaris, dades, toleràncies, proves i evidència per fila.
+- [ ] Construir i executar la matriu dels passos 1–17 i 19–37 amb escenaris, dades, toleràncies, proves i evidència per fila.
 - [ ] Comparar ubicacions, dates, càmeres, capes, datasets, instruments i fluxos equivalents amb l'oracle fixat.
 - [ ] Fixar pressupostos i perfilar pan/zoom, ticks temporals, salts, Gaia, DEM, superfície, scope, planificador i previews.
 - [ ] Eliminar reconstruccions, còpies, transferències i allocations que superin pressupost, sense canviar contractes científics.
@@ -71,7 +71,7 @@ No queda cap fila del pla sense evidència ni desviació sense decisió; ciènci
 
 ## Evidències
 
-- [ ] Informe final de paritat funcional i científica 1–37.
+- [ ] Informe final de paritat funcional i científica dels passos 1–17 i 19–37.
 - [ ] Quadre de pressupostos i resultats P50/P95 reproduïbles.
 - [ ] Captures/vídeos dels fluxos principals i de transicions interactives.
 - [ ] Informe de GPU, RSS, bridge, còpies, workers i handles.
@@ -84,4 +84,4 @@ Noves capacitats posteriors al pas 37 i la navegació espacial física descrita 
 
 ## Instrucció per a Codex
 
-Tracta aquest pas com una homologació, no com un calaix de noves features. Executa la matriu 1–37, corregeix cada desviació a la seva vertical, prova recuperació i transicions interactives i no eliminis cap fallback abans de demostrar el reemplaçament.
+Tracta aquest pas com una homologació, no com un calaix de noves features. Executa la matriu dels passos 1–17 i 19–37, corregeix cada desviació a la seva vertical, prova recuperació i transicions interactives i no eliminis cap fallback abans de demostrar el reemplaçament.

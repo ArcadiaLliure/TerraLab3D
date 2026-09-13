@@ -15,8 +15,8 @@ export interface PBRSurfaceMaps {
 /**
  * Reusable material policy for local-world terrain and reference surfaces.
  *
- * Defaults are explicitly visual until DEM/orthophoto products provide real
- * surface parameters. Colour textures are sRGB; all material-data textures are
+ * Defaults are explicitly visual until surface products provide real material
+ * parameters. Colour textures are sRGB; all material-data textures are
  * kept in NoColorSpace.
  */
 export class PBRMaterialPolicy {

@@ -6,7 +6,6 @@ from enum import Enum
 from terralab3d.domain.identifiers import ResourceId, TerrainTileId
 
 class SurfaceMode(str, Enum):
-    ORTHOPHOTO = "orthophoto"
     CATEGORICAL = "categorical"
 
 @dataclass(frozen=True, slots=True)

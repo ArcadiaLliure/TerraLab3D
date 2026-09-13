@@ -1113,7 +1113,7 @@ Canals:
 - vent, turbulència o combustible;
 - col·lisions detallades amb edificis o vegetació;
 - navmesh;
-- DEM, ortofoto i cobertura finals;
+- DEM i cobertura finals;
 - sistema complet de LOD i prefetch.
 
 ---

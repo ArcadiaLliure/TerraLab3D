@@ -54,12 +54,13 @@ Estats admesos:
 
 La numeració decimal és històrica; els passos 1–16 i els seus subpassos no es renumeren.
 
+El número 18 també queda reservat com a traça històrica: meteorologia s'ha retirat de l'ordre executable i ara és un [dossier per madurar](idees-per-madurar/meteorologia.md). Els passos 19–38 conserven la numeració existent.
+
 ## Passos pendents
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 17 | [Superfície, ortofoto, cobertura, estils i refinament visual](pendent/pas17-superficie-progressiva.md) | `parcial` | 16 |
-| 18 | [Meteorologia real, fallback i efectes atmosfèrics](pendent/pas18-meteorologia.md) | `pendent` | 7 |
+| 17 | [Superfície categòrica, estils i refinament visual](pendent/pas17-superficie-progressiva.md) | `parcial` | 16 |
 | 19 | [Modes ull, prismàtics i telescopi/càmera](pendent/pas19-modes-optics.md) | `pendent` | 5, 13 |
 | 20 | [Simulació fotogràfica](pendent/pas20-simulador-fotografic.md) | `pendent` | 14, 19 |
 | 21 | [Eines de mesura esfèrica](pendent/pas21-eines-mesura.md) | `pendent` | 6, 13, 19 |
@@ -79,20 +80,20 @@ La numeració decimal és històrica; els passos 1–16 i els seus subpassos no 
 | 35 | [Pestanya d'eclipsis](pendent/pas35-pestanya-eclipsis.md) | `parcial` | 9, 33, 34 opcional |
 | 36 | [Esdeveniments propis de planetes i Lluna](pendent/pas36-esdeveniments-objectes.md) | `parcial` | 32, 33 |
 | 37 | [Nomenclàtor GeoNames empaquetat](pendent/pas37-geonames-empaquetat.md) | `pendent` | 19, 29 |
-| 38 | [Homologació final, recuperació i rendiment](pendent/pas38-homologacio-final.md) | `pendent` | 1–37 |
+| 38 | [Homologació final, recuperació i rendiment](pendent/pas38-homologacio-final.md) | `pendent` | 1–17, 19–37 |
 
 ## Idees per madurar
 
-Els dotze dossiers exclosos de la seqüència executable, la seva decisió pendent, condició de maduresa i relació amb el backlog són a l'[índex d'idees per madurar](idees-per-madurar/README.md). El seu estat és `per madurar`.
+Els tretze dossiers exclosos de la seqüència executable, la seva decisió pendent, condició de maduresa i relació amb el backlog són a l'[índex d'idees per madurar](idees-per-madurar/README.md). El seu estat és `per madurar`.
 
 ## Mapa històric de la consolidació
 
-La taula registra una sola destinació per a cadascun dels vuit pendents històrics i els vint-i-cinc dossiers madurs del brainstorming. Els números de “pendent” i “novetat” són els identificadors anteriors a la fusió; ja no són ordre executable.
+La taula registra la destinació actual de cadascun dels vuit pendents històrics i els vint-i-cinc dossiers madurs del brainstorming. Els números de “pendent” i “novetat” són els identificadors anteriors a la fusió; ja no són ordre executable.
 
-| Pas final | Fonts absorbides | Decisió de fusió |
+| Destinació | Fonts absorbides | Decisió de fusió |
 |---:|---|---|
-| 17 | pendent 17 + novetat 37 | Superfície i refinament visual sobre els tiles ja completats. |
-| 18 | pendent 18 (còpia local provisional 30) | Meteorologia conserva tot el contingut i recupera el número correcte. |
+| 17 | pendent 17 + novetat 37 | Superfície categòrica i refinament visual sobre els tiles ja completats; l'ortofoto queda descartada. |
+| — | pendent 18 (còpia local provisional 30) | Meteorologia surt de l'ordre executable i es conserva com a [dossier per madurar](idees-per-madurar/meteorologia.md). |
 | 19 | pendent 19 + novetat 25 | Enquadrament, geometria òptica, HUD, Gaia i persistència. |
 | 20 | pendent 20 + novetat 26 | Fotometria, soroll, exposició, tracking i exportació. |
 | 21 | pendent 21 | Mesures esfèriques editables. |
@@ -116,7 +117,7 @@ La taula registra una sola destinació per a cadascun dels vuit pendents històr
 
 ## Procedència i criteri del brainstorming
 
-La pluja d'idees va aportar 25 propostes prou tancades per fusionar amb el pla i 12 dossiers amb preguntes obertes. Aquesta consolidació conserva decisions funcionals, elimina repeticions i instruccions de “crear des de zero”, i les vincula al codi real disponible. TerraLab és només oracle de comportament al [commit auditat `1fbcf088a0bfc1f832fc0f2a8ba2808e3e783a7d`](https://github.com/ArcadiaLliure/TerraLab/tree/1fbcf088a0bfc1f832fc0f2a8ba2808e3e783a7d); TerraLab3D no en depèn en execució.
+La pluja d'idees va aportar 25 propostes prou tancades per fusionar amb el pla i 12 dossiers amb preguntes obertes. La reclassificació posterior de meteorologia eleva a 13 els dossiers actuals per madurar. Aquesta consolidació conserva decisions funcionals, elimina repeticions i instruccions de “crear des de zero”, i les vincula al codi real disponible. TerraLab és només oracle de comportament al [commit auditat `1fbcf088a0bfc1f832fc0f2a8ba2808e3e783a7d`](https://github.com/ArcadiaLliure/TerraLab/tree/1fbcf088a0bfc1f832fc0f2a8ba2808e3e783a7d); TerraLab3D no en depèn en execució.
 
 ## Evidències i dades de referència
 

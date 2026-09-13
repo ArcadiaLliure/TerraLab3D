@@ -25,7 +25,7 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 
 | Capacitat | Implementació observable actual | Què no s'ha de donar per fet | Pla |
 |---|---|---|---|
-| Superfície categòrica | [`land_cover_coordinator.py`](../backend/src/terralab3d/application/land_cover_coordinator.py), adaptadors raster i [`LandCoverTextureManager.ts`](../frontend/src/view/three/terrain/LandCoverTextureManager.ts) | Ortofoto completa, estils de producte i refinament visual/semàntic complet. | [17](pendent/pas17-superficie-progressiva.md), [29](pendent/pas29-superficie-semantica.md) |
+| Superfície categòrica | [`land_cover_coordinator.py`](../backend/src/terralab3d/application/land_cover_coordinator.py), adaptadors raster i [`LandCoverTextureManager.ts`](../frontend/src/view/three/terrain/LandCoverTextureManager.ts) | Estils de producte i refinament visual/semàntic complet. | [17](pendent/pas17-superficie-progressiva.md), [29](pendent/pas29-superficie-semantica.md) |
 | Trajectòries i visibilitat | [`apparent_trajectory.py`](../backend/src/terralab3d/application/apparent_trajectory.py) i horitzó del pas 15 | Contracte observable general i creuaments de l'horitzó real per totes les famílies. | [22](pendent/pas22-trajectories-visibilitat.md) |
 | Recursos i descàrregues | [`download_manager.py`](../backend/src/terralab3d/infrastructure/resources/download_manager.py), instal·lacions, catàleg i [`ResourceManager.ts`](../frontend/src/application/ResourceManager.ts) | Reanudació/persistència integral, verificació atòmica i recuperació completa. | [24](pendent/pas24-cataleg-recursos-descarregues.md) |
 | Vistes de recursos | Catàlegs, renderers del Sistema Solar/espai profund i modal genèric | Navegadors jeràrquic solar i carta all-sky especialitzada. | [26](pendent/pas26-recursos-sistema-solar.md), [27](pendent/pas27-recursos-espai-profund.md) |
@@ -36,7 +36,7 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 
 | Capacitat | Fronteres ja presents | Implementació que falta | Pla |
 |---|---|---|---|
-| Meteorologia | [`domain/climate/`](../backend/src/terralab3d/domain/climate/) i [`WeatherLayerRenderer.ts`](../frontend/src/view/three/layers/WeatherLayerRenderer.ts) | Proveïdor real, cache/fallback, efectes connectats, UI i lifecycle. | [18](pendent/pas18-meteorologia.md) |
+| Meteorologia | [`domain/climate/`](../backend/src/terralab3d/domain/climate/) i [`WeatherLayerRenderer.ts`](../frontend/src/view/three/layers/WeatherLayerRenderer.ts) | Abast de producte, autoritat temporal, proveïdor, fallback, efectes, UI i lifecycle. | [Dossier per madurar](idees-per-madurar/meteorologia.md) |
 | Òptica | [`domain/optics/`](../backend/src/terralab3d/domain/optics/) i [`ScopeLayerRenderer.ts`](../frontend/src/view/three/layers/ScopeLayerRenderer.ts) | Coordinació, modes, geometria/HUD, Gaia cancel·lable, UI i persistència. | [19](pendent/pas19-modes-optics.md) |
 | Simulació fotogràfica | [`domain/imaging/`](../backend/src/terralab3d/domain/imaging/) i [`ImagingPreviewLayerRenderer.ts`](../frontend/src/view/three/layers/ImagingPreviewLayerRenderer.ts) | Senyal/soroll integrats, controls, tracking, traces i exportació completa. | [20](pendent/pas20-simulador-fotografic.md) |
 | Mesures | [`domain/measurements/`](../backend/src/terralab3d/domain/measurements/) i [`MeasurementLayerRenderer.ts`](../frontend/src/view/three/layers/MeasurementLayerRenderer.ts) | Gestos, càlculs finals, edició, historial, batches i persistència. | [21](pendent/pas21-eines-mesura.md) |

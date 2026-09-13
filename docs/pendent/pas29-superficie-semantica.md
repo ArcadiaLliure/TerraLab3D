@@ -4,7 +4,7 @@
 
 ## Estat actual verificat
 
-- [x] El pas 17 aporta una base categòrica parcial, ortofoto/estils i refinament visual sobre els tiles del pas 16.
+- [x] El pas 17 aporta una base categòrica parcial sobre els tiles del pas 16.
 - [x] Existeixen models de superfície, normalització inicial de classes i adaptadors de dades raster.
 - [ ] No hi ha mosaic TLST versionat, ontologia canònica completa ni arbre de refinament per AOI.
 - [ ] Qualsevol directori o cache residual amb noms `raster`/`refinement` no constitueix un contracte implementat.
@@ -27,7 +27,7 @@ L'usuari selecciona una AOI, veu quines fonts i refinadors poden millorar-la i o
 - Les categories es reprojecten i remostregen amb veí més proper; els overviews acceleren l'espai, no fusionen semàntica.
 - La consulta avalua només refinadors instal·lats, de més específic a més general, i pren el primer valor vàlid; la base global és el fallback.
 - L'arbre de refinament descriu cobertura i precedència per AOI, no força descàrregues. Qualsevol instal·lació passa pel pas 24.
-- El resultat és un raster categòric + paleta/estil; l'ortofoto continua sent una capa visual separada.
+- El resultat és exclusivament un raster categòric + paleta/estil; no incorpora cap mode fotogràfic.
 
 ## Codi existent a reutilitzar
 

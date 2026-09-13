@@ -1,4 +1,4 @@
-# Capacitat `surface` — superfícies, ortofoto i cobertura categòrica
+# Capacitat `surface` — superfície i cobertura categòrica
 
 ## 1. Propòsit
 
@@ -10,7 +10,7 @@ Modelar mostreig, paletes, classes i materials de superfície separats de la geo
 
 ## 3. Entrades i sortides
 
-- **Entrades:** Coordenades de terreny, ortofoto, categories, llegenda i estil.
+- **Entrades:** Coordenades de terreny, categories, llegenda i estil.
 - **Sortides:** Textura/atributs categòrics i descriptor de material versionat.
 
 ## 4. Dependències permeses
@@ -29,7 +29,7 @@ Modelar mostreig, paletes, classes i materials de superfície separats de la geo
 
 | Element | Tipus | Responsabilitat | Estat |
 |---|---|---|---|
-| `SurfaceSampleGrid` | DTO | Mostres RGB o categòriques | Esquelet |
+| `SurfaceSampleGrid` | DTO | Mostres categòriques | Esquelet |
 | `SurfaceMaterialDescriptor` | DTO | Material neutral | Esquelet |
 | `SurfaceSamplingCalculator` | Protocol científic | Remostreig i interpolació | Esquelet |
 
@@ -51,7 +51,6 @@ El paquet separa `models.py` (tipus i invariants), `calculations.py` (algoritmes
 | Origen a TerraLab | Símbol actual | Responsabilitat actual | Part reutilitzable | Part que no s’ha de copiar | Transformació necessària | Destí a TerraLab3D | Estratègia |
 |---|---|---|---|---|---|---|---|
 | `TerraLab/terrain/surface/service.py` | `mostreig, caché i context de render` | Lògica i comportament actuals | Regles científiques, invariants, fixtures i semàntica útils | Qt, QPainter, diccionaris sense tipus, threads o I/O que no pertanyin al domini | Aïllar, tipar i caracteritzar abans de traslladar | `backend/src/terralab3d/domain/surface` | `EXTRACT` |
-| `TerraLab/terrain/surface/rgb.py` | `ortofoto` | Lògica i comportament actuals | Regles científiques, invariants, fixtures i semàntica útils | Qt, QPainter, diccionaris sense tipus, threads o I/O que no pertanyin al domini | Aïllar, tipar i caracteritzar abans de traslladar | `backend/src/terralab3d/domain/surface` | `ADAPT` |
 | `TerraLab/terrain/surface/categorical.py; TerraLab/land_cover/*` | `classes i paletes` | Lògica i comportament actuals | Regles científiques, invariants, fixtures i semàntica útils | Qt, QPainter, diccionaris sense tipus, threads o I/O que no pertanyin al domini | Aïllar, tipar i caracteritzar abans de traslladar | `backend/src/terralab3d/domain/surface` | `EXTRACT` |
 
 Cap fila autoritza copiar un fitxer complet. Primer s’ha de separar ciència, coordinació, I/O i presentació; després s’ha de comparar el resultat amb fixtures de TerraLab.

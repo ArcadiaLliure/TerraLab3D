@@ -33,7 +33,7 @@ Un checkout local només és una comoditat de lectura i s'ha de verificar contra
 5. Ciència autoritativa, selecció de dades i decisions de producte pertanyen al domini o l'aplicació Python.
 6. Els recursos grans són persistents, binaris, versionats i tenen propietari explícit.
 7. No s'envien catàlegs, malles o textures completes per frame o tick temporal.
-8. Gaia, DEM, malles, ortofotos, Via Làctia i Planck no travessen el bridge en Base64.
+8. Gaia, DEM, malles, rasters categòrics, Via Làctia i Planck no travessen el bridge en Base64.
 9. Una migració comença caracteritzant el comportament de l'oracle fixat.
 10. Una diferència intencional necessita justificació, evidència i acceptació.
 11. No s'inventen dades ni implementacions falses per fer passar la UI.
@@ -76,7 +76,7 @@ Aquestes activitats formen part de cada pas:
 | 9 | Cel profund | 11, 27 |
 | 10 | Cerca astronòmica | 12, 33 |
 | 11 | Contaminació lumínica | 7 |
-| 12 | Meteorologia i atmosfera | 7, 18 |
+| 12 | Atmosfera | 7 |
 | 13 | Horitzó | 15, 22 |
 | 14 | Topografia i elevació | 16, 28 |
 | 15 | Superfície i nomenclàtor | 17, 29, 37 |
