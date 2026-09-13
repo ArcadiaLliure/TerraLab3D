@@ -4,6 +4,12 @@ TerraLab3D és una aplicació d’exploració astronòmica i geogràfica que per
 
 L’usuari pot situar-se en unes coordenades concretes, escollir una data i una hora i explorar com es veurien el firmament, el relleu, els astres i les condicions d’observació des d’aquell lloc.
 
+## Estat i pla de millores
+
+> **Font de veritat del progrés:** [pla de millores executable de TerraLab3D](docs/README.md).
+
+La llista funcional d'aquest README descriu la visió del producte. Que una capacitat hi aparegui no certifica que estigui implementada: l'estat verificable (`completat`, `parcial`, `pendent` o `per madurar`), el següent treball i les evidències viuen al pla enllaçat.
+
 ## Funcionalitats
 
 ### Observació des de qualsevol ubicació
