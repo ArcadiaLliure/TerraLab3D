@@ -276,6 +276,7 @@ Fabricant → model → perfil autocompletat
 sense canviar el motor fotogràfic.
 
 Una futura base de dades d'objectius pot seguir el mateix patró, però queda fora d'aquest pas.
+(possible font: https://github.com/EmberLightVFX/Camera-Sensor-Database/?tab=readme-ov-file)
 
 ## 4.8 Escala de píxel
 
