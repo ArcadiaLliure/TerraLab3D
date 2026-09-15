@@ -54,15 +54,14 @@ Estats admesos:
 
 La numeració decimal és històrica; els passos 1–16 i els seus subpassos no es renumeren.
 
-El número 18 també queda reservat com a traça històrica: meteorologia s'ha retirat de l'ordre executable i ara és un [dossier per madurar](idees-per-madurar/meteorologia.md). Els passos 19–38 conserven la numeració existent.
+Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha retirat de l'ordre executable i ara és un [dossier per madurar](idees-per-madurar/meteorologia.md); l'antic Pas 20 (simulació fotogràfica) ha estat absorbit pel Pas 19 (modes d'observació instrumental). La resta de passos conserven la numeració existent.
 
 ## Passos pendents
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
 | 17 | [Superfície categòrica, estils i refinament visual](pendent/pas17-superficie-progressiva.md) | `parcial` | 16 |
-| 19 | [Modes ull, prismàtics i telescopi/càmera](pendent/pas19-modes-optics.md) | `pendent` | 5, 13 |
-| 20 | [Simulació fotogràfica](pendent/pas20-simulador-fotografic.md) | `pendent` | 14, 19 |
+| 19 | [Modes d'observació: ull nu, càmera fotogràfica i telescopi/Scope](pendent/pas19-modes-optics.md) | `pendent` | 5, 13, 14 |
 | 21 | [Eines de mesura esfèrica](pendent/pas21-eines-mesura.md) | `pendent` | 6, 13, 19 |
 | 22 | [Trajectòries i visibilitat sobre l'horitzó real](pendent/pas22-trajectories-visibilitat.md) | `parcial` | 9, 15 |
 | 23 | [Constel·lacions oficials i d'usuari](pendent/pas23-constellacions.md) | `pendent` | 6, 13, 22 |
@@ -72,7 +71,7 @@ El número 18 també queda reservat com a traça històrica: meteorologia s'ha r
 | 27 | [Carta de recursos d'espai profund](pendent/pas27-recursos-espai-profund.md) | `parcial` | 10, 11, 24, 25 |
 | 28 | [Descobriment de DEM multiproveïdor](pendent/pas28-dem-multiproveidor.md) | `parcial` | 16, 24, 25 |
 | 29 | [Superfície semàntica, TLST i refinament](pendent/pas29-superficie-semantica.md) | `parcial` | 17, 24, 25 |
-| 30 | [Plate solving i comparador foto/simulació](pendent/pas30-plate-solving.md) | `pendent` | 5, 11, 20 |
+| 30 | [Plate solving i comparador foto/simulació](pendent/pas30-plate-solving.md) | `pendent` | 5, 11, 19 |
 | 31 | [“El millor d'aquesta nit” i planificador](pendent/pas31-millor-nit-planificador.md) | `pendent` | 22, 23 |
 | 32 | [Motor general d'efemèrides](pendent/pas32-motor-efemerides.md) | `parcial` | 9, 22 |
 | 33 | [Cercador d'objectes i efemèrides](pendent/pas33-cercador-objectes-efemerides.md) | `parcial` | 31, 32 |
@@ -94,8 +93,8 @@ La taula registra la destinació actual de cadascun dels vuit pendents històric
 |---:|---|---|
 | 17 | pendent 17 + novetat 37 | Superfície categòrica i refinament visual sobre els tiles ja completats; l'ortofoto queda descartada. |
 | — | pendent 18 (còpia local provisional 30) | Meteorologia surt de l'ordre executable i es conserva com a [dossier per madurar](idees-per-madurar/meteorologia.md). |
-| 19 | pendent 19 + novetat 25 | Enquadrament, geometria òptica, HUD, Gaia i persistència. |
-| 20 | pendent 20 + novetat 26 | Fotometria, soroll, exposició, tracking i exportació. |
+| 19 | pendent 19 + antic pas 20 + novetats 25, 26 | Modes d'observació instrumental, enquadrament, geometria òptica, HUD, Gaia i previsualització fotogràfica integrada. |
+| — | antic pas 20 | Reservat com a traça històrica; absorbit pel Pas 19. |
 | 21 | pendent 21 | Mesures esfèriques editables. |
 | 22 | novetat 28 | Trajectòries comunes i visibilitat contra l'horitzó real. |
 | 23 | pendent 22 + novetat 29 | Constel·lacions oficials, observables, editables i persistents. |

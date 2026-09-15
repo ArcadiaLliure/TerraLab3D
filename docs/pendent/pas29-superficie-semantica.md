@@ -15,7 +15,7 @@ L'usuari selecciona una AOI, veu quines fonts i refinadors poden millorar-la i o
 
 ## Dependències
 
-- [Pas 17 — superfície progressiva](pas17-superficie-progressiva.md).
+- [Pas 17 — superfície progressiva](../completat/pas17-superficie-progressiva.md).
 - [Pas 24 — catàleg i descàrregues](pas24-cataleg-recursos-descarregues.md).
 - [Pas 25 — gestor de capes i AOI](pas25-gestor-capes.md).
 

@@ -75,7 +75,7 @@ Les tres presentacions visuals —terreny tècnic, categòric original i categò
 
 ## Fora d'abast
 
-Descoberta de refinadors semàntics, TLST i AOI avançada ([pas 29](pas29-superficie-semantica.md)); meteorologia ([dossier per madurar](../idees-per-madurar/meteorologia.md)).
+Descoberta de refinadors semàntics, TLST i AOI avançada ([pas 29](../pendent/pas29-superficie-semantica.md)); meteorologia ([dossier per madurar](../idees-per-madurar/meteorologia.md)).
 
 ## Instrucció per a Codex
 

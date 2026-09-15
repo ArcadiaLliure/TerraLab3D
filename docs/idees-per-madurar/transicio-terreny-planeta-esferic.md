@@ -14,7 +14,7 @@
 ## Per què encara no és una fase concreta
 
 - No hi ha cap decisió sobre l'algorisme concret de transició (a quina altitud comença, com s'interpolen les dues representacions, com es gestiona el nivell de detall durant la transició).
-- No s'ha decidit si es reutilitza el pipeline de tiles/LOD del [pas 17](../pendent/pas17-superficie-progressiva.md) per a la representació esfèrica llunyana o si cal un sistema nou.
+- No s'ha decidit si es reutilitza el pipeline de tiles/LOD del [pas 17](../completat/pas17-superficie-progressiva.md) per a la representació esfèrica llunyana o si cal un sistema nou.
 
 ## Preguntes obertes
 
@@ -24,4 +24,4 @@
 
 ## Relació amb el pla i altres idees
 
-Bloqueja la [navegació lliure pel Sistema Solar](navegacio-lliure-sistema-solar.md) i [Go In / superfícies planetàries](go-in-superficies-planetaries.md). Ha de reutilitzar el [pas 17](../pendent/pas17-superficie-progressiva.md) i complir l'auditoria de transicions del [pas 38](../pendent/pas38-homologacio-final.md).
+Bloqueja la [navegació lliure pel Sistema Solar](navegacio-lliure-sistema-solar.md) i [Go In / superfícies planetàries](go-in-superficies-planetaries.md). Ha de reutilitzar el [pas 17](../completat/pas17-superficie-progressiva.md) i complir l'auditoria de transicions del [pas 38](../pendent/pas38-homologacio-final.md).

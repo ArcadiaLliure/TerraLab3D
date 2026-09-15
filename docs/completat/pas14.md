@@ -28,7 +28,7 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 - [ ] Implementar iniciar, pausar, reprendre, aturar i netejar.
 - [ ] Mostrar temps acumulat i estat de l’exposició.
 - [ ] Gestionar canvis d’ubicació o data durant una trace.
-- [ ] Integrar tracking de muntura quan s’introdueixi la simulació fotogràfica.
+- [ ] Reutilitzar aquestes traces en la previsualització fotogràfica del Pas 19 quan `tracking = false`; el control físic de muntures continua fora d'abast.
 - [ ] Aplicar color, opacitat i intensitat derivats de fotometria.
 - [ ] Comparar forma i velocitat amb TerraLab.
 
@@ -44,7 +44,7 @@ Les traces es construeixen incrementalment, es poden controlar, no depenen de la
 
 ## Fora d’abast del pas
 
-La simulació fotogràfica de llarga exposició completa arriba al pas 20.
+La previsualització fotogràfica instrumental reutilitza aquestes traces al Pas 19, després de la fusió dels antics passos 19 i 20.
 
 ## Annex de comparació reproduïble de traces circumpolars
 

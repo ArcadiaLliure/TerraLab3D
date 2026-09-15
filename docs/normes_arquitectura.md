@@ -70,7 +70,7 @@ Aquestes activitats formen part de cada pas:
 | 3 | Navegació i HUD | 1, 3.5, 4 |
 | 4 | Fons del cel | 7 |
 | 5 | Estrelles i Gaia | 5, 6 |
-| 6 | Traces temporals | 14, 20 |
+| 6 | Traces temporals | 14, 19 |
 | 7 | Sistema Solar | 8, 8.5, 8.6, 8.7, 9, 22, 26, 32, 35, 36 |
 | 8 | Via Làctia i Planck | 10, 27 |
 | 9 | Cel profund | 11, 27 |
@@ -80,15 +80,17 @@ Aquestes activitats formen part de cada pas:
 | 13 | Horitzó | 15, 22 |
 | 14 | Topografia i elevació | 16, 28 |
 | 15 | Superfície i nomenclàtor | 17, 29, 37 |
-| 16 | Modes òptics | 19 |
+| 16 | Modes d'observació instrumental | 19 |
 | 17 | Camp instrumental | 19 |
-| 18 | Simulació i interpretació fotogràfica | 20, 30 |
+| 18 | Simulació i interpretació fotogràfica | 19, 30 |
 | 19 | Selecció i inspecció | 13 |
 | 20 | Eines de mesura | 21 |
 | 21 | Constel·lacions | 23 |
 | 22 | Capes i AOI | 25 |
 | 23 | Dades i recursos | 24, 26–29, 37 |
 | 24 | Preferències, feedback, recuperació i homologació | 24, 25, 38 |
+
+> El número 20 queda reservat com a traça històrica. La previsualització fotogràfica necessària per a l'observació instrumental forma part del Pas 19; el Pas 30 conserva la interpretació astromètrica de fotografies reals.
 
 ## Criteri global d'homologació
 

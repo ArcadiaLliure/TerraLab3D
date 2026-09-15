@@ -5,7 +5,7 @@
 ## Estat actual verificat
 
 - [x] Els catàlegs Gaia i OpenNGC, la selecció celeste i el control de càmera ja funcionen.
-- [x] Hi ha un port/adaptador d'exportació d'imatge i el simulador fotogràfic està especificat al pas 20.
+- [x] Hi ha un port/adaptador d'exportació d'imatge i la previsualització fotogràfica instrumental està especificada al Pas 19 (després d'absorbir l'antic Pas 20).
 - [ ] No existeixen detecció de centroides, índex geomètric Gaia, blind solve, solució WCS ni comparador registrat.
 
 ## Resultat funcional
@@ -15,7 +15,7 @@ L'usuari carrega una fotografia del cel, fins i tot sense EXIF, TerraLab3D en re
 ## Dependències
 
 - [Pas 5 — Gaia](../completat/pas5.md) i [Pas 11 — OpenNGC](../completat/pas11.md).
-- [Pas 20 — simulador fotogràfic](pas20-simulador-fotografic.md).
+- [Pas 19 — modes d'observació instrumental i simulació fotogràfica](pas19-modes-optics.md) (que absorbeix l'antic Pas 20).
 
 ## Decisions tancades
 
@@ -78,4 +78,4 @@ Correcció automàtica d'una muntura, astrometria de camp extrem sense índex pr
 
 ## Instrucció per a Codex
 
-Implementa el solver com una vertical separada del simulador, reutilitzant Gaia/OpenNGC, càmera i exportació existents. Versiona l'índex derivat, valida la solució amb estrelles independents i no exigeixis EXIF.
+Implementa el solver com una vertical separada de la previsualització fotogràfica del Pas 19, reutilitzant Gaia/OpenNGC, càmera i exportació existents. Versiona l'índex derivat, valida la solució amb estrelles independents i no exigeixis EXIF.

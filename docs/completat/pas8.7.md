@@ -713,7 +713,7 @@ Aquest pas no implementa:
 - path tracing;
 - ray tracing físic complet;
 - scattering atmosfèric volumètric nou si el Pas 7 ja proporciona el model necessari;
-- autoexposure fotogràfic complet del Pas 20;
+- autoexposure fotogràfic físic complet, que continua fora de l'abast del Pas 19;
 - HDR fotogràfic del pipeline instrumental;
 - milers de llums urbanes artificials;
 - dades GIS de fanals;

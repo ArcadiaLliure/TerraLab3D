@@ -1,20 +1,20 @@
 # Pas 37 — Nomenclàtor GeoNames empaquetat
 
-> Estat: **pendent**. No hi ha dataset GeoNames ni renderers de nomenclàtor; la superfície categòrica, el terreny i els modes òptics són les bases reutilitzables.
+> Estat: **pendent**. No hi ha dataset GeoNames ni renderers de nomenclàtor; la superfície categòrica, el terreny i els modes d'observació instrumental són les bases reutilitzables.
 
 ## Estat actual verificat
 
 - [x] El terreny/DEM ja aporta geometria i el pas 29 aporta classes canòniques, inclosa superfície artificial.
-- [x] El pas 19 defineix camp de mira de prismàtics.
+- [x] El Pas 19 defineix els modes d'observació instrumental (el mode prismàtics s'ha descartat; el zoom visual global i el camp/reticle instrumental en són la referència).
 - [ ] GeoNames filtrat, l'assignació assentament↔taca, la consulta de cims i el sistema de labels no estan implementats.
 
 ## Resultat funcional
 
-Amb topografia carregada, TerraLab3D etiqueta assentaments reals associats a les taques artificials i permet veure cims nomenats dins la mira de prismàtics o mitjançant una opció global, amb línies/labels llegibles i sense descàrrega addicional.
+Amb topografia carregada, TerraLab3D etiqueta assentaments reals associats a les taques artificials i permet veure cims nomenats dins el camp visual (o filtrats pel reticle instrumental) o mitjançant una opció global, amb línies/labels llegibles i sense descàrrega addicional.
 
 ## Dependències
 
-- [Pas 19 — modes òptics](pas19-modes-optics.md).
+- [Pas 19 — modes d'observació instrumental](pas19-modes-optics.md).
 - [Pas 29 — superfície semàntica](pas29-superficie-semantica.md).
 
 ## Decisions tancades
@@ -23,7 +23,7 @@ Amb topografia carregada, TerraLab3D etiqueta assentaments reals associats a les
 - El CSV/índex derivat és dada base versionada i empaquetada: queda fora del gestor del pas 24, de l'AOI i de l'arbre de refinament.
 - GeoNames només aporta nom i punt. El raster determina l'extensió artificial; el DEM determina l'altura/oclusió del cim.
 - Assignació d'assentaments: punt dins la taca → directa; si no, proximitat sota un llindar documentat. Diverses localitats a la mateixa taca conserven totes les etiquetes.
-- Les dades es carreguen automàticament amb topografia. Els assentaments pertinents es representen; els cims dins la mira apareixen en prismàtics i l'opció global governa mostrar-ne la resta.
+- Les dades es carreguen automàticament amb topografia. Els assentaments pertinents es representen; els cims visibles es mostren segons el FOV/camp instrumental o mitjançant l'opció global.
 - Els cims usen línia vertical i label flotant escalat; decluttering/prioritat evita col·lisions segons zoom, distància i importància.
 
 ## Codi existent a reutilitzar
@@ -38,7 +38,7 @@ Amb topografia carregada, TerraLab3D etiqueta assentaments reals associats a les
 - [ ] Fixar versió/font, llicència, feature codes i pipeline reproducible de filtratge GeoNames.
 - [ ] Definir format empaquetat, índex espacial, manifest/checksum i carregador read-only.
 - [ ] Implementar components de taques artificials i assignació punt-dins/proximitat amb política multi-localitat.
-- [ ] Implementar consulta de cims visible/AOI de vista, altura des del DEM i filtratge per mira de prismàtics.
+- [ ] Implementar consulta de cims visible/AOI de vista, altura des del DEM i filtratge per camp visual / instrumental.
 - [ ] Crear batch renderer de línies i labels amb escala, prioritat, agrupació i decluttering estable.
 - [ ] Connectar càrrega automàtica a disponibilitat de topografia i toggle global de cims, sense entrada de descàrrega.
 - [ ] Afegir atribució CC BY 4.0 a crèdits, manifest i documentació de dades.
@@ -58,7 +58,7 @@ Asset empaquetat verificat → índex espacial per vista → assentaments + comp
 
 - Pipeline reproduïble, checksum, llicència, UTF-8, feature codes i asset corrupte/absent.
 - Punt dins taca, proximitat, fora de llindar i dues localitats dins una mateixa taca.
-- Cim dins/fora de mira, ocult pel DEM, mode global i canvis de zoom.
+- Cim dins/fora de camp, ocult pel DEM, mode global i canvis de zoom.
 - Golden layouts de labels densos, determinisme, cancel·lació i pressupostos CPU/GPU.
 
 ## Criteri de sortida
@@ -69,7 +69,7 @@ Una zona amb pobles pròxims i una serralada mostra noms correctes i llegibles a
 
 - [ ] Manifest reproducible i atribució CC BY 4.0 visible.
 - [ ] Captura d'una taca amb una i amb dues localitats.
-- [ ] Captures de cims en prismàtics i mode global a diversos zooms.
+- [ ] Captures de cims en camp instrumental i mode global a diversos zooms.
 - [ ] Confirmació automatitzada que el catàleg de descàrregues no conté GeoNames base.
 
 ## Fora d'abast

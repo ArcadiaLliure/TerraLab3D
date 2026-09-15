@@ -16,7 +16,7 @@
 ## Per què encara no és una fase concreta
 
 - El backend de malla 3D per a cossos irregulars (no DEM 2D pla) **encara no existeix** i passa de ser opcional a ser clau per a Fobos/Deimos i cossos menors.
-- No hi ha decisió sobre com s'integra “Go In” amb el terreny local existent (streaming, LOD) més enllà dels requisits dels [passos 17](../pendent/pas17-superficie-progressiva.md) i [38](../pendent/pas38-homologacio-final.md).
+- No hi ha decisió sobre com s'integra “Go In” amb el terreny local existent (streaming, LOD) més enllà dels requisits dels [passos 17](../completat/pas17-superficie-progressiva.md) i [38](../pendent/pas38-homologacio-final.md).
 - No hi ha prioritat tancada de quins cossos, més enllà de Lluna i Mart, entren a la primera versió.
 
 ## Preguntes obertes que cal resoldre abans de convertir-ho en un Pas
@@ -24,8 +24,8 @@
 1. Quin format de malla/model de forma 3D s'adoptarà per a cossos irregulars (Fobos, Deimos, asteroides)?
 2. Com es defineix exactament la transició GoTo → Go In (animació, temps, punt d'entrada a la superfície)?
 3. Quins cossos entren a la v1 més enllà de Lluna (candidat confirmat) i Mart (candidat natural)?
-4. Com es reutilitza la càrrega progressiva del [pas 17](../pendent/pas17-superficie-progressiva.md) per a superfícies planetàries diferents de la Terra?
+4. Com es reutilitza la càrrega progressiva del [pas 17](../completat/pas17-superficie-progressiva.md) per a superfícies planetàries diferents de la Terra?
 
 ## Relació amb el pla i altres idees
 
-Depèn de la [navegació lliure](navegacio-lliure-sistema-solar.md) i la [transició terreny → planeta](transicio-terreny-planeta-esferic.md); es relaciona amb la [nau 3D](nau-3d-tercera-persona.md), la [representació del Sol](representacio-del-sol.md) i els [satèl·lits de Júpiter](satellits-de-jupiter.md). El patró de càrrega que cal estudiar és el del [pas 17](../pendent/pas17-superficie-progressiva.md).
+Depèn de la [navegació lliure](navegacio-lliure-sistema-solar.md) i la [transició terreny → planeta](transicio-terreny-planeta-esferic.md); es relaciona amb la [nau 3D](nau-3d-tercera-persona.md), la [representació del Sol](representacio-del-sol.md) i els [satèl·lits de Júpiter](satellits-de-jupiter.md). El patró de càrrega que cal estudiar és el del [pas 17](../completat/pas17-superficie-progressiva.md).
