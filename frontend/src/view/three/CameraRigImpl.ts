@@ -101,6 +101,7 @@ export class CameraRigImpl implements CameraRig {
   // ─── Input state ───────────────────────────────────────────────────
   private readonly keysDown = new Set<string>();
   private dragging = false;
+  private interactionBlocked = false;
   private lastX = 0;
   private lastY = 0;
 
@@ -171,6 +172,14 @@ export class CameraRigImpl implements CameraRig {
 
   setTrackingState(isTracking: boolean): void {
     this.isTrackingTarget = isTracking;
+  }
+
+  setInteractionBlocked(blocked: boolean): void {
+    this.interactionBlocked = blocked;
+    if (blocked) {
+      this.dragging = false;
+      this.keysDown.clear();
+    }
   }
 
   orbit(deltaAz: number, deltaAlt: number): void {
@@ -782,6 +791,7 @@ export class CameraRigImpl implements CameraRig {
   // ─── Input handlers ────────────────────────────────────────────────
 
   private onPointerDown(e: PointerEvent): void {
+    if (this.interactionBlocked) return;
     if (e.button !== 0) return;
     this.dragging = true;
     this.lastX = e.clientX;
@@ -791,6 +801,7 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private onPointerMove(e: PointerEvent): void {
+    if (this.interactionBlocked) return;
     if (!this.dragging) return;
     const dx = e.clientX - this.lastX;
     const dy = e.clientY - this.lastY;
@@ -804,6 +815,7 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private onPointerUp(e: PointerEvent): void {
+    if (this.interactionBlocked) return;
     if (!this.dragging) return;
     this.dragging = false;
     this.container?.releasePointerCapture(e.pointerId);
@@ -811,6 +823,7 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private onWheel(e: WheelEvent): void {
+    if (this.interactionBlocked) { e.preventDefault(); return; }
     e.preventDefault();
     // No cridem this.userInteractionCallback?.(); perquè volem 
     // permetre fer zoom mentre segueix trackejant l'objectiu
@@ -839,6 +852,7 @@ export class CameraRigImpl implements CameraRig {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
+    if (this.interactionBlocked) return;
     if (e.code === "Escape") {
       if (this.gotoTarget) {
         e.preventDefault();

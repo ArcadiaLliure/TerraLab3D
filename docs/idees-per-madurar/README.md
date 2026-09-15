@@ -6,7 +6,7 @@ Aquestes idees no formen part de l'ordre executable dels passos 17–38. Conserv
 
 | Dossier | Decisió pendent principal | Condició per considerar-lo madur | Pas madur relacionat |
 |---|---|---|---|
-| [Base de dades de càmeres/sensors](base-de-dades-camares-sensors.md) | Font, llicència, manteniment i esquema del catàleg. | Dataset redistribuïble i política de versió/actualització tancats. | [19 — modes d'observació instrumental](../pendent/pas19-modes-optics.md) |
+| [Base de dades de càmeres/sensors](base-de-dades-camares-sensors.md) | Font, llicència, manteniment i esquema del catàleg. | Dataset redistribuïble i política de versió/actualització tancats. | [19 — modes d'observació instrumental](../completat/pas19-modes-optics.md) |
 | [Cartografia lunar](cartografia-lunar.md) | Abast de capes, font USGS i UX de selecció. | Fonts/llicències, resolucions i resultat funcional prioritzat. | [25 — gestor de capes](../pendent/pas25-gestor-capes.md) |
 | [Cinturó de Kuiper i núvol d'Oort](cinturo-kuiper-nuvol-oort.md) | Representació científica vs. divulgativa i escala. | Model de dades, incertesa i interacció observables definits. | [26 — recursos del Sistema Solar](../pendent/pas26-recursos-sistema-solar.md) |
 | [Cometes](cometes.md) | Catàleg, actualització orbital, esdeveniments i model observable. | Font/versionat, propagació, UI i toleràncies resolts. | [22 — observables](../pendent/pas22-trajectories-visibilitat.md), [32 — efemèrides](../pendent/pas32-motor-efemerides.md) |

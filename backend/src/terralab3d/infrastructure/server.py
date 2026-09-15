@@ -50,7 +50,8 @@ class TerraLabServer:
 
     @property
     def url(self) -> str:
-        return f"http://{self._host}:{self._actual_port}"
+        advertised_host = "127.0.0.1" if self._host in {"0.0.0.0", "::"} else self._host
+        return f"http://{advertised_host}:{self._actual_port}"
 
     @property
     def actual_port(self) -> int:

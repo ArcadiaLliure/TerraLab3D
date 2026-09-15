@@ -188,6 +188,10 @@ export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
   private lastMagnitudeLimit = 6.0;
   private startUtcMs: number | null = null;
   private currentSimUtcMs: number | null = null;
+  private explicitSessionActive = false;
+  private cameraPreviewEnabled = false;
+  private cameraPreviewExposureSeconds = 2.0;
+  private cameraPreviewMagnitudeLimit = 8.0;
 
   private linesGeometry: THREE.InstancedBufferGeometry | null = null;
   private linesMaterial: THREE.ShaderMaterial | null = null;
@@ -256,9 +260,13 @@ export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
 
   public applySnapshot(payload: StarTrailsComponentPayload): void {
     if (!payload.sessionId || payload.state === "idle") {
+      this.explicitSessionActive = false;
       this.clearSession();
+      this.restoreCameraPreview();
       return;
     }
+
+    this.explicitSessionActive = true;
 
     const sessionChanged = this.activeSessionId !== payload.sessionId;
     const magnitudeChanged = this.lastMagnitudeLimit !== payload.magnitudeLimit;
@@ -291,6 +299,21 @@ export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
     this.currentSimUtcMs = parseUtcMs(isoUtc);
   }
 
+  /** Ownership formal: explicitSession > cameraPreview > none. */
+  public setCameraPreview(enabled: boolean, exposureSeconds: number, magnitudeLimit: number): void {
+    const normalizedExposure = finiteNonNegative(exposureSeconds, 2.0);
+    const changed = this.cameraPreviewEnabled !== enabled
+      || this.cameraPreviewExposureSeconds !== normalizedExposure
+      || this.cameraPreviewMagnitudeLimit !== magnitudeLimit;
+    this.cameraPreviewEnabled = enabled;
+    this.cameraPreviewExposureSeconds = normalizedExposure;
+    this.cameraPreviewMagnitudeLimit = magnitudeLimit;
+    if (!changed) return;
+    if (this.explicitSessionActive) return;
+    this.clearSession();
+    this.restoreCameraPreview();
+  }
+
   public update(_timestampMs: number): void {
     if (this.state === "idle") return;
 
@@ -318,6 +341,8 @@ export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
   }
 
   public dispose(): void {
+    this.cameraPreviewEnabled = false;
+    this.explicitSessionActive = false;
     this.clearSession();
     this.rootGroup.removeFromParent();
   }
@@ -330,6 +355,18 @@ export class StarTrailLayerRendererImpl implements StarTrailLayerRenderer {
     this.sourceResourceKey = null;
     this.releaseGeometry();
     this.starCatalog.setTrailSuppressed(false);
+  }
+
+  private restoreCameraPreview(): void {
+    if (!this.cameraPreviewEnabled || this.explicitSessionActive) return;
+    this.activeSessionId = "camera-preview";
+    this.state = "camera_preview";
+    this.durationSeconds = Math.max(0.001, this.cameraPreviewExposureSeconds);
+    this.accumulatedExposureSeconds = this.durationSeconds;
+    this.lastMagnitudeLimit = this.cameraPreviewMagnitudeLimit;
+    this.rebuildGeometry();
+    this.updateUniforms();
+    this.syncStarFieldSuppression();
   }
 
   private rebuildGeometry(): void {

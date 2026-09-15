@@ -20,12 +20,13 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 | Via Làctia i cel profund | [Passos 10–11](README.md#passos-completats) | Planck/galàctic i catàleg OpenNGC renderitzats. |
 | Traces circumpolars | [Pas 14](completat/pas14.md) | Exposició temporal i renderer incremental. |
 | Horitzó i terreny | [Passos 15–16](README.md#passos-completats) | DEM local, perfil/oclusió, malla retinguda, tiles, LOD i picking. |
+| Òptica i observació instrumental | [`ObservationModeController.ts`](../frontend/src/application/ObservationModeController.ts), [`observation_coordinator.py`](../backend/src/terralab3d/application/observation_coordinator.py) i [Pas 19](completat/pas19-modes-optics.md) | Modes `eye/camera/telescope`, overlays retinguts, fotometria V1, perfils persistents, GoTo i Gaia profunda cancel·lable. |
 
 ## Capacitats parcials
 
 | Capacitat | Implementació observable actual | Què no s'ha de donar per fet | Pla |
 |---|---|---|---|
-| Superfície categòrica | [`land_cover_coordinator.py`](../backend/src/terralab3d/application/land_cover_coordinator.py), adaptadors raster i [`LandCoverTextureManager.ts`](../frontend/src/view/three/terrain/LandCoverTextureManager.ts) | Estils de producte i refinament visual/semàntic complet. | [17](pendent/pas17-superficie-progressiva.md), [29](pendent/pas29-superficie-semantica.md) |
+| Superfície categòrica | [`land_cover_coordinator.py`](../backend/src/terralab3d/application/land_cover_coordinator.py), adaptadors raster i [`LandCoverTextureManager.ts`](../frontend/src/view/three/terrain/LandCoverTextureManager.ts) | El refinament visual/semàntic avançat queda consolidat al Pas 29. | [17](completat/pas17-superficie-progressiva.md), [29](pendent/pas29-superficie-semantica.md) |
 | Trajectòries i visibilitat | [`apparent_trajectory.py`](../backend/src/terralab3d/application/apparent_trajectory.py) i horitzó del pas 15 | Contracte observable general i creuaments de l'horitzó real per totes les famílies. | [22](pendent/pas22-trajectories-visibilitat.md) |
 | Recursos i descàrregues | [`download_manager.py`](../backend/src/terralab3d/infrastructure/resources/download_manager.py), instal·lacions, catàleg i [`ResourceManager.ts`](../frontend/src/application/ResourceManager.ts) | Reanudació/persistència integral, verificació atòmica i recuperació completa. | [24](pendent/pas24-cataleg-recursos-descarregues.md) |
 | Vistes de recursos | Catàlegs, renderers del Sistema Solar/espai profund i modal genèric | Navegadors jeràrquic solar i carta all-sky especialitzada. | [26](pendent/pas26-recursos-sistema-solar.md), [27](pendent/pas27-recursos-espai-profund.md) |
@@ -37,9 +38,7 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 | Capacitat | Fronteres ja presents | Implementació que falta | Pla |
 |---|---|---|---|
 | Meteorologia | [`domain/climate/`](../backend/src/terralab3d/domain/climate/) i [`WeatherLayerRenderer.ts`](../frontend/src/view/three/layers/WeatherLayerRenderer.ts) | Abast de producte, autoritat temporal, proveïdor, fallback, efectes, UI i lifecycle. | [Dossier per madurar](idees-per-madurar/meteorologia.md) |
-| Òptica i observació instrumental | [`domain/optics/`](../backend/src/terralab3d/domain/optics/) i [`ScopeLayerRenderer.ts`](../frontend/src/view/three/layers/ScopeLayerRenderer.ts) | Coordinació, modes, geometria/HUD, Gaia cancel·lable, UI i persistència. | [19](pendent/pas19-modes-optics.md) |
-| Simulació fotogràfica | [`domain/imaging/`](../backend/src/terralab3d/domain/imaging/) i [`ImagingPreviewLayerRenderer.ts`](../frontend/src/view/three/layers/ImagingPreviewLayerRenderer.ts) | Senyal/soroll integrats, controls, tracking, traces i exportació completa (integrat a l'observació instrumental de l'antic Pas 20). | [19](pendent/pas19-modes-optics.md) |
-| Mesures | [`domain/measurements/`](../backend/src/terralab3d/domain/measurements/) i [`MeasurementLayerRenderer.ts`](../frontend/src/view/three/layers/MeasurementLayerRenderer.ts) | Gestos, càlculs finals, edició, historial, batches i persistència. | [21](pendent/pas21-eines-mesura.md) |
+| Mesures | [`domain/measurements/`](../backend/src/terralab3d/domain/measurements/), [`MeasurementCoordinator`](../backend/src/terralab3d/application/measurement_coordinator.py) i [`MeasurementLayerRenderer.ts`](../frontend/src/view/three/layers/MeasurementLayerRenderer.ts) | Observable: quatre eines esfèriques editables, historial, batches retinguts, labels i persistència versionada. | [21](completat/pas21-eines-mesura.md) |
 | Constel·lacions | [`domain/constellations/`](../backend/src/terralab3d/domain/constellations/) i [`ConstellationLayerRenderer.ts`](../frontend/src/view/three/layers/ConstellationLayerRenderer.ts) | Catàleg oficial, document d'usuari, observable, edició, snapping i persistència. | [23](pendent/pas23-constellacions.md) |
 | Capes | [`domain/layers/`](../backend/src/terralab3d/domain/layers/) i casos d'ús inicials | Contracte Cel/Terra, AOI, separació d'estats, UI comuna i preferències. | [25](pendent/pas25-gestor-capes.md) |
 

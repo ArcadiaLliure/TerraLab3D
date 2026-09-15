@@ -27,6 +27,21 @@ import type {
   HorizonProfileSettingsMessage,
   HorizonStatusMessage,
 } from "./horizon_contracts";
+import type {
+  CameraProfileMessage,
+  CancelCameraDepthMessage,
+  ConfigureCameraMessage,
+  ConfigureTelescopeMessage,
+  ObservationErrorMessage,
+  ObservationSnapshotMessage,
+  RequestCameraDepthMessage,
+  SetObservationModeMessage,
+} from "./observation_contracts";
+import type {
+  MeasurementCommandMessage,
+  MeasurementDocumentSnapshot,
+  MeasurementErrorMessage,
+} from "./measurement_contracts";
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
@@ -421,7 +436,14 @@ export type FrontendMessage =
   | ClearStarTrailsMessage
   | HorizonProfileSettingsMessage
   | RecalculateHorizonMessage
-  | CancelHorizonMessage;
+  | CancelHorizonMessage
+  | SetObservationModeMessage
+  | ConfigureCameraMessage
+  | ConfigureTelescopeMessage
+  | CameraProfileMessage
+  | RequestCameraDepthMessage
+  | CancelCameraDepthMessage
+  | MeasurementCommandMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -656,7 +678,11 @@ export type BackendMessage =
   | StarTrailsSnapshotMessage
   | HorizonStatusMessage
   | SurfaceProgressMessage
-  | LandCoverLegendMessage;
+  | LandCoverLegendMessage
+  | ObservationSnapshotMessage
+  | ObservationErrorMessage
+  | MeasurementDocumentSnapshot
+  | MeasurementErrorMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

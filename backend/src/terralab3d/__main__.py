@@ -106,6 +106,19 @@ async def run() -> int:
 
     # ── 2. Crear pont i servidor ──────────────────────────────────────
     bridge = WebSocketBridge()
+    from terralab3d.application.observation_coordinator import ObservationCoordinator
+    from terralab3d.application.measurement_coordinator import MeasurementCoordinator
+    from terralab3d.domain.optics.calculations import OpticalValidationError
+    from terralab3d.domain.measurements.calculations import MeasurementValidationError
+    from terralab3d.domain.optics.models import DeepCatalogStatus
+    from terralab3d.infrastructure.adapters.persistence.adapter import AtomicTextPreferencesAdapter
+
+    observation_coordinator = ObservationCoordinator(
+        AtomicTextPreferencesAdapter(), bridge.send,
+    )
+    measurement_coordinator = MeasurementCoordinator(
+        AtomicTextPreferencesAdapter(), bridge.send,
+    )
     moon_surface_assets = ManagedMoonSurfaceAssets()
     solar_system_assets = ManagedSolarSystemAssets()
     resource_catalog = LayerDatabase()
@@ -1011,6 +1024,145 @@ async def run() -> int:
         status_publisher=bridge.send_star_catalog_status,
         transform_publisher=bridge.send_celestial_frame_transform,
     )
+    deep_query_task: asyncio.Task[None] | None = None
+
+    async def _send_observation_error(data: dict[str, Any], exc: Exception) -> None:
+        await bridge.send({
+            "type": "observation_error",
+            "requestedRevision": int(data.get("observationRevision", -1)),
+            "field": getattr(exc, "field", None),
+            "message": str(exc),
+        })
+
+    def _require_next_observation_revision(data: dict[str, Any]) -> None:
+        requested = int(data.get("observationRevision", -1))
+        expected = observation_coordinator.observation_revision + 1
+        if requested != expected:
+            raise OpticalValidationError(
+                "observationRevision",
+                f"revisió instrumental obsoleta: esperada {expected}, rebuda {requested}",
+            )
+
+    async def _handle_set_observation_mode(data: dict[str, Any]) -> None:
+        try:
+            _require_next_observation_revision(data)
+            star_coordinator.cancel_deep_catalog(0)
+            await observation_coordinator.set_mode(str(data.get("mode", "")))
+        except (ValueError, OpticalValidationError) as exc:
+            await _send_observation_error(data, exc)
+
+    async def _handle_configure_camera(data: dict[str, Any]) -> None:
+        try:
+            _require_next_observation_revision(data)
+            star_coordinator.cancel_deep_catalog(0)
+            await observation_coordinator.configure_camera(data)
+        except (ValueError, KeyError, TypeError, OpticalValidationError) as exc:
+            await _send_observation_error(data, exc)
+
+    async def _handle_configure_telescope(data: dict[str, Any]) -> None:
+        try:
+            _require_next_observation_revision(data)
+            star_coordinator.cancel_deep_catalog(0)
+            await observation_coordinator.configure_telescope(data)
+        except (ValueError, KeyError, TypeError, OpticalValidationError) as exc:
+            await _send_observation_error(data, exc)
+
+    async def _handle_camera_profile(data: dict[str, Any]) -> None:
+        try:
+            _require_next_observation_revision(data)
+            star_coordinator.cancel_deep_catalog(0)
+            action = str(data.get("action", ""))
+            if action == "create":
+                await observation_coordinator.create_profile(data)
+            elif action == "update":
+                await observation_coordinator.update_profile(str(data.get("profileId", "")), data)
+            elif action == "delete":
+                await observation_coordinator.delete_profile(str(data.get("profileId", "")))
+            else:
+                raise OpticalValidationError("action", "acció de perfil desconeguda")
+        except (ValueError, KeyError, TypeError, OpticalValidationError) as exc:
+            await _send_observation_error(data, exc)
+
+    async def _handle_request_camera_depth(data: dict[str, Any]) -> None:
+        nonlocal deep_query_task
+        revision = int(data.get("deepQueryRevision", 0))
+        requested_observation_revision = int(data.get("observationRevision", -1))
+        authoritative = observation_coordinator.snapshot
+        if (
+            requested_observation_revision != observation_coordinator.observation_revision
+            or authoritative.mode.value != "camera"
+            or authoritative.field is None
+            or authoritative.photographic_preview is None
+        ):
+            return
+        star_coordinator.cancel_deep_catalog(revision)
+        if deep_query_task is not None and not deep_query_task.done():
+            deep_query_task.cancel()
+
+        async def execute() -> None:
+            try:
+                await observation_coordinator.set_deep_status(DeepCatalogStatus(
+                    state="loading", deep_query_revision=revision,
+                ))
+                result = await star_coordinator.request_deep_catalog(
+                    deep_query_revision=revision,
+                    ra_deg=float(data["raDeg"]),
+                    dec_deg=float(data["decDeg"]),
+                    radius_deg=float(authoritative.field.diagonal_deg or authoritative.field.width_deg) * 0.55,
+                    photometric_limit=authoritative.photographic_preview.estimated_limit_magnitude,
+                )
+                if result["state"] != "cancelled":
+                    await observation_coordinator.set_deep_status(DeepCatalogStatus(
+                        state=str(result["state"]),
+                        deep_query_revision=revision,
+                        selected_star_count=int(result["selectedStarCount"]),
+                        truncated=bool(result["truncated"]),
+                        message=result.get("message"),
+                    ))
+            except asyncio.CancelledError:
+                return
+            except (ValueError, KeyError, TypeError) as exc:
+                await _send_observation_error(data, exc)
+
+        deep_query_task = asyncio.create_task(execute(), name=f"gaia-deep-{revision}")
+
+    async def _handle_cancel_camera_depth(data: dict[str, Any]) -> None:
+        nonlocal deep_query_task
+        revision = int(data.get("deepQueryRevision", 0))
+        star_coordinator.cancel_deep_catalog(revision)
+        if deep_query_task is not None and not deep_query_task.done():
+            deep_query_task.cancel()
+        deep_query_task = None
+        await observation_coordinator.set_deep_status(DeepCatalogStatus(
+            state="idle", deep_query_revision=revision,
+        ))
+
+    bridge.on("set_observation_mode", _handle_set_observation_mode)
+    bridge.on("configure_camera", _handle_configure_camera)
+    bridge.on("configure_telescope", _handle_configure_telescope)
+    bridge.on("camera_profile", _handle_camera_profile)
+    bridge.on("request_camera_depth", _handle_request_camera_depth)
+    bridge.on("cancel_camera_depth", _handle_cancel_camera_depth)
+
+    async def _handle_measurement_command(data: dict[str, Any]) -> None:
+        try:
+            requested = int(data.get("measurementRevision", -1))
+            expected = measurement_coordinator.revision + 1
+            if requested != expected:
+                raise MeasurementValidationError(
+                    "measurementRevision",
+                    f"revisió de mesures obsoleta: esperada {expected}, rebuda {requested}",
+                )
+            await measurement_coordinator.apply(data)
+        except (ValueError, KeyError, TypeError, MeasurementValidationError) as exc:
+            await bridge.send({
+                "type": "measurement_error",
+                "requestedRevision": int(data.get("measurementRevision", -1)),
+                "field": getattr(exc, "field", None),
+                "message": str(exc),
+            })
+
+    bridge.on("measurement_command", _handle_measurement_command)
 
     async def _handle_resolve_star_pick(data: dict[str, Any]) -> None:
         try:
@@ -1054,6 +1206,8 @@ async def run() -> int:
         else:
             await horizon_coordinator.publish_active()
         await broadcast_location()
+        await observation_coordinator.publish_current()
+        await measurement_coordinator.publish_current()
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
         await bridge.send_planet_texture_manifest(solar_system_assets.descriptor)
         await bridge.send_satellite_catalog_manifest(solar_system_assets.descriptor)
@@ -1650,6 +1804,12 @@ async def run() -> int:
                 solar_disc_transmission=solar_transmission,
                 sky_eclipse_dimming_factor=sky_dimming,
             )
+            environment_changed = await observation_coordinator.update_environment(
+                sky.visibility.extinction_coefficient,
+                sky.visibility.zenith_magnitude_limit,
+            )
+            if environment_changed:
+                star_coordinator.cancel_deep_catalog(0)
             await bridge.send_sky_environment_snapshot(sky)
             await bridge.send_lighting_environment_snapshot(
                 lighting_composer.compose(
@@ -2060,6 +2220,13 @@ async def run() -> int:
         log.debug("Mètriques Pas 9 trajectòries: %s", trajectory_coordinator.metrics())
         
     await deep_sky_coordinator.shutdown()
+    if deep_query_task is not None and not deep_query_task.done():
+        deep_query_task.cancel()
+        try:
+            await deep_query_task
+        except asyncio.CancelledError:
+            pass
+    await star_coordinator.shutdown()
 
     if bridge.connected:
         await bridge.request_shutdown()

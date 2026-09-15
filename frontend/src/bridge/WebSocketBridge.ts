@@ -42,6 +42,19 @@ import type {
   SolarSystemSnapshot,
 } from "../contracts/solar_system_contracts";
 import type { TemporalSceneState } from "../contracts/temporal_scene_contracts";
+import type {
+  CameraCaptureSnapshot,
+  CameraProfileMessage,
+  ObservationErrorMessage,
+  ObservationMode,
+  ObservationSnapshotMessage,
+  TelescopeSnapshot,
+} from "../contracts/observation_contracts";
+import type {
+  MeasurementCommandMessage,
+  MeasurementDocumentSnapshot,
+  MeasurementErrorMessage,
+} from "../contracts/measurement_contracts";
 
 export type BridgeState = "connecting" | "connected" | "disconnected" | "error";
 
@@ -119,6 +132,10 @@ export interface BackendMessageListener {
   onAstronomicalSearchResult?(msg: import("../contracts/bridge_messages").AstronomicalSearchResultMessage): void;
   onStarTrailsSnapshot?(snapshot: import("../contracts/bridge_messages").StarTrailsSnapshotMessage): void;
   onHorizonStatus?(status: HorizonStatusMessage): void;
+  onObservationSnapshot?(snapshot: ObservationSnapshotMessage): void;
+  onObservationError?(error: ObservationErrorMessage): void;
+  onMeasurementSnapshot?(snapshot: MeasurementDocumentSnapshot): void;
+  onMeasurementError?(error: MeasurementErrorMessage): void;
 }
 
 export class WebSocketBridge {
@@ -518,6 +535,18 @@ export class WebSocketBridge {
           l.onLandCoverLegend?.(msg);
         }
         break;
+      case "observation_snapshot":
+        for (const l of this.messageListeners) l.onObservationSnapshot?.(msg);
+        break;
+      case "observation_error":
+        for (const l of this.messageListeners) l.onObservationError?.(msg);
+        break;
+      case "measurement_snapshot":
+        for (const l of this.messageListeners) l.onMeasurementSnapshot?.(msg);
+        break;
+      case "measurement_error":
+        for (const l of this.messageListeners) l.onMeasurementError?.(msg);
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -535,6 +564,41 @@ export class WebSocketBridge {
       type: "set_realtime_mode",
       enabled
     });
+  }
+
+  public setObservationMode(mode: ObservationMode, observationRevision: number): void {
+    this.sendMessage({ type: "set_observation_mode", mode, observationRevision });
+  }
+
+  public configureCamera(camera: CameraCaptureSnapshot, observationRevision: number): void {
+    this.sendMessage({ type: "configure_camera", observationRevision, ...camera });
+  }
+
+  public configureTelescope(telescope: TelescopeSnapshot, observationRevision: number): void {
+    this.sendMessage({ type: "configure_telescope", observationRevision, ...telescope });
+  }
+
+  public mutateCameraProfile(message: Omit<CameraProfileMessage, "type">): void {
+    this.sendMessage({ type: "camera_profile", ...message });
+  }
+
+  public requestCameraDepth(request: {
+    observationRevision: number;
+    deepQueryRevision: number;
+    raDeg: number;
+    decDeg: number;
+    radiusDeg: number;
+    photometricLimit: number;
+  }): void {
+    this.sendMessage({ type: "request_camera_depth", ...request });
+  }
+
+  public cancelCameraDepth(deepQueryRevision: number): void {
+    this.sendMessage({ type: "cancel_camera_depth", deepQueryRevision });
+  }
+
+  public sendMeasurementCommand(message: Omit<MeasurementCommandMessage, "type">): void {
+    this.sendMessage({ type: "measurement_command", ...message });
   }
 
   public sendSetTimePlaying(enabled: boolean): void {

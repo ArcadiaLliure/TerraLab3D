@@ -1,0 +1,725 @@
+{
+  "schemaVersion": 2,
+  "layers": [
+    {
+      "id": "sky.milky_way",
+      "name": "Via Làctia",
+      "description": "Mapa profund estel·lar complet elaborat per la NASA SVS (2020).",
+      "domain": "sky",
+      "category": "deep_sky",
+      "provider": "NASA/Goddard Space Flight Center — Scientific Visualization Studio",
+      "acquisitionKind": "STATIC_FILE",
+      "citation": "Goddard Space Flight Center Scientific Visualization Studio. (2020). Deep Star Maps 2020.",
+      "license": "NASA media usage guidelines",
+      "originalSourceUrl": "https://svs.gsfc.nasa.gov/4851/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "4k",
+          "title": "4K",
+          "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/milkyway_2020_4k.exr",
+          "sourceUrls": [],
+          "format": "exr",
+          "mimeType": "image/x-exr",
+          "width": 4096,
+          "height": 2048,
+          "publishedSizeLabel": "34.7 MB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        },
+        {
+          "id": "8k",
+          "title": "8K",
+          "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/milkyway_2020_8k.exr",
+          "sourceUrls": [],
+          "format": "exr",
+          "mimeType": "image/x-exr",
+          "width": 8192,
+          "height": 4096,
+          "publishedSizeLabel": "130.9 MB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        },
+        {
+          "id": "16k",
+          "title": "16K",
+          "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/milkyway_2020_16k.exr",
+          "sourceUrls": [],
+          "format": "exr",
+          "mimeType": "image/x-exr",
+          "width": 16384,
+          "height": 8192,
+          "publishedSizeLabel": "413.9 MB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        },
+        {
+          "id": "32k",
+          "title": "32K",
+          "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/milkyway_2020_32k.exr",
+          "sourceUrls": [],
+          "format": "exr",
+          "mimeType": "image/x-exr",
+          "width": 32768,
+          "height": 16384,
+          "publishedSizeLabel": "1.4 GB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        },
+        {
+          "id": "64k",
+          "title": "64K",
+          "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004800/a004851/milkyway_2020_64k.exr",
+          "sourceUrls": [],
+          "format": "exr",
+          "mimeType": "image/x-exr",
+          "width": 65536,
+          "height": 32768,
+          "publishedSizeLabel": "3.7 GB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [
+        "NASA/Goddard Space Flight Center",
+        "Scientific Visualization Studio",
+        "Deep Star Maps 2020 — SVS ID 4851"
+      ],
+      "dependencies": [],
+      "metadata": {
+        "coordinateFrame": "ICRF/J2000",
+        "projection": "plate-carree/equirectangular",
+        "raAtHorizontalCenterHours": 0.0,
+        "raIncreases": "left",
+        "declinationIncreases": "up",
+        "containsBrightHipparcosTychoStars": false
+      }
+    },
+    {
+      "id": "sky.planck_dust",
+      "name": "Pols Planck",
+      "description": "Model d'opacitat de pols GNILC de Planck (2015).",
+      "domain": "sky",
+      "category": "deep_sky",
+      "provider": "Planck Legacy Archive / NASA-IPAC IRSA",
+      "acquisitionKind": "STATIC_FILE",
+      "citation": "Planck Collaboration (2016). Planck 2015 results. X. Dust GNILC model opacity.",
+      "license": "ESA/Planck",
+      "originalSourceUrl": "https://irsa.ipac.caltech.edu/data/Planck/release_2/all-sky-maps/previews/COM_CompMap_Dust-GNILC-Model-Opacity_2048_R2.01/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "r2.01",
+          "title": "GNILC τ353 R2.01",
+          "sourceUrl": "https://irsa.ipac.caltech.edu/data/Planck/release_2/all-sky-maps/maps/component-maps/foregrounds/COM_CompMap_Dust-GNILC-Model-Opacity_2048_R2.01.fits",
+          "sourceUrls": [],
+          "format": "fits",
+          "mimeType": "application/fits",
+          "width": 3600,
+          "height": 1800,
+          "publishedSizeLabel": "~385 MB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [
+        "Planck Collaboration",
+        "NASA/IPAC Infrared Science Archive"
+      ],
+      "dependencies": [],
+      "metadata": {
+        "coordinateFrame": "GALACTIC",
+        "projection": "HEALPix",
+        "field": "TAU353"
+      }
+    },
+    {
+      "id": "sky.ngc",
+      "name": "Catàleg NGC",
+      "description": "OpenNGC: Base de dades d'objectes NGC i IC.",
+      "domain": "sky",
+      "category": "deep_sky",
+      "provider": "OpenNGC",
+      "acquisitionKind": "STATIC_FILE",
+      "citation": "Verga, M. (2023). OpenNGC: A database of NGC and IC objects.",
+      "license": "CC BY-SA 4.0",
+      "originalSourceUrl": "https://github.com/mattiaverga/OpenNGC",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "pinned",
+          "title": "OpenNGC (da90466)",
+          "sourceUrl": "https://raw.githubusercontent.com/mattiaverga/OpenNGC/da90466031b0372c896588b85be6016c617e205b/database_files/NGC.csv",
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [
+        "Mattia Verga",
+        "OpenNGC Contributors"
+      ],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "sky.stars.full",
+      "name": "Catàleg d'Estrelles Gaia",
+      "description": "Gaia Data Release 3. Conté milions de posicions estel·lars.",
+      "domain": "sky",
+      "category": "deep_sky",
+      "provider": "ESA / Gaia",
+      "acquisitionKind": "TAP_QUERY",
+      "citation": "Gaia Collaboration et al. (2023). Gaia Data Release 3. Summary of the content and survey properties.",
+      "license": "ESA/Gaia",
+      "originalSourceUrl": "https://gea.esac.esa.int/archive/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "dr3",
+          "title": "Gaia DR3",
+          "sourceUrl": null,
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [
+        "ESA/Gaia/DPAC"
+      ],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "earth.elevation.copernicus",
+      "name": "Copernicus DEM GLO-30",
+      "description": "Model d'elevació digital global a 30m de resolució.",
+      "domain": "earth",
+      "category": "elevation",
+      "provider": "Copernicus Data Space Ecosystem",
+      "acquisitionKind": "PARAMETRIC_DOWNLOAD",
+      "citation": "Copernicus DEM GLO-30. (2020). European Space Agency. DOI: 10.5270/ESA-c5d3d65",
+      "license": "Free and Open",
+      "originalSourceUrl": "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-dem",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "glo-30",
+          "title": "GLO-30 (30m)",
+          "sourceUrl": null,
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [
+        "© European Union",
+        "Copernicus Space Component"
+      ],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "earth.land_cover.copernicus",
+      "name": "Global Dynamic Land Cover",
+      "description": "Cobertura del sòl dinàmica a nivell global amb resolució de 100m.",
+      "domain": "earth",
+      "category": "land_cover",
+      "provider": "Copernicus Global Land Service",
+      "acquisitionKind": "PARAMETRIC_DOWNLOAD",
+      "citation": "Buchhorn, M. et al. (2020). Copernicus Global Land Cover Layers—Collection 2.",
+      "license": "Free and open access",
+      "originalSourceUrl": "https://land.copernicus.eu/global/products/lc",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "100m-2019",
+          "title": "100m - 2019",
+          "sourceUrl": null,
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [
+        "© European Union",
+        "Copernicus Land Monitoring Service"
+      ],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "solar.core.ephemeris",
+      "name": "Efemèrides Planetàries (SPK)",
+      "description": "Famílies de kernels (DE440s, DE421) per al càlcul de la posició dels planetes i la Lluna.",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "Acton, C. H. (1996). Ancillary data services of NASA's Navigation and Ancillary Information Facility.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "de440s",
+          "title": "Família DE440s",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~31.2 MiB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        },
+        {
+          "id": "de421",
+          "title": "Família DE421",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/a_old_versions/de421.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~17 MiB",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "solar.core.constants",
+      "name": "Constants i Temps (PCK/LSK)",
+      "description": "Lleis d'orientació, radis planetaris (PCK) i segons intercalars (LSK).",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "NASA / JPL NAIF.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "constants_default",
+          "title": "PCK i LSK per defecte",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/pck00011.tpc",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/earth_latest_high_prec.bpc",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/lsk/naif0012.tls",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/moon_pa_de421_1900-2050.bpc"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "Mida desconeguda",
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "solar.satellites.mars",
+      "name": "Satèl·lits de Mart",
+      "description": "Efemèrides dels satèl·lits marcians (mar099s).",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "NASA / JPL NAIF. Mars Satellite Ephemerides.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "mar099s",
+          "title": "mar099s",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/mar099s.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~64 MiB",
+          "expectedBytes": 67594240,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [
+        "solar.core.ephemeris"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "solar.satellites.jupiter",
+      "name": "Satèl·lits de Júpiter",
+      "description": "Efemèrides dels satèl·lits jovians (jup365, jup347-349).",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "NASA / JPL NAIF. Jupiter Jovian Satellite Ephemerides.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "default",
+          "title": "Catàleg Jup365 + 347/348/349",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/jup365.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/jup347.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/jup348.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/jup349.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~2.06 GiB",
+          "expectedBytes": 2215238656,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [
+        "solar.core.ephemeris"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "solar.satellites.saturn",
+      "name": "Satèl·lits de Saturn",
+      "description": "Efemèrides dels satèl·lits saturnians (sat441, sat415, etc.).",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "NASA / JPL NAIF. Saturn Satellite Ephemerides.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "default",
+          "title": "Kernels SAT (Múltiples)",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat393_daphnis.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat415.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat441.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat455.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat456.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat457.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat459.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/sat480.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~1.8 GiB",
+          "expectedBytes": 1994689536,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [
+        "solar.core.ephemeris"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "solar.satellites.uranus",
+      "name": "Satèl·lits d'Urà",
+      "description": "Efemèrides dels satèl·lits uranians (ura184).",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "NASA / JPL NAIF. Uranus Satellite Ephemerides.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "ura184",
+          "title": "ura184 (1, 2, 3)",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/ura184_part-1.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/ura184_part-2.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/ura184_part-3.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~4.3 GiB",
+          "expectedBytes": 4511944704,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [
+        "solar.core.ephemeris"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "solar.satellites.neptune",
+      "name": "Satèl·lits de Neptú",
+      "description": "Efemèrides dels satèl·lits neptunians (nep098, nep104, nep105).",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "NASA / JPL NAIF. Neptune Satellite Ephemerides.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "default",
+          "title": "Kernels NEP (Múltiples)",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/nep098_part-1.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/nep098_part-2.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/nep098_part-3.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/nep104.bsp",
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/nep105.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~4.6 GiB",
+          "expectedBytes": 4949300224,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [
+        "solar.core.ephemeris"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "solar.satellites.pluto",
+      "name": "Satèl·lits de Plutó",
+      "description": "Efemèrides dels satèl·lits plutonians (plu060).",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "NASA / JPL NAIF",
+      "acquisitionKind": "HTTP_BUNDLE",
+      "citation": "NASA / JPL NAIF. Pluto Satellite Ephemerides.",
+      "license": "NASA Public Domain",
+      "originalSourceUrl": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "plu060",
+          "title": "plu060",
+          "sourceUrl": null,
+          "sourceUrls": [
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/satellites/plu060.bsp"
+          ],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": "~129 MiB",
+          "expectedBytes": 135207936,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [
+        "solar.core.ephemeris"
+      ],
+      "metadata": {}
+    },
+    {
+      "id": "solar.saturn.rings",
+      "name": "Anells de Saturn",
+      "description": "Textura d'alta resolució dels anells de Saturn.",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "Solar System Scope",
+      "acquisitionKind": "STATIC_FILE",
+      "citation": "Solar System Scope. High Resolution Planet Textures.",
+      "license": "CC BY 4.0",
+      "originalSourceUrl": "https://www.solarsystemscope.com/textures/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "2k",
+          "title": "2K",
+          "sourceUrl": "https://www.solarsystemscope.com/textures/download/2k_saturn_ring_alpha.png",
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        },
+        {
+          "id": "8k",
+          "title": "8K",
+          "sourceUrl": "https://www.solarsystemscope.com/textures/download/8k_saturn_ring_alpha.png",
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "solar.moon.surface",
+      "name": "Superfície de la Lluna",
+      "description": "Textura d'alta resolució de la Lluna.",
+      "domain": "sky",
+      "category": "solar_system",
+      "provider": "Solar System Scope",
+      "acquisitionKind": "STATIC_FILE",
+      "citation": "Solar System Scope. High Resolution Planet Textures.",
+      "license": "CC BY 4.0",
+      "originalSourceUrl": "https://www.solarsystemscope.com/textures/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "2k",
+          "title": "2K",
+          "sourceUrl": "https://www.solarsystemscope.com/textures/download/2k_moon.jpg",
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        },
+        {
+          "id": "8k",
+          "title": "8K",
+          "sourceUrl": "https://www.solarsystemscope.com/textures/download/8k_moon.jpg",
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [],
+      "metadata": {}
+    },
+    {
+      "id": "earth.light_pollution.dvnl",
+      "name": "Earth Observation Group DVNL",
+      "description": "Mapa global VIIRS de llum nocturna (2020).",
+      "domain": "earth",
+      "category": "light_pollution",
+      "provider": "Earth Observation Group (EOG)",
+      "acquisitionKind": "STATIC_FILE",
+      "citation": "Elvidge, C. D. et al. (2021). A global VIIRS nighttime light map.",
+      "license": "Open Data",
+      "originalSourceUrl": "https://eogdata.mines.edu/products/vnl/",
+      "directUrl": null,
+      "variants": [
+        {
+          "id": "2020",
+          "title": "VNL V2 2020",
+          "sourceUrl": "https://eogdata.mines.edu/nighttime_light/annual/v21/2020/VNL_v21_npp_2020_global_vcmslcfg_c202102150000.average_masked.tif.gz",
+          "sourceUrls": [],
+          "format": null,
+          "mimeType": null,
+          "width": null,
+          "height": null,
+          "publishedSizeLabel": null,
+          "expectedBytes": null,
+          "checksum": null,
+          "metadata": {}
+        }
+      ],
+      "credits": [],
+      "dependencies": [],
+      "metadata": {}
+    }
+  ]
+}

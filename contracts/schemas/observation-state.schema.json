@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terralab3d.local/schemas/observation-state.schema.json",
+  "title": "TerraLab3D observation snapshot v1",
+  "type": "object",
+  "required": ["type", "schemaVersion", "observationRevision", "mode", "cameraProfiles", "camera", "telescope", "field", "metrics", "photographicPreview", "deepCatalog", "warning"],
+  "properties": {
+    "type": { "const": "observation_snapshot" },
+    "schemaVersion": { "const": 1 },
+    "observationRevision": { "type": "integer", "minimum": 0 },
+    "mode": { "enum": ["eye", "camera", "telescope"] },
+    "cameraProfiles": { "type": "array", "items": { "$ref": "#/$defs/cameraProfile" } },
+    "camera": { "$ref": "#/$defs/camera" },
+    "telescope": { "$ref": "#/$defs/telescope" },
+    "field": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/field" }] },
+    "metrics": { "$ref": "#/$defs/metrics" },
+    "photographicPreview": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/photographicPreview" }] },
+    "deepCatalog": { "$ref": "#/$defs/deepCatalog" },
+    "warning": { "type": ["string", "null"] }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "positive": { "type": "number", "exclusiveMinimum": 0 },
+    "optionalPositive": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/positive" }] },
+    "optionalTransmission": { "oneOf": [{ "type": "null" }, { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }] },
+    "sensor": {
+      "type": "object",
+      "required": ["key", "widthMm", "heightMm", "resolutionWidthPx", "resolutionHeightPx", "squarePixels", "pixelPitchUm", "pixelPitchXUm", "pixelPitchYUm"],
+      "properties": {
+        "key": { "type": "string", "minLength": 1 },
+        "widthMm": { "$ref": "#/$defs/positive" },
+        "heightMm": { "$ref": "#/$defs/positive" },
+        "resolutionWidthPx": { "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 1 }] },
+        "resolutionHeightPx": { "oneOf": [{ "type": "null" }, { "type": "integer", "minimum": 1 }] },
+        "squarePixels": { "type": "boolean" },
+        "pixelPitchUm": { "$ref": "#/$defs/optionalPositive" },
+        "pixelPitchXUm": { "$ref": "#/$defs/optionalPositive" },
+        "pixelPitchYUm": { "$ref": "#/$defs/optionalPositive" }
+      },
+      "additionalProperties": false
+    },
+    "cameraProfile": {
+      "type": "object",
+      "required": ["profileId", "name", "sensor", "builtIn"],
+      "properties": {
+        "profileId": { "type": "string", "pattern": "^camera:" },
+        "name": { "type": "string", "minLength": 1 },
+        "sensor": { "$ref": "#/$defs/sensor" },
+        "builtIn": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "camera": {
+      "type": "object",
+      "required": ["selectedProfileId", "focalLengthMm", "fNumber", "iso", "exposureSeconds", "trackingEnabled", "opticalTransmission"],
+      "properties": {
+        "selectedProfileId": { "type": "string", "pattern": "^camera:" },
+        "focalLengthMm": { "$ref": "#/$defs/positive" },
+        "fNumber": { "$ref": "#/$defs/positive" },
+        "iso": { "$ref": "#/$defs/positive" },
+        "exposureSeconds": { "$ref": "#/$defs/positive" },
+        "trackingEnabled": { "type": "boolean" },
+        "opticalTransmission": { "$ref": "#/$defs/optionalTransmission" }
+      },
+      "additionalProperties": false
+    },
+    "telescope": {
+      "type": "object",
+      "required": ["focalLengthMm", "apertureDiameterMm", "eyepieceFocalLengthMm", "eyepieceAfovDeg"],
+      "properties": {
+        "focalLengthMm": { "$ref": "#/$defs/positive" },
+        "apertureDiameterMm": { "$ref": "#/$defs/positive" },
+        "eyepieceFocalLengthMm": { "$ref": "#/$defs/positive" },
+        "eyepieceAfovDeg": { "$ref": "#/$defs/positive" }
+      },
+      "additionalProperties": false
+    },
+    "field": {
+      "type": "object",
+      "required": ["widthDeg", "heightDeg", "diagonalDeg", "aspectRatio", "solidAngleSr", "shape"],
+      "properties": {
+        "widthDeg": { "$ref": "#/$defs/positive" },
+        "heightDeg": { "$ref": "#/$defs/positive" },
+        "diagonalDeg": { "$ref": "#/$defs/optionalPositive" },
+        "aspectRatio": { "$ref": "#/$defs/optionalPositive" },
+        "solidAngleSr": { "$ref": "#/$defs/optionalPositive" },
+        "shape": { "enum": ["rectangle", "circle"] }
+      },
+      "additionalProperties": false
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["pixelScaleXArcsec", "pixelScaleYArcsec", "magnification", "exitPupilMm", "trueFovDeg"],
+      "properties": {
+        "pixelScaleXArcsec": { "$ref": "#/$defs/optionalPositive" },
+        "pixelScaleYArcsec": { "$ref": "#/$defs/optionalPositive" },
+        "magnification": { "$ref": "#/$defs/optionalPositive" },
+        "exitPupilMm": { "$ref": "#/$defs/optionalPositive" },
+        "trueFovDeg": { "$ref": "#/$defs/optionalPositive" }
+      },
+      "additionalProperties": false
+    },
+    "photographicPreview": {
+      "type": "object",
+      "required": ["modelId", "estimatedLimitMagnitude", "capturedPhotonIndex", "isoDetectionGainMagnitude", "atmosphericTransmission", "totalTransmission", "shortExposurePenaltyMagnitude", "skyPenaltyMagnitude"],
+      "properties": {
+        "modelId": { "const": "terralab.photographic-limiting-magnitude.v1" },
+        "estimatedLimitMagnitude": { "type": "number", "minimum": -12, "maximum": 22 },
+        "capturedPhotonIndex": { "$ref": "#/$defs/positive" },
+        "isoDetectionGainMagnitude": { "type": "number" },
+        "atmosphericTransmission": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "totalTransmission": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "shortExposurePenaltyMagnitude": { "type": "number", "minimum": 0 },
+        "skyPenaltyMagnitude": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "deepCatalog": {
+      "type": "object",
+      "required": ["state", "deepQueryRevision", "residentMagnitudeLimit", "selectedStarCount", "truncated", "message"],
+      "properties": {
+        "state": { "enum": ["idle", "loading", "ready", "cancelled", "unavailable", "error"] },
+        "deepQueryRevision": { "type": "integer", "minimum": 0 },
+        "residentMagnitudeLimit": { "$ref": "#/$defs/positive" },
+        "selectedStarCount": { "type": "integer", "minimum": 0, "maximum": 250000 },
+        "truncated": { "type": "boolean" },
+        "message": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    }
+  }
+}

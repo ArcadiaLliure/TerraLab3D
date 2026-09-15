@@ -18,6 +18,7 @@ Regla central:
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
 import time
@@ -94,6 +95,7 @@ class StarCoordinator:
         self._transform_generation = 0
         self._last_lat_deg: float | None = None
         self._last_lst_deg: float | None = None
+        self._active_deep_query_revision = 0
 
         self._started = False
         self._disposed = False
@@ -232,6 +234,108 @@ class StarCoordinator:
             self._pick_resolver.shutdown()
         log.debug("MGP: [StarCoordinator] [shutdown] [Coordinador tancat]")
 
+    def cancel_deep_catalog(self, deep_query_revision: int) -> None:
+        """Invalida la consulta profunda vigent sense considerar-ho un error."""
+        self._active_deep_query_revision = max(
+            self._active_deep_query_revision + 1,
+            int(deep_query_revision),
+        )
+
+    async def request_deep_catalog(
+        self,
+        *,
+        deep_query_revision: int,
+        ra_deg: float,
+        dec_deg: float,
+        radius_deg: float,
+        photometric_limit: float,
+        resident_magnitude_limit: float = 8.0,
+        maximum_stars: int = 250_000,
+    ) -> dict[str, Any]:
+        """Publica el top-N global d'un con Gaia, amb cancel·lació entre tiles."""
+        revision = int(deep_query_revision)
+        self._active_deep_query_revision = revision
+        if not isinstance(self._adapter, GaiaStarCatalogAdapter):
+            return {
+                "state": "unavailable", "deepQueryRevision": revision,
+                "selectedStarCount": 0, "truncated": False,
+                "message": "Gaia no està disponible; es manté el catàleg resident.",
+            }
+        if not all(np.isfinite(value) for value in (ra_deg, dec_deg, radius_deg, photometric_limit)):
+            raise ValueError("La consulta Gaia requereix coordenades i límits finits")
+        if radius_deg <= 0.0 or photometric_limit <= resident_magnitude_limit:
+            self._deep_resident_count = 0
+            self._batches.pop("stars:deep:camera", None)
+            self._resources.pop("stars:deep:camera", None)
+            await self._publish_status()
+            return {
+                "state": "idle", "deepQueryRevision": revision,
+                "selectedStarCount": 0, "truncated": False, "message": None,
+            }
+
+        started = time.perf_counter()
+        iterator = self._adapter.query_cone(
+            float(ra_deg), float(dec_deg), float(radius_deg), float(photometric_limit),
+        )
+        sentinel = object()
+        selected: StarBatch | None = None
+        seen: set[object] = set()
+        candidate_count = 0
+        while True:
+            batch = await asyncio.to_thread(next, iterator, sentinel)
+            if batch is sentinel:
+                break
+            if revision != self._active_deep_query_revision or self._disposed:
+                return {
+                    "state": "cancelled", "deepQueryRevision": revision,
+                    "selectedStarCount": 0, "truncated": False, "message": None,
+                }
+            assert isinstance(batch, StarBatch)
+            filtered, keys = _filter_deep_batch(
+                batch, resident_magnitude_limit, photometric_limit, seen,
+            )
+            seen.update(keys)
+            candidate_count += len(filtered)
+            if len(filtered) == 0:
+                continue
+            selected = _merge_brightest(selected, filtered, maximum_stars)
+            # La deduplicació reté només les identitats del top-N vigent; així
+            # la memòria no creix amb tota la consulta.
+            seen = _batch_identity_keys(selected)
+
+        if revision != self._active_deep_query_revision or self._disposed:
+            return {
+                "state": "cancelled", "deepQueryRevision": revision,
+                "selectedStarCount": 0, "truncated": False, "message": None,
+            }
+        if selected is None or len(selected) == 0:
+            self._deep_resident_count = 0
+            self._batches.pop("stars:deep:camera", None)
+            self._resources.pop("stars:deep:camera", None)
+            await self._publish_status()
+            return {
+                "state": "ready", "deepQueryRevision": revision,
+                "selectedStarCount": 0, "truncated": False, "message": None,
+            }
+        await self._build_and_publish_resource(
+            resource_id="stars:deep:camera",
+            role=StarResourceRole.DEEP_TILE,
+            batch=selected,
+            extra_metadata={"deepQueryRevision": revision},
+        )
+        self._deep_resident_count = len(selected)
+        await self._publish_status()
+        elapsed_ms = (time.perf_counter() - started) * 1000.0
+        log.info(
+            "MGP: [StarCoordinator] [deep_ready] [revision=%d candidates=%d selected=%d bytes=%d elapsedMs=%.1f]",
+            revision, candidate_count, len(selected), selected.nbytes, elapsed_ms,
+        )
+        return {
+            "state": "ready", "deepQueryRevision": revision,
+            "selectedStarCount": len(selected),
+            "truncated": candidate_count > len(selected), "message": None,
+        }
+
     # ─── Private ──────────────────────────────────────────────────────
 
     async def _load_fallback(self) -> None:
@@ -308,6 +412,7 @@ class StarCoordinator:
         resource_id: str,
         role: StarResourceRole,
         batch: StarBatch,
+        extra_metadata: dict[str, Any] | None = None,
     ) -> None:
         """Construeix buffers GPU i publica via bridge.
 
@@ -394,6 +499,8 @@ class StarCoordinator:
                     "catalogIndices": {"offset": idx_offset, "length": len(idx_bytes), "dtype": "uint32", "components": 1},
                 },
             }
+            if extra_metadata:
+                metadata.update(extra_metadata)
             await self._resource_publisher(resource_id, version, metadata, buffer)
 
         log.debug(
@@ -414,3 +521,69 @@ class StarCoordinator:
                 "fallbackStarCount": status.fallback_star_count,
                 "deepResidentCount": status.deep_resident_count,
             })
+
+
+def _filter_deep_batch(
+    batch: StarBatch,
+    resident_limit: float,
+    photometric_limit: float,
+    seen: set[object],
+) -> tuple[StarBatch, set[object]]:
+    mask = (batch.mag > resident_limit) & (batch.mag <= photometric_limit)
+    indices = np.flatnonzero(mask)
+    keep: list[int] = []
+    keys: set[object] = set()
+    for index in indices:
+        source_id = int(batch.source_id[index])
+        key: object
+        if source_id > 0:
+            key = ("gaia", source_id)
+        else:
+            key = (
+                "position",
+                round(float(batch.ra[index]), 6),
+                round(float(batch.dec[index]), 6),
+                round(float(batch.mag[index]), 3),
+            )
+        if key in seen or key in keys:
+            continue
+        keys.add(key)
+        keep.append(int(index))
+    selected = np.asarray(keep, dtype=np.int64)
+    return _slice_batch(batch, selected), keys
+
+
+def _merge_brightest(current: StarBatch | None, incoming: StarBatch, limit: int) -> StarBatch:
+    if current is None:
+        merged = incoming
+    else:
+        merged = StarBatch(
+            ra=np.concatenate((current.ra, incoming.ra)),
+            dec=np.concatenate((current.dec, incoming.dec)),
+            mag=np.concatenate((current.mag, incoming.mag)),
+            bp_rp=np.concatenate((current.bp_rp, incoming.bp_rp)),
+            source_id=np.concatenate((current.source_id, incoming.source_id)),
+        )
+    if len(merged) <= limit:
+        return merged
+    indices = np.argpartition(merged.mag, limit - 1)[:limit]
+    indices = indices[np.argsort(merged.mag[indices], kind="stable")]
+    return _slice_batch(merged, indices)
+
+
+def _batch_identity_keys(batch: StarBatch) -> set[object]:
+    keys: set[object] = set()
+    for index in range(len(batch)):
+        source_id = int(batch.source_id[index])
+        keys.add(("gaia", source_id) if source_id > 0 else (
+            "position", round(float(batch.ra[index]), 6),
+            round(float(batch.dec[index]), 6), round(float(batch.mag[index]), 3),
+        ))
+    return keys
+
+
+def _slice_batch(batch: StarBatch, indices: np.ndarray) -> StarBatch:
+    return StarBatch(
+        ra=batch.ra[indices], dec=batch.dec[indices], mag=batch.mag[indices],
+        bp_rp=batch.bp_rp[indices], source_id=batch.source_id[indices],
+    )

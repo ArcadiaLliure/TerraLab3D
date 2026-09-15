@@ -29,6 +29,9 @@
  */
 
 import * as THREE from "three";
+import type { ObservationSnapshotMessage } from "../../contracts/observation_contracts";
+import type { MeasurementDocumentSnapshot } from "../../contracts/measurement_contracts";
+import { MeasurementLayerRendererImpl } from "./layers/MeasurementLayerRenderer";
 import { HorizontalGrid } from "./HorizontalGrid";
 import { CelestialLabels } from "./CelestialLabels";
 import { CelestialEquator } from "./CelestialEquator";
@@ -89,10 +92,14 @@ export class ThreeSceneHostImpl {
   private targetLstRad = 0;
   private currentLstRad = 0;
 
+  // ─── Phase 21: Measurements ───────────────────────────────────────
+  private measurementLayerRenderer!: MeasurementLayerRendererImpl;
+
   // ─── State ─────────────────────────────────────────────────────────
   private container: HTMLElement | null = null;
   private disposed = false;
   private currentFovDeg = 60;
+  private observationSnapshot: ObservationSnapshotMessage | null = null;
   private labelsInitialized = false;
   private labelViewportRevision = 0;
   private lastLabelViewportRevision = -1;
@@ -216,6 +223,8 @@ export class ThreeSceneHostImpl {
       this.celestialSphere.add(meridian);
     }
 
+    this.measurementLayerRenderer = new MeasurementLayerRendererImpl(this.celestialRoot, this.celestialSphere);
+
     console.debug(`${LOG_PREFIX} [constructor] [Escena inicialitzada amb grid horitzontal, equador celeste i etiquetes]`);
   }
 
@@ -226,7 +235,30 @@ export class ThreeSceneHostImpl {
     return this.worldRoot;
   }
 
-  /** Celestial root for sky objects (no translational parallax). */
+  // ─── Measurements ──────────────────────────────────────────────────
+
+  getMeasurementLayerRenderer(): MeasurementLayerRendererImpl {
+    return this.measurementLayerRenderer;
+  }
+
+  presentMeasurements(snapshot: MeasurementDocumentSnapshot): void {
+    this.measurementLayerRenderer.presentDocument(snapshot);
+  }
+
+  getCelestialSphereQuaternion(): THREE.Quaternion {
+    if (this.celestialTransformState?.isValid) {
+      return this.celestialTransformState.quaternion;
+    }
+    return this.celestialSphere.quaternion;
+  }
+
+  presentObservation(snapshot: ObservationSnapshotMessage): void {
+    this.observationSnapshot = snapshot;
+  }
+
+  /**
+   * Called automatically by `applyDelta` to update scene graph positions.
+   */
   getCelestialRoot(): THREE.Group {
     return this.celestialRoot;
   }
@@ -288,6 +320,7 @@ export class ThreeSceneHostImpl {
     this.celestialLabels.mount(container);
     this.solarSystemLabels.mount(container);
     this.deepSkyRenderer.labels.mount(container);
+    this.measurementLayerRenderer.mountLabels(container);
   }
 
   resize(widthPx: number, heightPx: number): void {
@@ -322,7 +355,12 @@ export class ThreeSceneHostImpl {
     if (shortest > Math.PI) shortest -= Math.PI * 2;
     if (shortest < -Math.PI) shortest += Math.PI * 2;
     this.currentLstRad += shortest * 0.1;
-    this.celestialSphere.rotation.y = -this.currentLstRad;
+    
+    if (this.celestialTransformState?.isValid) {
+      this.celestialSphere.quaternion.copy(this.celestialTransformState.quaternion);
+    } else {
+      this.celestialSphere.rotation.set(0, -this.currentLstRad, 0);
+    }
 
     // ─── Recentre celestialRoot to camera position ───────────────────
     // This eliminates translational parallax for sky objects.
@@ -343,6 +381,9 @@ export class ThreeSceneHostImpl {
   renderFrame(): void {
     if (this.disposed) return;
     this.starFieldRenderer.prepareView(this.camera);
+    if (this.measurementLayerRenderer) {
+      this.measurementLayerRenderer.updateTime(performance.now(), this.getCelestialSphereQuaternion());
+    }
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -396,6 +437,10 @@ export class ThreeSceneHostImpl {
       || deepSkyLabelRevision !== this.lastDeepSkyLabelRevision
     )) {
       this.deepSkyRenderer.labels.update(this.camera, dsMatrix);
+    }
+
+    if (this.measurementLayerRenderer && this.container) {
+      this.measurementLayerRenderer.updateLabels(this.camera, this.container.getBoundingClientRect(), this.getCelestialSphereQuaternion());
     }
 
     this.labelsInitialized = true;

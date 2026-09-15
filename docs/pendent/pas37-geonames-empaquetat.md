@@ -14,7 +14,7 @@ Amb topografia carregada, TerraLab3D etiqueta assentaments reals associats a les
 
 ## Dependències
 
-- [Pas 19 — modes d'observació instrumental](pas19-modes-optics.md).
+- [Pas 19 — modes d'observació instrumental](../completat/pas19-modes-optics.md).
 - [Pas 29 — superfície semàntica](pas29-superficie-semantica.md).
 
 ## Decisions tancades
@@ -30,7 +30,7 @@ Amb topografia carregada, TerraLab3D etiqueta assentaments reals associats a les
 
 - Superfície: [`surface/land_cover.py`](../../backend/src/terralab3d/domain/surface/land_cover.py), [`land_cover_coordinator.py`](../../backend/src/terralab3d/application/land_cover_coordinator.py) i [`LandCoverTextureManager.ts`](../../frontend/src/view/three/terrain/LandCoverTextureManager.ts).
 - Terreny: [`elevation_coordinator.py`](../../backend/src/terralab3d/application/elevation_coordinator.py) i [`TerrainLayerRenderer.ts`](../../frontend/src/view/three/layers/TerrainLayerRenderer.ts).
-- Òptica: [`ScopeLayerRenderer.ts`](../../frontend/src/view/three/layers/ScopeLayerRenderer.ts) i [especificació del pas 19](pas19-modes-optics.md).
+- Òptica: [`ScopeLayerRenderer.ts`](../../frontend/src/view/three/layers/ScopeLayerRenderer.ts) i [especificació del pas 19](../completat/pas19-modes-optics.md).
 - Recursos base: [`domain/resources/models.py`](../../backend/src/terralab3d/domain/resources/models.py) i [`layer_database.py`](../../backend/src/terralab3d/infrastructure/resources/layer_database.py), només per assegurar que GeoNames no s'ofereix com a descàrrega.
 
 ## Treball pendent

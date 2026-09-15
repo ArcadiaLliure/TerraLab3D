@@ -121,3 +121,68 @@
   padding: 15px;
   overflow-y: auto;
 }
+
+.observation-mode-toggle {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.observation-mode-toggle[data-mode="camera"],
+.observation-mode-toggle[data-mode="telescope"] {
+  color: var(--button-checked-text);
+  background: var(--button-checked-bg);
+  border-color: var(--button-checked-border);
+}
+
+.observation-mode-toggle svg { width: 22px; height: 22px; }
+.observation-mode-label { min-width: 54px; font-size: 10px; color: var(--color-text-dim); }
+.optics-panel { border-top: 1px solid var(--color-border); padding-top: 10px; }
+.optics-panel-title { color: var(--color-gold); font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+.optics-section { display: flex; flex-direction: column; gap: 6px; }
+.optics-section label { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 10px; color: var(--color-text-dim); }
+.optics-section input[type="number"], .optics-section input[type="text"], .optics-section select {
+  width: 112px; min-width: 0; padding: 4px 5px; color: var(--color-text);
+  background: var(--color-chrome); border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+}
+.optics-section input.invalid { border-color: var(--color-danger, #e86b6b); }
+.optics-actions, .scope-movement-pad, .optics-goto { display: flex; gap: 5px; flex-wrap: wrap; }
+.optics-section button { padding: 4px 7px; color: var(--color-text); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); cursor: pointer; }
+.scope-movement-pad button { width: 30px; height: 30px; }
+.measurement-tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
+.measurement-tool-grid button, .measurement-action-row button { padding: 6px 8px; color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); cursor: pointer; }
+.measurement-tool-grid button.active { color: var(--button-checked-text); background: var(--button-checked-bg); border-color: var(--button-checked-border); }
+.measurement-action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.measurement-action-row button:disabled { cursor: default; opacity: 0.45; }
+.measurement-status { min-height: 28px; color: var(--color-text-muted); font-size: 10px; line-height: 1.35; }
+.measurement-label { position: absolute; top: 0; left: 0; z-index: 14; pointer-events: none; padding: 2px 5px; border: 1px solid rgba(89, 216, 255, 0.65); border-radius: 3px; color: #d9f7ff; background: rgba(4, 12, 18, 0.78); font: 10px/1.2 var(--font-family, sans-serif); white-space: nowrap; transform-origin: left bottom; }
+.optics-goto input { width: 76px !important; }
+.optics-metrics, .optics-status { margin-top: 7px; font: 10px var(--font-family-mono); color: var(--color-text-muted); line-height: 1.4; }
+.optics-status[data-state="error"] { color: var(--color-danger, #e86b6b); }
+
+.observation-hud {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 6;
+  transform: translateX(-50%);
+  pointer-events: none;
+  padding: 5px 9px;
+  border: 1px solid color-mix(in srgb, var(--color-gold) 50%, transparent);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text);
+  background: rgba(5, 10, 18, 0.72);
+  font: 10px var(--font-family-mono);
+  letter-spacing: 0.06em;
+  backdrop-filter: blur(3px);
+}

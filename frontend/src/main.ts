@@ -41,6 +41,10 @@ import { Shell } from "./view/ui/Shell";
 import { TimeBar } from "./view/ui/components/TimeBar";
 import { StarTrailsPanel } from "./view/ui/components/StarTrailsPanel";
 import { StarTrailLayerRendererImpl } from "./view/three/layers/StarTrailLayerRendererImpl";
+import { ObservationModeController } from "./application/ObservationModeController";
+import { OpticsPanelImpl } from "./view/ui/panels/OpticsPanelImpl";
+import { ObservationHUD } from "./view/ui/panels/ObservationHUD";
+import { MeasurementController } from "./application/MeasurementController";
 
 // ─── Picking (Pas 6) ─────────────────────────────────────────────────
 import { CelestialTransformState } from "./view/three/CelestialTransformState";
@@ -156,6 +160,8 @@ function main(): void {
   };
 
   // 2. Prepare UI pages
+  let observationController: ObservationModeController | null = null;
+  let measurementController: MeasurementController | null = null;
   const locationPage = new LocationPage({
     onRelocate: (lat, lon, height) => {
       const terrainLayer = sceneHost.getDemTerrainLayerRenderer();
@@ -193,6 +199,7 @@ function main(): void {
     onHudToggle: (visible) => {
       locationHUD.setVisible(visible);
     },
+    onObservationModeChanged: (mode) => observationController?.requestMode(mode),
   });
   const locContainer = shell.getPageContainer("location");
   if (locContainer) locationPage.mount(locContainer);
@@ -268,7 +275,14 @@ function main(): void {
   const earthContainer = shell.getPageContainer("earth");
   if (earthContainer) earthPage.mount(earthContainer);
 
-  const toolsPage = new ToolsPage(() => resourceManagerModal.open());
+  const toolsPage = new ToolsPage({
+    onOpenResourceManager: () => resourceManagerModal.open(),
+    onMeasurementTool: (kind) => measurementController?.setTool(kind),
+    onUndo: () => measurementController?.undo(),
+    onRedo: () => measurementController?.redo(),
+    onDelete: () => measurementController?.deleteSelected(),
+    onClear: () => measurementController?.clear(),
+  });
   const toolsContainer = shell.getPageContainer("tools");
   if (toolsContainer) toolsPage.mount(toolsContainer);
 
@@ -367,6 +381,22 @@ function main(): void {
   trackingResolver.updateDeepSkyRenderer(sceneHost.getDeepSkyRenderer());
   const focusTrackingController = new FocusTrackingController(cameraRig, trackingResolver);
 
+  const opticsPanel = new OpticsPanelImpl({
+    onCameraChanged: camera => observationController?.configureCamera(camera),
+    onTelescopeChanged: telescope => observationController?.configureTelescope(telescope),
+    onProfileMutation: message => observationController?.mutateProfile(message),
+    onManualGoto: (raDeg, decDeg) => observationController?.manualGoto(raDeg, decDeg),
+    onSelectedGoto: () => observationController?.gotoTarget(selectionController.getState().selectedTarget),
+    onMove: (deltaAzimuthDeg, deltaAltitudeDeg) => cameraRig.orbit(deltaAzimuthDeg, deltaAltitudeDeg),
+  });
+  opticsPanel.mount(locationPage.getOpticsPanelHost());
+  const observationHUD = new ObservationHUD();
+  observationHUD.mount(shell.getCanvasContainer());
+  observationController = new ObservationModeController(
+    bridge, sceneHost, cameraRig, celestialTransformState, trackingResolver,
+    starTrailRenderer, locationPage, opticsPanel, observationHUD,
+  );
+
   cameraRig.onUserInteraction(() => {
     focusTrackingController.stopTracking();
   });
@@ -446,6 +476,18 @@ function main(): void {
   });
   gestureRouter.attach(sceneHost.renderer.domElement);
   pickingController.mount(canvasContainer);
+  measurementController = new MeasurementController({
+    canvas: sceneHost.renderer.domElement,
+    camera: sceneHost.camera,
+    bridge,
+    cameraRig,
+    gestureRouter,
+    renderer: sceneHost.getMeasurementLayerRenderer(),
+    presentDocument: (snapshot) => sceneHost.presentMeasurements(snapshot),
+    toolsPage,
+    isTrackingEnabled: () => toolsPage.isTrackingEnabled(),
+    getTrackingQuaternion: () => sceneHost.getCelestialSphereQuaternion(),
+  });
 
   // Initial resize
   const rect = canvasContainer.getBoundingClientRect();
@@ -482,6 +524,7 @@ function main(): void {
     );
     // Phase 4: Update FOV for grid LOD switching
     sceneHost.setCurrentFov(pose.horizontalFovDeg);
+    observationController?.onScientificPointingChanged(pose);
   });
 
   let currentObserverLatitude = 41.38;
@@ -583,6 +626,7 @@ function main(): void {
     },
     onCelestialFrameTransform(generation, matrix3x3, transitionMs) {
       celestialTransformState.update(generation, matrix3x3 as number[], transitionMs);
+      observationController?.onScientificPointingChanged(cameraRig.pose());
     },
     onBinaryResourceReady(metadata, bufferPayload) {
       if (metadata.role === "horizon_profile") {
@@ -629,6 +673,7 @@ function main(): void {
         sceneHost.getDeepSkyRenderer().registerBinaryResource(metadata, bufferPayload);
         return;
       }
+      if (!observationController?.acceptsDeepResource(metadata) && metadata.role === "deep_tile") return;
       sceneHost.getStarFieldRenderer().registerBinaryResource(metadata, bufferPayload);
       const resourceId = metadata.resourceId as string;
       const entry = sceneHost.getStarFieldRenderer().getResource(resourceId);
@@ -636,6 +681,18 @@ function main(): void {
     },
     onHorizonStatus(status) {
       earthPage.updateHorizonStatus(status);
+    },
+    onObservationSnapshot(snapshot) {
+      observationController?.present(snapshot);
+    },
+    onObservationError(error) {
+      observationController?.presentError(error);
+    },
+    onMeasurementSnapshot(snapshot) {
+      measurementController?.present(snapshot);
+    },
+    onMeasurementError(error) {
+      measurementController?.presentError(error);
     },
     onStarPickResolved(msg) {
       if (!msg.star) return;
@@ -761,6 +818,8 @@ function main(): void {
     onShutdownRequested() {
       renderLoop.stop();
       cameraRig.detach();
+      measurementController?.dispose();
+      gestureRouter.dispose();
       terrainGotoController.dispose();
       navigationWorld.dispose();
       atmosphereRenderer.dispose();
@@ -929,8 +988,8 @@ function main(): void {
     for (const entry of entries) {
       const { width, height } = entry.contentRect;
       if (width > 0 && height > 0) {
-        sceneHost.resize(width, height);
         cameraRig.resize(width, height);
+        sceneHost.resize(width, height);
         bridge.sendViewportResized(width, height, window.devicePixelRatio);
       }
     }
@@ -942,12 +1001,17 @@ function main(): void {
     resizeObserver.disconnect();
     renderLoop.stop();
     cameraRig.detach();
+    measurementController?.dispose();
+    gestureRouter.dispose();
     terrainGotoController.dispose();
     navigationWorld.dispose();
     atmosphereRenderer.dispose();
     sceneHost.dispose();
     diagnostics.dispose();
     resourceManagerModal.dispose();
+    observationController?.dispose();
+    observationHUD.dispose();
+    opticsPanel.dispose();
     bridge.dispose();
   });
 }

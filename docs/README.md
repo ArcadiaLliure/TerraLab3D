@@ -6,7 +6,7 @@ Consulta també les [normes d'arquitectura i execució](normes_arquitectura.md) 
 
 ## Punt de represa
 
-> **Següent pas executable: [Pas 17 — superfície progressiva](pendent/pas17-superficie-progressiva.md).**
+> **Següent pas executable: [Pas 22 — trajectòries i visibilitat sobre l'horitzó real](pendent/pas22-trajectories-visibilitat.md).**
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README, seguir el punter anterior i executar només el primer pas que encara no compleixi el seu criteri de sortida.
 
@@ -51,6 +51,9 @@ Estats admesos:
 | 14 | [Traces circumpolars i exposició temporal](completat/pas14.md) | `completat` |
 | 15 | [Elevació real, perfil d'horitzó i oclusió](completat/pas15.md) | `completat` |
 | 16 | [Terreny 3D retingut, tiles, LOD i picking](completat/pas16.md) | `completat` |
+| 17 | [Superfície categòrica, estils i refinament visual](completat/pas17-superficie-progressiva.md) | `completat per ajust d'abast` |
+| 19 | [Modes d'observació: ull nu, càmera fotogràfica i telescopi/Scope](completat/pas19-modes-optics.md) | `completat` |
+| 21 | [Eines de mesura esfèrica](completat/pas21-eines-mesura.md) | `completat` |
 
 La numeració decimal és històrica; els passos 1–16 i els seus subpassos no es renumeren.
 
@@ -60,9 +63,6 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 17 | [Superfície categòrica, estils i refinament visual](pendent/pas17-superficie-progressiva.md) | `parcial` | 16 |
-| 19 | [Modes d'observació: ull nu, càmera fotogràfica i telescopi/Scope](pendent/pas19-modes-optics.md) | `pendent` | 5, 13, 14 |
-| 21 | [Eines de mesura esfèrica](pendent/pas21-eines-mesura.md) | `pendent` | 6, 13, 19 |
 | 22 | [Trajectòries i visibilitat sobre l'horitzó real](pendent/pas22-trajectories-visibilitat.md) | `parcial` | 9, 15 |
 | 23 | [Constel·lacions oficials i d'usuari](pendent/pas23-constellacions.md) | `pendent` | 6, 13, 22 |
 | 24 | [Catàleg de recursos i descàrregues persistents](pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 8.6, 12 |

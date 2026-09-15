@@ -208,6 +208,7 @@ export class LandCoverTextureManager {
     }
 
     const bank = this.banks[bankIndex];
+    if (!bank) return false;
     const layerSize = this.layerWidth * this.layerHeight;
     bank.classData.set(tile.data, localLayer * layerSize);
 
@@ -243,6 +244,7 @@ export class LandCoverTextureManager {
 
     if (bankIndex >= this.banks.length) return null;
     const bank = this.banks[bankIndex];
+    if (!bank) return null;
 
     const tileStartX = this.activeBounds.x + col * this.tileWorldSize.x;
     

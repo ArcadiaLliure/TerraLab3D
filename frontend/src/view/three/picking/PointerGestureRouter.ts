@@ -47,6 +47,7 @@ export class PointerGestureRouter {
   private pendingHoverY = 0;
   private hasPendingHover = false;
   private hoverRafId = 0;
+  private enabled = true;
 
   // ─── Callbacks ─────────────────────────────────────────────────────
   private tapCallbacks: TapCallback[] = [];
@@ -79,6 +80,14 @@ export class PointerGestureRouter {
     this.hoverClearCallbacks.push(cb);
   }
 
+  setEnabled(enabled: boolean): void {
+    this.enabled = enabled;
+    if (!enabled) {
+      this.isPointerDown = false;
+      this.cancelHoverRaf();
+    }
+  }
+
   attach(container: HTMLElement): void {
     this.container = container;
     // Observe in capture phase before CameraRig takes pointer capture. The
@@ -109,6 +118,7 @@ export class PointerGestureRouter {
   // ─── Private handlers ──────────────────────────────────────────────
 
   private onPointerDown(e: PointerEvent): void {
+    if (!this.enabled) return;
     if (e.button !== 0) return; // Només botó esquerre
     this.isPointerDown = true;
     this.pointerDownX = e.clientX;
@@ -117,6 +127,7 @@ export class PointerGestureRouter {
   }
 
   private onPointerMove(e: PointerEvent): void {
+    if (!this.enabled) return;
     if (this.isPointerDown) {
       // Si estem en pointerdown, no emetem hover
       return;
@@ -135,6 +146,7 @@ export class PointerGestureRouter {
   }
 
   private onPointerUp(e: PointerEvent): void {
+    if (!this.enabled) return;
     if (!this.isPointerDown || this.pointerDownButton !== 0) {
       this.isPointerDown = false;
       return;
@@ -155,6 +167,7 @@ export class PointerGestureRouter {
   }
 
   private onPointerLeave(_e: PointerEvent): void {
+    if (!this.enabled) return;
     this.isPointerDown = false;
     this.cancelHoverRaf();
     for (const cb of this.hoverClearCallbacks) cb();

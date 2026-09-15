@@ -20,11 +20,14 @@ def main() -> None:
         except json.JSONDecodeError as exc:
             errors.append(f"JSON invàlid: {path}: {exc}")
     for package in (ROOT / "backend/src/terralab3d/domain").iterdir():
-        if package.name == "__pycache__":
+        if not package.is_dir() or not (package / "__init__.py").exists():
             continue
-        if package.is_dir() and not (package / "README.md").exists():
+        if not (package / "README.md").exists():
             errors.append(f"Falta README de domini: {package}")
-        if package.is_dir() and not (package / "calculations.py").exists():
+        implementation_modules = [
+            path for path in package.glob("*.py") if path.name != "__init__.py"
+        ]
+        if not implementation_modules:
             errors.append(f"Falta espai de càlcul científic: {package}")
     if not (ROOT / "docs/normes_arquitectura.md").exists():
         errors.append("Falten les normes d’arquitectura")

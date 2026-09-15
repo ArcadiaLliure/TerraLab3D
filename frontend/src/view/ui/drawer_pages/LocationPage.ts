@@ -1,4 +1,5 @@
 import type { NavigationMode, NavigationCameraPose, MotionState, NavigationReadiness } from "../../../contracts/navigation";
+import type { ObservationMode } from "../../../contracts/observation_contracts";
 
 export type LocationRelocationOutcome = "flight-started" | "terrain-reload" | "destination-unavailable";
 
@@ -11,6 +12,7 @@ export interface LocationPageCallbacks {
   onResetToOrigin?: () => void;
   onOverlayToggle?: (key: string, visible: boolean) => void;
   onHudToggle?: (visible: boolean) => void;
+  onObservationModeChanged?: (mode: ObservationMode) => void;
 }
 
 // ─── SVG Icons ───────────────────────────────────────────────────────
@@ -25,6 +27,10 @@ const WALK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const FLIGHT_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>
 </svg>`;
+
+const EYE_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/></svg>`;
+const CAMERA_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h4l2-2h4l2 2h4v12H4z"/><circle cx="12" cy="13" r="4"/></svg>`;
+const TELESCOPE_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8l13-4 2 5-13 4z"/><path d="M11 12l2 8m-2-5-4 5m6-5 4 5"/></svg>`;
 
 export class LocationPage {
   private element: HTMLDivElement;
@@ -48,9 +54,13 @@ export class LocationPage {
   private navSpeedLabel: HTMLDivElement;
   private navHeightLabel: HTMLDivElement;
   private navZoneLabel: HTMLDivElement;
+  private btnObservationMode: HTMLButtonElement;
+  private observationModeLabel: HTMLDivElement;
+  private opticsPanelHost: HTMLDivElement;
 
   private isRealtimeActive = true;
   private currentNavMode: NavigationMode = "walk";
+  private currentObservationMode: ObservationMode = "eye";
   private statusHideTimer: number | null = null;
   private callbacks: LocationPageCallbacks;
 
@@ -259,6 +269,24 @@ export class LocationPage {
 
     modeRow.appendChild(this.btnNavMode);
     modeRow.appendChild(this.navModeLabel);
+    this.btnObservationMode = document.createElement("button");
+    this.btnObservationMode.id = "observation-mode-toggle";
+    this.btnObservationMode.className = "observation-mode-toggle";
+    this.btnObservationMode.innerHTML = EYE_SVG;
+    this.btnObservationMode.onclick = () => {
+      const next: ObservationMode = this.currentObservationMode === "eye"
+        ? "camera" : this.currentObservationMode === "camera" ? "telescope" : "eye";
+      this.callbacks.onObservationModeChanged?.(next);
+    };
+    this.btnObservationMode.onkeydown = event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault(); this.btnObservationMode.click();
+      }
+    };
+    this.observationModeLabel = document.createElement("div");
+    this.observationModeLabel.className = "observation-mode-label";
+    modeRow.append(this.btnObservationMode, this.observationModeLabel);
+    this.updateObservationModeUI();
     navSection.appendChild(modeRow);
 
     // Reset button
@@ -288,6 +316,10 @@ export class LocationPage {
     this.navZoneLabel = this.createInfoLabel(navSection, "Zona: --");
 
     this.element.appendChild(navSection);
+
+    this.opticsPanelHost = document.createElement("div");
+    this.opticsPanelHost.id = "optics-panel-host";
+    this.element.appendChild(this.opticsPanelHost);
 
     // Separator
     this.element.appendChild(this.createSeparator());
@@ -366,6 +398,13 @@ export class LocationPage {
     }
   }
 
+  public presentObservationMode(mode: ObservationMode): void {
+    this.currentObservationMode = mode;
+    this.updateObservationModeUI();
+  }
+
+  public getOpticsPanelHost(): HTMLElement { return this.opticsPanelHost; }
+
   /**
    * Updates the user-owned relocation fields after a true observer relocation.
    * Live GPS navigation is intentionally displayed only in the HUD.
@@ -432,6 +471,18 @@ export class LocationPage {
       this.btnNavMode.style.borderColor = "var(--button-checked-border)";
       this.navModeLabel.textContent = "Avió";
     }
+  }
+
+  private updateObservationModeUI(): void {
+    const next = this.currentObservationMode === "eye"
+      ? "càmera" : this.currentObservationMode === "camera" ? "telescopi" : "ull";
+    this.btnObservationMode.innerHTML = this.currentObservationMode === "eye"
+      ? EYE_SVG : this.currentObservationMode === "camera" ? CAMERA_SVG : TELESCOPE_SVG;
+    this.btnObservationMode.setAttribute("aria-label", `Canviar a mode ${next}`);
+    this.btnObservationMode.title = `Canviar a mode ${next}`;
+    this.observationModeLabel.textContent = this.currentObservationMode === "eye"
+      ? "Ull" : this.currentObservationMode === "camera" ? "Càmera" : "Telescopi";
+    this.btnObservationMode.dataset["mode"] = this.currentObservationMode;
   }
 
   private setRealtimeUI(active: boolean): void {

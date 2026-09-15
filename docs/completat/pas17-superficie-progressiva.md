@@ -1,6 +1,11 @@
 # Pas 17 — Superfície categòrica i càrrega visual progressiva
 
-> Estat: **parcial**. La cobertura categòrica és funcional; falten els estils complets i la seva càrrega visual progressiva.
+> Estat: **completat per ajust d'abast**. La vertical categòrica observable queda tancada aquí; els estils avançats i el refinament semàntic passen explícitament al [Pas 29](../pendent/pas29-superficie-semantica.md).
+
+Les caselles històriques que segueixen descriuen l'abast ampli original. No són
+criteri de reobertura del Pas 17: la càrrega categòrica, el lifecycle de textures
+i la integració amb el terreny retingut són la frontera acceptada; el refinament
+de producte restant té un únic propietari en el Pas 29.
 
 ## Estat actual verificat
 

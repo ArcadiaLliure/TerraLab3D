@@ -28,7 +28,7 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 - [ ] Implementar iniciar, pausar, reprendre, aturar i netejar.
 - [ ] Mostrar temps acumulat i estat de l’exposició.
 - [ ] Gestionar canvis d’ubicació o data durant una trace.
-- [ ] Reutilitzar aquestes traces en la previsualització fotogràfica del Pas 19 quan `tracking = false`; el control físic de muntures continua fora d'abast.
+- [x] Reutilitzar aquestes traces en la previsualització fotogràfica del [Pas 19](pas19-modes-optics.md) quan `tracking = false`; el control físic de muntures continua fora d'abast.
 - [ ] Aplicar color, opacitat i intensitat derivats de fotometria.
 - [ ] Comparar forma i velocitat amb TerraLab.
 

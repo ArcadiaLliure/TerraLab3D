@@ -15,7 +15,7 @@ L'usuari carrega una fotografia del cel, fins i tot sense EXIF, TerraLab3D en re
 ## Dependències
 
 - [Pas 5 — Gaia](../completat/pas5.md) i [Pas 11 — OpenNGC](../completat/pas11.md).
-- [Pas 19 — modes d'observació instrumental i simulació fotogràfica](pas19-modes-optics.md) (que absorbeix l'antic Pas 20).
+- [Pas 19 — modes d'observació instrumental i simulació fotogràfica](../completat/pas19-modes-optics.md) (que absorbeix l'antic Pas 20).
 
 ## Decisions tancades
 

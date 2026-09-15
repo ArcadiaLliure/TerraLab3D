@@ -234,4 +234,5 @@ manager.dispose();
 moonRenderer.dispose();
 
 console.log(`\n=== Land Cover Test Results: ${passed} passed, ${failed} failed ===`);
-if (failed > 0 && typeof process !== "undefined") (process as any).exit(1);
+const nodeProcess = (globalThis as { process?: { exit(code: number): void } }).process;
+if (failed > 0) nodeProcess?.exit(1);

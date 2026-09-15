@@ -46,6 +46,10 @@ export class CelestialTransformState {
     return this._threeToEquatorial;
   }
 
+  get quaternion(): THREE.Quaternion {
+    return this._visualQuat;
+  }
+
   get isValid(): boolean {
     return this._valid;
   }

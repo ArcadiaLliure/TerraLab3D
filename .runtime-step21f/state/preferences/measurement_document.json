@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "selectedMeasurementId": null,
+  "measurements": [
+    {
+      "measurementId": "measurement:user:1f3f529c-65e9-4ad5-8977-6986f5822a37",
+      "kind": "ruler",
+      "start": {
+        "altitudeDeg": 30.2436682710864,
+        "azimuthDeg": 339.56357095617005
+      },
+      "end": {
+        "altitudeDeg": 27.642890363111285,
+        "azimuthDeg": 357.0411707695147
+      },
+      "rotationDeg": 0.0
+    },
+    {
+      "measurementId": "measurement:user:4afaff5a-3edb-4ff4-a6a4-50b4dc650e34",
+      "kind": "square",
+      "start": {
+        "altitudeDeg": 32.8128846322829,
+        "azimuthDeg": 10.657534012872077
+      },
+      "end": {
+        "altitudeDeg": 29.662513069332064,
+        "azimuthDeg": 14.763660652838723
+      },
+      "rotationDeg": 0.0
+    },
+    {
+      "measurementId": "measurement:user:88dcd76a-5cd1-49fd-b11e-59c6eb345761",
+      "kind": "rectangle",
+      "start": {
+        "altitudeDeg": 13.53225896383832,
+        "azimuthDeg": 341.64111309963636
+      },
+      "end": {
+        "altitudeDeg": 10.371297793000203,
+        "azimuthDeg": 353.3955576662222
+      },
+      "rotationDeg": 0.0
+    },
+    {
+      "measurementId": "measurement:user:3450c161-78db-4399-8ad3-cb41e90aafc3",
+      "kind": "circle",
+      "start": {
+        "altitudeDeg": 13.989907308133185,
+        "azimuthDeg": 10.737709762356872
+      },
+      "end": {
+        "altitudeDeg": 11.002149562327405,
+        "azimuthDeg": 14.994537685727948
+      },
+      "rotationDeg": 0.0
+    }
+  ]
+}

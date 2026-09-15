@@ -1,4 +1,4 @@
-"""Models de domini tipats per a la capacitat mesures."""
+"""Models immutables de les mesures angulars sobre l'esfera celeste."""
 
 
 from dataclasses import dataclass
@@ -19,9 +19,18 @@ class Measurement:
     start: HorizontalCoordinate
     end: HorizontalCoordinate
     rotation_deg: float = 0.0
+    tracking: bool = True
 
 @dataclass(frozen=True, slots=True)
 class MeasurementGeometry:
     paths: tuple[tuple[HorizontalCoordinate, ...], ...]
     label: str
     anchor: HorizontalCoordinate
+
+
+@dataclass(frozen=True, slots=True)
+class MeasurementDocument:
+    schema_version: int = 1
+    revision: int = 0
+    measurements: tuple[Measurement, ...] = ()
+    selected_measurement_id: MeasurementId | None = None

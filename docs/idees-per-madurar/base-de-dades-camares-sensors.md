@@ -6,7 +6,7 @@
 
 ## Què s'ha decidit ja
 
-- Per afinar el mode càmera i la previsualització fotogràfica del [Pas 19](../pendent/pas19-modes-optics.md) (que absorbeix l'antic Pas 20), interessaria un selector de model de càmera/sensor d'una llista, que calculés automàticament la mida del marc al cel, estrelles estimades i necessitat de seguiment.
+- Per afinar el mode càmera i la previsualització fotogràfica del [Pas 19](../completat/pas19-modes-optics.md) (que absorbeix l'antic Pas 20), interessaria un selector de model de càmera/sensor d'una llista, que calculés automàticament la mida del marc al cel, estrelles estimades i necessitat de seguiment.
 - **Explícitament no bloquejant**: el simulador fotogràfic **no ha de dependre obligatòriament** d'aquesta base de dades — ha d'acceptar també paràmetres manuals o *presets* interns bàsics mentre no hi hagi font adequada.
 
 ## Per què encara no és una fase concreta
@@ -26,4 +26,4 @@ No s'ha trobat ni avaluat cap font concreta durant la pluja d'idees.
 
 ## Relació amb el pla i altres idees
 
-Cap directa. És una millora opcional del [Pas 19](../pendent/pas19-modes-optics.md) (antic Pas 20), que s'ha de poder completar sense aquesta peça.
+Cap directa. És una millora opcional del [Pas 19](../completat/pas19-modes-optics.md) (antic Pas 20), que s'ha completat sense aquesta peça.

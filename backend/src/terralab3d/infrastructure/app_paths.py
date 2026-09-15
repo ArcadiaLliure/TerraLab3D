@@ -27,6 +27,7 @@ log = logging.getLogger("terralab3d.app_paths")
 
 POINTER_NAME = "data_location.json"
 DATA_ROOT_ENV = "TERRALAB_DATA_ROOT"
+STATE_ROOT_ENV = "TERRALAB_STATE_ROOT"
 
 
 def platform_state_base() -> Path:
@@ -41,7 +42,17 @@ def platform_state_base() -> Path:
 
 def application_state_root() -> Path:
     """Retorna el directori d'estat de TerraLab3D (%APPDATA%/TerraLab3D)."""
+    configured = os.getenv(STATE_ROOT_ENV, "").strip()
+    if configured:
+        return Path(configured).expanduser().resolve(strict=False)
     return platform_state_base() / "TerraLab3D"
+
+
+def resolve_preferences_dir() -> Path:
+    """Retorna el directori privat de preferències de l'aplicació."""
+    path = application_state_root() / "state" / "preferences"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 def data_location_pointer_path() -> Path:
