@@ -45,6 +45,11 @@ import { ObservationModeController } from "./application/ObservationModeControll
 import { OpticsPanelImpl } from "./view/ui/panels/OpticsPanelImpl";
 import { ObservationHUD } from "./view/ui/panels/ObservationHUD";
 import { MeasurementController } from "./application/MeasurementController";
+import type {
+  ObservableTrajectoryTarget,
+  TrajectoryHorizonMode,
+} from "./contracts/astronomical_event_contracts";
+import type { TrajectoryConfiguration } from "./view/ui/components/TrajectoryVisibilityPanel";
 
 // ─── Picking (Pas 6) ─────────────────────────────────────────────────
 import { CelestialTransformState } from "./view/three/CelestialTransformState";
@@ -119,20 +124,92 @@ function main(): void {
       }
     }
   };
-  const requestDefaultApparentTrajectories = () => {
+  const selectionController = new CelestialSelectionController();
+  let trajectoryConfiguration: TrajectoryConfiguration = {
+    enabled: true,
+    intervalHours: 24,
+    resolution: "detailed",
+    horizonMode: "real",
+    showTerrainOccluded: true,
+    showBelowHorizon: true,
+  };
+  let trajectoryRequestRevision = 0;
+  let lastTrajectoryHorizonKey = "";
+  let lastTrajectoryCenterMs = 0;
+  let skyPage: SkyPage;
+  let earthPage: EarthPage;
+
+  const selectedTrajectoryTarget = (): ObservableTrajectoryTarget | null => {
+    const state = selectionController.getState();
+    const target = state.selectedTarget;
+    if (target === null) return null;
+    const model = buildInspectionModel(state, sceneHost);
+    if (target.kind === "solar_system") {
+      return {
+        objectId: target.bodyId,
+        family: target.bodyId.startsWith("naif-") ? "satellite" : "solar_system",
+        displayName: model?.displayName ?? target.bodyId,
+        bodyId: target.bodyId,
+      };
+    }
+    const rightAscensionDeg = (
+      "raDeg" in target && typeof target.raDeg === "number"
+        ? target.raDeg
+        : Number(model?.fields.raDeg)
+    );
+    const declinationDeg = (
+      "decDeg" in target && typeof target.decDeg === "number"
+        ? target.decDeg
+        : Number(model?.fields.decDeg)
+    );
+    if (!Number.isFinite(rightAscensionDeg) || !Number.isFinite(declinationDeg)) return null;
+    const family = target.kind === "deep_sky" ? "deep_sky" : target.kind;
+    const objectId = target.kind === "coordinate"
+      ? `coordinate:${rightAscensionDeg.toFixed(8)}:${declinationDeg.toFixed(8)}`
+      : `${target.kind}:${target.resourceId}:${target.catalogIndex}`;
+    return {
+      objectId,
+      family,
+      displayName: model?.displayName ?? objectId,
+      rightAscensionDeg,
+      declinationDeg,
+      frame: "ICRS/J2000",
+    };
+  };
+
+  const requestSelectedApparentTrajectory = () => {
+    const renderer = sceneHost.getSolarSystemRenderer();
+    renderer.setVisibility("trajectories", trajectoryConfiguration.enabled);
+    renderer.setApparentTrajectoryHiddenVisible(true);
+    renderer.setApparentTrajectoryBelowHorizonVisible(true);
+    if (!trajectoryConfiguration.enabled) {
+      renderer.clearApparentTrajectory();
+      return;
+    }
+    const observable = selectedTrajectoryTarget();
+    if (observable === null) {
+      renderer.clearApparentTrajectory();
+      skyPage?.updateTrajectoryUnavailable("Selecciona un objecte amb posició disponible.");
+      return;
+    }
     const center = Date.parse(latestSimulationTimeIso);
     if (!Number.isFinite(center)) return;
-    const startUtc = new Date(center - 12 * 3_600_000).toISOString();
-    const endUtc = new Date(center + 12 * 3_600_000).toISOString();
-    for (const bodyId of ["sun", "moon", "mars"]) {
-      bridge.requestApparentTrajectory(
-        `trajectory:${bodyId}:${latestSimulationTimeIso}`,
-        bodyId,
-        startUtc,
-        endUtc,
-        256,
-      );
-    }
+    lastTrajectoryCenterMs = center;
+    const startUtc = new Date(center - 120_000).toISOString();
+    const endUtc = new Date(center + 24 * 3_600_000).toISOString();
+    const requestId = `trajectory:${++trajectoryRequestRevision}:${observable.objectId}`;
+    renderer.beginApparentTrajectoryRequest(requestId, observable.objectId);
+    skyPage?.updateTrajectoryCalculating(observable.displayName);
+    const horizonMode: TrajectoryHorizonMode = (earthPage && !earthPage.isHorizonEnabled()) ? "astronomical" : "real";
+    bridge.requestApparentTrajectory(
+      requestId,
+      observable,
+      startUtc,
+      endUtc,
+      128, // Detailed resolution
+      "detailed",
+      horizonMode,
+    );
   };
 
   const readyGalacticResource = (
@@ -204,7 +281,7 @@ function main(): void {
   const locContainer = shell.getPageContainer("location");
   if (locContainer) locationPage.mount(locContainer);
 
-  const skyPage = new SkyPage(bridge, resourceManager, {
+  skyPage = new SkyPage(bridge, resourceManager, {
     onSearchSelected: (selection) => {
       console.log("MGP: [main.ts] [onSearchSelected]", selection);
       const target = fromSearchResult(selection as any);
@@ -226,7 +303,25 @@ function main(): void {
         satelliteOrbitsVisible = visible;
         requestRepresentativeOrbits();
       }
-      if (part === "trajectories" && visible) requestDefaultApparentTrajectories();
+    },
+    onTrajectoryConfigurationChanged: (configuration) => {
+      trajectoryConfiguration = configuration;
+      sceneHost.getSolarSystemRenderer().setApparentTrajectoryHiddenVisible(
+        configuration.showTerrainOccluded,
+      );
+      sceneHost.getSolarSystemRenderer().setApparentTrajectoryBelowHorizonVisible(
+        configuration.showBelowHorizon,
+      );
+      requestSelectedApparentTrajectory();
+    },
+    onTrajectoryPresentationChanged: (showTerrainOccluded, showBelowHorizon) => {
+      trajectoryConfiguration = {
+        ...trajectoryConfiguration,
+        showTerrainOccluded,
+        showBelowHorizon,
+      };
+      sceneHost.getSolarSystemRenderer().setApparentTrajectoryHiddenVisible(showTerrainOccluded);
+      sceneHost.getSolarSystemRenderer().setApparentTrajectoryBelowHorizonVisible(showBelowHorizon);
     },
     onMoonSurfaceToggled: (enabled) => {
       sceneHost.getSolarSystemRenderer().setMoonSurfaceEnabled(enabled);
@@ -259,10 +354,32 @@ function main(): void {
   const skyContainer = shell.getPageContainer("sky");
   if (skyContainer) skyPage.mount(skyContainer);
 
-  const earthPage = new EarthPage({
+  const autoInstallMilkyWay = async () => {
+    try {
+      const renderer = sceneHost.getGalacticSkyRenderer();
+      const res = readyGalacticResource("sky.milky_way");
+      await renderer.installMilkyWay(res);
+      renderer.setMilkyWayVisible(true);
+    } catch {
+      // not ready yet
+    }
+  };
+  resourceManager.subscribeCatalog(() => {
+    void autoInstallMilkyWay();
+  });
+  void autoInstallMilkyWay();
+
+  earthPage = new EarthPage({
     onHorizonSettings: (settings) => {
       sceneHost.getHorizonOcclusionState().setEnabled(settings.enabled);
       bridge.sendHorizonSettings(settings);
+      trajectoryConfiguration = {
+        ...trajectoryConfiguration,
+        horizonMode: settings.enabled ? "real" : "astronomical",
+      };
+      if (trajectoryConfiguration.enabled && selectedTrajectoryTarget() !== null) {
+        requestSelectedApparentTrajectory();
+      }
     },
     onRegenerate: (settings) => {
       sceneHost.getHorizonOcclusionState().setEnabled(settings.enabled);
@@ -297,8 +414,6 @@ function main(): void {
   const timeBar = new TimeBar(bridge);
   timeBar.mount(shell.getTimelineContainer());
 
-  const selectionController = new CelestialSelectionController();
-
   const locationHUD = new LocationHUD({
     onCenter: () => {
        const state = selectionController.getState();
@@ -313,10 +428,17 @@ function main(): void {
        const state = selectionController.getState();
        if (state.selectedTarget) {
          focusTrackingController.startTracking(state.selectedTarget);
+         const model = buildInspectionModel(state, sceneHost);
+         locationHUD.updateInspection(model, true);
        }
     },
     onRelease: () => {
        focusTrackingController.stopTracking();
+       const state = selectionController.getState();
+       if (state.selectedTarget) {
+         const model = buildInspectionModel(state, sceneHost);
+         locationHUD.updateInspection(model, false);
+       }
     },
     onClear: () => {
        selectionController.clearSelection();
@@ -400,14 +522,27 @@ function main(): void {
 
   cameraRig.onUserInteraction(() => {
     focusTrackingController.stopTracking();
+    const selState = selectionController.getState();
+    if (selState.selectedTarget) {
+      const model = buildInspectionModel(selState, sceneHost);
+      locationHUD.updateInspection(model, false);
+    }
   });
 
   selectionController.subscribe((state) => {
+    if (state.selectedTarget) {
+      focusTrackingController.startTracking(state.selectedTarget);
+    } else {
+      focusTrackingController.stopTracking();
+    }
+
+    const isTracking = focusTrackingController.getTrackingState() !== "inactive";
     const model = buildInspectionModel(state, sceneHost);
-    locationHUD.updateInspection(model);
+    locationHUD.updateInspection(model, isTracking);
     opticsPanel.updateSelectedTarget(model?.displayName ?? null);
-    
+
     observationController?.onSelectionChanged(state.selectedTarget);
+    if (trajectoryConfiguration.enabled) requestSelectedApparentTrajectory();
   });
 
   // 2. Mount scene + UI
@@ -522,6 +657,36 @@ function main(): void {
     observationController?.onScientificPointingChanged(pose);
   });
 
+  (window as any).__setCameraPose = (az: number, alt: number, fov = 60) => {
+    cameraRig.animateTo(az, alt, fov, 0);
+  };
+  (window as any).__setSimulationTime = (iso: string) => {
+    bridge.sendSetSimulationTime(iso);
+  };
+  (window as any).__setBortle = (bortle: number) => {
+    bridge.sendSetLightPollutionEnabled(true);
+    bridge.sendSetLightPollutionMode("bortle");
+    bridge.sendSetBortleClass(bortle);
+  };
+  (window as any).__setMilkyWayVisible = async (visible: boolean) => {
+    const renderer = sceneHost.getGalacticSkyRenderer();
+    if (visible) {
+      try {
+        await renderer.installMilkyWay(readyGalacticResource("sky.milky_way"));
+      } catch {}
+    }
+    renderer.setMilkyWayVisible(visible);
+  };
+  (window as any).__isDemLoaded = () => {
+    return sceneHost.getHorizonOcclusionState().hasDemBackedProfile;
+  };
+  (window as any).__setHudVisible = (visible: boolean) => {
+    locationHUD.setVisible(visible);
+  };
+  (window as any).__requestTrajectory = () => {
+    requestSelectedApparentTrajectory();
+  };
+
   let currentObserverLatitude = 41.38;
   let lastStarTrailsState = "idle";
   const temporalSceneCoordinator = new TemporalSceneCoordinator();
@@ -559,6 +724,7 @@ function main(): void {
       earthPage.updateObserver(lat, lon, elevation, heightOffset, effectiveHeight, elevationSource);
       // Phase 4: Update observer latitude for celestial equator
       sceneHost.setObserverLatitude(lat);
+      if (trajectoryConfiguration.enabled) requestSelectedApparentTrajectory();
     },
     onNavigationCoordinatesChanged(lat, lon) {
       currentObserverLatitude = lat;
@@ -576,6 +742,13 @@ function main(): void {
       shell.updateRealtimeUI(isRealtime);
       sceneHost.setSiderealTime(lstDeg);
       starTrailRenderer.setCurrentSimulationTime(currentTimeIso);
+      const coverage = sceneHost.getSolarSystemRenderer().updateApparentTrajectoryTime(currentTimeIso);
+      skyPage.updateTrajectoryCoverage(coverage);
+      const currentMs = Date.parse(currentTimeIso);
+      const isOutsideOrShifted = coverage === "outside_interval" || Math.abs(currentMs - lastTrajectoryCenterMs) > 15 * 60_000;
+      if (isOutsideOrShifted && trajectoryConfiguration.enabled && selectedTrajectoryTarget() !== null) {
+        requestSelectedApparentTrajectory();
+      }
     },
     onStarTrailsSnapshot(snapshot) {
       if (snapshot.state === "running" && lastStarTrailsState !== "running") {
@@ -629,6 +802,9 @@ function main(): void {
         const applied = horizonState.applyBinaryResource(metadata, bufferPayload);
         if (applied) {
           navigationWorld.setTechnicalPresentationVisible(!horizonState.hasDemBackedProfile);
+          if (trajectoryConfiguration.enabled && selectedTrajectoryTarget() !== null) {
+            requestSelectedApparentTrajectory();
+          }
         }
         return;
       }
@@ -661,7 +837,17 @@ function main(): void {
         return;
       }
       if (metadata.role === "apparent_trajectory") {
-        sceneHost.getSolarSystemRenderer().registerApparentTrajectoryResource(metadata, bufferPayload);
+        const solarRenderer = sceneHost.getSolarSystemRenderer();
+        solarRenderer.setApparentTrajectoryHiddenVisible(trajectoryConfiguration.showTerrainOccluded);
+        solarRenderer.setApparentTrajectoryBelowHorizonVisible(trajectoryConfiguration.showBelowHorizon);
+        const accepted = solarRenderer.registerApparentTrajectoryResource(
+          metadata,
+          bufferPayload,
+        );
+        if (accepted) {
+          solarRenderer.updateApparentTrajectoryTime(latestSimulationTimeIso);
+          skyPage.updateTrajectoryResult(metadata);
+        }
         return;
       }
       if (metadata.role === "deep_sky_catalog") {
@@ -676,6 +862,17 @@ function main(): void {
     },
     onHorizonStatus(status) {
       earthPage.updateHorizonStatus(status);
+      if (
+        trajectoryConfiguration.enabled
+        && trajectoryConfiguration.horizonMode === "real"
+        && (status.phase === "completed" || status.phase === "fallback")
+      ) {
+        const key = `${status.observerGeneration}:${status.settingsGeneration}:${status.generation}:${status.quality ?? ""}`;
+        if (key !== lastTrajectoryHorizonKey) {
+          lastTrajectoryHorizonKey = key;
+          requestSelectedApparentTrajectory();
+        }
+      }
     },
     onObservationSnapshot(snapshot) {
       observationController?.present(snapshot);
@@ -705,8 +902,9 @@ function main(): void {
             model.fields.raDeg = msg.star.raDeg;
             model.fields.decDeg = msg.star.decDeg;
          }
-         locationHUD.updateInspection(model);
-      }
+          const isTracking = focusTrackingController.getTrackingState() !== "inactive";
+          locationHUD.updateInspection(model, isTracking);
+       }
     },
     onSkyEnvironmentSnapshot(snapshot) {
       currentSkyVisibilityState = snapshot.visibility;
@@ -978,6 +1176,12 @@ function main(): void {
         motionState,
         navigationWorld.envelope.readiness,
       );
+      const selState = selectionController.getState();
+      if (selState.selectedTarget) {
+        const isTracking = focusTrackingController.getTrackingState() !== "inactive";
+        const model = buildInspectionModel(selState, sceneHost);
+        locationHUD.updateInspection(model, isTracking);
+      }
     }
   });
 

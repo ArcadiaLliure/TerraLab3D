@@ -168,6 +168,7 @@ export class CameraRigImpl implements CameraRig {
     this.rollDeg = p.rollDeg;
     this.animating = false;
     this.applyToCamera();
+    this.schedulePosePublish();
   }
 
   setTrackingState(isTracking: boolean): void {

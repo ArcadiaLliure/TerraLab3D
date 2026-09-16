@@ -22,12 +22,14 @@ export class ResourceBackedLayerRow {
     private unsubCatalog?: () => void;
     private _isDestroyed = false;
     private _onVisibilityChanged: ((visible: boolean) => void | Promise<void>) | undefined;
+    private requestedVisible: boolean;
 
     constructor(manager: ResourceManager, options: ResourceBackedLayerOptions) {
         this.manager = manager;
         this.resourceId = options.resourceId;
         this.variantId = options.variantId;
         this._onVisibilityChanged = options.onVisibilityChanged;
+        this.requestedVisible = options.initialVisible ?? false;
 
         this.element = document.createElement("div");
         this.element.style.cssText = `
@@ -46,9 +48,12 @@ export class ResourceBackedLayerRow {
         
         this.checkbox = document.createElement("input");
         this.checkbox.type = "checkbox";
-        this.checkbox.checked = options.initialVisible ?? false;
+        this.checkbox.checked = this.requestedVisible;
         this.checkbox.disabled = true; // Disabled until READY
-        this.checkbox.onchange = () => void this.applyVisibility(this.checkbox.checked);
+        this.checkbox.onchange = () => {
+            this.requestedVisible = this.checkbox.checked;
+            void this.applyVisibility(this.checkbox.checked);
+        };
         
         labelContainer.append(this.checkbox, document.createTextNode(options.label));
         
@@ -105,6 +110,7 @@ export class ResourceBackedLayerRow {
     }
     
     public setCheckboxVisible(visible: boolean) {
+        this.requestedVisible = visible;
         this.checkbox.checked = visible;
         void this.applyVisibility(visible);
     }
@@ -132,27 +138,20 @@ export class ResourceBackedLayerRow {
             targetVariantId = descriptor.variants[0]!.id;
         }
 
-        if (state.status !== "READY" && this.checkbox.checked) {
-            this.checkbox.checked = false;
-            void this.applyVisibility(false);
-        }
-
         if (state.status === "READY") {
             this.statusText.textContent = "";
             this.actionBtn.style.display = "none";
             this.progressBarContainer.style.display = "none";
             
-            // Just became ready, maybe auto-enable?
-            const wasDisabled = this.checkbox.disabled;
             this.checkbox.disabled = false;
-            
-            // If the user checked it while it was downloading (we don't allow it yet, but just in case)
-            if (wasDisabled && this.checkbox.checked) {
+            if (this.requestedVisible) {
+                this.checkbox.checked = true;
                 void this.applyVisibility(true);
             }
         } 
         else if (state.status === "NOT_INSTALLED" || state.status === "PARTIAL" || state.status === "ERROR") {
             this.checkbox.disabled = true;
+            this.checkbox.checked = false;
             this.progressBarContainer.style.display = "none";
             
             if (state.status === "ERROR") {

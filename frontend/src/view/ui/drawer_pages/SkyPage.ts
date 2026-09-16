@@ -31,16 +31,28 @@ export interface SkyPageOptions {
   onPlanckDustToggled?: (visible: boolean) => void | Promise<void>;
   onNgcToggled?: (visible: boolean) => void;
   onSearchSelected?: (result: AstronomicalSearchResultPayload) => void;
+  onTrajectoryConfigurationChanged?: (configuration: TrajectoryConfiguration) => void;
+  onTrajectoryPresentationChanged?: (
+    showTerrainOccluded: boolean,
+    showBelowHorizon: boolean,
+  ) => void;
 }
 
 import { ResourceBackedLayerRow } from "../components/ResourceBackedLayerRow";
 import { SearchWidget } from "../components/SearchWidget";
 import { StarTrailsPanel } from "../components/StarTrailsPanel";
+import {
+  TrajectoryVisibilityPanel,
+  type TrajectoryConfiguration,
+} from "../components/TrajectoryVisibilityPanel";
+import type { ApparentTrajectoryMetadata } from "../../../contracts/astronomical_event_contracts";
+import type { TrajectoryCoverage } from "../../three/ApparentTrajectoryRenderer";
 import type { ResourceManager } from "../../../application/ResourceManager";
 
 export class SkyPage {
   private element: HTMLDivElement;
   private options: SkyPageOptions;
+  private trajectoryPanel!: TrajectoryVisibilityPanel;
   
   // Elements UI que s'actualitzen dinàmicament
   private starSourceLabel!: HTMLSpanElement;
@@ -444,7 +456,7 @@ export class SkyPage {
     this.milkyWayRow = new ResourceBackedLayerRow(this.resourceManager, {
       label: "Via Làctia",
       resourceId: "sky.milky_way",
-      initialVisible: false,
+      initialVisible: true,
       onVisibilityChanged: (visible) => this.options.onMilkyWayToggled?.(visible),
     });
     group.appendChild(this.milkyWayRow.getElement());
@@ -465,8 +477,30 @@ export class SkyPage {
     });
     group.appendChild(this.ngcRow.getElement());
 
+    this.trajectoryPanel = new TrajectoryVisibilityPanel({
+      onConfigurationChanged: (cfg) => this.options.onTrajectoryConfigurationChanged?.(cfg),
+      onPresentationChanged: (occluded, below) => this.options.onTrajectoryPresentationChanged?.(occluded, below),
+    });
+    this.element.appendChild(this.trajectoryPanel.getElement());
+
     this.starTrailsPanel = new StarTrailsPanel(this.bridge);
     this.element.appendChild(this.starTrailsPanel.getElement());
+  }
+
+  public updateTrajectoryCalculating(displayName: string): void {
+    this.trajectoryPanel.updateCalculating(displayName);
+  }
+
+  public updateTrajectoryResult(metadata: ApparentTrajectoryMetadata): void {
+    this.trajectoryPanel.updateResult(metadata);
+  }
+
+  public updateTrajectoryCoverage(coverage: TrajectoryCoverage): void {
+    this.trajectoryPanel.updateCoverage(coverage);
+  }
+
+  public updateTrajectoryUnavailable(reason: string): void {
+    this.trajectoryPanel.updateUnavailable(reason);
   }
 
   public updateStarTrailsSnapshot(snapshot: StarTrailsSnapshotMessage): void {

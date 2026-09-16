@@ -66,7 +66,7 @@ export class GalacticSkyRenderer {
   private appliedTransformRevision = -1;
   private milkyWay: ResidentTexture | null = null;
   private planckDust: ResidentTexture | null = null;
-  private milkyWayRequestedVisible = false;
+  private milkyWayRequestedVisible = true;
   private planckDustRequestedVisible = false;
   private milkyWayRevision = 0;
   private planckRevision = 0;
@@ -89,7 +89,7 @@ export class GalacticSkyRenderer {
         u_radius: { value: SKY_RADIUS },
         u_milkyWayTexture: { value: this.emptyMilkyWayTexture },
         u_planckDustTexture: { value: this.emptyDustTexture },
-        u_milkyWayEnabled: { value: false },
+        u_milkyWayEnabled: { value: true },
         u_planckDustEnabled: { value: false },
         u_milkyWayOpacity: { value: 0.72 },
         u_dustDensityStrength: { value: 0.32 },

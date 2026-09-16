@@ -170,6 +170,75 @@ export interface ApparentTrajectoryMetadata {
   readonly directionByteOffset: number;
   readonly timeOffsetByteOffset: number;
   readonly validityByteOffset: number;
+  /** Pas 22 extensions. Their absence identifies the compatible Pas-9 layout. */
+  readonly contractVersion?: 2;
+  readonly requestId?: string;
+  readonly objectId?: string;
+  readonly objectFamily?: ObservableFamily;
+  readonly displayName?: string;
+  readonly horizonVersion?: number;
+  readonly horizonQuality?: string;
+  readonly resolution?: TrajectoryResolution;
+  readonly intervalClassification?: VisibilityIntervalClassification;
+  readonly astronomicallyCircumpolar?: boolean;
+  readonly temporalToleranceSeconds?: number;
+  readonly angularToleranceDeg?: number;
+  readonly computeMs?: number;
+  readonly visibilityComponentType?: "uint8";
+  readonly horizonProvenanceComponentType?: "uint8";
+  readonly visibilityByteOffset?: number;
+  readonly horizonProvenanceByteOffset?: number;
+  readonly segments?: readonly ApparentTrajectorySegment[];
+  readonly events?: readonly ApparentTrajectoryEvent[];
+}
+
+export type ObservableFamily =
+  | "solar_system"
+  | "satellite"
+  | "star"
+  | "deep_sky"
+  | "coordinate"
+  | "constellation";
+
+export type TrajectoryResolution = "automatic" | "detailed";
+export type TrajectoryHorizonMode = "real" | "astronomical";
+export type TrajectoryVisibilityState =
+  | "visible"
+  | "terrain_occluded"
+  | "below_astronomical_horizon"
+  | "insufficient_data";
+export type HorizonProvenance = "real" | "fallback_astronomical" | "insufficient";
+export type VisibilityIntervalClassification =
+  | "visible_throughout"
+  | "never_visible"
+  | "mixed"
+  | "insufficient_data";
+
+export interface ObservableTrajectoryTarget {
+  readonly objectId: string;
+  readonly family: ObservableFamily;
+  readonly displayName: string;
+  readonly bodyId?: string;
+  readonly rightAscensionDeg?: number;
+  readonly declinationDeg?: number;
+  readonly frame?: "ICRS/J2000";
+}
+
+export interface ApparentTrajectorySegment {
+  readonly startIndex: number;
+  readonly endIndex: number;
+  readonly visibility: TrajectoryVisibilityState;
+  readonly horizonProvenance: HorizonProvenance;
+}
+
+export interface ApparentTrajectoryEvent {
+  readonly kind: "rise" | "set" | "tangent";
+  readonly instantUtc: string;
+  readonly directionENU: readonly [number, number, number];
+  readonly azimuthDeg: number;
+  readonly altitudeDeg: number;
+  readonly horizonElevationDeg: number;
+  readonly horizonProvenance: HorizonProvenance;
 }
 
 export interface AngularSeparationResult {

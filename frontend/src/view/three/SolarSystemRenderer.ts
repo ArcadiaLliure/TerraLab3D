@@ -18,7 +18,11 @@ import type {
   SolarSystemSnapshot,
 } from "../../contracts/solar_system_contracts";
 import { threeFromEnu } from "./celestialCoordinates";
-import { ApparentTrajectoryRenderer, type ApparentTrajectoryMetrics } from "./ApparentTrajectoryRenderer";
+import {
+  ApparentTrajectoryRenderer,
+  type ApparentTrajectoryMetrics,
+  type TrajectoryCoverage,
+} from "./ApparentTrajectoryRenderer";
 import { CelestialOcclusionPolicy } from "./CelestialOcclusionPolicy";
 import {
   MoonSurfaceRenderer,
@@ -364,6 +368,26 @@ export class SolarSystemRenderer {
     return this.trajectories.registerBinaryResource(metadata, buffer);
   }
 
+  beginApparentTrajectoryRequest(requestId: string, objectId: string): void {
+    this.trajectories.beginRequest(requestId, objectId);
+  }
+
+  clearApparentTrajectory(): void {
+    this.trajectories.clear();
+  }
+
+  updateApparentTrajectoryTime(instantUtc: string): TrajectoryCoverage {
+    return this.trajectories.updateSimulationTime(instantUtc);
+  }
+
+  setApparentTrajectoryHiddenVisible(visible: boolean): void {
+    this.trajectories.setHiddenSegmentsVisible(visible);
+  }
+
+  setApparentTrajectoryBelowHorizonVisible(visible: boolean): void {
+    this.trajectories.setBelowHorizonVisible(visible);
+  }
+
   updateEventSnapshot(snapshot: AstronomicalEventSnapshot): boolean {
     if (
       snapshot.generation <= this.latestEventGeneration
@@ -411,6 +435,7 @@ export class SolarSystemRenderer {
 
   updateCamera(fovDeg: number, heightPx: number): void {
     this.satellites.updateCamera(fovDeg, heightPx);
+    this.trajectories.updateCamera(fovDeg, heightPx);
   }
 
   setMoonSurfaceEnabled(enabled: boolean): void {

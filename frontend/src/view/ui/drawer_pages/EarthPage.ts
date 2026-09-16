@@ -480,4 +480,8 @@ export class EarthPage {
       }
     };
   }
+
+  isHorizonEnabled(): boolean {
+    return this.enabledInput.checked;
+  }
 }

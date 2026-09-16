@@ -657,18 +657,22 @@ export class WebSocketBridge {
 
   public requestApparentTrajectory(
     requestId: string,
-    bodyId: string,
+    observable: import("../contracts/astronomical_event_contracts").ObservableTrajectoryTarget,
     startUtc: string,
     endUtc: string,
-    sampleCount = 256,
+    sampleCount = 64,
+    resolution: import("../contracts/astronomical_event_contracts").TrajectoryResolution = "automatic",
+    horizonMode: import("../contracts/astronomical_event_contracts").TrajectoryHorizonMode = "real",
   ): void {
     this.sendMessage({
       type: "request_apparent_trajectory",
       requestId,
-      bodyId,
+      observable,
       startUtc,
       endUtc,
       sampleCount,
+      resolution,
+      horizonMode,
     });
   }
 

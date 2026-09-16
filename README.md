@@ -85,6 +85,13 @@ versionats diferents de les òrbites planetocèntriques SPK. Prop de la totalita
 el limbe LRO/LOLA governa les Perles de Baily i l'anell de diamant; la corona
 procedural queda marcada explícitament com a aproximada.
 
+La trajectòria de l'objecte seleccionat també es pot comparar amb el perfil
+d'horitzó real. El panell permet escollir interval, resolució i horitzó real o
+astronòmic, i diferencia el tram visible, l'ocult pel relleu, el situat sota
+0° i els buits de dades. Els marcadors de sortida i posta provenen de
+creuaments temporals refinats; moure el temps dins l'interval només desplaça el
+marcador actiu i no repeteix el càlcul.
+
 ### Horitzó i relleu
 
 TerraLab3D calcula l’horitzó real que envolta l’observador.

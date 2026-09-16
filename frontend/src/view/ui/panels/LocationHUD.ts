@@ -272,7 +272,7 @@ export class LocationHUD {
   }
 
 
-  public updateInspection(model: CelestialInspectionModel | null): void {
+  public updateInspection(model: CelestialInspectionModel | null, isTracking = false): void {
     if (!model) {
       this.starContainer.style.display = "none";
       this.starContainer.innerHTML = "";
@@ -286,10 +286,14 @@ export class LocationHUD {
       html += `<div style="color: #ff5555; font-weight: bold; margin-bottom: 4px;">Recurs no disponible</div>`;
     }
 
+    const trackingBadge = isTracking
+      ? `<span style="background: #f1cd88; color: #0b111e; font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 2px; margin-left: 6px; vertical-align: middle;">SEGUINT</span>`
+      : "";
+
     if (model.kind === "star") {
       const bpRpText = model.fields.bpRp !== null && model.fields.bpRp !== undefined ? model.fields.bpRp.toFixed(2) : "N/A";
       html += `
-        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Estrella seleccionada</div>
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Estrella seleccionada${trackingBadge}</div>
         <div>ID: ${model.fields.sourceId ?? (model.targetRef as any).sourceId ?? "Pendent de resolució..."}</div>
         <div>RA: ${model.fields.raDeg?.toFixed(4) ?? "N/A"}° &nbsp; Dec: ${model.fields.decDeg?.toFixed(4) ?? "N/A"}°</div>
         <div>Mag: ${model.fields.magnitude?.toFixed(2) ?? "N/A"} &nbsp; BP-RP: ${bpRpText}</div>
@@ -313,7 +317,7 @@ export class LocationHUD {
       const familyName = labels[model.fields.familyCode as number] || "Objecte de Cel Profund";
 
       html += `
-        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cel Profund (NGC)</div>
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cel Profund (NGC)${trackingBadge}</div>
         <div>${escapeHtml(model.displayName)}</div>
         <div>${familyName}</div>
         <div>Mag: ${mag} &nbsp; Grandària: ${size}</div>
@@ -325,7 +329,7 @@ export class LocationHUD {
         : model.fields.apparentMagnitude.toFixed(2);
       
       html += `
-        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cos celeste seleccionat</div>
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Cos celeste seleccionat${trackingBadge}</div>
         <div>${escapeHtml(model.displayName)}</div>
         <div>Alt: ${model.fields.altitudeDeg?.toFixed(2) ?? "N/A"}° &nbsp; Az: ${model.fields.azimuthDeg?.toFixed(2) ?? "N/A"}°</div>
         <div>Distància: ${model.fields.distanceKm?.toLocaleString(undefined, { maximumFractionDigits: 0 }) ?? "N/A"} km</div>
@@ -333,7 +337,7 @@ export class LocationHUD {
       `;
     } else if (model.kind === "coordinate") {
       html += `
-        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Coordenada</div>
+        <div style="font-weight: 600; margin-bottom: 4px; color: #f1cd88;">Coordenada${trackingBadge}</div>
         <div>RA: ${model.fields.raDeg?.toFixed(4) ?? "N/A"}°</div>
         <div>Dec: ${model.fields.decDeg?.toFixed(4) ?? "N/A"}°</div>
       `;
@@ -343,7 +347,10 @@ export class LocationHUD {
     html += `
       <div style="margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap;">
         <button id="loc-hud-btn-center" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Centrar</button>
-        <button id="loc-hud-btn-follow" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Seguir</button>
+        ${isTracking
+          ? `<button id="loc-hud-btn-follow" style="background: #f1cd88; border: 1px solid #ffd899; color: #0b111e; font-weight: 700; padding: 2px 8px; cursor: pointer; border-radius: 3px;">Seguint ✓</button>`
+          : `<button id="loc-hud-btn-follow" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Seguir</button>`
+        }
         <button id="loc-hud-btn-release" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Alliberar</button>
         <button id="loc-hud-btn-clear" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 2px 6px; cursor: pointer; border-radius: 2px;">Netejar</button>
       </div>
@@ -354,7 +361,15 @@ export class LocationHUD {
     if (btnCenter && this.callbacks.onCenter) btnCenter.addEventListener("click", this.callbacks.onCenter);
     
     const btnFollow = this.starContainer.querySelector("#loc-hud-btn-follow");
-    if (btnFollow && this.callbacks.onFollow) btnFollow.addEventListener("click", this.callbacks.onFollow);
+    if (btnFollow) {
+      btnFollow.addEventListener("click", () => {
+        if (isTracking) {
+          this.callbacks.onRelease?.();
+        } else {
+          this.callbacks.onFollow?.();
+        }
+      });
+    }
     
     const btnRelease = this.starContainer.querySelector("#loc-hud-btn-release");
     if (btnRelease && this.callbacks.onRelease) btnRelease.addEventListener("click", this.callbacks.onRelease);

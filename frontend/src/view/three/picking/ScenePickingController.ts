@@ -127,6 +127,26 @@ export class ScenePickingController {
       return;
     }
 
+    const state = this.deps.selectionController.getState();
+    if (state.selectedTarget) {
+      let label: string | null = null;
+      if (state.selectedTarget.kind === "solar_system") {
+        const labels: Readonly<Record<string, string>> = {
+          sun: "Sol", moon: "Lluna", mercury: "Mercuri", venus: "Venus",
+          mars: "Mart", jupiter: "Júpiter", saturn: "Saturn", uranus: "Urà",
+          neptune: "Neptú", pluto: "Plutó",
+        };
+        label = labels[state.selectedTarget.bodyId] ?? state.selectedTarget.bodyId;
+      } else if (state.selectedTarget.kind === "star") {
+        label = state.selectedTarget.sourceId ? `Estrella ${state.selectedTarget.sourceId}` : "Estrella";
+      } else if (state.selectedTarget.kind === "deep_sky") {
+        label = "Objecte cel profund";
+      }
+      this.selectionMarker.setLabel(label);
+    } else {
+      this.selectionMarker.setLabel(null);
+    }
+
     if (this.selectedHit) {
       const pos = this.deps.pickProvider.reproject(this.selectedHit);
       if (pos) {
@@ -140,7 +160,6 @@ export class ScenePickingController {
       }
     }
 
-    const state = this.deps.selectionController.getState();
     if (state.selectedTarget && state.availability !== "unavailable" && trackingResolver && camera) {
       const resolved = trackingResolver.resolve(state.selectedTarget);
       if (resolved) {

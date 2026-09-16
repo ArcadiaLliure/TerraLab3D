@@ -18,8 +18,10 @@ const MARKER_COLOR = "#f1cd88"; // color gold de TerraLab3D
 
 export class SelectionMarker {
   private readonly element: HTMLDivElement;
+  private readonly labelElement: HTMLDivElement;
   private container: HTMLElement | null = null;
   private visible = false;
+  private currentLabel: string | null = null;
 
   constructor() {
     this.element = document.createElement("div");
@@ -34,11 +36,49 @@ export class SelectionMarker {
       transition: width 80ms linear, height 80ms linear;
     `;
     this.element.innerHTML = this.createSvg();
+
+    this.labelElement = document.createElement("div");
+    this.labelElement.className = "celestial-selection-label";
+    this.labelElement.style.cssText = `
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 10px;
+      padding: 3px 8px;
+      background: rgba(10, 16, 30, 0.88);
+      border: 1px solid rgba(241, 205, 136, 0.85);
+      border-radius: 4px;
+      color: #f1cd88;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+      display: none;
+    `;
+    this.element.appendChild(this.labelElement);
   }
 
   mount(container: HTMLElement): void {
     this.container = container;
     container.appendChild(this.element);
+  }
+
+  setLabel(text: string | null): void {
+    this.currentLabel = text;
+    if (text && text.trim().length > 0) {
+      this.labelElement.textContent = text;
+      if (this.visible) {
+        this.labelElement.style.display = "block";
+      }
+    } else {
+      this.labelElement.textContent = "";
+      this.labelElement.style.display = "none";
+    }
   }
 
   /**
@@ -62,6 +102,9 @@ export class SelectionMarker {
     if (!this.visible) {
       this.visible = true;
       this.element.style.display = "block";
+      if (this.currentLabel && this.currentLabel.trim().length > 0) {
+        this.labelElement.style.display = "block";
+      }
       console.log(`MGP: [SelectionMarker] Marker visible at x=${x.toFixed(1)} y=${y.toFixed(1)} size=${size}px`);
     }
   }
@@ -70,6 +113,7 @@ export class SelectionMarker {
     if (this.visible) {
       this.visible = false;
       this.element.style.display = "none";
+      this.labelElement.style.display = "none";
     }
   }
 

@@ -55,6 +55,7 @@ from terralab3d.application.orbit_sampler import OrbitSampler
 from terralab3d.application.apparent_trajectory import (
     ApparentTrajectoryCoordinator,
     ApparentTrajectorySampler,
+    observable_from_message,
 )
 from terralab3d.application.astronomical_events import (
     AstronomicalEventSearcher,
@@ -68,6 +69,7 @@ from terralab3d.domain.eclipses.models import (
     GeometryQuality,
 )
 from terralab3d.domain.eclipses.services import AstronomicalEventCalculator
+from terralab3d.domain.visibility.models import TrajectoryResolution
 from terralab3d.infrastructure.adapters.ephemeris.adapter import SkyfieldEphemerisAdapter
 from terralab3d.infrastructure.adapters.ephemeris.spice_adapter import SpiceEphemerisAdapter
 
@@ -1408,10 +1410,13 @@ async def run() -> int:
             AstronomicalEventSearcher(ephemeris_adapter),
             bridge.send_event_search_result,
         )
-        trajectory_coordinator = ApparentTrajectoryCoordinator(
-            ApparentTrajectorySampler(ephemeris_adapter),
-            bridge.send_apparent_trajectory,
-        )
+    trajectory_coordinator = ApparentTrajectoryCoordinator(
+        ApparentTrajectorySampler(
+            ephemeris_adapter if isinstance(ephemeris_adapter, SpiceEphemerisAdapter) else None,
+            horizon_profile=lambda: horizon_coordinator.active_profile,
+        ),
+        bridge.send_apparent_trajectory,
+    )
     metadata = ephemeris_adapter.metadata
     log.debug(
         "Efemèride: provider=%s kernel=%s generation=%s sha256=%s",
@@ -1526,17 +1531,11 @@ async def run() -> int:
             })
 
     async def _handle_request_apparent_trajectory(data: dict[str, Any]) -> None:
-        if trajectory_coordinator is None:
-            await bridge.send({
-                "type": "bridge_error",
-                "code": "TRAJECTORY_UNAVAILABLE",
-                "message": "Les trajectòries precises requereixen SPICE/DE440",
-            })
-            return
         try:
+            observable = observable_from_message(data)
             trajectory_coordinator.request(
                 request_id=str(data["requestId"]),
-                body_id=str(data["bodyId"]),
+                observable=observable,
                 observer=scientific_observer(),
                 observer_generation=observer_generation,
                 start_utc=datetime.fromisoformat(
@@ -1546,6 +1545,8 @@ async def run() -> int:
                     str(data["endUtc"]).replace("Z", "+00:00")
                 ),
                 sample_count=max(2, min(4096, int(data.get("sampleCount", 256)))),
+                resolution=TrajectoryResolution(str(data.get("resolution", "automatic"))),
+                use_terrain_horizon=str(data.get("horizonMode", "real")) == "real",
             )
         except (KeyError, TypeError, ValueError) as exc:
             await bridge.send({

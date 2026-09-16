@@ -10,6 +10,9 @@ import type {
   AstronomicalEventSearchResult,
   AstronomicalEventSnapshot,
   AngularSeparationResult,
+  ObservableTrajectoryTarget,
+  TrajectoryHorizonMode,
+  TrajectoryResolution,
 } from "./astronomical_event_contracts";
 import type {
   MoonSurfaceResourceDescriptor,
@@ -156,10 +159,12 @@ export interface RequestEventSearchMessage {
 export interface RequestApparentTrajectoryMessage {
   readonly type: "request_apparent_trajectory";
   readonly requestId: string;
-  readonly bodyId: string;
+  readonly observable: ObservableTrajectoryTarget;
   readonly startUtc: string;
   readonly endUtc: string;
   readonly sampleCount: number;
+  readonly resolution: TrajectoryResolution;
+  readonly horizonMode: TrajectoryHorizonMode;
 }
 
 export interface RequestAngularSeparationMessage {

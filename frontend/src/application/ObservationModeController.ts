@@ -163,11 +163,13 @@ export class ObservationModeController {
 
   private syncInstrumentTracking(): void {
     const snapshot = this.snapshot;
-    const shouldTrack = snapshot?.mode === "telescope"
-      || (snapshot?.mode === "camera" && snapshot.camera.trackingEnabled);
+    if (!snapshot || snapshot.mode === "eye") return;
+
+    const shouldTrack = snapshot.mode === "telescope"
+      || (snapshot.mode === "camera" && snapshot.camera.trackingEnabled);
     if (shouldTrack && this.selectedTarget) {
       this.focusTrackingController.startTracking(this.selectedTarget, true);
-    } else {
+    } else if (snapshot.mode === "camera" && !snapshot.camera.trackingEnabled) {
       this.focusTrackingController.stopTracking();
     }
   }
