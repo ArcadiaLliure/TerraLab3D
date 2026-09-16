@@ -18,11 +18,22 @@ interface Entry {
 }
 export interface MeasurementLayerMetrics { readonly geometryBuildCount: number; readonly geometryDisposeCount: number; readonly activeEntityCount: number; readonly lastChangedEntityCount: number; }
 
+/** Resol l'orientació visual d'una mesura sense confondre seguiment celeste i posició 3D fixa. */
+export function setMeasurementPresentationQuaternion(
+  measurement: Pick<MeasurementSnapshot, "tracking" | "fixedQuaternion">,
+  trackingQuaternion: THREE.Quaternion,
+  target: THREE.Quaternion,
+): THREE.Quaternion {
+  if (measurement.tracking) return target.copy(trackingQuaternion);
+  const fixed = measurement.fixedQuaternion;
+  return fixed ? target.set(fixed[0], fixed[1], fixed[2], fixed[3]) : target.identity();
+}
+
 export interface MeasurementLayerRenderer {
   applyDelta(delta: SceneDelta): void;
   mountLabels(container: HTMLElement): void;
   presentDocument(snapshot: MeasurementDocumentSnapshot): void;
-  presentPreview(geometry: MeasurementGeometrySnapshot | null, tracking?: boolean): void;
+  presentPreview(geometry: MeasurementGeometrySnapshot | null, tracking?: boolean, fixedQuaternion?: readonly [number, number, number, number] | null): void;
   pick(clientX: number, clientY: number, camera: THREE.Camera, viewport: DOMRect, trackingQuaternion?: THREE.Quaternion): MeasurementPick | null;
   updateLabels(camera: THREE.Camera, viewport: DOMRect, trackingQuaternion?: THREE.Quaternion): void;
   setHovered(id: string | null): void;
@@ -103,6 +114,7 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
   private lastChangedEntityCount = 0;
   private readonly projected = new THREE.Vector3();
   private readonly parentPosition = new THREE.Vector3();
+  private readonly presentationQuaternion = new THREE.Quaternion();
 
   constructor(parentFixed: THREE.Group, _parentTracking: THREE.Group) {
     this.groupFixed.name = "measurement-layer-fixed";
@@ -153,7 +165,7 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     this.lastChangedEntityCount = changed;
   }
 
-  presentPreview(geometry: MeasurementGeometrySnapshot | null, tracking = true): void {
+  presentPreview(geometry: MeasurementGeometrySnapshot | null, tracking = true, fixedQuaternion: readonly [number, number, number, number] | null = null): void {
     if (!geometry || geometry.paths.length === 0) {
       this.previewGeometry.instanceCount = 0;
       this.previewLine.visible = false;
@@ -162,6 +174,8 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     const isTracking = tracking ?? true;
     const parentGroup = isTracking ? this.groupTracking : this.groupFixed;
     if (this.previewLine.parent !== parentGroup) parentGroup.add(this.previewLine);
+    this.previewLine.quaternion.identity();
+    if (!isTracking && fixedQuaternion) this.previewLine.quaternion.set(...fixedQuaternion);
 
     let cursor = 0;
     for (const path of geometry.paths) {
@@ -190,8 +204,8 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     this.groupFixed.parent?.getWorldPosition(this.parentPosition);
     for (const entry of this.entries.values()) {
       setThreeFromAzimuthAltitude(this.projected, entry.measurement.geometry.anchor.azimuthDeg, entry.measurement.geometry.anchor.altitudeDeg, RADIUS);
-      const isTracking = entry.measurement.tracking ?? true;
-      if (isTracking) this.projected.applyQuaternion(trackingQuaternion);
+      setMeasurementPresentationQuaternion(entry.measurement, trackingQuaternion, this.presentationQuaternion);
+      this.projected.applyQuaternion(this.presentationQuaternion);
       this.projected.add(this.parentPosition).project(camera);
       const visible = this.projected.z >= -1 && this.projected.z <= 1 && Math.abs(this.projected.x) <= 1.1 && Math.abs(this.projected.y) <= 1.1;
       entry.label.hidden = !visible;
@@ -313,8 +327,13 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     label.textContent = measurement.geometry.label;
     this.mountedContainer?.appendChild(label);
 
-    const isTracking = measurement.tracking ?? true;
+    const isTracking = measurement.tracking;
     const parentGroup = isTracking ? this.groupTracking : this.groupFixed;
+    if (!isTracking) {
+      setMeasurementPresentationQuaternion(measurement, new THREE.Quaternion(), this.presentationQuaternion);
+      line.quaternion.copy(this.presentationQuaternion);
+      points.quaternion.copy(this.presentationQuaternion);
+    }
     parentGroup.add(line, points);
     this.geometryBuildCount += 2;
 
@@ -344,10 +363,11 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     return cursor + 1;
   }
 
-  private screenPoint(point: AngularCoordinate, camera: THREE.Camera, viewport: DOMRect, tracking = true, trackingQuaternion?: THREE.Quaternion): readonly [number, number] | null {
+  private screenPoint(point: AngularCoordinate, measurement: MeasurementSnapshot, camera: THREE.Camera, viewport: DOMRect, trackingQuaternion = new THREE.Quaternion()): readonly [number, number] | null {
     this.groupFixed.parent?.getWorldPosition(this.parentPosition);
     setThreeFromAzimuthAltitude(this.projected, point.azimuthDeg, point.altitudeDeg, RADIUS);
-    if (tracking && trackingQuaternion) this.projected.applyQuaternion(trackingQuaternion);
+    setMeasurementPresentationQuaternion(measurement, trackingQuaternion, this.presentationQuaternion);
+    this.projected.applyQuaternion(this.presentationQuaternion);
     this.projected.add(this.parentPosition).project(camera);
     if (this.projected.z < -1 || this.projected.z > 1) return null;
     return [viewport.left + (this.projected.x + 1) * viewport.width / 2, viewport.top + (1 - this.projected.y) * viewport.height / 2];
@@ -356,14 +376,13 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
   pick(clientX: number, clientY: number, camera: THREE.Camera, viewport: DOMRect, trackingQuaternion?: THREE.Quaternion): MeasurementPick | null {
     let winner: { distance: number; result: MeasurementPick } | null = null;
     for (const entry of this.entries.values()) {
-      const isTracking = entry.measurement.tracking ?? true;
       for (const [part, point] of [["start", entry.measurement.start], ["end", entry.measurement.end]] as const) {
-        const distance = this.screenDistance(clientX, clientY, point, camera, viewport, isTracking, trackingQuaternion);
+        const distance = this.screenDistance(clientX, clientY, point, entry.measurement, camera, viewport, trackingQuaternion);
         if (distance <= 18 && (!winner || distance < winner.distance)) winner = { distance, result: { measurementId: entry.measurement.measurementId, part } };
       }
       for (const path of entry.measurement.geometry.paths) for (let index = 1; index < path.length; index++) {
-        const first = this.screenPoint(path[index - 1]!, camera, viewport, isTracking, trackingQuaternion);
-        const second = this.screenPoint(path[index]!, camera, viewport, isTracking, trackingQuaternion);
+        const first = this.screenPoint(path[index - 1]!, entry.measurement, camera, viewport, trackingQuaternion);
+        const second = this.screenPoint(path[index]!, entry.measurement, camera, viewport, trackingQuaternion);
         if (!first || !second) continue;
         const distance = pointToSegmentDistance(clientX, clientY, first[0], first[1], second[0], second[1]);
         if (distance <= 15 && (!winner || distance < winner.distance)) winner = { distance, result: { measurementId: entry.measurement.measurementId, part: "edge" } };
@@ -372,8 +391,8 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     return winner?.result ?? null;
   }
 
-  private screenDistance(clientX: number, clientY: number, point: AngularCoordinate, camera: THREE.Camera, viewport: DOMRect, tracking = false, trackingQuaternion?: THREE.Quaternion): number {
-    const projected = this.screenPoint(point, camera, viewport, tracking, trackingQuaternion);
+  private screenDistance(clientX: number, clientY: number, point: AngularCoordinate, measurement: MeasurementSnapshot, camera: THREE.Camera, viewport: DOMRect, trackingQuaternion?: THREE.Quaternion): number {
+    const projected = this.screenPoint(point, measurement, camera, viewport, trackingQuaternion);
     return projected ? Math.hypot(clientX - projected[0], clientY - projected[1]) : Number.POSITIVE_INFINITY;
   }
 }

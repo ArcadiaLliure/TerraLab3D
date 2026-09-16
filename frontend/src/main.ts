@@ -282,6 +282,7 @@ function main(): void {
     onRedo: () => measurementController?.redo(),
     onDelete: () => measurementController?.deleteSelected(),
     onClear: () => measurementController?.clear(),
+    onTrackingChanged: (enabled) => measurementController?.setTrackingEnabled(enabled),
   });
   const toolsContainer = shell.getPageContainer("tools");
   if (toolsContainer) toolsPage.mount(toolsContainer);
@@ -393,7 +394,7 @@ function main(): void {
   const observationHUD = new ObservationHUD();
   observationHUD.mount(shell.getCanvasContainer());
   observationController = new ObservationModeController(
-    bridge, sceneHost, cameraRig, celestialTransformState, trackingResolver,
+    bridge, sceneHost, cameraRig, celestialTransformState, trackingResolver, focusTrackingController,
     starTrailRenderer, locationPage, opticsPanel, observationHUD,
   );
 
@@ -404,15 +405,9 @@ function main(): void {
   selectionController.subscribe((state) => {
     const model = buildInspectionModel(state, sceneHost);
     locationHUD.updateInspection(model);
+    opticsPanel.updateSelectedTarget(model?.displayName ?? null);
     
-    // Auto-track si prové de search o pick
-    if (state.selectedTarget) {
-        if (state.source === "search" || state.source === "pick") {
-           focusTrackingController.startTracking(state.selectedTarget);
-        }
-    } else {
-        focusTrackingController.stopTracking();
-    }
+    observationController?.onSelectionChanged(state.selectedTarget);
   });
 
   // 2. Mount scene + UI
@@ -823,6 +818,9 @@ function main(): void {
       terrainGotoController.dispose();
       navigationWorld.dispose();
       atmosphereRenderer.dispose();
+      observationController?.dispose();
+      observationHUD.dispose();
+      opticsPanel.dispose();
       sceneHost.dispose();
       diagnostics.dispose();
       locationPage.dispose();

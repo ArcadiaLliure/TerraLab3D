@@ -7,6 +7,7 @@ export type TrackingState = "inactive" | "acquiring" | "tracking";
 export class FocusTrackingController {
   private state: TrackingState = "inactive";
   private currentTarget: CelestialTargetRef | null = null;
+  private rotateField = false;
   
   constructor(
     private readonly cameraRig: CameraRigImpl,
@@ -28,10 +29,16 @@ export class FocusTrackingController {
     return this.currentTarget;
   }
 
-  public startTracking(target: CelestialTargetRef | null): void {
+  public startTracking(target: CelestialTargetRef | null, rotateField = false): void {
     if (!target) return;
+
+    if (this.currentTarget === target && this.state !== "inactive") {
+      this.rotateField = rotateField;
+      return;
+    }
     
     this.currentTarget = target;
+    this.rotateField = rotateField;
     this.state = "acquiring";
     
     const resolved = this.resolver.resolve(target);
@@ -48,7 +55,10 @@ export class FocusTrackingController {
     if (this.state !== "inactive") {
         this.state = "inactive";
         this.currentTarget = null;
+        this.rotateField = false;
         this.cameraRig.setTrackingState(false);
+        const pose = this.cameraRig.pose();
+        if (pose.rollDeg !== 0) this.cameraRig.setPose({ ...pose, rollDeg: 0 });
         console.debug("MGP: [FocusTrackingController] Tracking aturat");
     }
   }
@@ -83,6 +93,7 @@ export class FocusTrackingController {
       ...pose,
       azimuthDeg: resolved.azimuthDeg,
       altitudeDeg: resolved.altitudeDeg,
+      rollDeg: this.rotateField ? resolved.fieldRotationDeg : 0,
     });
   }
 }

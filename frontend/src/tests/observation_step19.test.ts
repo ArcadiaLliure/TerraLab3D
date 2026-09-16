@@ -1,8 +1,9 @@
 import * as THREE from "three";
-import { cameraOverlayHalfSize } from "../view/three/layers/ImagingPreviewLayerRenderer";
+import { cameraOverlayHalfSize, normalizeRotationDeg } from "../view/three/layers/ImagingPreviewLayerRenderer";
 import { telescopeOverlayRadiusY } from "../view/three/layers/ScopeLayerRenderer";
 import { StarTrailLayerRendererImpl } from "../view/three/layers/StarTrailLayerRendererImpl";
 import { cameraDeepQueryKey } from "../application/ObservationModeController";
+import { trackedFieldRotationDeg } from "../domain/observation/fieldRotation";
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {
@@ -23,6 +24,14 @@ const verticalRadiusPx = radiusY * height / 2;
 const horizontalRadiusPx = (radiusY / aspect) * width / 2;
 assert(near(verticalRadiusPx, horizontalRadiusPx), "telescope mask is circular in pixel space");
 assert(cameraOverlayHalfSize(100, 80, 30, aspect)[0] > 1, "larger instrumental fields clip without changing visual FOV");
+assert(near(normalizeRotationDeg(225), -135), "manual camera frame rotation is normalized");
+
+const equatorialRoll = trackedFieldRotationDeg(
+  { x: 1, y: 0, z: 0 },
+  { x: 0, y: 0, z: 1 },
+);
+assert(near(equatorialRoll, 90), "tracked field aligns with transformed celestial north");
+assert(near(trackedFieldRotationDeg({ x: 0, y: 1, z: 0 }, { x: 0, y: 0, z: 1 }), 0), "zenith singularity has a stable fallback");
 
 const scientificKey = cameraDeepQueryKey(180, 30, 4.5, 12.25);
 assert(scientificKey === cameraDeepQueryKey(180, 30, 4.5, 12.25), "visual zoom, viewport, DPR and transform ticks are absent from the Gaia key");

@@ -52,7 +52,7 @@
     },
     "camera": {
       "type": "object",
-      "required": ["selectedProfileId", "focalLengthMm", "fNumber", "iso", "exposureSeconds", "trackingEnabled", "opticalTransmission"],
+      "required": ["selectedProfileId", "focalLengthMm", "fNumber", "iso", "exposureSeconds", "trackingEnabled", "frameRotationDeg", "opticalTransmission"],
       "properties": {
         "selectedProfileId": { "type": "string", "pattern": "^camera:" },
         "focalLengthMm": { "$ref": "#/$defs/positive" },
@@ -60,6 +60,7 @@
         "iso": { "$ref": "#/$defs/positive" },
         "exposureSeconds": { "$ref": "#/$defs/positive" },
         "trackingEnabled": { "type": "boolean" },
+        "frameRotationDeg": { "type": "number", "minimum": -180, "maximum": 180 },
         "opticalTransmission": { "$ref": "#/$defs/optionalTransmission" }
       },
       "additionalProperties": false

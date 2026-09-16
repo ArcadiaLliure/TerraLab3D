@@ -32,6 +32,8 @@ import * as THREE from "three";
 import type { ObservationSnapshotMessage } from "../../contracts/observation_contracts";
 import type { MeasurementDocumentSnapshot } from "../../contracts/measurement_contracts";
 import { MeasurementLayerRendererImpl } from "./layers/MeasurementLayerRenderer";
+import { ScopeLayerRendererImpl } from "./layers/ScopeLayerRenderer";
+import { ImagingPreviewLayerRendererImpl } from "./layers/ImagingPreviewLayerRenderer";
 import { HorizontalGrid } from "./HorizontalGrid";
 import { CelestialLabels } from "./CelestialLabels";
 import { CelestialEquator } from "./CelestialEquator";
@@ -94,6 +96,10 @@ export class ThreeSceneHostImpl {
 
   // ─── Phase 21: Measurements ───────────────────────────────────────
   private measurementLayerRenderer!: MeasurementLayerRendererImpl;
+
+  // ─── Phase 19: Observation Overlays ────────────────────────────────
+  private readonly scopeLayerRenderer = new ScopeLayerRendererImpl();
+  private readonly imagingPreviewLayerRenderer = new ImagingPreviewLayerRendererImpl();
 
   // ─── State ─────────────────────────────────────────────────────────
   private container: HTMLElement | null = null;
@@ -252,8 +258,43 @@ export class ThreeSceneHostImpl {
     return this.celestialSphere.quaternion;
   }
 
+  getScopeLayerRenderer(): ScopeLayerRendererImpl {
+    return this.scopeLayerRenderer;
+  }
+
+  getImagingPreviewLayerRenderer(): ImagingPreviewLayerRendererImpl {
+    return this.imagingPreviewLayerRenderer;
+  }
+
   presentObservation(snapshot: ObservationSnapshotMessage): void {
     this.observationSnapshot = snapshot;
+    this.updateObservationOverlays();
+  }
+
+  private updateObservationOverlays(): void {
+    if (!this.observationSnapshot) return;
+    const aspect = this.camera.aspect || 1;
+    const fovH = this.currentFovDeg;
+    const mode = this.observationSnapshot.mode;
+    const field = this.observationSnapshot.field;
+
+    const isCamera = mode === "camera";
+    const isTelescope = mode === "telescope";
+
+    this.imagingPreviewLayerRenderer.setVisible(isCamera);
+    if (isCamera && field) {
+      this.imagingPreviewLayerRenderer.present(
+        field,
+        fovH,
+        aspect,
+        this.observationSnapshot.camera.frameRotationDeg,
+      );
+    }
+
+    this.scopeLayerRenderer.setVisible(isTelescope);
+    if (isTelescope && field) {
+      this.scopeLayerRenderer.present(field, fovH, aspect);
+    }
   }
 
   /**
@@ -333,6 +374,7 @@ export class ThreeSceneHostImpl {
     this.renderer.setSize(widthPx, heightPx);
     this.starFieldRenderer.updateViewport(renderPixelRatio);
     this.labelViewportRevision++;
+    this.updateObservationOverlays();
   }
 
   updateVisualState(timestampMs: number): void {
@@ -384,7 +426,13 @@ export class ThreeSceneHostImpl {
     if (this.measurementLayerRenderer) {
       this.measurementLayerRenderer.updateTime(performance.now(), this.getCelestialSphereQuaternion());
     }
+    this.renderer.autoClear = true;
     this.renderer.render(this.scene, this.camera);
+
+    this.renderer.autoClear = false;
+    this.imagingPreviewLayerRenderer.render(this.renderer);
+    this.scopeLayerRenderer.render(this.renderer);
+    this.renderer.autoClear = true;
   }
 
   /** Project only label groups invalidated by camera, viewport or scene data. */
@@ -467,6 +515,7 @@ export class ThreeSceneHostImpl {
   setCurrentFov(fovDeg: number): void {
     this.currentFovDeg = fovDeg;
     this.starFieldRenderer.updateCameraFov(fovDeg);
+    this.updateObservationOverlays();
   }
 
   setNavigationWorld(world: { setBoundsVisible(visible: boolean): void }): void {
@@ -548,6 +597,9 @@ export class ThreeSceneHostImpl {
     this.solarSystemRenderer.dispose();
     this.horizonOcclusionState.dispose();
     this.lightingController.dispose();
+    this.scopeLayerRenderer.dispose();
+    this.imagingPreviewLayerRenderer.dispose();
+    this.measurementLayerRenderer?.dispose();
 
     this.scene.traverse((obj) => {
       if (

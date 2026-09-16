@@ -18,6 +18,10 @@ export function resizeCanvasBackingStore(
   return resized;
 }
 
+export function acceptsTimelineSnapshot(incomingTimeMs: number, pendingFinalTimeMs: number | null): boolean {
+  return pendingFinalTimeMs === null || Math.abs(incomingTimeMs - pendingFinalTimeMs) <= 1;
+}
+
 export class TimeBar {
   private container: HTMLDivElement;
   private playPauseBtn: HTMLButtonElement;
@@ -32,6 +36,7 @@ export class TimeBar {
   private isTimePlaying = true;
 
   private isDragging = false;
+  private pendingFinalTimeMs: number | null = null;
   private bridge: WebSocketBridge;
 
   constructor(bridge: WebSocketBridge) {
@@ -121,7 +126,10 @@ export class TimeBar {
 
   public updateState(isoStr: string, sunAltitudes: number[], isRealtime: boolean) {
     if (this.isDragging) return; // Prevent jitter from backend updates while dragging
-    this.currentTime = new Date(isoStr);
+    const incomingTime = new Date(isoStr);
+    if (!acceptsTimelineSnapshot(incomingTime.getTime(), this.pendingFinalTimeMs)) return;
+    this.pendingFinalTimeMs = null;
+    this.currentTime = incomingTime;
     this.sunAltitudes = sunAltitudes;
     if (this.isRealtime !== isRealtime) {
       this.isRealtime = isRealtime;
@@ -135,6 +143,7 @@ export class TimeBar {
 
   private onMouseDown(e: MouseEvent) {
     this.isDragging = true;
+    this.pendingFinalTimeMs = null;
     this.bridge.sendTimelineDragStarted();
     this.updateTimeFromMouse(e);
   }
@@ -150,6 +159,7 @@ export class TimeBar {
     // The finished event carries the authoritative final value. Avoid sending
     // the same expensive ephemeris request once as set_time and again as finish.
     this.updateTimeFromMouse(e, false);
+    this.pendingFinalTimeMs = this.currentTime.getTime();
     this.bridge.sendTimelineDragFinished(this.currentTime.toISOString());
   }
 

@@ -166,6 +166,21 @@ def test_corrupt_profiles_do_not_block_eye_startup(tmp_path: Path) -> None:
     assert corrupt.read_text(encoding="utf-8") == "{broken"
 
 
+def test_camera_frame_rotation_is_versioned_and_validated(tmp_path: Path) -> None:
+    published: list[dict] = []
+
+    async def publish(payload: dict) -> None:
+        published.append(payload)
+
+    coordinator = ObservationCoordinator(AtomicTextPreferencesAdapter(tmp_path), publish)
+    asyncio.run(coordinator.configure_camera({"frameRotationDeg": -37.5}))
+    assert coordinator.snapshot.camera.frame_rotation_deg == pytest.approx(-37.5)
+    assert published[-1]["camera"]["frameRotationDeg"] == pytest.approx(-37.5)
+
+    with pytest.raises(OpticalValidationError):
+        asyncio.run(coordinator.configure_camera({"frameRotationDeg": 181}))
+
+
 def test_deep_filter_deduplicates_and_top_n_is_global() -> None:
     first = _batch([1, 2, 0], [9.0, 10.0, 11.0], [0.0, 1.0, 2.0])
     second = _batch([2, 3, 0], [9.5, 8.5, 10.5], [3.0, 4.0, 2.0])

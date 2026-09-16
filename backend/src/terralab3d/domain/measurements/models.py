@@ -20,6 +20,7 @@ class Measurement:
     end: HorizontalCoordinate
     rotation_deg: float = 0.0
     tracking: bool = True
+    fixed_quaternion_xyzw: tuple[float, float, float, float] | None = None
 
 @dataclass(frozen=True, slots=True)
 class MeasurementGeometry:
@@ -34,3 +35,4 @@ class MeasurementDocument:
     revision: int = 0
     measurements: tuple[Measurement, ...] = ()
     selected_measurement_id: MeasurementId | None = None
+    tracking_enabled: bool = True

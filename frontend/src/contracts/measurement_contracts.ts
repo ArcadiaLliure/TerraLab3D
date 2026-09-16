@@ -17,7 +17,8 @@ export interface MeasurementSnapshot {
   readonly start: AngularCoordinate;
   readonly end: AngularCoordinate;
   readonly rotationDeg: number;
-  readonly tracking?: boolean;
+  readonly tracking: boolean;
+  readonly fixedQuaternion: readonly [number, number, number, number] | null;
   readonly entityVersion: number;
   readonly geometry: MeasurementGeometrySnapshot;
 }
@@ -26,6 +27,7 @@ export interface MeasurementDocumentSnapshot {
   readonly type: "measurement_snapshot";
   readonly schemaVersion: 1;
   readonly measurementRevision: number;
+  readonly trackingEnabled: boolean;
   readonly measurements: readonly MeasurementSnapshot[];
   readonly selectedMeasurementId: string | null;
   readonly canUndo: boolean;
@@ -36,13 +38,14 @@ export interface MeasurementDocumentSnapshot {
 export interface MeasurementCommandMessage {
   readonly type: "measurement_command";
   readonly measurementRevision: number;
-  readonly action: "create" | "update" | "delete" | "select" | "undo" | "redo" | "clear";
+  readonly action: "create" | "update" | "delete" | "select" | "undo" | "redo" | "clear" | "set_tracking";
   readonly measurementId?: string | null;
   readonly kind?: MeasurementKind;
   readonly start?: AngularCoordinate;
   readonly end?: AngularCoordinate;
   readonly rotationDeg?: number;
   readonly tracking?: boolean;
+  readonly fixedQuaternion?: readonly [number, number, number, number] | null;
 }
 
 export interface MeasurementErrorMessage {

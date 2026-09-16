@@ -1034,18 +1034,18 @@ async def run() -> int:
             "message": str(exc),
         })
 
-    def _require_next_observation_revision(data: dict[str, Any]) -> None:
+    def _validate_observation_revision(data: dict[str, Any]) -> None:
+        # La revisió rebuda és correlació del client, no autoritat d'escriptura.
+        # El cel/atmosfera pot avançar la revisió mentre una ordre de UI viatja;
+        # el bridge ja serialitza les ordres i el coordinador publica la revisió
+        # monotònica real després d'aplicar-les.
         requested = int(data.get("observationRevision", -1))
-        expected = observation_coordinator.observation_revision + 1
-        if requested != expected:
-            raise OpticalValidationError(
-                "observationRevision",
-                f"revisió instrumental obsoleta: esperada {expected}, rebuda {requested}",
-            )
+        if requested < 0:
+            raise OpticalValidationError("observationRevision", "revisió instrumental invàlida")
 
     async def _handle_set_observation_mode(data: dict[str, Any]) -> None:
         try:
-            _require_next_observation_revision(data)
+            _validate_observation_revision(data)
             star_coordinator.cancel_deep_catalog(0)
             await observation_coordinator.set_mode(str(data.get("mode", "")))
         except (ValueError, OpticalValidationError) as exc:
@@ -1053,7 +1053,7 @@ async def run() -> int:
 
     async def _handle_configure_camera(data: dict[str, Any]) -> None:
         try:
-            _require_next_observation_revision(data)
+            _validate_observation_revision(data)
             star_coordinator.cancel_deep_catalog(0)
             await observation_coordinator.configure_camera(data)
         except (ValueError, KeyError, TypeError, OpticalValidationError) as exc:
@@ -1061,7 +1061,7 @@ async def run() -> int:
 
     async def _handle_configure_telescope(data: dict[str, Any]) -> None:
         try:
-            _require_next_observation_revision(data)
+            _validate_observation_revision(data)
             star_coordinator.cancel_deep_catalog(0)
             await observation_coordinator.configure_telescope(data)
         except (ValueError, KeyError, TypeError, OpticalValidationError) as exc:
@@ -1069,7 +1069,7 @@ async def run() -> int:
 
     async def _handle_camera_profile(data: dict[str, Any]) -> None:
         try:
-            _require_next_observation_revision(data)
+            _validate_observation_revision(data)
             star_coordinator.cancel_deep_catalog(0)
             action = str(data.get("action", ""))
             if action == "create":
@@ -1206,7 +1206,9 @@ async def run() -> int:
         else:
             await horizon_coordinator.publish_active()
         await broadcast_location()
-        await observation_coordinator.publish_current()
+        # Cada entrada/reconnexió comença en ull nu; els paràmetres dels
+        # instruments es conserven, però el mode actiu no és persistent.
+        await observation_coordinator.set_mode("eye")
         await measurement_coordinator.publish_current()
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
         await bridge.send_planet_texture_manifest(solar_system_assets.descriptor)
@@ -2128,7 +2130,11 @@ async def run() -> int:
 
     # ── 5. Obrir navegador ────────────────────────────────────────────
     if os.getenv("TERRALAB3D_NO_BROWSER") != "1":
-        asyncio.create_task(asyncio.to_thread(webbrowser.open, url))
+        # Cada arrencada força una navegació nova. Sense aquest identificador,
+        # el navegador podia reutilitzar una pestanya amb un bundle antic i
+        # reconnectar-la al backend nou amb contractes incompatibles.
+        launch_url = f"{url}/?build={int((dist_dir / 'bundle.js').stat().st_mtime_ns)}"
+        asyncio.create_task(asyncio.to_thread(webbrowser.open, launch_url))
 
     # ── 6. Esperar tancament ──────────────────────────────────────────
     # Configurar el manegador de Ctrl-C

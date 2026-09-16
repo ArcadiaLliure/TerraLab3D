@@ -6,10 +6,12 @@ import type { DeepSkyRenderer } from "../DeepSkyRenderer";
 import { threeDirectionToCameraPose } from "../CameraRigImpl";
 import type { CelestialTargetRef } from "../../../contracts/celestial_selection_contracts";
 import type { CelestialTransformState } from "../CelestialTransformState";
+import { trackedFieldRotationDeg } from "../../../domain/observation/fieldRotation";
 
 export interface ResolvedTrackingDirection {
   azimuthDeg: number;
   altitudeDeg: number;
+  fieldRotationDeg: number;
 }
 
 /**
@@ -26,6 +28,7 @@ export class TrackingTargetResolver {
   
   // Vector temporal per evitar instanciacions
   private readonly _tempVec3 = new Vector3();
+  private readonly _northPole = new Vector3();
 
   public updateCelestialTransform(transform: CelestialTransformState): void {
     this.celestialTransform = transform;
@@ -92,8 +95,7 @@ export class TrackingTargetResolver {
     
     // Transformació Equatorial (ICRS) -> Topocèntrica ENU
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
-    
-    return threeDirectionToCameraPose(this._tempVec3);
+    return this.resolveThreeDirection(this._tempVec3);
   }
 
   private resolveStar(resourceId: string, catalogIndex: number): ResolvedTrackingDirection | null {
@@ -111,8 +113,7 @@ export class TrackingTargetResolver {
 
     this._tempVec3.set(vx, vy, vz);
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
-    
-    return threeDirectionToCameraPose(this._tempVec3);
+    return this.resolveThreeDirection(this._tempVec3);
   }
 
   private resolveDeepSky(resourceId: string, catalogIndex: number): ResolvedTrackingDirection | null {
@@ -133,8 +134,7 @@ export class TrackingTargetResolver {
 
     this._tempVec3.set(vx, vy, vz);
     this._tempVec3.applyMatrix3(this.celestialTransform.equatorialToThree);
-    
-    return threeDirectionToCameraPose(this._tempVec3);
+    return this.resolveThreeDirection(this._tempVec3);
   }
 
   private resolveSolarSystem(id: string): ResolvedTrackingDirection | null {
@@ -145,6 +145,16 @@ export class TrackingTargetResolver {
     const dir = this.solarSystemRenderer.getDisplayedBodyDirection(id as any);
     if (!dir) return null;
 
-    return threeDirectionToCameraPose(dir);
+    return this.resolveThreeDirection(dir);
+  }
+
+  private resolveThreeDirection(direction: Vector3): ResolvedTrackingDirection | null {
+    const pose = threeDirectionToCameraPose(direction);
+    if (!this.celestialTransform) return { ...pose, fieldRotationDeg: 0 };
+    this._northPole.set(0, 0, 1).applyMatrix3(this.celestialTransform.equatorialToThree);
+    return {
+      ...pose,
+      fieldRotationDeg: trackedFieldRotationDeg(direction, this._northPole),
+    };
   }
 }

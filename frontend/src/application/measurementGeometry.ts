@@ -40,12 +40,12 @@ export function previewGeometry(kind: MeasurementKind, start: AngularCoordinate,
   
   if (Math.abs(dx) <= 1e-9 || Math.abs(dy) <= 1e-9) return null;
   const rotation = toRad(rotationDeg);
-  const localCorners: [number, number][] = [
+  const localCorners: [number, number][] = ([
     [0, 0],
     [dx, 0],
     [dx, dy],
     [0, dy],
-  ].map(([x, y]) => rotateXY(x, y, rotation));
+  ] as [number, number][]).map(([x, y]) => rotateXY(x, y, rotation));
   const edgeSegments = Math.max(2, Math.floor(segments / 4));
   const path: AngularCoordinate[] = [];
   for (let edge = 0; edge < 4; edge++) {

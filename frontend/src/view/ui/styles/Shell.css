@@ -146,9 +146,15 @@
 
 .observation-mode-toggle svg { width: 22px; height: 22px; }
 .observation-mode-label { min-width: 54px; font-size: 10px; color: var(--color-text-dim); }
+[hidden] {
+  display: none !important;
+}
+
 .optics-panel { border-top: 1px solid var(--color-border); padding-top: 10px; }
+.optics-panel[hidden] { display: none !important; }
 .optics-panel-title { color: var(--color-gold); font-size: 11px; font-weight: 600; margin-bottom: 8px; }
 .optics-section { display: flex; flex-direction: column; gap: 6px; }
+.optics-section[hidden] { display: none !important; }
 .optics-section label { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 10px; color: var(--color-text-dim); }
 .optics-section input[type="number"], .optics-section input[type="text"], .optics-section select {
   width: 112px; min-width: 0; padding: 4px 5px; color: var(--color-text);
@@ -159,6 +165,93 @@
 .optics-actions, .scope-movement-pad, .optics-goto { display: flex; gap: 5px; flex-wrap: wrap; }
 .optics-section button { padding: 4px 7px; color: var(--color-text); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); cursor: pointer; }
 .scope-movement-pad button { width: 30px; height: 30px; }
+.optics-subheading {
+  color: var(--color-gold);
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 6px;
+  margin-bottom: 2px;
+  letter-spacing: 0.03em;
+}
+.optics-goto-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border);
+}
+.optics-goto-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.optics-goto-row label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--color-text-dim);
+  margin: 0;
+}
+.optics-goto-row input {
+  width: 54px !important;
+  padding: 3px 4px !important;
+}
+.optics-goto-btn {
+  flex: 1;
+  padding: 4px 6px !important;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+.optics-goto-target-btn {
+  width: 100%;
+  padding: 6px 8px !important;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-dim);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.optics-goto-target-btn.has-target {
+  color: var(--color-gold);
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--button-checked-bg) 25%, var(--color-surface-raised));
+}
+.optics-goto-target-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.optics-advanced-details {
+  margin-top: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  padding: 4px 6px;
+  background: var(--color-chrome);
+}
+.optics-advanced-details summary {
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--color-text-dim);
+  user-select: none;
+  font-weight: 500;
+}
+.optics-advanced-details summary:hover {
+  color: var(--color-gold);
+}
+.optics-advanced-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border);
+}
 .measurement-tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
 .measurement-tool-grid button, .measurement-action-row button { padding: 6px 8px; color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-sm); cursor: pointer; }
 .measurement-tool-grid button.active { color: var(--button-checked-text); background: var(--button-checked-bg); border-color: var(--button-checked-border); }

@@ -1,6 +1,7 @@
 """Operacions immutables i historial acotat per al document de mesures."""
 
 
+from dataclasses import replace
 from typing import Protocol
 from terralab3d.domain.identifiers import MeasurementId
 from .models import Measurement, MeasurementDocument, MeasurementGeometry
@@ -16,8 +17,8 @@ class MeasurementDocumentHistory:
             raise ValueError("history_limit ha de ser positiu")
         self._document = document or MeasurementDocument()
         self._limit = history_limit
-        self._undo: list[tuple[Measurement, ...]] = []
-        self._redo: list[tuple[Measurement, ...]] = []
+        self._undo: list[tuple[tuple[Measurement, ...], bool]] = []
+        self._redo: list[tuple[tuple[Measurement, ...], bool]] = []
 
     @property
     def document(self) -> MeasurementDocument:
@@ -53,38 +54,58 @@ class MeasurementDocumentHistory:
             return self._document
         return self._commit((), None)
 
+    def set_tracking(
+        self,
+        enabled: bool,
+        fixed_quaternion_xyzw: tuple[float, float, float, float] | None,
+    ) -> MeasurementDocument:
+        if self._document.tracking_enabled == enabled and all(item.tracking == enabled for item in self._document.measurements):
+            return self._document
+        measurements = tuple(replace(
+            item,
+            tracking=enabled,
+            fixed_quaternion_xyzw=None if enabled else fixed_quaternion_xyzw,
+        ) for item in self._document.measurements)
+        return self._commit(measurements, self._document.selected_measurement_id, enabled)
+
     def select(self, measurement_id: MeasurementId | None) -> MeasurementDocument:
         if measurement_id is not None and not any(item.measurement_id == measurement_id for item in self._document.measurements):
             measurement_id = None
-        self._document = MeasurementDocument(1, self._document.revision + 1, self._document.measurements, measurement_id)
+        self._document = MeasurementDocument(1, self._document.revision + 1, self._document.measurements, measurement_id, self._document.tracking_enabled)
         return self._document
 
     def undo(self) -> MeasurementDocument:
         if not self._undo:
             return self._document
-        self._redo.append(self._document.measurements)
-        previous = self._undo.pop()
+        self._redo.append((self._document.measurements, self._document.tracking_enabled))
+        previous, tracking_enabled = self._undo.pop()
         selected = self._document.selected_measurement_id
         if selected is not None and not any(item.measurement_id == selected for item in previous):
             selected = None
-        self._document = MeasurementDocument(1, self._document.revision + 1, previous, selected)
+        self._document = MeasurementDocument(1, self._document.revision + 1, previous, selected, tracking_enabled)
         return self._document
 
     def redo(self) -> MeasurementDocument:
         if not self._redo:
             return self._document
-        self._undo.append(self._document.measurements)
-        following = self._redo.pop()
+        self._undo.append((self._document.measurements, self._document.tracking_enabled))
+        following, tracking_enabled = self._redo.pop()
         selected = self._document.selected_measurement_id
         if selected is not None and not any(item.measurement_id == selected for item in following):
             selected = None
-        self._document = MeasurementDocument(1, self._document.revision + 1, following, selected)
+        self._document = MeasurementDocument(1, self._document.revision + 1, following, selected, tracking_enabled)
         return self._document
 
-    def _commit(self, measurements: tuple[Measurement, ...], selected: MeasurementId | None) -> MeasurementDocument:
-        self._undo.append(self._document.measurements)
+    def _commit(self, measurements: tuple[Measurement, ...], selected: MeasurementId | None, tracking_enabled: bool | None = None) -> MeasurementDocument:
+        self._undo.append((self._document.measurements, self._document.tracking_enabled))
         if len(self._undo) > self._limit:
             del self._undo[0]
         self._redo.clear()
-        self._document = MeasurementDocument(1, self._document.revision + 1, measurements, selected)
+        self._document = MeasurementDocument(
+            1,
+            self._document.revision + 1,
+            measurements,
+            selected,
+            self._document.tracking_enabled if tracking_enabled is None else tracking_enabled,
+        )
         return self._document

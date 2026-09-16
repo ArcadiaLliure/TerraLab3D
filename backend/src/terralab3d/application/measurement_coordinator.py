@@ -67,6 +67,13 @@ class MeasurementCoordinator:
         elif action == "select":
             value = data.get("measurementId")
             self._history.select(None if value in (None, "") else MeasurementId(str(value)))
+        elif action == "set_tracking":
+            enabled = data.get("tracking")
+            if not isinstance(enabled, bool):
+                raise MeasurementValidationError("tracking", "el seguiment ha de ser booleà")
+            fixed_quaternion = None if enabled else _quaternion_from_payload(data.get("fixedQuaternion"))
+            self._history.set_tracking(enabled, fixed_quaternion)
+            self._refresh_entity_versions(before)
         elif action == "undo":
             self._history.undo()
             self._refresh_entity_versions(before)
@@ -94,6 +101,7 @@ class MeasurementCoordinator:
                 "end": _coordinate_payload(item.end),
                 "rotationDeg": item.rotation_deg,
                 "tracking": item.tracking,
+                "fixedQuaternion": None if item.fixed_quaternion_xyzw is None else list(item.fixed_quaternion_xyzw),
                 "entityVersion": self._entity_versions.get(str(item.measurement_id), 1),
                 "geometry": {
                     "paths": [[_coordinate_payload(point) for point in path] for path in geometry.paths],
@@ -105,6 +113,7 @@ class MeasurementCoordinator:
             "type": "measurement_snapshot",
             "schemaVersion": 1,
             "measurementRevision": document.revision,
+            "trackingEnabled": document.tracking_enabled,
             "measurements": measurements,
             "selectedMeasurementId": None if document.selected_measurement_id is None else str(document.selected_measurement_id),
             "canUndo": self._history.can_undo,
@@ -120,10 +129,14 @@ class MeasurementCoordinator:
             start = _coordinate_from_payload(data["start"])
             end = _coordinate_from_payload(data["end"])
             rotation = float(data.get("rotationDeg", 0.0))
-            tracking = bool(data.get("tracking", True))
+            raw_tracking = data.get("tracking", True)
+            if not isinstance(raw_tracking, bool):
+                raise ValueError("tracking invàlid")
+            tracking = raw_tracking
+            fixed_quaternion = None if tracking else _quaternion_from_payload(data.get("fixedQuaternion", [0.0, 0.0, 0.0, 1.0]))
         except (KeyError, TypeError, ValueError) as exc:
             raise MeasurementValidationError("measurement", "payload de mesura invàlid") from exc
-        return Measurement(measurement_id, kind, start, end, rotation, tracking)
+        return Measurement(measurement_id, kind, start, end, rotation, tracking, fixed_quaternion)
 
     def _load_document(self) -> tuple[MeasurementDocument, str | None]:
         try:
@@ -140,7 +153,10 @@ class MeasurementCoordinator:
                 self._calculator.geometry(measurement)
             selected = payload.get("selectedMeasurementId")
             selected_id = MeasurementId(str(selected)) if selected and any(str(item.measurement_id) == str(selected) for item in measurements) else None
-            return MeasurementDocument(1, 0, measurements, selected_id), None
+            tracking_enabled = payload.get("trackingEnabled", all(item.tracking for item in measurements))
+            if not isinstance(tracking_enabled, bool):
+                raise ValueError("trackingEnabled invàlid")
+            return MeasurementDocument(1, 0, measurements, selected_id, tracking_enabled), None
         except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError, MeasurementValidationError) as exc:
             log.warning("MGP: [MeasurementCoordinator] [load] [%s]", exc)
             return MeasurementDocument(), "No s'ha pogut restaurar el document de mesures; el fitxer es conserva per a diagnòstic."
@@ -150,6 +166,7 @@ class MeasurementCoordinator:
         payload = {
             "schemaVersion": 1,
             "selectedMeasurementId": None if document.selected_measurement_id is None else str(document.selected_measurement_id),
+            "trackingEnabled": document.tracking_enabled,
             "measurements": [
                 {
                     "measurementId": str(item.measurement_id),
@@ -158,6 +175,7 @@ class MeasurementCoordinator:
                     "end": _coordinate_payload(item.end),
                     "rotationDeg": item.rotation_deg,
                     "tracking": item.tracking,
+                    "fixedQuaternion": None if item.fixed_quaternion_xyzw is None else list(item.fixed_quaternion_xyzw),
                 }
                 for item in document.measurements
             ],
@@ -186,3 +204,16 @@ def _coordinate_from_payload(value: Any) -> HorizontalCoordinate:
 
 def _coordinate_payload(value: HorizontalCoordinate) -> dict[str, float]:
     return {"altitudeDeg": value.altitude_deg, "azimuthDeg": value.azimuth_deg % 360.0}
+
+
+def _quaternion_from_payload(value: Any) -> tuple[float, float, float, float]:
+    if not isinstance(value, (list, tuple)) or len(value) != 4:
+        raise MeasurementValidationError("fixedQuaternion", "el quaternion congelat necessita quatre components")
+    quaternion = tuple(float(component) for component in value)
+    if not all(math.isfinite(component) for component in quaternion):
+        raise MeasurementValidationError("fixedQuaternion", "el quaternion congelat ha de ser finit")
+    norm = math.sqrt(sum(component * component for component in quaternion))
+    if norm <= 1e-12:
+        raise MeasurementValidationError("fixedQuaternion", "el quaternion congelat no pot ser nul")
+    normalized = tuple(component / norm for component in quaternion)
+    return normalized  # type: ignore[return-value]

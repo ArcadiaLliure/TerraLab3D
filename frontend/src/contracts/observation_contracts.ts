@@ -26,6 +26,7 @@ export interface CameraCaptureSnapshot {
   readonly iso: number;
   readonly exposureSeconds: number;
   readonly trackingEnabled: boolean;
+  readonly frameRotationDeg: number;
   readonly opticalTransmission: number | null;
 }
 

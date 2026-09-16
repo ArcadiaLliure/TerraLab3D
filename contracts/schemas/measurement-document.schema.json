@@ -3,11 +3,12 @@
   "$id": "https://terralab3d.local/schemas/measurement-document.schema.json",
   "title": "TerraLab3D measurement document snapshot v1",
   "type": "object",
-  "required": ["type", "schemaVersion", "measurementRevision", "measurements", "selectedMeasurementId", "canUndo", "canRedo", "warning"],
+  "required": ["type", "schemaVersion", "measurementRevision", "trackingEnabled", "measurements", "selectedMeasurementId", "canUndo", "canRedo", "warning"],
   "properties": {
     "type": { "const": "measurement_snapshot" },
     "schemaVersion": { "const": 1 },
     "measurementRevision": { "type": "integer", "minimum": 0 },
+    "trackingEnabled": { "type": "boolean" },
     "measurements": { "type": "array", "items": { "$ref": "#/$defs/measurement" } },
     "selectedMeasurementId": { "oneOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }] },
     "canUndo": { "type": "boolean" },
@@ -41,13 +42,20 @@
     },
     "measurement": {
       "type": "object",
-      "required": ["measurementId", "kind", "start", "end", "rotationDeg", "entityVersion", "geometry"],
+      "required": ["measurementId", "kind", "start", "end", "rotationDeg", "tracking", "fixedQuaternion", "entityVersion", "geometry"],
       "properties": {
         "measurementId": { "type": "string", "minLength": 1 },
         "kind": { "enum": ["ruler", "square", "rectangle", "circle"] },
         "start": { "$ref": "#/$defs/coordinate" },
         "end": { "$ref": "#/$defs/coordinate" },
         "rotationDeg": { "type": "number" },
+        "tracking": { "type": "boolean" },
+        "fixedQuaternion": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "prefixItems": [{ "type": "number" }, { "type": "number" }, { "type": "number" }, { "type": "number" }], "minItems": 4, "maxItems": 4 }
+          ]
+        },
         "entityVersion": { "type": "integer", "minimum": 1 },
         "geometry": { "$ref": "#/$defs/geometry" }
       },

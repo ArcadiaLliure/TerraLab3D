@@ -63,6 +63,8 @@ class TerraLabServer:
             response = await handler(request)
             if "Content-Security-Policy" in response.headers:
                 del response.headers["Content-Security-Policy"]
+            if request.path in {"/", "/index.html", "/bundle.js", "/bundle.css"}:
+                response.headers["Cache-Control"] = "no-store"
             return response
         except aiohttp.web.HTTPException as ex:
             if "Content-Security-Policy" in ex.headers:

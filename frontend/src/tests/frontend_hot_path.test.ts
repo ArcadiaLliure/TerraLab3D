@@ -1,4 +1,4 @@
-import { resizeCanvasBackingStore } from "../view/ui/components/TimeBar";
+import { acceptsTimelineSnapshot, resizeCanvasBackingStore } from "../view/ui/components/TimeBar";
 import { computeRenderPixelRatio } from "../view/three/renderResolutionPolicy";
 import { CelestialTransformState } from "../view/three/CelestialTransformState";
 import { WebSocketBridge, type BridgeState } from "../bridge/WebSocketBridge";
@@ -31,6 +31,9 @@ assert(resizeCanvasBackingStore(canvas, 1024, 48), "real width change resizes th
 assert(widthWrites === 1 && heightWrites === 0, "only the changed canvas dimension is assigned");
 assert(resizeCanvasBackingStore(canvas, 1024, 64), "real height change resizes the backing store");
 assert(widthWrites === 1 && heightWrites === 1, "height resize does not rewrite the stable width");
+assert(!acceptsTimelineSnapshot(1_000, 2_000), "stale drag snapshots cannot move the marker backwards after release");
+assert(acceptsTimelineSnapshot(2_000, 2_000), "the authoritative final drag snapshot releases the marker latch");
+assert(acceptsTimelineSnapshot(3_000, null), "ordinary timeline snapshots remain accepted");
 
 const screenshotRatio = computeRenderPixelRatio(1.25, 2048, 1050);
 assert(screenshotRatio < 1.25, "large high-DPI viewport is reduced below native DPR");

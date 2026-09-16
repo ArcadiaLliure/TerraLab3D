@@ -93,6 +93,15 @@ def _validate_measurement(measurement: Measurement) -> None:
             raise MeasurementValidationError(name, "l'azimut ha de ser finit")
     if not math.isfinite(measurement.rotation_deg):
         raise MeasurementValidationError("rotationDeg", "la rotació ha de ser finita")
+    if measurement.tracking and measurement.fixed_quaternion_xyzw is not None:
+        raise MeasurementValidationError("fixedQuaternion", "una mesura amb seguiment no pot tenir una orientació congelada")
+    if not measurement.tracking:
+        quaternion = measurement.fixed_quaternion_xyzw
+        if quaternion is None or len(quaternion) != 4 or not all(math.isfinite(value) for value in quaternion):
+            raise MeasurementValidationError("fixedQuaternion", "una mesura fixa necessita un quaternion finit")
+        norm = math.sqrt(sum(value * value for value in quaternion))
+        if abs(norm - 1.0) > 1e-6:
+            raise MeasurementValidationError("fixedQuaternion", "el quaternion congelat ha d'estar normalitzat")
 
 
 def _unit(coordinate: HorizontalCoordinate) -> tuple[float, float, float]:

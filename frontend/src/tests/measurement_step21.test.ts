@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { angularDistanceDeg, previewGeometry, rotateCoordinatePair } from "../application/measurementGeometry";
 import type { MeasurementDocumentSnapshot, MeasurementKind, MeasurementSnapshot } from "../contracts/measurement_contracts";
-import { MeasurementLayerRendererImpl } from "../view/three/layers/MeasurementLayerRenderer";
+import { MeasurementLayerRendererImpl, setMeasurementPresentationQuaternion } from "../view/three/layers/MeasurementLayerRenderer";
 
 let failures = 0;
 function assert(condition: boolean, message: string): void {
@@ -37,11 +37,19 @@ Object.defineProperty(globalThis, "document", { configurable: true, value: { cre
 function entity(id: string, version: number, endAzimuth: number): MeasurementSnapshot {
   const start = { altitudeDeg: 10, azimuthDeg: 20 };
   const end = { altitudeDeg: 14, azimuthDeg: endAzimuth };
-  return { measurementId: id, kind: "ruler", start, end, rotationDeg: 0, entityVersion: version, geometry: previewGeometry("ruler", start, end)! };
+  return { measurementId: id, kind: "ruler", start, end, rotationDeg: 0, tracking: true, fixedQuaternion: null, entityVersion: version, geometry: previewGeometry("ruler", start, end)! };
 }
 function snapshot(revision: number, measurements: readonly MeasurementSnapshot[], selected: string | null = null): MeasurementDocumentSnapshot {
-  return { type: "measurement_snapshot", schemaVersion: 1, measurementRevision: revision, measurements, selectedMeasurementId: selected, canUndo: revision > 0, canRedo: false, warning: null };
+  return { type: "measurement_snapshot", schemaVersion: 1, measurementRevision: revision, trackingEnabled: true, measurements, selectedMeasurementId: selected, canUndo: revision > 0, canRedo: false, warning: null };
 }
+
+const movingSky = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 3);
+const frozen = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 5);
+const resolved = new THREE.Quaternion();
+setMeasurementPresentationQuaternion({ tracking: false, fixedQuaternion: [frozen.x, frozen.y, frozen.z, frozen.w] }, movingSky, resolved);
+assert(near(resolved.angleTo(frozen), 0), "tracking off keeps the frozen 3D orientation independently of the current sky");
+setMeasurementPresentationQuaternion({ tracking: true, fixedQuaternion: null }, movingSky, resolved);
+assert(near(resolved.angleTo(movingSky), 0), "tracking on follows the current celestial orientation");
 
 const parent = new THREE.Group();
 const renderer = new MeasurementLayerRendererImpl(parent, parent);

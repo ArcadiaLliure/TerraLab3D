@@ -52,6 +52,14 @@ def test_zero_radius_and_degenerate_rectangle_are_rejected() -> None:
         calculator.geometry(measurement(MeasurementKind.CIRCLE, end=(0, 0)))
     with pytest.raises(MeasurementValidationError):
         calculator.geometry(measurement(MeasurementKind.RECTANGLE, end=(0, 10)))
+    with pytest.raises(MeasurementValidationError, match="quaternion"):
+        calculator.geometry(Measurement(
+            MeasurementId("fixed-without-frame"),
+            MeasurementKind.RULER,
+            HorizontalCoordinate(0, 0),
+            HorizontalCoordinate(1, 1),
+            tracking=False,
+        ))
 
 
 def test_history_is_immutable_bounded_and_supports_undo_redo() -> None:
@@ -145,6 +153,43 @@ def test_coordinator_crud_versions_clear_and_restore_with_undo(tmp_path: Path) -
         await coordinator.apply({"action": "redo"})
         assert coordinator.snapshot_payload()["measurements"] == []
         assert len(published) == 5
+
+    asyncio.run(scenario())
+
+
+def test_tracking_toggle_freezes_all_shapes_in_one_persisted_3d_frame(tmp_path: Path) -> None:
+    async def publish(_: dict) -> None:
+        return None
+
+    async def scenario() -> None:
+        adapter = AtomicTextPreferencesAdapter(tmp_path)
+        coordinator = MeasurementCoordinator(adapter, publish)
+        await coordinator.apply({
+            "action": "create", "measurementId": "measurement:user:tracked", "kind": "ruler",
+            "start": {"altitudeDeg": 10, "azimuthDeg": 20},
+            "end": {"altitudeDeg": 12, "azimuthDeg": 24},
+        })
+        before = coordinator.snapshot_payload()["measurements"][0]["entityVersion"]
+        await coordinator.apply({
+            "action": "set_tracking",
+            "tracking": False,
+            "fixedQuaternion": [0, math.sqrt(0.5), 0, math.sqrt(0.5)],
+        })
+        frozen = coordinator.snapshot_payload()
+        assert frozen["trackingEnabled"] is False
+        assert frozen["measurements"][0]["tracking"] is False
+        assert frozen["measurements"][0]["fixedQuaternion"] == pytest.approx([0, math.sqrt(0.5), 0, math.sqrt(0.5)])
+        assert frozen["measurements"][0]["entityVersion"] == before + 1
+
+        restored = MeasurementCoordinator(adapter, publish).snapshot_payload()
+        assert restored["trackingEnabled"] is False
+        assert restored["measurements"][0]["fixedQuaternion"] == pytest.approx(frozen["measurements"][0]["fixedQuaternion"])
+
+        await coordinator.apply({"action": "undo"})
+        resumed = coordinator.snapshot_payload()
+        assert resumed["trackingEnabled"] is True
+        assert resumed["measurements"][0]["tracking"] is True
+        assert resumed["measurements"][0]["fixedQuaternion"] is None
 
     asyncio.run(scenario())
 

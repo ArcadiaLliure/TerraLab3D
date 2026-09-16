@@ -119,8 +119,11 @@ class ObservationCoordinator:
             iso=float(data.get("iso", self._camera.iso)),
             exposure_seconds=float(data.get("exposureSeconds", self._camera.exposure_seconds)),
             tracking_enabled=bool(data.get("trackingEnabled", self._camera.tracking_enabled)),
+            frame_rotation_deg=float(data.get("frameRotationDeg", self._camera.frame_rotation_deg)),
             optical_transmission=self._optional_float(data.get("opticalTransmission", self._camera.optical_transmission)),
         )
+        if not -180.0 <= candidate.frame_rotation_deg <= 180.0:
+            raise OpticalValidationError("frameRotationDeg", "la rotació del marc ha d'estar entre -180° i 180°")
         profile = self._profiles[profile_id]
         field = camera_field(profile, candidate)
         camera_metrics(profile, field, candidate.focal_length_mm)

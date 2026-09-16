@@ -61,6 +61,16 @@ export class MeasurementController {
   redo(): void { this.sendSimpleCommand("redo"); }
   clear(): void { this.sendSimpleCommand("clear"); }
 
+  setTrackingEnabled(enabled: boolean): void {
+    if (this.commandPending || this.snapshot?.trackingEnabled === enabled) return;
+    const current = this.options.getTrackingQuaternion();
+    this.sendCommand({
+      action: "set_tracking",
+      tracking: enabled,
+      fixedQuaternion: enabled ? null : [current.x, current.y, current.z, current.w],
+    });
+  }
+
   deleteSelected(): void {
     const selected = this.snapshot?.selectedMeasurementId;
     if (!selected || this.commandPending) return;
@@ -104,7 +114,7 @@ export class MeasurementController {
     if (!hit) return;
     const measurement = this.snapshot?.measurements.find(item => item.measurementId === hit.measurementId);
     if (measurement) {
-      const coordinate = this.coordinateAt(event.clientX, event.clientY, !!measurement.tracking);
+      const coordinate = this.coordinateAt(event.clientX, event.clientY, measurement);
       if (!coordinate) return;
       this.beginGesture(event, coordinate, measurement, hit.part);
     }
@@ -129,7 +139,7 @@ export class MeasurementController {
     this.lastClientX = event.clientX;
     this.lastClientY = event.clientY;
     const candidate = this.gesture ? this.candidateForGesture(this.gesture) : null;
-    this.options.renderer.presentPreview(candidate ? previewGeometry(candidate.kind, candidate.start, candidate.end, candidate.rotationDeg) : null, candidate?.tracking);
+    this.options.renderer.presentPreview(candidate ? previewGeometry(candidate.kind, candidate.start, candidate.end, candidate.rotationDeg) : null, candidate?.tracking, candidate?.fixedQuaternion);
     event.preventDefault();
     event.stopImmediatePropagation();
   };
@@ -148,12 +158,12 @@ export class MeasurementController {
     this.finishGesture();
     if (!candidate || !previewGeometry(candidate.kind, candidate.start, candidate.end, candidate.rotationDeg)) return;
     if (gesture.part === "create") {
-      this.sendCommand({ action: "create", kind: candidate.kind, start: candidate.start, end: candidate.end, rotationDeg: candidate.rotationDeg, ...(candidate.tracking !== undefined ? { tracking: candidate.tracking } : {}) });
+      this.sendCommand({ action: "create", kind: candidate.kind, start: candidate.start, end: candidate.end, rotationDeg: candidate.rotationDeg, tracking: candidate.tracking, fixedQuaternion: candidate.fixedQuaternion });
       this.activeTool = null;
       this.options.toolsPage.presentActiveTool(null);
       this.syncInteractionOwnership();
     } else if (gesture.moved) {
-      this.sendCommand({ action: "update", measurementId: candidate.measurementId, kind: candidate.kind, start: candidate.start, end: candidate.end, rotationDeg: candidate.rotationDeg, ...(candidate.tracking !== undefined ? { tracking: candidate.tracking } : {}) });
+      this.sendCommand({ action: "update", measurementId: candidate.measurementId, kind: candidate.kind, start: candidate.start, end: candidate.end, rotationDeg: candidate.rotationDeg, tracking: candidate.tracking, fixedQuaternion: candidate.fixedQuaternion });
     } else {
       this.sendCommand({ action: "select", measurementId: candidate.measurementId });
     }
@@ -211,7 +221,8 @@ export class MeasurementController {
   private candidateForGesture(gesture: ActiveGesture): MeasurementSnapshot | null {
     if (gesture.part === "create") {
       if (!this.activeTool) return null;
-      return { measurementId: "preview", kind: this.activeTool, start: gesture.origin, end: gesture.current, rotationDeg: 0, tracking: this.options.isTrackingEnabled(), entityVersion: 0, geometry: { paths: [], label: "", anchor: gesture.origin } };
+      const tracking = this.options.isTrackingEnabled();
+      return { measurementId: "preview", kind: this.activeTool, start: gesture.origin, end: gesture.current, rotationDeg: 0, tracking, fixedQuaternion: tracking ? null : [0, 0, 0, 1], entityVersion: 0, geometry: { paths: [], label: "", anchor: gesture.origin } };
     }
     const measurement = gesture.measurement;
     if (!measurement) return null;
@@ -221,16 +232,20 @@ export class MeasurementController {
     return { ...measurement, start, end };
   }
 
-  private coordinateAt(clientX: number, clientY: number, tracking?: boolean): AngularCoordinate | null {
+  private coordinateAt(clientX: number, clientY: number, frame?: boolean | MeasurementSnapshot): AngularCoordinate | null {
     const rect = this.options.canvas.getBoundingClientRect();
     this.pointerNdc.x = ((clientX - rect.left) / rect.width) * 2 - 1;
     this.pointerNdc.y = -((clientY - rect.top) / rect.height) * 2 + 1;
     this.raycaster.setFromCamera(this.pointerNdc, this.options.camera);
     const direction = this.raycaster.ray.direction.clone();
-    const useTracking = tracking !== undefined ? tracking : (this.gesture?.measurement ? !!this.gesture.measurement.tracking : this.options.isTrackingEnabled());
-    if (useTracking) {
-      direction.applyQuaternion(this.options.getTrackingQuaternion().clone().invert());
-    }
+    const measurement = typeof frame === "object" ? frame : (frame === undefined ? this.gesture?.measurement : null);
+    const useTracking = typeof frame === "boolean" ? frame : (measurement?.tracking ?? this.options.isTrackingEnabled());
+    const quaternion = useTracking
+      ? this.options.getTrackingQuaternion().clone()
+      : measurement?.fixedQuaternion
+        ? new THREE.Quaternion(...measurement.fixedQuaternion)
+        : null;
+    if (quaternion) direction.applyQuaternion(quaternion.invert());
     return azimuthAltitudeFromThreeDirection(direction);
   }
 

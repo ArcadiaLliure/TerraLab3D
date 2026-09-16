@@ -7,6 +7,7 @@ export interface ToolsPageCallbacks {
   readonly onRedo: () => void;
   readonly onDelete: () => void;
   readonly onClear: () => void;
+  readonly onTrackingChanged: (enabled: boolean) => void;
 }
 
 const TOOL_LABELS: Readonly<Record<MeasurementKind, string>> = {
@@ -22,6 +23,7 @@ export class ToolsPage {
   private readonly clearButton: HTMLButtonElement;
   private readonly status: HTMLDivElement;
   private readonly trackingCheckbox: HTMLInputElement;
+  private snapshotTrackingEnabled: boolean | null = null;
 
   constructor(private readonly callbacks: ToolsPageCallbacks) {
     this.element = document.createElement("div");
@@ -61,7 +63,8 @@ export class ToolsPage {
     this.trackingCheckbox.id = "measurement-tracking-checkbox";
     const trackingLabel = document.createElement("label");
     trackingLabel.htmlFor = "measurement-tracking-checkbox";
-    trackingLabel.textContent = "Seguiment (ancorar al cel)";
+    trackingLabel.textContent = "Seguiment";
+    this.trackingCheckbox.onchange = () => callbacks.onTrackingChanged(this.trackingCheckbox.checked);
     trackingRow.appendChild(this.trackingCheckbox);
     trackingRow.appendChild(trackingLabel);
     group.appendChild(trackingRow);
@@ -108,6 +111,9 @@ export class ToolsPage {
   }
 
   presentMeasurements(snapshot: MeasurementDocumentSnapshot): void {
+    this.snapshotTrackingEnabled = snapshot.trackingEnabled;
+    this.trackingCheckbox.checked = snapshot.trackingEnabled;
+    this.trackingCheckbox.disabled = false;
     this.undoButton.disabled = !snapshot.canUndo;
     this.redoButton.disabled = !snapshot.canRedo;
     this.deleteButton.disabled = snapshot.selectedMeasurementId === null;
@@ -116,8 +122,15 @@ export class ToolsPage {
     this.status.textContent = snapshot.warning ?? `${snapshot.measurements.length} ${snapshot.measurements.length === 1 ? "mesura" : "mesures"}${selected}`;
   }
 
-  presentMeasurementPending(): void { this.status.textContent = "Aplicant operació…"; }
-  presentMeasurementError(message: string): void { this.status.textContent = `No s'ha aplicat: ${message}`; }
+  presentMeasurementPending(): void {
+    this.trackingCheckbox.disabled = true;
+    this.status.textContent = "Aplicant operació…";
+  }
+  presentMeasurementError(message: string): void {
+    if (this.snapshotTrackingEnabled !== null) this.trackingCheckbox.checked = this.snapshotTrackingEnabled;
+    this.trackingCheckbox.disabled = false;
+    this.status.textContent = `No s'ha aplicat: ${message}`;
+  }
   dispose(): void { this.element.remove(); }
 
   private makeButton(label: string, action: () => void): HTMLButtonElement {

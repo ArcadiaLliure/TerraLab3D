@@ -9,6 +9,18 @@
 - [x] Creació, selecció, moviment, redimensionament, eliminació, cancel·lació i undo/redo són observables.
 - [x] El document es restaura després de reiniciar sense conservar cap coordenada de pantalla.
 
+## Ajustos d'observació incorporats en el tancament del pas
+
+- [x] TerraLab3D entra en mode **ull nu**; `Escape` atura qualsevol seguiment instrumental i torna a aquest mode.
+- [x] El check **Seguiment** de càmera és autoritatiu: desmarcar-lo també allibera el seguiment automàtic iniciat en seleccionar un astre; marcar-lo el reactiva sobre la selecció vigent.
+- [x] El seguiment de càmera o telescopi actualitza apuntat i rotació de camp. El roll s'obté projectant el nord celeste en el pla tangent de la visual; per tant, latitud i temps sideral ja entren a través de la transformació equatorial→topocèntrica, sense duplicar fórmules a la UI.
+- [x] El rectangle de càmera es pot rotar arrossegant la nansa de la cantonada superior dreta. L'angle queda versionat al snapshot i també es pot editar numèricament com a `Rotació marc (°)`.
+- [x] `Ctrl` + roda en mode càmera modifica la focal en mil·límetres i, en conseqüència, el FOV físic del sensor; la roda sense `Ctrl` conserva el zoom visual ordinari.
+- [x] La timeline reté la posició final en deixar anar el ratolí i descarta els ecos antics del drag fins que arriba el snapshot final, evitant el moviment d'anada i tornada.
+- [x] Les revisions instrumentals són autoritat del backend: una actualització interna d'atmosfera ja no converteix una ordre vàlida de canvi de mode en l'error «revisió instrumental obsoleta».
+
+Aquestes interaccions s'han verificat amb proves de càlcul, contracte, compilació i regressió. Tal com es va acordar, no s'ha afegit una prova gràfica específica per `Escape`, la nansa de rotació ni `Ctrl` + roda.
+
 ## Resultat funcional
 
 L'usuari pot triar `Regla`, `Quadrat`, `Rectangle` o `Cercle` a la pàgina
@@ -20,7 +32,8 @@ final, eliminar i recuperar amb undo.
 
 Les etiquetes mostren distància, amplada × alçada o radi · diàmetre. Es
 reprojecten quan canvien càmera, FOV o viewport, però la persistència només
-conté altitud, azimut, tipus i rotació.
+conté coordenades angulars, tipus, rotació i el marc 3D de seguiment; mai
+coordenades de pantalla.
 
 ## Dependències reutilitzades
 
@@ -44,6 +57,8 @@ conté altitud, azimut, tipus i rotació.
 - [x] `MeasurementController` converteix el raig de pantalla a coordenada horitzontal i no envia píxels al backend.
 - [x] Un gest actiu bloqueja càmera i picking ordinari; `Escape` i `pointercancel` cancel·len sense crear historial.
 - [x] El picking prioritza nanses i calcula distància real a cada segment projectat de la vora.
+- [x] El control es diu simplement **Seguiment**: activat, les formes segueixen el marc RA/Dec; desactivat, totes congelen sense salt el quaternion 3D de l'instant i queden independents del moviment posterior del cel.
+- [x] El mateix marc congelat s'aplica a línies, nanses, etiquetes, picking, preview d'edició i conversió del raig de pantalla.
 - [x] La nansa inicial mou cercle/quadrat/rectangle rígidament; la final redimensiona; una vora mou la forma; la regla permet editar ambdós extrems.
 - [x] El renderer conserva un batch de línia i un de nanses per entitat, comparteix materials i només substitueix l'entitat amb `entityVersion` modificada.
 - [x] El preview usa un `Float32Array`/`BufferGeometry` fix de 512 vèrtexs, sense crear geometria durant `pointermove`.
@@ -53,11 +68,13 @@ conté altitud, azimut, tipus i rotació.
 ### Persistència i contracte
 
 - [x] `measurement-document.schema.json` defineix el snapshot v1 compartit.
+- [x] `trackingEnabled` i `fixedQuaternion` formen part del snapshot i del JSON persistent; el canvi és autoritatiu, versionat, atòmic i reversible amb undo/redo.
 - [x] El JSON persistent usa `schemaVersion: 1` i substitució atòmica amb temporals únics.
 - [x] La migració v0 accepta l'antic camp `items`; un fitxer corrupte es conserva i genera un avís recuperable.
 - [x] Els bloquejos transitoris de `os.replace` a Windows tenen cinc reintents acotats i prova de regressió.
 - [x] `TERRALAB_STATE_ROOT` permet aïllar estat en validacions sense tocar les preferències de l'usuari.
 - [x] El bundler considera `.ts`, `.tsx` i `.css` en la frescor; una modificació només CSS ja no deixa `bundle.css` obsolet.
+- [x] L'HTML, el JS i el CSS actius es serveixen amb `Cache-Control: no-store`, i cada arrencada obre una URL identificada pel build; una pestanya antiga ja no pot reconnectar-se silenciosament a un backend nou.
 
 ## Treball completat
 
@@ -74,12 +91,14 @@ conté altitud, azimut, tipus i rotació.
 - [x] Casos `359,9° ↔ 0,1° = 0,2°`, zenit oposat `= 0,2°`, separació antipodal `= 180°` i separació microscòpica finita.
 - [x] Radi nul i rectangle degenerat rebutjats; les quatre geometries tenen punts finits dins els dominis angulars.
 - [x] Historial immutable/acotat, CRUD, clear, undo/redo, versions d'entitat, round-trip, migració i corrupció.
+- [x] El toggle de seguiment congela totes les formes en un únic marc 3D normalitzat, persisteix després de reiniciar i reprèn RA/Dec en desfer o reactivar-lo.
 - [x] Preview sense noves geometries, reconstrucció parcial, labels projectats i alliberament complet.
 - [x] TypeScript, build frontend, suite Python, validador estructural, esquemes i link-check documental.
 
-Resultat final de regressió: **153 proves Python** i tota la suite frontend,
+Resultat final de regressió: **156 proves Python** i tota la suite frontend,
 inclosa `measurement_step21.test.ts`, superades. La prova específica del pas té
-**11 casos Python** més les comprovacions frontend de geometria, projecció i
+**12 casos Python** més les comprovacions frontend de geometria, projecció,
+seguiment/fixació 3D i
 lifecycle.
 
 ## Evidències
@@ -89,7 +108,7 @@ lifecycle.
 - [x] [Captura després d'editar, eliminar i desfer](../evidencies/pas21/edit-delete-undo.png).
 - [x] La regla passa de `9,891°` a `15,498°`; el cercle es mou `91,76 CSS px` i conserva exactament `r 5,118° · Ø 10,236°`.
 - [x] El HUD confirma conservació exacta de pose/FOV durant tots els gestos; quatre botons natius conserven `title` i `aria-pressed`.
-- [x] Reinici real: es restauren quatre entitats i quatre labels visibles, sense errors de consola; JSON de cuatro mesures: **1.572 bytes**.
+- [x] Reinici real: es restauren quatre entitats i quatre labels visibles, sense errors de consola; JSON de quatre mesures: **1.572 bytes**.
 - [x] Comptadors retinguts: dues entitats creen 4 geometries més el preview fix; editar-ne una suma exactament 2 builds i 2 disposals, amb `activeEntityCount = 2`.
 
 ## Criteri de sortida

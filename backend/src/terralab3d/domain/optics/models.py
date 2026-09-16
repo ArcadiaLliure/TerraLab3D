@@ -51,6 +51,7 @@ class CameraCaptureSettings:
     iso: float = 800.0
     exposure_seconds: float = 2.0
     tracking_enabled: bool = False
+    frame_rotation_deg: float = 0.0
     optical_transmission: float | None = None
 
 

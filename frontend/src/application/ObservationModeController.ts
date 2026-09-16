@@ -14,6 +14,7 @@ import { setThreeFromAzimuthAltitude } from "../view/three/celestialCoordinates"
 import type { ThreeSceneHostImpl } from "../view/three/ThreeSceneHostImpl";
 import type { StarTrailLayerRendererImpl } from "../view/three/layers/StarTrailLayerRendererImpl";
 import type { TrackingTargetResolver } from "../view/three/picking/TrackingTargetResolver";
+import type { FocusTrackingController } from "../view/three/picking/FocusTrackingController";
 import type { LocationPage } from "../view/ui/drawer_pages/LocationPage";
 import type { OpticsPanelImpl } from "../view/ui/panels/OpticsPanelImpl";
 import type { ObservationHUD } from "../view/ui/panels/ObservationHUD";
@@ -39,6 +40,9 @@ export class ObservationModeController {
   private pendingDeepTimer: number | null = null;
   private lastDeepKey = "";
   private deepActive = false;
+  private selectedTarget: CelestialTargetRef | null = null;
+  private pendingCamera: CameraCaptureSnapshot | null = null;
+  private cameraMutationTimer: number | null = null;
   private readonly direction = new THREE.Vector3();
 
   constructor(
@@ -47,13 +51,22 @@ export class ObservationModeController {
     private readonly cameraRig: CameraRigImpl,
     private readonly transform: CelestialTransformState,
     private readonly trackingResolver: TrackingTargetResolver,
+    private readonly focusTrackingController: FocusTrackingController,
     private readonly trailRenderer: StarTrailLayerRendererImpl,
     private readonly locationPage: LocationPage,
     private readonly panel: OpticsPanelImpl,
     private readonly hud: ObservationHUD,
-  ) {}
+  ) {
+    window.addEventListener("keydown", this.onGlobalKeyDown, true);
+    this.sceneHost.renderer.domElement.addEventListener("wheel", this.onInstrumentWheel, { capture: true, passive: false });
+    this.sceneHost.getImagingPreviewLayerRenderer().attachRotationInteraction(
+      this.sceneHost.renderer.domElement,
+      rotationDeg => this.updateCamera({ frameRotationDeg: rotationDeg }),
+    );
+  }
 
   requestMode(mode: ObservationMode): void {
+    if (mode === "eye") this.focusTrackingController.stopTracking();
     this.bridge.setObservationMode(mode, (this.snapshot?.observationRevision ?? 0) + 1);
   }
 
@@ -80,6 +93,8 @@ export class ObservationModeController {
     this.hud.present(snapshot);
     this.locationPage.presentObservationMode(snapshot.mode);
     this.sceneHost.presentObservation(snapshot);
+    if (this.cameraMutationTimer === null) this.pendingCamera = null;
+    this.syncInstrumentTracking();
 
     const cameraPreview = snapshot.mode === "camera" && !snapshot.camera.trackingEnabled;
     this.trailRenderer.setCameraPreview(
@@ -108,6 +123,11 @@ export class ObservationModeController {
     if (this.snapshot?.mode === "camera") this.scheduleDeepQuery(pose);
   }
 
+  onSelectionChanged(target: CelestialTargetRef | null): void {
+    this.selectedTarget = target;
+    this.syncInstrumentTracking();
+  }
+
   manualGoto(raDeg: number, decDeg: number): void {
     const revision = ++this.gotoRevision;
     const resolved = this.trackingResolver.resolve({ kind: "coordinate", raDeg, decDeg, frame: "J2000" });
@@ -134,8 +154,52 @@ export class ObservationModeController {
 
   dispose(): void {
     this.cancelDeepQuery();
+    if (this.cameraMutationTimer !== null) window.clearTimeout(this.cameraMutationTimer);
+    window.removeEventListener("keydown", this.onGlobalKeyDown, true);
+    this.sceneHost.renderer.domElement.removeEventListener("wheel", this.onInstrumentWheel, true);
+    this.sceneHost.getImagingPreviewLayerRenderer().detachRotationInteraction();
     this.trailRenderer.setCameraPreview(false, 0, 8.0);
   }
+
+  private syncInstrumentTracking(): void {
+    const snapshot = this.snapshot;
+    const shouldTrack = snapshot?.mode === "telescope"
+      || (snapshot?.mode === "camera" && snapshot.camera.trackingEnabled);
+    if (shouldTrack && this.selectedTarget) {
+      this.focusTrackingController.startTracking(this.selectedTarget, true);
+    } else {
+      this.focusTrackingController.stopTracking();
+    }
+  }
+
+  private updateCamera(update: Partial<CameraCaptureSnapshot>): void {
+    const base = this.pendingCamera ?? this.snapshot?.camera;
+    if (!base || this.snapshot?.mode !== "camera") return;
+    this.pendingCamera = { ...base, ...update };
+    if (this.cameraMutationTimer !== null) window.clearTimeout(this.cameraMutationTimer);
+    this.cameraMutationTimer = window.setTimeout(() => {
+      this.cameraMutationTimer = null;
+      const camera = this.pendingCamera;
+      if (!camera) return;
+      this.pendingCamera = null;
+      this.configureCamera(camera);
+    }, 80);
+  }
+
+  private readonly onGlobalKeyDown = (event: KeyboardEvent): void => {
+    if (event.key !== "Escape") return;
+    this.focusTrackingController.stopTracking();
+    if (this.snapshot?.mode !== "eye") this.requestMode("eye");
+  };
+
+  private readonly onInstrumentWheel = (event: WheelEvent): void => {
+    if (!event.ctrlKey || this.snapshot?.mode !== "camera") return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const base = this.pendingCamera?.focalLengthMm ?? this.snapshot.camera.focalLengthMm;
+    const focalLengthMm = THREE.MathUtils.clamp(base * Math.exp(-event.deltaY * 0.0015), 0.1, 100_000);
+    this.updateCamera({ focalLengthMm });
+  };
 
   private scheduleDeepQuery(pose: CameraPose): void {
     const snapshot = this.snapshot;

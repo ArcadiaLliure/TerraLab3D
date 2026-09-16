@@ -17,6 +17,7 @@ export interface OpticsPanelCallbacks {
 
 export class OpticsPanelImpl {
   readonly element = document.createElement("section");
+  private readonly title = document.createElement("div");
   private readonly cameraSection = document.createElement("div");
   private readonly telescopeSection = document.createElement("div");
   private readonly metrics = document.createElement("div");
@@ -28,6 +29,8 @@ export class OpticsPanelImpl {
   private readonly squarePixelsInput = document.createElement("input");
   private readonly telescopeInputs = new Map<string, HTMLInputElement>();
   private readonly trackingInput = document.createElement("input");
+  private selectedGotoButton: HTMLButtonElement | null = null;
+  private selectedTargetName: string | null = null;
   private debounceTimer: number | null = null;
   private snapshot: ObservationSnapshotMessage | null = null;
   private fastMovement = false;
@@ -35,10 +38,9 @@ export class OpticsPanelImpl {
 
   constructor(private readonly callbacks: OpticsPanelCallbacks) {
     this.element.className = "optics-panel";
-    const title = document.createElement("div");
-    title.className = "optics-panel-title";
-    title.textContent = "Instrument òptic";
-    this.element.append(title, this.cameraSection, this.telescopeSection, this.metrics, this.status);
+    this.title.className = "optics-panel-title";
+    this.title.textContent = "Instrument òptic";
+    this.element.append(this.title, this.cameraSection, this.telescopeSection, this.metrics, this.status);
     this.buildCameraSection();
     this.buildTelescopeSection();
     this.status.className = "optics-status";
@@ -51,9 +53,33 @@ export class OpticsPanelImpl {
     this.element.hidden = snapshot.mode === "eye";
     this.cameraSection.hidden = snapshot.mode !== "camera";
     this.telescopeSection.hidden = snapshot.mode !== "telescope";
-    if (snapshot.mode === "camera") this.presentCamera(snapshot);
-    if (snapshot.mode === "telescope") this.presentTelescope(snapshot);
+    if (snapshot.mode === "camera") {
+      this.title.textContent = "Instrument: Càmera";
+      this.presentCamera(snapshot);
+    } else if (snapshot.mode === "telescope") {
+      this.title.textContent = "Instrument: Telescopi";
+      this.presentTelescope(snapshot);
+    } else {
+      this.title.textContent = "Instrument òptic";
+    }
     this.status.textContent = snapshot.warning ?? this.deepStatus(snapshot);
+  }
+
+  updateSelectedTarget(name: string | null): void {
+    this.selectedTargetName = name;
+    if (this.selectedGotoButton) {
+      if (name) {
+        this.selectedGotoButton.textContent = `GoTo astre: ${name}`;
+        this.selectedGotoButton.title = `Apunta el telescopi directament cap a ${name}`;
+        this.selectedGotoButton.classList.add("has-target");
+        this.selectedGotoButton.disabled = false;
+      } else {
+        this.selectedGotoButton.textContent = "GoTo selecció (cap astre)";
+        this.selectedGotoButton.title = "Selecciona abans un astre al mapa o al cercador per apuntar-hi el telescopi";
+        this.selectedGotoButton.classList.remove("has-target");
+        this.selectedGotoButton.disabled = true;
+      }
+    }
   }
 
   presentError(error: ObservationErrorMessage): void {
@@ -75,25 +101,11 @@ export class OpticsPanelImpl {
     this.cameraSection.className = "optics-section";
     this.addLabelled(this.cameraSection, "Sensor", this.profileSelect);
     this.profileSelect.onchange = () => { this.presentProfileDraft(); this.scheduleCamera(); };
-    this.profileName.type = "text";
-    this.addLabelled(this.cameraSection, "Nom perfil", this.profileName);
-    for (const [field, label] of [
-      ["widthMm", "Sensor ample (mm)"], ["heightMm", "Sensor alt (mm)"],
-      ["resolutionWidthPx", "Resolució X"], ["resolutionHeightPx", "Resolució Y"],
-      ["pixelPitchUm", "Pitch quadrat (µm)"], ["pixelPitchXUm", "Pitch X (µm)"],
-      ["pixelPitchYUm", "Pitch Y (µm)"],
-    ] as const) {
-      const input = this.numberInput(field, "0.01");
-      this.profileInputs.set(field, input);
-      this.addLabelled(this.cameraSection, label, input);
-    }
-    this.squarePixelsInput.type = "checkbox";
-    this.squarePixelsInput.checked = true;
-    this.addLabelled(this.cameraSection, "Píxels quadrats", this.squarePixelsInput);
+
     const definitions: Array<[string, string, string]> = [
       ["focalLengthMm", "Focal (mm)", "1"], ["fNumber", "Número f", "0.1"],
       ["iso", "ISO", "1"], ["exposureSeconds", "Exposició (s)", "0.1"],
-      ["opticalTransmission", "Transmissió", "0.01"],
+      ["frameRotationDeg", "Rotació marc (°)", "0.1"],
     ];
     for (const [field, label, step] of definitions) {
       const input = this.numberInput(field, step);
@@ -105,6 +117,38 @@ export class OpticsPanelImpl {
     this.trackingInput.onchange = () => this.scheduleCamera();
     this.addLabelled(this.cameraSection, "Seguiment", this.trackingInput);
 
+    // Advanced sensor configuration (collapsible)
+    const advanced = document.createElement("details");
+    advanced.className = "optics-advanced-details";
+    const summary = document.createElement("summary");
+    summary.textContent = "Geometria i perfils de sensor…";
+    advanced.appendChild(summary);
+
+    const advancedContent = document.createElement("div");
+    advancedContent.className = "optics-advanced-content";
+
+    this.profileName.type = "text";
+    this.addLabelled(advancedContent, "Nom perfil", this.profileName);
+
+    for (const [field, label] of [
+      ["widthMm", "Sensor ample (mm)"], ["heightMm", "Sensor alt (mm)"],
+      ["resolutionWidthPx", "Resolució X"], ["resolutionHeightPx", "Resolució Y"],
+      ["pixelPitchUm", "Pitch quadrat (µm)"], ["pixelPitchXUm", "Pitch X (µm)"],
+      ["pixelPitchYUm", "Pitch Y (µm)"],
+    ] as const) {
+      const input = this.numberInput(field, "0.01");
+      this.profileInputs.set(field, input);
+      this.addLabelled(advancedContent, label, input);
+    }
+    this.squarePixelsInput.type = "checkbox";
+    this.squarePixelsInput.checked = true;
+    this.addLabelled(advancedContent, "Píxels quadrats", this.squarePixelsInput);
+
+    const transInput = this.numberInput("opticalTransmission", "0.01");
+    this.cameraInputs.set("opticalTransmission", transInput);
+    this.addLabelled(advancedContent, "Transmissió", transInput);
+    transInput.oninput = () => this.scheduleCamera();
+
     const profileActions = document.createElement("div");
     profileActions.className = "optics-actions";
     profileActions.append(
@@ -112,7 +156,10 @@ export class OpticsPanelImpl {
       this.button("Editar", () => this.updateProfile()),
       this.button("Eliminar", () => this.deleteProfile()),
     );
-    this.cameraSection.appendChild(profileActions);
+    advancedContent.appendChild(profileActions);
+
+    advanced.appendChild(advancedContent);
+    this.cameraSection.appendChild(advanced);
   }
 
   private buildTelescopeSection(): void {
@@ -128,6 +175,11 @@ export class OpticsPanelImpl {
       input.oninput = () => this.scheduleTelescope();
     }
 
+    const movementTitle = document.createElement("div");
+    movementTitle.className = "optics-subheading";
+    movementTitle.textContent = "Control de moviment";
+    this.telescopeSection.appendChild(movementTitle);
+
     const speed = this.button("Moviment: fi", () => {
       this.fastMovement = !this.fastMovement;
       speed.textContent = this.fastMovement ? "Moviment: ràpid" : "Moviment: fi";
@@ -141,19 +193,60 @@ export class OpticsPanelImpl {
     );
     this.telescopeSection.appendChild(pad);
 
-    const goto = document.createElement("div");
-    goto.className = "optics-goto";
+    const gotoContainer = document.createElement("div");
+    gotoContainer.className = "optics-goto-container";
+
+    const gotoTitle = document.createElement("div");
+    gotoTitle.className = "optics-subheading";
+    gotoTitle.textContent = "Alineació GoTo (Apuntat automàtic)";
+    gotoContainer.appendChild(gotoTitle);
+
+    // 1. GoTo manual per coordenades RA / Dec
+    const gotoRow = document.createElement("div");
+    gotoRow.className = "optics-goto-row";
+
+    const raLabel = document.createElement("label");
+    raLabel.textContent = "RA:";
     const ra = this.numberInput("raDeg", "0.01");
+    ra.placeholder = "0..360°";
+    ra.title = "Ascensió Recta (0.0° a 360.0°)";
+    raLabel.appendChild(ra);
+
+    const decLabel = document.createElement("label");
+    decLabel.textContent = "Dec:";
     const dec = this.numberInput("decDeg", "0.01");
-    ra.placeholder = "RA graus"; dec.placeholder = "Dec graus";
-    goto.append(ra, dec, this.button("GoTo", () => {
+    dec.placeholder = "-90..+90°";
+    dec.title = "Declinació (-90.0° a +90.0°)";
+    decLabel.appendChild(dec);
+
+    const manualBtn = this.button("GoTo", () => {
       const raDeg = Number(ra.value); const decDeg = Number(dec.value);
       if (Number.isFinite(raDeg) && Number.isFinite(decDeg) && decDeg >= -90 && decDeg <= 90) {
         this.callbacks.onManualGoto(((raDeg % 360) + 360) % 360, decDeg);
       }
-    }));
-    goto.append(this.button("GoTo selecció", () => this.callbacks.onSelectedGoto()));
-    this.telescopeSection.appendChild(goto);
+    });
+    manualBtn.className = "optics-goto-btn";
+    manualBtn.title = "Apunta el telescopi a les coordenades astronòmiques introduïdes (RA i Dec)";
+
+    gotoRow.append(raLabel, decLabel, manualBtn);
+    gotoContainer.appendChild(gotoRow);
+
+    // 2. GoTo a la selecció actual
+    this.selectedGotoButton = this.button(
+      this.selectedTargetName ? `GoTo astre: ${this.selectedTargetName}` : "GoTo selecció (cap astre)",
+      () => this.callbacks.onSelectedGoto()
+    );
+    this.selectedGotoButton.className = "optics-goto-target-btn";
+    this.selectedGotoButton.title = "Apunta el telescopi automàticament a l'astre actualment seleccionat (planeta, estrella, etc.)";
+    if (this.selectedTargetName) {
+      this.selectedGotoButton.classList.add("has-target");
+      this.selectedGotoButton.disabled = false;
+    } else {
+      this.selectedGotoButton.disabled = true;
+    }
+    gotoContainer.appendChild(this.selectedGotoButton);
+
+    this.telescopeSection.appendChild(gotoContainer);
   }
 
   private presentCamera(snapshot: ObservationSnapshotMessage): void {
@@ -188,6 +281,7 @@ export class OpticsPanelImpl {
         iso: this.value(this.cameraInputs, "iso"),
         exposureSeconds: this.value(this.cameraInputs, "exposureSeconds"),
         trackingEnabled: this.trackingInput.checked,
+        frameRotationDeg: this.value(this.cameraInputs, "frameRotationDeg"),
         opticalTransmission: this.optionalValue(this.cameraInputs, "opticalTransmission"),
       });
     });
