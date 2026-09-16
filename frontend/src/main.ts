@@ -744,9 +744,8 @@ function main(): void {
       starTrailRenderer.setCurrentSimulationTime(currentTimeIso);
       const coverage = sceneHost.getSolarSystemRenderer().updateApparentTrajectoryTime(currentTimeIso);
       skyPage.updateTrajectoryCoverage(coverage);
-      const currentMs = Date.parse(currentTimeIso);
-      const isOutsideOrShifted = coverage === "outside_interval" || Math.abs(currentMs - lastTrajectoryCenterMs) > 15 * 60_000;
-      if (isOutsideOrShifted && trajectoryConfiguration.enabled && selectedTrajectoryTarget() !== null) {
+      const isOutside = coverage === "outside_interval";
+      if (isOutside && trajectoryConfiguration.enabled && selectedTrajectoryTarget() !== null) {
         requestSelectedApparentTrajectory();
       }
     },

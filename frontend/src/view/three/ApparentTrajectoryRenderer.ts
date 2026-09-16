@@ -98,9 +98,12 @@ export class ApparentTrajectoryRenderer {
 
   /** Immediately invalidates the previous identity while latest-wins work runs. */
   beginRequest(requestId: string, objectId: string): void {
+    const objectChanged = this.expectedObjectId !== objectId;
     this.expectedRequestId = requestId;
     this.expectedObjectId = objectId;
-    this.clearVisualData();
+    if (objectChanged) {
+      this.clearVisualData();
+    }
     this.root.userData.trajectoryStatus = "calculating";
   }
 
