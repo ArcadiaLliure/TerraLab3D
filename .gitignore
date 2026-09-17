@@ -1,15 +1,39 @@
+# Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
 .venv/
-node_modules/
-.test-dist/
-dist/
-build/
-.coverage
+env/
+venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+htmlcov/
 
+# Node / Frontend
+node_modules/
+dist/
+build/
+.test-dist/
+frontend/dist/
+frontend/node_modules/
+frontend/scratch/
+
+# IDE & Editor
+.vscode/
+.idea/
+.antigravity/
+.agents/
+*.swp
+*.swo
+*~
+
+# Temporary & Debug
 diff.txt
-
 log.txt
+*.patch
+.runtime-*/
+.tracking_resolver_*.ts
+docs/evidencies/debug/
