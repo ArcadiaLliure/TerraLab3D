@@ -1,4 +1,8 @@
 import * as THREE from "three";
+import { Line2 } from "three/addons/lines/Line2.js";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
+import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 
 import type {
   ApparentTrajectoryEvent,
@@ -7,6 +11,14 @@ import type {
 } from "../../contracts/astronomical_event_contracts";
 import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
 import { threeFromEnu } from "./celestialCoordinates";
+import {
+  createOverlayLineMaterials,
+  disposeOverlayLineMaterials,
+  OVERLAY_LINE_PROFILES,
+  setOverlayResolution,
+  withOverlayColor,
+  type OverlayLineMaterials,
+} from "./materials/OverlayLineStyle";
 
 const TRAJECTORY_RADIUS = CELESTIAL_SCENE_RADIUS.solarSystem * 0.97;
 const MARKER_RADIUS = TRAJECTORY_RADIUS + 1_000;
@@ -17,10 +29,11 @@ const STATE_ORDER: readonly TrajectoryVisibilityState[] = [
   "insufficient_data",
 ];
 
-type SegmentLine = THREE.LineSegments<
-  THREE.BufferGeometry,
-  THREE.LineBasicMaterial | THREE.LineDashedMaterial
->;
+interface SegmentLine {
+  readonly root: THREE.Group;
+  readonly geometry: LineSegmentsGeometry;
+  readonly materials: OverlayLineMaterials;
+}
 
 export type TrajectoryCoverage = "empty" | "covered" | "outside_interval";
 
@@ -31,21 +44,18 @@ export interface ApparentTrajectoryMetrics {
   readonly staleResourceCount: number;
   readonly bridgeBytes: number;
   readonly activeGeometryCount: number;
+  readonly activeOverlayMaterialCount: number;
   readonly activeMarkerUpdateCount: number;
 }
 
 /** Persistent renderer for one selected observer-sky path with retroilluminated styling. */
 export class ApparentTrajectoryRenderer {
   readonly root = new THREE.Group();
-  private readonly legacyGeometry = new THREE.BufferGeometry();
-  private readonly legacyMaterial = new THREE.LineBasicMaterial({
-    color: 0x38bdf8,
-    transparent: true,
-    opacity: 0.90,
-    depthWrite: false,
-    depthTest: true,
-  });
-  private readonly legacyLine = new THREE.Line(this.legacyGeometry, this.legacyMaterial);
+  private readonly legacyGeometry = new LineGeometry();
+  private readonly legacyMaterials = createOverlayLineMaterials(OVERLAY_LINE_PROFILES.trajectoryPrimary);
+  private readonly legacyRoot = new THREE.Group();
+  private readonly legacyHalo = new Line2(this.legacyGeometry, this.legacyMaterials.halo);
+  private readonly legacyLine = new Line2(this.legacyGeometry, this.legacyMaterials.core);
   private readonly segmentLines = new Map<TrajectoryVisibilityState, SegmentLine>();
   private readonly eventRoot = new THREE.Group();
   private readonly labelRoot = new THREE.Group();
@@ -68,15 +78,15 @@ export class ApparentTrajectoryRenderer {
   private expectedRequestId: string | null = null;
   private expectedObjectId: string | null = null;
   private enabled = true;
-  private showTerrainOccluded = false;
-  private showBelowHorizon = false;
+  private showTerrainOccluded = true;
+  private showBelowHorizon = true;
   private currentFovDeg = 60;
   private currentHeightPx = 800;
   private disposed = false;
   // Pas-9 metrics count the persistent trajectory line; the active marker is
   // a Pas-22 auxiliary that never rebuilds and stays outside that regression.
   private _geometryBuildCount = 1;
-  private _materialBuildCount = 1;
+  private _materialBuildCount = 2;
   private _resourceApplyCount = 0;
   private _staleResourceCount = 0;
   private _bridgeBytes = 0;
@@ -84,15 +94,22 @@ export class ApparentTrajectoryRenderer {
 
   constructor(parent: THREE.Object3D) {
     this.root.name = "apparentTrajectories";
-    this.legacyLine.name = "apparentTrajectory:legacy-or-visible";
+    this.legacyGeometry.setPositions(new Float32Array([0, 0, 0, 0, 0, 0]));
+    this.legacyGeometry.instanceCount = 0;
+    this.legacyRoot.name = "apparentTrajectory:legacy-or-visible";
+    this.legacyHalo.name = "apparentTrajectory:legacy-or-visible:halo";
+    this.legacyHalo.frustumCulled = false;
+    this.legacyHalo.renderOrder = 89;
+    this.legacyLine.name = "apparentTrajectory:legacy-or-visible:core";
     this.legacyLine.frustumCulled = false;
     this.legacyLine.renderOrder = 90;
+    this.legacyRoot.add(this.legacyHalo, this.legacyLine);
     this.activeMarker.name = "apparentTrajectory:active-time";
     this.activeMarker.visible = false;
     this.activeMarker.renderOrder = 106;
     this.eventRoot.name = "apparentTrajectory:events";
     this.labelRoot.name = "apparentTrajectory:event-labels";
-    this.root.add(this.legacyLine, this.eventRoot, this.labelRoot, this.activeMarker);
+    this.root.add(this.legacyRoot, this.eventRoot, this.labelRoot, this.activeMarker);
     parent.add(this.root);
   }
 
@@ -215,6 +232,13 @@ export class ApparentTrajectoryRenderer {
   updateCamera(fovDeg: number, heightPx: number): void {
     this.currentFovDeg = fovDeg;
     this.currentHeightPx = heightPx;
+    const widthPx = heightPx * (typeof window !== "undefined" && window.innerHeight > 0
+      ? window.innerWidth / window.innerHeight
+      : 16 / 9);
+    setOverlayResolution(this.legacyMaterials, widthPx, heightPx);
+    for (const line of this.segmentLines.values()) {
+      setOverlayResolution(line.materials, widthPx, heightPx);
+    }
     this.updateLabelScales();
   }
 
@@ -253,6 +277,7 @@ export class ApparentTrajectoryRenderer {
       activeGeometryCount: this.disposed
         ? 0
         : 2 + this.segmentLines.size + this.eventRoot.children.length,
+      activeOverlayMaterialCount: this.disposed ? 0 : 2 + this.segmentLines.size * 2,
       activeMarkerUpdateCount: this._activeMarkerUpdateCount,
     };
   }
@@ -262,12 +287,12 @@ export class ApparentTrajectoryRenderer {
     this.disposed = true;
     this.root.removeFromParent();
     this.legacyGeometry.dispose();
-    this.legacyMaterial.dispose();
+    disposeOverlayLineMaterials(this.legacyMaterials);
     this.activeMarkerGeometry.dispose();
     this.activeMarkerMaterial.dispose();
     for (const line of this.segmentLines.values()) {
       line.geometry.dispose();
-      line.material.dispose();
+      disposeOverlayLineMaterials(line.materials);
     }
     this.clearEvents();
     this.segmentLines.clear();
@@ -284,7 +309,7 @@ export class ApparentTrajectoryRenderer {
   }
 
   private applyLegacyTrajectory(): void {
-    for (const line of this.segmentLines.values()) line.visible = false;
+    for (const line of this.segmentLines.values()) line.root.visible = false;
     const positions = new Float32Array(this.metadata!.sampleCount * 3);
     for (let index = 0; index < this.metadata!.sampleCount; index++) {
       const target = index * 3;
@@ -294,10 +319,9 @@ export class ApparentTrajectoryRenderer {
         this.directionAt(index).normalize().multiplyScalar(TRAJECTORY_RADIUS).toArray(positions, target);
       }
     }
-    this.legacyGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    this.legacyGeometry.setDrawRange(0, Infinity);
+    this.legacyGeometry.setPositions(positions);
     this.legacyGeometry.computeBoundingSphere();
-    this.legacyLine.visible = this.enabled;
+    this.legacyRoot.visible = this.enabled;
   }
 
   private applySegmentedTrajectory(
@@ -308,7 +332,9 @@ export class ApparentTrajectoryRenderer {
     for (const state of STATE_ORDER) {
       positionsByState.set(state, []);
     }
+    const sampleCount = metadata.sampleCount;
     const segments = metadata.segments ?? this.deriveSegments(visibility);
+
     for (const segment of segments) {
       const positions = positionsByState.get(segment.visibility)!;
       for (let index = segment.startIndex; index < segment.endIndex; index++) {
@@ -316,31 +342,32 @@ export class ApparentTrajectoryRenderer {
         const left = this.directionAt(index).normalize().multiplyScalar(TRAJECTORY_RADIUS);
         const right = this.directionAt(index + 1).normalize().multiplyScalar(TRAJECTORY_RADIUS);
 
-        if (segment.visibility === "terrain_occluded" || segment.visibility === "below_astronomical_horizon") {
-          // Geometrically dashed: 4 subdivisions per sample step (dash - gap - dash - gap)
-          const steps = 4;
-          for (let step = 0; step < steps; step++) {
-            if (step % 2 !== 0) continue; // skip odd steps for gap
-            const t0 = step / steps;
-            const t1 = (step + 1) / steps;
-            const p0 = left.clone().lerp(right, t0);
-            const p1 = left.clone().lerp(right, t1);
-            positions.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z);
-          }
-        } else {
-          // Continuous core line
-          positions.push(left.x, left.y, left.z, right.x, right.y, right.z);
-        }
+        positions.push(left.x, left.y, left.z, right.x, right.y, right.z);
       }
     }
-    this.legacyLine.visible = false;
+
+    // Tancament de bucle 360° (Loop closure): connectar l'última mostra amb la primera si ambdues són vàlides
+    if (sampleCount >= 2 && this.validity[sampleCount - 1] !== 0 && this.validity[0] !== 0) {
+      const lastState = segments.length > 0 ? segments[segments.length - 1]!.visibility : "visible";
+      const positions = positionsByState.get(lastState)!;
+      const left = this.directionAt(sampleCount - 1).normalize().multiplyScalar(TRAJECTORY_RADIUS);
+      const right = this.directionAt(0).normalize().multiplyScalar(TRAJECTORY_RADIUS);
+      // Només afegir segment de tancament si no coincideixen exactament en coordenades
+      if (left.distanceToSquared(right) > 1e-8) {
+        positions.push(left.x, left.y, left.z, right.x, right.y, right.z);
+      }
+    }
+
+    this.legacyRoot.visible = false;
     for (const state of STATE_ORDER) {
       const line = this.ensureSegmentLine(state);
-      line.geometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(new Float32Array(positionsByState.get(state)!), 3),
-      );
-      line.geometry.setDrawRange(0, Infinity);
+      const positions = positionsByState.get(state)!;
+      if (positions.length >= 6) {
+        line.geometry.setPositions(new Float32Array(positions));
+      } else {
+        line.geometry.setPositions(new Float32Array([0, 0, 0, 0, 0, 0]));
+        line.geometry.instanceCount = 0;
+      }
       line.geometry.computeBoundingSphere();
     }
     this.updateLayerVisibility();
@@ -375,24 +402,38 @@ export class ApparentTrajectoryRenderer {
   private ensureSegmentLine(state: TrajectoryVisibilityState): SegmentLine {
     const existing = this.segmentLines.get(state);
     if (existing !== undefined) return existing;
-    const geometry = new THREE.BufferGeometry();
+    const geometry = new LineSegmentsGeometry();
+    geometry.setPositions(new Float32Array([0, 0, 0, 0, 0, 0]));
+    geometry.instanceCount = 0;
     const style = stateStyle(state);
-    const material = new THREE.LineBasicMaterial({
-      color: style.color,
-      transparent: true,
-      opacity: style.opacity,
-      depthTest: style.depthTest,
-      depthWrite: false,
-    });
-    const line = new THREE.LineSegments(geometry, material);
-    line.name = `apparentTrajectory:${state}`;
-    line.frustumCulled = false;
-    line.renderOrder = state === "terrain_occluded" ? 100 : (state === "below_astronomical_horizon" ? 95 : 90);
+    const baseProfile = state === "visible"
+      ? OVERLAY_LINE_PROFILES.trajectoryPrimary
+      : OVERLAY_LINE_PROFILES.trajectorySecondary;
+    const materials = createOverlayLineMaterials(withOverlayColor(
+      baseProfile,
+      style.color,
+      style.opacity,
+      style.depthTest,
+    ));
+    setOverlayResolution(materials, 1920, 1080);
+    const renderOrder = state === "terrain_occluded" ? 100 : (state === "below_astronomical_horizon" ? 95 : 90);
+    const halo = new LineSegments2(geometry, materials.halo);
+    halo.name = `apparentTrajectory:${state}:halo`;
+    halo.frustumCulled = false;
+    halo.renderOrder = renderOrder - 1;
+    const core = new LineSegments2(geometry, materials.core);
+    core.name = `apparentTrajectory:${state}:core`;
+    core.frustumCulled = false;
+    core.renderOrder = renderOrder;
+    const root = new THREE.Group();
+    root.name = `apparentTrajectory:${state}`;
+    root.add(halo, core);
 
+    const line = { root, geometry, materials };
     this.segmentLines.set(state, line);
-    this.root.add(line);
+    this.root.add(root);
     this._geometryBuildCount += 1;
-    this._materialBuildCount += 1;
+    this._materialBuildCount += 2;
     return line;
   }
 
@@ -404,7 +445,7 @@ export class ApparentTrajectoryRenderer {
         || (state === "terrain_occluded" && this.showTerrainOccluded)
         || (state === "below_astronomical_horizon" && this.showBelowHorizon)
       );
-      line.visible = isVisible;
+      line.root.visible = isVisible;
     }
   }
 
@@ -554,11 +595,11 @@ export class ApparentTrajectoryRenderer {
   }
 
   private clearVisualData(): void {
-    this.legacyGeometry.setDrawRange(0, 0);
-    this.legacyLine.visible = false;
+    this.legacyGeometry.instanceCount = 0;
+    this.legacyRoot.visible = false;
     for (const line of this.segmentLines.values()) {
-      line.geometry.setDrawRange(0, 0);
-      line.visible = false;
+      line.geometry.instanceCount = 0;
+      line.root.visible = false;
     }
     this.activeMarker.visible = false;
     this.clearEvents();

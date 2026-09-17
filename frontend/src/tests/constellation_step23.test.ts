@@ -54,6 +54,7 @@ const renderer = new ConstellationLayerRendererImpl(parent);
 renderer.presentCatalog(catalog);
 assert.equal(renderer.metrics().catalogBuildCount, 2);
 assert.equal(renderer.metrics().catalogEntities, 2);
+assert.equal(renderer.metrics().activeMaterialCount, 6, "els traços comparteixen tres parelles nucli/halo");
 renderer.presentCatalog(catalog);
 assert.equal(renderer.metrics().catalogBuildCount, 2, "el mateix catàleg no es reconstrueix");
 
@@ -69,6 +70,11 @@ renderer.setShowAll(true);
 assert.equal(orion.visible, true);
 assert.equal(renderer.metrics().catalogBuildCount, beforeVisibility.catalogBuildCount);
 assert.equal(serpens.children.length, 2, "Caput i Cauda són línies independents");
+const catalogCore = orion.getObjectByName("constellation:stroke:core") as any;
+const catalogHalo = orion.getObjectByName("constellation:stroke:halo") as any;
+assert.equal(catalogCore.material.color.getHex(), 0xffffff, "el traçat IAU adoptat és blanc");
+assert.ok(catalogHalo.material.linewidth > (catalogCore.material.coreWidth ?? 0), "el halo és més ample que el nucli");
+assert.equal(catalogCore.geometry, catalogHalo.geometry, "nucli i halo comparteixen geometria");
 
 const camera = new THREE.PerspectiveCamera(60, 4 / 3, 0.1, 2_000_000);
 camera.up.set(0, 0, 1);
@@ -88,6 +94,8 @@ assert.ok(renderer.reprojectCatalog("Ori", camera, viewport));
 renderer.presentDocument(document(1, [[{ raDeg: 10, decDeg: 10 }, { raDeg: 11, decDeg: 11 }]]));
 const first = renderer.root.getObjectByName("constellation:user:user:test");
 assert.ok(first);
+const userCore = first!.getObjectByName("constellation:stroke:core") as any;
+assert.equal(userCore.material.color.getHex(), 0x6ee7a8, "la constel·lació d'usuari és verda");
 assert.equal(renderer.metrics().userBuildCount, 1);
 renderer.presentDocument(document(1, [[{ raDeg: 10, decDeg: 10 }, { raDeg: 11, decDeg: 11 }]]));
 assert.equal(renderer.metrics().userBuildCount, 1, "entityVersion estable conserva la geometria");

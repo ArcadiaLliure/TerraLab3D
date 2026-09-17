@@ -199,8 +199,16 @@ function main(): void {
     const center = Date.parse(latestSimulationTimeIso);
     if (!Number.isFinite(center)) return;
     lastTrajectoryCenterMs = center;
-    const startUtc = new Date(center - 120_000).toISOString();
-    const endUtc = new Date(center + 24 * 3_600_000).toISOString();
+    const isSidereal = (
+      observable.family === "star"
+      || observable.family === "deep_sky"
+      || observable.family === "constellation"
+      || observable.family === "coordinate"
+    );
+    const periodSeconds = isSidereal ? 86164.0905 : (trajectoryConfiguration.intervalHours * 3600);
+    const halfIntervalMs = (periodSeconds / 2) * 1000;
+    const startUtc = new Date(center - halfIntervalMs).toISOString();
+    const endUtc = new Date(center + halfIntervalMs).toISOString();
     const requestId = `trajectory:${++trajectoryRequestRevision}:${observable.objectId}`;
     renderer.beginApparentTrajectoryRequest(requestId, observable.objectId);
     skyPage?.updateTrajectoryCalculating(observable.displayName);

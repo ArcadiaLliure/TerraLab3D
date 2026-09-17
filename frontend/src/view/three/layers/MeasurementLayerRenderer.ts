@@ -1,22 +1,30 @@
 import * as THREE from "three";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
-import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import type { SceneDelta } from "../../../contracts/scene";
 import type { AngularCoordinate, MeasurementDocumentSnapshot, MeasurementGeometrySnapshot, MeasurementSnapshot } from "../../../contracts/measurement_contracts";
 import { setThreeFromAzimuthAltitude } from "../celestialCoordinates";
 import { CELESTIAL_SCENE_RADIUS } from "../celestialScenePolicy";
+import {
+  createOverlayLineMaterials,
+  disposeOverlayLineMaterials,
+  OVERLAY_LINE_PROFILES,
+  setOverlayIntensity,
+  setOverlayResolution,
+  type OverlayLineMaterials,
+} from "../materials/OverlayLineStyle";
 
 export type MeasurementPickPart = "start" | "end" | "edge";
 export interface MeasurementPick { readonly measurementId: string; readonly part: MeasurementPickPart; }
 interface Entry {
   version: number;
   line: LineSegments2;
+  halo: LineSegments2;
   handles: THREE.Points;
   label: HTMLDivElement;
   measurement: MeasurementSnapshot;
 }
-export interface MeasurementLayerMetrics { readonly geometryBuildCount: number; readonly geometryDisposeCount: number; readonly activeEntityCount: number; readonly lastChangedEntityCount: number; }
+export interface MeasurementLayerMetrics { readonly geometryBuildCount: number; readonly geometryDisposeCount: number; readonly activeEntityCount: number; readonly lastChangedEntityCount: number; readonly activeMaterialCount: number; }
 
 /** Resol l'orientació visual d'una mesura sense confondre seguiment celeste i posició 3D fixa. */
 export function setMeasurementPresentationQuaternion(
@@ -52,46 +60,9 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
   private hoveredId: string | null = null;
   private selectedMeasurementId: string | null = null;
 
-  // Solid, seamless, smoothed lines without bead artifacts (NormalBlending, opacity 1.0)
-  private readonly normalMaterial = new LineMaterial({
-    color: 0x00f0ff,
-    linewidth: 3.5,
-    transparent: true,
-    opacity: 1.0,
-    depthWrite: false,
-    depthTest: false,
-    blending: THREE.NormalBlending,
-  });
-
-  private readonly hoverMaterial = new LineMaterial({
-    color: 0xffffff,
-    linewidth: 6.0,
-    transparent: true,
-    opacity: 1.0,
-    depthWrite: false,
-    depthTest: false,
-    blending: THREE.NormalBlending,
-  });
-
-  private readonly selectedMaterial = new LineMaterial({
-    color: 0xffb700,
-    linewidth: 5.0,
-    transparent: true,
-    opacity: 1.0,
-    depthWrite: false,
-    depthTest: false,
-    blending: THREE.NormalBlending,
-  });
-
-  private readonly previewMaterial = new LineMaterial({
-    color: 0x00f0ff,
-    linewidth: 3.5,
-    transparent: true,
-    opacity: 1.0,
-    depthWrite: false,
-    depthTest: false,
-    blending: THREE.NormalBlending,
-  });
+  private readonly normalMaterials = createOverlayLineMaterials(OVERLAY_LINE_PROFILES.measurementNormal);
+  private readonly hoverMaterials = createOverlayLineMaterials(OVERLAY_LINE_PROFILES.measurementHover);
+  private readonly selectedMaterials = createOverlayLineMaterials(OVERLAY_LINE_PROFILES.measurementSelected);
 
   private readonly handleMaterial = new THREE.PointsMaterial({
     color: 0xffffff,
@@ -107,6 +78,7 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
   private readonly previewPositions = new Float32Array(MAX_PREVIEW_VERTICES * 3);
   private readonly previewGeometry = new LineSegmentsGeometry();
   private readonly previewLine: LineSegments2;
+  private readonly previewHalo: LineSegments2;
 
   private mountedContainer: HTMLElement | null = null;
   private geometryBuildCount = 1;
@@ -131,11 +103,17 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     this.previewGeometry.setPositions(this.previewPositions);
     this.previewGeometry.instanceCount = 0;
 
-    this.previewLine = new LineSegments2(this.previewGeometry, this.previewMaterial);
+    this.previewHalo = new LineSegments2(this.previewGeometry, this.normalMaterials.halo);
+    this.previewHalo.name = "measurement:preview:halo";
+    this.previewHalo.renderOrder = 999;
+    this.previewHalo.frustumCulled = false;
+    this.previewHalo.visible = false;
+    this.previewLine = new LineSegments2(this.previewGeometry, this.normalMaterials.core);
+    this.previewLine.name = "measurement:preview:core";
     this.previewLine.renderOrder = 1000;
     this.previewLine.frustumCulled = false;
     this.previewLine.visible = false;
-    this.groupFixed.add(this.previewLine);
+    this.groupFixed.add(this.previewHalo, this.previewLine);
   }
 
   mountLabels(container: HTMLElement): void { this.mountedContainer = container; }
@@ -169,13 +147,17 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     if (!geometry || geometry.paths.length === 0) {
       this.previewGeometry.instanceCount = 0;
       this.previewLine.visible = false;
+      this.previewHalo.visible = false;
       return;
     }
     const isTracking = tracking ?? true;
     const parentGroup = isTracking ? this.groupTracking : this.groupFixed;
     if (this.previewLine.parent !== parentGroup) parentGroup.add(this.previewLine);
+    if (this.previewHalo.parent !== parentGroup) parentGroup.add(this.previewHalo);
     this.previewLine.quaternion.identity();
+    this.previewHalo.quaternion.identity();
     if (!isTracking && fixedQuaternion) this.previewLine.quaternion.set(...fixedQuaternion);
+    if (!isTracking && fixedQuaternion) this.previewHalo.quaternion.set(...fixedQuaternion);
 
     let cursor = 0;
     for (const path of geometry.paths) {
@@ -192,9 +174,11 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
       this.previewGeometry.computeBoundingBox();
       this.previewGeometry.computeBoundingSphere();
       this.previewLine.visible = true;
+      this.previewHalo.visible = true;
     } else {
       this.previewGeometry.instanceCount = 0;
       this.previewLine.visible = false;
+      this.previewHalo.visible = false;
     }
   }
 
@@ -228,20 +212,19 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     if (trackingQuaternion) {
       this.groupTracking.quaternion.copy(trackingQuaternion);
     }
-    // Pulse selected line between gold (0xffd200) and warm amber (0xff8800) without altering opacity
-    const pulse = Math.sin(timeMs / 200) * 0.5 + 0.5; // 0 to 1
-    this.selectedMaterial.color.setRGB(1.0, 0.65 + pulse * 0.22, pulse * 0.1);
-    this.handleMaterial.opacity = 0.7 + pulse * 0.3;
+    // La mesura conserva la propietat de la pulsació; l'estil comú només
+    // aplica una intensitat transitòria al nucli i al halo grocs.
+    const pulse = Math.sin(timeMs / 360) * 0.5 + 0.5;
+    setOverlayIntensity(this.selectedMaterials, 0.84 + pulse * 0.16);
+    this.handleMaterial.opacity = 0.78 + pulse * 0.2;
   }
 
   restoreResources(): void {
-    for (const material of [
-      this.normalMaterial,
-      this.hoverMaterial,
-      this.selectedMaterial,
-      this.previewMaterial,
-      this.handleMaterial
-    ]) material.needsUpdate = true;
+    for (const materials of [this.normalMaterials, this.hoverMaterials, this.selectedMaterials]) {
+      materials.core.needsUpdate = true;
+      materials.halo.needsUpdate = true;
+    }
+    this.handleMaterial.needsUpdate = true;
   }
 
   metrics(): MeasurementLayerMetrics {
@@ -249,7 +232,8 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
       geometryBuildCount: this.geometryBuildCount,
       geometryDisposeCount: this.geometryDisposeCount,
       activeEntityCount: this.entries.size,
-      lastChangedEntityCount: this.lastChangedEntityCount
+      lastChangedEntityCount: this.lastChangedEntityCount,
+      activeMaterialCount: 7,
     };
   }
 
@@ -258,10 +242,9 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     this.entries.clear();
     this.previewGeometry.dispose();
     this.geometryDisposeCount++;
-    this.normalMaterial.dispose();
-    this.hoverMaterial.dispose();
-    this.selectedMaterial.dispose();
-    this.previewMaterial.dispose();
+    disposeOverlayLineMaterials(this.normalMaterials);
+    disposeOverlayLineMaterials(this.hoverMaterials);
+    disposeOverlayLineMaterials(this.selectedMaterials);
     this.handleMaterial.dispose();
     this.groupFixed.removeFromParent();
     this.groupTracking.removeFromParent();
@@ -269,23 +252,22 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
   }
 
   private setAllResolutions(res: THREE.Vector2): void {
-    this.normalMaterial.resolution = res;
-    this.hoverMaterial.resolution = res;
-    this.selectedMaterial.resolution = res;
-    this.previewMaterial.resolution = res;
+    setOverlayResolution(this.normalMaterials, res.x, res.y);
+    setOverlayResolution(this.hoverMaterials, res.x, res.y);
+    setOverlayResolution(this.selectedMaterials, res.x, res.y);
   }
 
   private updateEntryMaterials(entry: Entry): void {
     const isSelected = entry.measurement.measurementId === this.selectedMeasurementId;
     const isHovered = entry.measurement.measurementId === this.hoveredId;
     if (isSelected) {
-      entry.line.material = this.selectedMaterial;
+      this.setEntryMaterials(entry, this.selectedMaterials);
       entry.handles.visible = true;
     } else if (isHovered) {
-      entry.line.material = this.hoverMaterial;
+      this.setEntryMaterials(entry, this.hoverMaterials);
       entry.handles.visible = false;
     } else {
-      entry.line.material = this.normalMaterial;
+      this.setEntryMaterials(entry, this.normalMaterials);
       entry.handles.visible = false;
     }
   }
@@ -303,9 +285,14 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
 
     const isSelected = measurement.measurementId === this.selectedMeasurementId;
     const isHovered = measurement.measurementId === this.hoveredId;
-    const mat = isSelected ? this.selectedMaterial : isHovered ? this.hoverMaterial : this.normalMaterial;
+    const materials = isSelected ? this.selectedMaterials : isHovered ? this.hoverMaterials : this.normalMaterials;
 
-    const line = new LineSegments2(geometry, mat);
+    const halo = new LineSegments2(geometry, materials.halo);
+    halo.name = `measurement:${measurement.measurementId}:halo`;
+    halo.frustumCulled = false;
+    halo.renderOrder = 999;
+    const line = new LineSegments2(geometry, materials.core);
+    line.name = `measurement:${measurement.measurementId}:core`;
     line.frustumCulled = false;
     line.renderOrder = 1000;
 
@@ -332,12 +319,13 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     if (!isTracking) {
       setMeasurementPresentationQuaternion(measurement, new THREE.Quaternion(), this.presentationQuaternion);
       line.quaternion.copy(this.presentationQuaternion);
+      halo.quaternion.copy(this.presentationQuaternion);
       points.quaternion.copy(this.presentationQuaternion);
     }
-    parentGroup.add(line, points);
+    parentGroup.add(halo, line, points);
     this.geometryBuildCount += 2;
 
-    return { version: measurement.entityVersion, line, handles: points, label, measurement };
+    return { version: measurement.entityVersion, line, halo, handles: points, label, measurement };
   }
 
   private disposeEntry(entry: Entry): void {
@@ -345,8 +333,14 @@ export class MeasurementLayerRendererImpl implements MeasurementLayerRenderer {
     entry.handles.geometry.dispose();
     this.geometryDisposeCount += 2;
     entry.line.removeFromParent();
+    entry.halo.removeFromParent();
     entry.handles.removeFromParent();
     entry.label.remove();
+  }
+
+  private setEntryMaterials(entry: Entry, materials: OverlayLineMaterials): void {
+    entry.line.material = materials.core;
+    entry.halo.material = materials.halo;
   }
 
   private pushDirection(target: number[], point: AngularCoordinate): void {

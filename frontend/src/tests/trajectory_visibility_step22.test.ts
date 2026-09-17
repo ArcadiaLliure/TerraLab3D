@@ -115,14 +115,30 @@ assert(
   renderer.root.getObjectByName("apparentTrajectory:visible") !== undefined,
   "the visible segment has its own retained visual",
 );
+const visibleCore = renderer.root.getObjectByName("apparentTrajectory:visible:core") as any;
+const visibleHalo = renderer.root.getObjectByName("apparentTrajectory:visible:halo") as any;
+assert(
+  visibleCore.material.color.getHex() === 0x38bdf8
+    && visibleHalo.material.linewidth > (visibleCore.material.coreWidth ?? 0),
+  "the visible segment preserves cyan semantics and adds a wider shared halo",
+);
+assert(
+  visibleCore.geometry === visibleHalo.geometry,
+  "trajectory core and halo share one retained segmented geometry",
+);
+assert(
+  renderer.root.getObjectByName("apparentTrajectory:terrain_occluded")!.visible,
+  "terrain-occluded segments are visible by default",
+);
+renderer.setHiddenSegmentsVisible(false);
 assert(
   !renderer.root.getObjectByName("apparentTrajectory:terrain_occluded")!.visible,
-  "terrain-occluded segments are hidden by default",
+  "terrain-occluded segments can be hidden independently",
 );
 renderer.setHiddenSegmentsVisible(true);
 assert(
   renderer.root.getObjectByName("apparentTrajectory:terrain_occluded")!.visible,
-  "terrain-occluded segments can be shown independently",
+  "terrain-occluded segments can be shown again",
 );
 const geometryBuilds = renderer.metrics().geometryBuildCount;
 assert(
@@ -157,6 +173,7 @@ assert(
   "sample, transfer, and calculation metrics remain observable",
 );
 const activeGeometries = renderer.metrics().activeGeometryCount;
+const activeOverlayMaterials = renderer.metrics().activeOverlayMaterialCount;
 for (let cycle = 0; cycle < 5; cycle++) {
   const requestId = `cycle-${cycle}`;
   renderer.beginRequest(requestId, "fixture");
@@ -165,6 +182,10 @@ for (let cycle = 0; cycle < 5; cycle++) {
 assert(
   renderer.metrics().activeGeometryCount === activeGeometries,
   "repeated replacement cycles retain a bounded number of live geometries",
+);
+assert(
+  renderer.metrics().activeOverlayMaterialCount === activeOverlayMaterials,
+  "repeated replacement cycles retain a bounded number of overlay materials",
 );
 renderer.beginRequest("request-3", "other-object");
 assert(
@@ -180,6 +201,7 @@ assert(
 );
 renderer.dispose();
 assert(renderer.metrics().activeGeometryCount === 0, "dispose releases all owned trajectory resources");
+assert(renderer.metrics().activeOverlayMaterialCount === 0, "dispose releases all trajectory overlay materials");
 
 console.log(`Step 22 frontend tests: ${passed} passed, ${failed} failed`);
 if (failed > 0) process.exitCode = 1;

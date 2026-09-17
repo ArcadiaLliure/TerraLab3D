@@ -1,4 +1,6 @@
 import * as THREE from "three";
+import { Line2 } from "three/addons/lines/Line2.js";
+import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import type {
   ConstellationCatalogEntrySnapshot,
   ConstellationCatalogSnapshot,
@@ -7,6 +9,13 @@ import type {
   UserConstellationSnapshot,
 } from "../../../contracts/constellation_contracts";
 import { CELESTIAL_SCENE_RADIUS } from "../celestialScenePolicy";
+import {
+  createOverlayLineMaterials,
+  disposeOverlayLineMaterials,
+  OVERLAY_LINE_PROFILES,
+  setOverlayResolution,
+  type OverlayLineMaterials,
+} from "../materials/OverlayLineStyle";
 
 interface RetainedEntity {
   readonly root: THREE.Group;
@@ -19,6 +28,7 @@ export interface ConstellationRendererMetrics {
   readonly disposeCount: number;
   readonly catalogEntities: number;
   readonly userEntities: number;
+  readonly activeMaterialCount: number;
 }
 
 export interface ConstellationGeometryHit {
@@ -34,9 +44,9 @@ export class ConstellationLayerRendererImpl {
   readonly root = new THREE.Group();
   private readonly catalogRoot = new THREE.Group();
   private readonly userRoot = new THREE.Group();
-  private readonly catalogMaterial = new THREE.LineBasicMaterial({ color: 0x5f7fbd, transparent: true, opacity: 0.42, depthWrite: false });
-  private readonly selectedMaterial = new THREE.LineBasicMaterial({ color: 0xe4c66a, transparent: true, opacity: 0.9, depthWrite: false });
-  private readonly userMaterial = new THREE.LineBasicMaterial({ color: 0x74d7c4, transparent: true, opacity: 0.9, depthWrite: false });
+  private readonly catalogMaterials = createOverlayLineMaterials(OVERLAY_LINE_PROFILES.constellationCatalog);
+  private readonly selectedMaterials = createOverlayLineMaterials(OVERLAY_LINE_PROFILES.constellationSelected);
+  private readonly userMaterials = createOverlayLineMaterials(OVERLAY_LINE_PROFILES.constellationUser);
   private readonly catalogEntities = new Map<string, RetainedEntity>();
   private readonly catalogEntries = new Map<string, ConstellationCatalogEntrySnapshot>();
   private readonly userEntities = new Map<string, RetainedEntity>();
@@ -123,15 +133,21 @@ export class ConstellationLayerRendererImpl {
     );
     const raycaster = new THREE.Raycaster();
     raycaster.setFromCamera(ndc, camera);
+    for (const materials of [this.catalogMaterials, this.selectedMaterials, this.userMaterials]) {
+      setOverlayResolution(materials, viewport.width, viewport.height);
+    }
+    (raycaster.params as THREE.RaycasterParameters & { Line2?: { threshold: number } }).Line2 = {
+      threshold: hitRadiusCssPx * 2,
+    };
     const distance = Math.max(1, camera.position.distanceTo(this.root.getWorldPosition(new THREE.Vector3())) + CELESTIAL_SCENE_RADIUS.distantSky);
     raycaster.params.Line = {
       threshold: 2 * distance * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2) * hitRadiusCssPx / viewport.height,
     };
-    const visibleLines: THREE.Line[] = [];
+    const visibleLines: Line2[] = [];
     for (const retained of this.catalogEntities.values()) {
       if (!retained.root.visible) continue;
       retained.root.traverse(object => {
-        if (object instanceof THREE.Line) visibleLines.push(object);
+        if (object instanceof Line2) visibleLines.push(object);
       });
     }
     const hit = raycaster.intersectObjects(visibleLines, false)[0];
@@ -182,6 +198,7 @@ export class ConstellationLayerRendererImpl {
       disposeCount: this._disposeCount,
       catalogEntities: this.catalogEntities.size,
       userEntities: this.userEntities.size,
+      activeMaterialCount: 6,
     };
   }
 
@@ -191,9 +208,9 @@ export class ConstellationLayerRendererImpl {
     this.catalogEntities.clear();
     this.catalogEntries.clear();
     this.userEntities.clear();
-    this.catalogMaterial.dispose();
-    this.selectedMaterial.dispose();
-    this.userMaterial.dispose();
+    disposeOverlayLineMaterials(this.catalogMaterials);
+    disposeOverlayLineMaterials(this.selectedMaterials);
+    disposeOverlayLineMaterials(this.userMaterials);
     this.root.removeFromParent();
   }
 
@@ -204,7 +221,7 @@ export class ConstellationLayerRendererImpl {
     for (const component of entry.visualComponents) {
       for (const stroke of component.strokes) {
         if (stroke.length < 2) continue;
-        root.add(this.line(stroke.map(point => ({ raDeg: point[0], decDeg: point[1] })), this.catalogMaterial));
+        root.add(this.line(stroke.map(point => ({ raDeg: point[0], decDeg: point[1] })), this.catalogMaterials));
       }
     }
     const label = this.buildLabel(entry.name, entry.center[0], entry.center[1], "#a9bde8");
@@ -217,7 +234,7 @@ export class ConstellationLayerRendererImpl {
     root.name = `constellation:user:${entry.constellationId}`;
     root.userData.constellationId = entry.constellationId;
     for (const stroke of entry.strokes) {
-      if (stroke.length >= 2) root.add(this.line(stroke, this.userMaterial));
+      if (stroke.length >= 2) root.add(this.line(stroke, this.userMaterials));
     }
     const points = entry.strokes.flat();
     if (points.length > 0) {
@@ -233,7 +250,7 @@ export class ConstellationLayerRendererImpl {
     return root;
   }
 
-  private line(points: readonly EquatorialPoint[], material: THREE.LineBasicMaterial): THREE.Line {
+  private line(points: readonly EquatorialPoint[], materials: OverlayLineMaterials): THREE.Group {
     const values = new Float32Array(points.length * 3);
     points.forEach((point, index) => {
       const radius = CELESTIAL_SCENE_RADIUS.distantSky * 0.985;
@@ -242,12 +259,22 @@ export class ConstellationLayerRendererImpl {
       values[index * 3 + 1] = position.y;
       values[index * 3 + 2] = position.z;
     });
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(values, 3));
-    const line = new THREE.Line(geometry, material);
-    line.frustumCulled = false;
-    line.renderOrder = -620;
-    return line;
+    const geometry = new LineGeometry();
+    geometry.setPositions(values);
+    const halo = new Line2(geometry, materials.halo);
+    halo.name = "constellation:stroke:halo";
+    halo.userData.overlayLineLayer = "halo";
+    halo.frustumCulled = false;
+    halo.renderOrder = -621;
+    const core = new Line2(geometry, materials.core);
+    core.name = "constellation:stroke:core";
+    core.userData.overlayLineLayer = "core";
+    core.frustumCulled = false;
+    core.renderOrder = -620;
+    const visual = new THREE.Group();
+    visual.name = "constellation:stroke";
+    visual.add(halo, core);
+    return visual;
   }
 
   private position(raDeg: number, decDeg: number, radius: number): THREE.Vector3 {
@@ -298,15 +325,19 @@ export class ConstellationLayerRendererImpl {
     for (const [id, retained] of this.catalogEntities) {
       const selected = id === this.selectedCatalogId;
       retained.root.visible = this.showAll || selected;
+      const materials = selected ? this.selectedMaterials : this.catalogMaterials;
       retained.root.traverse(object => {
-        if (object instanceof THREE.Line) object.material = selected ? this.selectedMaterial : this.catalogMaterial;
+        if (!(object instanceof Line2)) return;
+        object.material = object.userData.overlayLineLayer === "halo" ? materials.halo : materials.core;
       });
     }
   }
 
   private disposeEntity(root: THREE.Object3D): void {
+    const geometries = new Set<THREE.BufferGeometry>();
     root.traverse(object => {
-      if (object instanceof THREE.Line) {
+      if (object instanceof Line2 && !geometries.has(object.geometry)) {
+        geometries.add(object.geometry);
         object.geometry.dispose();
         this._disposeCount++;
       } else if (object instanceof THREE.Sprite) {

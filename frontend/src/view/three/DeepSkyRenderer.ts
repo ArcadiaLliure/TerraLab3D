@@ -8,6 +8,7 @@ import { DEFAULT_SKY_VISIBILITY } from "../../contracts/sky_visibility_defaults"
 import { DeepSkyLabels } from "./DeepSkyLabels";
 import type { HorizonOcclusionState } from "./HorizonOcclusionState";
 import { CELESTIAL_SCENE_RADIUS } from "./celestialScenePolicy";
+import { OVERLAY_LINE_HALO_GLSL } from "./materials/OverlayLineStyle";
 import {
   HORIZON_GLSL_FUNCTIONS,
   HORIZON_GLSL_UNIFORMS,
@@ -100,7 +101,7 @@ const VERTEX_SHADER = `
   }
 `;
 
-const FRAGMENT_SHADER = `
+export const DEEP_SKY_FRAGMENT_SHADER = `
   precision highp float;
   
   varying vec2 vUv;
@@ -113,6 +114,7 @@ const FRAGMENT_SHADER = `
   uniform float u_extinctionCoefficient;
   uniform float u_twilightSuppression;
   uniform float u_fadeWidthMag;
+  ${OVERLAY_LINE_HALO_GLSL}
   
   void main() {
     // Distance from center of the quad (-1 to 1)
@@ -147,14 +149,11 @@ const FRAGMENT_SHADER = `
       color = vec3(0.80, 0.57, 0.85);
     }
     
-    // Línea simple y fina (rodoneta)
-    // d va de 0 al centro a 1 en el borde exterior.
-    // Trazamos la línea en d = 0.95
-    float distToLine = abs(d - 0.95);
+    // Contorn amb nucli definit i halo SDF moderat; la paleta per família
+    // continua sent semàntica pròpia d'aquest renderer.
+    float distToLine = abs(d - 0.91);
     
-    // Un grosor muy fino para que sea una línea simple sin rellenos ni glows
-    float thickness = 0.03;
-    float alpha = smoothstep(thickness, 0.0, distToLine);
+    float alpha = overlayLineAlpha(distToLine, 0.032, 0.14, 0.74, 0.18);
     
     gl_FragColor = vec4(color, alpha * fade);
   }
@@ -316,7 +315,7 @@ export class DeepSkyRenderer {
 
     this.material = new THREE.ShaderMaterial({
       vertexShader: VERTEX_SHADER,
-      fragmentShader: FRAGMENT_SHADER,
+      fragmentShader: DEEP_SKY_FRAGMENT_SHADER,
       uniforms: {
         u_equatorialToENUMatrix: { value: mat3 },
         u_radius: { value: CELESTIAL_SCENE_RADIUS.distantSky },
@@ -336,6 +335,7 @@ export class DeepSkyRenderer {
       blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide,
     });
+    this.material.userData.overlayLineStyle = "ngc-family-contour";
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.name = "deepSkyInstancedMesh";
