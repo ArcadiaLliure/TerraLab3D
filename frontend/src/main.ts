@@ -45,6 +45,7 @@ import { ObservationModeController } from "./application/ObservationModeControll
 import { OpticsPanelImpl } from "./view/ui/panels/OpticsPanelImpl";
 import { ObservationHUD } from "./view/ui/panels/ObservationHUD";
 import { MeasurementController } from "./application/MeasurementController";
+import { ConstellationController } from "./application/ConstellationController";
 import type {
   ObservableTrajectoryTarget,
   TrajectoryHorizonMode,
@@ -58,6 +59,7 @@ import { StarPickProvider } from "./view/three/picking/StarPickProvider";
 import { SolarSystemPickProvider } from "./view/three/picking/SolarSystemPickProvider";
 import { DeepSkyPickProvider } from "./view/three/picking/DeepSkyPickProvider";
 import { CelestialPickProvider } from "./view/three/picking/CelestialPickProvider";
+import { ConstellationPickProvider } from "./view/three/picking/ConstellationPickProvider";
 import { ScenePickingController } from "./view/three/picking/ScenePickingController";
 import { TrackingTargetResolver } from "./view/three/picking/TrackingTargetResolver";
 import { FocusTrackingController } from "./view/three/picking/FocusTrackingController";
@@ -166,14 +168,16 @@ function main(): void {
     const family = target.kind === "deep_sky" ? "deep_sky" : target.kind;
     const objectId = target.kind === "coordinate"
       ? `coordinate:${rightAscensionDeg.toFixed(8)}:${declinationDeg.toFixed(8)}`
-      : `${target.kind}:${target.resourceId}:${target.catalogIndex}`;
+      : target.kind === "constellation"
+        ? `constellation:${target.constellationId}`
+        : `${target.kind}:${target.resourceId}:${target.catalogIndex}`;
     return {
       objectId,
       family,
       displayName: model?.displayName ?? objectId,
       rightAscensionDeg,
       declinationDeg,
-      frame: "ICRS/J2000",
+      frame: target.kind === "constellation" ? "ICRS" : "ICRS/J2000",
     };
   };
 
@@ -239,6 +243,7 @@ function main(): void {
   // 2. Prepare UI pages
   let observationController: ObservationModeController | null = null;
   let measurementController: MeasurementController | null = null;
+  let constellationController: ConstellationController | null = null;
   const locationPage = new LocationPage({
     onRelocate: (lat, lon, height) => {
       const terrainLayer = sceneHost.getDemTerrainLayerRenderer();
@@ -394,12 +399,29 @@ function main(): void {
 
   const toolsPage = new ToolsPage({
     onOpenResourceManager: () => resourceManagerModal.open(),
-    onMeasurementTool: (kind) => measurementController?.setTool(kind),
+    onMeasurementTool: (kind) => {
+      if (kind) constellationController?.setEditing(false);
+      measurementController?.setTool(kind);
+    },
     onUndo: () => measurementController?.undo(),
     onRedo: () => measurementController?.redo(),
     onDelete: () => measurementController?.deleteSelected(),
     onClear: () => measurementController?.clear(),
     onTrackingChanged: (enabled) => measurementController?.setTrackingEnabled(enabled),
+    onConstellationCreate: () => constellationController?.create(),
+    onConstellationSelect: (constellationId) => constellationController?.select(constellationId),
+    onConstellationRename: (name) => constellationController?.renameSelected(name),
+    onConstellationEditingChanged: (enabled) => {
+      if (enabled) measurementController?.setTool(null);
+      constellationController?.setEditing(enabled);
+    },
+    onConstellationShowAll: (visible) => constellationController?.setShowAll(visible),
+    onConstellationNewStroke: () => constellationController?.newStroke(),
+    onConstellationFinish: () => constellationController?.finish(),
+    onConstellationUndo: () => constellationController?.undo(),
+    onConstellationRedo: () => constellationController?.redo(),
+    onConstellationDelete: () => constellationController?.deleteSelected(),
+    onConstellationClear: () => constellationController?.clear(),
   });
   const toolsContainer = shell.getPageContainer("tools");
   if (toolsContainer) toolsPage.mount(toolsContainer);
@@ -481,10 +503,16 @@ function main(): void {
     isDeepSkyLayerVisible: () => sceneHost.getDeepSkyRenderer().visible,
     horizonOcclusionState: sceneHost.getHorizonOcclusionState(),
   });
+  const constellationPickProvider = new ConstellationPickProvider({
+    camera: sceneHost.camera,
+    renderer: sceneHost.getConstellationLayerRenderer(),
+    getViewportRect: () => sceneHost.renderer.domElement.getBoundingClientRect(),
+  });
   const pickProvider = new CelestialPickProvider({
     starPicker: starPickProvider,
     solarSystemPicker: solarSystemPickProvider,
     deepSkyPicker: deepSkyPickProvider,
+    constellationPicker: constellationPickProvider,
   });
 
   const pickingController = new ScenePickingController({
@@ -542,6 +570,9 @@ function main(): void {
     opticsPanel.updateSelectedTarget(model?.displayName ?? null);
 
     observationController?.onSelectionChanged(state.selectedTarget);
+    constellationController?.setSelectedOfficial(
+      state.selectedTarget?.kind === "constellation" ? state.selectedTarget.constellationId : null,
+    );
     if (trajectoryConfiguration.enabled) requestSelectedApparentTrajectory();
   });
 
@@ -617,6 +648,15 @@ function main(): void {
     toolsPage,
     isTrackingEnabled: () => toolsPage.isTrackingEnabled(),
     getTrackingQuaternion: () => sceneHost.getCelestialSphereQuaternion(),
+  });
+  constellationController = new ConstellationController({
+    canvas: sceneHost.renderer.domElement,
+    bridge,
+    cameraRig,
+    gestureRouter,
+    starPicker: starPickProvider,
+    renderer: sceneHost.getConstellationLayerRenderer(),
+    toolsPage,
   });
 
   // Initial resize
@@ -885,6 +925,15 @@ function main(): void {
     onMeasurementError(error) {
       measurementController?.presentError(error);
     },
+    onConstellationCatalog(snapshot) {
+      constellationController?.presentCatalog(snapshot);
+    },
+    onConstellationDocument(snapshot) {
+      constellationController?.present(snapshot);
+    },
+    onConstellationError(error) {
+      constellationController?.presentError(error);
+    },
     onStarPickResolved(msg) {
       if (!msg.star) return;
       pickingController.handleResolveResponse(msg as any);
@@ -1011,6 +1060,7 @@ function main(): void {
       renderLoop.stop();
       cameraRig.detach();
       measurementController?.dispose();
+      constellationController?.dispose();
       gestureRouter.dispose();
       terrainGotoController.dispose();
       navigationWorld.dispose();
@@ -1203,6 +1253,7 @@ function main(): void {
     renderLoop.stop();
     cameraRig.detach();
     measurementController?.dispose();
+    constellationController?.dispose();
     gestureRouter.dispose();
     terrainGotoController.dispose();
     navigationWorld.dispose();

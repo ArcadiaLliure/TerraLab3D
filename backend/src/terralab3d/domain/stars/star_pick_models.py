@@ -32,7 +32,7 @@ class StarPickRequest:
     resource_id: str
     resource_version: str
     catalog_index: int
-    purpose: Literal["select", "hover"]
+    purpose: Literal["select", "hover", "constellation_snap"]
 
 
 @dataclass(frozen=True, slots=True)

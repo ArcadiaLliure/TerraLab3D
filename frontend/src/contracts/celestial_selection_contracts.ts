@@ -37,11 +37,22 @@ export interface CoordinateTargetRef {
   readonly displayName?: string;
 }
 
+export interface ConstellationTargetRef {
+  readonly kind: "constellation";
+  readonly constellationId: string;
+  readonly displayName: string;
+  readonly raDeg: number;
+  readonly decDeg: number;
+  readonly angularRadiusDeg: number;
+  readonly frame: "ICRS";
+}
+
 export type CelestialTargetRef =
   | StarTargetRef
   | SolarSystemTargetRef
   | DeepSkyTargetRef
-  | CoordinateTargetRef;
+  | CoordinateTargetRef
+  | ConstellationTargetRef;
 
 export type CelestialAvailability = "available" | "unavailable" | "waiting_for_source";
 

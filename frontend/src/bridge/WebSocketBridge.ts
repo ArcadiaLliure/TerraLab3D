@@ -55,6 +55,12 @@ import type {
   MeasurementDocumentSnapshot,
   MeasurementErrorMessage,
 } from "../contracts/measurement_contracts";
+import type {
+  ConstellationCatalogSnapshot,
+  ConstellationCommandMessage,
+  ConstellationDocumentSnapshot,
+  ConstellationErrorMessage,
+} from "../contracts/constellation_contracts";
 
 export type BridgeState = "connecting" | "connected" | "disconnected" | "error";
 
@@ -136,6 +142,9 @@ export interface BackendMessageListener {
   onObservationError?(error: ObservationErrorMessage): void;
   onMeasurementSnapshot?(snapshot: MeasurementDocumentSnapshot): void;
   onMeasurementError?(error: MeasurementErrorMessage): void;
+  onConstellationCatalog?(snapshot: ConstellationCatalogSnapshot): void;
+  onConstellationDocument?(snapshot: ConstellationDocumentSnapshot): void;
+  onConstellationError?(error: ConstellationErrorMessage): void;
 }
 
 export class WebSocketBridge {
@@ -547,6 +556,15 @@ export class WebSocketBridge {
       case "measurement_error":
         for (const l of this.messageListeners) l.onMeasurementError?.(msg);
         break;
+      case "constellation_catalog":
+        for (const l of this.messageListeners) l.onConstellationCatalog?.(msg);
+        break;
+      case "constellation_document":
+        for (const l of this.messageListeners) l.onConstellationDocument?.(msg);
+        break;
+      case "constellation_error":
+        for (const l of this.messageListeners) l.onConstellationError?.(msg);
+        break;
       default:
         console.warn("[Bridge] Unknown message payload");
     }
@@ -599,6 +617,10 @@ export class WebSocketBridge {
 
   public sendMeasurementCommand(message: Omit<MeasurementCommandMessage, "type">): void {
     this.sendMessage({ type: "measurement_command", ...message });
+  }
+
+  public sendConstellationCommand(message: Omit<ConstellationCommandMessage, "type">): void {
+    this.sendMessage({ type: "constellation_command", ...message });
   }
 
   public sendSetTimePlaying(enabled: boolean): void {

@@ -1,0 +1,31 @@
+Pas 23 — resum de verificació automatitzada
+Data: 2026-09-17
+
+Backend:
+  python -m pytest backend/tests -q
+  177 proves correctes després de la incorporació final del picking oficial.
+
+Frontend:
+  npm --prefix frontend test
+  suite completa correcta, inclosa constellation_step23.test.ts.
+  npm --prefix frontend run typecheck
+  correcte.
+
+Catàleg i bridge:
+  - el catàleg es publica només des de frontend_ready amb include_catalog=True;
+  - els ticks temporals no inclouen geometria de constel·lacions;
+  - el renderer conserva el catàleg per catalogVersion;
+  - les figures d'usuari es reconcilien per entityVersion;
+  - canviar visibilitat no incrementa catalogBuildCount ni disposeCount.
+
+Persistència:
+  - fitxer canònic constellations.v1.json amb reemplaçament atòmic;
+  - historial de 256 mutacions només en memòria;
+  - reinici amb document restaurat i historial buit;
+  - migració legacy idempotent amb original intacte;
+  - document invàlid copiat amb nom datat abans del reemplaçament buit.
+
+Artefacte Python:
+  pip wheel ./backend --no-deps --wheel-dir build/wheels
+  El wheel conté terralab3d/THIRD-PARTY.md i
+  terralab3d/infrastructure/catalogs/constellations.v1.json.

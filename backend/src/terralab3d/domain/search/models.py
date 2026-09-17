@@ -10,6 +10,7 @@ class SearchTargetKind(str, Enum):
     BODY = "body"
     DEEP_SKY = "deep_sky"
     COORDINATE = "coordinate"
+    CONSTELLATION = "constellation"
 
 @dataclass(frozen=True, slots=True)
 class SearchQuery:
@@ -27,4 +28,4 @@ class SearchResult:
     coordinate_snapshot: EquatorialCoordinate | None = None
     resource_id: str | None = None
     matched_alias: str | None = None
-
+    angular_radius_deg: float | None = None

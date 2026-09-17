@@ -26,6 +26,10 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"terralab3d" = ["THIRD-PARTY.md"]
+"terralab3d.infrastructure.catalogs" = ["*.json"]
+
 [tool.pyright]
 pythonVersion = "3.13"
 extraPaths = ["src"]

@@ -134,7 +134,7 @@ export class StarPickProvider {
    * @param clientY — coordenada Y del pointer (CSS px, event.clientY)
    * @returns StarPickHit o null si no hi ha hit
    */
-  pick(clientX: number, clientY: number): StarPickHit | null {
+  pick(clientX: number, clientY: number, fixedRadiusCssPx?: number): StarPickHit | null {
     const t0 = performance.now();
     this._queryCount++;
 
@@ -175,7 +175,7 @@ export class StarPickProvider {
 
     // 4. Calcular radi angular de consulta basat en FOV i hit radius
     const dpr = this.deps.renderer.getPixelRatio();
-    const maxHitCssPx = 30; // radi de cerca generós en CSS px
+    const maxHitCssPx = fixedRadiusCssPx ?? 30;
     const queryAngleRad = this.computeQueryAngleRad(
       _ndcVec.x,
       _ndcVec.y,
@@ -269,10 +269,11 @@ export class StarPickProvider {
         const visualRadius = computeStarVisualRadiusCssPx(mag, pointScale, dpr);
         const hitRadius = computeStarHitRadiusCssPx(mag, pointScale, dpr);
 
-        if (dist > hitRadius) continue;
+        const effectiveRadius = fixedRadiusCssPx ?? hitRadius;
+        if (dist > effectiveRadius) continue;
 
         // Normalitzar distància pel hit radius
-        const normalizedDist = dist / hitRadius;
+        const normalizedDist = dist / effectiveRadius;
 
         candidates.push({
           ref: {
@@ -344,6 +345,11 @@ export class StarPickProvider {
       hitRadiusCssPx: winner.hitRadiusCssPx,
       magnitude: winner.magnitude,
     };
+  }
+
+  pickNearest(clientX: number, clientY: number, maxRadiusCssPx: number): StarPickHit | null {
+    if (!Number.isFinite(maxRadiusCssPx) || maxRadiusCssPx <= 0) return null;
+    return this.pick(clientX, clientY, maxRadiusCssPx);
   }
 
   /**

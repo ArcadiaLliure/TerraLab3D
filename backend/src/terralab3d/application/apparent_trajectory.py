@@ -685,6 +685,10 @@ def observable_from_message(data: dict[str, object]) -> ObservableObject:
         declination_deg=float(dec) if dec is not None else None,
         frame=str(payload.get("frame") or "ICRS/J2000"),
     )
+    if observable.right_ascension_deg is not None and not math.isfinite(observable.right_ascension_deg):
+        raise ValueError("rightAscensionDeg must be finite")
+    if observable.declination_deg is not None and not math.isfinite(observable.declination_deg):
+        raise ValueError("declinationDeg must be finite")
     if observable.right_ascension_deg is not None and not 0.0 <= observable.right_ascension_deg < 360.0:
         raise ValueError("rightAscensionDeg must be in [0, 360)")
     if observable.declination_deg is not None and not -90.0 <= observable.declination_deg <= 90.0:

@@ -45,6 +45,12 @@ import type {
   MeasurementDocumentSnapshot,
   MeasurementErrorMessage,
 } from "./measurement_contracts";
+import type {
+  ConstellationCatalogSnapshot,
+  ConstellationCommandMessage,
+  ConstellationDocumentSnapshot,
+  ConstellationErrorMessage,
+} from "./constellation_contracts";
 
 // ─── Frontend → Python ───────────────────────────────────────────────
 
@@ -448,7 +454,8 @@ export type FrontendMessage =
   | CameraProfileMessage
   | RequestCameraDepthMessage
   | CancelCameraDepthMessage
-  | MeasurementCommandMessage;
+  | MeasurementCommandMessage
+  | ConstellationCommandMessage;
 
 // ─── Python → Frontend ───────────────────────────────────────────────
 
@@ -620,13 +627,14 @@ export interface DownloadJobSnapshotMessage extends DownloadJobSnapshot {
 
 export interface AstronomicalSearchResultPayload {
   readonly targetRef: string;
-  readonly kind: "star" | "body" | "deep_sky" | "coordinate";
+  readonly kind: "star" | "body" | "deep_sky" | "coordinate" | "constellation";
   readonly displayName: string;
   readonly score: number;
   readonly availability: string;
   readonly coordinateSnapshot?: { raDeg: number; decDeg: number };
   readonly resourceId?: string;
   readonly matchedAlias?: string;
+  readonly angularRadiusDeg?: number;
 }
 
 export interface AstronomicalSearchResultMessage {
@@ -687,7 +695,10 @@ export type BackendMessage =
   | ObservationSnapshotMessage
   | ObservationErrorMessage
   | MeasurementDocumentSnapshot
-  | MeasurementErrorMessage;
+  | MeasurementErrorMessage
+  | ConstellationCatalogSnapshot
+  | ConstellationDocumentSnapshot
+  | ConstellationErrorMessage;
 
 // ─── Union of all messages ───────────────────────────────────────────
 

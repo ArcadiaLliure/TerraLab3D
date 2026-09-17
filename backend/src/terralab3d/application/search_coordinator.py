@@ -31,13 +31,14 @@ class AstronomicalSearchCoordinator:
         named_stars: Sequence[dict[str, Any]],
         ngc_objects: Sequence[Any],
         planets: Sequence[dict[str, Any]],
+        constellations: Sequence[dict[str, Any]] = (),
     ) -> None:
         log.debug(
             "MGP: [AstronomicalSearchCoordinator] [build_index] "
-            "[stars=%d, ngc=%d, planets=%d]",
-            len(named_stars), len(ngc_objects), len(planets)
+            "[stars=%d, ngc=%d, planets=%d, constellations=%d]",
+            len(named_stars), len(ngc_objects), len(planets), len(constellations)
         )
-        self._index.build_index(named_stars, ngc_objects, planets)
+        self._index.build_index(named_stars, ngc_objects, planets, constellations)
         self._is_index_built = True
 
     async def search(self, request_id: str, generation: int, query_text: str, limit: int = 20) -> None:
@@ -62,7 +63,12 @@ class AstronomicalSearchCoordinator:
         # Si no és coordenada, cerca de text
         query = SearchQuery(
             text=query_text,
-            kinds=frozenset([SearchTargetKind.STAR, SearchTargetKind.BODY, SearchTargetKind.DEEP_SKY]),
+            kinds=frozenset([
+                SearchTargetKind.STAR,
+                SearchTargetKind.BODY,
+                SearchTargetKind.DEEP_SKY,
+                SearchTargetKind.CONSTELLATION,
+            ]),
             limit=limit,
         )
         
@@ -86,6 +92,8 @@ class AstronomicalSearchCoordinator:
                 d["resourceId"] = r.resource_id
             if r.matched_alias:
                 d["matchedAlias"] = r.matched_alias
+            if r.angular_radius_deg is not None:
+                d["angularRadiusDeg"] = r.angular_radius_deg
             results.append(d)
             
         await self._publish(request_id, generation, "ok", results)

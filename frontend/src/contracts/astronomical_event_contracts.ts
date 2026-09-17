@@ -221,7 +221,7 @@ export interface ObservableTrajectoryTarget {
   readonly bodyId?: string;
   readonly rightAscensionDeg?: number;
   readonly declinationDeg?: number;
-  readonly frame?: "ICRS/J2000";
+  readonly frame?: "ICRS" | "ICRS/J2000";
 }
 
 export interface ApparentTrajectorySegment {

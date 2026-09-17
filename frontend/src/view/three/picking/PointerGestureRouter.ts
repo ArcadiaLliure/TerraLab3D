@@ -19,7 +19,7 @@
 
 const LOG_PREFIX = "MGP: [PointerGestureRouter]";
 
-export type TapCallback = (xCssPx: number, yCssPx: number) => void;
+export type TapCallback = (xCssPx: number, yCssPx: number) => boolean | void;
 export type HoverCallback = (xCssPx: number, yCssPx: number) => void;
 export type HoverClearCallback = () => void;
 
@@ -68,16 +68,32 @@ export class PointerGestureRouter {
     this.onPointerLeaveBound = this.onPointerLeave.bind(this);
   }
 
-  onTap(cb: TapCallback): void {
-    this.tapCallbacks.push(cb);
+  onTap(cb: TapCallback, priority: "high" | "normal" = "normal"): () => void {
+    if (priority === "high") {
+      this.tapCallbacks.unshift(cb);
+    } else {
+      this.tapCallbacks.push(cb);
+    }
+    return () => {
+      const idx = this.tapCallbacks.indexOf(cb);
+      if (idx >= 0) this.tapCallbacks.splice(idx, 1);
+    };
   }
 
-  onHover(cb: HoverCallback): void {
+  onHover(cb: HoverCallback): () => void {
     this.hoverCallbacks.push(cb);
+    return () => {
+      const idx = this.hoverCallbacks.indexOf(cb);
+      if (idx >= 0) this.hoverCallbacks.splice(idx, 1);
+    };
   }
 
-  onHoverClear(cb: HoverClearCallback): void {
+  onHoverClear(cb: HoverClearCallback): () => void {
     this.hoverClearCallbacks.push(cb);
+    return () => {
+      const idx = this.hoverClearCallbacks.indexOf(cb);
+      if (idx >= 0) this.hoverClearCallbacks.splice(idx, 1);
+    };
   }
 
   setEnabled(enabled: boolean): void {
@@ -161,7 +177,10 @@ export class PointerGestureRouter {
 
     if (distance <= this.config.clickDragThresholdCssPx) {
       // És un tap
-      for (const cb of this.tapCallbacks) cb(e.clientX, e.clientY);
+      for (const cb of this.tapCallbacks) {
+        const handled = cb(e.clientX, e.clientY);
+        if (handled) break;
+      }
     }
     // Si distance > threshold, era drag — CameraRig ja l'ha gestionat
   }

@@ -1,0 +1,25 @@
+=== VALIDACIO DOCUMENTAL I ESQUELET PAS 22.5 ===
+Data de generacio: 2026-09-17
+
+--- 1. python tools/validate_docs.py ---
+Validaci� documental completada amb �xit (41 passos analitzats, zero incid�ncies).
+Exit code: 0
+
+--- 2. python tools/validate_skeleton.py ---
+Esquelet TerraLab3D validat correctament
+Exit code: 0
+
+--- 3. npm run validate ---
+> validate
+> python tools/validate_docs.py && python tools/validate_skeleton.py && npm run typecheck
+
+Validaci� documental completada amb �xit (41 passos analitzats, zero incid�ncies).
+Esquelet TerraLab3D validat correctament
+
+> typecheck
+> npm --prefix frontend run typecheck
+
+
+> @terralab3d/frontend@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+Exit code: 0

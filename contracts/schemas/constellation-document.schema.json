@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terralab3d.local/schemas/constellation-document.schema.json",
+  "title": "TerraLab3D constellation document v1",
+  "type": "object",
+  "required": ["documentType", "schemaVersion", "constellations"],
+  "properties": {
+    "documentType": { "const": "terralab3d.constellations" },
+    "schemaVersion": { "const": 1 },
+    "constellations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/constellation" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "node": {
+      "type": "object",
+      "required": ["nodeId", "raDeg", "decDeg", "sourceId", "starName", "resourceId", "resourceVersion", "catalogIndex", "startsNewStroke"],
+      "properties": {
+        "nodeId": { "type": "string", "minLength": 1 },
+        "raDeg": { "type": "number", "minimum": 0, "exclusiveMaximum": 360 },
+        "decDeg": { "type": "number", "minimum": -90, "maximum": 90 },
+        "sourceId": { "type": ["string", "null"] },
+        "starName": { "type": ["string", "null"] },
+        "resourceId": { "type": ["string", "null"] },
+        "resourceVersion": { "type": ["string", "null"] },
+        "catalogIndex": { "type": ["integer", "null"], "minimum": 0 },
+        "startsNewStroke": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "constellation": {
+      "type": "object",
+      "required": ["constellationId", "name", "nodes"],
+      "properties": {
+        "constellationId": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+      },
+      "additionalProperties": false
+    }
+  }
+}

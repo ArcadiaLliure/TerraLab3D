@@ -118,6 +118,9 @@ export class CelestialSelectionController {
       // In theory should check frame, but currently J2000 is hardcoded
       return Math.abs(a.raDeg - b.raDeg) < 1e-6 && Math.abs(a.decDeg - b.decDeg) < 1e-6;
     }
+    if (a.kind === "constellation" && b.kind === "constellation") {
+      return a.constellationId === b.constellationId;
+    }
     return false;
   }
 
@@ -144,6 +147,16 @@ export function fromPickHit(hit: CelestialPickHit): CelestialTargetRef {
       resourceId: hit.ref.resourceId,
       resourceVersion: hit.ref.resourceVersion,
       catalogIndex: hit.ref.catalogIndex,
+    };
+  } else if (hit.kind === "constellation") {
+    return {
+      kind: "constellation",
+      constellationId: hit.constellationId,
+      displayName: hit.displayName,
+      raDeg: hit.raDeg,
+      decDeg: hit.decDeg,
+      angularRadiusDeg: hit.angularRadiusDeg,
+      frame: "ICRS",
     };
   } else {
     return {
@@ -220,6 +233,16 @@ export function fromSearchResult(result: AstronomicalSearchResultPayload | null)
          bodyId: result.targetRef
        };
     }
+  } else if (result.kind === "constellation" && result.coordinateSnapshot) {
+    return {
+      kind: "constellation",
+      constellationId: result.targetRef,
+      displayName: result.displayName,
+      raDeg: result.coordinateSnapshot.raDeg,
+      decDeg: result.coordinateSnapshot.decDeg,
+      angularRadiusDeg: result.angularRadiusDeg ?? 10,
+      frame: "ICRS",
+    };
   }
   
   if (result.coordinateSnapshot) {

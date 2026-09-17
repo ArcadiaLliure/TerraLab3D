@@ -31,7 +31,9 @@
 import * as THREE from "three";
 import type { ObservationSnapshotMessage } from "../../contracts/observation_contracts";
 import type { MeasurementDocumentSnapshot } from "../../contracts/measurement_contracts";
+import type { ConstellationCatalogSnapshot, ConstellationDocumentSnapshot } from "../../contracts/constellation_contracts";
 import { MeasurementLayerRendererImpl } from "./layers/MeasurementLayerRenderer";
+import { ConstellationLayerRendererImpl } from "./layers/ConstellationLayerRenderer";
 import { ScopeLayerRendererImpl } from "./layers/ScopeLayerRenderer";
 import { ImagingPreviewLayerRendererImpl } from "./layers/ImagingPreviewLayerRenderer";
 import { HorizontalGrid } from "./HorizontalGrid";
@@ -96,6 +98,7 @@ export class ThreeSceneHostImpl {
 
   // ─── Phase 21: Measurements ───────────────────────────────────────
   private measurementLayerRenderer!: MeasurementLayerRendererImpl;
+  private constellationLayerRenderer!: ConstellationLayerRendererImpl;
 
   // ─── Phase 19: Observation Overlays ────────────────────────────────
   private readonly scopeLayerRenderer = new ScopeLayerRendererImpl();
@@ -229,6 +232,7 @@ export class ThreeSceneHostImpl {
       this.celestialSphere.add(meridian);
     }
 
+    this.constellationLayerRenderer = new ConstellationLayerRendererImpl(this.celestialSphere);
     this.measurementLayerRenderer = new MeasurementLayerRendererImpl(this.celestialRoot, this.celestialSphere);
 
     console.debug(`${LOG_PREFIX} [constructor] [Escena inicialitzada amb grid horitzontal, equador celeste i etiquetes]`);
@@ -245,6 +249,18 @@ export class ThreeSceneHostImpl {
 
   getMeasurementLayerRenderer(): MeasurementLayerRendererImpl {
     return this.measurementLayerRenderer;
+  }
+
+  getConstellationLayerRenderer(): ConstellationLayerRendererImpl {
+    return this.constellationLayerRenderer;
+  }
+
+  presentConstellationCatalog(snapshot: ConstellationCatalogSnapshot): void {
+    this.constellationLayerRenderer.presentCatalog(snapshot);
+  }
+
+  presentConstellationDocument(snapshot: ConstellationDocumentSnapshot): void {
+    this.constellationLayerRenderer.presentDocument(snapshot);
   }
 
   presentMeasurements(snapshot: MeasurementDocumentSnapshot): void {
@@ -600,6 +616,7 @@ export class ThreeSceneHostImpl {
     this.scopeLayerRenderer.dispose();
     this.imagingPreviewLayerRenderer.dispose();
     this.measurementLayerRenderer?.dispose();
+    this.constellationLayerRenderer?.dispose();
 
     this.scene.traverse((obj) => {
       if (

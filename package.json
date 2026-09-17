@@ -4,6 +4,6 @@
   "scripts": {
     "typecheck": "npm --prefix frontend run typecheck",
     "test": "python -m pytest backend/tests -q && npm --prefix frontend test",
-    "validate": "python tools/validate_skeleton.py && npm run typecheck"
+    "validate": "python tools/validate_docs.py && python tools/validate_skeleton.py && npm run typecheck"
   }
 }

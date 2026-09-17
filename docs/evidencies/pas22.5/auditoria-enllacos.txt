@@ -1,0 +1,16 @@
+=== AUDITORIA D ENLLANCOS I RECURSOS LOCALS PAS 22.5 ===
+Data de generacio: 2026-09-17
+
+--- python tools/check_doc_links.py ---
+Documentaci�n: enlaces locales v�lidos
+Exit code: 0
+
+Estructura validada:
+- docs/normes-arquitectura.md (variant unica canonica)
+- docs/README.md (taules i punter de represa al Pas 23)
+- docs/inventari-funcional.md (sense duplicats, taules valides)
+- docs/tasques/completat/ (passos 1 a 22.5 normalitzats)
+- docs/tasques/pendent/ (passos 23 a 38 normalitzats)
+- docs/tasques/idees-per-madurar/ (dossiers enllancats correctament)
+
+Tots els enllancos locals Markdown han resolt amb 0 incidencies.

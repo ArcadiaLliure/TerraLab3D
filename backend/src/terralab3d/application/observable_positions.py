@@ -47,8 +47,6 @@ class ObservablePositionService:
             ObservableFamily.SATELLITE,
         ):
             return self._solar_system_position(observable, instant_utc, observer)
-        if observable.family is ObservableFamily.CONSTELLATION:
-            raise ValueError("Constellation geometry is unavailable until Pas 23")
         return self._fixed_equatorial_position(observable, instant_utc, observer)
 
     def _solar_system_position(

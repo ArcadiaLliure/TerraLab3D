@@ -20,6 +20,7 @@ class AstronomicalSearchIndex:
         named_stars: Sequence[dict[str, Any]],
         ngc_objects: Sequence[Any],
         planets: Sequence[dict[str, Any]],
+        constellations: Sequence[dict[str, Any]] = (),
     ) -> None:
         """Construeix l'índex amb els objectes proporcionats."""
         self._entries.clear()
@@ -84,6 +85,21 @@ class AstronomicalSearchIndex:
                     resource_id="sky.ngc"
                 )
 
+        # 4. Identitats IAU amb centre calculat sobre el traçat adoptat.
+        for item in constellations:
+            coordinate = EquatorialCoordinate(float(item["ra"]), float(item["dec"]))
+            for alias in (str(item["name"]), str(item["constellation_id"])):
+                self._add_entry(
+                    target_ref=str(item["constellation_id"]),
+                    kind=SearchTargetKind.CONSTELLATION,
+                    display_name=str(item["name"]),
+                    search_key=self._calculator.normalize_query(alias),
+                    is_exact_alias=True,
+                    original_alias=alias,
+                    coordinate_snapshot=coordinate,
+                    angular_radius_deg=float(item["angular_radius_deg"]),
+                )
+
     def _add_entry(self, **kwargs: Any) -> None:
         self._entries.append(kwargs)
 
@@ -136,7 +152,8 @@ class AstronomicalSearchIndex:
                         availability=availability,
                         coordinate_snapshot=entry["coordinate_snapshot"],
                         resource_id=entry.get("resource_id"),
-                        matched_alias=entry["original_alias"] if entry["original_alias"] != entry["display_name"] else None
+                        matched_alias=entry["original_alias"] if entry["original_alias"] != entry["display_name"] else None,
+                        angular_radius_deg=entry.get("angular_radius_deg"),
                     )
                 )
 

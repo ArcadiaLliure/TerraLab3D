@@ -53,9 +53,9 @@ class VisibilityIntervalClassification(StrEnum):
 class ObservableObject:
     """Identity and scientific inputs for one observable object.
 
-    Solar-system bodies and satellites use ``body_id``. Fixed ICRS/J2000
-    targets use right ascension and declination. Constellations deliberately
-    declare no position until Pas 23 supplies their centre/envelope.
+    Solar-system bodies and satellites use ``body_id``. Fixed ICRS targets,
+    including constellation centres from Pas 23, use right ascension and
+    declination.
     """
 
     object_id: str
@@ -64,14 +64,12 @@ class ObservableObject:
     body_id: str | None = None
     right_ascension_deg: float | None = None
     declination_deg: float | None = None
-    frame: str = "ICRS/J2000"
+    frame: str = "ICRS"
 
     @property
     def has_apparent_position(self) -> bool:
         if self.family in (ObservableFamily.SOLAR_SYSTEM, ObservableFamily.SATELLITE):
             return bool(self.body_id)
-        if self.family is ObservableFamily.CONSTELLATION:
-            return False
         return self.right_ascension_deg is not None and self.declination_deg is not None
 
 
@@ -143,4 +141,3 @@ class VisibleTrajectory:
     temporal_tolerance_seconds: float
     angular_tolerance_deg: float
     compute_ms: float
-

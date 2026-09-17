@@ -137,5 +137,21 @@ export function buildInspectionModel(state: CelestialSelectionState, sceneHost: 
     };
   }
 
+  if (target.kind === "constellation") {
+    return {
+      targetRef: target,
+      displayName: target.displayName,
+      kind: "constellation",
+      availability: state.availability,
+      fields: {
+        abbreviation: target.constellationId,
+        raDeg: target.raDeg,
+        decDeg: target.decDeg,
+        angularRadiusDeg: target.angularRadiusDeg,
+        frame: target.frame,
+      },
+    };
+  }
+
   return null;
 }

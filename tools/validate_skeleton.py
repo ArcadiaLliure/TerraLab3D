@@ -29,15 +29,16 @@ def main() -> None:
         ]
         if not implementation_modules:
             errors.append(f"Falta espai de càlcul científic: {package}")
-    if not (ROOT / "docs/normes_arquitectura.md").exists():
+    if not (ROOT / "docs/normes-arquitectura.md").exists():
         errors.append("Falten les normes d’arquitectura")
-    if not (ROOT / "docs/completat").is_dir():
+    if not (ROOT / "docs/tasques/completat").is_dir():
         errors.append("Falta el directori de passos completats")
-    if not (ROOT / "docs/pendent").is_dir():
+    if not (ROOT / "docs/tasques/pendent").is_dir():
         errors.append("Falta el directori de passos pendents")
     if errors:
         raise SystemExit("\n".join(errors))
     print("Esquelet TerraLab3D validat correctament")
+
 
 if __name__ == "__main__":
     main()

@@ -2,23 +2,23 @@
 
 Aquest és el punt d'entrada i la font de veritat del progrés. L'estat es basa en comportament observable, proves i evidències del repositori; l'existència d'un paquet, contracte o renderer buit no equival a una funcionalitat implementada.
 
-Consulta també les [normes d'arquitectura i execució](normes_arquitectura.md) i l'[inventari funcional verificat](inventari-funcional.md).
+Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) i l'[inventari funcional verificat](inventari-funcional.md).
 
 ## Punt de represa
 
-> **Següent pas executable: [Pas 23 — constel·lacions oficials i d'usuari](pendent/pas23-constellacions.md).**
+> **Següent pas executable: [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](tasques/pendent/pas23-constellacions.md).**
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README, seguir el punter anterior i executar només el primer pas que encara no compleixi el seu criteri de sortida.
 
 ## Protocol perquè Codex continuï el pla
 
-1. Llegir aquest README i les [normes d'arquitectura](normes_arquitectura.md).
+1. Llegir aquest README i les [normes d'arquitectura](normes-arquitectura.md).
 2. Obrir el document assenyalat a **Punt de represa** i verificar de nou l'estat del codi; el repositori actual preval sobre la descripció.
-3. Implementar la vertical funcional completa en l'ordre de les caselles de “Treball pendent”, ampliant el codi existent indicat i respectant dependències i fora d'abast.
+3. Implementar la vertical funcional completa en l'ordre de les caselles de “Tasques” i tancar després les de “Treball pendent”, ampliant el codi existent indicat i respectant dependències i fora d'abast.
 4. Executar les proves del pas i les regressions afectades; recollir les evidències exigides i escriure al document els resultats reproduïbles.
 5. Actualitzar caselles i estat. `parcial` només és vàlid si hi ha una part observable connectada; un esquelet continua `pendent`.
 6. Quan totes les caselles i el criteri de sortida estiguin verificats, canviar l'estat a `completat`, moure el mateix document de `pendent/` a `completat/`, actualitzar les dues taules i avançar **Punt de represa** al número següent.
-7. No començar un pas posterior per esquivar un criteri de sortida ni incorporar una [idea per madurar](idees-per-madurar/README.md) a la seqüència sense tancar abans les seves decisions obertes.
+7. No començar un pas posterior per esquivar un criteri de sortida ni incorporar una [idea per madurar](tasques/idees-per-madurar/README.md) a la seqüència sense tancar abans les seves decisions obertes.
 
 Estats admesos:
 
@@ -31,59 +31,60 @@ Estats admesos:
 
 | Pas | Capacitat | Estat |
 |---:|---|---|
-| 1 | [Entorn 3D executable, càmera 360° i bridge Python ↔ Three.js](completat/pas1.md) | `completat` |
-| 2 | [Ubicació geogràfica de l'observador i orientació local](completat/pas2.md) | `completat` |
-| 3 | [Rellotge de simulació, temps sideral i moviment visible](completat/pas3.md) | `completat` |
-| 3.5 | [Càmera translacional, mode caminar i mode avió](completat/pas3.5.md) | `completat` |
-| 4 | [Grid celeste, brúixola, etiquetes i HUD](completat/pas4.md) | `completat` |
-| 5 | [Camp estel·lar Gaia real, fallback i buffers persistents](completat/pas5.md) | `completat` |
-| 6 | [Picking estel·lar precís](completat/pas6.md) | `completat` |
-| 7 | [Cel, atmosfera, contaminació lumínica i Bortle](completat/pas7.md) | `completat` |
-| 8 | [Sol, Lluna i planetes amb posicions i aparença reals](completat/pas8.md) | `completat` |
-| 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](completat/pas8.5.md) | `completat` |
-| 8.6 | [Planetes, anells i satèl·lits naturals](completat/pas8.6.md) | `completat` |
-| 8.7 | [Il·luminació física de l'escena](completat/pas8.7.md) | `completat` |
-| 9 | [Eclipsis, ocultacions, separacions i trajectòries](completat/pas9.md) | `completat` |
-| 10 | [Via Làctia i pols galàctica Planck](completat/pas10.md) | `completat` |
-| 11 | [Cel profund NGC/IC](completat/pas11.md) | `completat` |
-| 12 | [Cerca astronòmica, focus i seguiment](completat/pas12.md) | `completat` |
-| 13 | [Picking real, hover, selecció i inspecció](completat/pas13.md) | `completat` |
-| 14 | [Traces circumpolars i exposició temporal](completat/pas14.md) | `completat` |
-| 15 | [Elevació real, perfil d'horitzó i oclusió](completat/pas15.md) | `completat` |
-| 16 | [Terreny 3D retingut, tiles, LOD i picking](completat/pas16.md) | `completat` |
-| 17 | [Superfície categòrica, estils i refinament visual](completat/pas17-superficie-progressiva.md) | `completat per ajust d'abast` |
-| 19 | [Modes d'observació: ull nu, càmera fotogràfica i telescopi/Scope](completat/pas19-modes-optics.md) | `completat` |
-| 21 | [Eines de mesura esfèrica](completat/pas21-eines-mesura.md) | `completat` |
-| 22 | [Trajectòries i visibilitat sobre l'horitzó real](completat/pas22-trajectories-visibilitat.md) | `completat` |
+| 1 | [Entorn 3D executable, càmera 360° i bridge Python ↔ Three.js](tasques/completat/pas1.md) | `completat` |
+| 2 | [Ubicació geogràfica de l'observador i orientació local](tasques/completat/pas2.md) | `completat` |
+| 3 | [Rellotge de simulació, temps sideral i moviment visible](tasques/completat/pas3.md) | `completat` |
+| 3.5 | [Càmera translacional, mode caminar i mode avió](tasques/completat/pas3.5.md) | `completat` |
+| 4 | [Grid celeste, brúixola, etiquetes i HUD](tasques/completat/pas4.md) | `completat` |
+| 5 | [Camp estel·lar Gaia real, fallback i buffers persistents](tasques/completat/pas5.md) | `completat` |
+| 6 | [Picking estel·lar precís](tasques/completat/pas6.md) | `completat` |
+| 7 | [Cel, atmosfera, contaminació lumínica i Bortle](tasques/completat/pas7.md) | `completat` |
+| 8 | [Sol, Lluna i planetes amb posicions i aparença reals](tasques/completat/pas8.md) | `completat` |
+| 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](tasques/completat/pas8.5.md) | `completat` |
+| 8.6 | [Planetes, anells i satèl·lits naturals](tasques/completat/pas8.6.md) | `completat` |
+| 8.7 | [Il·luminació física de l'escena](tasques/completat/pas8.7.md) | `completat` |
+| 9 | [Eclipsis, ocultacions, separacions i trajectòries](tasques/completat/pas9.md) | `completat` |
+| 10 | [Via Làctia i pols galàctica Planck](tasques/completat/pas10.md) | `completat` |
+| 11 | [Cel profund NGC/IC](tasques/completat/pas11.md) | `completat` |
+| 12 | [Cerca astronòmica, focus i seguiment](tasques/completat/pas12.md) | `completat` |
+| 13 | [Picking real, hover, selecció i inspecció](tasques/completat/pas13.md) | `completat` |
+| 14 | [Traces circumpolars i exposició temporal](tasques/completat/pas14.md) | `completat` |
+| 15 | [Elevació real, perfil d'horitzó i oclusió](tasques/completat/pas15.md) | `completat` |
+| 16 | [Terreny 3D retingut, tiles, LOD i picking](tasques/completat/pas16.md) | `completat` |
+| 17 | [Superfície categòrica, estils i refinament visual](tasques/completat/pas17-superficie-progressiva.md) | `completat per ajust d'abast` |
+| 19 | [Modes d'observació: ull nu, càmera fotogràfica i telescopi/Scope](tasques/completat/pas19-modes-optics.md) | `completat` |
+| 21 | [Eines de mesura esfèrica](tasques/completat/pas21-eines-mesura.md) | `completat` |
+| 22 | [Trajectòries i visibilitat sobre l'horitzó real](tasques/completat/pas22-trajectories-visibilitat.md) | `completat` |
+| 22.5 | [Normalització de la documentació viva](tasques/completat/pas22.5-normalitzacio-documental.md) | `completat` |
 
 La numeració decimal és històrica; els passos 1–16 i els seus subpassos no es renumeren.
 
-Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha retirat de l'ordre executable i ara és un [dossier per madurar](idees-per-madurar/meteorologia.md); l'antic Pas 20 (simulació fotogràfica) ha estat absorbit pel Pas 19 (modes d'observació instrumental). La resta de passos conserven la numeració existent.
+Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha retirat de l'ordre executable i ara és un [dossier per madurar](tasques/idees-per-madurar/meteorologia.md); l'antic Pas 20 (simulació fotogràfica) ha estat absorbit pel Pas 19 (modes d'observació instrumental). La resta de passos conserven la numeració existent.
 
 ## Passos pendents
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 23 | [Constel·lacions oficials i d'usuari](pendent/pas23-constellacions.md) | `pendent` | 6, 13, 22 |
-| 24 | [Catàleg de recursos i descàrregues persistents](pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 8.6, 12 |
-| 25 | [Gestor de capes Cel/Terra](pendent/pas25-gestor-capes.md) | `pendent` | 24 |
-| 26 | [Vista de recursos del Sistema Solar](pendent/pas26-recursos-sistema-solar.md) | `parcial` | 24, 25 |
-| 27 | [Carta de recursos d'espai profund](pendent/pas27-recursos-espai-profund.md) | `parcial` | 10, 11, 24, 25 |
-| 28 | [Descobriment de DEM multiproveïdor](pendent/pas28-dem-multiproveidor.md) | `parcial` | 16, 24, 25 |
-| 29 | [Superfície semàntica, TLST i refinament](pendent/pas29-superficie-semantica.md) | `parcial` | 17, 24, 25 |
-| 30 | [Plate solving i comparador foto/simulació](pendent/pas30-plate-solving.md) | `pendent` | 5, 11, 19 |
-| 31 | [“El millor d'aquesta nit” i planificador](pendent/pas31-millor-nit-planificador.md) | `pendent` | 22, 23 |
-| 32 | [Motor general d'efemèrides](pendent/pas32-motor-efemerides.md) | `parcial` | 9, 22 |
-| 33 | [Cercador d'objectes i efemèrides](pendent/pas33-cercador-objectes-efemerides.md) | `parcial` | 31, 32 |
-| 34 | [Miniatures i animacions d'efemèrides](pendent/pas34-previsualitzacions-efemerides.md) | `pendent` | 32, 33 |
-| 35 | [Pestanya d'eclipsis](pendent/pas35-pestanya-eclipsis.md) | `parcial` | 9, 33, 34 opcional |
-| 36 | [Esdeveniments propis de planetes i Lluna](pendent/pas36-esdeveniments-objectes.md) | `parcial` | 32, 33 |
-| 37 | [Nomenclàtor GeoNames empaquetat](pendent/pas37-geonames-empaquetat.md) | `pendent` | 19, 29 |
-| 38 | [Homologació final, recuperació i rendiment](pendent/pas38-homologacio-final.md) | `pendent` | 1–17, 19–37 |
+| 23 | [Constel·lacions IAU, traçat de referència i documents d'usuari](tasques/pendent/pas23-constellacions.md) | `en curs` | 6, 13, 22, 22.5 |
+| 24 | [Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 8.6, 12 |
+| 25 | [Gestor de capes Cel/Terra](tasques/pendent/pas25-gestor-capes.md) | `pendent` | 24 |
+| 26 | [Vista de recursos del Sistema Solar](tasques/pendent/pas26-recursos-sistema-solar.md) | `parcial` | 24, 25 |
+| 27 | [Carta de recursos d'espai profund](tasques/pendent/pas27-recursos-espai-profund.md) | `parcial` | 10, 11, 24, 25 |
+| 28 | [Descobriment de DEM multiproveïdor](tasques/pendent/pas28-dem-multiproveidor.md) | `parcial` | 16, 24, 25 |
+| 29 | [Superfície semàntica, TLST i refinament](tasques/pendent/pas29-superficie-semantica.md) | `parcial` | 17, 24, 25 |
+| 30 | [Plate solving i comparador foto/simulació](tasques/pendent/pas30-plate-solving.md) | `pendent` | 5, 11, 19 |
+| 31 | [“El millor d'aquesta nit” i planificador](tasques/pendent/pas31-millor-nit-planificador.md) | `pendent` | 22, 23 |
+| 32 | [Motor general d'efemèrides](tasques/pendent/pas32-motor-efemerides.md) | `parcial` | 9, 22 |
+| 33 | [Cercador d'objectes i efemèrides](tasques/pendent/pas33-cercador-objectes-efemerides.md) | `parcial` | 31, 32 |
+| 34 | [Miniatures i animacions d'efemèrides](tasques/pendent/pas34-previsualitzacions-efemerides.md) | `pendent` | 32, 33 |
+| 35 | [Pestanya d'eclipsis](tasques/pendent/pas35-pestanya-eclipsis.md) | `parcial` | 9, 33, 34 opcional |
+| 36 | [Esdeveniments propis de planetes i Lluna](tasques/pendent/pas36-esdeveniments-objectes.md) | `parcial` | 32, 33 |
+| 37 | [Nomenclàtor GeoNames empaquetat](tasques/pendent/pas37-geonames-empaquetat.md) | `pendent` | 19, 29 |
+| 38 | [Homologació final, recuperació i rendiment](tasques/pendent/pas38-homologacio-final.md) | `pendent` | 1–17, 19–37 |
 
 ## Idees per madurar
 
-Els tretze dossiers exclosos de la seqüència executable, la seva decisió pendent, condició de maduresa i relació amb el backlog són a l'[índex d'idees per madurar](idees-per-madurar/README.md). El seu estat és `per madurar`.
+Els tretze dossiers exclosos de la seqüència executable, la seva decisió pendent, condició de maduresa i relació amb el backlog són a l'[índex d'idees per madurar](tasques/idees-per-madurar/README.md). El seu estat és `per madurar`.
 
 ## Mapa històric de la consolidació
 
@@ -92,7 +93,7 @@ La taula registra la destinació actual de cadascun dels vuit pendents històric
 | Destinació | Fonts absorbides | Decisió de fusió |
 |---:|---|---|
 | 17 | pendent 17 + novetat 37 | Superfície categòrica i refinament visual sobre els tiles ja completats; l'ortofoto queda descartada. |
-| — | pendent 18 (còpia local provisional 30) | Meteorologia surt de l'ordre executable i es conserva com a [dossier per madurar](idees-per-madurar/meteorologia.md). |
+| — | pendent 18 (còpia local provisional 30) | Meteorologia surt de l'ordre executable i es conserva com a [dossier per madurar](tasques/idees-per-madurar/meteorologia.md). |
 | 19 | pendent 19 + antic pas 20 + novetats 25, 26 | Modes d'observació instrumental, enquadrament, geometria òptica, HUD, Gaia i previsualització fotogràfica integrada. |
 | — | antic pas 20 | Reservat com a traça històrica; absorbit pel Pas 19. |
 | 21 | pendent 21 | Mesures esfèriques editables. |

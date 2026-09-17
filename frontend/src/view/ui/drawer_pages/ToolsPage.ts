@@ -1,4 +1,5 @@
 import type { MeasurementDocumentSnapshot, MeasurementKind } from "../../../contracts/measurement_contracts";
+import type { ConstellationDocumentSnapshot } from "../../../contracts/constellation_contracts";
 
 export interface ToolsPageCallbacks {
   readonly onOpenResourceManager: () => void;
@@ -8,6 +9,17 @@ export interface ToolsPageCallbacks {
   readonly onDelete: () => void;
   readonly onClear: () => void;
   readonly onTrackingChanged: (enabled: boolean) => void;
+  readonly onConstellationCreate: () => void;
+  readonly onConstellationSelect: (constellationId: string | null) => void;
+  readonly onConstellationRename: (name: string) => void;
+  readonly onConstellationEditingChanged: (enabled: boolean) => void;
+  readonly onConstellationShowAll: (visible: boolean) => void;
+  readonly onConstellationNewStroke: () => void;
+  readonly onConstellationFinish: () => void;
+  readonly onConstellationUndo: () => void;
+  readonly onConstellationRedo: () => void;
+  readonly onConstellationDelete: () => void;
+  readonly onConstellationClear: () => void;
 }
 
 const TOOL_LABELS: Readonly<Record<MeasurementKind, string>> = {
@@ -24,6 +36,14 @@ export class ToolsPage {
   private readonly status: HTMLDivElement;
   private readonly trackingCheckbox: HTMLInputElement;
   private snapshotTrackingEnabled: boolean | null = null;
+  private readonly constellationEditing: HTMLInputElement;
+  private readonly constellationShowAll: HTMLInputElement;
+  private readonly constellationStatus: HTMLDivElement;
+  private readonly constellationUndo: HTMLButtonElement;
+  private readonly constellationRedo: HTMLButtonElement;
+  private readonly constellationDelete: HTMLButtonElement;
+  private readonly constellationSelect: HTMLSelectElement;
+  private readonly constellationName: HTMLInputElement;
 
   constructor(private readonly callbacks: ToolsPageCallbacks) {
     this.element = document.createElement("div");
@@ -97,6 +117,70 @@ export class ToolsPage {
     this.redoButton.disabled = true;
     this.deleteButton.disabled = true;
     this.clearButton.disabled = true;
+
+    const constellationGroup = document.createElement("div");
+    constellationGroup.style.cssText = group.style.cssText;
+    const constellationTitle = document.createElement("div");
+    constellationTitle.style.cssText = title.style.cssText;
+    constellationTitle.textContent = "Constel·lacions";
+    constellationGroup.appendChild(constellationTitle);
+    const constellationInfo = document.createElement("div");
+    constellationInfo.style.cssText = info.style.cssText;
+    constellationInfo.textContent = "Consulta el traçat de referència o crea grups connectant estrelles visibles.";
+    constellationGroup.appendChild(constellationInfo);
+    const constellationIdentity = document.createElement("div");
+    constellationIdentity.style.cssText = "display:grid;grid-template-columns:1fr auto;gap:6px;";
+    this.constellationSelect = document.createElement("select");
+    this.constellationSelect.onchange = () => callbacks.onConstellationSelect(this.constellationSelect.value || null);
+    this.constellationName = document.createElement("input");
+    this.constellationName.type = "text";
+    this.constellationName.maxLength = 80;
+    this.constellationName.placeholder = "Nom del grup";
+    const rename = this.makeButton("Reanomena", () => callbacks.onConstellationRename(this.constellationName.value));
+    constellationIdentity.append(this.constellationSelect, document.createElement("span"), this.constellationName, rename);
+    constellationGroup.appendChild(constellationIdentity);
+    const constellationActions = document.createElement("div");
+    constellationActions.className = "measurement-action-row";
+    constellationActions.append(
+      this.makeButton("Nou grup", callbacks.onConstellationCreate),
+      this.makeButton("Nou traç", callbacks.onConstellationNewStroke),
+      this.makeButton("Finalitza", callbacks.onConstellationFinish),
+    );
+    constellationGroup.appendChild(constellationActions);
+    const toggles = document.createElement("div");
+    toggles.style.cssText = trackingRow.style.cssText;
+    this.constellationEditing = document.createElement("input");
+    this.constellationEditing.type = "checkbox";
+    this.constellationEditing.id = "constellation-editing-checkbox";
+    this.constellationEditing.onchange = () => callbacks.onConstellationEditingChanged(this.constellationEditing.checked);
+    const editingLabel = document.createElement("label");
+    editingLabel.htmlFor = this.constellationEditing.id;
+    editingLabel.textContent = "Edita";
+    this.constellationShowAll = document.createElement("input");
+    this.constellationShowAll.type = "checkbox";
+    this.constellationShowAll.id = "constellation-show-all-checkbox";
+    this.constellationShowAll.onchange = () => callbacks.onConstellationShowAll(this.constellationShowAll.checked);
+    const showAllLabel = document.createElement("label");
+    showAllLabel.htmlFor = this.constellationShowAll.id;
+    showAllLabel.textContent = "Mostra totes";
+    toggles.append(this.constellationEditing, editingLabel, this.constellationShowAll, showAllLabel);
+    constellationGroup.appendChild(toggles);
+    const history = document.createElement("div");
+    history.className = "measurement-action-row";
+    this.constellationUndo = this.makeButton("Desfer", callbacks.onConstellationUndo);
+    this.constellationRedo = this.makeButton("Refer", callbacks.onConstellationRedo);
+    this.constellationDelete = this.makeButton("Elimina", callbacks.onConstellationDelete);
+    history.append(this.constellationUndo, this.constellationRedo, this.constellationDelete, this.makeButton("Neteja", callbacks.onConstellationClear));
+    constellationGroup.appendChild(history);
+    this.constellationStatus = document.createElement("div");
+    this.constellationStatus.className = "measurement-status";
+    this.constellationStatus.setAttribute("role", "status");
+    this.constellationStatus.textContent = "Carregant constel·lacions…";
+    constellationGroup.appendChild(this.constellationStatus);
+    this.element.appendChild(constellationGroup);
+    this.constellationUndo.disabled = true;
+    this.constellationRedo.disabled = true;
+    this.constellationDelete.disabled = true;
   }
 
   mount(container: HTMLElement): void { container.appendChild(this.element); }
@@ -130,6 +214,44 @@ export class ToolsPage {
     if (this.snapshotTrackingEnabled !== null) this.trackingCheckbox.checked = this.snapshotTrackingEnabled;
     this.trackingCheckbox.disabled = false;
     this.status.textContent = `No s'ha aplicat: ${message}`;
+  }
+
+  presentConstellations(snapshot: ConstellationDocumentSnapshot): void {
+    this.constellationEditing.checked = snapshot.editing;
+    this.constellationEditing.disabled = false;
+    this.constellationUndo.disabled = !snapshot.canUndo;
+    this.constellationRedo.disabled = !snapshot.canRedo;
+    this.constellationDelete.disabled = snapshot.selectedConstellationId === null;
+    const currentOptions = [...this.constellationSelect.options].map(option => option.value).join("|");
+    const nextOptions = snapshot.constellations.map(item => item.constellationId).join("|");
+    if (currentOptions !== nextOptions) {
+      this.constellationSelect.replaceChildren();
+      const empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = "Selecciona un grup";
+      this.constellationSelect.appendChild(empty);
+      for (const item of snapshot.constellations) {
+        const option = document.createElement("option");
+        option.value = item.constellationId;
+        option.textContent = item.name;
+        this.constellationSelect.appendChild(option);
+      }
+    }
+    this.constellationSelect.value = snapshot.selectedConstellationId ?? "";
+    const selectedGroup = snapshot.constellations.find(item => item.constellationId === snapshot.selectedConstellationId);
+    this.constellationName.value = selectedGroup?.name ?? "";
+    const selected = snapshot.selectedConstellationId ? " · grup seleccionat" : "";
+    this.constellationStatus.textContent = snapshot.warning ?? `${snapshot.constellations.length} grups d'usuari${selected}`;
+  }
+
+  presentConstellationPending(): void {
+    this.constellationEditing.disabled = true;
+    this.constellationStatus.textContent = "Aplicant operació…";
+  }
+
+  presentConstellationError(message: string): void {
+    this.constellationEditing.disabled = false;
+    this.constellationStatus.textContent = `No s'ha aplicat: ${message}`;
   }
   dispose(): void { this.element.remove(); }
 

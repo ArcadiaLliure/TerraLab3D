@@ -1,0 +1,22 @@
+Pas 23 — validació reproduïble del catàleg
+Data: 2026-09-17
+
+Comanda:
+  python tools/generate_constellation_catalog.py
+
+Resultat de dues regeneracions consecutives:
+  entitats: 88
+  SHA-256 abans: BDEBC06F58F1ADBDC23960D533AA9F6367E82BDDFBB3BE31ABCC1A78E5B967A1
+  SHA-256 després: BDEBC06F58F1ADBDC23960D533AA9F6367E82BDDFBB3BE31ABCC1A78E5B967A1
+
+Fonts fixades:
+  constellations.lines.json: 294f66bef5d5cf50b1e17f16d2efa1d97a15131612c68dd935adef6e7373e13c
+  constellations.json: ab4ae692027cbc042c0d6791a84456a65eb7c55656107fd00c58ff6e55d4d8b2
+
+Comprovacions automatitzades:
+  - conjunt exacte de 88 abreviatures IAU;
+  - totes les coordenades, centres i radis són finits i dins de rang;
+  - separació màxima entre mostres consecutives <= 1 grau;
+  - rangs visuals 1, 2 i 3 preservats;
+  - una sola entitat Ser amb components caput i cauda independents;
+  - cap estructura del model permet una aresta entre components.

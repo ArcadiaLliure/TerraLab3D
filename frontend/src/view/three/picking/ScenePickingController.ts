@@ -141,6 +141,8 @@ export class ScenePickingController {
         label = state.selectedTarget.sourceId ? `Estrella ${state.selectedTarget.sourceId}` : "Estrella";
       } else if (state.selectedTarget.kind === "deep_sky") {
         label = "Objecte cel profund";
+      } else if (state.selectedTarget.kind === "constellation") {
+        label = state.selectedTarget.displayName;
       }
       this.selectionMarker.setLabel(label);
     } else {
@@ -335,6 +337,10 @@ export class ScenePickingController {
       } else if (hit.kind === "deep_sky") {
         console.debug(
           `${LOG_PREFIX} [handleTap] [Deep Sky: ${hit.ref.resourceId} idx=${hit.ref.catalogIndex} dist=${hit.screenDistanceCssPx.toFixed(1)}px]`
+        );
+      } else if (hit.kind === "constellation") {
+        console.debug(
+          `${LOG_PREFIX} [handleTap] [Constel·lació: ${hit.constellationId} dist=${hit.screenDistanceCssPx.toFixed(1)}px]`,
         );
       } else {
         console.debug(

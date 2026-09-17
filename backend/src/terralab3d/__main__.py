@@ -1016,9 +1016,19 @@ async def run() -> int:
 
     from terralab3d.application.star_coordinator import StarCoordinator
     from terralab3d.application.star_pick_resolver import StarPickResolver
+    from terralab3d.application.constellation_coordinator import ConstellationCoordinator
+    from terralab3d.domain.constellations.calculations import ConstellationValidationError
     from terralab3d.domain.stars.star_pick_models import StarPickRequest
+    from terralab3d.infrastructure.catalogs.constellations import PackagedConstellationCatalog
     
     star_pick_resolver = StarPickResolver()
+    constellation_catalog = PackagedConstellationCatalog()
+    constellation_coordinator = ConstellationCoordinator(
+        AtomicTextPreferencesAdapter(),
+        bridge.send,
+        star_pick_resolver,
+        constellation_catalog,
+    )
     star_coordinator = StarCoordinator()
     star_coordinator.set_pick_resolver(star_pick_resolver)
     star_coordinator.set_publishers(
@@ -1166,6 +1176,21 @@ async def run() -> int:
 
     bridge.on("measurement_command", _handle_measurement_command)
 
+    async def _handle_constellation_command(data: dict[str, Any]) -> None:
+        try:
+            await constellation_coordinator.apply(data)
+        except (ValueError, KeyError, TypeError, ConstellationValidationError) as exc:
+            await bridge.send({
+                "type": "constellation_error",
+                "requestId": str(data.get("requestId", "")),
+                "requestedRevision": int(data.get("documentRevision", -1)),
+                "authoritativeRevision": constellation_coordinator.revision,
+                "field": getattr(exc, "field", None),
+                "message": str(exc),
+            })
+
+    bridge.on("constellation_command", _handle_constellation_command)
+
     async def _handle_resolve_star_pick(data: dict[str, Any]) -> None:
         try:
             req = StarPickRequest(
@@ -1212,6 +1237,7 @@ async def run() -> int:
         # instruments es conserven, però el mode actiu no és persistent.
         await observation_coordinator.set_mode("eye")
         await measurement_coordinator.publish_current()
+        await constellation_coordinator.publish_current(include_catalog=True)
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
         await bridge.send_planet_texture_manifest(solar_system_assets.descriptor)
         await bridge.send_satellite_catalog_manifest(solar_system_assets.descriptor)
@@ -1697,7 +1723,8 @@ async def run() -> int:
                 search_coordinator.build_index(
                     named_stars=named_stars,
                     ngc_objects=ngc_objects,
-                    planets=planets_data
+                    planets=planets_data,
+                    constellations=constellation_catalog.search_records(),
                 )
             
             await search_coordinator.search(req_id, gen, query, limit)

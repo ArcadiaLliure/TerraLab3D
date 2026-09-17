@@ -317,7 +317,7 @@ Una transició llarga —viatge de càmera, càrrega, descàrrega, càlcul, canv
 - La càmera, escena retinguda i controls no es desmunten per mostrar una animació de càrrega.
 - L'operació declara revisió, progrés determinat o indeterminat, cancel·lació i fallback.
 - La transició representa el canvi real, respecta `prefers-reduced-motion` i no retarda artificialment la finalització.
-- El [pas 38](pendent/pas38-homologacio-final.md) audita interactivitat, cancel·lació i pressupostos.
+- El [pas 38](tasques/pendent/pas38-homologacio-final.md) audita interactivitat, cancel·lació i pressupostos.
 
 ## ADR 0005 — Dades base empaquetades fora del gestor
 
@@ -327,8 +327,8 @@ Els datasets petits, obligatoris, versionats amb el producte i sense variants el
 
 ### Conseqüències
 
-- No apareixen al catàleg, cua ni AOI del [gestor de descàrregues](pendent/pas24-cataleg-recursos-descarregues.md).
+- No apareixen al catàleg, cua ni AOI del [gestor de descàrregues](tasques/pendent/pas24-cataleg-recursos-descarregues.md).
 - La seva absència o incompatibilitat és un error d'instal·lació/versionat, no una descàrrega implícita.
 - Empaquetat no significa acoblament al renderer: domini, carregador/índex i batches continuen separats.
-- GeoNames filtrat aplica aquest patró al [pas 37](pendent/pas37-geonames-empaquetat.md).
+- GeoNames filtrat aplica aquest patró al [pas 37](tasques/pendent/pas37-geonames-empaquetat.md).
 - Un dataset futur només l'adopta si compleix tots els criteris; si té variants, mida material o decisió d'usuari, passa pel gestor central.

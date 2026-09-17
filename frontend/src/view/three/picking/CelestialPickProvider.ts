@@ -6,8 +6,9 @@ import {
   SolarSystemPickProvider,
   type SolarSystemPickHit,
 } from "./SolarSystemPickProvider";
+import { ConstellationPickProvider, type ConstellationPickHit } from "./ConstellationPickProvider";
 
-export type CelestialPickHit = StarPickHit | SolarSystemPickHit | DeepSkyPickHit;
+export type CelestialPickHit = StarPickHit | SolarSystemPickHit | DeepSkyPickHit | ConstellationPickHit;
 
 export interface CelestialScreenProjection {
   readonly x: number;
@@ -19,6 +20,7 @@ export interface CelestialPickProviderDeps {
   readonly starPicker: StarPickProvider;
   readonly solarSystemPicker: SolarSystemPickProvider;
   readonly deepSkyPicker: DeepSkyPickProvider;
+  readonly constellationPicker: ConstellationPickProvider;
 }
 
 /**
@@ -33,9 +35,10 @@ export class CelestialPickProvider {
     const solarBody = this.deps.solarSystemPicker.pick(clientX, clientY);
     const star = this.deps.starPicker.pick(clientX, clientY);
     const deepSky = this.deps.deepSkyPicker.pick(clientX, clientY);
+    const constellation = this.deps.constellationPicker.pick(clientX, clientY);
     
     // Sort all non-null hits by normalized distance
-    const hits = [solarBody, star, deepSky].filter((h): h is CelestialPickHit => h !== null);
+    const hits = [solarBody, star, deepSky, constellation].filter((h): h is CelestialPickHit => h !== null);
     if (hits.length === 0) return null;
     
     hits.sort((a, b) => {
@@ -61,6 +64,7 @@ export class CelestialPickProvider {
         visualRadiusCssPx: position.visualRadiusCssPx,
       };
     }
+    if (hit.kind === "constellation") return this.deps.constellationPicker.reproject(hit.constellationId);
     return this.deps.solarSystemPicker.reproject(hit.bodyId);
   }
 }
@@ -74,6 +78,7 @@ function getPriority(hit: CelestialPickHit): number {
     case "solar_system_body": return 0;
     case "star": return 1;
     case "deep_sky": return 2;
-    default: return 3;
+    case "constellation": return 3;
+    default: return 4;
   }
 }
