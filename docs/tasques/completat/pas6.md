@@ -38,7 +38,7 @@ Aconseguir identificació estel·lar interactiva totalment desacoblada de l'estr
 **En depenen:**
 - [Pas 13 — Picking real, hover, selecció i inspecció](pas13.md)
 - [Pas 19 — Modes d'observació: ull nu, càmera fotogràfica i telescopi/Scope](pas19-modes-optics.md)
-- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](../pendent/pas23-constellacions.md)
+- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](pas23-constellacions.md)
 - [Pas 38 — Homologació final, recuperació i rendiment](../pendent/pas38-homologacio-final.md)
 
 ## Codi existent a reutilitzar

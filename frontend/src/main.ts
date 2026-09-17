@@ -706,6 +706,7 @@ function main(): void {
   });
 
   (window as any).__setCameraPose = (az: number, alt: number, fov = 60) => {
+    focusTrackingController.stopTracking();
     cameraRig.animateTo(az, alt, fov, 0);
   };
   (window as any).__setSimulationTime = (iso: string) => {
@@ -730,9 +731,51 @@ function main(): void {
   };
   (window as any).__setHudVisible = (visible: boolean) => {
     locationHUD.setVisible(visible);
+    if (!visible) {
+      shell.closeDrawer();
+    }
+  };
+  (window as any).__closeDrawer = () => {
+    shell.closeDrawer();
   };
   (window as any).__requestTrajectory = () => {
     requestSelectedApparentTrajectory();
+  };
+  (window as any).__getConstellationController = () => constellationController;
+  (window as any).__setConstellationsVisible = (visible: boolean) => {
+    sceneHost.getConstellationLayerRenderer().setVisible(visible);
+  };
+  (window as any).__getSceneHost = () => sceneHost;
+  (window as any).__getSelectionController = () => selectionController;
+  (window as any).__selectSun = () => {
+    selectionController.select({
+      kind: "solar_system",
+      bodyId: "sun",
+    }, "search");
+  };
+  (window as any).__selectM31 = () => {
+    selectionController.select({
+      kind: "deep_sky",
+      resourceId: "deep_sky.opengc",
+      resourceVersion: "v1",
+      catalogIndex: 224,
+      raDeg: 10.6847,
+      decDeg: 41.2687,
+    }, "search");
+  };
+  (window as any).__selectOrion = () => {
+    selectionController.select({
+      kind: "constellation",
+      constellationId: "Ori",
+      displayName: "Orion",
+      raDeg: 83.82,
+      decDeg: -5.39,
+      angularRadiusDeg: 15.0,
+      frame: "ICRS",
+    }, "search");
+  };
+  (window as any).__selectTarget = (target: any) => {
+    selectionController.select(target, "search");
   };
 
   let currentObserverLatitude = 41.38;

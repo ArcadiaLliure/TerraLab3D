@@ -17,6 +17,10 @@ export interface OverlayLineProfile {
   readonly coreOpacity: number;
   readonly haloOpacity: number;
   readonly depthTest: boolean;
+  readonly dashed?: boolean;
+  readonly dashSize?: number;
+  readonly gapSize?: number;
+  readonly dashScale?: number;
 }
 
 export interface OverlayLineMaterials {
@@ -93,11 +97,15 @@ export const OVERLAY_LINE_PROFILES = {
   trajectorySecondary: {
     color: 0xc084fc,
     coreColor: 0xffffff,
-    linewidthPx: 6.0,
-    coreWidthPx: 1.2,
-    coreOpacity: 0.85,
-    haloOpacity: 0.30,
+    linewidthPx: 6.5,
+    coreWidthPx: 1.3,
+    coreOpacity: 0.95,
+    haloOpacity: 0.40,
     depthTest: false,
+    dashed: true,
+    dashSize: 0.40,
+    gapSize: 0.25,
+    dashScale: 1,
   },
 } as const satisfies Record<string, OverlayLineProfile>;
 
@@ -266,6 +274,7 @@ export function withOverlayColor(
   color: THREE.ColorRepresentation,
   opacity = base.coreOpacity,
   depthTest = base.depthTest,
+  dashed = base.dashed,
 ): OverlayLineProfile {
   const opacityRatio = base.coreOpacity > 0 ? opacity / base.coreOpacity : 1;
   return {
@@ -274,6 +283,7 @@ export function withOverlayColor(
     coreOpacity: opacity,
     haloOpacity: THREE.MathUtils.clamp(base.haloOpacity * opacityRatio, 0, 1),
     depthTest,
+    dashed,
   };
 }
 
@@ -286,6 +296,10 @@ export function createOverlayLineMaterials(profile: OverlayLineProfile): Overlay
     coreOpacity: profile.coreOpacity,
     haloOpacity: profile.haloOpacity,
     depthTest: profile.depthTest,
+    dashed: profile.dashed ?? false,
+    dashSize: profile.dashSize ?? 0.40,
+    gapSize: profile.gapSize ?? 0.25,
+    dashScale: profile.dashScale ?? 1,
   });
 
   return { material, core: material, halo: material, profile };

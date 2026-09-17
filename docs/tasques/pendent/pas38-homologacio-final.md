@@ -50,7 +50,7 @@ Completar la vertical de «homologació final, recuperació i rendiment» de pun
 - [Pas 19 — Modes d'observació: ull nu, càmera fotogràfica i telescopi/Scope](../completat/pas19-modes-optics.md)
 - [Pas 21 — Eines de mesura esfèrica](../completat/pas21-eines-mesura.md)
 - [Pas 22 — Trajectòries i visibilitat sobre l'horitzó real](../completat/pas22-trajectories-visibilitat.md)
-- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](pas23-constellacions.md)
+- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](../completat/pas23-constellacions.md)
 - [Pas 24 — Catàleg de recursos i descàrregues persistents](pas24-cataleg-recursos-descarregues.md)
 - [Pas 25 — Gestor de capes Cel/Terra](pas25-gestor-capes.md)
 - [Pas 26 — Vista de recursos del Sistema Solar](pas26-recursos-sistema-solar.md)

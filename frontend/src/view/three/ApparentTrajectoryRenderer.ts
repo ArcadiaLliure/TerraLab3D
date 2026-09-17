@@ -364,6 +364,9 @@ export class ApparentTrajectoryRenderer {
       const positions = positionsByState.get(state)!;
       if (positions.length >= 6) {
         line.geometry.setPositions(new Float32Array(positions));
+        if (line.materials.profile.dashed) {
+          computeAngularLineDistances(line.geometry);
+        }
       } else {
         line.geometry.setPositions(new Float32Array([0, 0, 0, 0, 0, 0]));
         line.geometry.instanceCount = 0;
@@ -489,20 +492,21 @@ export class ApparentTrajectoryRenderer {
     position: THREE.Vector3,
   ): THREE.Sprite | null {
     if (typeof document === "undefined") return null;
+    // High-resolution canvas for ultra-crisp text rendering
     const canvas = document.createElement("canvas");
-    canvas.width = 310;
-    canvas.height = 50;
+    canvas.width = 340;
+    canvas.height = 60;
     const context = canvas.getContext("2d");
     if (context === null) return null;
 
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     // Rounded high-contrast card background
-    const radius = 6;
-    const x = 2;
-    const y = 2;
-    const w = canvas.width - 4;
-    const h = canvas.height - 4;
+    const radius = 8;
+    const x = 3;
+    const y = 3;
+    const w = canvas.width - 6;
+    const h = canvas.height - 6;
 
     context.beginPath();
     context.moveTo(x + radius, y);
@@ -516,25 +520,25 @@ export class ApparentTrajectoryRenderer {
     context.quadraticCurveTo(x, y, x + radius, y);
     context.closePath();
 
-    context.fillStyle = "rgba(7, 12, 24, 0.88)";
+    context.fillStyle = "rgba(10, 15, 29, 0.92)";
     context.fill();
 
     const isRise = event.kind === "rise";
     const accentColor = isRise ? "#34d399" : "#f87171";
-    context.lineWidth = 2;
+    context.lineWidth = 2.5;
     context.strokeStyle = accentColor;
     context.stroke();
 
-    context.font = "bold 19px Segoe UI, Roboto, system-ui, sans-serif";
+    context.font = "bold 20px Segoe UI, Roboto, system-ui, sans-serif";
     context.fillStyle = accentColor;
     const symbol = isRise ? "↑ Alba" : "↓ Posta";
-    context.fillText(symbol, 12, 32);
+    context.fillText(symbol, 14, 38);
 
-    context.font = "17px Segoe UI, Roboto, system-ui, sans-serif";
+    context.font = "bold 18px Segoe UI, Roboto, system-ui, sans-serif";
     context.fillStyle = "#f8fafc";
     const timeStr = new Date(event.instantUtc).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     const azStr = `Az ${event.azimuthDeg.toFixed(1)}°`;
-    context.fillText(`${timeStr} · ${azStr}`, 108, 32);
+    context.fillText(`${timeStr} · ${azStr}`, 115, 38);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.needsUpdate = true;
@@ -547,6 +551,9 @@ export class ApparentTrajectoryRenderer {
     const sprite = new THREE.Sprite(material);
     sprite.name = `apparentTrajectory:${event.kind}-label`;
     sprite.position.copy(position).multiplyScalar(1.0015);
+    // Flow labels inwards into the viewport so they never clip the screen borders
+    const centerX = isRise ? 0.15 : 0.85;
+    sprite.center.set(centerX, -0.2);
     sprite.userData.event = event;
     sprite.renderOrder = 110;
 
@@ -560,9 +567,9 @@ export class ApparentTrajectoryRenderer {
     const heightPx = Math.max(1, this.currentHeightPx);
     const fovRad = THREE.MathUtils.degToRad(fovDeg);
     const pixelsPerRad = heightPx / (2 * Math.tan(fovRad / 2));
-    const targetHeightPx = 16; // Refined smaller height in CSS pixels on screen
+    const targetHeightPx = 22; // Screen height in CSS pixels: compact and readable
     const worldHeight = targetHeightPx * (MARKER_RADIUS / pixelsPerRad);
-    const aspectRatio = 310 / 50;
+    const aspectRatio = 340 / 60;
     return {
       width: worldHeight * aspectRatio,
       height: worldHeight,
@@ -621,6 +628,29 @@ export class ApparentTrajectoryRenderer {
   }
 }
 
+function computeAngularLineDistances(geometry: LineSegmentsGeometry): void {
+  const instanceStart = geometry.attributes.instanceStart;
+  const instanceEnd = geometry.attributes.instanceEnd;
+  if (!instanceStart || !instanceEnd || instanceStart.count === 0) return;
+  const lineDistances = new Float32Array(2 * instanceStart.count);
+  const p1 = new THREE.Vector3();
+  const p2 = new THREE.Vector3();
+
+  let accumulatedDeg = 0;
+  for (let i = 0, j = 0; i < instanceStart.count; i++, j += 2) {
+    p1.fromBufferAttribute(instanceStart, i).normalize();
+    p2.fromBufferAttribute(instanceEnd, i).normalize();
+    const angleDeg = THREE.MathUtils.radToDeg(p1.angleTo(p2));
+    lineDistances[j] = accumulatedDeg;
+    accumulatedDeg += angleDeg;
+    lineDistances[j + 1] = accumulatedDeg;
+  }
+
+  const instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer(lineDistances, 2, 1);
+  geometry.setAttribute("instanceDistanceStart", new THREE.InterleavedBufferAttribute(instanceDistanceBuffer, 1, 0));
+  geometry.setAttribute("instanceDistanceEnd", new THREE.InterleavedBufferAttribute(instanceDistanceBuffer, 1, 1));
+}
+
 function stateFromCode(code: number): TrajectoryVisibilityState {
   return STATE_ORDER[code] ?? "insufficient_data";
 }
@@ -657,3 +687,5 @@ function stateStyle(state: TrajectoryVisibilityState): {
       };
   }
 }
+
+

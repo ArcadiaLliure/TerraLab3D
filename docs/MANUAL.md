@@ -285,7 +285,7 @@ El shader ajusta la brillantor i el contrast de la Via Làctia en funció de la 
 
 ### 8.1. Què fa i per a què serveix
 
-Projecta la trajectòria aparent de 24 hores cap endavant de qualsevol astre seleccionat, avaluant de forma rigorosa si en cada instant és visible o queda ocult darrere de les muntanyes i carenes del relleu local (DEM) o sota l'horitzó astronòmic pla a 0°.
+Projecta la trajectòria aparent de 24 hores cap endavant de qualsevol astre seleccionat, avaluant de forma rigorosa si en cada instant és visible o queda ocult darrere de les muntanyes i carenes del relleu local (DEM).
 
 ![Estats visuals de la trajectòria](examples/pas22/estats-trajectoria.png)
 
@@ -304,15 +304,10 @@ Projecta la trajectòria aparent de 24 hores cap endavant de qualsevol astre sel
 - `┄ ┄ ┄` **Lila clar puntejat:** Segment situat per sota de l'horitzó pla a 0°.
 - `┈ ┈ ┈` **Ambre puntejat:** Dades insuficients de perfil DEM.
 
-| Alba sobre el relleu oriental | Posta darrere les serralades |
-| :---: | :---: |
-| ![Alba sobre relleu](evidencies/pas22/alba.png) | ![Posta darrere muntanyes](evidencies/pas22/puesta.png) |
-| *Etiqueta compacta d'alba amb traç subterrani.* | *Línia discontínua lila travessant el relleu 3D.* |
-
-| Perspectiva panoràmica completa | Comparació Horitzó Real vs. Pla 0° |
-| :---: | :---: |
-| ![Trajectòria completa](evidencies/pas22/trajectoria-completa.png) | ![Comparació d'horitzons](examples/pas22/comparacio-horitzons.png) |
-| *Vista general en zoom-out amb caiguda a l'horitzó.* | *Impacte del relleu avançant la posta i retardant l'alba.* |
+| Enquadrament panoràmic complet: Trajectòria de 24h a la nit amb Alba i Posta simultànies |
+| :---: |
+| ![Trajectòria completa de 24h amb etiquetes d'alba i posta](evidencies/pas22/trajectoria-completa.png) |
+| *Vista general nocturna en gran angular (FOV 115°) amb la Lluna en culminació meridional. En un únic enquadrament s'observa l'arc sencer de 24h, l'etiqueta d'Alba (`↑ Alba 17:00:27 · Az 126.5°`) a l'est, la de Posta (`↓ Posta 01:49:19 · Az 234.9°`) a l'oest i el traçat discontinu lila penetrant sota la línia de carena de les muntanyes.* |
 
 ### 8.3. Com funciona per dins: Refinament de Creuaments per Bisecció
 
@@ -441,9 +436,14 @@ Les línies visibles són un **traçat visual de referència**, no fronteres ni 
 4. Podeu reanomenar, eliminar, desfer i refer durant la sessió. El document es desa entre reinicis, però l'historial de desfer/refer no.
 5. **Mostrar totes** només canvia la visibilitat del catàleg i no modifica les figures pròpies.
 
+| Constel·lació personalitzada sencera aïllada | Catàleg oficial de constel·lacions (Zoom-out complet) |
+| :---: | :---: |
+| ![Constel·lació personalitzada sencera](evidencies/pas23/edicio-i-visibilitat.png) | ![Catàleg de constel·lacions en zoom-out](evidencies/pas23/constellacio-amb-trajectoria.png) |
+| *Figura pròpia («Triangle d'Estiu propi») en verd maragda (`#6ee7a8`) visualitzada sencera i amb marges confortables sobre la Via Làctia, sense altres constel·lacions actives.* | *Panoràmica de la volta celeste en zoom-out màxim (FOV 115°) mostrant la xarxa de constel·lacions de referència en blanc (Cygnus, Aquila, Pegasus, Sagittarius, Hercules...) sense constel·lacions d'usuari.* |
+
 El traçat de referència deriva de d3-celestial sota BSD-3-Clause. L'avís complet, el commit i els fitxers d'origen consten a [THIRD-PARTY.md](../THIRD-PARTY.md).
 
-**Pas d'origen:** [Pas 23 — Constel·lacions](tasques/pendent/pas23-constellacions.md).
+**Pas d'origen:** [Pas 23 — Constel·lacions](tasques/completat/pas23-constellacions.md).
 
 ---
 
@@ -453,6 +453,7 @@ El traçat de referència deriva de d3-celestial sota BSD-3-Clause. L'avís comp
 | :--- | :--- | :--- |
 | `Esc` | Allibera seguiment de càmera / Tanca diàlegs / Retorna a Ull nu | Global |
 | `W`, `A`, `S`, `D` | Desplaçament de càmera endavant, esquerra, enrere, dreta | Mode Caminar / Avió |
+| `F` | Intercanvi entre mode caminar i mode avió | Mode Caminar / Avió |
 | `Espai` | Pausa / Reprèn el rellotge de simulació temporal | Global |
 | `Ctrl + Z` | Desfer la darrera mesura o edició | Eines de mesura |
 | `Ctrl + Y` / `Ctrl + Shift + Z` | Refer la darrera mesura desfeta | Eines de mesura |

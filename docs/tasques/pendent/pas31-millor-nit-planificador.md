@@ -29,7 +29,7 @@ Completar la vertical de «“el millor d'aquesta nit” i planificador» de pun
 
 **Depèn de:**
 - [Pas 22 — Trajectòries i visibilitat sobre l'horitzó real](../completat/pas22-trajectories-visibilitat.md)
-- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](pas23-constellacions.md)
+- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](../completat/pas23-constellacions.md)
 
 **En depenen:**
 - [Pas 33 — Cercador d'objectes i efemèrides](pas33-cercador-objectes-efemerides.md)

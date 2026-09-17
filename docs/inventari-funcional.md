@@ -23,6 +23,7 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 | Òptica i observació instrumental | [`ObservationModeController.ts`](../frontend/src/application/ObservationModeController.ts), [`observation_coordinator.py`](../backend/src/terralab3d/application/observation_coordinator.py) i [Pas 19](tasques/completat/pas19-modes-optics.md) | Modes `eye/camera/telescope`, overlays retinguts, fotometria V1, perfils persistents, GoTo i Gaia profunda cancel·lable. |
 | Eines de mesura esfèrica | [Pas 21](tasques/completat/pas21-eines-mesura.md) | Quatre eines esfèriques editables (regla, quadrat, rectangle, cercle), historial undo/redo, batches retinguts, labels projectats i persistència versionada. |
 | Trajectòries i visibilitat sobre l'horitzó real | [Pas 22](tasques/completat/pas22-trajectories-visibilitat.md) | Trajectòries temporals d'objectes observables (cossos solars, satèl·lits, estrelles, cel profund, coordenades), classificació contra relleu real (DEM) i astronòmic, creuaments refinats, marcadors temporals, homologació visual en navegador i evidències. |
+| Constel·lacions IAU, figures pròpies i estil d'overlays | [Pas 23](tasques/completat/pas23-constellacions.md) | Catàleg immutable de 88 constel·lacions IAU, Serpens desconnectada, cerca i seguiment del centre amb el Pas 22, snapping i edició d'usuari (16 px CSS), persistència atòmica `constellations.v1.json` i estil compartit `OverlayLineStyle` de nucli definit i halo subtil per a constel·lacions, mesures, NGC i trajectòries. |
 
 ## Capacitats parcials
 

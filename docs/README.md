@@ -6,7 +6,7 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Següent pas executable: [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](tasques/pendent/pas23-constellacions.md).**
+> **Següent pas executable: [Pas 24 — Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md).**
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README, seguir el punter anterior i executar només el primer pas que encara no compleixi el seu criteri de sortida.
 
@@ -56,6 +56,7 @@ Estats admesos:
 | 21 | [Eines de mesura esfèrica](tasques/completat/pas21-eines-mesura.md) | `completat` |
 | 22 | [Trajectòries i visibilitat sobre l'horitzó real](tasques/completat/pas22-trajectories-visibilitat.md) | `completat` |
 | 22.5 | [Normalització de la documentació viva](tasques/completat/pas22.5-normalitzacio-documental.md) | `completat` |
+| 23 | [Constel·lacions IAU, traçat de referència i documents d'usuari](tasques/completat/pas23-constellacions.md) | `completat` |
 
 La numeració decimal és històrica; els passos 1–16 i els seus subpassos no es renumeren.
 
@@ -65,7 +66,6 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 23 | [Constel·lacions IAU, traçat de referència i documents d'usuari](tasques/pendent/pas23-constellacions.md) | `en curs` | 6, 13, 22, 22.5 |
 | 24 | [Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 8.6, 12 |
 | 25 | [Gestor de capes Cel/Terra](tasques/pendent/pas25-gestor-capes.md) | `pendent` | 24 |
 | 26 | [Vista de recursos del Sistema Solar](tasques/pendent/pas26-recursos-sistema-solar.md) | `parcial` | 24, 25 |

@@ -23,7 +23,7 @@ Adoptar l'estructura obligatòria `docs/tasques/{pendent,completat,idees-per-mad
 - Cap pas previ.
 
 **En depenen:**
-- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](../pendent/pas23-constellacions.md)
+- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](pas23-constellacions.md)
 
 ## Codi existent a reutilitzar
 

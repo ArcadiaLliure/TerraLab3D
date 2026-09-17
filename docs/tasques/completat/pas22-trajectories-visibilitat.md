@@ -30,7 +30,7 @@ Connectar l'objecte observable seleccionat amb el mostreig d'altura/azimut, el p
 - [Pas 15 — Elevació real, perfil d'horitzó i oclusió](pas15.md)
 
 **En depenen:**
-- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](../pendent/pas23-constellacions.md)
+- [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](pas23-constellacions.md)
 - [Pas 31 — “El millor d'aquesta nit” i planificador](../pendent/pas31-millor-nit-planificador.md)
 - [Pas 32 — Motor general d'efemèrides](../pendent/pas32-motor-efemerides.md)
 - [Pas 38 — Homologació final, recuperació i rendiment](../pendent/pas38-homologacio-final.md)
@@ -89,12 +89,8 @@ S'han verificat tant les proves automatitzades com l'homologació visual interac
 - [x] **Regressió backend:** 165 proves superades a la suite de tests Python (`pytest backend/tests`).
 - [x] **Frontend i contractes:** [`trajectory_visibility_step22.test.ts`](../../../frontend/src/tests/trajectory_visibility_step22.test.ts) (16 proves superades).
 - [x] **Compilació i tipus:** `npm run typecheck` superat sense cap incidència.
-- [x] **Homologació visual en navegador real (Chromium headless a 1440×900):**
-  - [x] [Alba sobre el relleu oriental](../../evidencies/pas22/alba.png): sortida centrada a les carenes amb etiqueta de sortida més compacta `↑ Alba` i traça subterrània.
-  - [x] [Posta sobre les muntanyes](../../evidencies/pas22/puesta.png): posta de Sol amb línia discontínua lila travessant de forma contínua tot el cos de les muntanyes sense talls i etiqueta compacta `↓ Posta`.
-  - [x] [Trajectòria completa general amb zoom-out](../../evidencies/pas22/trajectoria-completa.png): perspectiva panoràmica (FOV 95°) mostrant la identificació de l'astre ("Sol") al HUD amb estat de seguiment actiu (`Seguint ✓`), l'astre centrat a la càmera i la caiguda diagonal de la línia cap a l'horitzó.
-  - [x] [Horitzó astronòmic 0°](../../evidencies/pas22/astronomical-horizon.png): posta i sortida a l'horitzó pla en desactivar el terreny a Topografia.
-  - [x] [Etiquetes invariants al zoom](../../evidencies/pas22/time-marker-and-labels.png): caixes d'esdeveniments amb alçada constant i compacta de 16 px de pantalla invariant al camp de visió.
+- [x] **Homologació visual en navegador real (Chromium a 2560×1305 / 1920×1080):**
+  - [x] [Trajectòria completa general panoràmica (Alba i Posta simultànies)](../../evidencies/pas22/trajectoria-completa.png): perspectiva panoràmica nocturna en gran angular (FOV 115°) amb la Lluna culminant al sud, mostrant en un mateix enquadrament l'arc sencer de 24h, l'etiqueta d'Alba a l'est, la de Posta a l'oest i el traçat discontinu lila sota la línia de carena de les muntanyes.
 - [x] **Neteja i cicle de vida:** desactivació de la trajectòria restablint l'estat a `Inactiva` i alliberant geometries, amb `browserErrors: []`.
 
 ## Fora d'abast
