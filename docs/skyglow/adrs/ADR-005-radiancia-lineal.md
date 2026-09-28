@@ -1,6 +1,6 @@
 # ADR-005 — Radiància lineal com a moneda
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
