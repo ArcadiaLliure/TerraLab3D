@@ -1,76 +1,74 @@
 # Pas 23.66 — Skyglow físic — terreny, horitzó i curvatura al kernel
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.59 i Pas 23.51
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Integrar DEM real i curvatura amb visibilitat binària per raig.
+
+## Descripció funcional
+
+Trunca observer→sky i oculta source→P sense transparència artificial.
 
 ## Fonts a consultar
 
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`02-arquitectura-integracio.md`](../../skyglow/02-arquitectura-integracio.md), [`08-validacio-cientifica.md`](../../skyglow/08-validacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
 
 ## Objectiu
 
 Integrar DEM real i curvatura amb visibilitat binària per raig.
 
-## Descripció funcional
+## Dependències
 
-Trunca observer→sky i oculta source→P sense transparència de muntanya.
+**Depèn de:**
+- [Pas 23.59](pas23.59-radiance-patch-quadtree.md)
+- [Pas 23.51](pas23.51-kernel-geometric.md)
 
-## Abast
+**En depenen:**
+- [Pas 23.67](pas23.67-cache-error-based.md)
 
-Reutilitzar geodèsia/DEM actual, elevacions font/observer, partial region visibility.
+## Codi existent a reutilitzar
+
+- DEM/horitzó/geodèsia existents per visibilitat i coordenades.
+- `domain/atmosphere`, `domain/light_pollution` i bridge actuals.
+- Caches existents només com a infraestructura; no confondre-les amb `PropagationCacheEntry`.
+
+## Flux tècnic
+
+Observer/source/ECEF + DEM authority → ray visibility → `V∈{0,1}` i `s_terrain`.
+
+## Errors, cancel·lació i recursos
+
+- Discontinuïtats invaliden abans de qualsevol linealització.
+- Resultats obsolets es descarten i l'últim resultat vàlid es conserva segons política.
+- Risc: Cost DEM source→P.
+- Rollback: Acceleració conservadora; mai smoothing d'oclusió.
+
+## Tasques
+
+- [ ] Implementar només l'abast d'aquest pas.
+- [ ] Afegir unitats, versions i procedència.
+- [ ] Afegir proves de discontinuïtats i casos límit.
+- [ ] Executar benchmark/validació indicats.
+- [ ] Actualitzar documentació viva segons evidència.
+
+## Criteri de sortida
+
+muntanya sintètica, font parcial i font llunyana amb curvatura. Cost de visibilitat per patch/node. La decisió queda traçable i reproduïble.
+
+## Proves i evidències obligatòries
+
+- [ ] muntanya sintètica, font parcial i font llunyana amb curvatura.
+- [ ] Cost de visibilitat per patch/node.
+- [ ] Evidència sota `docs/evidencies/pas23.66/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
-Refracció atmosfèrica.
+Refracció atmosfèrica geomètrica.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-terrain/horizon integration, tests.
+Observer/source/ECEF + DEM authority → ray visibility → `V∈{0,1}` i `s_terrain`. No converteixis aproximacions de cache o renderer en física del kernel.
 
-## Contractes
+## Treball pendent
 
-`TerrainVisibility`/revision.
-
-## Implementació
-
-Mateixa convenció WGS84/ECEF/topocèntrica que projecte.
-
-## Proves i comprovacions
-
-muntanya sintètica, font parcial, Earth curvature far source.
-
-## Benchmark / rendiment
-
-cost visibility per patch/node.
-
-## Criteris d'acceptació
-
-- [ ] Flip visible↔occluded determinista.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-debug plots i tests. Les evidències noves s'han de desar sota `docs/evidencies/pas23.66/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Cost DEM source→P.
-
-## Rollback
-
-Acceleració conservadora; mai smoothing d'oclusió.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
