@@ -1,76 +1,75 @@
 # Pas 23.51 — Skyglow físic — esquelet geomètric del PropagationKernel
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.50
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Crear el kernel únic, geometria LOS, `s_max` i contractes de radiància sense scattering real.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Crear el kernel únic, geometria LOS i `s_max` sense scattering real.
 
 ## Descripció funcional
 
-Estableix la frontera física comuna per zenit i cúpules.
+Estableix la frontera comuna per zenit i cúpules.
 
-## Abast
+## Fonts a consultar
 
-Observer, DirectionSet, source point fixture, segments, curvatura bàsica i resultat.
+- [`docs/skyglow/README.md`](../../skyglow/README.md) i documents especialitzats del dossier.
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- Fonts primàries de [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) quan el pas toca física o dades.
+
+## Objectiu
+
+Crear el kernel únic, geometria LOS i `s_max` sense scattering real.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.50](pas23.50-skyglow-b0.md)
+
+**En depenen:**
+- [Pas 23.52](pas23.52-rayleigh-hg-b1a.md)
+- [Pas 23.66](pas23.66-terrain-curvature.md)
+- [Pas 23.69](pas23.69-dome-profile-pchip.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` com a namespace de domini existent, sense donar-ne per implementada la nova física.
+- `backend/src/terralab3d/domain/atmosphere/`, `domain/horizon/`, `domain/terrain/` i adaptador DEM quan pertoqui.
+- `frontend/src/bridge/`, `frontend/src/contracts/`, `AtmosphereRenderer.ts` i `skyShader.ts` només quan el pas arriba al frontend.
+
+## Flux tècnic
+
+Observer+DirectionSet+Source fixture → LOS → segments → resultat; 90° usa exactament la mateixa ruta.
+
+## Errors, cancel·lació i recursos
+
+- Resultats obsolets es descarten per revisió; cap càlcul llarg bloqueja el render thread.
+- Fallbacks i dades absents es declaren amb procedència; no s'inventen valors.
+- Risc principal: Abstracció massa genèrica.
+- Rollback: Conservar B0 i retirar l'esquelet no connectat.
+
+## Tasques
+
+- [ ] Implementar només l'abast d'aquest pas amb contractes i unitats explícites.
+- [ ] Afegir instrumentació i procedència necessàries.
+- [ ] Integrar cancel·lació/revisions obsoletes quan hi hagi treball asíncron.
+- [ ] Executar proves i benchmark indicats.
+- [ ] Actualitzar inventari, README i evidències només segons estat real.
+
+## Criteri de sortida
+
+Reexecutar B0 amb l'esquelet real. zenit com direcció ordinària, geometria esfèrica, unitats i cancel·lació. El resultat queda reproduïble i no anticipa capacitats posteriors.
+
+## Proves i evidències obligatòries
+
+- [ ] zenit com direcció ordinària, geometria esfèrica, unitats i cancel·lació.
+- [ ] Reexecutar B0 amb l'esquelet real.
+- [ ] Guardar JSON/CSV/plots o golden data sota `docs/evidencies/pas23.51/` quan s'executi.
+- [ ] Executar `tools/validate_docs.py` i regressions afectades abans de completar.
 
 ## Fora d'abast
 
-Espectre, aerosols, gasos, clouds, renderer.
+Espectre, aerosols, gasos, núvols i renderer.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-`domain/light_pollution` i/o nou subpaquet coherent amb arquitectura; tests.
+Observer+DirectionSet+Source fixture → LOS → segments → resultat; 90° usa exactament la mateixa ruta. No redissenyar decisions congelades del dossier; si una hipòtesi de benchmark falla, registrar l'evidència i proposar un ADR de substitució.
 
-## Contractes
+## Treball pendent
 
-`PropagationRequest`, `PropagationResult`, `DirectionSample`.
-
-## Implementació
-
-Una sola ruta d'avaluació per qualsevol direcció; 90° no té codi especial.
-
-## Proves i comprovacions
-
-Zenit com direcció ordinària; unitats; geometria esfèrica; cancel·lació.
-
-## Benchmark / rendiment
-
-Reexecutar B0 amb kernel real i comparar overhead.
-
-## Criteris d'acceptació
-
-- [ ] No existeix cap solver zenital separat.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-Tests, perfil de cost i diagrama de crides. Les evidències noves s'han de desar sota `docs/evidencies/pas23.51/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Abstracció massa genèrica.
-
-## Rollback
-
-Conservar harness B0 i retirar només l'esquelet no connectat.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar totes les tasques, proves i evidències abans de moure aquest document a `completat/`.
