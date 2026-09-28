@@ -16,18 +16,19 @@ Hi haurà un únic `PropagationKernel`. Zenit, direccions arbitràries i cúpule
 
 ## Ordre de lectura
 
-1. `01-especificacio-algorismes.md`: física, matemàtiques i pipeline complet.
-2. `02-arquitectura-integracio.md`: encaix amb el codi real de TerraLab3D.
-3. `03-pipeline-python-typescript-threejs.md`: recorregut executable backend → bridge → frontend → GPU.
-4. `04-justificacio-cientifica.md`: bibliografia, fets publicats i separació respecte de decisions pròpies.
-5. `05-disseny-tecnic.md`: TDD, responsabilitats, fallades, observabilitat i alternatives.
-6. `06-contractes-dades.md`: contractes canònics Python/TypeScript i unitats.
-7. `07-benchmark-b0-b7.md`: protocol de benchmark obligatori.
-8. `08-validacio-cientifica.md`: validació numèrica, espectral, atmosfèrica, all-sky i contra mesures.
-9. `09-incertesa-proveniencia.md`: pressupostos d'error, correlació i cache validity.
-10. `10-datasets-llicencies.md`: dades, drets, checksums i actualització.
-11. `11-riscs.md`, `12-glossari-unitats.md`, `13-debug.md`, `14-migracio.md`, `15-tracabilitat.md`.
-12. `adrs/`: decisions arquitectòniques.
+1. `00-inventari-repositori.md`: estat real del codi i punts d'integració.
+2. `01-especificacio-algorismes.md`: física, matemàtiques i pipeline complet.
+3. `02-arquitectura-integracio.md`: encaix amb el codi real de TerraLab3D.
+4. `03-pipeline-python-typescript-threejs.md`: recorregut executable backend → bridge → frontend → GPU.
+5. `04-justificacio-cientifica.md`: bibliografia, fets publicats i separació respecte de decisions pròpies.
+6. `05-disseny-tecnic.md`: TDD, responsabilitats, fallades, observabilitat i alternatives.
+7. `06-contractes-dades.md`: contractes canònics Python/TypeScript i unitats.
+8. `07-benchmark-b0-b7.md`: protocol de benchmark obligatori.
+9. `08-validacio-cientifica.md`: validació numèrica, espectral, atmosfèrica, all-sky i contra mesures.
+10. `09-incertesa-proveniencia.md`: pressupostos d'error, correlació i cache validity.
+11. `10-datasets-llicencies.md`: dades, drets, checksums i actualització.
+12. `11-riscs.md`, `12-glossari-unitats.md`, `13-debug.md`, `14-migracio.md`, `15-tracabilitat.md`, `16-auditoria.md` i `17-bibliografia.md`.
+13. `adrs/`: decisions arquitectòniques.
 
 ## Decisions congelades
 
