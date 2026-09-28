@@ -1,76 +1,73 @@
 # Pas 23.71 — Skyglow físic — modes diagnòstics i observabilitat
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.70
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Connectar els modes de depuració definits al dossier.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Connectar modes de depuració per fonts, LOS, tiles, fase, cache i incertesa.
 
 ## Descripció funcional
 
-Fa inspeccionables fonts, LOS, tiles, fase, cache i incertesa.
+Fa inspeccionable cada component sense alterar la física.
 
-## Abast
+## Fonts a consultar
 
-UI/dev toggles, fals color i telemetria.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`03-pipeline-python-typescript-threejs.md`](../../skyglow/03-pipeline-python-typescript-threejs.md), [`07-benchmark-b0-b7.md`](../../skyglow/07-benchmark-b0-b7.md) i [`08-validacio-cientifica.md`](../../skyglow/08-validacio-cientifica.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+
+## Objectiu
+
+Connectar modes de depuració per fonts, LOS, tiles, fase, cache i incertesa.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.70](pas23.70-three-renderer.md)
+
+**En depenen:**
+- [Pas 23.74](pas23.74-b7-homologacio-skyglow.md)
+
+## Codi existent a reutilitzar
+
+- `frontend/src/view/three/AtmosphereRenderer.ts` i `shaders/skyShader.ts` com a camí legacy a migrar, no com a física de referència.
+- `frontend/src/bridge/`, `frontend/src/contracts/scene.ts` i recursos retinguts.
+- Backend skyglow construït als passos anteriors.
+
+## Flux tècnic
+
+debug request → payload compacte → visualització fals color/overlay → telemetria.
+
+## Errors, cancel·lació i recursos
+
+- Resultats obsolets no arriben a escena; uploads i recursos tenen propietari/dispose.
+- Comparacions científiques es fan abans de tone mapping.
+- Risc: El debug altera timing o memòria.
+- Rollback: Toggles desactivats.
+
+## Tasques
+
+- [ ] Implementar només l'abast d'aquest pas.
+- [ ] Afegir revisions, observabilitat i lifecycle.
+- [ ] Afegir proves de contracte i casos límit.
+- [ ] Executar benchmark/validació indicats.
+- [ ] Actualitzar README, inventari, MANUAL només si canvia comportament observable.
+
+## Criteri de sortida
+
+toggle cleanup, no leak, revisions obsoletes i debug OFF sense payload massiu. Overhead debug OFF i ON. El resultat queda documentat amb evidència reproduïble.
+
+## Proves i evidències obligatòries
+
+- [ ] toggle cleanup, no leak, revisions obsoletes i debug OFF sense payload massiu.
+- [ ] Overhead debug OFF i ON.
+- [ ] Evidència sota `docs/evidencies/pas23.71/`.
+- [ ] `tools/validate_docs.py`, tests backend/frontend i regressions afectades en verd.
 
 ## Fora d'abast
 
-Cap canvi de física.
+Cap canvi de física o calibratge.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-frontend debug UI + backend debug payloads.
+debug request → payload compacte → visualització fals color/overlay → telemetria. No eliminar el fallback legacy abans que el pas de tancament ho autoritzi amb evidència.
 
-## Contractes
+## Treball pendent
 
-Debug DTOs versionats.
-
-## Implementació
-
-No enviar dades massives si no s'activa el mode.
-
-## Proves i comprovacions
-
-Toggle cleanup, no leak, revisions obsoletes.
-
-## Benchmark / rendiment
-
-Overhead debug OFF pràcticament nul; debug ON mesurat.
-
-## Criteris d'acceptació
-
-- [ ] Cada component físic té una vista diagnòstica útil.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-captures i perf logs. Les evidències noves s'han de desar sota `docs/evidencies/pas23.71/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Debug altera timing.
-
-## Rollback
-
-Toggles desactivats.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
