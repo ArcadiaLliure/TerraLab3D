@@ -1,76 +1,74 @@
 # Pas 23.55 — Skyglow físic — RSR real NOAA-20/J1
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.54
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Incorporar repositori/loader de RSR amb provenance i checksum sense empaquetar el ZIP si la redistribució no és verificada.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Incorporar loader/repository de RSR amb procedència i checksum sense assumir redistribució.
 
 ## Descripció funcional
 
-Elimina aproximacions centre/FWHM/rectangle.
+Elimina aproximacions per centre, FWHM o rectangle.
 
-## Abast
+## Fonts a consultar
 
-NOAA-20/J1 DNB band-averaged; fixture mínima legal.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`10-datasets-llicencies.md`](../../skyglow/10-datasets-llicencies.md).
+
+## Objectiu
+
+Incorporar loader/repository de RSR amb procedència i checksum sense assumir redistribució.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.54](pas23.54-spectral-bandset-b2a.md)
+
+**En depenen:**
+- [Pas 23.56](pas23.56-spectral-source-b2b.md)
+- [Pas 23.57](pas23.57-viirs-adapter.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` i ports/adaptadors actuals.
+- `backend/src/terralab3d/infrastructure/adapters/dem/adapter.py` quan hi hagi geometria/ràster.
+- Contractes/bridge existents; no crear un segon canal paral·lel.
+
+## Flux tècnic
+
+recurs NOAA → validació λ/RSR → `ViirsSpectralResponse` → integració de normalització.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes tenen estat explícit i procedència.
+- Resultats tardans es descarten; recursos grans no es dupliquen pel bridge.
+- Risc: Drets de redistribució del ZIP.
+- Rollback: Descàrrega externa obligatòria.
+
+## Tasques
+
+- [ ] Implementar contractes i transformacions d'aquest pas.
+- [ ] Afegir unitats, versions i procedència.
+- [ ] Afegir proves numèriques/fixtures.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+sanity checks dels paràmetres NOAA-20 i integral contra fixture. Mesurar cost de normalització offline; no entra al LOS. Cap capacitat posterior queda marcada com a implementada.
+
+## Proves i evidències obligatòries
+
+- [ ] sanity checks dels paràmetres NOAA-20 i integral contra fixture.
+- [ ] Mesurar cost de normalització offline; no entra al LOS.
+- [ ] Evidència reproduïble sota `docs/evidencies/pas23.55/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
-Detector-specific raw SDR si no cal.
+Detector-specific raw SDR si no és necessari a la primera vertical.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-recurs metadata, loader, tests, docs llicència.
+recurs NOAA → validació λ/RSR → `ViirsSpectralResponse` → integració de normalització. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
-## Contractes
+## Treball pendent
 
-`ViirsSpectralResponse`.
-
-## Implementació
-
-Validar λ ordenada, RSR no negativa i integració normalitzada segons convenció documentada.
-
-## Proves i comprovacions
-
-Paràmetres de control 694,8/499,1/890,5/391,4 nm com sanity checks, no com substitut de corba.
-
-## Benchmark / rendiment
-
-Cost de normalització offline, no runtime LOS.
-
-## Criteris d'acceptació
-
-- [ ] Cap normalització DNB usa rectangle.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-source URL, release, sha256, test integral. Les evidències noves s'han de desar sota `docs/evidencies/pas23.55/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Drets de redistribució.
-
-## Rollback
-
-Descàrrega externa obligatòria.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
