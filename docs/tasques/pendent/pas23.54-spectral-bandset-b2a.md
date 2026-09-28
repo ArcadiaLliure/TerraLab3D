@@ -1,76 +1,75 @@
 # Pas 23.54 — Skyglow físic — infraestructura espectral i benchmark B2a
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.52
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Introduir `SpectralBandSet`/`BandRadiance` sense fixar 8 bandes.
+
+## Descripció funcional
+
+Vectoritza la física en 1/2/4/8 bandes.
 
 ## Fonts a consultar
 
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
+- [`docs/skyglow/README.md`](../../skyglow/README.md) i documents especialitzats del dossier.
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- Fonts primàries de [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) quan el pas toca física o dades.
 
 ## Objectiu
 
 Introduir `SpectralBandSet`/`BandRadiance` sense fixar 8 bandes.
 
-## Descripció funcional
+## Dependències
 
-Vectoritza la física en 1/2/4/8 bandes i mesura escalat.
+**Depèn de:**
+- [Pas 23.52](pas23.52-rayleigh-hg-b1a.md)
 
-## Abast
+**En depenen:**
+- [Pas 23.55](pas23.55-viirs-rsr.md)
+- [Pas 23.60](pas23.60-optical-field.md)
+- [Pas 23.63](pas23.63-gas-b4.md)
 
-Band sets sintètics, Rayleigh espectral, B2a.
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` com a namespace de domini existent, sense donar-ne per implementada la nova física.
+- `backend/src/terralab3d/domain/atmosphere/`, `domain/horizon/`, `domain/terrain/` i adaptador DEM quan pertoqui.
+- `frontend/src/bridge/`, `frontend/src/contracts/`, `AtmosphereRenderer.ts` i `skyShader.ts` només quan el pas arriba al frontend.
+
+## Flux tècnic
+
+compartir geometria i tiles entre bandes; vectors identificats per `bandSetId`.
+
+## Errors, cancel·lació i recursos
+
+- Resultats obsolets es descarten per revisió; cap càlcul llarg bloqueja el render thread.
+- Fallbacks i dades absents es declaren amb procedència; no s'inventen valors.
+- Risc principal: Duplicar ray-march per banda.
+- Rollback: Conservar configuració d'una banda.
+
+## Tasques
+
+- [ ] Implementar només l'abast d'aquest pas amb contractes i unitats explícites.
+- [ ] Afegir instrumentació i procedència necessàries.
+- [ ] Integrar cancel·lació/revisions obsoletes quan hi hagi treball asíncron.
+- [ ] Executar proves i benchmark indicats.
+- [ ] Actualitzar inventari, README i evidències només segons estat real.
+
+## Criteri de sortida
+
+B2a `t(Nbands)` per 1/2/4/8. equivalència 1 banda, unitats i longituds de vector. El resultat queda reproduïble i no anticipa capacitats posteriors.
+
+## Proves i evidències obligatòries
+
+- [ ] equivalència 1 banda, unitats i longituds de vector.
+- [ ] B2a `t(Nbands)` per 1/2/4/8.
+- [ ] Guardar JSON/CSV/plots o golden data sota `docs/evidencies/pas23.54/` quan s'executi.
+- [ ] Executar `tools/validate_docs.py` i regressions afectades abans de completar.
 
 ## Fora d'abast
 
 RSR i priors SPD.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-models espectrals, càlculs vectoritzats, tests.
+compartir geometria i tiles entre bandes; vectors identificats per `bandSetId`. No redissenyar decisions congelades del dossier; si una hipòtesi de benchmark falla, registrar l'evidència i proposar un ADR de substitució.
 
-## Contractes
+## Treball pendent
 
-`SpectralBandSet`, `BandRadiance`.
-
-## Implementació
-
-Compartir geometria/tiles entre bandes.
-
-## Proves i comprovacions
-
-Mateix resultat per 1 banda equivalent; unitats i longitud de vectors.
-
-## Benchmark / rendiment
-
-B2a `t(Nbands)`.
-
-## Criteris d'acceptació
-
-- [ ] API independent del nombre de bandes i corba de cost disponible.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-CSV/plot B2a. Les evidències noves s'han de desar sota `docs/evidencies/pas23.54/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Duplicar ray-march per banda.
-
-## Rollback
-
-Conservar 1 banda.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar totes les tasques, proves i evidències abans de moure aquest document a `completat/`.
