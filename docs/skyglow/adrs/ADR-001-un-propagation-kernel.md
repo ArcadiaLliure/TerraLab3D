@@ -1,6 +1,6 @@
 # ADR-001 — Un únic PropagationKernel
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
