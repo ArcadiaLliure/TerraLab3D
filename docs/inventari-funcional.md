@@ -44,6 +44,7 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 
 | Capacitat | Estat actual | Pla |
 |---|---|---|
+| Skyglow físic VIIRS → atmosfera → cúpules | **Pendent; només especificació documental.** El Pas 7 observable continua sent el model Bortle/magnitud existent. | [Dossier skyglow](skyglow/README.md), [Pas 23.50](tasques/pendent/pas23.50-skyglow-b0.md)–[23.74](tasques/pendent/pas23.74-b7-homologacio-skyglow.md) |
 | Gestor de capes Cel/Terra | Pendent d'implementació | [Pas 25](tasques/pendent/pas25-gestor-capes.md) |
 | Plate solving i comparador foto/simulació | Pendent d'implementació | [Pas 30](tasques/pendent/pas30-plate-solving.md) |
 | “El millor d'aquesta nit” i planificador | Pendent d'implementació | [Pas 31](tasques/pendent/pas31-millor-nit-planificador.md) |
