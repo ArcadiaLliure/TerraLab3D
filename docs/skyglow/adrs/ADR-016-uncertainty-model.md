@@ -1,6 +1,6 @@
 # ADR-016 — Separar incertesa de predicció i de validesa de cache
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
