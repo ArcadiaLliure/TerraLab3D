@@ -6,7 +6,9 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Següent pas executable: [Pas 24 — Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md).**
+> **Següent pas executable: [Pas 23.50 — Skyglow físic: benchmark B0 i infraestructura de mesura](tasques/pendent/pas23.50-skyglow-b0.md).**
+>
+> El bloc 23.50–23.74 és un retrofit científic del Pas 7 incorporat el 2026-09-28. No invalida l'abast històric completat del Pas 7: introdueix una nova vertical física, encara pendent, documentada a [`skyglow/`](skyglow/README.md).
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README, seguir el punter anterior i executar només el primer pas que encara no compleixi el seu criteri de sortida.
 
@@ -58,7 +60,7 @@ Estats admesos:
 | 22.5 | [Normalització de la documentació viva](tasques/completat/pas22.5-normalitzacio-documental.md) | `completat` |
 | 23 | [Constel·lacions IAU, traçat de referència i documents d'usuari](tasques/completat/pas23-constellacions.md) | `completat` |
 
-La numeració decimal és històrica; els passos 1–16 i els seus subpassos no es renumeren.
+La numeració decimal és històrica; els passos existents no es renumeren. El bloc 23.50–23.74 s'ha inserit deliberadament entre 23 i 24 per prioritzar el retrofit físic de contaminació lumínica sense renumerar el backlog 24–38.
 
 Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha retirat de l'ordre executable i ara és un [dossier per madurar](tasques/idees-per-madurar/meteorologia.md); l'antic Pas 20 (simulació fotogràfica) ha estat absorbit pel Pas 19 (modes d'observació instrumental). La resta de passos conserven la numeració existent.
 
@@ -66,6 +68,31 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
+| 23.50 | [Skyglow físic — benchmark B0](tasques/pendent/pas23.50-skyglow-b0.md) | `pendent` | 7, 22.5, 23 |
+| 23.51 | [PropagationKernel geomètric](tasques/pendent/pas23.51-kernel-geometric.md) | `pendent` | 23.50 |
+| 23.52 | [Rayleigh + HG i B1a](tasques/pendent/pas23.52-rayleigh-hg-b1a.md) | `pendent` | 23.51 |
+| 23.53 | [Forward AD i B1b](tasques/pendent/pas23.53-forward-ad-b1b.md) | `pendent` | 23.52 |
+| 23.54 | [Infraestructura espectral i B2a](tasques/pendent/pas23.54-spectral-bandset-b2a.md) | `pendent` | 23.52 |
+| 23.55 | [RSR real NOAA-20/J1](tasques/pendent/pas23.55-viirs-rsr.md) | `pendent` | 23.54 |
+| 23.56 | [SpectralSourceModel i B2b](tasques/pendent/pas23.56-spectral-source-b2b.md) | `pendent` | 23.55 |
+| 23.57 | [Adaptador VIIRS/VNL/Black Marble](tasques/pendent/pas23.57-viirs-adapter.md) | `pendent` | 23.55 |
+| 23.58 | [EmissionRegion i watershed](tasques/pendent/pas23.58-emission-region-watershed.md) | `pendent` | 23.57 |
+| 23.59 | [RadiancePatch i quadtree](tasques/pendent/pas23.59-radiance-patch-quadtree.md) | `pendent` | 23.58 |
+| 23.60 | [OpticalField tiled](tasques/pendent/pas23.60-optical-field.md) | `pendent` | 23.54 |
+| 23.61 | [PhaseFunction i aerosol fallback](tasques/pendent/pas23.61-phase-aerosol-library.md) | `pendent` | 23.52, 23.60 |
+| 23.62 | [Benchmark Legendre B3](tasques/pendent/pas23.62-legendre-b3.md) | `pendent` | 23.61 |
+| 23.63 | [Absorció gasosa B4](tasques/pendent/pas23.63-gas-b4.md) | `pendent` | 23.54, 23.60 |
+| 23.64 | [AtmosphericOpticsProvider estàndard](tasques/pendent/pas23.64-atmos-provider-standard.md) | `pendent` | 23.60, 23.61, 23.63 |
+| 23.65 | [Providers ERA5/CAMS](tasques/pendent/pas23.65-atmos-provider-era5-cams.md) | `pendent` | 23.64 |
+| 23.66 | [Terreny i curvatura al kernel](tasques/pendent/pas23.66-terrain-curvature.md) | `pendent` | 23.59, 23.51 |
+| 23.67 | [Cache error-based](tasques/pendent/pas23.67-cache-error-based.md) | `pendent` | 23.53, 23.60, 23.66 |
+| 23.68 | [Incertesa i provenance](tasques/pendent/pas23.68-uncertainty-registry.md) | `pendent` | 23.56, 23.65, 23.67 |
+| 23.69 | [DomeProfile i PCHIP](tasques/pendent/pas23.69-dome-profile-pchip.md) | `pendent` | 23.51, 23.59, 23.67 |
+| 23.70 | [Renderer Three.js lineal](tasques/pendent/pas23.70-three-renderer.md) | `pendent` | 23.69 |
+| 23.71 | [Modes diagnòstics](tasques/pendent/pas23.71-debug-modes.md) | `pendent` | 23.70 |
+| 23.72 | [Validació TESS/SQM/all-sky](tasques/pendent/pas23.72-ground-truth-validation.md) | `pendent` | 23.69, 23.65, 23.68 |
+| 23.73 | [Núvols single-scattering i B6](tasques/pendent/pas23.73-clouds-b6.md) | `pendent` | 23.65, 23.61, 23.63 |
+| 23.74 | [B7 FULL i homologació skyglow](tasques/pendent/pas23.74-b7-homologacio-skyglow.md) | `pendent` | 23.50–23.73 |
 | 24 | [Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 8.6, 12 |
 | 25 | [Gestor de capes Cel/Terra](tasques/pendent/pas25-gestor-capes.md) | `pendent` | 24 |
 | 26 | [Vista de recursos del Sistema Solar](tasques/pendent/pas26-recursos-sistema-solar.md) | `parcial` | 24, 25 |
