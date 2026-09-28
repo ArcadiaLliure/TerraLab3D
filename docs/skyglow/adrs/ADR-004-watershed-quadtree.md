@@ -1,6 +1,6 @@
 # ADR-004 — Watershed + quadtree intern
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
