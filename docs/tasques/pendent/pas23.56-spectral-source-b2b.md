@@ -1,76 +1,73 @@
 # Pas 23.56 — Skyglow físic — SpectralSourceModel, bases SPD i benchmark B2b
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.55
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Implementar base espectral normalitzada, priors i ensemble sense inferir SPD únic.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Implementar bases normalitzades, priors i ensemble sense inferir un SPD únic.
 
 ## Descripció funcional
 
-Separa escala DNB de composició espectral.
+Separa escala DNB i composició espectral.
 
-## Abast
+## Fonts a consultar
 
-Bases candidates LED/HPS/LPS/halogenur, `A_j`, `c_jf`, B2b.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`10-datasets-llicencies.md`](../../skyglow/10-datasets-llicencies.md).
+
+## Objectiu
+
+Implementar bases normalitzades, priors i ensemble sense inferir un SPD únic.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.55](pas23.55-viirs-rsr.md)
+
+**En depenen:**
+- [Pas 23.68](pas23.68-uncertainty-registry.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` i ports/adaptadors actuals.
+- `backend/src/terralab3d/infrastructure/adapters/dem/adapter.py` quan hi hagi geometria/ràster.
+- Contractes/bridge existents; no crear un segon canal paral·lel.
+
+## Flux tècnic
+
+`Φ_f` + pesos `c_jf` + RSR → `A_j` → `L_j,k,f`; vectorització per bases.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes tenen estat explícit i procedència.
+- Resultats tardans es descarten; recursos grans no es dupliquen pel bridge.
+- Risc: SPD sense llicència o prior massa rígid.
+- Rollback: Base sintètica mínima amb confiança baixa.
+
+## Tasques
+
+- [ ] Implementar contractes i transformacions d'aquest pas.
+- [ ] Afegir unitats, versions i procedència.
+- [ ] Afegir proves numèriques/fixtures.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+conservació d'energia, suma de pesos i absència de doble comptatge. B2b amb 1/2/3/5 bases. Cap capacitat posterior queda marcada com a implementada.
+
+## Proves i evidències obligatòries
+
+- [ ] conservació d'energia, suma de pesos i absència de doble comptatge.
+- [ ] B2b amb 1/2/3/5 bases.
+- [ ] Evidència reproduïble sota `docs/evidencies/pas23.56/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
-Biblioteca definitiva i calibratge regional.
+Biblioteca SPD definitiva o calibratge regional.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-SpectralBasisLibrary, source model, tests.
+`Φ_f` + pesos `c_jf` + RSR → `A_j` → `L_j,k,f`; vectorització per bases. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
-## Contractes
+## Treball pendent
 
-`SpectralBasis`, `SpectrumHint`, `SpectralSourceEstimate`.
-
-## Implementació
-
-Normalitzar `Φ`, pesos sumen 1, calcular `A_j` i `L_j,k,f` una sola vegada.
-
-## Proves i comprovacions
-
-Conservació d'energia, prior erroni dins DNB canvia escala, ensemble lineal.
-
-## Benchmark / rendiment
-
-B2b bases 1/2/3/5.
-
-## Criteris d'acceptació
-
-- [ ] No hi ha doble comptatge d'`A` o `c`.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-golden spectra i plot cost. Les evidències noves s'han de desar sota `docs/evidencies/pas23.56/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-SPD sense llicència.
-
-## Rollback
-
-Base sintètica mínima documentada.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
