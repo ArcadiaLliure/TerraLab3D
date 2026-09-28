@@ -1,76 +1,73 @@
 # Pas 23.62 — Skyglow físic — benchmark B3 de complexitat de fase
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.61
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Mesurar HG i Legendre 4/8/12/20 contra referència.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Mesurar HG i Legendre 4/8/12/20 contra una referència independent.
 
 ## Descripció funcional
 
-Converteix L en decisió basada en error↔cost.
+Converteix l'ordre L en decisió basada en error↔cost.
 
-## Abast
+## Fonts a consultar
 
-Escenaris forward scattering i atmosferes diverses.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`01-especificacio-algorismes.md`](../../skyglow/01-especificacio-algorismes.md), [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+
+## Objectiu
+
+Mesurar HG i Legendre 4/8/12/20 contra una referència independent.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.61](pas23.61-phase-aerosol-library.md)
+
+**En depenen:**
+- [Pas 23.74](pas23.74-b7-homologacio-skyglow.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/atmosphere/` i `domain/light_pollution/`.
+- `backend/src/terralab3d/infrastructure/adapters/` per fronteres externes.
+- Bridge i escena existents només quan calgui publicar resultats.
+
+## Flux tècnic
+
+mateixa geometria/nodes → variants de fase → error angular/radiomètric + temps.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes es declaren; cap fallback silenciós.
+- Dependències de tiles es registren durant la quadratura.
+- Risc: Referència inadequada.
+- Rollback: Mantenir L configurable.
+
+## Tasques
+
+- [ ] Implementar contractes i càlculs de l'abast.
+- [ ] Afegir procedència i versions.
+- [ ] Afegir proves numèriques.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+reference phase d'ordre alt o taula Mie/mesurada. B3 complet HG/L4/L8/L12/L20. El resultat és reproduïble i no fixa candidats sense evidència.
+
+## Proves i evidències obligatòries
+
+- [ ] reference phase d'ordre alt o taula Mie/mesurada.
+- [ ] B3 complet HG/L4/L8/L12/L20.
+- [ ] Evidència sota `docs/evidencies/pas23.62/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
 No fixa aerosol provider final.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-benchmark configs/results.
+mateixa geometria/nodes → variants de fase → error angular/radiomètric + temps. No traslladar detalls del proveïdor al `PropagationKernel`.
 
-## Contractes
+## Treball pendent
 
-Sense nous contractes.
-
-## Implementació
-
-Mateixa geometria i nodes per totes variants.
-
-## Proves i comprovacions
-
-Reference phase independent.
-
-## Benchmark / rendiment
-
-B3 complet.
-
-## Criteris d'acceptació
-
-- [ ] Informe cost/error; cap ordre declarat guanyador sense SLO.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-CSV/plots i decisió candidata. Les evidències noves s'han de desar sota `docs/evidencies/pas23.62/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Referència inadequada.
-
-## Rollback
-
-Mantenir L configurable.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
