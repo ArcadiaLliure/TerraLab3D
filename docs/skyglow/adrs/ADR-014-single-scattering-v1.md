@@ -1,6 +1,6 @@
 # ADR-014 — Single-scattering a la v1
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
