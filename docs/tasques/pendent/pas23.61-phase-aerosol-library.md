@@ -1,76 +1,76 @@
 # Pas 23.61 — Skyglow físic — PhaseFunction unificada i AerosolOpticsLibrary mínima
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.52 i Pas 23.60
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Substituir branques de fase per una representació comuna i preparar aerosol data project.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Unificar la fase i preparar la biblioteca aerosol amb HG com a fallback.
 
 ## Descripció funcional
 
-HG continua com fallback però entra al kernel a través del mateix contracte.
+El kernel consumeix una representació comuna independent de l'origen.
 
-## Abast
+## Fonts a consultar
 
-Legendre representation, provenance, HG→Legendre, fixtures Mie/tabulades si legals.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`01-especificacio-algorismes.md`](../../skyglow/01-especificacio-algorismes.md), [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+
+## Objectiu
+
+Unificar la fase i preparar la biblioteca aerosol amb HG com a fallback.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.52](pas23.52-rayleigh-hg-b1a.md)
+- [Pas 23.60](pas23.60-optical-field.md)
+
+**En depenen:**
+- [Pas 23.62](pas23.62-legendre-b3.md)
+- [Pas 23.64](pas23.64-atmos-provider-standard.md)
+- [Pas 23.73](pas23.73-clouds-b6.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/atmosphere/` i `domain/light_pollution/`.
+- `backend/src/terralab3d/infrastructure/adapters/` per fronteres externes.
+- Bridge i escena existents només quan calgui publicar resultats.
+
+## Flux tècnic
+
+model/taula/HG → coeficients Legendre normalitzats → `PhaseFunction` + provenance.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes es declaren; cap fallback silenciós.
+- Dependències de tiles es registren durant la quadratura.
+- Risc: Truncació amb lobes negatius.
+- Rollback: HG directe darrere del mateix contracte.
+
+## Tasques
+
+- [ ] Implementar contractes i càlculs de l'abast.
+- [ ] Afegir procedència i versions.
+- [ ] Afegir proves numèriques.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+HG directe vs expansió alta, cas isòtrop i normalització. Microbenchmark de fase. El resultat és reproduïble i no fixa candidats sense evidència.
+
+## Proves i evidències obligatòries
+
+- [ ] HG directe vs expansió alta, cas isòtrop i normalització.
+- [ ] Microbenchmark de fase.
+- [ ] Evidència sota `docs/evidencies/pas23.61/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
 Selecció definitiva d'aerosols.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-phase functions, aerosol library metadata.
+model/taula/HG → coeficients Legendre normalitzats → `PhaseFunction` + provenance. No traslladar detalls del proveïdor al `PropagationKernel`.
 
-## Contractes
+## Treball pendent
 
-`PhaseFunction`.
-
-## Implementació
-
-Normalització 4π, `a0=1`, `a1=g`; recurrència estable.
-
-## Proves i comprovacions
-
-HG directe vs expansió alta, isotropic case, positivity diagnostics.
-
-## Benchmark / rendiment
-
-Microbenchmark fase.
-
-## Criteris d'acceptació
-
-- [ ] Kernel no té switch Mie/HG per font.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-coefficients/plots. Les evidències noves s'han de desar sota `docs/evidencies/pas23.61/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Truncació pot crear lobes negatius.
-
-## Rollback
-
-HG directe només com implementació del contracte.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
