@@ -1,76 +1,73 @@
 # Pas 23.53 — Skyglow físic — forward AD geomètric i benchmark B1b
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.52
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Propagar `(B,dBx,dBy,dBz)` en la mateixa quadratura dins branques diferenciables.
+
+## Descripció funcional
+
+Mesura sensibilitats geomètriques per al cache.
 
 ## Fonts a consultar
 
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
+- [`docs/skyglow/README.md`](../../skyglow/README.md) i documents especialitzats del dossier.
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- Fonts primàries de [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) quan el pas toca física o dades.
 
 ## Objectiu
 
 Propagar `(B,dBx,dBy,dBz)` en la mateixa quadratura dins branques diferenciables.
 
-## Descripció funcional
+## Dependències
 
-Mesura el cost real de sensibilitats geomètriques abans d'usar-les al cache.
+**Depèn de:**
+- [Pas 23.52](pas23.52-rayleigh-hg-b1a.md)
 
-## Abast
+**En depenen:**
+- [Pas 23.67](pas23.67-cache-error-based.md)
 
-AD forward, terme de Leibniz, validació offline amb diferències finites.
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` com a namespace de domini existent, sense donar-ne per implementada la nova física.
+- `backend/src/terralab3d/domain/atmosphere/`, `domain/horizon/`, `domain/terrain/` i adaptador DEM quan pertoqui.
+- `frontend/src/bridge/`, `frontend/src/contracts/`, `AtmosphereRenderer.ts` i `skyShader.ts` només quan el pas arriba al frontend.
+
+## Flux tècnic
+
+forward-mode AD + terme de Leibniz; discontinuïtats invaliden i no es diferencien.
+
+## Errors, cancel·lació i recursos
+
+- Resultats obsolets es descarten per revisió; cap càlcul llarg bloqueja el render thread.
+- Fallbacks i dades absents es declaren amb procedència; no s'inventen valors.
+- Risc principal: Derivades incorrectes a `s_max`.
+- Rollback: AD OFF sense canviar el kernel base.
+
+## Tasques
+
+- [ ] Implementar només l'abast d'aquest pas amb contractes i unitats explícites.
+- [ ] Afegir instrumentació i procedència necessàries.
+- [ ] Integrar cancel·lació/revisions obsoletes quan hi hagi treball asíncron.
+- [ ] Executar proves i benchmark indicats.
+- [ ] Actualitzar inventari, README i evidències només segons estat real.
+
+## Criteri de sortida
+
+B1b vs B1a i `AD_overhead`. comparació amb diferències finites offline en casos suaus. El resultat queda reproduïble i no anticipa capacitats posteriors.
+
+## Proves i evidències obligatòries
+
+- [ ] comparació amb diferències finites offline en casos suaus.
+- [ ] B1b vs B1a i `AD_overhead`.
+- [ ] Guardar JSON/CSV/plots o golden data sota `docs/evidencies/pas23.53/` quan s'executi.
+- [ ] Executar `tools/validate_docs.py` i regressions afectades abans de completar.
 
 ## Fora d'abast
 
-Cap diferenciació d'oclusió/quadtree.
+Diferenciar oclusió, quadtree o canvis topològics.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-tipus dual/AD intern, tests, benchmark.
+forward-mode AD + terme de Leibniz; discontinuïtats invaliden i no es diferencien. No redissenyar decisions congelades del dossier; si una hipòtesi de benchmark falla, registrar l'evidència i proposar un ADR de substitució.
 
-## Contractes
+## Treball pendent
 
-`PropagationSensitivities`.
-
-## Implementació
-
-Activació per opció; mateix node GK calcula valor i derivades.
-
-## Proves i comprovacions
-
-Comparació central finite-difference offline en casos suaus; invalidació de casos discontinus.
-
-## Benchmark / rendiment
-
-B1b vs B1a, `AD_overhead`.
-
-## Criteris d'acceptació
-
-- [ ] Derivades concorden amb referència i overhead queda mesurat.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-Taula d'errors i overhead. Les evidències noves s'han de desar sota `docs/evidencies/pas23.53/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Derivades incorrectes a `s_max`.
-
-## Rollback
-
-AD OFF sense canviar kernel base.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar totes les tasques, proves i evidències abans de moure aquest document a `completat/`.
