@@ -332,3 +332,7 @@ Els datasets petits, obligatoris, versionats amb el producte i sense variants el
 - Empaquetat no significa acoblament al renderer: domini, carregador/índex i batches continuen separats.
 - GeoNames filtrat aplica aquest patró al [pas 37](tasques/pendent/pas37-geonames-empaquetat.md).
 - Un dataset futur només l'adopta si compleix tots els criteris; si té variants, mida material o decisió d'usuari, passa pel gestor central.
+
+## ADR 0006 i següents
+
+Les decisions especialitzades del sistema físic de contaminació lumínica es mantenen al [registre d'ADR de skyglow](skyglow/adrs/README.md). Aquest registre conserva la seva numeració pròpia existent (`ADR-001`…`ADR-016`) i **no es renumera** per encaixar-la en la sèrie transversal d'aquest document.
