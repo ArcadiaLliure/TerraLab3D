@@ -1,6 +1,6 @@
 # ADRs — sistema físic de skyglow
 
-Cada ADR té estat **Accepted for implementation** però no implica funcionalitat implementada. Canvis futurs requereixen superseding ADR, no edició silenciosa de la decisió històrica.
+Cada ADR té estat **Acceptada — implementació pendent** però no implica funcionalitat implementada. Canvis futurs requereixen superseding ADR, no edició silenciosa de la decisió històrica.
 
 - [ADR-001 — Un únic PropagationKernel](ADR-001-un-propagation-kernel.md)
 - [ADR-002 — Cúpules comprimides en lloc d'all-sky runtime](ADR-002-cupules-comprimides.md)
