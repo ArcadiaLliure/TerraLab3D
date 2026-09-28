@@ -1,6 +1,6 @@
 # ADR-002 — Cúpules comprimides en lloc d'all-sky runtime
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
