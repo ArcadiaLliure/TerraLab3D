@@ -1,76 +1,75 @@
 # Pas 23.52 — Skyglow físic — Rayleigh, aerosol HG fallback i benchmark B1a
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.51
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Afegir single-scattering mínim monocromàtic amb Rayleigh normalitzat i HG fallback.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Afegir single-scattering mínim monocromàtic amb Rayleigh i HG fallback.
 
 ## Descripció funcional
 
-Primera física completa source→P→observer amb extinció i scattering.
+Primera física source→P→observer.
 
-## Abast
+## Fonts a consultar
 
-1 banda, 1 base, AD OFF, atmosfera sintètica.
+- [`docs/skyglow/README.md`](../../skyglow/README.md) i documents especialitzats del dossier.
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- Fonts primàries de [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) quan el pas toca física o dades.
+
+## Objectiu
+
+Afegir single-scattering mínim monocromàtic amb Rayleigh i HG fallback.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.51](pas23.51-kernel-geometric.md)
+
+**En depenen:**
+- [Pas 23.53](pas23.53-forward-ad-b1b.md)
+- [Pas 23.54](pas23.54-spectral-bandset-b2a.md)
+- [Pas 23.61](pas23.61-phase-aerosol-library.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` com a namespace de domini existent, sense donar-ne per implementada la nova física.
+- `backend/src/terralab3d/domain/atmosphere/`, `domain/horizon/`, `domain/terrain/` i adaptador DEM quan pertoqui.
+- `frontend/src/bridge/`, `frontend/src/contracts/`, `AtmosphereRenderer.ts` i `skyShader.ts` només quan el pas arriba al frontend.
+
+## Flux tècnic
+
+calcular `E`, `Γ`, `dB` i integral LOS amb `T=exp(-τ)` i sense segon `1/r_PO²`.
+
+## Errors, cancel·lació i recursos
+
+- Resultats obsolets es descarten per revisió; cap càlcul llarg bloqueja el render thread.
+- Fallbacks i dades absents es declaren amb procedència; no s'inventen valors.
+- Risc principal: Confondre intensitat, irradiància i radiància.
+- Rollback: Feature flag del kernel físic.
+
+## Tasques
+
+- [ ] Implementar només l'abast d'aquest pas amb contractes i unitats explícites.
+- [ ] Afegir instrumentació i procedència necessàries.
+- [ ] Integrar cancel·lació/revisions obsoletes quan hi hagi treball asíncron.
+- [ ] Executar proves i benchmark indicats.
+- [ ] Actualitzar inventari, README i evidències només segons estat real.
+
+## Criteri de sortida
+
+B1a: 1 banda, 1 base, AD OFF. normalització 4π, positivitat, linealitat i transmissió. El resultat queda reproduïble i no anticipa capacitats posteriors.
+
+## Proves i evidències obligatòries
+
+- [ ] normalització 4π, positivitat, linealitat i transmissió.
+- [ ] B1a: 1 banda, 1 base, AD OFF.
+- [ ] Guardar JSON/CSV/plots o golden data sota `docs/evidencies/pas23.52/` quan s'executi.
+- [ ] Executar `tools/validate_docs.py` i regressions afectades abans de completar.
 
 ## Fora d'abast
 
-Legendre, gasos, clouds, espectre real.
+Legendre, gasos, núvols i espectre real.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-càlculs òptics, fase Rayleigh/HG, tests i benchmark.
+calcular `E`, `Γ`, `dB` i integral LOS amb `T=exp(-τ)` i sense segon `1/r_PO²`. No redissenyar decisions congelades del dossier; si una hipòtesi de benchmark falla, registrar l'evidència i proposar un ADR de substitució.
 
-## Contractes
+## Treball pendent
 
-`PhaseFunction`, `OpticalTileBand` mínim.
-
-## Implementació
-
-Implementar `E`, `Γ`, `dB` i integral LOS sense segon `1/r_PO²`.
-
-## Proves i comprovacions
-
-Normalització 4π, positivitat, linealitat, transmissió `exp(-τ)`.
-
-## Benchmark / rendiment
-
-B1a exactament segons dossier.
-
-## Criteris d'acceptació
-
-- [ ] Resultat físic estable i error contra reference fixture dins tolerància documentada.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-B1a raw + tests de fórmula. Les evidències noves s'han de desar sota `docs/evidencies/pas23.52/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Confondre intensitat/irradiància/radiància.
-
-## Rollback
-
-Feature flag del kernel físic.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar totes les tasques, proves i evidències abans de moure aquest document a `completat/`.
