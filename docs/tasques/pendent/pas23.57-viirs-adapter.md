@@ -1,76 +1,73 @@
 # Pas 23.57 — Skyglow físic — adaptador de productes VIIRS/VNL/Black Marble
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.55
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Convertir productes reals a observacions de font amb semàntica i qualitat explícites.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Convertir productes reals a observacions de font amb semàntica, unitats i qualitat explícites.
 
 ## Descripció funcional
 
 Diferencia DNB SDR, VNL i Black Marble abans del model de font.
 
-## Abast
+## Fonts a consultar
 
-Almenys un producte actual del projecte i fixtures dels altres.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`10-datasets-llicencies.md`](../../skyglow/10-datasets-llicencies.md).
+
+## Objectiu
+
+Convertir productes reals a observacions de font amb semàntica, unitats i qualitat explícites.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.55](pas23.55-viirs-rsr.md)
+
+**En depenen:**
+- [Pas 23.58](pas23.58-emission-region-watershed.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` i ports/adaptadors actuals.
+- `backend/src/terralab3d/infrastructure/adapters/dem/adapter.py` quan hi hagi geometria/ràster.
+- Contractes/bridge existents; no crear un segon canal paral·lel.
+
+## Flux tècnic
+
+raster/producte → quality/nodata/CRS/unitats → `ViirsSourceObservation` + provenance.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes tenen estat explícit i procedència.
+- Resultats tardans es descarten; recursos grans no es dupliquen pel bridge.
+- Risc: Confondre radiància TOA amb emissió de superfície.
+- Rollback: Mantenir adapter legacy separat.
+
+## Tasques
+
+- [ ] Implementar contractes i transformacions d'aquest pas.
+- [ ] Afegir unitats, versions i procedència.
+- [ ] Afegir proves numèriques/fixtures.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+fixtures de raster, unit conversion, nodata i mismatch de producte. Throughput d'ingestió separat del kernel. Cap capacitat posterior queda marcada com a implementada.
+
+## Proves i evidències obligatòries
+
+- [ ] fixtures de raster, unit conversion, nodata i mismatch de producte.
+- [ ] Throughput d'ingestió separat del kernel.
+- [ ] Evidència reproduïble sota `docs/evidencies/pas23.57/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
 Gestor de descàrregues complet del Pas 24.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-adaptador infraestructura light_pollution, ports, fixtures.
+raster/producte → quality/nodata/CRS/unitats → `ViirsSourceObservation` + provenance. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
-## Contractes
+## Treball pendent
 
-`ViirsSourceObservation`, quality/provenance.
-
-## Implementació
-
-Unitats, nodata, masks, CRS, processing level i dates.
-
-## Proves i comprovacions
-
-Raster fixture, unit conversion, nodata, product mismatch.
-
-## Benchmark / rendiment
-
-Throughput ingest/preprocess separat del kernel.
-
-## Criteris d'acceptació
-
-- [ ] Cap raster entra al kernel sense productId/provenance.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-manifest fixture i tests. Les evidències noves s'han de desar sota `docs/evidencies/pas23.57/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Confondre TOA amb emissió de superfície.
-
-## Rollback
-
-Mantenir adapter legacy separat.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
