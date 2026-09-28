@@ -1,76 +1,76 @@
 # Pas 23.60 — Skyglow físic — OpticalField tiled i dependències
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.54
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Crear camp òptic 3D+temps versionat i registrar tiles durant quadratura.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Crear un camp òptic 3D+temps versionat i registrar tiles durant la quadratura.
 
 ## Descripció funcional
 
 Base per atmosfera variable i cache selectiva.
 
-## Abast
+## Fonts a consultar
 
-Tiles/capes, versions, lookup, dependency set.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`01-especificacio-algorismes.md`](../../skyglow/01-especificacio-algorismes.md), [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+
+## Objectiu
+
+Crear un camp òptic 3D+temps versionat i registrar tiles durant la quadratura.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.54](pas23.54-spectral-bandset-b2a.md)
+
+**En depenen:**
+- [Pas 23.61](pas23.61-phase-aerosol-library.md)
+- [Pas 23.63](pas23.63-gas-b4.md)
+- [Pas 23.64](pas23.64-atmos-provider-standard.md)
+- [Pas 23.67](pas23.67-cache-error-based.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/atmosphere/` i `domain/light_pollution/`.
+- `backend/src/terralab3d/infrastructure/adapters/` per fronteres externes.
+- Bridge i escena existents només quan calgui publicar resultats.
+
+## Flux tècnic
+
+OpticalState → tiles/capes versionats → segmentació LOS → dependency set en la mateixa visita.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes es declaren; cap fallback silenciós.
+- Dependències de tiles es registren durant la quadratura.
+- Risc: Granularitat massa fina.
+- Rollback: Tiles més grans sense canviar API.
+
+## Tasques
+
+- [ ] Implementar contractes i càlculs de l'abast.
+- [ ] Afegir procedència i versions.
+- [ ] Afegir proves numèriques.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+travessa múltiples tiles, versions i exactitud de dependències. B0/B1 amb 1/2/8 tiles. El resultat és reproduïble i no fixa candidats sense evidència.
+
+## Proves i evidències obligatòries
+
+- [ ] travessa múltiples tiles, versions i exactitud de dependències.
+- [ ] B0/B1 amb 1/2/8 tiles.
+- [ ] Evidència sota `docs/evidencies/pas23.60/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
-Providers reals.
+Providers meteorològics reals.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-domain/atmosphere i infraestructura cache.
+OpticalState → tiles/capes versionats → segmentació LOS → dependency set en la mateixa visita. No traslladar detalls del proveïdor al `PropagationKernel`.
 
-## Contractes
+## Treball pendent
 
-`OpticalState`, `OpticalTile`, `OpticalTileBand`.
-
-## Implementació
-
-Segmentar LOS a límits de tile; cap segon ray-march.
-
-## Proves i comprovacions
-
-Travessa múltiples tiles, versions, dependency exactness.
-
-## Benchmark / rendiment
-
-B0/B1 amb 1/2/8 tiles.
-
-## Criteris d'acceptació
-
-- [ ] Dependències reproduïbles i cost mesurat.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-trace de tiles/nodes. Les evidències noves s'han de desar sota `docs/evidencies/pas23.60/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Granularitat massa fina.
-
-## Rollback
-
-Tiles més grans sense canviar API.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
