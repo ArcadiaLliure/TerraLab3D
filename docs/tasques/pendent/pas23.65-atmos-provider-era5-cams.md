@@ -1,76 +1,75 @@
 # Pas 23.65 — Skyglow físic — providers ERA5/CAMS i composició de camps
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.64
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Afegir reanàlisi/forecast real sense acoblar el kernel a Copernicus.
+
+## Descripció funcional
+
+Compon P/T/RH, aerosols i gasos amb procedència individual.
 
 ## Fonts a consultar
 
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`02-arquitectura-integracio.md`](../../skyglow/02-arquitectura-integracio.md), [`08-validacio-cientifica.md`](../../skyglow/08-validacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
 
 ## Objectiu
 
 Afegir reanàlisi/forecast real sense acoblar el kernel a Copernicus.
 
-## Descripció funcional
+## Dependències
 
-Compon P/T/RH i aerosols/gasos amb procedència individual.
+**Depèn de:**
+- [Pas 23.64](pas23.64-atmos-provider-standard.md)
 
-## Abast
+**En depenen:**
+- [Pas 23.68](pas23.68-uncertainty-registry.md)
+- [Pas 23.72](pas23.72-ground-truth-validation.md)
+- [Pas 23.73](pas23.73-clouds-b6.md)
 
-ERA5 i CAMS, cache de dades, validTime/leadTime.
+## Codi existent a reutilitzar
+
+- DEM/horitzó/geodèsia existents per visibilitat i coordenades.
+- `domain/atmosphere`, `domain/light_pollution` i bridge actuals.
+- Caches existents només com a infraestructura; no confondre-les amb `PropagationCacheEntry`.
+
+## Flux tècnic
+
+ERA5/CAMS adapters → camps validats → composició per variable → OpticalState → OpticalField.
+
+## Errors, cancel·lació i recursos
+
+- Discontinuïtats invaliden abans de qualsevol linealització.
+- Resultats obsolets es descarten i l'últim resultat vàlid es conserva segons política.
+- Risc: API drift, quota o producte canviant.
+- Rollback: Desactivar provider i usar atmosfera estàndard.
+
+## Tasques
+
+- [ ] Implementar només l'abast d'aquest pas.
+- [ ] Afegir unitats, versions i procedència.
+- [ ] Afegir proves de discontinuïtats i casos límit.
+- [ ] Executar benchmark/validació indicats.
+- [ ] Actualitzar documentació viva segons evidència.
+
+## Criteri de sortida
+
+fixtures de resposta, camps parcials, fallback per camp i validTime/leadTime. Latència de provider i cache fora del render thread. La decisió queda traçable i reproduïble.
+
+## Proves i evidències obligatòries
+
+- [ ] fixtures de resposta, camps parcials, fallback per camp i validTime/leadTime.
+- [ ] Latència de provider i cache fora del render thread.
+- [ ] Evidència sota `docs/evidencies/pas23.65/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
 Observacions locals específiques.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-infra adapters atmosphere/weather, cache.
+ERA5/CAMS adapters → camps validats → composició per variable → OpticalState → OpticalField. No converteixis aproximacions de cache o renderer en física del kernel.
 
-## Contractes
+## Treball pendent
 
-mateix provider port.
-
-## Implementació
-
-Mapping explícit variable→òptica; versions i llicència.
-
-## Proves i comprovacions
-
-fixtures de resposta, camps parcialment absents, fallback per camp.
-
-## Benchmark / rendiment
-
-latència de provider fora del render thread.
-
-## Criteris d'acceptació
-
-- [ ] Kernel rep OpticalState idèntic independentment de font.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-manifests i exemples de composició. Les evidències noves s'han de desar sota `docs/evidencies/pas23.65/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-API drift/quota.
-
-## Rollback
-
-ERA5/CAMS desactivables; standard fallback.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
