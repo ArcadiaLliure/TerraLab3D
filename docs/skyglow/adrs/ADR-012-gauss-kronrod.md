@@ -1,6 +1,6 @@
 # ADR-012 — Gauss–Kronrod 7/15 adaptatiu candidat
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
