@@ -1,76 +1,75 @@
 # Pas 23.63 — Skyglow físic — GasAbsorptionModel i benchmark B4
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.54 i Pas 23.60
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Afegir absorció O3/H2O/O2 via LUT efectiva preservant transmitància.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Afegir absorció O3/H2O/O2 via LUT efectiva preservant transmitància.
 
 ## Descripció funcional
 
 Evita `β_abs=0` i `exp(-mean τ)`.
 
-## Abast
+## Fonts a consultar
 
-Generador offline/referència, LUT runtime per banda/base.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`01-especificacio-algorismes.md`](../../skyglow/01-especificacio-algorismes.md), [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+
+## Objectiu
+
+Afegir absorció O3/H2O/O2 via LUT efectiva preservant transmitància.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.54](pas23.54-spectral-bandset-b2a.md)
+- [Pas 23.60](pas23.60-optical-field.md)
+
+**En depenen:**
+- [Pas 23.64](pas23.64-atmos-provider-standard.md)
+- [Pas 23.73](pas23.73-clouds-b6.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/atmosphere/` i `domain/light_pollution/`.
+- `backend/src/terralab3d/infrastructure/adapters/` per fronteres externes.
+- Bridge i escena existents només quan calgui publicar resultats.
+
+## Flux tècnic
+
+HITRAN/LOWTRAN offline → LUT `T_eff(k,f,T,p,column)` → lookup vectoritzat al kernel.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes es declaren; cap fallback silenciós.
+- Dependències de tiles es registren durant la quadratura.
+- Risc: Llicència de derivats i resolució insuficient.
+- Rollback: LUT mínima pròpia amb font permesa.
+
+## Tasques
+
+- [ ] Implementar contractes i càlculs de l'abast.
+- [ ] Afegir procedència i versions.
+- [ ] Afegir proves numèriques.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+Jensen sanity, comparació espectral fina i interpolació LUT. B4 cost incremental. El resultat és reproduïble i no fixa candidats sense evidència.
+
+## Proves i evidències obligatòries
+
+- [ ] Jensen sanity, comparació espectral fina i interpolació LUT.
+- [ ] B4 cost incremental.
+- [ ] Evidència sota `docs/evidencies/pas23.63/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
 Line-by-line runtime.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-gas model, LUT metadata, tests.
+HITRAN/LOWTRAN offline → LUT `T_eff(k,f,T,p,column)` → lookup vectoritzat al kernel. No traslladar detalls del proveïdor al `PropagationKernel`.
 
-## Contractes
+## Treball pendent
 
-`GasState`, `GasAbsorptionModelRef`.
-
-## Implementació
-
-`T_eff` ponderat per base espectral; eixos T/p/columnes documentats.
-
-## Proves i comprovacions
-
-Jensen sanity, comparació espectral fina, interpolació LUT.
-
-## Benchmark / rendiment
-
-B4 cost incremental.
-
-## Criteris d'acceptació
-
-- [ ] Error LUT i cost reportats.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-manifest HITRAN/LOWTRAN source + checksum derivat. Les evidències noves s'han de desar sota `docs/evidencies/pas23.63/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Llicència derivats.
-
-## Rollback
-
-LUT pròpia mínima basada en font permesa.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
