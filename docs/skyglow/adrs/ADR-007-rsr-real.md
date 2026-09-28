@@ -1,6 +1,6 @@
 # ADR-007 — Utilitzar la RSR real del DNB
 
-- **Estat:** Accepted for implementation
+- **Estat:** Acceptada — implementació pendent
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
