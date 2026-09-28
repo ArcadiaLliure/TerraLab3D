@@ -61,3 +61,7 @@ La biblioteca d'aerosols de producció, la parametrització de núvols, el prior
 ## Relació amb el pla
 
 El dossier introdueix una seqüència de passos de retrofit del Pas 7. El primer pas és infraestructura/benchmark, no el renderer. El punt de represa només s'ha de moure quan els documents de passos, dependències i README del pla quedin actualitzats en el mateix lot documental.
+
+## Actualitzacions documentals del projecte
+
+`docs/README.md`, l'inventari funcional i el Pas 38 s'han actualitzat en aquest lot. `docs/MANUAL.md` i el `README.md` d'arrel es mantenen deliberadament sense canvis perquè no hi ha cap comportament d'usuari nou implementat; el protocol del projecte prohibeix documentar com a observable una capacitat només especificada.
