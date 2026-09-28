@@ -1,76 +1,75 @@
 # Pas 23.64 — Skyglow físic — AtmosphericOpticsProvider amb atmosfera estàndard
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.60, Pas 23.61 i Pas 23.63
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Implementar provider fallback complet amb procedència per camp.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Implementar provider fallback complet amb procedència per camp.
 
 ## Descripció funcional
 
 Permet executar el kernel sense xarxa ni reanàlisi.
 
-## Abast
+## Fonts a consultar
 
-P/T/RH/gasos/aerosol fallback i perfil vertical versionat.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`01-especificacio-algorismes.md`](../../skyglow/01-especificacio-algorismes.md), [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+
+## Objectiu
+
+Implementar provider fallback complet amb procedència per camp.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.60](pas23.60-optical-field.md)
+- [Pas 23.61](pas23.61-phase-aerosol-library.md)
+- [Pas 23.63](pas23.63-gas-b4.md)
+
+**En depenen:**
+- [Pas 23.65](pas23.65-atmos-provider-era5-cams.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/atmosphere/` i `domain/light_pollution/`.
+- `backend/src/terralab3d/infrastructure/adapters/` per fronteres externes.
+- Bridge i escena existents només quan calgui publicar resultats.
+
+## Flux tècnic
+
+perfil estàndard versionat → OpticalParameter per camp → OpticalState → OpticalField.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes es declaren; cap fallback silenciós.
+- Dependències de tiles es registren durant la quadratura.
+- Risc: Confondre fallback amb observació.
+- Rollback: Provider unavailable en lloc de dades falses.
+
+## Tasques
+
+- [ ] Implementar contractes i càlculs de l'abast.
+- [ ] Afegir procedència i versions.
+- [ ] Afegir proves numèriques.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+offline determinista, interpolació vertical i provenance. Resolve throughput i build OpticalField. El resultat és reproduïble i no fixa candidats sense evidència.
+
+## Proves i evidències obligatòries
+
+- [ ] offline determinista, interpolació vertical i provenance.
+- [ ] Resolve throughput i build OpticalField.
+- [ ] Evidència sota `docs/evidencies/pas23.64/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
 ERA5/CAMS/live.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-provider domain port + standard adapter.
+perfil estàndard versionat → OpticalParameter per camp → OpticalState → OpticalField. No traslladar detalls del proveïdor al `PropagationKernel`.
 
-## Contractes
+## Treball pendent
 
-`AtmosphericOpticsProvider`, `OpticalParameter`.
-
-## Implementació
-
-Cap confidence→sigma inventat; camps absents explícits.
-
-## Proves i comprovacions
-
-Offline deterministic, altitude interpolation, provenance.
-
-## Benchmark / rendiment
-
-Resolve throughput i build OpticalField.
-
-## Criteris d'acceptació
-
-- [ ] Resultat físic pot declarar `STANDARD_ATMOSPHERE` de punta a punta.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-snapshot perfil i tests. Les evidències noves s'han de desar sota `docs/evidencies/pas23.64/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Fallback confós amb observació.
-
-## Rollback
-
-Provider unavailable en lloc de dades falses.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
