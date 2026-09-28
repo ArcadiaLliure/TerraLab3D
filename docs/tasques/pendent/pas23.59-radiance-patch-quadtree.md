@@ -1,76 +1,74 @@
 # Pas 23.59 — Skyglow físic — RadiancePatch, quadtree adaptatiu i amplada angular
 
-> **Estat:** Pendent
-> **Dependències:** Pas 23.58
-
-## Fonts a consultar
-
-- `docs/skyglow/README.md` i documents especialitzats del dossier.
-- `docs/normes-arquitectura.md`, `docs/inventari-funcional.md` i `AGENTS.md`.
-- Fonts científiques exactes citades a `docs/skyglow/04-justificacio-cientifica.md`.
-
-## Objectiu
-
-Representar internament cada regió amb error controlat i calcular `W_physical/W_effective`.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Representar cada regió amb error controlat i calcular `W_physical/W_effective`.
 
 ## Descripció funcional
 
-Permet oclusió parcial i fonts extenses sense un patch per píxel.
+Permet fonts extenses i oclusió parcial sense un patch per píxel.
 
-## Abast
+## Fonts a consultar
 
-Quadtree que no creua regions, projecció topocèntrica, 95% candidat.
+- [`docs/skyglow/README.md`](../../skyglow/README.md).
+- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md) i [`docs/inventari-funcional.md`](../../inventari-funcional.md).
+- [`04-justificacio-cientifica.md`](../../skyglow/04-justificacio-cientifica.md) i [`10-datasets-llicencies.md`](../../skyglow/10-datasets-llicencies.md).
+
+## Objectiu
+
+Representar cada regió amb error controlat i calcular `W_physical/W_effective`.
+
+## Dependències
+
+**Depèn de:**
+- [Pas 23.58](pas23.58-emission-region-watershed.md)
+
+**En depenen:**
+- [Pas 23.66](pas23.66-terrain-curvature.md)
+- [Pas 23.69](pas23.69-dome-profile-pchip.md)
+
+## Codi existent a reutilitzar
+
+- `backend/src/terralab3d/domain/light_pollution/` i ports/adaptadors actuals.
+- `backend/src/terralab3d/infrastructure/adapters/dem/adapter.py` quan hi hagi geometria/ràster.
+- Contractes/bridge existents; no crear un segon canal paral·lel.
+
+## Flux tècnic
+
+EmissionRegion → quadtree intern → error `I/r²×T×V` → patches → projecció topocèntrica i widths.
+
+## Errors, cancel·lació i recursos
+
+- Dades absents/corruptes tenen estat explícit i procedència.
+- Resultats tardans es descarten; recursos grans no es dupliquen pel bridge.
+- Risc: Explosió de patches propers.
+- Rollback: Refinament més conservador; mai fusió no controlada.
+
+## Tasques
+
+- [ ] Implementar contractes i transformacions d'aquest pas.
+- [ ] Afegir unitats, versions i procedència.
+- [ ] Afegir proves numèriques/fixtures.
+- [ ] Executar benchmark indicat.
+- [ ] Actualitzar evidències i inventari segons estat real.
+
+## Criteri de sortida
+
+regió allargada, wrap 359°/1°, outlier feble i oclusió parcial. B5 preliminar `ε_patch` vs patches/error. Cap capacitat posterior queda marcada com a implementada.
+
+## Proves i evidències obligatòries
+
+- [ ] regió allargada, wrap 359°/1°, outlier feble i oclusió parcial.
+- [ ] B5 preliminar `ε_patch` vs patches/error.
+- [ ] Evidència reproduïble sota `docs/evidencies/pas23.59/`.
+- [ ] `tools/validate_docs.py` i regressions afectades en verd.
 
 ## Fora d'abast
 
-Cache global.
+Cache global i renderer.
 
-## Fitxers previsibles
+## Instrucció per a Codex
 
-patch tree, geometry, tests.
+EmissionRegion → quadtree intern → error `I/r²×T×V` → patches → projecció topocèntrica i widths. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
-## Contractes
+## Treball pendent
 
-`RadiancePatch`, width metrics.
-
-## Implementació
-
-Refinar per error en `I/r²×T×V`; circular statistics per azimut.
-
-## Proves i comprovacions
-
-Regió allargada, wrap 359°/1°, oclusió parcial, 95% outlier feble.
-
-## Benchmark / rendiment
-
-B5 preliminar `ε_patch` vs patches/error.
-
-## Criteris d'acceptació
-
-- [ ] Cap patch travessa `EmissionRegion` i l'error és mesurable.
-- [ ] No marcar cap capacitat com a implementada només perquè existeixi el contracte o el document.
-- [ ] Errors, cancel·lació, revisions obsoletes i recursos queden tractats segons `docs/normes-arquitectura.md`.
-
-## Evidències
-
-plots quadtree/width. Les evidències noves s'han de desar sota `docs/evidencies/pas23.59/` o la convenció equivalent validada pel repositori, sense esborrar evidència històrica.
-
-## Riscos
-
-Explosió de patches propers.
-
-## Rollback
-
-Límit conservador + més refinament, mai fusió no controlada.
-
-## Impacte en inventari funcional
-
-Mentre el pas sigui pendent, l'inventari només pot descriure'l com a planificat. En tancar-lo, classificar el resultat com `esquelet`, `parcial` o `observable` segons proves i ruta executable.
-
-## Impacte en MANUAL / README / punt de represa
-
-No actualitzar `docs/MANUAL.md` com si el comportament fos d'usuari fins que existeixi. En completar el pas: actualitzar `docs/README.md`, evidències i inventari; avançar el punt de represa al següent pas executable de la seqüència skyglow o al pas global que correspongui.
-
-## Punt de represa
-
-Si el pas queda incomplet, documentar l'última prova verda, fitxers tocats, evidència generada, bloqueig concret i primera acció següent.
+- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
