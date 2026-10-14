@@ -22,6 +22,8 @@ Comparar prediccions amb mesures reals separant calibratge i validació.
 - [Pas 23.69](pas23.69-dome-profile-pchip.md)
 - [Pas 23.65](pas23.65-atmos-provider-era5-cams.md)
 - [Pas 23.68](pas23.68-uncertainty-registry.md)
+- [Pas 23.691](pas23.691-photometric-projections.md)
+- [Pas 23.692](pas23.692-sky-radiance-composition.md)
 
 **En depenen:**
 - [Pas 23.74](pas23.74-b7-homologacio-skyglow.md)
@@ -34,7 +36,7 @@ Comparar prediccions amb mesures reals separant calibratge i validació.
 
 ## Flux tècnic
 
-observacions calibrades + metadata → simulació sensor → join temporal/geogràfic → mètriques/intervals.
+observacions calibrades + metadata → composició reference/instantaneous compatible → projecció sensor (RSR/FOV/zero point) → join temporal/geogràfic → mètriques/intervals. No s'absorbeix Lluna/cel natural dins el calibratge artificial.
 
 ## Errors, cancel·lació i recursos
 
@@ -53,7 +55,7 @@ observacions calibrades + metadata → simulació sensor → join temporal/geogr
 
 ## Criteri de sortida
 
-data leakage checks i sensor-response golden. Informe científic; no benchmark runtime. El resultat queda documentat amb evidència reproduïble.
+data leakage checks, sensor-response golden i separació reference/instantaneous. `BortleEquivalent` no s'usa com a ground truth. Informe científic; no benchmark runtime. El resultat queda documentat amb evidència reproduïble.
 
 ## Proves i evidències obligatòries
 
