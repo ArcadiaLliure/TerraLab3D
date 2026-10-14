@@ -24,6 +24,7 @@ Integrar DEM real i curvatura amb visibilitat binària per raig.
 
 **En depenen:**
 - [Pas 23.67](pas23.67-cache-error-based.md)
+- [Pas 23.681](pas23.681-zenith-absolute-gate.md)
 
 ## Codi existent a reutilitzar
 
