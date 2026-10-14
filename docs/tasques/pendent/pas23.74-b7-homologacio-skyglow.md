@@ -23,6 +23,7 @@ Executar la configuració candidata completa i fixar SLO basats en evidència.
 - [Pas 23.71](pas23.71-debug-modes.md)
 - [Pas 23.72](pas23.72-ground-truth-validation.md)
 - [Pas 23.73](pas23.73-clouds-b6.md)
+- [Pas 23.692](pas23.692-sky-radiance-composition.md)
 
 **En depenen:**
 - Cap pas skyglow directe.
@@ -35,7 +36,7 @@ Executar la configuració candidata completa i fixar SLO basats en evidència.
 
 ## Flux tècnic
 
-configuracions candidates + B7 + ground truth + renderer telemetry → frontera error↔cost → SLO → decisió shadow/default.
+configuracions candidates + gate zenital + projeccions/composició + B7 + ground truth + renderer telemetry → frontera error↔cost → SLO → decisió shadow/default.
 
 ## Errors, cancel·lació i recursos
 
@@ -54,7 +55,7 @@ configuracions candidates + B7 + ground truth + renderer telemetry → frontera 
 
 ## Criteri de sortida
 
-regressió completa, coherència matemàtica/unitats/contractes i cap pendent bloquejant ocult. B7 AD OFF/ON, uncertainty OFF/ON, cache cold/warm i SLO multidimensional. El resultat queda documentat amb evidència reproduïble.
+regressió completa, coherència matemàtica/unitats/contractes i cap pendent bloquejant ocult. B7 AD OFF/ON, uncertainty OFF/ON, cache cold/warm/movement/prefetch/teleport i SLO multidimensional. Gate zenital mantingut, `BortleEquivalent` només reference, composició lineal correcta i `kernelIntegralsPerRenderFrame=0`. El resultat queda documentat amb evidència reproduïble.
 
 ## Proves i evidències obligatòries
 
