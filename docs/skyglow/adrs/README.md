@@ -18,3 +18,5 @@ Cada ADR té estat **Acceptada — implementació pendent** però no implica fun
 - [ADR-014 — Single-scattering a la v1](ADR-014-single-scattering-v1.md)
 - [ADR-015 — Benchmark abans de congelar configuració](ADR-015-benchmark-before-optimization.md)
 - [ADR-016 — Separar incertesa de predicció i de validesa de cache](ADR-016-uncertainty-model.md)
+- [ADR-017 — Gate zenital i projeccions fotomètriques post-kernel](ADR-017-zenith-photometric-projections.md)
+- [ADR-018 — Runtime sense integral per frame i reutilització error-bounded](ADR-018-runtime-performance-policy.md)
