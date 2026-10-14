@@ -72,6 +72,10 @@
 
 ## Reanàlisi i forecast
 
+**FET ESTÀNDARD.** CIE 018:2019 fixa el vincle SI entre radiometria i fotometria i la constant `K_cd=683 lm/W`, juntament amb les funcions d'eficiència lluminosa espectral. **DECISIÓ NOSTRA:** la luminància fotòpica és una projecció post-kernel; no s'utilitza per calibrar retrospectivament el camp radiomètric.
+
+**FET PUBLICAT.** L'escala Bortle original (Bortle, 2001) combina criteris observacionals com magnitud límit, Via Làctia, llum zodiacal i visibilitat d'objectes; no és una funció universal d'SQM. **DECISIÓ NOSTRA:** TerraLab3D només exposa `BortleEquivalent` com a diagnòstic versionat sota condicions de referència sense Lluna/crepuscle.
+
 **FET PUBLICAT/OFICIAL.** ERA5 dona camps horaris globals i 137 nivells de model fins aproximadament 80 km; CAMS dona anàlisi/forecast de composició amb espècies químiques i famílies d'aerosol. Fonts: https://www.ecmwf.int/en/forecasts/dataset/ecmwf-reanalysis-v5 i https://www.ecmwf.int/en/forecasts/datasets/cams-global-atmospheric-composition-forecasts.
 
 **DECISIÓ NOSTRA.** `AtmosphericOpticsProvider` pot barrejar camps de proveïdors diferents i conserva procedència/incertesa per camp.
