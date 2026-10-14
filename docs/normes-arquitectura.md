@@ -335,4 +335,4 @@ Els datasets petits, obligatoris, versionats amb el producte i sense variants el
 
 ## ADR 0006 i següents
 
-Les decisions especialitzades del sistema físic de contaminació lumínica es mantenen al [registre d'ADR de skyglow](skyglow/adrs/README.md). Aquest registre conserva la seva numeració pròpia existent (`ADR-001`…`ADR-016`) i **no es renumera** per encaixar-la en la sèrie transversal d'aquest document.
+Les decisions especialitzades del sistema físic de contaminació lumínica es mantenen al [registre d'ADR de skyglow](skyglow/adrs/README.md). Aquest registre conserva la seva numeració pròpia existent (`ADR-001`…`ADR-018`) i **no es renumera** per encaixar-la en la sèrie transversal d'aquest document.
