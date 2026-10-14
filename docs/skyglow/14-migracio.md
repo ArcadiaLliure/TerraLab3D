@@ -12,17 +12,17 @@ B0, contractes, unitats, `PropagationKernel` mínim sense UI. Cap canvi visual.
 
 B1, Rayleigh+HG, fonts sintètiques. Publicar resultats només a debug/telemetria.
 
-## Fase 3 — VIIRS i espectre
+## Fase 3 — VIIRS, espectre i gate zenital
 
-Ingestió real, RSR, prior SPD, regions/patches. Comparar predicció zenital amb legacy i mesures, sense substituir encara.
+Ingestió real, RSR, prior SPD, regions/patches. Tancar primer la cadena absoluta a 90° amb el mateix kernel, reference solver i unitats físiques. Comparar predicció zenital amb mesures; el legacy només és regressió visual, no referència científica. No es promouen cúpules si el gate zenital no passa.
 
-## Fase 4 — terreny/cache/AD
+## Fase 4 — terreny/cache/AD i moviment
 
-Oclusió real, curvatura, cache error-based, moviment. Demostrar zero reutilització després d'un flip d'oclusió.
+Oclusió real, curvatura, cache error-based, moviment. Demostrar zero reutilització després d'un flip d'oclusió, zero integrals per frame, coalescing de moviment ràpid i que prefetch/cold/warm mantenen el pressupost d'error.
 
-## Fase 5 — cúpules i renderer
+## Fase 5 — cúpules, projeccions i renderer
 
-`DomeProfile`, PCHIP, renderer lineal, doble buffer. Mode de selecció `legacy/physical/compare` només per desenvolupament.
+`DomeProfile`, PCHIP, projeccions fotomètriques/SQM/TESS, `BortleEquivalent` versionat, composició reference/instantaneous, renderer lineal i doble buffer. La mostra 90° ha de reproduir el gate zenital. Mode `legacy/physical/compare` només per desenvolupament.
 
 ## Fase 6 — atmosfera real
 
