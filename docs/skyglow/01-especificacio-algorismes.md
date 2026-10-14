@@ -96,6 +96,12 @@ Per patch `j`, banda `k`, base `f` i node `P`:
 
 No hi ha un segon `1/r_PO²`: la radiància que viatja de P a O conserva la seva geometria i només pateix extinció. La v1 és single-scattering per decisió de TerraLab3D; Cinzano–Falchi 2012 és explícitament més general i tracta dispersió múltiple.
 
+## 8.1. Gate zenital radiomètric absolut
+
+El primer resultat científic que es promou fora de fixtures és la direcció `ω_zenith` (elevació 90°) avaluada pel **mateix** `PropagationKernel`. No és un solver separat ni una aproximació especial.
+
+El gate exigeix cadena d'unitats completa, cap `calibrationFactor` opac, convergència contra el reference solver, comprovacions de linealitat/positivitat/transmissió i benchmark cold/warm. El resultat de 90° queda com a invariant: qualsevol `DomeProfile` posterior ha de reproduir-lo dins el pressupost d'error declarat.
+
 ## 9. Integració numèrica
 
 Cada direcció és una integral LOS. Les 100 fonts × 9 elevacions són aproximadament 900 integrals, no 900 operacions. El LOS es parteix als límits d'`OpticalTile`, capes i discontinuïtats. Per cada segment s'aplica Gauss–Kronrod 7/15 adaptatiu; l'estimador inicial és `|Q15-Q7|`, amb subdivisió fins al pressupost local.
@@ -108,11 +114,31 @@ Mostres inicials d'elevació: `[0.5,2,5,10,20,30,45,60,90]°`. El zenit és la m
 
 Fonts diferents se sumen abans de qualsevol logaritme o transformació perceptual: `B_total(ω)=Σ_j B_j(ω)`.
 
+## 10.1. Projeccions fotomètriques i instrumentals
+
+El kernel retorna radiància física. Les magnituds perceptuals o instrumentals són adaptadors posteriors i **no poden retroalimentar la física**.
+
+Per luminància fotòpica, quan hi ha radiància espectral suficient: `L_v = K_cd ∫ V(λ) L_e,λ dλ`, amb `K_cd = 683 lm W⁻¹` i la funció d'eficiència lluminosa CIE declarada/versionada.
+
+Per SQM, TESS-W o un sensor futur s'aplica la seva resposta espectral i el seu FOV/calibratge: `S_sensor = ∫∫ R_sensor(λ,ω) L_e,λ(ω) dλ dΩ`. El zero point i la transformació final a `mag/arcsec²` formen part del model/calibratge de l'instrument. No hi ha una constant universal per convertir DNB o radiància genèrica a «SQM».
+
+`BortleEquivalent` és una política de presentació versionada, no una sortida del kernel ni ground truth físic.
+
+## 10.2. Composició física del cel
+
+Els canals es mantenen separats fins a la composició lineal: `B_total = B_artificial + B_natural_moonless + B_moon + B_twilight`.
+
+Es distingeix **reference sky** (nit de referència sense Lluna ni crepuscle, candidat per a `BortleEquivalent`) d'**instantaneous sky** (estat real a data/hora). La Lluna pot canviar el cel instantani, però no reclassifica per si sola la contaminació lumínica intrínseca del lloc.
+
 ## 11. Cache i derivades
 
 Ordre d'invalidació: (1) canvi visible↔ocult; (2) canvi de topologia/quadtree/domini; (3) guardes geomètriques barates; (4) estimació contínua `ΔB_geometry+ΔB_atmosphere`; (5) pressupost d'error.
 
 Dins una branca diferenciable, `B(q)=∫_0^{smax(q)}F(q,s)ds` i `∇B=∫∇F ds + F(q,smax)∇smax`. El candidat és forward-mode AD amb `(B,dB/dx,dB/dy,dB/dz)` en la mateixa quadratura. Oclusió, canvis discrets de quadtree i travesses topològiques invaliden; no es diferencien.
+
+**Invariant de runtime:** el kernel no s'executa per frame. Els canvis ràpids d'observador es coalescen i les revisions obsoletes no es publiquen. La precàrrega predictiva és candidata de rendiment, no física: només s'activa si B7 demostra guany sense false hits ni augment de l'error.
+
+S'han de precomputar les parts estàtiques o quasiestàtiques quan sigui possible (integrals RSR/basis, LUT gasosa, segmentació/quadtree, índexs de terreny i metadades de tiles). No es precomputa globalment un cel dependent de l'observador sense model d'error i invalidació.
 
 ## 12. Complexitat
 
