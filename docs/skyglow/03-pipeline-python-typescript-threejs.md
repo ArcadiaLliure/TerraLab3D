@@ -29,6 +29,12 @@ El `PropagationKernel` rep `SourceSet`, `Observer`, `OpticalField`, `TerrainVisi
 
 Ha d'existir un camí offline més lent amb toleràncies estretes, malla angular densa i espectre fi. No és el mateix que la v1 runtime. Serveix per validar discretització espectral, compressió de cúpules, ordre de fase, H_TOA i quadratura.
 
+### Projeccions fotomètriques i composició
+
+Després del kernel, `PhotometricProjectionService` calcula projeccions fotòpiques o de sensor amb pesos espectrals/FOV precomputables i versionats. Aquesta etapa no repeteix LOS ni scattering.
+
+`SkyRadianceComposer` combina en radiància lineal canals compatibles: artificial, natural sense Lluna, lunar i crepuscular. Manté simultàniament un estat `reference` i un estat `instantaneous`.
+
 ### Serialització
 
 El bridge no envia nodes de quadratura. Envia `PropagationResultSummary` i `DomeProfile[]` amb esquema versionat. Els vectors de radiància han d'indicar `bandSetId` i unitats. Els buffers grans es poden transportar binàriament amb el port existent si el benchmark ho justifica.
@@ -41,7 +47,7 @@ Els DTO TypeScript reflecteixen exactament els contractes serialitzats Python, n
 
 ### Runtime
 
-`SkyglowRuntime` manté `requestedRevision`, `acceptedRevision`, estat de càlcul, cache de presentació i doble buffer. Cada resultat tardà es descarta. Els canvis ràpids d'observador es coalescen; el frontend no força un càlcul per frame.
+`SkyglowRuntime` manté `requestedRevision`, `acceptedRevision`, estat de càlcul, cache de presentació i doble buffer. Cada resultat tardà es descarta. Els canvis ràpids d'observador es coalescen; el frontend **no força mai una integral del kernel per frame**. El scheduler pot demanar precàrrega segons posició, velocitat i direcció de moviment, però una resposta prefetched només s'accepta després de validar clau, versions, topologia i error.
 
 ### Interpolació
 
@@ -71,6 +77,8 @@ LOD de renderer i LOD físic són independents. El renderer pot reduir resoluci�
 
 ## Píxel final
 
-`VIIRS radiance → source spectrum/geometry → propagation radiance → dome compression → bridge → linear sky radiance field → natural+artificial linear composition → camera/exposure → tone mapping → display transform → pixel`.
+`VIIRS radiance → source spectrum/geometry → propagation radiance → dome compression → bridge → linear artificial field → + natural moonless + moon + twilight (linear composition) → camera/exposure → tone mapping → display transform → pixel`.
+
+En paral·lel, el resultat físic pot passar per `PhotometricProjectionService` per obtenir luminància, SQM/TESS simulats i `BortleEquivalent`; aquestes projeccions no són la font del kernel.
 
 Qualsevol comparació científica s'atura abans de camera/exposure/tone mapping.
