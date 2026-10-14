@@ -9,7 +9,7 @@ El backend ja segueix domini/aplicació/infraestructura/scene. Existeixen `domai
 - REUSE: coordenades, observador, DEM/horizon, bridge, workers, lifecycle, resource registry, escena persistent.
 - ADAPT: `domain/light_pollution` com a namespace de domini; `SkyEnvironmentSnapshot`; scheduler d'actualitzacions; infraestructura cache.
 - REWRITE progressiu: l'ús de Bortle com a font de `u_artificialBrightness` al shader.
-- NEW: model VIIRS, `EmissionRegion`, `RadiancePatch`, espectre, òptica atmosfèrica, kernel, cache física, `DomeProfile`, benchmark/reference solver.
+- NEW: model VIIRS, `EmissionRegion`, `RadiancePatch`, espectre, òptica atmosfèrica, kernel, cache física, `DomeProfile`, `PhotometricProjectionService`, `SkyRadianceComposer`, benchmark/reference solver.
 - DISCARD només al final de migració: glow Bortle artístic com a autoritat física. Es pot conservar temporalment com a fallback explícit.
 
 ## 3. Components proposats
@@ -35,6 +35,12 @@ flowchart LR
 ## 4. Fronteres de responsabilitat
 
 Python és autoritatiu per ciència, ingestió de dades, segmentació, radiometria, òptica, propagació, incertesa i decisions de cache científica. TypeScript és autoritatiu per scheduling de presentació, recepció de revisions, doble buffer, interpolació PCHIP si es decideix enviar mostres en lloc de LUT final, estat de renderer i observabilitat de frontend. GLSL només avalua la representació ja resolta; no calcula transferència radiativa.
+
+### Projeccions i composició
+
+`PhotometricProjectionService` consumeix resultats radiomètrics ja resolts i produeix luminància o respostes instrumentals (SQM/TESS/altres) amb resposta espectral, FOV, zero point, versió i incertesa explícits. No pot invocar de nou el kernel.
+
+`SkyRadianceComposer` manté components separats (`artificial`, `naturalMoonless`, `moon`, `twilight`) i només els suma en espai lineal compatible. El diagnòstic `reference` i l'estat `instantaneous` són contractes diferents.
 
 ## 5. Lifecycle
 
@@ -78,6 +84,8 @@ flowchart TD
   E -- yes --> I
   E -- no --> H[HIT + optional first-order correction]
 ~~~
+
+La política de runtime prohibeix recomputar per frame. El scheduler coalesça moviment ràpid, cancela feina obsoleta cooperativament i pot precalcular/prefetch posicions probables. Qualsevol resultat prefetched reutilitzat ha de passar exactament les mateixes guardes topològiques, de versions i de pressupost d'error que un hit normal.
 
 ## 7. Actualització atmosfèrica
 
