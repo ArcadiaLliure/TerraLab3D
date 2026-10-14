@@ -87,12 +87,15 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 | 23.66 | [Terreny i curvatura al kernel](tasques/pendent/pas23.66-terrain-curvature.md) | `pendent` | 23.59, 23.51 |
 | 23.67 | [Cache error-based](tasques/pendent/pas23.67-cache-error-based.md) | `pendent` | 23.53, 23.60, 23.66 |
 | 23.68 | [Incertesa i provenance](tasques/pendent/pas23.68-uncertainty-registry.md) | `pendent` | 23.56, 23.65, 23.67 |
-| 23.69 | [DomeProfile i PCHIP](tasques/pendent/pas23.69-dome-profile-pchip.md) | `pendent` | 23.51, 23.59, 23.67 |
+| 23.681 | [Gate zenital radiomètric absolut](tasques/pendent/pas23.681-zenith-absolute-gate.md) | `pendent` | 23.57, 23.66, 23.68 |
+| 23.69 | [DomeProfile i PCHIP](tasques/pendent/pas23.69-dome-profile-pchip.md) | `pendent` | 23.51, 23.59, 23.67, 23.681 |
+| 23.691 | [Projeccions fotomètriques, SQM/TESS i BortleEquivalent](tasques/pendent/pas23.691-photometric-projections.md) | `pendent` | 23.681, 23.69 |
+| 23.692 | [Composició física del cel](tasques/pendent/pas23.692-sky-radiance-composition.md) | `pendent` | 23.691 |
 | 23.70 | [Renderer Three.js lineal](tasques/pendent/pas23.70-three-renderer.md) | `pendent` | 23.69 |
 | 23.71 | [Modes diagnòstics](tasques/pendent/pas23.71-debug-modes.md) | `pendent` | 23.70 |
-| 23.72 | [Validació TESS/SQM/all-sky](tasques/pendent/pas23.72-ground-truth-validation.md) | `pendent` | 23.69, 23.65, 23.68 |
+| 23.72 | [Validació TESS/SQM/all-sky](tasques/pendent/pas23.72-ground-truth-validation.md) | `pendent` | 23.69, 23.65, 23.68, 23.691, 23.692 |
 | 23.73 | [Núvols single-scattering i B6](tasques/pendent/pas23.73-clouds-b6.md) | `pendent` | 23.65, 23.61, 23.63 |
-| 23.74 | [B7 FULL i homologació skyglow](tasques/pendent/pas23.74-b7-homologacio-skyglow.md) | `pendent` | 23.50–23.73 |
+| 23.74 | [B7 FULL i homologació skyglow](tasques/pendent/pas23.74-b7-homologacio-skyglow.md) | `pendent` | 23.50–23.73, inclosos 23.681/23.691/23.692 |
 | 24 | [Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 8.6, 12 |
 | 25 | [Gestor de capes Cel/Terra](tasques/pendent/pas25-gestor-capes.md) | `pendent` | 24 |
 | 26 | [Vista de recursos del Sistema Solar](tasques/pendent/pas26-recursos-sistema-solar.md) | `parcial` | 24, 25 |
