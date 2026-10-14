@@ -62,6 +62,22 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 `baseAltitudeM`, `topAltitudeM`, `opticalDepth?`, `liquidWaterPath?`, `iceWaterPath?`, `effectiveRadiusUm?`, `betaExt`, `omega0`, `phaseFunctionId`, `provenance`. Camps absents no s'inventen.
 
+## PhotometricProjection
+
+`projectionId`, `sourceRevision`, `kind=PHOTOPIC_LUMINANCE|SQM|TESS_W|CUSTOM_SENSOR`, `value`, `unit`, `spectralResponseId`, `fovModelId?`, `zeroPointId?`, `predictionUncertainty`, `provenance`. Sense resposta/calibratge identificable, la projecció és `unavailable`.
+
+## SkyRadianceComponents
+
+`bandSetId`, `directions`, components `artificial`, `naturalMoonless`, `moon`, `twilight`, estat `available|unavailable|not_applicable`, versions i provenance. La composició autoritzada és suma lineal només entre camps compatibles.
+
+## SkyBrightnessDiagnostics
+
+`reference`: cel nocturn de referència sense Lluna/crepuscle. `instantaneous`: estat real a data/hora. Pot incloure luminància zenital, projeccions SQM/TESS, `bortleEquivalent`, `bortlePolicyId` i incertesa. `bortleEquivalent` de lloc només consumeix `reference`.
+
+## RuntimePerformanceStats
+
+`timeToFirstValidMs`, `kernelLatencyMs`, `cacheDecision`, `recomputeReason`, `prefetchHit`, `cancelledJobs`, `staleResultsDiscarded`, `queueDepth`, `bridgeBytes`, `gpuUploadMs`, `renderThreadStutterMs`. És telemetria, no física.
+
 ## PropagationResult
 
 `requestId`, `revision`, `observer`, `directions`, `bandSetId`, `radiance`, `numericError`, `predictionUncertainty`, `cacheValidityUncertainty`, `opticalTileDependencies`, `metrics`, `fallbacks`, `modelVersion`.
