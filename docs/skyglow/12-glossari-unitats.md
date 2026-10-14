@@ -23,6 +23,10 @@
 | SQM | instrument/banda pròpia, no sinònim exacte de Johnson V |
 | TESS-W | fotòmetre amb resposta espectral pròpia i FOV propi |
 | Bortle | escala qualitativa observacional 1–9; no unitat física |
+| BortleEquivalent | diagnòstic/política versionada de TerraLab3D; no és la classificació observacional completa |
+| reference sky | estat nocturn de referència sense Lluna ni crepuscle per caracteritzar el lloc |
+| instantaneous sky | estat físic a data/hora, pot incloure Lluna, crepuscle i atmosfera real |
+| photometric projection | transformació post-kernel de radiància espectral a luminància o resposta instrumental |
 
 ## Regles
 
@@ -34,3 +38,7 @@
 6. Angles wire en graus només si el camp ho diu; càlcul intern pot usar radians.
 7. Distàncies del kernel en metres; km només presentació/configuració.
 8. Qualsevol LUT indica les unitats dels eixos.
+9. No hi ha conversió directa VIIRS→SQM ni `relativeRadiance×calibrationFactor→cd/m²` sense model físic/calibratge explicitat.
+10. Cel artificial, natural, lunar i crepuscular se sumen en radiància lineal compatible, mai en magnituds.
+11. Les projeccions SQM/TESS declaren resposta espectral, FOV i zero point/calibratge.
+12. El `BortleEquivalent` de lloc usa condicions de referència; la Lluna només modifica el cel instantani.
