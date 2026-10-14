@@ -6,6 +6,10 @@ Objectiu: demostrar que discretització i integració convergeixen abans de comp
 
 Proves: convergència GK; comparació amb quadratura d'ordre alt; invariància sota partició equivalent de tiles; linealitat en intensitat; suma de patches igual a font no agregada dins tolerància; positivitat de radiància; absència de NaN/Inf a 0,5°.
 
+## 1.1. Gate zenital absolut
+
+Abans de validar cúpules, la direcció 90° ha de superar un gate propi amb la mateixa implementació del kernel: unitats físiques completes, convergència de quadratura, comparació amb reference solver, sensibilitat a extinció/oclusió i absència de factors de calibratge opacs.
+
 ## 2. Validació espectral
 
 Reference spectrum de pas fi (≤1 nm o prou fi per convergir les mètriques) sobre 400–900 nm i RSR DNB real. Comparar `PropagationBandSet` candidats 4/6/8/10/12 bandes. Mètriques: error en luminància fotòpica, resposta SQM, resposta TESS-W, XYZ, radiància de banda i resultat després de Rayleigh/aerosol/gas.
@@ -26,7 +30,9 @@ Mètriques mínimes: MAE hemisferi ponderat per angle sòlid, MAE 0–20°, P95 
 
 ## 5. Ground truth
 
-Fonts prioritàries: TESS-W i SQM amb resposta espectral coneguda; all-sky fotomètric calibrat quan estigui disponible. La comparació amb un sensor simula la seva banda i FOV; no es converteix una radiància espectral a «SQM» amb una constant universal.
+Fonts prioritàries: TESS-W i SQM amb resposta espectral coneguda; all-sky fotomètric calibrat quan estigui disponible. La comparació amb un sensor simula la seva banda, FOV, zero point/calibratge i resposta espacial; no es converteix una radiància espectral a «SQM» amb una constant universal.
+
+Quan l'observació inclou cel natural, Lluna o crepuscle, la comparació usa `instantaneous` amb els mateixos components o aïlla explícitament la contribució artificial. No s'ajusta el model artificial per absorbir una contribució natural no modelada.
 
 Per cada observació registrar: posició, elevació, hora UTC, lluna, núvols, transparència/AOD si disponible, instrument/serial, calibratge, FOV, temperatura, dades VIIRS corresponents i versió atmosfèrica.
 
@@ -38,7 +44,7 @@ Reportar errors amb intervals/quantils i estratificar per distància a fonts, br
 
 ## 7. Bortle
 
-Bortle és una escala observacional qualitativa. Només es pot mostrar com equivalència orientativa derivada de radiància/condicions, mai com ground truth físic primari. Les conversions actuals del Pas 7 es mantenen com a legacy fins que una política nova sigui validada.
+Bortle és una escala observacional qualitativa. Només es pot mostrar com `BortleEquivalent` orientatiu derivat de condicions de referència, mai com ground truth físic primari. La política té `bortlePolicyId` i està separada de SQM. El `BortleEquivalent` intrínsec del lloc s'avalua sense Lluna ni crepuscle; aquests components només alteren el diagnòstic instantani. Les conversions actuals del Pas 7 es mantenen com a legacy fins que una política nova sigui validada.
 
 ## 8. Criteris d'acceptació
 
