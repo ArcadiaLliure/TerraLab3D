@@ -22,8 +22,10 @@ Comprimir el camp per font a 9 elevacions i reconstruir-lo en log-radiància.
 - [Pas 23.51](pas23.51-kernel-geometric.md)
 - [Pas 23.59](pas23.59-radiance-patch-quadtree.md)
 - [Pas 23.67](pas23.67-cache-error-based.md)
+- [Pas 23.681](pas23.681-zenith-absolute-gate.md)
 
 **En depenen:**
+- [Pas 23.691](pas23.691-photometric-projections.md)
 - [Pas 23.70](pas23.70-three-renderer.md)
 - [Pas 23.72](pas23.72-ground-truth-validation.md)
 
@@ -54,7 +56,7 @@ kernel a 0.5/2/5/10/20/30/45/60/90° → `DomeProfile` → PCHIP log → radiàn
 
 ## Criteri de sortida
 
-zenit=90°, positivitat, wrap azimut i comparació all-sky. Mètriques de compressió i prova de mostra 1°. La decisió queda traçable i reproduïble.
+zenit=90° reprodueix el resultat homologat del Pas 23.681 dins pressupost, positivitat, wrap azimut i comparació all-sky. Mètriques de compressió i prova de mostra 1°. La decisió queda traçable i reproduïble.
 
 ## Proves i evidències obligatòries
 
