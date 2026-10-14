@@ -23,6 +23,7 @@ Convertir productes reals a observacions de font amb semàntica, unitats i quali
 
 **En depenen:**
 - [Pas 23.58](pas23.58-emission-region-watershed.md)
+- [Pas 23.681](pas23.681-zenith-absolute-gate.md)
 
 ## Codi existent a reutilitzar
 
