@@ -6,7 +6,7 @@ El Pas 7 actual resol una necessitat visual i de visibilitat amb Bortle/magnitud
 
 ## Goals
 
-Radiància artificial direccional físicament traçable; zenit i cúpules amb un únic kernel; fonts VIIRS segmentades; terreny/curvatura; espectre i RSR; atmosfera extensible; cache error-based; renderer sense stutter; validació científica reproduïble.
+Radiància artificial direccional físicament traçable; zenit i cúpules amb un únic kernel; gate zenital absolut abans de cúpules; fonts VIIRS segmentades; terreny/curvatura; espectre i RSR; atmosfera extensible; projeccions fotomètriques/sensor separades; composició reference/instantaneous; cache error-based; renderer sense stutter; validació científica reproduïble.
 
 ## Non-goals v1
 
@@ -32,7 +32,7 @@ Cada càlcul publica `correlationId`, `revision`, `sourceCount`, `patchCount`, `
 
 ## Rendiment
 
-No es fixa SLO abans de B0–B7. El render thread no espera el kernel. Les actualitzacions són revisionades i coalescibles. El cache conserva `observerAnchor`, `validityEnvelope`, dependències de tiles i sensibilitats només si el cost/benefici es demostra.
+No es fixa SLO abans de B0–B7. El render thread no espera el kernel i **no hi ha integral LOS per frame**. Les actualitzacions són revisionades, coalescibles i cancel·lables; les obsoletes no es publiquen. El cache conserva `observerAnchor`, `validityEnvelope`, dependències de tiles i sensibilitats només si el cost/benefici es demostra. B7 mesura cold start, warm hit, moviment continu, teleport, canvi atmosfèric, occlusion flip, queue depth, treball cancel·lat i time-to-first-valid.
 
 ## Recuperació
 
@@ -52,7 +52,10 @@ Unitari: fórmules, unitats, RSR, espectre, fase, quadratura, PCHIP, geometria. 
 - HG com a única representació: descartat; només fallback;
 - invalidació per distància fixa: descartada a favor de pressupost d'error;
 - segon ray-march per dependències: descartat; es registren durant quadratura;
-- HITRAN line-by-line runtime: descartat per cost.
+- HITRAN line-by-line runtime: descartat per cost;
+- conversió directa VIIRS/relative radiance → SQM amb factor empíric opac: descartada;
+- solver nou per cada frame o moviment submètric: descartat; scheduler + cache error-based;
+- usar Lluna/crepuscle per reclassificar el `BortleEquivalent` intrínsec del lloc: descartat.
 
 ## Migració
 
