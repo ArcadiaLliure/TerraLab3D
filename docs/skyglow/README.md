@@ -14,6 +14,8 @@ TerraLab3D és actualment Python 3.12+ al backend (`aiohttp`, `astropy`, `numpy`
 
 Hi haurà un únic `PropagationKernel`. Zenit, direccions arbitràries i cúpules són avaluacions del mateix operador físic. Les cúpules són una compressió angular del camp, no un segon model. La moneda interna és radiància lineal; magnituds, SQM, luminància, XYZ/RGB i Bortle són projeccions posteriors.
 
+Abans de promoure les cúpules com a resultat científic, la mateixa ruta del kernel a 90° ha de superar un **gate zenital radiomètric absolut**: unitats físiques coherents, convergència numèrica, comparació amb el solver de referència i absència de factors de calibratge arbitraris. No es crea un solver zenital paral·lel.
+
 ## Ordre de lectura
 
 1. `00-inventari-repositori.md`: estat real del codi i punts d'integració.
@@ -44,7 +46,12 @@ Hi haurà un únic `PropagationKernel`. Zenit, direccions arbitràries i cúpule
 - v1 de producció candidata single-scattering, explicitada com a simplificació pròpia;
 - Gauss–Kronrod 7/15 adaptatiu com a candidat congelat per benchmark;
 - cache invalidada per error de canvi, amb discontinuïtats geomètriques comprovades abans de la linealització;
-- benchmark B0–B7 abans de congelar bandes, ordre de Legendre, H_TOA o SLO.
+- benchmark B0–B7 abans de congelar bandes, ordre de Legendre, H_TOA o SLO;
+- gate zenital absolut abans de donar per vàlida la compressió direccional;
+- projeccions fotomètriques i de sensor sempre posteriors al kernel: cap conversió directa VIIRS→SQM ni `calibrationFactor` opac;
+- `BortleEquivalent` és una projecció orientativa versionada, no una magnitud física ni ground truth;
+- composició del cel en radiància lineal separant com a mínim artificial, natural sense Lluna, Lluna dispersada i crepuscle;
+- cap integral LOS al render loop ni una integral nova per frame: cache, coalescing, cancel·lació i precàrrega només si preserven una cota d'error mesurable.
 
 ## Candidats pendents de benchmark
 
