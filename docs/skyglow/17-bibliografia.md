@@ -32,6 +32,8 @@
 ## Mesura del cel
 
 - Bará, S. et al. (2019). *Absolute Radiometric Calibration of TESS-W and SQM Night Sky Brightness Sensors*. Sensors 19, 1336. DOI: 10.3390/s19061336.
+- CIE (2019). *The Basis of Physical Photometry, 3rd Edition*. CIE 018:2019. DOI: 10.25039/TR.018.2019.
+- Bortle, J. E. (2001). *Introducing the Bortle Dark-Sky Scale*. Sky & Telescope, 101(2), 126–129.
 
 ## Meteorologia i composició
 
