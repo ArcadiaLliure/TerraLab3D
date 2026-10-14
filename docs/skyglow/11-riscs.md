@@ -19,6 +19,10 @@
 | variabilitat GPU | mitjana | mitjà | benchmark dispositius | buffers simples, zero ciència shader | CPU-side LUT |
 | stutter per uploads | mitjana | alt UX | telemetry render | doble buffer/coalescing | conservar resultat anterior |
 | APIs externes no disponibles | mitjana | mitjà | health/status | cache persistent + jerarquia provider | reanàlisi/climatologia/standard |
+| confondre DNB/TOA amb luminància o SQM | mitjana | crític científic | tests d'unitats + gate zenital | projeccions post-kernel i sensor model explícit | `unavailable` |
+| Lluna/crepuscle contaminen Bortle de lloc | mitjana | alt | tests reference vs instantaneous | components separats i política moonless | no publicar BortleEquivalent |
+| recompute per frame / moviment ràpid | alta sense scheduler | alt UX/CPU | telemetry recomputeHz/queue | coalescing, cancel·lació, cache error-based, prefetch validat | últim resultat vàlid |
+| prefetch/cache publica resultat obsolet | baixa amb revisions | crític | stale revision tests | latest-wins + guardes versions/topologia/error | miss + recompute |
 
 ## Riscos bloquejants actuals
 
