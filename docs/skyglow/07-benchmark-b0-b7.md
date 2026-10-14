@@ -29,6 +29,10 @@ Warm-up: 5 passades completes descartades. Mesura: 30 passades per configuració
 
 Les toleràncies de producció no es fixen aquí. Per benchmark comparatiu: reference solver amb tolerància almenys 10× més estricta que la configuració candidata i comprovació de convergència duplicant exigència. `ε_quad` s'escombra logarítmicament (`1e-3,3e-4,1e-4,3e-5,1e-5` relatiu a escala normalitzada de l'escenari) i es reporta, no es tria per intuïció.
 
+## Checkpoint Z — gate zenital obligatori
+
+Abans de promoure `DomeProfile`, executar el mateix kernel només a 90° en fixtures sintètiques i almenys una fixture VIIRS/atmosfera/DEM reproduïble. Comparar runtime candidate contra reference solver en radiància física per banda. Reportar error, `coldMs`, `warmMs`, peak RSS i dependències tocades. El checkpoint falla si necessita un factor de calibratge opac o si 90° segueix una ruta diferent.
+
 ## B0 — infraestructura
 
 Geometria esfèrica, segmentació per tiles, GK 7/15 i integrand trivial. AD OFF. Mesura overhead pur, nodes/LOS, segments/LOS i subdivisions.
@@ -63,11 +67,11 @@ Afegir núvol single-scattering amb una capa òpticament prima/moderada. No usar
 
 ## B7 FULL
 
-Configuració candidata completa, AD OFF/ON i propagació d'incertesa OFF/ON. Incloure cache cold, warm hit, small-motion hit, atmospheric-tile change i occlusion flip obligatòriament miss.
+Configuració candidata completa, AD OFF/ON i propagació d'incertesa OFF/ON. Incloure cache cold, warm hit, small-motion hit, moviment continu 3D, precàrrega predictiva ON/OFF, teleport, atmospheric-tile change i occlusion flip obligatòriament miss. El moviment ràpid ha de demostrar coalescing/cancel·lació i absència d'integració per frame.
 
 ## Mètriques
 
-`latencyP50Ms`, `latencyP95Ms`, `latencyP99Ms`, `losPerSecond`, `domeSourcesPerSecond`, `losCount`, `segmentCount`, `quadratureNodeCount`, `phaseEvaluationCount`, `gkSubdivisionCount`, `cacheHits`, `cacheMisses`, `adOverhead`, `uncertaintyOverhead`, `cpuTimeMs`, `wallTimeMs`, `peakRssBytes`, `allocationCount` si disponible, `gpuTimeMs` si aplica, `radiometricError`, `angularError`.
+`latencyP50Ms`, `latencyP95Ms`, `latencyP99Ms`, `timeToFirstValidMs`, `recomputeHz`, `losPerSecond`, `domeSourcesPerSecond`, `losCount`, `segmentCount`, `quadratureNodeCount`, `phaseEvaluationCount`, `gkSubdivisionCount`, `cacheHits`, `cacheMisses`, `prefetchHits`, `prefetchMisses`, `cancelledJobs`, `staleResultsDiscarded`, `queueDepthMax`, `bridgeBytes`, `adOverhead`, `uncertaintyOverhead`, `cpuTimeMs`, `wallTimeMs`, `peakRssBytes`, `allocationCount` si disponible, `gpuTimeMs` si aplica, `radiometricError`, `angularError`.
 
 ## Esquema JSON mínim
 
