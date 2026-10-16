@@ -1,31 +1,110 @@
-# Contractes i acceptació del cel físic
+# Contractes, pressupostos, validació i SLO del cel físic
 
 ## Configuració
 
-- **skyRenderingMode:** simulated | physical, independent del mode de contaminació lumínica i de l'activació d'atmosfera; preferència persistent i serialitzada.
-- **spectralBandCount:** enter positiu configurable, sense dimensió compilada fixa; acompanyat de **spectralBandSetId**, intervals nm, ponderacions, convenció de radiància integrada o mostrejada, rang espectral i revisió de configuració. Si s'ofereixen límits explícits, el nombre ha de coincidir. Configuració invàlida → error tipat, no truncament silenciós.
-- **skyPhysicalAvailability:** available | unavailable | initializing; causa i versió; cap fallback silenciós de physical a simulated.
-- **observer:** lat/lon, altitud geodèsica/ortomètrica amb datum, altura relativa al terreny si escau, ECEF/ENU i revisió de geometria.
-- **atmosphericOpticsRevision:** identificador immutable de perfils i propietats compartides; validesa espacial/temporal i procedència.
-- **solarRadianceSource / lunarRadianceSource:** espectre, distància, geometria del disc, fase lunar, irradiància i incertesa amb unitats.
-- **physicalSkyResource:** transmittance LUT, multiscattering LUT, SkyView LUT RGB lineal i recursos d'aerial perspective quan calgui; clau de cache, dimensions, espai de color i propietari de GPU.
-- **skyRadianceComponents:** artificial, solar/twilight, lunar i naturalMoonless en espai lineal compatible; no sumar magnituds ni colors després de tone mapping.
+- **skyRenderingMode:** `simulated | physical`, persistent i independent de light pollution.
+- **spectralBandCount:** enter positiu configurable; mai dimensió compilada fixa ni N seleccionat per benchmark.
+- **spectralBandSetId:** intervals nm, ponderacions, convenció integrada/mostrejada, rang i revisió.
+- **skyPhysicalAvailability:** `initializing | available | unavailable` + causa + versió.
+- **observer:** lat/lon, datum, altitud geodèsica/ortomètrica, altura sobre DEM, ECEF/ENU i revisió.
+- **atmosphericOpticsRevision / cloudOpticalRevision:** claus immutables de l'estat òptic.
+- **solarRadianceSource / lunarRadianceSource:** espectre, disc, distància, fase, irradiància, qualitat i incertesa.
+- **naturalNightSkyState:** airglow, zodiacal, integrated starlight i components opcionals, cadascun amb disponibilitat/procedència.
+- **physicalSkyResource:** transmittance LUT, multiscattering LUT, SkyView RGB lineal i high-quality resources; dimensions/formats configurables.
+- **skyRadianceComponents:** artificial, solar/twilight, lunar i naturalMoonless en radiància lineal compatible.
 
-## Convencions espectrals
+## Radiometria i projeccions
 
-Distingir **radiància espectral** en W·m⁻²·sr⁻¹·nm⁻¹ de **radiància integrada per banda** en W·m⁻²·sr⁻¹. Cada conversió usa quadratura/pesos declarats; la radiància de VIIRS DNB és una mesura de banda ampla i no identifica per si sola un espectre d'emissió. Les respostes de SQM/TESS/CIE requereixen espectre o projecció calibrada pròpia, **mai** la inversió de la SkyView LUT RGB. Canviar spectralBandCount invalida caches, LUT científiques i projeccions dependents, no els catàlegs estel·lars.
+Distingir:
+- radiància espectral `W·m⁻²·sr⁻¹·nm⁻¹`;
+- radiància integrada per banda `W·m⁻²·sr⁻¹`;
+- irradiància `W·m⁻²`;
+- RGB lineal de presentació.
 
-## Proves obligatòries
+SQM/TESS/CIE utilitzen la seva RSR/FOV/zero point o pesos versionats. **Mai** s'inverteix la SkyView RGB per obtenir espectre.
 
-1. **Mode:** alternança repetida simulated↔physical sense recrear escena/bridge, conservar l'estat solar/lunar i de skyglow; errors visibles i dispose de recursos.
-2. **Bandes:** provar dimensions, límits, identificadors, unitats, suma/integració i invalidació de configuració activa. **No executar sweeps ni benchmarks per determinar el nombre de bandes.** Els benchmarks generals de runtime i la validació científica continuen.
-3. **Altitud:** superfície, muntanya, avió, estratosfera, límit superior de l'atmosfera i òrbita; oclusió del planeta, depressió d'horitzó, trajectes tangents, absència de salt en creuar capes i estabilitat ECEF/ENU.
-4. **Limbe:** arc diürn dispersat, costat nocturn, terminador, geometria solar i ombra terrestre; la franja no pot ser un anell afegit sense transferència física.
-5. **Fonts:** Sol/Lluna independents, fase/distància, disc directe vs dispersió, eclipsis, canvi de temps d'1 s/s i scrub ràpid amb latest-wins.
-6. **Ciència:** transmittance i radiància comparades amb casos analítics o solver de referència per la configuració escollida; resposta instrumental amb RSR/FOV/zero point; error/limitacions documentats.
-7. **Render:** SkyView LUT RGB lineal, gestió de color i exposició únics, ombres/il·luminació del terreny coherents; cap doble comptatge amb skyglow ni càlcul radiatiu artificial al render loop.
-8. **Llicències:** manifests/avisos per cada recurs incorporat, sense restricció comercial ni dades no verificades.
+Per una projecció lineal `q = Σ_b w_q,b L_b`, la cota d'error usa `Σ_b |w_q,b| E_b`; això també s'aplica a transformacions amb coeficients negatius, com una matriu XYZ→RGB. La decisió de pruning es pren abans de tone mapping.
+
+## RadiativeErrorBudget
+
+Per cada contribució `i` i banda `b` cal una cota demostrable:
+`0 <= L_i,b <= U_i,b`.
+
+Si es descarta un conjunt `D`:
+`E_b,max = Σ_(i in D) U_i,b`.
+
+Defaults inicials **configurables**:
+- una contribució individual descartada: `<= 0.1 %` de la senyal de referència activa;
+- suma de descartes numèrics: `<= 0.5 %`;
+- projecció de sensor atribuïble al pruning: `<= 0.5 %` o tolerància instrumental més estricta;
+- prop de zero: `radianceAbsoluteFloor` obligatori per evitar mètrica relativa singular.
+
+Per treball repetitiu entre frames, histèresi de scheduler: entrar en estat skipped només si la cota queda per sota de `0.8 ×` el pressupost assignat; sortir-ne quan supera el pressupost complet. El ledger acumulat continua sent l'autoritat.
+
+**Si no es pot demostrar una cota conservadora, no es poda.**
+
+## Cotes conservadores
+
+Els bounds poden utilitzar només factors que no subestimin:
+- emissió/irradiància màxima del node o font;
+- `T <= 1` quan ignorar extinció sigui conservador;
+- màxim de coeficient de scattering per banda/segment;
+- `phaseMax` de la funció de fase;
+- distància mínima geomètrica i longitud de segment màxima;
+- envelope de núvols/aerosols. Si les núvols poden augmentar la radiància i no hi ha envelope segur, pruning desactivat;
+- `Kmax` versionat i validat per qualsevol aproximació de multiple scattering.
+
+Ocultar terreny pot reduir radiància; **no** es pot usar una oclusió incerta per justificar un bound inferior.
+
+## Validació científica
+
+Oracles:
+- Bruneton CPU/espectral: clear-sky, transmittance, scattering i colorimetria;
+- path tracer Hillaire: geometria i multiple scattering;
+- ROLO/USGS: irradiància lunar;
+- GAMBONS i ESO/SkyCalc: referència externa de fons natural, sense vendoritzar codi incompatible;
+- ecRad/discrete ordinates o equivalent: núvols;
+- solucions analítiques: esfera, tangència, depressió d'horitzó i casos límit.
+
+Gates inicials de **software**, no afirmacions d'exactitud del món real:
+- transmittance clear-sky vs referència: p95 `<= 2 %`;
+- radiància clear-sky fora de singularitats: p95 `<= 2 %`;
+- error numèric/interpolació lunar vs ROLO: `<= 0.5 %` dins del seu domini;
+- error acumulat introduït per culling: `<= 0.5 %`;
+- error numèric SQM/TESS atribuïble al solver: `<= 1 %` o tolerància instrumental més estricta;
+- cap discontinuïtat artificial en `simulated↔physical` ni en travessar top-of-atmosphere.
+
+La incertesa de ROLO, aerosols, núvols, airglow o dades d'entrada es registra **separada** d'aquests errors d'implementació.
+
+## Matriu mínima
+
+- altura: 0 m, muntanya, 10 km, 30 km, top-of-atmosphere i òrbita;
+- Sol: +90°, +30°, +5°, 0°, −6°, −12°, −18° i profundament ocult;
+- vista: zenit, horitzó, solar, 90° solar, antisolar i limbe;
+- aerosols: net, nominal i AOD alt;
+- Lluna: plena/nova, 30°, 60°, 90°, >90°, perigeu/apogeu, eclipsi;
+- núvols: clear, `τ≈0.1, 1, 5, 20`, líquid/gel quan hi hagi dades;
+- fons natural: airglow baix/nominal/alt i geometries eclíptiques;
+- timeline: 1 s/s, salts, scrub continu i temps invers.
+
+No es fa un benchmark `N=3/6/8/12` per seleccionar bandes.
+
+## SLO inicial `desktop-60`
+
+Perfil de referència, **no promesa universal de hardware**:
+- frame total: 16,67 ms;
+- CPU d'actualització física de cel: `<=0.5 ms p95` excloent jobs offline;
+- actualització SkyView GPU: `<=2 ms p95`;
+- SkyView + composició durant scrub: `<=4 ms p99`;
+- input timeline → cel corresponent: objectiu `<=1 frame`, `p95 <=2 frames`;
+- cua efectiva de revisions: màxim 1 pendent;
+- SkyView inicial: `192×108`, configurable;
+- format preferit: `R11G11B10F` si és renderitzable; fallback `RGBA16F`;
+- rellotge normal: 1 Hz; scrub: màxim 1 update per frame;
+- LUT base de cel físic: objectiu <8 MiB, recursos de núvol separats.
+
+El hardware de referència, driver, resolució i navegador/WebGL s'han de registrar abans d'homologar.
 
 ## Condició de sortida
 
-El mode simulat preserva el comportament històric; el físic és calculat, traçable i disponible quan se selecciona; l'altura i el limbe són correctes; no es promet precisió espectral a partir de RGB; l'estat funcional només passa a completat amb proves i evidències reals. Els SLO de GPU i CPU es mesuren independentment del nombre de bandes seleccionat.
+El mode simulat conserva el comportament històric; el físic és calculat, traçable i legalment distribuïble; l'altura, limbe, fons natural, Lluna, núvols, pruning i scheduler tenen contractes verificats; les mètriques científiques no depenen de RGB; i els SLO s'han mesurat amb evidència.

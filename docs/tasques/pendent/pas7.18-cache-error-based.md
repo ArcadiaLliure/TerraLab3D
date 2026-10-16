@@ -11,6 +11,7 @@ Moviments petits reutilitzen resultats només si l'error és acotat.
 - [`docs/skyglow/README.md`](../../skyglow/README.md).
 - [`02-arquitectura-integracio.md`](../../skyglow/02-arquitectura-integracio.md), [`08-validacio-cientifica.md`](../../skyglow/08-validacio-cientifica.md) i [`09-incertesa-proveniencia.md`](../../skyglow/09-incertesa-proveniencia.md).
 - [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+- [`docs/cel-fisic/04-contractes-validacio.md`](../../cel-fisic/04-contractes-validacio.md) per al contracte compartit `RadiativeErrorBudget`.
 
 ## Objectiu
 
@@ -26,6 +27,7 @@ Implementar cache amb guardes topològiques i estimació contínua de `ΔB`.
 **En depenen:**
 - [Pas 7.19](pas7.19-uncertainty-registry.md)
 - [Pas 7.21](pas7.21-dome-profile-pchip.md)
+- [Pas 7.62 — Pressupost d'error del cel físic](pas7.62-radiative-error-budget.md)
 
 ## Codi existent a reutilitzar
 
@@ -48,6 +50,8 @@ request/revision → coalescing → occlusion/topology guards → envelope → �
 
 - [ ] Implementar només l'abast d'aquest pas.
 - [ ] Afegir unitats, versions i procedència.
+- [ ] Fer explícit el `RadiativeErrorBudget`: cota superior per banda, ledger acumulat i regla **si no hi ha cota conservadora, no hi ha pruning/reuse**.
+- [ ] Projectar les cotes a SQM/TESS/CIE amb pesos absoluts; cap decisió de cache basada només en diferència visual.
 - [ ] Afegir proves de discontinuïtats i casos límit.
 - [ ] Executar benchmark/validació indicats.
 - [ ] Mesurar cold/warm, small-motion, moviment continu 3D, teleport, prefetch ON/OFF, coalescing, cancel·lació i time-to-first-valid.
@@ -55,7 +59,7 @@ request/revision → coalescing → occlusion/topology guards → envelope → �
 
 ## Criteri de sortida
 
-occlusion flip sempre miss, tile no relacionat no invalida i small move pot hit. cold/warm/small-motion/tile-change. Cap integral per frame; moviment ràpid es coalesça; teleport no reutilitza fora d'envelope; prefetch no pot produir false hit. La decisió queda traçable i reproduïble.
+occlusion flip sempre miss, tile no relacionat no invalida i small move pot hit només quan la cota acumulada d'error continua dins del `RadiativeErrorBudget`. cold/warm/small-motion/tile-change. Cap integral per frame; moviment ràpid es coalesça; teleport no reutilitza fora d'envelope; prefetch no pot produir false hit. La decisió queda traçable i reproduïble.
 
 ## Proves i evidències obligatòries
 
@@ -71,7 +75,7 @@ SLO final de producció.
 
 ## Instrucció per a Codex
 
-request → occlusion/topology guards → envelope → ΔB geometry+atmosphere → hit/miss. No converteixis aproximacions de cache o renderer en física del kernel.
+request → occlusion/topology guards → envelope → bound conservador + `RadiativeErrorBudget` → hit/miss. Si no es pot demostrar el bound, força miss. No converteixis aproximacions de cache o renderer en física del kernel.
 
 ## Treball pendent
 

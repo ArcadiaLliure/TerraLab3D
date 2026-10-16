@@ -31,10 +31,21 @@ Els identificadors de pas d'aquesta taula són els proposats pel lot documental;
 
 | Requeriment | Decisió | Document | Pas | Test/evidència |
 |---|---|---|---|---|
-| Llicències comercials | Hillaire MIT, Bruneton BSD-3, Third-Party per recurs incorporat | cel-fisic/03 | 7.51 | gate de manifests i avisos |
-| Selector simulat/real | flag persistent, estratègies independents | cel-fisic/01 | 7.52 | alternança i regressió legacy |
-| Altura | estat geodèsic i òptic compartit | cel-fisic/02 | 7.53,7.58 | superfície/estratosfera/òrbita |
-| Fonts Sol/Lluna | irradiància espectral i fase separades | cel-fisic/02 | 7.54–7.55 | unitats/fase/eclipsi |
-| SkyView LUT | RGB lineal només per render, sensors espectrals | cel-fisic/01,04 | 7.56–7.57 | colorimetria i projeccions independents |
-| Limbe solar terrestre | raigs tangents, oclusió i terminador | cel-fisic/02 | 7.58 | arc diürn/nocturn i altitud |
-| Integració i homologació | latest-wins, sense stutter, mode simulat permanent | cel-fisic/04 | 7.59–7.62 | SLO, llicències i regressions |
+| Llicències comercials | allowlist permissiva; Hillaire MIT, Bruneton BSD-3, ROLO/USGS PD, Copernicus amb atribució; copyleft només referència sota política actual | cel-fisic/03 | 7.51 | manifests, avisos i gate de distribució |
+| Selector simulat/real | flag persistent i estratègies independents | cel-fisic/01 | 7.52 | alternança i regressió legacy |
+| Altura/geodèsia | estat ECEF/ENU + òptica compartida | cel-fisic/02 | 7.53, 7.58 | superfície/estratosfera/òrbita |
+| Font solar | irradiància espectral + disc/distància/eclipsis | cel-fisic/02 | 7.54 | unitats i geometria |
+| Lluna | ROLO/USGS + reflectància Hapke/LS separada | cel-fisic/02,05 | 7.55 | fixtures ROLO, fase i extrapolació |
+| Transport | Hillaire runtime + branca espectral independent | cel-fisic/01 | 7.56 | Bruneton/path tracer |
+| SkyView | RGB lineal; 192×108 perfil inicial configurable; sensors espectrals | cel-fisic/01,04 | 7.57 | colorimetria, format i projeccions |
+| Limbe/terminador | raigs tangents + high-quality pass per error | cel-fisic/02 | 7.58 | superfície→òrbita, arc dia/nit |
+| Il·luminació | directe/difús/ombra/eclipsi sense doble comptatge | cel-fisic/02 | 7.59 | terreny/cel/eclipsi |
+| Integració | façana Three.js, lifecycle i revisions | cel-fisic/01 | 7.60 | context loss/resync |
+| Fons natural | airglow + zodiacal + integrated starlight; Pas 10 conserva Via Làctia | cel-fisic/02,05 | 7.61 | GAMBONS/ESO extern + no double count |
+| Error budget | cota superior; 0,1 % individual / 0,5 % acumulat defaults | cel-fisic/04,05 | 7.62 | falsos pruning = 0, sensor bounds |
+| Núvols | CloudOpticalState compartit; delta-Eddington astral | cel-fisic/02,04 | 7.63 | clear/τ i oracle cloud |
+| Scheduler | latest-wins monotònic, queue efectiva <=1 | cel-fisic/01,04 | 7.64 | stale/cancel/scrub |
+| Oracle | Bruneton + Hillaire path tracer + ROLO + oracles específics | cel-fisic/04,05 | 7.65 | fixtures reproduïbles |
+| Validació | radiometria/sensors/geometria separats | cel-fisic/04 | 7.66 | matriu i gates |
+| Rendiment | perfil desktop-60; p95/p99; independent de N | cel-fisic/04 | 7.67 | telemetry reproduïble |
+| Homologació | legal + científica + runtime + simulated permanent | cel-fisic/04 | 7.68 | informe final i recovery |

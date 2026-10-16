@@ -42,6 +42,8 @@ transport físic → SkyView LUT RGB lineal → composició radiància compatibl
 ## Tasques
 
 - [ ] Definir espai RGB lineal, intensitats i unitats de la SkyView LUT, sense tone mapping en la textura.
+- [ ] Fixar **perfil inicial configurable** `192×108` per SkyView; no és una constant científica. Negociar `R11G11B10F` si és renderitzable i `RGBA16F` com a fallback.
+- [ ] Mesurar memòria/upload i exposar dimensions/formats en diagnòstic; la resolució angular és independent de `spectralBandCount`.
 - [ ] Evitar doble gamma, doble comptatge del disc solar/lunar i suma de colors ja exposats.
 - [ ] Definir spectralBandCount configurable, bandSetId, límits/ponderacions i invalidació de cache; no fixar N a 8.
 - [ ] Conservar espectres solar/lunar i resposta CIE/SQM/TESS fora de la LUT RGB; mai inferir sensors des de píxels.
@@ -49,11 +51,12 @@ transport físic → SkyView LUT RGB lineal → composició radiància compatibl
 
 ## Criteri de sortida
 
-La SkyView LUT visual és RGB lineal, mentre la fotometria continua espectral i independent del selector.
+La SkyView LUT visual és RGB lineal, de resolució/formats configurables, mentre la fotometria continua espectral i independent del selector.
 
 ## Proves i evidències obligatòries
 
 - [ ] RGB lineal→exposició únic i composició lineal abans de tone mapping.
+- [ ] Perfil `192×108` i formats GPU compatibles sense canviar resultats científics; pujar resolució no pot alterar SQM/TESS.
 - [ ] Canvi de spectralBandCount: coherència dimensional/units i invalidació, sense benchmark de selecció de N.
 - [ ] Projeccions instrumentals no canvien en alternar mode visual simulat/real.
 - [ ] Evidències reproduïbles sota docs/evidencies/pas7.57/ quan s'implementi.

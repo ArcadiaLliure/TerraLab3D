@@ -2,31 +2,49 @@
 
 ## Política vinculant
 
-**No incorporar codi, textures, dades espectrals ni LUT de tercers amb restriccions d'ús comercial.** La disponibilitat pública, la publicació científica i l'ús en un motor comercial no concedeixen per si mateixos permís de còpia o redistribució. Registrar origen, URL, commit/versió, titular, text de llicència, atribució, dret de modificació, distribució de binaris, datasets derivats i dependències transitives abans de fer vendoring.
+Només es poden incorporar codi i dades amb **llicència permissiva compatible amb distribució comercial** o amb termes de dades que autoritzin explícitament l'ús requerit. La política no es limita literalment a MIT/BSD: pot admetre MIT, BSD, Apache-2.0, domini públic i llicències de dades comercials compatibles, sempre amb manifest i obligacions verificades.
 
-## Implementacions verificades (consulta de repositoris originals, 2026-10-16)
+La disponibilitat pública d'un article o repositori **no** autoritza automàticament codi, assets, LUT, taules o datasets. Registrar URL, versió/commit, titular, llicència, atribució, modificació, redistribució, derivats, checksum i dependències transitives.
 
-| Recurs | Llicència del repositori consultat | Ús comercial | Obligacions / límit |
-|---|---|---|---|
-| [Hillaire — UnrealEngineSkyAtmosphere](https://github.com/sebh/UnrealEngineSkyAtmosphere) | [MIT](https://github.com/sebh/UnrealEngineSkyAtmosphere/blob/master/LICENSE), copyright 2020 Epic Games, Inc. | **Permès** per al codi cobert per aquesta llicència | Conservar copyright i avís MIT en còpies o porcions substancials. Portar shaders/algoritme necessaris, no assumir llicència de tots els submòduls |
-| [Bruneton — precomputed_atmospheric_scattering](https://github.com/ebruneton/precomputed_atmospheric_scattering) | [BSD-3-Clause](https://github.com/ebruneton/precomputed_atmospheric_scattering/blob/master/LICENSE), copyright 2017 Eric Bruneton | **Permès** | Retenir avisos i disclaimer; no usar noms per promocionar sense permís |
-| [Three.js](https://github.com/mrdoob/three.js) | [MIT](https://github.com/mrdoob/three.js/blob/master/LICENSE) | **Permès** | Conservar avís i copyright en distribució |
-| Unreal Engine i altres fitxers no coberts pel repositori MIT de Hillaire | **No verificat com a MIT** | **No autoritzat per inferència** | No copiar codi del motor ni assets propietaris; cal llicència independent |
+## Recursos verificats o elegibles
 
-L'exemple Hillaire conté submòduls com imgui i tinyexr i indica codi Bruneton copiat amb autorització. **No importar la demo sencera**: cada fitxer de tercers o dependència que es vulgui incorporar requereix auditoria individual. La llicència MIT del repositori no substitueix la dels submòduls.
+| Recurs | Situació | Política TerraLab3D |
+|---|---|---|
+| Hillaire — `sebh/UnrealEngineSkyAtmosphere` | MIT per al codi del repositori cobert pel LICENSE | **Permès** amb avís; no inferir drets sobre Unreal Engine ni submòduls |
+| Bruneton — `precomputed_atmospheric_scattering` | BSD-3-Clause | **Permès** amb avisos BSD |
+| Three.js | MIT | **Permès** |
+| ROLO/USGS lunar model/database | recursos USGS produïts pel govern federal, generalment domini públic; verificar cada fitxer i qualsevol contingut de tercers | **Preferit** per al model lunar, amb provenance per fitxer |
+| ecRad / implementacions de referència modernes auditades | Apache-2.0 quan la versió exacta ho declari | **Permès** com a referència o dependència si es fixa versió i avisos |
+| ERA5/CAMS/Copernicus | llicència de productes Copernicus compatible amb ús/redistribució comercial amb atribució, segons producte | **Permès** només amb manifest del producte exacte i text d'atribució |
 
-## Models i dades encara no autoritzats per incorporar
+## Recursos de referència que no es vendoritzen amb la política actual
 
-- Espectre solar tabulat, reflectància/espectre lunar, paràmetres de models tipus ROLO, ozó/gasos, taules Mie i altres LUT: **pendent de verificar la llicència del producte/versió exactes**. Preferir models propis basats en equacions publicades i dades de domini públic o llicència permissiva verificable; les equacions publicades no impliquen que les taules o el codi de l'article siguin lliures.
-- Productes meteorològics i òptics ERA5/CAMS: registrar producte concret, termes Copernicus i atribució. Les dades VIIRS, HITRAN i DEM tenen auditories específiques a [datasets skyglow](../skyglow/10-datasets-llicencies.md).
-- Referències visuals, imatges terrestres o de núvols, fotografies i calibratges d'instruments: no empaquetar sense drets comercials i de redistribució verificats.
+| Recurs | Motiu | Ús permès al pla |
+|---|---|---|
+| ESO Advanced Sky Model / SkyCalc software | GPL en el software distribuït | articles, metodologia i comparacions externes; no incorporar el codi runtime |
+| LIME Toolbox | LGPL-3 segons el repositori auditat | oracle extern/validació; no vendoritzar mentre la política exclogui copyleft |
+| Hipparcos/Tycho com a nova dependència distribuïda | pàgines oficials poden imposar termes no comercials al producte concret | no introduir com a nova font comercial sense revisió específica |
+| Gaia i derivats | els crèdits/open access no substitueixen els termes del release/producte exacte | reutilitzar només el recurs ja autoritzat pel projecte o auditar el producte concret abans de crear nous derivats |
+
+GPL/LGPL **no significa “no comercial”**; s'exclouen del producte distribuït per la política de copyleft/compatibilitat del projecte, no perquè prohibeixin vendre.
+
+## Fonts i URLs a registrar
+
+- Hillaire: https://github.com/sebh/UnrealEngineSkyAtmosphere
+- Bruneton: https://github.com/ebruneton/precomputed_atmospheric_scattering
+- ROLO/USGS: https://www.usgs.gov/media/files/rolo-lunar-model-and-database
+- Copernicus licence: https://cds.climate.copernicus.eu/licences/licence-to-use-copernicus-products
+- ecRad: https://confluence.ecmwf.int/spaces/ECRAD/overview
+- LIME: https://github.com/LIME-ESA/lime_tbx
+- ESO Sky Model: https://www.hq.eso.org/sci/software/pipelines/skytools/skycalc
 
 ## Gate d'implementació
 
-1. Fixar commit exacte de la font MIT/BSD i fitxers realment reutilitzats.
-2. Inventariar dependències, fragments de codi, datasets i possibles restriccions.
-3. Copiar els avisos necessaris a **THIRD-PARTY.md** només quan s'incorpori efectivament codi/recurs; aquest dossier és **planificació**, no declaració d'inclusió.
-4. Bloquejar qualsevol asset o LUT amb drets no verificats; no substituir-lo per un resultat opac sense procedència.
-5. Mantenir test de distribució que comprovi avisos i manifests.
+1. Fixar versió/commit i fitxers realment reutilitzats.
+2. Resoldre llicència **per fitxer/dataset**, inclosos submòduls i dades.
+3. Bloquejar `unavailable` qualsevol recurs de drets incerts; no substituir-lo per dades opaques.
+4. Actualitzar `THIRD-PARTY.md` només quan el recurs s'incorpori realment.
+5. Mantenir manifests d'atribució i proves de distribució.
+6. No copiar codi propietari d'Unreal Engine ni assets propietaris perquè l'exemple Hillaire sigui MIT.
 
-Aquesta auditoria tècnica no substitueix una revisió jurídica de la distribució comercial final.
+Aquesta auditoria tècnica no substitueix la revisió jurídica de la distribució comercial final.

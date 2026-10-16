@@ -2,37 +2,66 @@
 
 ## Decisió
 
-El selector de configuració **skyRenderingMode = simulated | physical** és estable i independent de **lightPollutionMode = automatic | bortle | magnitude** i d'**atmosphereEnabled**. La UI pot etiquetar els valors «Simulat» i «Real (físic)», però «real» significa model físic calculat, no observació meteorològica en directe. El valor inicial conserva **simulated** fins que la ruta física estigui homologada; no s'elimina el mode simulat en completar-la.
+`skyRenderingMode = simulated | physical` és estable, persistent i independent de `lightPollutionMode` i d'`atmosphereEnabled`. La UI pot etiquetar «Simulat» i «Real (físic)»; «real» significa model físic calculat, no meteorologia observada en directe. El valor inicial continua sent `simulated` fins a l'homologació i el mode simulat **no s'elimina** després.
 
-## Responsabilitats, segons docs/normes-arquitectura.md
+## Responsabilitats
 
-| Capa existent | Responsabilitat | Prohibició |
+| Capa | Responsabilitat | Prohibició |
 |---|---|---|
-| backend/domain/astronomy, sky_background i atmosphere | Efemèrides autoritatives, irradiància solar/lunar, geometria ECEF/geodèsica, òptica, coeficients espectrals, resultats físics i incertesa | No coneix Three.js, WebGL ni UI |
-| backend/application | Selecció del mode, revisió temporal/observador, orquestració de serveis i ports, invalidació de resultats obsolets | No duplica models científics |
-| backend/infrastructure | Datasets i LUT precalculades autoritzades, checksums, cache, workers i procedència | No fixa per si sola l'estat científic |
-| backend/scene | Snapshot/deltes neutrals: mode, identificadors de recursos, vectors, altures, versions i estat de disponibilitat | No conté shaders ni fórmules físiques |
-| frontend/contracts i bridge | DTOs tipats, correlació, unitats, versió, revisió, recuperació | No envia espectres gegants per fotograma |
-| frontend/application i view/ui | Preferència de mode, indicador de disponibilitat i diagnòstic | No infereix SQM de colors |
-| frontend/view/three | Estratègies de render **SimulatedSkyRenderer** i **PhysicalSkyRenderer**, SkyView LUT, buffers, uniforms, selecció, dispose i GPU | No és font autoritativa d'efemèrides, sensors ni atmosfera |
+| `backend/domain/astronomy` | efemèrides, `SolarRadianceSource`, `LunarIrradianceProvider`, geometria de disc/fase | no coneix Three.js |
+| `backend/domain/atmosphere` | `AtmosphericOpticsState`, `CloudOpticalState`, transport espectral de referència, `NaturalNightSkyModel`, `RadiativeErrorBudget` | no conté UI ni caches GPU |
+| `backend/domain/photometry` | `SpectralBandSet`, integració CIE/SQM/TESS i transformacions amb unitats | no llegeix SkyView RGB com a espectre |
+| `backend/application` | `PhysicalSkyCoordinator`, `SkyRevisionScheduler`, coalescing, revisió/invalidation | no duplica física |
+| `backend/infrastructure` | datasets, manifests, ROLO, Copernicus, caches persistents i adapters de solver de referència | no fixa l'estat científic per si sola |
+| `backend/scene` | snapshots/deltes neutrals, revisions, disponibilitat i identificadors de recursos | no inclou shaders |
+| `frontend/contracts` / bridge | DTOs tipats, unitats, correlació i recovery | no envia espectres gegants per frame |
+| `frontend/application` / UI | preferència de mode, qualitat i diagnòstic | no calcula SQM |
+| `frontend/view/three` | `SkyRendererFacade` → `SimulatedSkyRenderer` / `PhysicalSkyRenderer`, LUTs, buffers, high-quality limb pass, lifecycle GPU | no és autoritat d'efemèrides ni sensors |
 
-**Integració al codi real:** mantenir el camí de **AtmosphereRenderer.ts**, **shaders/skyShader.ts** i **sky_palette.py** com a estratègia simulada; crear una estratègia física separada darrere d'una façana/selector integrat a **ThreeSceneHostImpl** i al **RenderLoopImpl**. Reutilitzar el mateix horitzó/DEM, càmera, ordre de dibuix, estat solar/lunar, registre de recursos i política de color. No instanciar dues escenes o dos ponts.
+El camí actual `AtmosphereRenderer.ts`, `shaders/skyShader.ts` i `sky_palette.py` queda com a estratègia **simulated**. El físic entra darrere de la mateixa façana i del mateix `ThreeSceneHostImpl`; no es crea una segona escena, un segon bridge ni un segon rellotge.
 
 ## Dos integradors, una òptica compartida
 
-1. **Cel astral:** radiació solar/lunar incident, transport atmosfèric de fonts direccionals llunyanes, transmittance/multiscattering/SkyView LUT, perspectiva aèria i llum de terreny. Referència algorísmica: Hillaire 2020, implementació MIT verificada.
-2. **Skyglow artificial:** emissions terrestres distribuïdes VIIRS + priors SPD, PropagationKernel, DEM, cúpules i projeccions. Detall a [skyglow](../skyglow/README.md).
-3. **Estat òptic compartit:** pressió, temperatura, densitats, aerosols, ozó/gasos, núvols quan suportats, altitud, data, geodèsia i procedència; cada integrador fa la seva pròpia transferència, amb versions compatibles.
-4. **Composició:** radiància artificial + solar dispersada + lunar dispersada + fons natural nocturn, només si unitats, espectre, direcció i temps són compatibles; evitar doble comptar el disc directe, el crepuscle o el skyglow. El BortleEquivalent de lloc continua sense Lluna ni crepuscle.
+1. **Cel astral:** Sol/Lluna com a fonts externes direccionals + Hillaire/LUT per runtime visual + ruta espectral científica separada.
+2. **Skyglow artificial:** VIIRS + priors SPD + `PropagationKernel` + DEM + cúpules.
+3. **Estat compartit:** pressió, temperatura, densitats, aerosols, ozó/gasos, `CloudOpticalState`, altitud, geodèsia, temps i procedència.
+4. **Composició:** artificial + solar/twilight + lunar + `naturalMoonless` només en radiància lineal compatible i abans d'exposició/tone mapping.
+5. **BortleEquivalent:** continua sent mètrica de lloc de referència sense Lluna ni crepuscle.
 
-## RGB visual i banda científica
+Compartir `AtmosphericOpticsState`, `CloudOpticalState` i `RadiativeErrorBudget` **no** autoritza a compartir els integradors o les caches radiatives.
 
-La **SkyView LUT RGB lineal** és un format de presentació, no un oracle de fotometria. L'exemple Hillaire resol normalment tres components RGB efectives; aquesta aproximació no equival a una solució espectral completa. La branca científica conserva les distribucions espectrals solar/lunar i les bandes configurades quan es calculen luminància, SQM/TESS o altres sensors. No es reconstrueix un espectre únic a partir de RGB ni es fa servir la LUT RGB com a entrada científica d'instruments.
+## RGB visual i branca científica
 
-El nombre de bandes del càlcul espectral es configura per **spectralBandCount**, amb definició determinista de límits/ponderacions, identificador de band set i procedència. No hi ha nombre obligatori ni campanya de benchmarks per seleccionar-lo; les proves d'unitats, consistència i resultats físics de la configuració activa continuen sent necessàries. El nombre de canals de la LUT RGB és sempre tres.
+La **SkyView LUT RGB lineal** és una textura de presentació. Hillaire utilitza tres components efectives en runtime; això no equival a una discretització espectral completa.
 
-## Actualització i errors
+La branca científica conserva:
+- `spectralBandCount` configurable;
+- `spectralBandSetId`, límits nm, pesos i convenció d'integració;
+- espectres/irradiàncies solar i lunar;
+- radiància natural i artificial per banda;
+- RSR/FOV/zero point de cada instrument.
 
-La UI i el render són **latest-wins**: quan canvien hora, Sol, Lluna, observador o mode, l'última revisió preval; les LUT dependents de direcció/altitud es recalculen a GPU quan correspon, i les que depenen només de l'atmosfera es reutilitzen mentre les seves claus siguin vàlides. Cap debounce perceptible a la timeline. La física del skyglow artificial no s'integra per fotograma.
+No es reconstrueix espectre a partir de RGB. Canviar `spectralBandCount` invalida només recursos científics dependents; la dimensió de SkyView continua sent RGB.
 
-Si **physical** no està disponible, exposar **unavailable** i la causa; només una acció explícita de l'usuari pot canviar a **simulated**. El canvi de mode és reversible, sense fugues de GPU ni canvis en resultats SQM/TESS. El render de la Terra/limbe és propietat de la ruta física, no del shader de gradient.
+## Scheduler i invalidació
+
+`SkyRevisionScheduler` és **latest-wins**:
+- una petició nova substitueix qualsevol petició pendent no iniciada;
+- un resultat només es publica si `result.revision == currentRequestedRevision`;
+- un resultat antic pot entrar en cache només si la seva clau física completa continua vàlida;
+- no hi ha debounce perceptible;
+- rellotge normal: actualització física objectiu 1 Hz;
+- scrub: com a màxim una nova avaluació SkyView per frame presentat.
+
+Regla d'invalidació inicial:
+
+| Canvi | Transmittance / multiscattering | SkyView | branca espectral | skyglow artificial |
+|---|---|---|---|---|
+| +1 s amb òptica igual | reutilitzar | actualitzar si canvia geometria | fonts/geom. segons cadència | no per frame |
+| scrub temporal | reutilitzar si òptica igual | sí | sí segons geometria | només si l'estat temporal ho exigeix |
+| AOD/perfil/gasos/núvol | invalidar | invalidar | invalidar | invalidar dependències |
+| altura/teleport | revisar clau | invalidar | invalidar geometria | revisar envelope/topologia |
+| rotació de càmera | no | normalment no, es consulta altra direcció | no | no integral nova |
+| `spectralBandCount` | no per la LUT RGB | no per dimensió | invalidar | invalidar vectorització espectral |
+
+Si `physical` no està disponible, s'exposa la causa; només una acció explícita canvia a `simulated`.

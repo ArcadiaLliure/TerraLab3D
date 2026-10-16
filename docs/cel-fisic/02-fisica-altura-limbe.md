@@ -1,34 +1,77 @@
-# Física del Sol, la Lluna, l'altura i el limbe terrestre
+# Física del Sol, la Lluna, el fons nocturn, l'altura i el limbe terrestre
 
-## Fonts radiatives
+## Sol
 
-**Sol:** reutilitzar efemèrides i distància Sol–Terra autoritatives; model d'irradiància espectral amb unitats, calibratge i procedència. Calcular disc directe, extinció, dispersió Rayleigh/Mie i absorció gasosa; evitar confondre intensitat visual amb radiància física. La geometria del disc i eclipsis és coherent amb el Pas 9.
+Reutilitzar efemèrides i distància Sol–Terra autoritatives. `SolarRadianceSource` conserva irradiància espectral, geometria del disc, distància, unitats, revisió i incertesa. Disc directe, extinció, dispersió Rayleigh/Mie, absorció gasosa i eclipsis són components diferents; la intensitat visual no substitueix la radiometria.
 
-**Lluna:** direcció, distància, fase, geometria Sol–Lluna–observador i irradiància espectral reflectida; el model de fase/oposició i albedo espectral ha de tenir procedència i drets verificats. Transportar la font lunar amb la mateixa òptica, sense tractar-la com un Sol de color blanc simplement atenuat. Separar disc lunar directe, dispersió lunar i il·luminació lunar de superfícies.
+No hi ha un llindar solar fix que apagui el crepuscle. A cada punt de ray march s'avaluen per separat:
+1. visibilitat **Sol → mostra atmosfèrica**;
+2. visibilitat **mostra → observador**.
 
-**Crepuscle i nit:** no introduir un llindar solar fix que talli la radiància; calcular dispersió quan el Sol és geomètricament sota l'horitzó local però il·lumina capes atmosfèriques altes. El fons sense Lluna (airglow, estrelles, zodiacal) és un component explícit amb estat **available/unavailable**, mai una constant opaca per calibrar el skyglow.
+Això permet que el Sol sota l'horitzó de l'observador continuï il·luminant capes altes.
+
+## Lluna: decisió ROLO + reflectància separada
+
+La Lluna no és el Sol multiplicat per un factor RGB.
+
+Es separen dues responsabilitats:
+- **`LunarIrradianceProvider`**: quantitat espectral integrada que arriba des del disc lunar.
+- **`MoonSurfaceReflectanceModel`**: distribució espacial de brillantor sobre el disc visible.
+
+**Model principal:** ROLO/USGS per irradiància integrada en disc dins del domini observacional cobert aproximadament fins a `|phaseAngle| <= 90°`, amb geometria de fase, libració i distàncies. La implementació ha de conservar la incertesa del model i no confondre error d'interpolació amb exactitud física absoluta.
+
+**Fora del domini ROLO:** extensió de reflectància basada en Hapke, amb Lommel-Seeliger com a fallback mínim, calibrada per continuïtat a la frontera i marcada `quality=extrapolated`. Una fase >90° no pot presentar la mateixa confiança que el domini calibrat.
+
+`LunarRadianceSource` inclou com a mínim direcció, radi angular, `spectralIrradiance[N]`, distància, angle de fase, incertesa, `quality` i revisió. Hillaire consumeix la font; **no** implementa ROLO/Hapke.
+
+Separar disc lunar directe, dispersió lunar atmosfèrica i irradiància lunar sobre terreny.
+
+## Fons natural sense Lluna
+
+`NaturalNightSkyModel` és independent del skyglow artificial i de la Lluna:
+
+`L_natural = L_airglow + L_zodiacal + L_integratedStarlight + L_optionalExtragalactic`.
+
+- **Airglow:** model paramètric propi, espectral i versionat; dependències mínimes de zenit/airmass, temps i proxy d'activitat solar quan sigui disponible. Cap constant opaca de “night floor” pot ser resultat científic.
+- **Llum zodiacal:** geometria eclíptica + espectre solar reflectit, amb coeficients/dataset de llicència auditada.
+- **Integrated starlight:** mapa/angularització precomputada a partir d'un catàleg autoritzat; excloure exactament les estrelles que el renderer resol individualment.
+- **Via Làctia difusa:** continua sota el Pas 10 i es compon una sola vegada.
+- **Fons extragalàctic:** port opcional, explícit i traçable.
+
+GAMBONS i ESO/SkyCalc són referències de validació, no dependències runtime ni datasets vendorizats automàticament.
 
 ## Observador geodèsic i altura
 
-- Convertir latitud, longitud i altura amb datum declarat (ellipsoidal WGS84 o ortomètrica + geoide). No confondre altura sobre el terreny, altura sobre el nivell del mar i radi des del centre de la Terra.
-- L'altura modifica la longitud dels raigs atmosfèrics, densitat local, massa d'aire, extinció, dispersió, horitzó aparent, oclusió terrestre, exposició al Sol i aspecte del cel. Actualitzar la LUT segons posició/altura de càmera quan variïn les condicions geomètriques.
-- Per una aproximació esfèrica de radi R i observador a r=R+h, la depressió geomètrica de l'horitzó és **acos(R/r)** per h≥0. L'el·lipsoide i el DEM són l'autoritat geodèsica; qualsevol radi equivalent utilitzat pel shader s'explicita i se n'acota l'error.
-- Distingir els casos **dins l'atmosfera**, **al voltant del límit superior** i **fora de l'atmosfera**. No projectar un degradat de cel de superfície sobre una càmera orbital.
-- Els raigs han d'intersectar correctament superfície/DEM, cos terrestre i capes atmosfèriques. Si un raig toca la Terra, no s'integra la radiància del cel darrere del planeta. La precisió de coordenades a gran altura exigeix origen local/rebasament i conversió ECEF→ENU coherent.
+- Declarar WGS84/geoide i distingir altitud ellipsoïdal, ortomètrica i altura sobre DEM.
+- L'altura modifica camí atmosfèric, densitat local, massa d'aire, extinció, dispersió, depressió d'horitzó, oclusió terrestre, visibilitat del Sol i aspecte del cel.
+- En esfera de referència, per `r=R+h`, la depressió geomètrica és `acos(R/r)`; l'el·lipsoide/DEM prevalen i qualsevol radi equivalent del shader queda documentat.
+- Distingir interior, top-of-atmosphere i exterior de l'atmosfera.
+- Usar ECEF/ENU i origen local/rebasament per mantenir precisió a escala orbital.
 
-## Limbe terrestre il·luminat
+## Limbe terrestre, terminador i qualitat angular
 
-Quan la càmera s'eleva prou per veure la curvatura, l'atmosfera al voltant del **limbe terrestre** pot presentar una franja/halo il·luminat pel Sol, amb color i gruix angular dependents de la geometria, altitud, òptica i direcció solar. També apareixen el terminador dia/nit i la regió d'ombra terrestre. **No dibuixar un cercle lluminós artificial.**
+El halo del limbe és conseqüència del transport, **mai un anell decoratiu**:
+1. intersecció vista–atmosfera–Terra/DEM;
+2. segment visible i trajectes tangents;
+3. visibilitat solar a cada mostra;
+4. extinció mostra→observador i scattering;
+5. composició amb superfície terrestre sense doble comptatge.
 
-El resultat surt de:
-1. intersecció del raig de vista amb l'embolcall atmosfèric i amb el planeta;
-2. integració de radiància dispersada sobre el segment visible, incloent trajectes tangents llargs;
-3. visibilitat del Sol a cada punt (oclusió per la Terra, eclipsis i geometria de disc quan calgui);
-4. extinció punt→observador i múltiples dispersions segons l'aproximació declarada;
-5. composició amb la superfície terrestre il·luminada, sense duplicar la llum difusa o el disc solar.
+L'arc diürn, terminador i costat nocturn són asimètrics. El resultat ha de ser continu en travessar top-of-atmosphere.
 
-El halo pot ser asimètric: l'arc de costat diürn és diferent del nocturn. El comportament ha de ser continu quan la càmera travessa l'altura superior de l'atmosfera, gira cap al limbe o creua el terminador.
+La SkyView base parteix d'un perfil angular configurable; **192×108 és només un perfil inicial de runtime**, no una constant científica. Zones d'alt gradient (limbe, terminador, proximitat solar) poden activar resolució superior o ray march per píxel/high-quality pass si la LUT base no compleix el gate visual/radiomètric corresponent.
+
+## Núvols
+
+`CloudOpticalState` és neutral respecte de l'integrador i conté per banda, com a mínim:
+`tau`, `singleScatteringAlbedo (ω0)`, `asymmetryG`, `cloudFraction`, `baseAltitude`, `topAltitude`, revisió i procedència.
+
+- `7.27` calcula l'efecte sobre skyglow artificial.
+- `7.63` calcula l'efecte sobre Sol/Lluna/fons natural.
+- Baseline astral: Beer-Lambert + fase direccional i compensació de multiple scattering amb delta-Eddington.
+- Clear-sky és un estat científic vàlid.
+- Una textura alpha artística no és `physical`.
 
 ## Precisió i límits
 
-Hillaire és una base de transport atmosfèric de temps real amb aproximacions RGB i LUT, no una garantia de precisió espectral. Documentar aproximacions (esfera local, dispersió múltiple, aerosols, núvols, fonts espectrals) i validar casos de solució coneguda i observació. No afirmar que el render RGB és una mesura SQM. El nombre de bandes científiques és configurable i no es tria mitjançant un benchmark de nombre de bandes.
+Hillaire és runtime físic aproximat, no oracle espectral. Bruneton espectral/CPU i el path tracer de Hillaire són oracles de desenvolupament. ROLO, referències de fons natural i solvers de núvols aporten validació específica. Les toleràncies de software i la incertesa dels models es registren per separat.

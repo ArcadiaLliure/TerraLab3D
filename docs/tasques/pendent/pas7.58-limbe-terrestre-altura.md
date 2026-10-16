@@ -44,6 +44,7 @@ observer ECEF/altura + raig de vista → intersecció Terra/atmosfera → visibi
 - [ ] Calcular horitzó geomètric dependent d'altura i interseccions amb superfície/el·lipsoide/atmosfera.
 - [ ] Distingir vista des de superfície, vol, estratosfera i fora de l'atmosfera; respectar DEM i oclusió de la Terra.
 - [ ] Integrar raigs tangents i la il·luminació solar local al llarg de l'atmosfera; cap cercle de glow decoratiu.
+- [ ] Afegir `LimbHighQualityPass` o resolució angular adaptativa/ray march per píxel en limbe, terminador i gradients extrems quan la SkyView base no compleixi el gate; la decisió és per error, no per efecte artístic.
 - [ ] Renderitzar disc terrestre, terminador, ombra del planeta i halo diürn asimètric, amb continuïtat de transició.
 - [ ] Aplicar rebasament/origen local per evitar errors de precisió GPU a escala orbital.
 
@@ -56,6 +57,7 @@ La curvatura i el limbe solar físic són visibles i geomètricament coherents a
 - [ ] Depressió d'horitzó acos(R/(R+h)) en cas esfèric de referència.
 - [ ] Càmera sota/dins/sobre atmosfera, tangent, raigs ocults i costat nocturn.
 - [ ] Halo present només on hi ha dispersió/il·luminació; sense anell uniforme i sense salts en creuar capes.
+- [ ] Comparar LUT base vs high-quality en limbe/terminador i activar el pass de qualitat només quan el bound d'error ho exigeixi.
 - [ ] Evidències reproduïbles sota docs/evidencies/pas7.58/ quan s'implementi.
 - [ ] Executar tools/validate_docs.py i les regressions afectades abans de completar.
 

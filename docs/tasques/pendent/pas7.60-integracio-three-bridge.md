@@ -22,7 +22,7 @@ Connectar estratègies simulat/real amb revisions, LUT dinàmiques, recursos per
 - [Pas 7.59](pas7.59-illuminacio-terreny-eclipsis.md)
 
 **En depenen:**
-- [Pas 7.61](pas7.61-validacio-cel-fisic.md)
+- [Pas 7.61](pas7.61-natural-night-sky.md)
 
 ## Codi existent a reutilitzar
 
@@ -42,10 +42,10 @@ snapshot autoritatiu + mode + revisions → contractes/bridge → SkyRendererSel
 ## Tasques
 
 - [ ] Integrar el selector dins ThreeSceneHostImpl i RenderLoopImpl, reutilitzant ordre de render, càmera i horitzó.
-- [ ] Fer latest-wins a 1 s/s i scrubbing ràpid, descartant revisions obsoletes sense debounce perceptible.
+- [ ] Connectar revisions i coalescing latest-wins bàsic a 1 s/s i scrubbing ràpid, descartant resultats obsolets sense debounce perceptible; la política completa i la matriu d'invalidació es tanquen al Pas 7.64.
 - [ ] Recalcular SkyView quan canvien Sol/Lluna/altura i reutilitzar LUT atmosfèriques si les claus continuen vàlides.
 - [ ] Mantenir recursos GPU amb propietari/dispose i recuperar context WebGL/bridge sense reconstruir catàlegs.
-- [ ] Compondre skyglow artificial, Sol/Lluna i fons natural només en radiància compatible; errors de disponibilitat visibles.
+- [ ] Preparar ports de composició per skyglow artificial, Sol/Lluna i `naturalMoonless` només en radiància compatible; fins al Pas 7.61 el fons natural pot estar `unavailable`, mai inventat.
 
 ## Criteri de sortida
 

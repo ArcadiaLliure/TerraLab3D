@@ -106,8 +106,14 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 | 7.58 | [Limbe terrestre i altura orbital](tasques/pendent/pas7.58-limbe-terrestre-altura.md) | `pendent` | 7.57 |
 | 7.59 | [Il·luminació solar/lunar i eclipsis](tasques/pendent/pas7.59-illuminacio-terreny-eclipsis.md) | `pendent` | 7.58 |
 | 7.60 | [Integració bridge/Three.js](tasques/pendent/pas7.60-integracio-three-bridge.md) | `pendent` | 7.59 |
-| 7.61 | [Validació física, color i limbe](tasques/pendent/pas7.61-validacio-cel-fisic.md) | `pendent` | 7.60 |
-| 7.62 | [Homologació del cel real/simulat](tasques/pendent/pas7.62-homologacio-cel-fisic.md) | `pendent` | 7.61 |
+| 7.61 | [Fons natural nocturn: airglow, zodiacal i llum estel·lar integrada](tasques/pendent/pas7.61-natural-night-sky.md) | `pendent` | 7.60 |
+| 7.62 | [Pressupost d'error i descarte radiatiu conservador](tasques/pendent/pas7.62-radiative-error-budget.md) | `pendent` | 7.61, 7.18 |
+| 7.63 | [Núvols físics, horitzó, ombra planetària i terminador](tasques/pendent/pas7.63-clouds-horizon-terminator.md) | `pendent` | 7.62, 7.27 |
+| 7.64 | [Scheduler latest-wins, invalidació i caches del cel físic](tasques/pendent/pas7.64-scheduler-cache-cel-fisic.md) | `pendent` | 7.63 |
+| 7.65 | [Solver espectral de referència i oracles científics](tasques/pendent/pas7.65-reference-solver.md) | `pendent` | 7.64 |
+| 7.66 | [Matriu de validació científica del cel físic](tasques/pendent/pas7.66-validacio-cel-fisic.md) | `pendent` | 7.65 |
+| 7.67 | [SLO de rendiment, memòria i latència interactiva](tasques/pendent/pas7.67-slo-rendiment-cel-fisic.md) | `pendent` | 7.66 |
+| 7.68 | [Homologació final del cel físic real/simulat](tasques/pendent/pas7.68-homologacio-cel-fisic.md) | `pendent` | 7.67 |
 | 24 | [Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 8.6, 12 |
 | 25 | [Gestor de capes Cel/Terra](tasques/pendent/pas25-gestor-capes.md) | `pendent` | 24 |
 | 26 | [Vista de recursos del Sistema Solar](tasques/pendent/pas26-recursos-sistema-solar.md) | `parcial` | 24, 25 |
@@ -122,7 +128,7 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 | 35 | [Pestanya d'eclipsis](tasques/pendent/pas35-pestanya-eclipsis.md) | `parcial` | 9, 33, 34 opcional |
 | 36 | [Esdeveniments propis de planetes i Lluna](tasques/pendent/pas36-esdeveniments-objectes.md) | `parcial` | 32, 33 |
 | 37 | [Nomenclàtor GeoNames empaquetat](tasques/pendent/pas37-geonames-empaquetat.md) | `pendent` | 19, 29 |
-| 38 | [Homologació final, recuperació i rendiment](tasques/pendent/pas38-homologacio-final.md) | `pendent` | 1–17, 19–37, 7.28, 7.62 |
+| 38 | [Homologació final, recuperació i rendiment](tasques/pendent/pas38-homologacio-final.md) | `pendent` | 1–17, 19–37, 7.28, 7.68 |
 
 ## Idees per madurar
 

@@ -11,6 +11,7 @@ Els núvols no són un multiplicador arbitrari d'entrada.
 - [`docs/skyglow/README.md`](../../skyglow/README.md).
 - [`03-pipeline-python-typescript-threejs.md`](../../skyglow/03-pipeline-python-typescript-threejs.md), [`07-benchmark-b0-b7.md`](../../skyglow/07-benchmark-b0-b7.md) i [`08-validacio-cientifica.md`](../../skyglow/08-validacio-cientifica.md).
 - [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
+- [`docs/cel-fisic/02-fisica-altura-limbe.md`](../../cel-fisic/02-fisica-altura-limbe.md) i [`04-contractes-validacio.md`](../../cel-fisic/04-contractes-validacio.md) per al contracte neutral `CloudOpticalState`.
 
 ## Objectiu
 
@@ -25,6 +26,7 @@ Afegir núvols com a dispersors/absorbidors i derivar `A_skyglow`.
 
 **En depenen:**
 - [Pas 7.28](pas7.28-b7-homologacio-skyglow.md)
+- [Pas 7.63 — Núvols del cel astral](pas7.63-clouds-horizon-terminator.md)
 
 ## Codi existent a reutilitzar
 
@@ -34,7 +36,7 @@ Afegir núvols com a dispersors/absorbidors i derivar `A_skyglow`.
 
 ## Flux tècnic
 
-cloud microphysics/state → β_ext,ω0,P → mateix Γ del kernel → cloudy/clear diagnostic.
+cloud microphysics/state → `CloudOpticalState(τ,ω0,g,cover,base,top,bandSetId)` → mateix Γ del kernel artificial → cloudy/clear diagnostic. Aquest pas **no** calcula dispersió solar/lunar.
 
 ## Errors, cancel·lació i recursos
 
@@ -46,6 +48,9 @@ cloud microphysics/state → β_ext,ω0,P → mateix Γ del kernel → cloudy/cl
 ## Tasques
 
 - [ ] Implementar només l'abast d'aquest pas.
+- [ ] Definir/publicar `CloudOpticalState` com a contracte neutral reutilitzable, amb unitats, bandes, revisió i procedència; l'integrador artificial només en consumeix la part necessària.
+- [ ] Mantenir separats `CloudDataProvider`, `CloudOpticsModel` i l'efecte radiatiu del `PropagationKernel`.
+- [ ] Prohibir que aquest pas implementi Hillaire, Sol, Lluna, limbe o terminador; això és 7.63.
 - [ ] Afegir revisions, observabilitat i lifecycle.
 - [ ] Afegir proves de contracte i casos límit.
 - [ ] Executar benchmark/validació indicats.
@@ -64,11 +69,11 @@ clear limit, A<1 o A>1 possible i cap amplificació hardcoded. B6 incremental am
 
 ## Fora d'abast
 
-Multiple scattering de núvol gruixut.
+Transport solar/lunar de núvols i multiple scattering astral; correspon al Pas 7.63.
 
 ## Instrucció per a Codex
 
-cloud microphysics/state → β_ext,ω0,P → mateix Γ del kernel → cloudy/clear diagnostic. No eliminar el fallback legacy abans que el pas de tancament ho autoritzi amb evidència.
+cloud data → `CloudOpticalState` compartit → Γ del kernel **artificial** → cloudy/clear diagnostic. No implementar aquí Sol/Lluna. No eliminar el fallback legacy abans que el pas de tancament ho autoritzi amb evidència.
 
 ## Treball pendent
 
