@@ -10,7 +10,7 @@ La RSR DNB exigeix resolució diferent de la propagació runtime.
 
 ## Decisió
 
-Normalització amb espectre fi; propagació amb band set versionat.
+Normalització amb espectre fi; propagació amb band set versionat i `spectralBandCount` configurable, amb límits/ponderacions explícits i invalidació de caches. Cap N fix.
 
 ## Conseqüències
 
@@ -22,7 +22,7 @@ Es mantenen documentades al TDD i a l'especificació d'algorismes; qualsevol alt
 
 ## Validació
 
-Benchmark espectral 4/6/8/10/12 bandes.
+Proves de coherència espectral, dimensions, unitats i respostes instrumentals amb la configuració activa. No s'executen benchmarks ni sweeps per determinar el nombre de bandes.
 
 ## Estat d'implementació
 

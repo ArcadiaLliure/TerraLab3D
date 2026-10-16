@@ -55,7 +55,7 @@ El repositori té tests backend i frontend per verticals existents i Vitest al f
 
 `AGENTS.md` exigeix skill `plan`; no és accessible en aquest entorn. `docs/README.md`, `docs/normes-arquitectura.md`, `docs/inventari-funcional.md`, `tools/validate_docs.py` i el Pas 22.5 són el protocol de contingència aplicat.
 
-Abans d'aquest dossier, el punt de represa era Pas 24 i el Pas 7 figurava completat pel seu abast visual. El nou bloc 23.50–23.74 s'insereix com a retrofit prioritzat sense reescriure l'evidència històrica del Pas 7.
+Abans d'aquest dossier, el punt de represa era Pas 24 i el Pas 7 figurava completat pel seu abast visual. El nou bloc 7.1–7.28 s'insereix com a retrofit prioritzat sense reescriure l'evidència històrica del Pas 7.
 
 ## Codi experimental
 

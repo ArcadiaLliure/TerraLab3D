@@ -34,7 +34,7 @@
 
 **FET FÍSIC.** Una única mesura panchromàtica no determina un SPD únic. **DECISIÓ NOSTRA:** representar la forma amb una base/ensemble i normalitzar-la contra la RSR real. Les famílies LED/HPS/LPS/halogenur són candidates de biblioteca, no una base científica definitiva.
 
-**CANDIDAT PENDENT DE BENCHMARK.** 8 bandes de propagació. Es valida contra espectre fi en luminància fotòpica, resposta SQM/TESS, XYZ i radiància propagada.
+**DECISIÓ ACTUAL:** nombre de bandes de propagació configurable per `spectralBandCount` i `bandSetId`, sense valor fix ni benchmark per determinar N. La configuració activa es verifica en unitats, integració espectral, luminància fotòpica, SQM/TESS, XYZ i radiància propagada; això no és una campanya de selecció del nombre de bandes.
 
 ## Atmosfera i gasos
 

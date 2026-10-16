@@ -130,3 +130,6 @@ RSR, LUT de gas, biblioteques SPD/aerosol/núvol i productes VIIRS són recursos
 ## 12. Compatibilitat
 
 Els controls Bortle/magnitud existents es mantenen durant shadow mode. El nou resultat físic s'afegeix com a font `physical_model`; la UI ha de distingir `manual`, `legacy_dataset`, `physical_model` i `unavailable`. No es canvia silenciosament la semàntica d'un camp existent.
+## 13. Frontera amb el cel físic solar/lunar (7.51+)
+
+El [cel físic astral](../cel-fisic/01-arquitectura-i-modes.md) és un integrador independent de fonts llunyanes i LUT GPU; el `PropagationKernel` continua exclusivament per emissió artificial distribuïda. Comparteixen `AtmosphericOpticsState` i geodèsia, però no caches radiatives ni fonts. El selector `skyRenderingMode=simulated|physical` només canvia el renderer de cel i no les projeccions SQM/TESS ni el mode de contaminació. La composició exigeix radiància lineal compatible i mai dedueix sensors de la SkyView LUT RGB. El mode simulat és permanent.

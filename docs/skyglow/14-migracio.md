@@ -22,7 +22,7 @@ Oclusió real, curvatura, cache error-based, moviment. Demostrar zero reutilitza
 
 ## Fase 5 — cúpules, projeccions i renderer
 
-`DomeProfile`, PCHIP, projeccions fotomètriques/SQM/TESS, `BortleEquivalent` versionat, composició reference/instantaneous, renderer lineal i doble buffer. La mostra 90° ha de reproduir el gate zenital. Mode `legacy/physical/compare` només per desenvolupament.
+`DomeProfile`, PCHIP, projeccions fotomètriques/SQM/TESS, `BortleEquivalent` versionat, composició reference/instantaneous, renderer lineal i doble buffer. La mostra 90° ha de reproduir el gate zenital. El mode **skyRenderingMode=simulated|physical** és permanent i independent del mode de contaminació lumínica; `compare` és opcional i exclusiu de diagnòstic. No eliminar el shader simulat del Pas 7.
 
 ## Fase 6 — atmosfera real
 
@@ -43,3 +43,6 @@ Només després d'evidència: el mode físic esdevé automàtic per defecte. Bor
 ## Rollback
 
 Cada fase manté un flag/configuració que permet tornar a l'últim camí homologat. No s'esborra el legacy fins a la fase 9. Els esquemes wire són versionats per permetre frontend/backend desalineats temporalment durant desenvolupament.
+## Separació respecte de la vertical solar/lunar
+
+Aquesta migració tracta **únicament el skyglow artificial**. El transport solar/lunar Hillaire, la SkyView LUT RGB, el selector permanent simulat/real i el limbe terrestre tenen [pla propi 7.51+](../cel-fisic/README.md). Compartir estat òptic i sumar radiància lineal no implica reutilitzar el PropagationKernel per al Sol o la Lluna.

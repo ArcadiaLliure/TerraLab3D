@@ -27,7 +27,7 @@ El `PropagationKernel` rep `SourceSet`, `Observer`, `OpticalField`, `TerrainVisi
 
 ### Reference solver
 
-Ha d'existir un camí offline més lent amb toleràncies estretes, malla angular densa i espectre fi. No és el mateix que la v1 runtime. Serveix per validar discretització espectral, compressió de cúpules, ordre de fase, H_TOA i quadratura.
+Ha d'existir un camí offline més lent amb toleràncies estretes, malla angular densa i espectre fi. No és el mateix que la v1 runtime. Serveix per comprovar la configuració espectral activa, la compressió de cúpules, l'ordre de fase, H_TOA i la quadratura; no per seleccionar N mitjançant benchmarks.
 
 ### Projeccions fotomètriques i composició
 
@@ -82,3 +82,6 @@ LOD de renderer i LOD físic són independents. El renderer pot reduir resoluci�
 En paral·lel, el resultat físic pot passar per `PhotometricProjectionService` per obtenir luminància, SQM/TESS simulats i `BortleEquivalent`; aquestes projeccions no són la font del kernel.
 
 Qualsevol comparació científica s'atura abans de camera/exposure/tone mapping.
+## Cel físic astral separat
+
+La [vertical 7.51+](../cel-fisic/README.md) calcula fonts solars/lunars i transport Hillaire de visualització amb LUT GPU, i manté una ruta espectral independent per a sensors. No comparteix integrador ni pipeline VIIRS amb el skyglow artificial; la composició es fa abans de l'exposició.

@@ -6,11 +6,11 @@
 
 ## Context
 
-Bandes, Legendre, H_TOA, AD i cache tenen costos multiplicatius desconeguts.
+Legendre, H_TOA, AD i cache tenen costos multiplicatius desconeguts. El nombre de bandes és una decisió de configuració de l'usuari, no un paràmetre a seleccionar per benchmarking.
 
 ## Decisió
 
-B0–B7 és gate obligatori abans de fixar configuració de producció.
+B0–B7 és gate obligatori de rendiment/precisió per la configuració activa abans de fixar SLO i optimitzacions, **excloent expressament benchmarks o sweeps per triar el nombre de bandes**.
 
 ## Conseqüències
 

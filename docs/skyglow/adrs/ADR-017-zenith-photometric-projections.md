@@ -24,7 +24,7 @@ Solver zenital separat, calibratge final opac i Bortle derivat de la Lluna insta
 
 ## Validació
 
-Passos 23.681, 23.691, 23.692 i 23.72.
+Passos 7.20, 7.22, 7.23 i 7.26.
 
 ## Estat d'implementació
 

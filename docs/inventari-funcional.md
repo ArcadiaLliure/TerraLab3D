@@ -44,7 +44,8 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 
 | Capacitat | Estat actual | Pla |
 |---|---|---|
-| Skyglow físic VIIRS → atmosfera → zenit/cúpules → projeccions SQM/TESS/BortleEquivalent | **Pendent; només especificació documental.** El Pas 7 observable continua sent el model Bortle/magnitud existent. El nou pla separa gate zenital, projeccions fotomètriques i composició reference/instantaneous. | [Dossier skyglow](skyglow/README.md), [Pas 23.50](tasques/pendent/pas23.50-skyglow-b0.md)–[23.74](tasques/pendent/pas23.74-b7-homologacio-skyglow.md) |
+| Skyglow físic VIIRS → atmosfera → zenit/cúpules → projeccions SQM/TESS/BortleEquivalent | **Pendent; només especificació documental.** El Pas 7 observable continua sent el model Bortle/magnitud existent. El nou pla separa gate zenital, projeccions fotomètriques i composició reference/instantaneous. | [Dossier skyglow](skyglow/README.md), [Pas 7.1](tasques/pendent/pas7.1-skyglow-b0.md)–[7.28](tasques/pendent/pas7.28-b7-homologacio-skyglow.md) |
+| Cel físic solar/lunar amb selector simulat/real, SkyView LUT RGB, altura i limbe terrestre | **Pendent; especificació documental, no implementat.** El Pas 7 actual manté el shader/paleta visuals i la llum difusa existent; no hi ha transport Hillaire ni limbe físic homologats. | [Dossier cel físic](cel-fisic/README.md), [Pas 7.51](tasques/pendent/pas7.51-llicencies-i-recursos.md)–[7.62](tasques/pendent/pas7.62-homologacio-cel-fisic.md) |
 | Gestor de capes Cel/Terra | Pendent d'implementació | [Pas 25](tasques/pendent/pas25-gestor-capes.md) |
 | Plate solving i comparador foto/simulació | Pendent d'implementació | [Pas 30](tasques/pendent/pas30-plate-solving.md) |
 | “El millor d'aquesta nit” i planificador | Pendent d'implementació | [Pas 31](tasques/pendent/pas31-millor-nit-planificador.md) |

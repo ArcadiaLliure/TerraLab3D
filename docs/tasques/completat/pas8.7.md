@@ -143,6 +143,7 @@ Three.js determina COM aquesta llum es representa eficientment a la GPU.
 - [Pas 8.6 — Planetes, anells i satèl·lits naturals](pas8.6.md)
 
 **En depenen:**
+- [Pas 7.51 — Llicències i recursos del cel físic](../pendent/pas7.51-llicencies-i-recursos.md)
 - [Pas 38 — Homologació final, recuperació i rendiment](../pendent/pas38-homologacio-final.md)
 
 ## Codi existent a reutilitzar

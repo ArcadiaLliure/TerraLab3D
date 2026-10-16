@@ -6,7 +6,7 @@ Un kernel únic; radiància lineal; cúpules comprimides; PCHIP log; watershed+q
 
 ## Candidats pendents de benchmark
 
-Mostra 1°, 95% `W_effective`, 8 bandes, 8 hipòtesis SPD, H_TOA 80/100/120 km, Legendre 4/8/12/20, GK tolerances, `ε_patch`, cache envelopes, SLO.
+Mostra 1°, 95% `W_effective`, 8 hipòtesis SPD, H_TOA 80/100/120 km, Legendre 4/8/12/20, GK tolerances, `ε_patch`, cache envelopes, SLO. **Bandes:** `spectralBandCount` configurable; cap N fix ni benchmark de selecció.
 
 ## Dades pendents
 
@@ -38,4 +38,4 @@ El model conceptual és compartit però les classes internes no travessen el bri
 
 ## Següent pas executable
 
-`Pas 23.50 — Benchmark B0 i infraestructura de mesura`, un cop incorporat formalment a `docs/README.md` i les dependències. No cal esperar la biblioteca aerosol definitiva per començar-lo.
+`Pas 7.1 — Benchmark B0 i infraestructura de mesura`, un cop incorporat formalment a `docs/README.md` i les dependències. No cal esperar la biblioteca aerosol definitiva per començar-lo.

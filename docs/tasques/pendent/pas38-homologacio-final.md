@@ -21,6 +21,8 @@ Decisions tancades de referència:
 
 ## Objectiu
 
+Incloure la vertical de skyglow artificial **7.1–7.28** i la vertical de cel físic solar/lunar **7.51–7.62** en l'homologació final quan estiguin implementades, sense modificar l'estat històric del Pas 7. El mode simulat/real és permanent; la fotometria instrumental no es dedueix de SkyView RGB.
+
 Completar la vertical de «homologació final, recuperació i rendiment» de punta a punta, mantenint la separació de responsabilitats, contractes tipats i integració amb el renderer Three.js sense anticipar capacitats posteriors.
 
 ## Dependències
@@ -51,7 +53,9 @@ Completar la vertical de «homologació final, recuperació i rendiment» de pun
 - [Pas 21 — Eines de mesura esfèrica](../completat/pas21-eines-mesura.md)
 - [Pas 22 — Trajectòries i visibilitat sobre l'horitzó real](../completat/pas22-trajectories-visibilitat.md)
 - [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](../completat/pas23-constellacions.md)
-- [Passos 23.50–23.74 — retrofit físic de skyglow](../../skyglow/README.md)
+- [Passos 7.1–7.28 — retrofit físic de skyglow](../../skyglow/README.md)
+- [Pas 7.28 — Homologació del skyglow artificial](pas7.28-b7-homologacio-skyglow.md)
+- [Pas 7.62 — Homologació del cel solar/lunar](pas7.62-homologacio-cel-fisic.md)
 - [Pas 24 — Catàleg de recursos i descàrregues persistents](pas24-cataleg-recursos-descarregues.md)
 - [Pas 25 — Gestor de capes Cel/Terra](pas25-gestor-capes.md)
 - [Pas 26 — Vista de recursos del Sistema Solar](pas26-recursos-sistema-solar.md)
@@ -95,7 +99,7 @@ Matriu versionada → execució automatitzada/manual → mètriques i evidèncie
 - [x] Els passos 1–16 tenen especificació completada i evidències històriques.
 - [x] Hi ha escena persistent, pont científic, registre de recursos, workers i lifecycle reutilitzables.
 - [ ] Falta una matriu única de paritat, pressupostos mesurats, recuperació integral i auditoria de totes les transicions llargues.
-- [ ] Construir i executar la matriu dels passos 1–17, 19–23, 23.50–23.74 i 24–37 amb escenaris, dades, toleràncies, proves i evidència per fila.
+- [ ] Construir i executar la matriu dels passos 1–17, 19–23, 7.1–7.28 i 24–37 amb escenaris, dades, toleràncies, proves i evidència per fila.
 - [ ] Comparar ubicacions, dates, càmeres, capes, datasets, instruments i fluxos equivalents amb l'oracle fixat.
 - [ ] Fixar pressupostos i perfilar pan/zoom, ticks temporals, salts, Gaia, DEM, superfície, scope, planificador i previews.
 - [ ] Eliminar reconstruccions, còpies, transferències i allocations que superin pressupost, sense canviar contractes científics.
@@ -116,7 +120,7 @@ No queda cap fila del pla sense evidència ni desviació sense decisió; ciènci
 - [ ] Context loss, restart, reconnexió, resync, suspend/resume i shutdown sota càrrega.
 - [ ] Auditoria de transicions amb pan/zoom actius, cancel·lació i `prefers-reduced-motion`.
 - [ ] Instal·lació neta sense checkout ni ruta local de TerraLab.
-- [ ] Informe final de paritat funcional i científica dels passos 1–17, 19–23, 23.50–23.74 i 24–37.
+- [ ] Informe final de paritat funcional i científica dels passos 1–17, 19–23, 7.1–7.28 i 24–37.
 - [ ] Quadre de pressupostos i resultats P50/P95 reproduïbles.
 - [ ] Captures/vídeos dels fluxos principals i de transicions interactives.
 - [ ] Informe de GPU, RSS, bridge, còpies, workers i handles.
@@ -129,7 +133,7 @@ Noves capacitats posteriors al pas 37 i la navegació espacial física descrita 
 
 ## Instrucció per a Codex
 
-Tracta aquest pas com una homologació, no com un calaix de noves features. Executa la matriu dels passos 1–17, 19–23, 23.50–23.74 i 24–37, corregeix cada desviació a la seva vertical, prova recuperació i transicions interactives i no eliminis cap fallback abans de demostrar el reemplaçament.
+Tracta aquest pas com una homologació, no com un calaix de noves features. Executa la matriu dels passos 1–17, 19–23, 7.1–7.28 i 24–37, corregeix cada desviació a la seva vertical, prova recuperació i transicions interactives i no eliminis cap fallback abans de demostrar el reemplaçament.
 
 ## Treball pendent
 

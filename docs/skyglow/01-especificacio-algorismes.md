@@ -142,8 +142,11 @@ S'han de precomputar les parts estàtiques o quasiestàtiques quan sigui possibl
 
 ## 12. Complexitat
 
-Cost aproximat: `O(N_source_effective × N_direction × N_segment × N_node × N_band × N_basis × C_phase)`. Tots els multiplicadors s'han de mesurar separadament a B0–B7. La geometria LOS i la visita de tiles s'han de compartir entre bandes/bases sempre que sigui possible.
+Cost aproximat: `O(N_source_effective × N_direction × N_segment × N_node × N_band × N_basis × C_phase)`. Els costos estructurals es mesuren a B0–B7 amb la configuració espectral activa; **no** es fan sweeps ni benchmarks per determinar el nombre de bandes. La geometria LOS i la visita de tiles s'han de compartir entre bandes/bases sempre que sigui possible.
 
 ## 13. Fallback
 
 Sense dades atmosfèriques reals: atmosfera estàndard versionada. Sense aerosol detallat: HG amb paràmetres explícits i confiança baixa. Sense prior SPD local: ensemble global documentat. Sense núvols fiables: cel clar declarat; mai inventar cobertura. Sense VIIRS: mantenir modes manuals existents com a fallback de producte, però no etiquetar-los com a simulació física.
+## Configuració espectral de la vertical 7.1–7.50
+
+El nombre de bandes del kernel és un paràmetre de configuració (`spectralBandCount`) amb límits/ponderacions i `bandSetId` versionats. No existeix un N fix ni un benchmark per triar-lo; es comproven unitats, integració i coherència de la configuració activa. El cel solar/lunar i el limbe terrestre són responsabilitat de la [vertical 7.51+](../cel-fisic/README.md), que comparteix òptica però no el `PropagationKernel` artificial.

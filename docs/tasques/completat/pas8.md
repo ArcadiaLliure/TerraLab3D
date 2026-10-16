@@ -25,6 +25,7 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 - [Pas 3 — Rellotge de simulació, temps sideral i moviment visible](pas3.md)
 
 **En depenen:**
+- [Pas 7.51 — Llicències i recursos del cel físic](../pendent/pas7.51-llicencies-i-recursos.md)
 - [Pas 8.5 — Superfície lunar LRO/LOLA, orientació i libració](pas8.5.md)
 - [Pas 8.6 — Planetes, anells i satèl·lits naturals](pas8.6.md)
 - [Pas 9 — Eclipsis, ocultacions, separacions i trajectòries](pas9.md)

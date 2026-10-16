@@ -46,16 +46,16 @@ Abans de promoure les cúpules com a resultat científic, la mateixa ruta del ke
 - v1 de producció candidata single-scattering, explicitada com a simplificació pròpia;
 - Gauss–Kronrod 7/15 adaptatiu com a candidat congelat per benchmark;
 - cache invalidada per error de canvi, amb discontinuïtats geomètriques comprovades abans de la linealització;
-- benchmark B0–B7 abans de congelar bandes, ordre de Legendre, H_TOA o SLO;
+- benchmark B0–B7 per rendiment, ordre de Legendre, H_TOA i SLO; **el nombre de bandes no es tria amb benchmarks** i és configurable;
 - gate zenital absolut abans de donar per vàlida la compressió direccional;
 - projeccions fotomètriques i de sensor sempre posteriors al kernel: cap conversió directa VIIRS→SQM ni `calibrationFactor` opac;
 - `BortleEquivalent` és una projecció orientativa versionada, no una magnitud física ni ground truth;
 - composició del cel en radiància lineal separant com a mínim artificial, natural sense Lluna, Lluna dispersada i crepuscle;
 - cap integral LOS al render loop ni una integral nova per frame: cache, coalescing, cancel·lació i precàrrega només si preserven una cota d'error mesurable.
 
-## Candidats pendents de benchmark
+## Configuració espectral i candidats de rendiment
 
-`VISIBLE_V1_CANDIDATE` (~8 bandes), mostra a 1°, 95% per `W_effective`, màxim 8 hipòtesis SPD, `H_TOA` 80/100/120 km, ordre de Legendre 4/8/12/20, toleràncies GK, `ε_patch`, límits de cache i SLO de latència/freqüència.
+El nombre de bandes de propagació és **parametritzable** (`spectralBandCount`, `bandSetId`, límits i pesos espectrals). No es fixa a vuit ni es fa cap benchmark comparatiu per seleccionar N. Es mantenen proves d'unitats, coherència espectral de la configuració activa i validació científica. Els candidats pendents de benchmark són la mostra a 1°, 95% per `W_effective`, màxim 8 hipòtesis SPD, `H_TOA` 80/100/120 km, ordre de Legendre 4/8/12/20, toleràncies GK, `ε_patch`, límits de cache i SLO.
 
 ## Verificacions científiques resoltes en aquesta recerca
 
@@ -67,7 +67,45 @@ La biblioteca d'aerosols de producció, la parametrització de núvols, el prior
 
 ## Relació amb el pla
 
+**Numeració canònica:** els passos abans anomenats 23.50–23.74 són ara **7.1–7.28** en el mateix ordre, sense perdre'n dependències ni abast; **7.29–7.50** reservats per skyglow artificial. El cel físic solar/lunar ocupa **7.51+** i té [dossier propi](../cel-fisic/README.md). El mode simulat actual es manté permanentment i no és una autoritat científica.
+
 El dossier introdueix una seqüència de passos de retrofit del Pas 7. El primer pas és infraestructura/benchmark, no el renderer. El punt de represa només s'ha de moure quan els documents de passos, dependències i README del pla quedin actualitzats en el mateix lot documental.
+
+
+## Equivalència de numeració anterior
+
+Els identificadors 23.* eren **pendents** i es traslladen sense canviar-ne l'ordre ni donar-los per implementats:
+
+| Identificador anterior | Subpas canònic actual |
+|---|---|
+| 23.50 | 7.1 |
+| 23.51 | 7.2 |
+| 23.52 | 7.3 |
+| 23.53 | 7.4 |
+| 23.54 | 7.5 |
+| 23.55 | 7.6 |
+| 23.56 | 7.7 |
+| 23.57 | 7.8 |
+| 23.58 | 7.9 |
+| 23.59 | 7.10 |
+| 23.60 | 7.11 |
+| 23.61 | 7.12 |
+| 23.62 | 7.13 |
+| 23.63 | 7.14 |
+| 23.64 | 7.15 |
+| 23.65 | 7.16 |
+| 23.66 | 7.17 |
+| 23.67 | 7.18 |
+| 23.68 | 7.19 |
+| 23.681 | 7.20 |
+| 23.69 | 7.21 |
+| 23.691 | 7.22 |
+| 23.692 | 7.23 |
+| 23.70 | 7.24 |
+| 23.71 | 7.25 |
+| 23.72 | 7.26 |
+| 23.73 | 7.27 |
+| 23.74 | 7.28 |
 
 ## Actualitzacions documentals del projecte
 

@@ -4,6 +4,8 @@
 
 ## Descripció funcional
 
+**Nota de continuïtat:** aquest Pas 7 continua completat pel cel visual i els modes Bortle/magnitud ja implementats. Els subpassos pendents 7.1–7.50 són exclusius de contaminació lumínica artificial i els 7.51+ del cel físic solar/lunar, amb selector permanent simulat/real. Cap subpas pendent no modifica retroactivament les evidències històriques.
+
 El cel passa contínuament de dia a nit; existeixen crepuscles civil, nàutic i astronòmic; alba i posta són visuals i direccionals; zenit i horitzó tenen aspecte diferent; hi ha glow al voltant de la direcció solar; no hi ha quadrícules/tiles visibles; Bortle 1 i Bortle 9 són clarament diferents; mode Bortle funciona; mode magnitud manual funciona; mode automàtic funciona només si hi ha font real; les estrelles s'atenuen de manera contínua; les estrelles invisibles deixen de ser pickables; Gaia NO es reenvia; els buffers estel·lars NO es reconstrueixen; la translació local no recalcula atmosfera ni contaminació; camera rotation NO genera bridge calls.
 
 ## Fonts a consultar
@@ -29,6 +31,7 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 - [Pas 3 — Rellotge de simulació, temps sideral i moviment visible](pas3.md)
 
 **En depenen:**
+- [Pas 7.51 — Llicències i recursos del cel físic](../pendent/pas7.51-llicencies-i-recursos.md)
 - [Pas 8.7 — Il·luminació física de l'escena](pas8.7.md)
 - [Pas 10 — Via Làctia i pols galàctica Planck](pas10.md)
 - [Pas 38 — Homologació final, recuperació i rendiment](../pendent/pas38-homologacio-final.md)

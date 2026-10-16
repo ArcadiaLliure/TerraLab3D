@@ -12,7 +12,7 @@ TerraLab3D permet moviment continu. Reintegrar dispersió a cada frame faria el 
 
 El `PropagationKernel` s'executa per revisions científiques, mai per frame. El runtime aplica coalescing, cancel·lació cooperativa, cache amb versions/dependències/guardes topològiques i pressupost de `ΔB`, reutilització de treball estàtic, precàrrega predictiva opcional i latest-wins.
 
-Cap optimització pot canviar silenciosament la física. Quadtree, bandes, PCHIP, LUT, cache i prefetch es trien sobre una frontera error↔cost contra reference solver.
+Cap optimització pot canviar silenciosament la física. Quadtree, PCHIP, LUT, cache i prefetch es trien sobre una frontera error↔cost contra reference solver. **Les bandes són configurables** i no es trien per benchmark; el runtime respecta el `bandSetId` actiu.
 
 ## Conseqüències
 
@@ -24,7 +24,7 @@ Integral per frame, invalidació per distància fixa i prefetch sense guardes: d
 
 ## Validació
 
-Passos 23.67, 23.70 i 23.74; B7 cold/warm/small-motion/continuous-motion/prefetch/teleport/occlusion-flip.
+Passos 7.18, 7.24 i 7.28; B7 cold/warm/small-motion/continuous-motion/prefetch/teleport/occlusion-flip.
 
 ## Estat d'implementació
 

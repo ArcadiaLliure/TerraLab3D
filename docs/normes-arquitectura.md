@@ -336,3 +336,7 @@ Els datasets petits, obligatoris, versionats amb el producte i sense variants el
 ## ADR 0006 i següents
 
 Les decisions especialitzades del sistema físic de contaminació lumínica es mantenen al [registre d'ADR de skyglow](skyglow/adrs/README.md). Aquest registre conserva la seva numeració pròpia existent (`ADR-001`…`ADR-018`) i **no es renumera** per encaixar-la en la sèrie transversal d'aquest document.
+
+## Cel físic, skyglow i modes (subpassos 7)
+
+La vertical **7.1–7.50** és exclusiva del skyglow artificial i el seu `PropagationKernel`; la **7.51+** és el transport solar/lunar i l'aparença física del cel, inclòs el limbe terrestre a gran altura. Comparteixen l'estat òptic/geodèsic autoritatiu, no els integradors. El mode visual permanent `skyRenderingMode=simulated|physical` no modifica la fotometria científica ni el mode de contaminació lumínica. Les projeccions SQM/TESS provenen de radiància espectral, mai de la SkyView LUT RGB. `spectralBandCount` és configurable amb `bandSetId`, unitats i invalidació de cache; no s'executen benchmarks per escollir N. Vegeu [cel físic](cel-fisic/README.md) i [skyglow](skyglow/README.md).

@@ -64,3 +64,6 @@ Shadow mode obligatori. El sistema legacy i el físic conviuen fins que la valid
 ## Seguretat de canvis
 
 Cap pas nou pot marcar el Pas 7 com a «físic» retrospectivament. El Pas 7 continua completat per l'abast històric; el dossier documenta una nova vertical que l'amplia.
+## Separació de verticals i configuració espectral
+
+El `PropagationKernel` continua exclusivament artificial; Sol/Lluna i limbe són responsabilitat de [7.51+](../cel-fisic/README.md). La configuració espectral del kernel és variable (`spectralBandCount`, `bandSetId`), sense valor fix ni benchmarks per determinar N. El mode simulat/real és permanent i independent del skyglow; no s'elimina el shader actual.

@@ -2,7 +2,7 @@
 
 ## Objectiu
 
-Mesurar la frontera precisió↔cost abans de congelar configuració. El benchmark és determinista i no depèn del renderer visual.
+Mesurar la frontera precisió↔cost de la configuració de runtime **ja escollida**. El benchmark és determinista i no depèn del renderer visual. El nombre de bandes és configurable i **no es fan benchmarks ni sweeps per triar-lo**.
 
 ## Metadades obligatòries
 
@@ -41,13 +41,13 @@ Geometria esfèrica, segmentació per tiles, GK 7/15 i integrand trivial. AD OFF
 
 B1a: Rayleigh + aerosol HG, 1 banda, 1 base, AD OFF. B1b idèntic amb forward AD `(B,dBx,dBy,dBz)`. `AD_overhead=t_B1b/t_B1a`.
 
-## B2a
+## B2a — proves espectrals de la configuració activa
 
-Bandes `1,2,4,8`, una base. Reportar `t(Nbands)` i nodes; verificar que la geometria no es repeteix accidentalment.
+Validar el `SpectralBandSet` seleccionat per configuració: longituds, límits nm, pesos, unitats, `bandSetId`, vectorització correcta i compartició de geometria. **No** comparar temps entre valors de N, ni escollir N amb benchmark. Els comptadors de nodes i la telemetria general del runtime poden continuar registrant-se per la configuració activa.
 
 ## B2b
 
-Nombre de bandes candidat fix i bases `1,2,3,5`. Reportar increments marginals i memòria. No assumir linealitat.
+Usar el nombre de bandes configurat i bases SPD `1,2,3,5`. Reportar increments marginals de bases i memòria, sense comparar ni seleccionar nombres de bandes.
 
 ## B3
 
@@ -85,8 +85,8 @@ Una fila per iteració, no només agregats: `benchmark_id,scenario,variant,itera
 
 ## Plots obligatoris
 
-latència vs error; ordre Legendre vs error; bandes vs temps; bases vs temps; `ε_quad` vs nodes/error; `ε_patch` vs patches/error; AD overhead; uncertainty overhead; cache hit/miss; histograma p50/p95/p99.
+latència vs error; ordre Legendre vs error; bases vs temps; `ε_quad` vs nodes/error; `ε_patch` vs patches/error; AD overhead; uncertainty overhead; cache hit/miss; histograma p50/p95/p99.
 
 ## Criteri de selecció
 
-No hi ha «guanyador» per un únic score. Una configuració només és candidata si compleix simultàniament l'error físic acordat, latència p95 acordada, freqüència de recompute acordada i stutter zero. Els llindars es fixen després de mesures i proves perceptuals.
+No hi ha «guanyador» per un únic score. El nombre de bandes no forma part de la selecció per benchmark. La configuració activa només és candidata si compleix simultàniament l'error físic acordat, latència p95 acordada, freqüència de recompute acordada i stutter zero. Els llindars es fixen després de mesures i proves perceptuals.

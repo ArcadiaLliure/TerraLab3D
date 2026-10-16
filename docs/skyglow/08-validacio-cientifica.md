@@ -12,9 +12,9 @@ Abans de validar cúpules, la direcció 90° ha de superar un gate propi amb la 
 
 ## 2. Validació espectral
 
-Reference spectrum de pas fi (≤1 nm o prou fi per convergir les mètriques) sobre 400–900 nm i RSR DNB real. Comparar `PropagationBandSet` candidats 4/6/8/10/12 bandes. Mètriques: error en luminància fotòpica, resposta SQM, resposta TESS-W, XYZ, radiància de banda i resultat després de Rayleigh/aerosol/gas.
+Reference spectrum de pas fi (≤1 nm o prou fi per convergir les mètriques) sobre el rang necessari per CIE/sensors i RSR DNB real. Comprovar **només la configuració espectral activa** definida per `spectralBandCount`, `bandSetId` i límits/ponderacions. Mètriques: coherència de luminància fotòpica, resposta SQM, resposta TESS-W, XYZ, radiància de banda i resultat després de Rayleigh/aerosol/gas. **No** comparar candidats N ni executar benchmarks per seleccionar el nombre de bandes.
 
-Un band set només es congela si la mateixa configuració és acceptable per una biblioteca diversa d'SPD i atmosferes; no s'ajusta només a LED blanc.
+La precisió declarada correspon a la configuració activa i a les SPD/atmosferes cobertes; no s'atribueix precisió universal a un N arbitrari.
 
 ## 3. Validació atmosfèrica
 
@@ -38,7 +38,7 @@ Per cada observació registrar: posició, elevació, hora UTC, lluna, núvols, t
 
 ## 6. Disseny estadístic
 
-Separar calibratge i validació. Si s'ajusten priors o paràmetres d'emissió amb llocs mesurats, fer leave-one-site-out i una validació geogràfica externa. No utilitzar el mateix conjunt per triar bandes, ajustar emissió i reportar precisió final.
+Separar calibratge i validació. Si s'ajusten priors o paràmetres d'emissió amb llocs mesurats, fer leave-one-site-out i una validació geogràfica externa. No utilitzar el mateix conjunt per ajustar emissió i reportar precisió final. El nombre de bandes no es selecciona amb una campanya comparativa.
 
 Reportar errors amb intervals/quantils i estratificar per distància a fonts, brillantor, aerosol, relleu, elevació i tipus d'il·luminació.
 

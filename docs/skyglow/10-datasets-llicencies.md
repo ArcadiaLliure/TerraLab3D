@@ -55,3 +55,6 @@ Projecte independent. Candidats: propietats Mie/ice tabulades d'una font oficial
 ## UncertaintyModelRegistry
 
 Derivat de documentació oficial de productes i validacions publicades. Cada registre és versionat i cita la font exacta; no es pot crear un sigma només a partir d'una etiqueta de qualitat.
+## Llicències del cel solar/lunar (vertical 7.51+)
+
+El codi de referència Hillaire té llicència MIT; Bruneton, BSD-3-Clause; Three.js, MIT. L'auditoria de codi, submòduls, models i dades de fonts solars/lunars és a [cel-fisic/03-llicencies.md](../cel-fisic/03-llicencies.md). La llicència MIT del repositori Hillaire no cobreix automàticament codi propietari d'Unreal Engine ni dades espectrals externes.

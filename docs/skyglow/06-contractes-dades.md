@@ -30,7 +30,7 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 ## SpectralBandSet / BandRadiance
 
-`SpectralBandSet`: `id`, llista ordenada de bandes amb límits nm i funció de ponderació. `BandRadiance`: `bandSetId`, `values`, `unit`. No s'accepta `double[8]`/`number[8]` a la frontera.
+`SpectralBandSet`: `id`, llista ordenada de bandes amb límits nm i funció de ponderació. `BandRadiance`: `bandSetId`, `values`, `unit`. `SpectralConfiguration`: `spectralBandCount` (enter positiu), `bandSetId`, rang, regla determinista de partició o límits explícits i revisió; el nombre d'elements ha de coincidir. No s'accepta `double[8]`/`number[8]` a la frontera ni un N fix. Canviar N invalida caches i projeccions dependents; no es fan benchmarks per seleccionar-lo.
 
 ## ViirsSpectralResponse
 
@@ -68,7 +68,7 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 ## SkyRadianceComponents
 
-`bandSetId`, `directions`, components `artificial`, `naturalMoonless`, `moon`, `twilight`, estat `available|unavailable|not_applicable`, versions i provenance. La composició autoritzada és suma lineal només entre camps compatibles.
+`bandSetId`, `directions`, components `artificial`, `naturalMoonless`, `moon`, `twilight`, estat `available|unavailable|not_applicable`, versions i provenance. La composició autoritzada és suma lineal només entre camps compatibles; els ports de la vertical 7.51+ poden afegir `solarScattered`/`twilight` i `lunarScattered`, sense reconstruir espectres des de SkyView RGB.
 
 ## SkyBrightnessDiagnostics
 
@@ -111,3 +111,6 @@ Descriu incertesa del canvi des de l'entrada cachejada: distribució/quantil de 
 ## Compatibilitat Python/TypeScript
 
 Els noms wire són camelCase. Python tradueix explícitament des de noms interns snake_case. La validació de schema s'executa als dos costats. Qualsevol canvi incompatible incrementa `schemaVersion`; no es reutilitza un camp canviant-ne la unitat.
+## Selector visual independent
+
+`skyRenderingMode=simulated|physical` és un contracte de presentació persistent, ortogonal a `lightPollutionMode` i `atmosphereEnabled`. `skyPhysicalAvailability=initializing|available|unavailable` incorpora causa i revisió. Les respostes SQM/TESS provenen de radiància espectral i respostes instrumentals, no del mode visual. Vegeu [contractes del cel físic](../cel-fisic/04-contractes-validacio.md).
