@@ -8,7 +8,7 @@ Cada ADR té estat **Acceptada — implementació pendent** però no implica fun
 - [ADR-004 — Watershed + quadtree intern](ADR-004-watershed-quadtree.md)
 - [ADR-005 — Radiància lineal com a moneda](ADR-005-radiancia-lineal.md)
 - [ADR-006 — Separar NormalizationSpectrum i PropagationBandSet](ADR-006-separacio-espectral.md)
-- [ADR-007 — Utilitzar la RSR real del DNB](ADR-007-rsr-real.md)
+- [ADR-007 — RSR real DNB, `BAND_INTEGRATED` i resolució release/data](ADR-007-rsr-real.md)
 - [ADR-008 — AtmosphericOpticsProvider](ADR-008-atmospheric-optics-provider.md)
 - [ADR-009 — OpticalField tiled i versionat](ADR-009-optical-field-tiled.md)
 - [ADR-010 — Cache basada en error de canvi](ADR-010-cache-error-based.md)

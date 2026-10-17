@@ -18,7 +18,11 @@
 | AOD | aerosol optical depth; adimensional, especificar longitud d'ona |
 | SPD | spectral power distribution; en aquest dossier, forma espectral normalitzada o radiància espectral segons context |
 | RSR | relative spectral response; funció adimensional relativa del sensor |
-| `nW/cm²/sr` | unitat habitual VNL; `1 nW/cm² = 1e-5 W/m²` |
+| VNP46 | família NASA Black Marble escollida com a font operativa; producte/release concret versionat |
+| DNB | canal VIIRS que defineix el model de mesura espectral de l'observació VNP46 |
+| `BAND_INTEGRATED` | operador de mesura adoptat per normalitzar la resposta DNB; unitat exacta del contracte pendent de verificació ATBD |
+| radiància observada | valor del producte VNP46 abans de la inferència de font |
+| radiància artificial estimada | resultat de `SourceModel`; no és sinònim de radiància observada |
 | mag/arcsec² | magnitud logarítmica per angle sòlid aparent; depèn de banda/zero point |
 | SQM | instrument/banda pròpia, no sinònim exacte de Johnson V |
 | TESS-W | fotòmetre amb resposta espectral pròpia i FOV propi |
@@ -31,14 +35,16 @@
 ## Regles
 
 1. No usar «brillantor» sense indicar si és radiància, luminància o magnitud.
-2. No convertir `nW/cm²/sr` VIIRS directament a `cd/m²` sense SPD/resposta.
+2. No convertir VNP46/DNB directament a `cd/m²` sense SPD/resposta; la unitat concreta es llegeix del producte i la de l'ATBD continua pendent de verificació.
 3. No sumar magnituds; convertir a radiància, sumar i tornar a projectar.
 4. No confondre intensitat radiant de font amb radiància del cel.
 5. `P(θ)` sempre documenta la normalització.
 6. Angles wire en graus només si el camp ho diu; càlcul intern pot usar radians.
 7. Distàncies del kernel en metres; km només presentació/configuració.
 8. Qualsevol LUT indica les unitats dels eixos.
-9. No hi ha conversió directa VIIRS→SQM ni `relativeRadiance×calibrationFactor→cd/m²` sense model físic/calibratge explicitat.
-10. Cel artificial, natural, lunar i crepuscular se sumen en radiància lineal compatible, mai en magnituds.
-11. Les projeccions SQM/TESS declaren resposta espectral, FOV i zero point/calibratge.
-12. El `BortleEquivalent` de lloc usa condicions de referència; la Lluna només modifica el cel instantani.
+9. No hi ha conversió directa VNP46/DNB→SQM ni `relativeRadiance×calibrationFactor→cd/m²` sense model físic/calibratge explicitat.
+10. No aplicar `max(0, radiancia_observada)` silenciosament; baixa radiància conserva qualitat/incertesa.
+11. LUT/FFT són acceleracions del mateix operador físic i han de declarar domini/error.
+12. Cel artificial, natural, lunar i crepuscular se sumen en radiància lineal compatible, mai en magnituds.
+13. Les projeccions SQM/TESS declaren resposta espectral, FOV i zero point/calibratge.
+14. El `BortleEquivalent` de lloc usa condicions de referència; la Lluna només modifica el cel instantani.

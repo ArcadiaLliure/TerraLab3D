@@ -2,7 +2,9 @@
 
 ## Modes
 
-- `source-only`: geometria/radiometria de fonts sense atmosfera.
+- `source-only`: `radiancia_observada`, `radiancia_artificial_estimada`, SPD/model angular i geometria de fonts sense atmosfera.
+- `vnp46-quality`: producte/release/data, quality flags, baixa radiància, punt zero i transformacions del producte.
+- `measurement-model`: RSR resolta, `BAND_INTEGRATED` i normalització espectral.
 - `natural-only`: cel natural existent, artificial zero.
 - `artificial-only`: skyglow físic sense natural.
 - `rayleigh-only`: `Γ` només molecular.
@@ -28,8 +30,12 @@ Els modes de debug poden usar fals color, però han de mostrar clarament que no 
 
 ## Incidències típiques
 
-Glow massa ample: revisar geometria de regió i projecció, no shader primer. Pic desplaçat: revisar azimut topocèntric/escorç. Zenit no coincideix amb profile 90°: bug d'arquitectura. Bandes negatives/NaN: revisar LUT/transmissió/normalització. Salt en moure observador: revisar oclusió/topologia/cache. Cúpula canvia amb tone mapping però no radiància: problema de presentació, no kernel.
+Glow massa ample: revisar geometria de regió i projecció, no shader primer. Pic desplaçat: revisar azimut topocèntric/escorç. Zenit no coincideix amb profile 90°: bug d'arquitectura. Valor VNP46 negatiu o prop de zero: revisar quality/política LOW-RAD, no clippar. Bandes propagades negatives/NaN: revisar SourceModel/LUT/transmissió/normalització. Salt en moure observador: revisar oclusió/topologia/cache. Cúpula canvia amb tone mapping però no radiància: problema de presentació, no kernel.
 
 ## Evidència
 
 Cada pas que toqui física afegeix almenys una captura/plot diagnòstic i un JSON de mètriques reproduïble. Els modes de debug no compten com funcionalitat d'usuari fins que estiguin connectats a una UI de desenvolupador.
+
+## Backend accelerat
+
+Quan s'activi una LUT/FFT, el debug ha de poder comparar-la amb la ruta directa per la mateixa fixture i mostrar domini de validesa, error radiomètric i motiu de fallback. Una diferència no es corregeix al shader.

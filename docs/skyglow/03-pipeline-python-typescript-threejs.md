@@ -4,18 +4,23 @@
 
 ### Ingestió
 
-1. `LightPollutionDatasetAdapter` resol el producte i la versió.
-2. Aplica quality mask, nodata, cobertura, geometria i unitats.
-3. Converteix a un `ViirsSourceObservation` immutable amb `productId`, `acquisitionPeriod`, `radianceUnit`, `processingLevel`, `sourceUrl`, checksum i qualitat.
-4. No interpreta encara la radiància com a emissió terrestre isotropa.
+1. `LightPollutionDatasetAdapter` consumeix la família VNP46 com a font operativa.
+2. Resol producte, release, data/període d'adquisició, quality mask, nodata, cobertura, geometria i unitat declarada pel producte.
+3. Publica `ViirsSourceObservation` immutable conservant `radiancia_observada`; no aplica `max(0,·)` ni confon observació amb emissió.
+4. Confirma per producte/release quines correccions ja s'han aplicat; stray light no es corregeix dues vegades.
+5. Les sèries de baixa radiància que travessen 2017 queden com a no directament comparables fins que es tanqui la política de punt zero.
 
 ### Preprocessament i fonts
 
-`SourceModelBuilder` aplica el model angular d'emissió i el prior espectral. El segmentador executa log-radiance, denoise conservador, llindar, màxims/prominence, watershed i merge. `EmissionRegionBuilder` conserva geometria, moments radiomètrics i patches. `RadiancePatchTree` refina segons error físic, no segons un nombre objectiu de nodes.
+`SourceModelBuilder` consumeix l'observació VNP46 junt amb el model de mesura DNB. Aplica el prior espectral i el model angular d'emissió seleccionat, amb incertesa explícita. VNP46 no es tracta com a flux hemisfèric ni imposa Lambert.
+
+El segmentador treballa sobre `radiancia_artificial_estimada` o equivalent físicament admissible, no sobre valors crus clipats. Després executa log-radiance, denoise conservador, llindar, màxims/prominence, watershed i merge. `EmissionRegionBuilder` conserva geometria, moments radiomètrics i patches. `RadiancePatchTree` refina segons error físic i valida l'aproximació puntual contra integració d'àrea independent en fixtures de control.
 
 ### Espectre
 
-`SpectralBasisLibrary` conté formes normalitzades i metadades. `ViirsSpectralResponseRepository` proporciona la RSR exacta. `SpectralSourceModel` produeix `SpectralSourceEstimate` i ensemble. La normalització DNB es fa a resolució espectral suficient; el kernel rep només `BandRadiance` per `SpectralBandSet`.
+`SpectralBasisLibrary` conté formes normalitzades i metadades. `ViirsSpectralResponseRepository` resol la RSR compatible amb plataforma/release i data d'adquisició. L'operador vigent és `BAND_INTEGRATED`; la unitat exacta del DNB queda pendent de verificació directa contra l'ATBD.
+
+`SpectralSourceModel` produeix `SpectralSourceEstimate` i ensemble. VNP46 continua sent una observació panchromàtica: el kernel rep `BandRadiance` per `SpectralBandSet` i no un únic flux acromàtic.
 
 ### Atmosfera
 
@@ -27,7 +32,7 @@ El `PropagationKernel` rep `SourceSet`, `Observer`, `OpticalField`, `TerrainVisi
 
 ### Reference solver
 
-Ha d'existir un camí offline més lent amb toleràncies estretes, malla angular densa i espectre fi. No és el mateix que la v1 runtime. Serveix per comprovar la configuració espectral activa, la compressió de cúpules, l'ordre de fase, H_TOA i la quadratura; no per seleccionar N mitjançant benchmarks.
+Ha d'existir un camí offline independent per validar el transport. La decisió S1 continua oberta: pot ser un `SG-REF` propi de skyglow o una dependència creuada amb el Pas 7.65. Si es quantifica el biaix single-scattering, l'oracle ha d'incloure multiple scattering segons F5. El gate 7.20 valida transport donat el mateix `SourceModel`; no valida empíricament la inferència VNP46→emissió.
 
 ### Projeccions fotomètriques i composició
 
@@ -77,7 +82,7 @@ LOD de renderer i LOD físic són independents. El renderer pot reduir resoluci�
 
 ## Píxel final
 
-`VIIRS radiance → source spectrum/geometry → propagation radiance → dome compression → bridge → linear artificial field → + natural moonless + moon + twilight (linear composition) → camera/exposure → tone mapping → display transform → pixel`.
+`VNP46 observation → DNB measurement model/RSR → SourceModel spectrum+angular emission → spectral propagation radiance → dome compression → bridge → linear artificial field → + natural moonless + moon + twilight → camera/exposure → tone mapping → display transform → pixel`.
 
 En paral·lel, el resultat físic pot passar per `PhotometricProjectionService` per obtenir luminància, SQM/TESS simulats i `BortleEquivalent`; aquestes projeccions no són la font del kernel.
 
@@ -85,3 +90,8 @@ Qualsevol comparació científica s'atura abans de camera/exposure/tone mapping.
 ## Cel físic astral separat
 
 La [vertical 7.51+](../cel-fisic/README.md) calcula fonts solars/lunars i transport Hillaire de visualització amb LUT GPU, i manté una ruta espectral independent per a sensors. No comparteix integrador ni pipeline VIIRS amb el skyglow artificial; la composició es fa abans de l'exposició.
+
+
+### Acceleració offline
+
+Es poden precalcular LUT o kernels i, quan les hipòtesis de simetria ho permetin, usar convolució FFT. Aquesta ruta és un backend del mateix operador físic: ha de conservar bandes, model de font, atmosfera i terreny dins el domini declarat i comparar-se contra la ruta directa. Si la invariància translacional no es compleix, la FFT no és aplicable.

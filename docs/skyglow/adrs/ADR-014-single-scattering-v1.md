@@ -14,7 +14,7 @@ La primera implementació productiva candidata és single-scattering, sense atri
 
 ## Conseqüències
 
-Redueix cost; limita núvols i atmosferes òpticament gruixudes.
+Redueix cost; introdueix un error estructural que s'ha de quantificar per escenari i incorporar a `PredictionUncertainty.modelStructural`.
 
 ## Alternatives
 
@@ -22,7 +22,7 @@ Es mantenen documentades al TDD i a l'especificació d'algorismes; qualsevol alt
 
 ## Validació
 
-Comparació offline amb solver més general i ground truth.
+Comparació offline amb un oracle que inclogui multiple scattering. La decisió F5 continua oberta: A) `SG-REF` incorpora una variant pròpia; B) la quantificació queda pendent del path tracer del Pas 7.65 amb dependència creuada explícita. Un oracle single-scattering no tanca aquest biaix.
 
 ## Estat d'implementació
 

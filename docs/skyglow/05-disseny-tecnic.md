@@ -2,15 +2,15 @@
 
 ## Context
 
-El Pas 7 actual resol una necessitat visual i de visibilitat amb Bortle/magnitud límit, però no propaga fonts VIIRS a través d'una atmosfera física. El nou sistema substitueix progressivament aquesta autoritat sense trencar els modes manuals existents.
+El Pas 7 actual resol una necessitat visual i de visibilitat amb Bortle/magnitud límit, però no propaga fonts artificials a través d'una atmosfera física. La nova vertical usa VNP46 com a observació operativa, conserva VIIRS DNB com a model de mesura i infereix la font abans del transport espectral.
 
 ## Goals
 
-Radiància artificial direccional físicament traçable; zenit i cúpules amb un únic kernel; gate zenital absolut abans de cúpules; fonts VIIRS segmentades; terreny/curvatura; espectre i RSR; atmosfera extensible; projeccions fotomètriques/sensor separades; composició reference/instantaneous; cache error-based; renderer sense stutter; validació científica reproduïble.
+Radiància artificial direccional físicament traçable; VNP46 com a font operativa sense confondre observació i emissió; model de mesura DNB/RSR `BAND_INTEGRATED`; `SourceModel` espectral/angular; zenit i cúpules amb un únic kernel; terreny/curvatura; atmosfera extensible; projeccions de sensor separades; acceleracions offline homologades; cache error-based; renderer sense stutter; validació científica reproduïble.
 
 ## Non-goals v1
 
-Dispersió múltiple general en runtime, inversió espectral única a partir de DNB, meteorologia perfecta, núvols òpticament gruixuts exactes, 60 FPS del kernel, substitució immediata de tots els controls legacy.
+Dispersió múltiple general en runtime, inferir un SPD únic o una emissió angular única a partir de VNP46/DNB, meteorologia perfecta, núvols òpticament gruixuts exactes, 60 FPS del kernel, substituir la física per una convolució FFT general o eliminar immediatament els controls legacy.
 
 ## API de domini
 
@@ -40,7 +40,7 @@ Si un càlcul falla, es manté l'últim resultat físic vàlid amb indicador `st
 
 ## Testing
 
-Unitari: fórmules, unitats, RSR, espectre, fase, quadratura, PCHIP, geometria. Integració: VIIRS→font→kernel→DTO. Contract tests Python/TS. Golden tests amb reference solver. Property tests: positivitat, linealitat en intensitat de font, invariància d'unitats, monotonia de transmissió amb τ, suma commutativa de fonts.
+Unitari: fórmules, unitats, RSR, `BAND_INTEGRATED`, espectre, fase, quadratura, PCHIP, geometria i baixa radiància. Integració: VNP46→observació→SourceModel→kernel→DTO. Contract tests Python/TS. Golden tests amb reference solver. Property tests: positivitat, linealitat en intensitat de font, invariància d'unitats, monotonia de transmissió amb τ, suma commutativa de fonts.
 
 ## Alternatives descartades
 
@@ -53,7 +53,10 @@ Unitari: fórmules, unitats, RSR, espectre, fase, quadratura, PCHIP, geometria. 
 - invalidació per distància fixa: descartada a favor de pressupost d'error;
 - segon ray-march per dependències: descartat; es registren durant quadratura;
 - HITRAN line-by-line runtime: descartat per cost;
-- conversió directa VIIRS/relative radiance → SQM amb factor empíric opac: descartada;
+- conversió directa VNP46/DNB → SQM amb factor empíric opac: descartada;
+- tractar VNP46 com a flux hemisfèric lambertià per defecte: descartat;
+- col·lapsar el transport espectral a un únic flux perquè VNP46 sigui panchromàtic: descartat;
+- usar FFT/LUT com a física diferent del `PropagationKernel`: descartat; només són acceleracions homologables del mateix operador;
 - solver nou per cada frame o moviment submètric: descartat; scheduler + cache error-based;
 - usar Lluna/crepuscle per reclassificar el `BortleEquivalent` intrínsec del lloc: descartat.
 

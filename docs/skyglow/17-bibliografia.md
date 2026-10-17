@@ -28,6 +28,8 @@
 - NOAA/NASA. *VIIRS SDR User's Guide* i *Radiometric Calibration ATBD*.
 - Earth Observation Group. *VIIRS Nighttime Lights VNL*. https://eogdata.mines.edu/products/vnl/
 - NASA VIIRS Land. *Black Marble VNP46 product suite*. https://viirsland.gsfc.nasa.gov/Products/NASA/BlackMarble.html
+- Coesfeld, J.; Kuester, T.; Kuechly, H. U.; Kyba, C. C. M. (2020). *Reducing Variability and Removing Natural Light from Nighttime Satellite Imagery: A Case Study Using the VIIRS DNB*. Sensors 20, 3287. DOI: 10.3390/s20113287. Ús documental: §2.3.1 per la discontinuïtat de punt zero de la sèrie estudiada; la correcció concreta no es generalitza.
+- Uprety, S. et al. (2019). *Calibration Improvements in S-NPP VIIRS DNB Sensor Data Record Using Version 2 Reprocessing*. IEEE TGRS 57(12), 9602–9611. DOI: 10.1109/TGRS.2019.2927942. Ús documental: baixa radiància, offset/airglow i processament DNB; aplicabilitat a cada producte VNP46 s'ha de verificar.
 
 ## Mesura del cel
 
@@ -47,4 +49,4 @@
 
 ## Notes de verificació
 
-Les atribucions específiques de Cinzano–Falchi sobre 20 coeficients de Legendre, graella 80–100 km i límit horitzontal 120 km s'han verificat directament al text primari. La redistribució del ZIP RSR i els drets de derivats HITRAN continuen pendents de verificació legal específica.
+Les atribucions específiques de Cinzano–Falchi sobre 20 coeficients de Legendre, graella 80–100 km i límit horitzontal 120 km constaven com a verificades en la revisió anterior. Continuem sense donar per verificats aquí la §2.1.2.1 de l'ATBD, la unitat `W·cm⁻²·sr⁻¹` com a unitat exacta del contracte DNB, les Figures 3–4 de Sánchez de Miguel et al. (2017) ni una afirmació concreta de Cinzano–Falchi sobre la precisió de dues dispersions. La redistribució del ZIP RSR i els drets de derivats HITRAN continuen pendents de verificació legal específica.

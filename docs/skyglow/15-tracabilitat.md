@@ -5,10 +5,13 @@
 | zenit i cúpules mateixa física | un `PropagationKernel` | 01, ADR-001 | 7.2+ | golden zenit=mostra 90° |
 | gate zenital absolut | validar 90° abans de promoure cúpules | 01,08, ADR-017 | 7.20 | reference solver + unitats + convergència |
 | radiància lineal | suma abans de projecció | 01, ADR-005 | 7.2–7.28 | property test de linealitat |
-| VIIRS real | adaptador + source model | 01,04,10 | 7.5–7.10 | fixture VNL/RSR checksum |
+| VNP46 operatiu | adaptador VNP46 + observació separada d'emissió | 01,04,06,10 | 7.8–7.10 | fixture producte/release/quality |
+| model de mesura DNB | RSR real + `BAND_INTEGRATED` + resolució temporal | 01,04,06, ADR-007 | 7.6–7.8 | fixture RSR/provenance; unitat ATBD pendent |
+| baixa radiància | no clipping + restricció pre/post-2017 | 01,04,08,09,10 | 7.8,7.19,7.26 | fixtures negatives/prop de zero/temporal |
+| SourceModel | SPD + emissió angular + incertesa separades | 01,03,06 | 7.7–7.10 | sintètics + dades externes quan existeixin |
 | segmentació | watershed + quadtree | 01, ADR-004 | 7.9–7.10 | regions sintètiques + error patch |
 | espectre | normalization vs propagation, N configurat | 01,06, ADR-006 | 7.5–7.7 | unitats, vectors i projeccions de la configuració activa; cap benchmark per triar N |
-| RSR real | NOAA NCC | 04,10, ADR-007 | 7.6 | checksum/provenance |
+| acceleració offline | LUT/FFT només com a backend del mateix operador | 01,02,03,05 | 7.28 | error backend vs ruta directa + domini de validesa |
 | atmosfera extensible | provider + tiled field | 02,06, ADR-008/009 | 7.11, 7.15–7.16 | contract/provider tests |
 | Rayleigh | fórmula normalitzada | 01,04 | 7.3 | unit/golden |
 | aerosols | PhaseFunction unificada | 01,04, ADR-013 | 7.12–7.13 | B3 |

@@ -2,11 +2,15 @@
 
 | Risc | Prob. | Impacte | Detecció | Mitigació | Fallback |
 |---|---|---|---|---|---|
-| DNB no reconstrueix SPD | alta | alt | dispersió ensemble | priors versionats + validació espectral | interval ampli / prior global |
+| VNP46/DNB no reconstrueix SPD | alta | alt | dispersió ensemble | priors versionats + validació espectral | interval ampli / prior global |
+| VNP46 no constreny emissió angular | alta | alt, sobretot baixa elevació | contrast amb dades angulars externes | model/ensemble versionat + incertesa estructural | estat no homologat |
+| punt zero/baixa radiància pre-post 2017 | mitjana-alta | alt per fonts febles | fixtures temporals i metadata release | política explícita LOW-RAD/DNB-2017 | excloure comparació temporal |
+| doble correcció de stray light/product processing | mitjana | alt | auditoria de metadata/producte | confirmar transformacions per release | no aplicar correcció pròpia |
 | prior erroni dins 500–900 nm biaixa escala | mitjana-alta | alt | contrast multi-SPD | ensemble i calibratge extern | confiança baixa |
 | aerosol insuficient | alta | alt | error vs ground truth/AOD | biblioteca pròpia + CAMS + RH | HG documentat |
 | núvols/multiple scattering | alta | alt en cobert | residus sistemàtics | B6 limitat + solver offline | cel clar o single-scattering etiquetat |
 | cost LOS excessiu | mitjana | alt | B0–B7 | vectorització, cache, quadtree, LUT | menys recompute, no menys física silenciosa |
+| FFT/LUT fora del seu domini | mitjana | crític científic | contrast backend accelerat vs kernel directe | domini de validesa + error bound | ruta directa |
 | inestabilitat prop horitzó | mitjana | alt | casos 0,5–2° | segmentació, precisió, referència | limitar qualitat/advertir |
 | oclusió DEM incorrecta | mitjana | alt local | fixtures muntanya | mateixa geodèsia + refinament patch | marcar DEM absent |
 | llicència RSR/HITRAN/SPD | mitjana | alt | auditoria legal | descàrrega a origen, derivats permesos | no empaquetar |

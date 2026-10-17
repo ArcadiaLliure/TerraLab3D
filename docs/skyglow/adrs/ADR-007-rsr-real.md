@@ -6,11 +6,15 @@
 
 ## Context
 
-Centre/FWHM/rectangle perden la forma real del sensor.
+VNP46 és la font operativa, però continua derivant d'una mesura DNB de banda ampla. Aproximar la resposta per centre/FWHM/rectangle o ignorar release/data pot introduir una normalització incompatible.
 
 ## Decisió
 
-Integrar contra la RSR oficial versionada i checksum.
+Integrar contra la RSR oficial versionada, amb checksum/procedència, i resoldre-la de manera compatible amb el release i la data d'adquisició de l'observació.
+
+La vertical usa `measurementOperatorId=BAND_INTEGRATED` i conserva `A = L / ∫S·R dλ`. No es normalitza `R` per la seva integral per defecte.
+
+La unitat exacta de `L` queda pendent de verificació directa contra l'ATBD aplicable.
 
 ## Conseqüències
 
@@ -22,7 +26,7 @@ Es mantenen documentades al TDD i a l'especificació d'algorismes; qualsevol alt
 
 ## Validació
 
-Test integral contra fixture oficial i provenance.
+Test integral contra fixture oficial, resolució release/data i provenance. El test no pot donar per verificada una unitat de l'ATBD encara pendent.
 
 ## Estat d'implementació
 

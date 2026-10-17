@@ -6,15 +6,17 @@ Congelar snapshots del Pas 7 actual: Bortle 1/4/9, dia/nit, Via Làctia, estrell
 
 ## Fase 1 — benchmark i infraestructura
 
-B0, contractes, unitats, `PropagationKernel` mínim sense UI. Cap canvi visual.
+B0, contractes, unitats, `PropagationKernel` mínim sense UI. La ruta directa defineix la semàntica que qualsevol LUT/FFT futura haurà de reproduir. Cap canvi visual.
 
 ## Fase 2 — kernel mínim shadow
 
 B1, Rayleigh+HG, fonts sintètiques. Publicar resultats només a debug/telemetria.
 
-## Fase 3 — VIIRS, espectre i gate zenital
+## Fase 3 — VNP46, model DNB, SourceModel i gate zenital
 
-Ingestió real, RSR, prior SPD, regions/patches. Tancar primer la cadena absoluta a 90° amb el mateix kernel, reference solver i unitats físiques. Comparar predicció zenital amb mesures; el legacy només és regressió visual, no referència científica. No es promouen cúpules si el gate zenital no passa.
+Ingestió VNP46 real amb producte/release/data, RSR DNB resolta temporalment, operador `BAND_INTEGRATED`, prior SPD i model angular explícit. Preservar baixa radiància sense clipping i registrar la restricció pre/post-2017.
+
+Tancar la cadena de propagació a 90° amb el mateix kernel i l'oracle que resulti de S1. El gate valida transport donat el model de font; la validació empírica de l'emissió continua separada. No es promouen cúpules si el gate no passa.
 
 ## Fase 4 — terreny/cache/AD i moviment
 
@@ -32,9 +34,9 @@ Atmosfera estàndard → ERA5/CAMS → providers observats/forecast. Procedènci
 
 Single-scattering amb limitacions explícites; no activar per defecte fins validar.
 
-## Fase 8 — B7 i ground truth
+## Fase 8 — B7, acceleracions i ground truth
 
-Benchmark full, validació geogràfica, SLO i uncertainty budget.
+Benchmark full, validació geogràfica, SLO i uncertainty budget. Qualsevol backend precomputat/LUT/FFT es valida contra la ruta directa dins del seu domini; no es promociona només perquè sigui més ràpid.
 
 ## Fase 9 — retirada legacy
 

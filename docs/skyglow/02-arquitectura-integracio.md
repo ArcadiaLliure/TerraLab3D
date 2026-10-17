@@ -9,15 +9,17 @@ El backend ja segueix domini/aplicació/infraestructura/scene. Existeixen `domai
 - REUSE: coordenades, observador, DEM/horizon, bridge, workers, lifecycle, resource registry, escena persistent.
 - ADAPT: `domain/light_pollution` com a namespace de domini; `SkyEnvironmentSnapshot`; scheduler d'actualitzacions; infraestructura cache.
 - REWRITE progressiu: l'ús de Bortle com a font de `u_artificialBrightness` al shader.
-- NEW: model VIIRS, `EmissionRegion`, `RadiancePatch`, espectre, òptica atmosfèrica, kernel, cache física, `DomeProfile`, `PhotometricProjectionService`, `SkyRadianceComposer`, benchmark/reference solver.
+- NEW: adaptador VNP46, model de mesura VIIRS DNB/RSR, `SourceModel`, `EmissionRegion`, `RadiancePatch`, espectre, òptica atmosfèrica, kernel, cache física, `DomeProfile`, `PhotometricProjectionService`, `SkyRadianceComposer` i oracle(s) de referència.
 - DISCARD només al final de migració: glow Bortle artístic com a autoritat física. Es pot conservar temporalment com a fallback explícit.
 
 ## 3. Components proposats
 
 ~~~mermaid
 flowchart LR
-  V[VIIRS/VNL/Black Marble] --> A[adaptador light_pollution]
-  A --> S[SourceModelBuilder]
+  V[VNP46] --> A[adaptador VNP46]
+  A --> O[ViirsSourceObservation]
+  R[RSR DNB + BAND_INTEGRATED] --> S[SourceModel]
+  O --> S
   S --> ER[EmissionRegion + RadiancePatch]
   MET[Atmosfera estàndard / ERA5 / CAMS] --> AP[AtmosphericOpticsProvider]
   AP --> OF[OpticalField tiled]
@@ -26,11 +28,15 @@ flowchart LR
   OF --> K
   OBS[Observer] --> K
   K --> PR[PropagationResult]
+  K -. mateix operador .-> ACC[backend precomputat/LUT/FFT si és homologat]
+  ACC --> PR
   PR --> DP[DomeProfile compressor]
   DP --> BR[Bridge DTO versionat]
   BR --> RT[SkyglowRuntime TS]
   RT --> GPU[Three.js DomeSkyglowRenderer]
 ~~~
+
+VNP46 és entrada de dades; VIIRS DNB continua essent semàntica de mesura. `SourceModel` resol la inferència espectral/angular abans del transport. Cap backend accelerat pot canviar aquesta frontera.
 
 ## 4. Fronteres de responsabilitat
 
@@ -125,7 +131,7 @@ Els càlculs llargs han d'usar el patró existent de correlació, cancel·lació
 
 ## 11. Persistència
 
-RSR, LUT de gas, biblioteques SPD/aerosol/núvol i productes VIIRS són recursos versionats gestionats. Han de seguir el model del Pas 24 quan aquest estigui disponible: checksum, origen, llicència, instal·lació atòmica i estat de disponibilitat. Fins aleshores, el benchmark pot usar fixtures petites versionades amb llicència compatible.
+RSR, LUT de gas, biblioteques SPD/aerosol/núvol i productes VNP46 són recursos versionats gestionats. La procedència VNP46 conserva producte, release i data/període d'adquisició; les RSR es resolen de manera compatible amb aquesta procedència. Han de seguir el model del Pas 24 quan aquest estigui disponible: checksum, origen, llicència, instal·lació atòmica i estat de disponibilitat. Fins aleshores, el benchmark pot usar fixtures petites versionades amb llicència compatible.
 
 ## 12. Compatibilitat
 
@@ -133,3 +139,8 @@ Els controls Bortle/magnitud existents es mantenen durant shadow mode. El nou re
 ## 13. Frontera amb el cel físic solar/lunar (7.51+)
 
 El [cel físic astral](../cel-fisic/01-arquitectura-i-modes.md) és un integrador independent de fonts llunyanes i LUT GPU; el `PropagationKernel` continua exclusivament per emissió artificial distribuïda. Comparteixen `AtmosphericOpticsState` i geodèsia, però no caches radiatives ni fonts. El selector `skyRenderingMode=simulated|physical` només canvia el renderer de cel i no les projeccions SQM/TESS ni el mode de contaminació. La composició exigeix radiància lineal compatible i mai dedueix sensors de la SkyView LUT RGB. El mode simulat és permanent.
+
+
+## 14. Acceleració offline
+
+La ruta directa del `PropagationKernel` defineix la semàntica física. LUT, kernels precalculats o FFT són implementacions d'acceleració admissibles només dins un domini on es demostri equivalència dins el pressupost d'error. Una FFT exigeix invariància translacional suficient; atmosfera espacialment variable, geometria/terreny o models de font locals poden trencar aquesta hipòtesi. L'acceleració no converteix VNP46 en un camp escalar acromàtic ni elimina el transport espectral.

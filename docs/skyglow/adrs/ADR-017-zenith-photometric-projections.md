@@ -10,13 +10,13 @@ La primera iteració podia produir camps direccionals plausibles abans de tancar
 
 ## Decisió
 
-La direcció de 90° es valida primer com a gate radiomètric absolut amb el mateix `PropagationKernel`. El kernel només produeix radiància física. Luminància CIE, SQM, TESS-W, altres sensors i `BortleEquivalent` són projeccions post-kernel amb resposta espectral, FOV, zero point/calibratge i versió explícits.
+La direcció de 90° es valida primer com a gate radiomètric absolut amb el mateix `PropagationKernel`. El gate valida transport donat el mateix `SourceModel` a runtime i oracle; no valida empíricament la inferència VNP46→emissió. El kernel només produeix radiància física. Luminància CIE, SQM, TESS-W, altres sensors i `BortleEquivalent` són projeccions post-kernel amb resposta espectral, FOV, zero point/calibratge i versió explícits.
 
-No s'accepta conversió directa VIIRS→SQM ni `relativeRadiance × calibrationFactor → cd/m²` sense model físic traçable. Artificial, natural sense Lluna, lunar i crepuscular es mantenen separats i se sumen linealment. El `BortleEquivalent` de lloc usa condicions de referència sense Lluna ni crepuscle.
+No s'accepta conversió directa VNP46/DNB→SQM ni `relativeRadiance × calibrationFactor → cd/m²` sense model físic traçable. Artificial, natural sense Lluna, lunar i crepuscular es mantenen separats i se sumen linealment. El `BortleEquivalent` de lloc usa condicions de referència sense Lluna ni crepuscle.
 
 ## Conseqüències
 
-El zenit es converteix en invariant de les cúpules i els sensors es poden canviar sense tocar propagació.
+El zenit es converteix en invariant de les cúpules i els sensors es poden canviar sense tocar propagació. SQM/TESS utilitzen la resposta espectral real; `predictionUncertainty` conserva l'efecte de l'espectre assumit quan sigui material.
 
 ## Alternatives
 
