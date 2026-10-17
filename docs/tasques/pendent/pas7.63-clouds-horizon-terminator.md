@@ -27,7 +27,7 @@ Aplicar `CloudOpticalState` compartit al transport solar/lunar/natural i tancar 
 
 ## Codi existent a reutilitzar
 
-`CloudOpticalState` de 7.23, providers ERA5/CAMS de 7.16, optical state, Hillaire de 7.56, DEM/horitzó i limbe de 7.58.
+`CloudOpticalState` de 7.23, providers ERA5/CAMS de 7.15, optical state, Hillaire de 7.56, DEM/horitzó i limbe de 7.58.
 
 ## Flux tècnic
 
