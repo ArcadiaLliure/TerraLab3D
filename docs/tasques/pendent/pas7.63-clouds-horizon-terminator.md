@@ -20,14 +20,14 @@ Aplicar `CloudOpticalState` compartit al transport solar/lunar/natural i tancar 
 
 **Depèn de:**
 - [Pas 7.62](pas7.62-radiative-error-budget.md)
-- [Pas 7.27 — CloudOpticalState artificial](pas7.27-clouds-b6.md)
+- [Pas 7.23 — CloudOpticalState artificial](pas7.23-clouds-b6.md)
 
 **En depenen:**
 - [Pas 7.64](pas7.64-scheduler-cache-cel-fisic.md)
 
 ## Codi existent a reutilitzar
 
-`CloudOpticalState` de 7.27, providers ERA5/CAMS de 7.16, optical state, Hillaire de 7.56, DEM/horitzó i limbe de 7.58.
+`CloudOpticalState` de 7.23, providers ERA5/CAMS de 7.16, optical state, Hillaire de 7.56, DEM/horitzó i limbe de 7.58.
 
 ## Flux tècnic
 
@@ -42,7 +42,7 @@ CloudDataProvider → CloudOpticsModel → `CloudOpticalState(τ,ω0,g,cover,bas
 
 ## Tasques
 
-- [ ] Consumir el mateix `CloudOpticalState` neutral de 7.27, sense reutilitzar el seu integrador artificial.
+- [ ] Consumir el mateix `CloudOpticalState` neutral de 7.23, sense reutilitzar el seu integrador artificial.
 - [ ] Baseline: transmissió Beer-Lambert + fase direccional; compensar multiple scattering de capa amb delta-Eddington i declarar-ne límits.
 - [ ] Separar `CloudDataProvider` de la conversió microfísica→òptica; ERA5/CAMS és un provider, no el model radiatiu.
 - [ ] Avaluar visibilitat Sol/Lluna→mostra i mostra→observador amb Terra/DEM; un Sol sota l'horitzó de l'observador pot il·luminar capes altes.
@@ -68,7 +68,7 @@ Volumetria meteorològica 3D completa o Monte Carlo cloud en runtime.
 
 ## Instrucció per a Codex
 
-`CloudOpticalState` compartit → integrador astral propi + geometria Terra/DEM → radiància; el Pas 7.27 continua exclusivament artificial. Respectar `simulated|physical`, la separació 7.1–7.50 / 7.51+, les unitats i les llicències. No donar per implementat un contracte buit.
+`CloudOpticalState` compartit → integrador astral propi + geometria Terra/DEM → radiància; el Pas 7.23 continua exclusivament artificial. Respectar `simulated|physical`, la separació 7.1–7.50 / 7.51+, les unitats i les llicències. No donar per implementat un contracte buit.
 
 ## Treball pendent
 

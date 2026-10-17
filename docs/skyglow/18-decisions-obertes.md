@@ -1,25 +1,23 @@
 # Decisions obertes del skyglow
 
-Aquest registre conté decisions que **no** es poden tancar implícitament durant la implementació. La decisió ja presa és que VNP46 és la família de dades operativa, mentre VIIRS DNB continua essent el model de mesura espectral i el transport continua en el `PropagationKernel`.
+Aquest registre continua sent autoritatiu, però cap decisió bloquejant pot quedar “oberta” mentre Codex avança. Cada fila té ara un **pas de resolució**. Si en aquell pas manca evidència suficient, l’estat és `bloquejat` i no s’avança.
 
-| ID | Pregunta | Opcions | Conseqüències | Qui decideix | Dades necessàries |
-|---|---|---|---|---|---|
-| DATA-VNP46 | Quin producte/release VNP46 alimenta la v1 i amb quina política temporal? | producte anual estable / producte mensual / combinació versionada | estabilitat vs variació temporal; canvien qualitat i processament | responsable de dades + científic | documentació oficial, unitats, quality, correccions i llicència |
-| F1 | Com s'infereix la distribució angular d'emissió des de VNP46 quasi-nadir? | model paramètric publicat / model empíric regional / ensemble | condiciona sobretot cúpules baixes i llarga distància | responsable científic | mesures angulars independents i informació d'apantallament/reflexió |
-| F5 | Com es quantifica el biaix single-scattering? | A: `SG-REF` amb variant multiple-scattering pròpia; B: esperar el path tracer del Pas 7.65 i declarar dependència creuada | A desacobla però crea un solver offline; B reutilitza oracle però bloqueja homologació final | científic + arquitectura | cost de solver, fixtures i domini atmosfèric |
-| F6 | Quina magnitud, si n'hi ha, representa percepció visual nocturna? | fotòpica+escotòpica / model mesòpic / cap magnitud perceptiva única | complexitat i risc de falsa interpretació | científic + producte | casos d'ús i norma CIE adoptada |
-| F7 | Quin radi màxim de fonts s'utilitza? | fix / adaptatiu per cota d'error / perfils de qualitat | cost contra radiància omesa | científic + rendiment | convergència radial i distribució de fonts |
-| V1 | Quins llindars fan PASS/FAIL? | preregistrar per referència publicada, requisit de producte o convergència numèrica | evita ajustar criteris després de veure resultats | producte + científic | requeriments i incerteses de referència |
-| V3 | Com s'homologa un `SpectralBandSet`? | pressupost únic / pressupost per projecció / refinament fins convergència | determina error espectral sense escollir N per benchmark | científic | espectre fi, SPD adverses i toleràncies sensor |
-| S1 | Quin oracle usa el gate 7.20? | A: pas propi `SG-REF`; B: dependència creuada amb 7.65 | A manté verticals separades; B simplifica oracles però bloqueja 7.20/7.21 | arquitectura + científic | cost, independència i calendari de 7.65 |
-| DNB-2017 | Com es tracta el canvi de punt zero de baixa radiància al voltant de 2017? | restricció temporal sense correcció automàtica / paràmetre versionat per producte/release | afecta comparabilitat temporal de fonts febles | dades + científic | documentació/reprocessament i validació externa |
-| LOW-RAD | Què es fa amb mesures negatives, prop de zero o no fiables? | excloure / propagar amb incertesa / política específica de producte | clipping pot eliminar fonts; conservar soroll pot crear cúpules espúries | científic de dades | distribució d'offset, quality flags i ground truth |
+| ID | Pregunta | Resolució executable | Pas |
+|---|---|---|---:|
+| DATA-VNP46 | Producte/release i política temporal v1 | congelar al manifest v1 amb unitats/quality/llicència verificades | 7.1 |
+| DNB-2017 | Canvi de baixa radiància al voltant de 2017 | política versionada per producte/release, sense correcció universal implícita | 7.1–7.2 |
+| LOW-RAD | Negatius/prop de zero/no fiables | política explícita del manifest; mai `max(0,·)` silenciós | 7.1–7.2 |
+| V1 | Llindars PASS/FAIL | preregistrar origen i valor abans dels benchmarks/gates | 7.1 |
+| S1 | Oracle del gate zenital | **SG-REF propi del skyglow**; no dependència amb 7.65 | 7.1 i 7.6 |
+| F5 | Biaix single-scattering | quantificar offline amb SG-REF/oracle més ric; no calibratge opac | 7.1 i 7.6 |
+| F7 | Radi màxim de fonts | radi adaptatiu per cota d’error, no tall fix arbitrari | 7.1 |
+| F6 | Magnitud perceptiva nocturna | no bloqueja v1 si no s’exposa una magnitud única; qualsevol model perceptiu futur requereix decisió pròpia | 7.1 |
+| V3 | Homologació del SpectralBandSet | selecció per error contra espectre fi, mai per benchmark de temps | 7.4 |
+| F1 | Emissió angular des de VNP46 quasi-nadir | model publicat/empíric/ensemble amb domini i incertesa; Lambert no és default | 7.5 |
 
 ## Regles
 
-- No es decideix Lambert per defecte.
-- No es decideix una correcció universal pre/post-2017.
-- No es decideix un llindar numèric sense origen.
-- No es crea una FFT com a substitut de la física; només pot aparèixer com a acceleració validada.
-- El Pas 7.20 no valida l'emissió; valida el transport donada l'emissió.
-- El Pas 7.28 no pot homologar la vertical mentre una decisió bloquejant necessària per al domini declarat continuï oberta.
+- Cap pas posterior pot “tancar” retroactivament una decisió que era prerequisit.
+- Els llindars científics no es poden canviar després de veure el resultat del gate.
+- Runtime↔SG-REF valida implementació/transport; no valida per si sol VNP46→emissió.
+- Quadtree, Legendre, AD, cache i LUT/FFT són acceleracions posteriors al baseline directe.

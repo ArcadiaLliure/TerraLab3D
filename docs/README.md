@@ -6,17 +6,17 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Següent pas executable: [Pas 7.1 — Skyglow físic: benchmark B0 i infraestructura de mesura](tasques/pendent/pas7.1-skyglow-b0.md).**
+> **Següent pas executable: [Pas 7.1 — Contracte científic v1, dades i criteris d’acceptació](tasques/pendent/pas7.1-contracte-cientific-v1.md).**
 >
 > Els subpassos **7.1–7.50** pertanyen exclusivament a contaminació lumínica artificial; la font operativa acordada és VNP46, interpretada amb el model de mesura VIIRS DNB i propagada espectralment. Els **7.51+** pertanyen al cel físic solar/lunar. El Pas 7 històric manté l'estat completat per la seva visualització actual. Les dues noves verticals són **pendents**, documentades a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
-La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README, seguir el punter anterior i executar només el primer pas que encara no compleixi el seu criteri de sortida.
+La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README i executar **exactament un pas cada vegada**. Per a la vertical 7.1–7.28, l’ordre és una linealització científica deliberada: cap optimització pot precedir el seu baseline directe/oracle i cap decisió bloquejant es pot resoldre amb una constant implícita.
 
 ## Protocol perquè Codex continuï el pla
 
 1. Llegir aquest README i les [normes d'arquitectura](normes-arquitectura.md).
 2. Obrir el document assenyalat a **Punt de represa** i verificar de nou l'estat del codi; el repositori actual preval sobre la descripció.
-3. Implementar la vertical funcional completa en l'ordre de les caselles de “Tasques” i tancar després les de “Treball pendent”, ampliant el codi existent indicat i respectant dependències i fora d'abast.
+3. Implementar **només el pas assenyalat** i els seus subtreballs interns. No començar cap pas posterior, encara que sembli independent, fins que el criteri de sortida actual estigui verificat.
 4. Executar les proves del pas i les regressions afectades; recollir les evidències exigides i escriure al document els resultats reproduïbles.
 5. Actualitzar caselles i estat. `parcial` només és vàlid si hi ha una part observable connectada; un esquelet continua `pendent`.
 6. Quan totes les caselles i el criteri de sortida estiguin verificats, canviar l'estat a `completat`, moure el mateix document de `pendent/` a `completat/`, actualitzar les dues taules i avançar **Punt de represa** al número següent.
@@ -27,6 +27,7 @@ Estats admesos:
 - `completat`: vertical executable amb criteri de sortida i evidències verificats.
 - `parcial`: hi ha comportament observable reutilitzable, però falta part del resultat funcional.
 - `pendent`: només hi ha especificació, contractes, esquelets o cap implementació útil.
+- `bloquejat`: el pas és executable però manca una dada/decisió científica externa imprescindible; Codex ha de documentar el bloqueig i **aturar la seqüència**, no inventar-la ni saltar al pas següent.
 - `per madurar`: la idea encara té decisions funcionals o tècniques obertes i queda fora de l'ordre executable.
 
 ## Passos completats
@@ -68,34 +69,34 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.1 | [Skyglow físic — benchmark B0](tasques/pendent/pas7.1-skyglow-b0.md) | `pendent` | 7, 22.5, 23 |
-| 7.2 | [PropagationKernel geomètric](tasques/pendent/pas7.2-kernel-geometric.md) | `pendent` | 7.1 |
-| 7.3 | [Rayleigh + HG i B1a](tasques/pendent/pas7.3-rayleigh-hg-b1a.md) | `pendent` | 7.2 |
-| 7.4 | [Forward AD i B1b](tasques/pendent/pas7.4-forward-ad-b1b.md) | `pendent` | 7.3 |
-| 7.5 | [Infraestructura espectral i B2a](tasques/pendent/pas7.5-spectral-bandset-b2a.md) | `pendent` | 7.3 |
-| 7.6 | [Model de mesura DNB, RSR real i BAND_INTEGRATED](tasques/pendent/pas7.6-viirs-rsr.md) | `pendent` | 7.5 |
-| 7.7 | [SourceModel espectral/angular i B2b](tasques/pendent/pas7.7-spectral-source-b2b.md) | `pendent` | 7.6 |
-| 7.8 | [Adaptador VNP46 i baixa radiància](tasques/pendent/pas7.8-vnp46-adapter.md) | `pendent` | 7.6, 7.7 |
-| 7.9 | [EmissionRegion i watershed](tasques/pendent/pas7.9-emission-region-watershed.md) | `pendent` | 7.8 |
-| 7.10 | [RadiancePatch i quadtree](tasques/pendent/pas7.10-radiance-patch-quadtree.md) | `pendent` | 7.9 |
-| 7.11 | [OpticalField tiled](tasques/pendent/pas7.11-optical-field.md) | `pendent` | 7.5 |
-| 7.12 | [PhaseFunction i aerosol fallback](tasques/pendent/pas7.12-phase-aerosol-library.md) | `pendent` | 7.3, 7.11 |
-| 7.13 | [Benchmark Legendre B3](tasques/pendent/pas7.13-legendre-b3.md) | `pendent` | 7.12 |
-| 7.14 | [Absorció gasosa B4](tasques/pendent/pas7.14-gas-b4.md) | `pendent` | 7.5, 7.11 |
-| 7.15 | [AtmosphericOpticsProvider estàndard](tasques/pendent/pas7.15-atmos-provider-standard.md) | `pendent` | 7.11, 7.12, 7.14 |
-| 7.16 | [Providers ERA5/CAMS](tasques/pendent/pas7.16-atmos-provider-era5-cams.md) | `pendent` | 7.15 |
-| 7.17 | [Terreny i curvatura al kernel](tasques/pendent/pas7.17-terrain-curvature.md) | `pendent` | 7.10, 7.2 |
-| 7.18 | [Cache error-based](tasques/pendent/pas7.18-cache-error-based.md) | `pendent` | 7.4, 7.11, 7.17 |
-| 7.19 | [Incertesa i provenance](tasques/pendent/pas7.19-uncertainty-registry.md) | `pendent` | 7.7, 7.16, 7.18 |
-| 7.20 | [Gate zenital radiomètric absolut](tasques/pendent/pas7.20-zenith-absolute-gate.md) | `pendent` | 7.8, 7.17, 7.19 + decisió S1 |
-| 7.21 | [DomeProfile i PCHIP](tasques/pendent/pas7.21-dome-profile-pchip.md) | `pendent` | 7.2, 7.10, 7.18, 7.20 |
-| 7.22 | [Projeccions fotomètriques, SQM/TESS i BortleEquivalent](tasques/pendent/pas7.22-photometric-projections.md) | `pendent` | 7.20, 7.21 |
-| 7.23 | [Composició física del cel](tasques/pendent/pas7.23-sky-radiance-composition.md) | `pendent` | 7.22 |
-| 7.24 | [Renderer Three.js lineal](tasques/pendent/pas7.24-three-renderer.md) | `pendent` | 7.21 |
-| 7.25 | [Modes diagnòstics](tasques/pendent/pas7.25-debug-modes.md) | `pendent` | 7.24 |
-| 7.26 | [Validació TESS/SQM/all-sky](tasques/pendent/pas7.26-ground-truth-validation.md) | `pendent` | 7.21, 7.16, 7.19, 7.22, 7.23 |
-| 7.27 | [Núvols single-scattering i B6](tasques/pendent/pas7.27-clouds-b6.md) | `pendent` | 7.16, 7.12, 7.14 |
-| 7.28 | [B7 FULL i homologació skyglow](tasques/pendent/pas7.28-b7-homologacio-skyglow.md) | `pendent` | 7.1–7.27, inclosos 7.20/7.22/7.23 |
+| 7.1 | [Contracte científic v1, dades i criteris d’acceptació](tasques/pendent/pas7.1-contracte-cientific-v1.md) | `pendent` | 7, 22.5, 23 |
+| 7.2 | [Adaptador VNP46 d’observació, qualitat i procedència](tasques/pendent/pas7.2-vnp46-observation-adapter.md) | `pendent` | 7.1 |
+| 7.3 | [Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED](tasques/pendent/pas7.3-dnb-rsr-measurement.md) | `pendent` | 7.2 |
+| 7.4 | [Oracle espectral fi i homologació del SpectralBandSet v1](tasques/pendent/pas7.4-spectral-bandset-validation.md) | `pendent` | 7.3 |
+| 7.5 | [SourceModel v1: SPD, emissió angular i incertesa](tasques/pendent/pas7.5-source-model-v1.md) | `pendent` | 7.4 |
+| 7.6 | [SG-REF: oracle independent de transport i integració d’àrea](tasques/pendent/pas7.6-sg-ref-reference-solver.md) | `pendent` | 7.5 |
+| 7.7 | [PropagationKernel geomètric i benchmark B0](tasques/pendent/pas7.7-kernel-geometry-b0.md) | `pendent` | 7.6 |
+| 7.8 | [OpticalField tiled i atmosfera estàndard determinista](tasques/pendent/pas7.8-optical-field-standard.md) | `pendent` | 7.7 |
+| 7.9 | [Rayleigh, aerosol de referència i benchmark B1](tasques/pendent/pas7.9-rayleigh-aerosol-b1.md) | `pendent` | 7.8 |
+| 7.10 | [Kernel espectral complet i absorció gasosa](tasques/pendent/pas7.10-gas-spectral-kernel.md) | `pendent` | 7.9 |
+| 7.11 | [Terreny, curvatura i visibilitat física](tasques/pendent/pas7.11-terrain-curvature.md) | `pendent` | 7.10 |
+| 7.12 | [Gate zenital de transport radiomètric](tasques/pendent/pas7.12-zenith-transport-gate.md) | `pendent` | 7.11 |
+| 7.13 | [Camp angular i DomeProfile sobre ruta directa](tasques/pendent/pas7.13-dome-profile-direct.md) | `pendent` | 7.12 |
+| 7.14 | [Projeccions fotomètriques i sensors SQM/TESS](tasques/pendent/pas7.14-photometric-projections.md) | `pendent` | 7.13 |
+| 7.15 | [Atmosfera real ERA5/CAMS i composició de camps](tasques/pendent/pas7.15-atmos-era5-cams.md) | `pendent` | 7.14 |
+| 7.16 | [Incertesa quantitativa i provenance completa](tasques/pendent/pas7.16-uncertainty-provenance.md) | `pendent` | 7.15 |
+| 7.17 | [Validació empírica clear-sky de SourceModel i transport](tasques/pendent/pas7.17-clear-sky-ground-truth.md) | `pendent` | 7.16 |
+| 7.18 | [Watershed, EmissionRegion i quadtree com acceleració B5](tasques/pendent/pas7.18-source-spatial-acceleration.md) | `pendent` | 7.17 |
+| 7.19 | [Compressió de PhaseFunction i benchmark B3](tasques/pendent/pas7.19-phase-acceleration-b3.md) | `pendent` | 7.18 |
+| 7.20 | [Forward AD i RadiativeErrorBudget](tasques/pendent/pas7.20-ad-error-budget.md) | `pendent` | 7.19 |
+| 7.21 | [Cache error-based, scheduler latest-wins i prefetch](tasques/pendent/pas7.21-cache-scheduler.md) | `pendent` | 7.20 |
+| 7.22 | [Decisió i backend opcional LUT/precomputació/FFT](tasques/pendent/pas7.22-optional-runtime-acceleration.md) | `pendent` | 7.21 |
+| 7.23 | [CloudOpticalState i núvols single-scattering B6](tasques/pendent/pas7.23-clouds-b6.md) | `pendent` | 7.22 |
+| 7.24 | [Validació empírica final clear/cloudy i congelació de model](tasques/pendent/pas7.24-full-ground-truth.md) | `pendent` | 7.23 |
+| 7.25 | [Bridge Python→TypeScript i SkyglowRuntime](tasques/pendent/pas7.25-bridge-runtime.md) | `pendent` | 7.24 |
+| 7.26 | [Renderer Three.js lineal i modes diagnòstics](tasques/pendent/pas7.26-three-renderer-debug.md) | `pendent` | 7.25 |
+| 7.27 | [Composició lineal del cel i estats reference/instantaneous](tasques/pendent/pas7.27-sky-composition.md) | `pendent` | 7.26 |
+| 7.28 | [B7 FULL, SLO i homologació del skyglow artificial](tasques/pendent/pas7.28-b7-homologacio-skyglow.md) | `pendent` | 7.1–7.27 |
 | 7.51 | [Llicències comercials i recursos del cel físic](tasques/pendent/pas7.51-llicencies-i-recursos.md) | `pendent` | 7, 8, 8.7 |
 | 7.52 | [Selector permanent cel simulat/real](tasques/pendent/pas7.52-selector-cel-simulat-real.md) | `pendent` | 7.51 |
 | 7.53 | [Estat òptic, geodèsia i altura](tasques/pendent/pas7.53-optica-observador-altura.md) | `pendent` | 7.52 |
@@ -107,8 +108,8 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 | 7.59 | [Il·luminació solar/lunar i eclipsis](tasques/pendent/pas7.59-illuminacio-terreny-eclipsis.md) | `pendent` | 7.58 |
 | 7.60 | [Integració bridge/Three.js](tasques/pendent/pas7.60-integracio-three-bridge.md) | `pendent` | 7.59 |
 | 7.61 | [Fons natural nocturn: airglow, zodiacal i llum estel·lar integrada](tasques/pendent/pas7.61-natural-night-sky.md) | `pendent` | 7.60 |
-| 7.62 | [Pressupost d'error i descarte radiatiu conservador](tasques/pendent/pas7.62-radiative-error-budget.md) | `pendent` | 7.61, 7.18 |
-| 7.63 | [Núvols físics, horitzó, ombra planetària i terminador](tasques/pendent/pas7.63-clouds-horizon-terminator.md) | `pendent` | 7.62, 7.27 |
+| 7.62 | [Pressupost d'error i descarte radiatiu conservador](tasques/pendent/pas7.62-radiative-error-budget.md) | `pendent` | 7.61, 7.20 |
+| 7.63 | [Núvols físics, horitzó, ombra planetària i terminador](tasques/pendent/pas7.63-clouds-horizon-terminator.md) | `pendent` | 7.62, 7.23 |
 | 7.64 | [Scheduler latest-wins, invalidació i caches del cel físic](tasques/pendent/pas7.64-scheduler-cache-cel-fisic.md) | `pendent` | 7.63 |
 | 7.65 | [Solver espectral de referència i oracles científics](tasques/pendent/pas7.65-reference-solver.md) | `pendent` | 7.64 |
 | 7.66 | [Matriu de validació científica del cel físic](tasques/pendent/pas7.66-validacio-cel-fisic.md) | `pendent` | 7.65 |

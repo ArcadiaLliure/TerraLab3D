@@ -1,0 +1,296 @@
+# Pla executable canònic del skyglow per a Codex
+
+> Estat: pendent d’implementació. Aquest document substitueix l’ordre executable anterior de 7.1–7.28. La numeració es conserva per compatibilitat amb la vertical 7.51+, **no** per preservar la descomposició antiga.
+
+## Regla d’execució
+
+Codex executa un únic pas cada vegada. No pot començar el següent fins que el criteri de sortida de l’actual estigui verificat amb proves/evidències i l’estat/documentació s’hagi actualitzat. Si una dada o decisió científica imprescindible no es pot justificar amb una font autoritativa o evidència reproduïble, el pas passa a `bloquejat` i la seqüència s’atura.
+
+No s’accepta cap d’aquests patrons:
+- implementar una optimització abans del baseline directe que ha de validar;
+- usar el mateix algoritme aproximat com a únic oracle;
+- “resoldre” una decisió oberta amb una constant de conveniència;
+- ajustar llindars PASS/FAIL després de veure els resultats;
+- fer que VNP46 impliqui Lambert, flux hemisfèric o skyglow directament;
+- executar integrals radiatives al render loop.
+
+## Ordre lineal
+
+| Pas | Capacitat | Dependència |
+|---:|---|---|
+| 7.1 | Contracte científic v1, dades i criteris d’acceptació | 7, 22.5, 23 |
+| 7.2 | Adaptador VNP46 d’observació, qualitat i procedència | 7.1 |
+| 7.3 | Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED | 7.2 |
+| 7.4 | Oracle espectral fi i homologació del SpectralBandSet v1 | 7.3 |
+| 7.5 | SourceModel v1: SPD, emissió angular i incertesa | 7.4 |
+| 7.6 | SG-REF: oracle independent de transport i integració d’àrea | 7.5 |
+| 7.7 | PropagationKernel geomètric i benchmark B0 | 7.6 |
+| 7.8 | OpticalField tiled i atmosfera estàndard determinista | 7.7 |
+| 7.9 | Rayleigh, aerosol de referència i benchmark B1 | 7.8 |
+| 7.10 | Kernel espectral complet i absorció gasosa | 7.9 |
+| 7.11 | Terreny, curvatura i visibilitat física | 7.10 |
+| 7.12 | Gate zenital de transport radiomètric | 7.11 |
+| 7.13 | Camp angular i DomeProfile sobre ruta directa | 7.12 |
+| 7.14 | Projeccions fotomètriques i sensors SQM/TESS | 7.13 |
+| 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14 |
+| 7.16 | Incertesa quantitativa i provenance completa | 7.15 |
+| 7.17 | Validació empírica clear-sky de SourceModel i transport | 7.16 |
+| 7.18 | Watershed, EmissionRegion i quadtree com acceleració B5 | 7.17 |
+| 7.19 | Compressió de PhaseFunction i benchmark B3 | 7.18 |
+| 7.20 | Forward AD i RadiativeErrorBudget | 7.19 |
+| 7.21 | Cache error-based, scheduler latest-wins i prefetch | 7.20 |
+| 7.22 | Decisió i backend opcional LUT/precomputació/FFT | 7.21 |
+| 7.23 | CloudOpticalState i núvols single-scattering B6 | 7.22 |
+| 7.24 | Validació empírica final clear/cloudy i congelació de model | 7.23 |
+| 7.25 | Bridge Python→TypeScript i SkyglowRuntime | 7.24 |
+| 7.26 | Renderer Three.js lineal i modes diagnòstics | 7.25 |
+| 7.27 | Composició lineal del cel i estats reference/instantaneous | 7.26 |
+| 7.28 | B7 FULL, SLO i homologació del skyglow artificial | 7.1–7.27 |
+
+## Fases
+
+**A — Contracte científic i inferència (7.1–7.6).** Tanca producte/dades, DNB, espectre, SourceModel i oracle. Quan acaba, la pregunta “què és la font i contra què validem?” ja no està oberta.
+
+**B — Transport directe i gates (7.7–7.17).** Implementa la física sense acceleracions, supera el zenit, construeix all-sky/projeccions i la contrasta amb observacions clear-sky.
+
+**C — Acceleracions homologades (7.18–7.22).** Només ara entren quadtree, fase comprimida, AD, cache i un backend LUT/FFT opcional. Tots es comparen contra la ruta directa.
+
+**D — Núvols i validació final (7.23–7.24).** Amplia el domini atmosfèric i congela què és realment homologable.
+
+**E — Integració i tancament (7.25–7.28).** Bridge, renderer, composició i B7. La UI no decideix física.
+
+## Detall dels gates
+
+### 7.1 — Contracte científic v1, dades i criteris d’acceptació
+
+**Finalitat.** Convertir les decisions que bloquegen la implementació en un perfil v1 explícit abans d’escriure física de producció.
+
+**Gate de sortida.** No queda cap decisió necessària per implementar 7.2–7.4 sense propietari, origen i valor. Si manca evidència oficial per una decisió bloquejant, el pas queda `bloquejat`: Codex no pot inventar constants ni continuar.
+
+**Fitxer executable:** [pas7.1-contracte-cientific-v1.md](../tasques/pendent/pas7.1-contracte-cientific-v1.md)
+
+### 7.2 — Adaptador VNP46 d’observació, qualitat i procedència
+
+**Finalitat.** Ingerir la font operativa exacta congelada a 7.1 sense confondre radiància observada amb emissió hemisfèrica.
+
+**Gate de sortida.** Un fixture VNP46 es pot llegir i serialitzar preservant unitats, quality, temps i provenance; cap transformació converteix encara l’observació en SPD o emissió angular.
+
+**Fitxer executable:** [pas7.2-vnp46-observation-adapter.md](../tasques/pendent/pas7.2-vnp46-observation-adapter.md)
+
+### 7.3 — Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED
+
+**Finalitat.** Modelar què mesura DNB amb la RSR real i semàntica radiomètrica versionada.
+
+**Gate de sortida.** La mateixa SPD produeix una mesura DNB reproduïble i auditada contra una referència fina; la unitat i la RSR queden versionades i traçables.
+
+**Fitxer executable:** [pas7.3-dnb-rsr-measurement.md](../tasques/pendent/pas7.3-dnb-rsr-measurement.md)
+
+### 7.4 — Oracle espectral fi i homologació del SpectralBandSet v1
+
+**Finalitat.** Tancar `V3` abans que el nombre de bandes entri al kernel de producció.
+
+**Gate de sortida.** `V3` queda tancada: existeix un `SpectralBandSet` v1 que compleix el pressupost espectral contra l’oracle fi. Cap benchmark de rendiment ha decidit N.
+
+**Fitxer executable:** [pas7.4-spectral-bandset-validation.md](../tasques/pendent/pas7.4-spectral-bandset-validation.md)
+
+### 7.5 — SourceModel v1: SPD, emissió angular i incertesa
+
+**Finalitat.** Tancar `F1` i transformar observacions DNB en una distribució de font explícita, versionada i falsable.
+
+**Gate de sortida.** `F1` queda resolta per al domini v1 o el pas queda `bloquejat`. Un `Vnp46Observation` pot produir un `SourceModel` complet amb provenance i incertesa declarada.
+
+**Fitxer executable:** [pas7.5-source-model-v1.md](../tasques/pendent/pas7.5-source-model-v1.md)
+
+### 7.6 — SG-REF: oracle independent de transport i integració d’àrea
+
+**Finalitat.** Crear una veritat numèrica offline més estricta que el runtime i independent de les seves aproximacions.
+
+**Gate de sortida.** `S1` és executable: SG-REF demostra convergència i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime.
+
+**Fitxer executable:** [pas7.6-sg-ref-reference-solver.md](../tasques/pendent/pas7.6-sg-ref-reference-solver.md)
+
+### 7.7 — PropagationKernel geomètric i benchmark B0
+
+**Finalitat.** Construir la frontera única de propagació i la instrumentació abans d’afegir scattering.
+
+**Gate de sortida.** B0 és reproduïble i el kernel retorna resultats geomètrics/unitaris sense NaN; zenit és només una direcció del mateix operador.
+
+**Fitxer executable:** [pas7.7-kernel-geometry-b0.md](../tasques/pendent/pas7.7-kernel-geometry-b0.md)
+
+### 7.8 — OpticalField tiled i atmosfera estàndard determinista
+
+**Finalitat.** Donar al kernel un estat atmosfèric offline, versionat i espacialment segmentable abans de connectar reanàlisi.
+
+**Gate de sortida.** El kernel pot recórrer un camp òptic determinista i registrar exactament quins tiles/versions ha utilitzat.
+
+**Fitxer executable:** [pas7.8-optical-field-standard.md](../tasques/pendent/pas7.8-optical-field-standard.md)
+
+### 7.9 — Rayleigh, aerosol de referència i benchmark B1
+
+**Finalitat.** Introduir la primera física de scattering sobre la ruta directa i auditable.
+
+**Gate de sortida.** El runtime clear-sky d’una banda coincideix amb SG-REF dins el perfil V1 en fixtures B1.
+
+**Fitxer executable:** [pas7.9-rayleigh-aerosol-b1.md](../tasques/pendent/pas7.9-rayleigh-aerosol-b1.md)
+
+### 7.10 — Kernel espectral complet i absorció gasosa
+
+**Finalitat.** Passar del B1 monocromàtic a transport espectral v1 complet amb absorció.
+
+**Gate de sortida.** La ruta directa clear-sky espectral compleix V1 contra SG-REF i oracle espectral en fixtures; cap absorció es tracta com zero per conveniència.
+
+**Fitxer executable:** [pas7.10-gas-spectral-kernel.md](../tasques/pendent/pas7.10-gas-spectral-kernel.md)
+
+### 7.11 — Terreny, curvatura i visibilitat física
+
+**Finalitat.** Afegir l’oclusió i la geometria terrestre a la ruta directa abans del gate zenital.
+
+**Gate de sortida.** Els casos sintètics de terreny/curvatura coincideixen amb SG-REF i els flips d’oclusió són detectables com a discontinuïtats.
+
+**Fitxer executable:** [pas7.11-terrain-curvature.md](../tasques/pendent/pas7.11-terrain-curvature.md)
+
+### 7.12 — Gate zenital de transport radiomètric
+
+**Finalitat.** Validar el transport complet abans de cúpules, compressions o caches.
+
+**Gate de sortida.** El mateix `PropagationKernel` supera el perfil V1 al zenit contra SG-REF sense calibratge arbitrari. El PASS valida transport donat un SourceModel, no la inferència d’emissió.
+
+**Fitxer executable:** [pas7.12-zenith-transport-gate.md](../tasques/pendent/pas7.12-zenith-transport-gate.md)
+
+### 7.13 — Camp angular i DomeProfile sobre ruta directa
+
+**Finalitat.** Estendre el mateix operador homologat del zenit a direccions arbitràries sense acceleracions de fonts.
+
+**Gate de sortida.** `DomeProfile` reprodueix zenit i camp angular directe dins el pressupost V1; la compressió angular té error quantificat independent.
+
+**Fitxer executable:** [pas7.13-dome-profile-direct.md](../tasques/pendent/pas7.13-dome-profile-direct.md)
+
+### 7.14 — Projeccions fotomètriques i sensors SQM/TESS
+
+**Finalitat.** Projectar radiància espectral física a magnituds/instruments sense retroalimentar el kernel.
+
+**Gate de sortida.** SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies preregistrades i cap projecció modifica la radiància física.
+
+**Fitxer executable:** [pas7.14-photometric-projections.md](../tasques/pendent/pas7.14-photometric-projections.md)
+
+### 7.15 — Atmosfera real ERA5/CAMS i composició de camps
+
+**Finalitat.** Substituir el provider estàndard per dades reals sense canviar la física del kernel.
+
+**Gate de sortida.** El mateix kernel pot executar atmosfera estàndard o real amb contracte idèntic i provenance completa; fixtures reanàlisi són reproduïbles.
+
+**Fitxer executable:** [pas7.15-atmos-era5-cams.md](../tasques/pendent/pas7.15-atmos-era5-cams.md)
+
+### 7.16 — Incertesa quantitativa i provenance completa
+
+**Finalitat.** Construir intervals i components d’error després que font, atmosfera i transport ja tinguin models concrets.
+
+**Gate de sortida.** Cada resultat físic pot explicar quines incerteses coneix, quines desconeix i com s’han propagat; no hi ha sigmes fictícies.
+
+**Fitxer executable:** [pas7.16-uncertainty-provenance.md](../tasques/pendent/pas7.16-uncertainty-provenance.md)
+
+### 7.17 — Validació empírica clear-sky de SourceModel i transport
+
+**Finalitat.** Contrastar el sistema físic directe amb observacions externes abans de qualsevol acceleració espacial o cache.
+
+**Gate de sortida.** Existeix una validació empírica clear-sky reproduïble. Si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5; no es compensa amb calibratge del kernel.
+
+**Fitxer executable:** [pas7.17-clear-sky-ground-truth.md](../tasques/pendent/pas7.17-clear-sky-ground-truth.md)
+
+### 7.18 — Watershed, EmissionRegion i quadtree com acceleració B5
+
+**Finalitat.** Comprimir fonts només després de disposar d’una integració directa d’àrea validada.
+
+**Gate de sortida.** La ruta comprimida és una acceleració demostrablement equivalent dins pressupost al baseline directe; punt vs àrea queda validat en camp proper.
+
+**Fitxer executable:** [pas7.18-source-spatial-acceleration.md](../tasques/pendent/pas7.18-source-spatial-acceleration.md)
+
+### 7.19 — Compressió de PhaseFunction i benchmark B3
+
+**Finalitat.** Aproximar la fase només contra la representació de referència ja validada.
+
+**Gate de sortida.** La fase accelerada té domini i error explícits i compleix V1; si cap candidat ho fa, el runtime conserva la fase de referència.
+
+**Fitxer executable:** [pas7.19-phase-acceleration-b3.md](../tasques/pendent/pas7.19-phase-acceleration-b3.md)
+
+### 7.20 — Forward AD i RadiativeErrorBudget
+
+**Finalitat.** Crear cotes conservadores per reutilització/pruning sense convertir l’AD en part de la física autoritativa.
+
+**Gate de sortida.** Existeix una cota d’error auditable per moviments/pertorbacions suaus i una regla explícita per discontinuïtats. El contracte és reutilitzable pel cel físic 7.62.
+
+**Fitxer executable:** [pas7.20-ad-error-budget.md](../tasques/pendent/pas7.20-ad-error-budget.md)
+
+### 7.21 — Cache error-based, scheduler latest-wins i prefetch
+
+**Finalitat.** Fer interactiu el runtime sense alterar el resultat físic.
+
+**Gate de sortida.** Cap integral s’executa per frame; teleports i flips d’oclusió fan miss; small-motion només hit dins `RadiativeErrorBudget`; no hi ha stale swap.
+
+**Fitxer executable:** [pas7.21-cache-scheduler.md](../tasques/pendent/pas7.21-cache-scheduler.md)
+
+### 7.22 — Decisió i backend opcional LUT/precomputació/FFT
+
+**Finalitat.** Afegir una acceleració global només si la ruta directa+cache no compleix els SLO preregistrats.
+
+**Gate de sortida.** O bé hi ha evidència que no cal backend addicional, o bé existeix un backend accelerat homologat contra la ruta directa amb domini/error/fallback explícits.
+
+**Fitxer executable:** [pas7.22-optional-runtime-acceleration.md](../tasques/pendent/pas7.22-optional-runtime-acceleration.md)
+
+### 7.23 — CloudOpticalState i núvols single-scattering B6
+
+**Finalitat.** Incorporar núvols com a estat òptic físic i no com un multiplicador arbitrari.
+
+**Gate de sortida.** B6 és incremental, reproduïble i compleix el pressupost del domini cloud declarat; `CloudOpticalState` no conté lògica específica del skyglow.
+
+**Fitxer executable:** [pas7.23-clouds-b6.md](../tasques/pendent/pas7.23-clouds-b6.md)
+
+### 7.24 — Validació empírica final clear/cloudy i congelació de model
+
+**Finalitat.** Repetir la validació del sistema ja optimitzat i amb núvols abans d’integrar-lo al renderer.
+
+**Gate de sortida.** Existeix un informe empíric final per al domini homologable. Si només clear-sky és defensable, el domini de producció queda explícitament limitat i cloud no es declara homologat.
+
+**Fitxer executable:** [pas7.24-full-ground-truth.md](../tasques/pendent/pas7.24-full-ground-truth.md)
+
+### 7.25 — Bridge Python→TypeScript i SkyglowRuntime
+
+**Finalitat.** Transportar resultats físics ja homologats sense portar integració radiativa al frontend.
+
+**Gate de sortida.** TypeScript pot rebre/validar/swap resultats de skyglow amb revisió monotònica i sense executar física de propagació.
+
+**Fitxer executable:** [pas7.25-bridge-runtime.md](../tasques/pendent/pas7.25-bridge-runtime.md)
+
+### 7.26 — Renderer Three.js lineal i modes diagnòstics
+
+**Finalitat.** Renderitzar radiància artificial lineal amb doble buffer i fer-la inspeccionable sense alterar-la.
+
+**Gate de sortida.** El renderer mostra el camp artificial sense càlcul radiatiu per frame, descarta resultats tardans i els modes debug OFF no alteren física ni rendiment materialment.
+
+**Fitxer executable:** [pas7.26-three-renderer-debug.md](../tasques/pendent/pas7.26-three-renderer-debug.md)
+
+### 7.27 — Composició lineal del cel i estats reference/instantaneous
+
+**Finalitat.** Integrar el canal artificial amb la resta del cel sense doble comptatge ni calibratge creuat.
+
+**Gate de sortida.** El skyglow artificial conserva identitat i provenance dins la composició; la Lluna/crepuscle no canvien la inferència artificial i `reference` és invariant als components instantanis.
+
+**Fitxer executable:** [pas7.27-sky-composition.md](../tasques/pendent/pas7.27-sky-composition.md)
+
+### 7.28 — B7 FULL, SLO i homologació del skyglow artificial
+
+**Finalitat.** Tancar la vertical només després que ciència, rendiment i integració hagin passat gates independents.
+
+**Gate de sortida.** La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat està explícit. En cas contrari roman parcial/bloquejada amb fallback legacy.
+
+**Fitxer executable:** [pas7.28-b7-homologacio-skyglow.md](../tasques/pendent/pas7.28-b7-homologacio-skyglow.md)
+
+## Canvis respecte del pla substituït
+
+El gate zenital deixa de dependre de cache, AD, ERA5/CAMS, quadtree o d’un oracle futur del cel solar/lunar. Ara es valida aviat amb atmosfera estàndard, fonts directes i `SG-REF`. La validació empírica clear-sky també passa abans de les acceleracions.
+
+`EmissionRegion`/watershed/quadtree, Legendre, AD/cache i LUT/FFT deixen de ser peces prèvies a la veritat física i passen a ser **backends d’optimització**. Aquesta és la diferència essencial per a una execució segura pas a pas per Codex.
+
+## Relació amb 7.51+
+
+El cel solar/lunar 7.51+ continua separat. Comparteix contractes neutrals quan té sentit (`RadiativeErrorBudget`, `CloudOpticalState`, estat geodèsic/òptic), però no integradors. El skyglow ja no depèn del reference solver 7.65: `SG-REF` és propi de 7.6.

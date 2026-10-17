@@ -20,14 +20,14 @@ Fixar `RadiativeErrorBudget` com a única autoritat per pruning, contribucions n
 
 **Depèn de:**
 - [Pas 7.61](pas7.61-natural-night-sky.md)
-- [Pas 7.18 — Cache error-based artificial](pas7.18-cache-error-based.md)
+- [Pas 7.20 — Forward AD i RadiativeErrorBudget artificial](pas7.20-ad-error-budget.md)
 
 **En depenen:**
 - [Pas 7.63](pas7.63-clouds-horizon-terminator.md)
 
 ## Codi existent a reutilitzar
 
-Contracte `RadiativeErrorBudget` introduït a 7.18, `SpectralBandSet`, respostes SQM/TESS/CIE i bounds del quadtree artificial.
+Contracte `RadiativeErrorBudget` introduït a 7.20, `SpectralBandSet`, respostes SQM/TESS/CIE i bounds del quadtree artificial.
 
 ## Flux tècnic
 

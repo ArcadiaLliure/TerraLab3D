@@ -1,54 +1,42 @@
-# Matriu de traçabilitat
+# Matriu de traçabilitat — pla executable redissenyat
 
-| Requeriment | Decisió | Document | Pas | Test/evidència |
-|---|---|---|---|---|
-| zenit i cúpules mateixa física | un `PropagationKernel` | 01, ADR-001 | 7.2+ | golden zenit=mostra 90° |
-| gate zenital absolut | validar 90° abans de promoure cúpules | 01,08, ADR-017 | 7.20 | reference solver + unitats + convergència |
-| radiància lineal | suma abans de projecció | 01, ADR-005 | 7.2–7.28 | property test de linealitat |
-| VNP46 operatiu | adaptador VNP46 + observació separada d'emissió | 01,04,06,10 | 7.8–7.10 | fixture producte/release/quality |
-| model de mesura DNB | RSR real + `BAND_INTEGRATED` + resolució temporal | 01,04,06, ADR-007 | 7.6–7.8 | fixture RSR/provenance; unitat ATBD pendent |
-| baixa radiància | no clipping + restricció pre/post-2017 | 01,04,08,09,10 | 7.8,7.19,7.26 | fixtures negatives/prop de zero/temporal |
-| SourceModel | SPD + emissió angular + incertesa separades | 01,03,06 | 7.7–7.10 | sintètics + dades externes quan existeixin |
-| segmentació | watershed + quadtree | 01, ADR-004 | 7.9–7.10 | regions sintètiques + error patch |
-| espectre | normalization vs propagation, N configurat | 01,06, ADR-006 | 7.5–7.7 | unitats, vectors i projeccions de la configuració activa; cap benchmark per triar N |
-| acceleració offline | LUT/FFT només com a backend del mateix operador | 01,02,03,05 | 7.28 | error backend vs ruta directa + domini de validesa |
-| atmosfera extensible | provider + tiled field | 02,06, ADR-008/009 | 7.11, 7.15–7.16 | contract/provider tests |
-| Rayleigh | fórmula normalitzada | 01,04 | 7.3 | unit/golden |
-| aerosols | PhaseFunction unificada | 01,04, ADR-013 | 7.12–7.13 | B3 |
-| gas | LUT `T_eff` | 01,04 | 7.14 | B4 |
-| terreny | visibilitat binària + patch | 01,02 | 7.10,7.17 | occlusion flip |
-| cache | error de canvi | 01,09, ADR-010 | 7.18 | hit/miss + small-motion + teleport |
-| AD | forward mode en branca suau | 01,09, ADR-011 | 7.4,7.18 | B1b/B7 |
-| rendiment runtime | cap integral per frame; coalescing/prefetch validat | 02,03,05,07, ADR-018 | 7.18,7.24,7.28 | recomputeHz, TTFF, queue, stale/cancel |
-| cúpules | 9 mostres + PCHIP log | 01, ADR-002/003 | 7.21 | all-sky compression + zenit invariant |
-| projeccions fotomètriques | post-kernel, sensor-specific | 01,06,08, ADR-017 | 7.22 | CIE/sensor golden, zero point/FOV |
-| composició del cel | artificial+natural+Lluna+crepuscle lineal | 01,06, ADR-017 | 7.23 | reference vs instantaneous |
-| renderer | doble buffer lineal | 03 | 7.24 | frame/stutter telemetry |
-| ground truth | TESS/SQM/all-sky | 08 | 7.26 | leave-one-site-out |
-| núvols | single scattering v1 | 01,04 | 7.27 | B6 |
-| full | B7 + SLO | 07,08 | 7.28 | report JSON/CSV/plots |
+> La numeració de passos anterior a 2026-10-17 queda històrica. Aquesta taula segueix el [pla executable canònic](19-pla-executable-codex.md).
 
-Els identificadors de pas d'aquesta taula són els proposats pel lot documental; la font de veritat final és `docs/README.md` un cop actualitzat.
+| Requeriment | Decisió | Pas | Test/evidència |
+|---|---|---:|---|
+| contracte/dades v1 | manifest + bloquejos explícits | 7.1 | manifest, fonts i decisions |
+| VNP46 operatiu | observació immutable, no emissió | 7.2 | fixtures product/release/quality/LOW-RAD |
+| mesura DNB | RSR real + BAND_INTEGRATED | 7.3 | oracle espectral fi de mesura |
+| espectre runtime | V3 abans del kernel | 7.4 | SPDs adverses + bandSetId homologat |
+| SourceModel | SPD + angular + incertesa | 7.5 | F1 tancada o pas bloquejat |
+| oracle transport | SG-REF independent + àrea directa | 7.6 | convergència i fixtures analítiques |
+| kernel únic | zenit=direcció ordinària | 7.7 | B0 + invariants geomètrics |
+| camp òptic | provider estàndard tiled | 7.8 | fixtures multi-tile |
+| Rayleigh/aerosol | fase de referència primer | 7.9 | B1 vs SG-REF |
+| gas/espectral | absorció no nul·la | 7.10 | B2/B4 vs oracle fi |
+| terreny/curvatura | visibilitat física | 7.11 | muntanya/curvatura vs SG-REF |
+| gate zenital | transport directe abans d’optimitzar | 7.12 | runtime vs SG-REF |
+| cúpules | DomeProfile des de ruta directa | 7.13 | all-sky dens + invariant zenit |
+| projeccions | SQM/TESS/CIE post-kernel | 7.14 | sensor golden |
+| atmosfera real | ERA5/CAMS com providers | 7.15 | fixtures/camps parcials |
+| incertesa | ledger quantitatiu | 7.16 | coverage/provenance |
+| ground truth clear | font i transport separats | 7.17 | leave-one-site-out |
+| compressió fonts | watershed/quadtree com backend | 7.18 | B5 vs àrea directa |
+| compressió fase | Legendre com backend | 7.19 | B3 vs fase ref |
+| AD/error budget | cotes conservadores | 7.20 | FD + bounds |
+| cache/scheduler | reuse només dins error | 7.21 | cold/warm/movement/teleport |
+| LUT/FFT opcional | només si SLO ho exigeix | 7.22 | directe vs accelerat |
+| núvols | CloudOpticalState + B6 | 7.23 | clear limit + oracle |
+| validació final | domini homologable congelat | 7.24 | clear/cloudy report |
+| bridge | DTO + revisions | 7.25 | stale discard/bytes |
+| renderer/debug | doble buffer lineal | 7.26 | frame/stutter/leaks |
+| composició | canals lineals separats | 7.27 | reference/instantaneous |
+| homologació | B7 + SLO + cap bloqueig ocult | 7.28 | informe final |
 
-## Matriu de frontera amb el cel astral
+## Frontera amb el cel astral
 
-| Requeriment | Decisió | Document | Pas | Test/evidència |
-|---|---|---|---|---|
-| Llicències comercials | allowlist permissiva; Hillaire MIT, Bruneton BSD-3, ROLO/USGS PD, Copernicus amb atribució; copyleft només referència sota política actual | cel-fisic/03 | 7.51 | manifests, avisos i gate de distribució |
-| Selector simulat/real | flag persistent i estratègies independents | cel-fisic/01 | 7.52 | alternança i regressió legacy |
-| Altura/geodèsia | estat ECEF/ENU + òptica compartida | cel-fisic/02 | 7.53, 7.58 | superfície/estratosfera/òrbita |
-| Font solar | irradiància espectral + disc/distància/eclipsis | cel-fisic/02 | 7.54 | unitats i geometria |
-| Lluna | ROLO/USGS + reflectància Hapke/LS separada | cel-fisic/02,05 | 7.55 | fixtures ROLO, fase i extrapolació |
-| Transport | Hillaire runtime + branca espectral independent | cel-fisic/01 | 7.56 | Bruneton/path tracer |
-| SkyView | RGB lineal; 192×108 perfil inicial configurable; sensors espectrals | cel-fisic/01,04 | 7.57 | colorimetria, format i projeccions |
-| Limbe/terminador | raigs tangents + high-quality pass per error | cel-fisic/02 | 7.58 | superfície→òrbita, arc dia/nit |
-| Il·luminació | directe/difús/ombra/eclipsi sense doble comptatge | cel-fisic/02 | 7.59 | terreny/cel/eclipsi |
-| Integració | façana Three.js, lifecycle i revisions | cel-fisic/01 | 7.60 | context loss/resync |
-| Fons natural | airglow + zodiacal + integrated starlight; Pas 10 conserva Via Làctia | cel-fisic/02,05 | 7.61 | GAMBONS/ESO extern + no double count |
-| Error budget | cota superior; 0,1 % individual / 0,5 % acumulat defaults | cel-fisic/04,05 | 7.62 | falsos pruning = 0, sensor bounds |
-| Núvols | CloudOpticalState compartit; delta-Eddington astral | cel-fisic/02,04 | 7.63 | clear/τ i oracle cloud |
-| Scheduler | latest-wins monotònic, queue efectiva <=1 | cel-fisic/01,04 | 7.64 | stale/cancel/scrub |
-| Oracle | Bruneton + Hillaire path tracer + ROLO + oracles específics | cel-fisic/04,05 | 7.65 | fixtures reproduïbles |
-| Validació | radiometria/sensors/geometria separats | cel-fisic/04 | 7.66 | matriu i gates |
-| Rendiment | perfil desktop-60; p95/p99; independent de N | cel-fisic/04 | 7.67 | telemetry reproduïble |
-| Homologació | legal + científica + runtime + simulated permanent | cel-fisic/04 | 7.68 | informe final i recovery |
+El cel físic 7.51+ conserva la seva vertical. Els dos únics contractes que aquesta reordenació mou i que són consumits explícitament per la vertical astral són:
+- `RadiativeErrorBudget`: ara es formalitza a **7.20**.
+- `CloudOpticalState`: ara es formalitza a **7.23**.
+
+No hi ha dependència del skyglow cap al Pas 7.65: l’oracle artificial és `SG-REF` de 7.6.

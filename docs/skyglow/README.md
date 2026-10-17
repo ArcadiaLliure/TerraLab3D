@@ -1,5 +1,7 @@
 # Nou sistema físic de contaminació lumínica — índex mestre
 
+> **Pla executable canònic per a Codex:** [19-pla-executable-codex.md](19-pla-executable-codex.md). Des del redisseny de 2026-10-17, la numeració 7.1–7.28 es conserva només com a espai de la vertical; **l’ordre i la descomposició antics queden substituïts**. Si una referència de passos dins els documents 00–18 entra en conflicte amb el pla executable, prevalen `docs/README.md`, el document 19 i el fitxer del pas actual.
+
 > Estat documental: especificació aprovada per implementar; cap element nou d'aquest dossier s'ha de considerar implementat fins que el pas corresponent aporti proves i evidències. Base de repositori inspeccionada: `main@e432454273befdcc7f33cb552d2b58cb0719298f`.
 
 ## Autoritat documental
@@ -42,7 +44,7 @@ Abans de promoure cúpules, la mateixa ruta del kernel a 90° ha de superar el g
 - un únic `PropagationKernel`;
 - mostres de cúpula inicials a 0,5°, 2°, 5°, 10°, 20°, 30°, 45°, 60° i 90°; 1° queda candidat;
 - reconstrucció PCHIP sobre `log(B + ε)` i suma de fonts en radiància lineal;
-- watershed radiomètric per `EmissionRegion` i quadtree intern que no travessa regions;
+- watershed/`EmissionRegion`/quadtree només com a **acceleració posterior** a la validació de la integració directa d’àrea;
 - separació `NormalizationSpectrum` / `PropagationBandSet`;
 - VNP46 com a família de dades operativa, sense confondre observació amb emissió;
 - RSR real de VIIRS DNB, resolta amb release/procedència i data d'adquisició, amb `measurementOperatorId=BAND_INTEGRATED`;
@@ -51,7 +53,7 @@ Abans de promoure cúpules, la mateixa ruta del kernel a 90° ha de superar el g
 - absorció gasosa no nul·la i LUT offline;
 - v1 de producció candidata single-scattering, explicitada com a simplificació pròpia;
 - Gauss–Kronrod 7/15 adaptatiu com a candidat congelat per benchmark;
-- cache invalidada per error de canvi, amb discontinuïtats geomètriques comprovades abans de la linealització;
+- cache/AD només després del gate físic directe, invalidada per cota d’error i discontinuïtats topològiques;
 - benchmark B0–B7 per rendiment, ordre de Legendre, H_TOA i SLO; **el nombre de bandes no es tria amb benchmarks** i és configurable;
 - gate zenital absolut abans de donar per vàlida la compressió direccional;
 - projeccions fotomètriques i de sensor sempre posteriors al kernel: cap conversió directa VNP46/DNB→SQM ni `calibrationFactor` opac;
@@ -71,49 +73,17 @@ Cinzano & Falchi (2012) sí descriuen, per a la funció de fase atmosfèrica usa
 
 ## Qüestions encara obertes
 
-El registre autoritatiu és [18-decisions-obertes.md](18-decisions-obertes.md). Hi consten el producte VNP46 concret, emissió angular, oracle de multiple scattering/reference solver, percepció nocturna, radi de fonts, llindars d'acceptació, convergència espectral, punt zero 2017 i política de baixa radiància. Biblioteca d'aerosols/núvols, models d'incertesa per proveïdor i SLO continuen requerint evidència pròpia.
+El registre autoritatiu continua sent [18-decisions-obertes.md](18-decisions-obertes.md), però aquestes qüestions **ja no poden quedar flotant fins al final**: cada bloqueig té ara un pas de resolució. DATA-VNP46, DNB-2017, LOW-RAD, V1, S1, F5/F7 es tanquen o bloquegen a 7.1; V3 a 7.4; F1 a 7.5. Una decisió que no disposi d’evidència suficient deixa el pas en estat `bloquejat` i atura Codex.
 
 ## Relació amb el pla
 
-**Numeració canònica:** els passos abans anomenats 23.50–23.74 són ara **7.1–7.28** en el mateix ordre, sense perdre'n dependències ni abast; **7.29–7.50** reservats per skyglow artificial. El cel físic solar/lunar ocupa **7.51+** i té [dossier propi](../cel-fisic/README.md). El mode simulat actual es manté permanentment i no és una autoritat científica.
+La vertical continua ocupant **7.1–7.28**, però ja **no hereta l’ordre 23.50–23.74**. El nou pla s’ha linealitzat perquè Codex l’executi seqüencialment: contracte/dades → model de mesura i espectre → SourceModel → oracle independent → kernel directe → gate zenital → all-sky/projeccions → atmosfera real/validació → acceleracions → núvols → bridge/renderer/composició → B7.
 
-El dossier introdueix una seqüència de passos de retrofit del Pas 7. El primer pas és infraestructura/benchmark, no el renderer. El punt de represa només s'ha de moure quan els documents de passos, dependències i README del pla quedin actualitzats en el mateix lot documental.
-
+La regla central és: **cap aproximació es valida contra ella mateixa**. Quadtree, Legendre, AD, cache, precomputació/LUT/FFT apareixen després d’un baseline directe i d’un oracle independent. El document canònic és [19-pla-executable-codex.md](19-pla-executable-codex.md).
 
 ## Equivalència de numeració anterior
 
-Els identificadors 23.* eren **pendents** i es traslladen sense canviar-ne l'ordre ni donar-los per implementats:
-
-| Identificador anterior | Subpas canònic actual |
-|---|---|
-| 23.50 | 7.1 |
-| 23.51 | 7.2 |
-| 23.52 | 7.3 |
-| 23.53 | 7.4 |
-| 23.54 | 7.5 |
-| 23.55 | 7.6 |
-| 23.56 | 7.7 |
-| 23.57 | 7.8 |
-| 23.58 | 7.9 |
-| 23.59 | 7.10 |
-| 23.60 | 7.11 |
-| 23.61 | 7.12 |
-| 23.62 | 7.13 |
-| 23.63 | 7.14 |
-| 23.64 | 7.15 |
-| 23.65 | 7.16 |
-| 23.66 | 7.17 |
-| 23.67 | 7.18 |
-| 23.68 | 7.19 |
-| 23.681 | 7.20 |
-| 23.69 | 7.21 |
-| 23.691 | 7.22 |
-| 23.692 | 7.23 |
-| 23.70 | 7.24 |
-| 23.71 | 7.25 |
-| 23.72 | 7.26 |
-| 23.73 | 7.27 |
-| 23.74 | 7.28 |
+La taula 23.50–23.74 només conserva valor **històric**. Ja no existeix equivalència semàntica 1:1 amb els nous 7.1–7.28 perquè el backlog s’ha redissenyat per dependències científiques i d’execució. Els documents antics de pas es mantenen únicament com a redireccions cap als nous fitxers executables.
 
 ## Actualitzacions documentals del projecte
 

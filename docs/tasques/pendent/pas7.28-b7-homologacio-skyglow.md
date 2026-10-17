@@ -1,80 +1,43 @@
-# Pas 7.28 — Skyglow físic — B7 FULL, SLO i tancament de skyglow artificial
+# Pas 7.28 — Skyglow físic — B7 FULL, SLO i homologació del skyglow artificial
 
-> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Executar la configuració candidata completa i fixar SLO basats en evidència.
+> **Estat:** pendent. **Execució:** seqüencial. **Pla canònic:** [19-pla-executable-codex.md](../../skyglow/19-pla-executable-codex.md).
 
-## Descripció funcional
+## Finalitat
 
-Tanca la vertical sense declarar rendiment o precisió per intuïció.
-
-## Fonts a consultar
-
-- [`docs/skyglow/README.md`](../../skyglow/README.md).
-- [`03-pipeline-python-typescript-threejs.md`](../../skyglow/03-pipeline-python-typescript-threejs.md), [`07-benchmark-b0-b7.md`](../../skyglow/07-benchmark-b0-b7.md) i [`08-validacio-cientifica.md`](../../skyglow/08-validacio-cientifica.md).
-- [`docs/normes-arquitectura.md`](../../normes-arquitectura.md).
-
-## Objectiu
-
-Executar la configuració candidata completa i fixar SLO basats en evidència.
+Tancar la vertical només després que ciència, rendiment i integració hagin passat gates independents.
 
 ## Dependències
 
-**Depèn de:**
-- [Pas 7.13](pas7.13-legendre-b3.md)
-- [Pas 7.25](pas7.25-debug-modes.md)
-- [Pas 7.26](pas7.26-ground-truth-validation.md)
-- [Pas 7.27](pas7.27-clouds-b6.md)
-- [Pas 7.23](pas7.23-sky-radiance-composition.md)
+7.1–7.27
 
-**En depenen:**
-- [Pas 38 — Homologació final](pas38-homologacio-final.md)
+## Referències obligatòries
 
-## Codi existent a reutilitzar
-
-- `frontend/src/view/three/AtmosphereRenderer.ts` i `shaders/skyShader.ts` com a camí legacy a migrar, no com a física de referència.
-- `frontend/src/bridge/`, `frontend/src/contracts/scene.ts` i recursos retinguts.
-- Backend skyglow construït als passos anteriors.
-
-## Flux tècnic
-
-VNP46/producte/release + configuració espectral activa + `SourceModel` + gate zenital + projeccions/composició + B7 + ground truth + comparació directe↔accelerat si aplica → frontera error↔cost → SLO → decisió shadow/default.
-
-## Errors, cancel·lació i recursos
-
-- Resultats obsolets no arriben a escena; uploads i recursos tenen propietari/dispose.
-- Comparacions científiques es fan abans de tone mapping.
-- Risc: Cap configuració compleix tots els SLO.
-- Risc: una decisió bloquejant (F1/F5/V1/V3/S1/LOW-RAD/DNB-2017) queda amagada darrere un fallback o una constant.
-- Rollback: Mantenir shadow/legacy i obrir un pas específic de millora.
+- [07-benchmark-b0-b7.md](../../skyglow/07-benchmark-b0-b7.md)
+- [08-validacio-cientifica.md](../../skyglow/08-validacio-cientifica.md)
+- [16-auditoria.md](../../skyglow/16-auditoria.md)
 
 ## Tasques
 
-- [ ] Implementar només l'abast d'aquest pas.
-- [ ] Afegir revisions, observabilitat i lifecycle.
-- [ ] Afegir proves de contracte i casos límit.
-- [ ] Executar benchmark/validació indicats.
-- [ ] Actualitzar README, inventari, MANUAL només si canvia comportament observable.
+- [ ] Executar B7 amb AD OFF/ON, uncertainty OFF/ON, cold/warm/movement/prefetch/teleport/tile-change/occlusion-flip i backend 7.22 si existeix.
+- [ ] Auditar que DATA-VNP46, F1, F5, F7, V1, V3, S1, DNB-2017 i LOW-RAD estan tancades per al domini declarat.
+- [ ] Reexecutar gate zenital, regressions all-sky, projeccions i validació empírica congelada.
+- [ ] Verificar `kernelIntegralsPerRenderFrame=0`, stutter zero dins SLO, memòria i lifecycle.
+- [ ] Decidir shadow/default i retirar només els fallbacks que l’evidència autoritza; actualitzar inventari, README i evidències finals.
 
 ## Criteri de sortida
 
-regressió completa, coherència matemàtica/unitats/contractes i **cap decisió bloquejant necessària per al domini homologat sense tancar**. Si F5 adopta l'opció B, l'homologació depèn explícitament del Pas 7.65. B7 AD OFF/ON, uncertainty OFF/ON, cache cold/warm/movement/prefetch/teleport i SLO multidimensional. Gate zenital mantingut, `BortleEquivalent` només reference, composició lineal correcta i `kernelIntegralsPerRenderFrame=0`. El resultat queda documentat amb evidència reproduïble.
+La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat està explícit. En cas contrari roman parcial/bloquejada amb fallback legacy.
 
-## Proves i evidències obligatòries
+## Evidències obligatòries
 
-- [ ] regressió completa, coherència matemàtica/unitats/contractes i cap pendent bloquejant ocult.
-- [ ] B7 AD OFF/ON, uncertainty OFF/ON, cache cold/warm i SLO multidimensional.
-- [ ] Si hi ha backend LUT/FFT/precomputat: comparar-lo contra la ruta directa i registrar domini/error/fallback.
-- [ ] Auditar DATA-VNP46, F1, F5, V1, V3, S1, DNB-2017 i LOW-RAD abans de declarar homologació.
-- [ ] Evidència sota `docs/evidencies/pas7.28/`.
-- [ ] `tools/validate_docs.py`, tests backend/frontend i regressions afectades en verd.
-
-## Fora d'abast
-
-Multiple scattering general si no és requisit del producte.
+- [ ] Proves unitàries/golden/property rellevants en verd.
+- [ ] Regressions afectades en verd.
+- [ ] Evidència reproduïble sota `docs/evidencies/pas7.28/`.
+- [ ] README/inventari/estat actualitzats només segons comportament observable.
+- [ ] Cap capacitat d’un pas posterior marcada prematurament com a implementada.
 
 ## Instrucció per a Codex
 
-No homologuis una acceleració perquè sigui ràpida ni una emissió perquè runtime i oracle coincideixin. Tanca només el domini que tingui producte VNP46, SourceModel, oracle, ground truth i criteris preregistrats traçables. No eliminar el fallback legacy abans que el pas de tancament ho autoritzi amb evidència.
+No reescriguis els llindars després de veure B7. No homologuis una acceleració perquè sigui ràpida ni una font perquè runtime i SG-REF coincideixin.
 
-## Treball pendent
-
-- [ ] Completar tasques, proves i evidències abans de moure el pas a `completat/`.
+Quan el criteri de sortida no es pugui demostrar, **no continuïs al pas següent**. Corregeix aquest pas o marca’l `bloquejat` amb la causa i l’evidència.
