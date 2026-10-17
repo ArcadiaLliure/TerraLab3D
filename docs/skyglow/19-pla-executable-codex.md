@@ -85,9 +85,9 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 **Finalitat.** Ingerir la font operativa exacta congelada a 7.1 sense confondre radiància observada amb emissió hemisfèrica.
 
-**Gate de sortida.** Un fixture VNP46 es pot llegir i serialitzar preservant unitats, quality, temps i provenance; cap transformació converteix encara l’observació en SPD o emissió angular.
+**Gate de sortida.** Un fixture VNP46 i un grànul real es poden llegir i serialitzar preservant unitats, quality, temps i provenance; cap transformació converteix encara l’observació en SPD o emissió angular. **Estat: completat** amb contrast real de mostres de diagnòstic i fill; QA 0 queda coberta per fixtures.
 
-**Fitxer executable:** [pas7.2-vnp46-observation-adapter.md](../tasques/pendent/pas7.2-vnp46-observation-adapter.md)
+**Fitxer executable:** [pas7.2-vnp46-observation-adapter.md](../tasques/completat/pas7.2-vnp46-observation-adapter.md)
 
 ### 7.3 — Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED
 

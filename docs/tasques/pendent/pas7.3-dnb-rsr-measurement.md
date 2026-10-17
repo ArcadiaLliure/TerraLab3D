@@ -8,7 +8,7 @@ Modelar què mesura DNB amb la RSR real i semàntica radiomètrica versionada.
 
 ## Dependències
 
-7.2
+[Pas 7.2 — adaptador VNP46](../completat/pas7.2-vnp46-observation-adapter.md), completat amb [contrast binari real](../../evidencies/pas7.2/validacio-adaptador.md).
 
 ## Referències obligatòries
 

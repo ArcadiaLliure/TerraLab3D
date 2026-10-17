@@ -1,0 +1,20 @@
+﻿2026-10-17 | ConvertFrom-Json: correcte
+Contracte VNP46A2.002, QA candidata [0], sense clipping: correcte
+Gate V1: bloquejat; llindars cientifics i de rendiment no definits
+No hi ha proves de fisica ni lectura de granuls
+python -X utf8 tools/check_doc_links.py: 0 enllacos locals trencats
+python -X utf8 tools/validate_docs.py: 720 incidencies documentals heretades; el pas 7.1 i el pas 7.2 no apareixen a la llista
+Filtre del validador per pas7.1-contracte-cientific-v1 i pas7.2-vnp46-observation-adapter: cap incidencia estructural
+git diff --check: correcte; avisos de conversio LF/CRLF del directori de treball
+
+REEVALUACIO 2026-10-17 (politica V1 preregistrada; les linies anteriors son registre historic)
+Perfil: status=contract_complete; acceptanceProfile.status=policy_preregistered.
+Gates declarats en ordre: 7.4, 7.12, 7.17, 7.22 i 7.28 (nomes consumidor).
+7.4/7.12/7.17/7.22: thresholds=null; cap valor PASS/FAIL numeric nou.
+Origen, moment de congelacio, prohibicio d'ajust retrospectiu i bloqueig al primer gate aplicable: declarats al perfil.
+Pas 7.1 traslladat a docs/tasques/completat/; punt de represa documental: 7.2, no implementat.
+JSON analitzat amb assertions de politica/gates: correcte.
+python -X utf8 tools/check_doc_links.py: enllacos locals valids.
+python -X utf8 tools/validate_docs.py: 720 incidencies, igual que a la revisio inicial; 0 en pas7.1-contracte-cientific-v1.md i pas7.2-vnp46-observation-adapter.md.
+git diff --check: correcte; avisos LF/CRLF sense errors de whitespace.
+Cap lectura de granul, prova de fisica ni benchmark executat.

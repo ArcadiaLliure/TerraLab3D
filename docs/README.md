@@ -6,11 +6,11 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.2 — Adaptador VNP46 d'observació, qualitat i procedència](tasques/pendent/pas7.2-vnp46-observation-adapter.md).** El [Pas 7.1](tasques/completat/pas7.1-contracte-cientific-v1.md) ha completat el contracte de dades i la política V1 preregistrada al [perfil](skyglow/skyglow-v1-profile.json). Els valors numèrics PASS/FAIL es justificaran i congelaran als primers gates que els apliquin: 7.4, 7.12, 7.17 i 7.22; 7.28 només els consumirà. La manca d'un valor no bloqueja 7.2 ni 7.3.
+> **Punt de represa: [Pas 7.3 — Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED](tasques/pendent/pas7.3-dnb-rsr-measurement.md).** El [Pas 7.2](tasques/completat/pas7.2-vnp46-observation-adapter.md) ha verificat el lector local amb fixtures HDF5 i un grànul VNP46A2.002 real aportat per l'usuari; no hi ha encara skyglow físic de producte. El [Pas 7.1](tasques/completat/pas7.1-contracte-cientific-v1.md) ha completat el contracte de dades i la política V1 preregistrada al [perfil](skyglow/skyglow-v1-profile.json). Els valors numèrics PASS/FAIL es justificaran i congelaran als primers gates que els apliquin: 7.4, 7.12, 7.17 i 7.22; 7.28 només els consumirà.
 >
 > Els subpassos **7.1–7.50** pertanyen exclusivament a contaminació lumínica artificial; la font operativa acordada és VNP46, interpretada amb el model de mesura VIIRS DNB i propagada espectralment. Els **7.51+** pertanyen al cel físic solar/lunar. El Pas 7 històric manté l'estat completat per la seva visualització actual. Les dues noves verticals són **pendents**, documentades a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
-Auditoria documental del 2026-10-17: tots els enllaços locals resolen i els passos 7.1–7.2 no generen incidències estructurals; el validador integral encara informa de 720 incidències en altres passos heretats. Vegeu l'[evidència del pas 7.1](evidencies/pas7.1/validacio-contracte.txt). El normalitzador antic no s'ha executat perquè utilitza un mapa de passos anterior al pla canònic actual.
+Auditoria documental del 2026-10-17: els passos 7.1–7.2 no generen incidències estructurals; el validador integral encara informa de 720 incidències en altres passos heretats. Vegeu les evidències dels passos [7.1](evidencies/pas7.1/validacio-contracte.txt) i [7.2](evidencies/pas7.2/validacio-adaptador.md). El normalitzador antic no s'ha executat perquè utilitza un mapa de passos anterior al pla canònic actual.
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README i executar **exactament un pas cada vegada**. Per a la vertical 7.1–7.28, l’ordre és una linealització científica deliberada: cap optimització pot precedir el seu baseline directe/oracle i cap decisió bloquejant es pot resoldre amb una constant implícita.
 
@@ -45,6 +45,7 @@ Estats admesos:
 | 6 | [Picking estel·lar precís](tasques/completat/pas6.md) | `completat` |
 | 7 | [Cel, atmosfera, contaminació lumínica i Bortle](tasques/completat/pas7.md) | `completat` |
 | 7.1 | [Contracte científic v1, dades i política d'acceptació](tasques/completat/pas7.1-contracte-cientific-v1.md) | `completat` documentalment |
+| 7.2 | [Adaptador VNP46 d’observació, qualitat i procedència](tasques/completat/pas7.2-vnp46-observation-adapter.md) | `completat` |
 | 8 | [Sol, Lluna i planetes amb posicions i aparença reals](tasques/completat/pas8.md) | `completat` |
 | 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](tasques/completat/pas8.5.md) | `completat` |
 | 8.6 | [Planetes, anells i satèl·lits naturals](tasques/completat/pas8.6.md) | `completat` |
@@ -72,7 +73,6 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.2 | [Adaptador VNP46 d’observació, qualitat i procedència](tasques/pendent/pas7.2-vnp46-observation-adapter.md) | `pendent` | 7.1 |
 | 7.3 | [Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED](tasques/pendent/pas7.3-dnb-rsr-measurement.md) | `pendent` | 7.2 |
 | 7.4 | [Oracle espectral fi i homologació del SpectralBandSet v1](tasques/pendent/pas7.4-spectral-bandset-validation.md) | `pendent` | 7.3 |
 | 7.5 | [SourceModel v1: SPD, emissió angular i incertesa](tasques/pendent/pas7.5-source-model-v1.md) | `pendent` | 7.4 |

@@ -38,6 +38,10 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 `radianciaObservada` no equival a `radianciaArtificialEstimada`; aquesta segona pertany a `SourceModel`. El valor original no es trunca silenciosament a zero.
 
+### Vnp46Observation local (Pas 7.2)
+
+El [lector implementat](../../backend/src/terralab3d/infrastructure/adapters/light_pollution/vnp46.py) retorna un DTO immutable per píxel amb `schemaVersion`, `profileId`, `productId`, `collection`, `acquisitionDate`, fila/columna, latitud/longitud, `rawRadiance`, `radianceUnit`, `qualityFlag`, `qfCloudMask`, `snowFlag`, `latestHighQualityRetrieval`, `isFill`, `classification` i `sourceInferenceCandidate`. La procedència inclou identificador i SHA-256 del grànul, URL d'origen si es coneix, DOI, versions d'algorisme/PGE, temps de producció, període, identificadors de tile, referències d'entrada de processament i atributs autoritatius de la capa. El lector no aplica escala, offset, correcció de punt zero, gap-fill ni inferència d'emissió. El contracte s'ha provat amb fixtures HDF5 i un [grànul binari real aportat localment](../evidencies/pas7.2/validacio-adaptador.md); aquest tile no conté QA 0.
+
 ## ViirsSpectralResponse
 
 `sensor`, `platform`, `band=DNB`, `detectorMode=band-averaged|detector-specific`, vector λ/RSR, `releaseId`, `measurementOperatorId=BAND_INTEGRATED`, `sourceUrl`, `retrievedAt`, `sha256`, `accessMode`, `redistributionStatus`, `provenance`.

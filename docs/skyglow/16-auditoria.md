@@ -38,4 +38,4 @@ El model conceptual és compartit però les classes internes no travessen el bri
 
 ## Següent pas executable
 
-El [Pas 7.1](../tasques/completat/pas7.1-contracte-cientific-v1.md) és completat documentalment. El [Pas 7.2](../tasques/pendent/pas7.2-vnp46-observation-adapter.md) és el punt de represa executable; encara no s'ha implementat.
+El [Pas 7.1](../tasques/completat/pas7.1-contracte-cientific-v1.md) és completat documentalment i el [Pas 7.2](../tasques/completat/pas7.2-vnp46-observation-adapter.md) ha validat l'adaptador amb fixtures i un grànul real. El punt de represa executable és el [Pas 7.3](../tasques/pendent/pas7.3-dnb-rsr-measurement.md).

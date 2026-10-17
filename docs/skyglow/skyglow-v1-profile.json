@@ -1,0 +1,136 @@
+{
+  "profileId": "skyglow-v1-profile",
+  "schemaVersion": 1,
+  "decisionDate": "2026-10-17",
+  "status": "contract_complete",
+  "owner": "TerraLab3D",
+  "operationalSource": {
+    "productId": "VNP46A2",
+    "collection": "002",
+    "archiveSet": "5200",
+    "processingMode": "standard",
+    "platform": "Suomi-NPP",
+    "cadence": "daily",
+    "primaryLayer": "DNB_BRDF-Corrected_NTL",
+    "gapFilledLayerIsPrimary": false,
+    "radianceUnit": "nW cm^-2 sr^-1",
+    "radiancePhysicalQuantity": "observed_brdf_corrected_ntl_radiance",
+    "fillValue": -999.9,
+    "validMinimumInclusive": 0,
+    "qualityLayer": "Mandatory_Quality_Flag",
+    "candidateQualityValues": [0],
+    "diagnosticOnlyQualityValues": [1, 2, 3, 4, 5],
+    "noRetrievalQualityValue": 255,
+    "additionalQualityLayers": ["QF_Cloud_Mask", "Snow_Flag", "Latest_High_Quality_Retrieval"],
+    "granuleAttributesRequired": ["LocalGranuleID", "AlgorithmVersion", "PGEVersion", "ProductionTime", "RangeBeginningDate", "RangeEndingDate"],
+    "datasetAttributesAreAuthoritative": ["units", "_FillValue", "valid_range", "scale_factor", "offset"],
+    "granuleMismatchPolicy": "quarantine_without_silent_conversion",
+    "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2",
+    "fileSpecificationUrl": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/2/VNP46A2_v2.0.fs",
+    "doi": "10.5067/VIIRS/VNP46A2.002"
+  },
+  "measurementModel": {
+    "measurementOperatorId": "BAND_INTEGRATED",
+    "status": "project_decision_pending_step_7_3_validation",
+    "note": "The VNP46A2 unit is documented; the RSR-normalized spectral operator is a TerraLab3D model to validate in step 7.3."
+  },
+  "temporalPolicy": {
+    "selection": "exact_acquisition_day",
+    "missingDay": "unavailable",
+    "interpolation": "forbidden",
+    "gapFilling": "forbidden_in_primary_observation",
+    "cross2017LowRadianceComparison": "unvalidated",
+    "zeroPointCorrection": "none_without_product_specific_evidence",
+    "requireProcessingLineageForComparison": true
+  },
+  "lowRadiancePolicy": {
+    "negativeRawValue": "preserve_and_reject_as_outside_valid_range",
+    "fillValue": "preserve_and_mark_no_retrieval",
+    "zeroRawValue": "preserve_as_observation_not_proof_of_zero_emission",
+    "positiveValue": "preserve_without_unverified_detection_threshold",
+    "nonCandidateQuality": "preserve_for_diagnostics_exclude_from_source_inference",
+    "silentClipping": false,
+    "uncertaintyWithoutVerifiedModel": "unavailable"
+  },
+  "license": {
+    "reuseAndRedistribution": "allowed_by_LAADS_policy",
+    "citation": "requested_by_LAADS",
+    "policyUrl": "https://ladsweb.modaps.eosdis.nasa.gov/learn"
+  },
+  "referencePolicy": {
+    "transportOracle": "SG-REF",
+    "solarLunarReferenceSolverDependency": false,
+    "singleScatteringBias": "offline_higher_order_reference_required",
+    "sourceRadius": "adaptive_error_bound",
+    "singleNightPerceptualMagnitude": "outside_v1"
+  },
+  "acceptanceProfile": {
+    "status": "policy_preregistered",
+    "policyVersion": 1,
+    "freezeRule": "before_observing_the_candidate_result_used_for_pass_fail",
+    "postResultThresholdAdjustment": "forbidden_for_the_same_candidate_and_validation_set; revisions_apply_prospectively",
+    "permittedThresholdOrigins": [
+      "scientific_literature_or_metrological_source",
+      "demonstrated_oracle_uncertainty",
+      "approved_product_requirement",
+      "scientifically_justified_convergence_criterion"
+    ],
+    "thresholdRecordRequired": ["metric", "value", "unit", "domain", "originCategory", "evidenceReference", "justification", "owner", "freezeTime", "profileRevision"],
+    "missingThresholdPolicy": "blocks_only_the_first_gate_that_applies_its_pass_fail_decision",
+    "additionalCriterionPolicy": "preregister_at_first_applying_step_before_candidate_result_with_the_same_origin_and_freeze_rules",
+    "unprovenConvenienceConstants": "forbidden",
+    "scientificThresholds": null,
+    "performanceThresholds": null,
+    "gates": [
+      {
+        "step": "7.4",
+        "criterion": "spectral_discretization_error",
+        "freezeBefore": "SpectralBandSet_candidate_selection",
+        "status": "awaiting_gate_evidence",
+        "thresholds": null,
+        "missingThresholdAction": "block_step_7.4"
+      },
+      {
+        "step": "7.12",
+        "criterion": "runtime_vs_SG-REF_zenith_transport",
+        "freezeBefore": "runtime_candidate_pass_fail_comparison",
+        "mayUseEvidenceFrom": "step_7.6_oracle_convergence_and_numerical_uncertainty",
+        "status": "awaiting_gate_evidence",
+        "thresholds": null,
+        "missingThresholdAction": "block_step_7.12"
+      },
+      {
+        "step": "7.17",
+        "criterion": "empirical_clear_sky_validation",
+        "freezeBefore": "held_out_validation_set_evaluation",
+        "uncertaintyInputsRequired": ["instrument", "data", "model"],
+        "status": "awaiting_gate_evidence",
+        "thresholds": null,
+        "missingThresholdAction": "block_step_7.17"
+      },
+      {
+        "step": "7.22",
+        "criterion": "TerraLab3D_product_performance_SLO",
+        "freezeBefore": "decision_whether_LUT_precomputation_or_FFT_is_needed",
+        "requiredOrigin": "approved_product_requirement",
+        "status": "awaiting_product_requirement",
+        "thresholds": null,
+        "missingThresholdAction": "block_step_7.22"
+      },
+      {
+        "step": "7.28",
+        "criterion": "final_homologation",
+        "role": "consume_previously_frozen_criteria_only",
+        "mayCreateOrModifyThresholds": false
+      }
+    ],
+    "note": "No published source or approved product requirement in the repository establishes numeric PASS/FAIL limits for transport, spectral discretization, runtime latency and recomputation. NASA VNP46A2 detection goals are product-performance metrics, not those limits."
+  },
+  "sourcesConsulted": [
+    "https://landweb.modaps.eosdis.nasa.gov/data/userguide/BlackMarbleUserGuide_Collection2.0_20241203.pdf",
+    "https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/2/VNP46A2_v2.0.fs",
+    "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2",
+    "https://ladsweb.modaps.eosdis.nasa.gov/learn",
+    "https://doi.org/10.3390/s20113287"
+  ]
+}

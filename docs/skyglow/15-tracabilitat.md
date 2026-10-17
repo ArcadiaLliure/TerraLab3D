@@ -5,7 +5,7 @@
 | Requeriment | Decisió | Pas | Test/evidència |
 |---|---|---:|---|
 | contracte/dades v1 | manifest i política V1 preregistrada; valors diferits als gates | 7.1 completat | [perfil](skyglow-v1-profile.json), [fonts](../evidencies/pas7.1/auditoria-fonts.md) i [validació](../evidencies/pas7.1/validacio-contracte.txt) |
-| VNP46 operatiu | observació immutable, no emissió | 7.2 | fixtures product/release/quality/LOW-RAD |
+| VNP46 operatiu | observació immutable, no emissió; lector local verificat amb grànul real | 7.2 completat | [fixtures, proves i contrast binari](../evidencies/pas7.2/validacio-adaptador.md) en verd; QA 0 real encara no contrastada |
 | mesura DNB | RSR real + BAND_INTEGRATED | 7.3 | oracle espectral fi de mesura |
 | error espectral V1 | pressupost justificat abans de seleccionar bandes; manca de valor bloqueja aquí | 7.4 | oracle fi, origen i registre congelat + SPDs adverses + bandSetId homologat |
 | SourceModel | SPD + angular + incertesa | 7.5 | F1 tancada o pas bloquejat |

@@ -2,7 +2,7 @@
 
 > **Pla executable canònic per a Codex:** [19-pla-executable-codex.md](19-pla-executable-codex.md). Des del redisseny de 2026-10-17, la numeració 7.1–7.28 es conserva només com a espai de la vertical; **l’ordre i la descomposició antics queden substituïts**. Si una referència de passos dins els documents 00–18 entra en conflicte amb el pla executable, prevalen `docs/README.md`, el document 19 i el fitxer del pas actual.
 
-> Estat documental: especificació aprovada per implementar; cap element nou d'aquest dossier s'ha de considerar implementat fins que el pas corresponent aporti proves i evidències. Base de repositori inspeccionada: `main@e432454273befdcc7f33cb552d2b58cb0719298f`.
+> Estat documental: especificació aprovada per implementar. El lector local de 7.2 té [proves i contrast amb un grànul real](../evidencies/pas7.2/validacio-adaptador.md); cap skyglow físic de producte no està homologat. Base de repositori inspeccionada: `main@e432454273befdcc7f33cb552d2b58cb0719298f`.
 
 ## Autoritat documental
 
@@ -14,7 +14,7 @@ TerraLab3D és actualment Python 3.12+ al backend (`aiohttp`, `astropy`, `numpy`
 
 ## Decisió central congelada
 
-La font operativa de la primera vertical és **NASA Black Marble VNP46A2 Collection 2**, concretada al [perfil v1](skyglow-v1-profile.json). El Pas 7.1 ha completat el contracte documental i la política PASS/FAIL `V1`; els valors es preregistren amb evidència als gates 7.4, 7.12, 7.17 i 7.22. El punt de represa és 7.2. VIIRS DNB continua essent el **model de mesura**: RSR real, operador `BAND_INTEGRATED`, procedència temporal i semàntica radiomètrica. VNP46 no es tracta com a flux hemisfèric ni com a skyglow.
+La font operativa de la primera vertical és **NASA Black Marble VNP46A2 Collection 2**, concretada al [perfil v1](skyglow-v1-profile.json). El Pas 7.1 ha completat el contracte documental i la política PASS/FAIL `V1`; els valors es preregistren amb evidència als gates 7.4, 7.12, 7.17 i 7.22. El Pas 7.2 ha validat l'adaptador d'observació i el punt de represa és 7.3. VIIRS DNB continua essent el **model de mesura**: RSR real, operador `BAND_INTEGRATED`, procedència temporal i semàntica radiomètrica. VNP46 no es tracta com a flux hemisfèric ni com a skyglow.
 
 El pipeline canònic és `VNP46 → observació → model de mesura DNB → SourceModel (SPD + emissió angular + incertesa) → PropagationKernel espectral → cúpules/projeccions`.
 
