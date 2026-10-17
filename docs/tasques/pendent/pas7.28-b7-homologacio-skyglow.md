@@ -36,13 +36,14 @@ Executar la configuració candidata completa i fixar SLO basats en evidència.
 
 ## Flux tècnic
 
-configuració espectral activa + gate zenital + projeccions/composició + B7 + ground truth + renderer telemetry → frontera error↔cost → SLO → decisió shadow/default.
+VNP46/producte/release + configuració espectral activa + `SourceModel` + gate zenital + projeccions/composició + B7 + ground truth + comparació directe↔accelerat si aplica → frontera error↔cost → SLO → decisió shadow/default.
 
 ## Errors, cancel·lació i recursos
 
 - Resultats obsolets no arriben a escena; uploads i recursos tenen propietari/dispose.
 - Comparacions científiques es fan abans de tone mapping.
 - Risc: Cap configuració compleix tots els SLO.
+- Risc: una decisió bloquejant (F1/F5/V1/V3/S1/LOW-RAD/DNB-2017) queda amagada darrere un fallback o una constant.
 - Rollback: Mantenir shadow/legacy i obrir un pas específic de millora.
 
 ## Tasques
@@ -55,12 +56,14 @@ configuració espectral activa + gate zenital + projeccions/composició + B7 + g
 
 ## Criteri de sortida
 
-regressió completa, coherència matemàtica/unitats/contractes i cap pendent bloquejant ocult. B7 AD OFF/ON, uncertainty OFF/ON, cache cold/warm/movement/prefetch/teleport i SLO multidimensional. Gate zenital mantingut, `BortleEquivalent` només reference, composició lineal correcta i `kernelIntegralsPerRenderFrame=0`. El resultat queda documentat amb evidència reproduïble.
+regressió completa, coherència matemàtica/unitats/contractes i **cap decisió bloquejant necessària per al domini homologat sense tancar**. Si F5 adopta l'opció B, l'homologació depèn explícitament del Pas 7.65. B7 AD OFF/ON, uncertainty OFF/ON, cache cold/warm/movement/prefetch/teleport i SLO multidimensional. Gate zenital mantingut, `BortleEquivalent` només reference, composició lineal correcta i `kernelIntegralsPerRenderFrame=0`. El resultat queda documentat amb evidència reproduïble.
 
 ## Proves i evidències obligatòries
 
 - [ ] regressió completa, coherència matemàtica/unitats/contractes i cap pendent bloquejant ocult.
 - [ ] B7 AD OFF/ON, uncertainty OFF/ON, cache cold/warm i SLO multidimensional.
+- [ ] Si hi ha backend LUT/FFT/precomputat: comparar-lo contra la ruta directa i registrar domini/error/fallback.
+- [ ] Auditar DATA-VNP46, F1, F5, V1, V3, S1, DNB-2017 i LOW-RAD abans de declarar homologació.
 - [ ] Evidència sota `docs/evidencies/pas7.28/`.
 - [ ] `tools/validate_docs.py`, tests backend/frontend i regressions afectades en verd.
 
@@ -70,7 +73,7 @@ Multiple scattering general si no és requisit del producte.
 
 ## Instrucció per a Codex
 
-configuració espectral activa + B7 + ground truth + renderer telemetry → frontera error↔cost → SLO → decisió shadow/default. No eliminar el fallback legacy abans que el pas de tancament ho autoritzi amb evidència.
+No homologuis una acceleració perquè sigui ràpida ni una emissió perquè runtime i oracle coincideixin. Tanca només el domini que tingui producte VNP46, SourceModel, oracle, ground truth i criteris preregistrats traçables. No eliminar el fallback legacy abans que el pas de tancament ho autoritzi amb evidència.
 
 ## Treball pendent
 

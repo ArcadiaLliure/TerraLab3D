@@ -11,7 +11,7 @@
 
 ## Skyglow existent
 
-`backend/src/terralab3d/domain/light_pollution/models.py` defineix modes Bortle/magnitud/dataset i models de qualitat del cel. `calculations.py` conté conversions empíriques Bortle↔SQM/magnitud i altres aproximacions. `services.py` orquestra aquest model. `ports.py` defineix fronteres de dades. `infrastructure/adapters/light_pollution/adapter.py` és una especificació abstracta, no un adaptador VIIRS físic complet.
+`backend/src/terralab3d/domain/light_pollution/models.py` defineix modes Bortle/magnitud/dataset i models de qualitat del cel. `calculations.py` conté conversions empíriques Bortle↔SQM/magnitud i altres aproximacions. `services.py` orquestra aquest model. `ports.py` defineix fronteres de dades. `infrastructure/adapters/light_pollution/adapter.py` és una especificació abstracta, no un adaptador VNP46 físic complet.
 
 Per tant, la nova vertical no parteix d'un `PropagationKernel` preexistent.
 
@@ -59,7 +59,7 @@ Abans d'aquest dossier, el punt de represa era Pas 24 i el Pas 7 figurava comple
 
 ## Codi experimental
 
-No s'ha localitzat un solver físic VIIRS/RT ja implementat al repositori inspeccionat. Sí existeix el namespace `light_pollution`, però la ruta observable actual és Bortle/magnitud + shader heurístic. Qualsevol experiment local no versionat queda fora d'aquesta inspecció i s'ha de revisar a l'entorn de desenvolupament abans d'implementar.
+No s'ha localitzat un solver físic VNP46/DNB/RT ja implementat al repositori inspeccionat. Sí existeix el namespace `light_pollution`, però la ruta observable actual és Bortle/magnitud + shader heurístic. Qualsevol experiment local no versionat queda fora d'aquesta inspecció i s'ha de revisar a l'entorn de desenvolupament abans d'implementar.
 
 ## Implicacions
 
@@ -68,3 +68,7 @@ No s'ha localitzat un solver físic VIIRS/RT ja implementat al repositori inspec
 3. Three.js ha de rebre `DomeProfile`/LUT, no executar transferència radiativa.
 4. DEM/raster/geodèsia són reutilitzables, però la visibilitat source→P és una extensió real.
 5. La cache física, AD, biblioteques espectrals/aerosol/núvol i reference solver són nous.
+
+## Decisió de dades posterior a la inspecció
+
+La inspecció de codi anterior es manté històrica. La decisió vigent del dossier és usar **VNP46 com a font operativa**, mantenint VIIRS DNB com a model de mesura espectral. Aquesta decisió és documental i encara no està implementada al codi.

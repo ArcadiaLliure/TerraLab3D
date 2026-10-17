@@ -1,6 +1,6 @@
 # Pas 7.26 — Skyglow físic — validació TESS/SQM/all-sky
 
-> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Comparar prediccions amb mesures reals separant calibratge i validació.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Comparar prediccions amb mesures reals separant calibratge, validació del transport i validació del `SourceModel` VNP46→emissió.
 
 ## Descripció funcional
 
@@ -36,13 +36,15 @@ Comparar prediccions amb mesures reals separant calibratge i validació.
 
 ## Flux tècnic
 
-observacions calibrades + metadata → composició reference/instantaneous compatible → projecció sensor (RSR/FOV/zero point) → join temporal/geogràfic → mètriques/intervals. No s'absorbeix Lluna/cel natural dins el calibratge artificial.
+observacions externes + metadata → validació separada del `SourceModel` i del camp propagat → composició reference/instantaneous compatible → projecció sensor (RSR/FOV/zero point) → join temporal/geogràfic → mètriques/intervals. No s'absorbeix Lluna/cel natural dins el calibratge artificial.
 
 ## Errors, cancel·lació i recursos
 
 - Resultats obsolets no arriben a escena; uploads i recursos tenen propietari/dispose.
 - Comparacions científiques es fan abans de tone mapping.
 - Risc: Ground truth heterogeni o meteorologia desconeguda.
+- Risc: confondre coincidència runtime↔oracle amb validació empírica de l'emissió angular.
+- Risc: baixa radiància VNP46 no comparable temporalment o dominada per política LOW-RAD.
 - Rollback: Campanya exploratòria sense promoure paràmetres.
 
 ## Tasques
@@ -55,7 +57,7 @@ observacions calibrades + metadata → composició reference/instantaneous compa
 
 ## Criteri de sortida
 
-data leakage checks, sensor-response golden i separació reference/instantaneous. `BortleEquivalent` no s'usa com a ground truth. Informe científic; no benchmark runtime. El resultat queda documentat amb evidència reproduïble.
+data leakage checks, sensor-response golden, separació reference/instantaneous i informe separat de transport vs `SourceModel`. `BortleEquivalent` no s'usa com a ground truth. Si no hi ha dades externes suficients, l'estat és no empíricament homologat. Informe científic; no benchmark runtime. El resultat queda documentat amb evidència reproduïble.
 
 ## Proves i evidències obligatòries
 

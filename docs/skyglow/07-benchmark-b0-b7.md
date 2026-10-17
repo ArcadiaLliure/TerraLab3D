@@ -2,7 +2,7 @@
 
 ## Objectiu
 
-Mesurar la frontera precisió↔cost de la configuració de runtime **ja escollida**. El benchmark és determinista i no depèn del renderer visual. El nombre de bandes és configurable i **no es fan benchmarks ni sweeps per triar-lo**.
+Mesurar la frontera precisió↔cost de la configuració de runtime **ja escollida** i, quan existeixi, comparar qualsevol backend accelerat amb la ruta directa del mateix operador. El benchmark és determinista i no depèn del renderer visual. El nombre de bandes és configurable i **no es fan benchmarks ni sweeps per triar-lo**.
 
 ## Metadades obligatòries
 
@@ -27,11 +27,11 @@ Warm-up: 5 passades completes descartades. Mesura: 30 passades per configuració
 
 ## Toleràncies
 
-Les toleràncies de producció no es fixen aquí. Per benchmark comparatiu: reference solver amb tolerància almenys 10× més estricta que la configuració candidata i comprovació de convergència duplicant exigència. `ε_quad` s'escombra logarítmicament (`1e-3,3e-4,1e-4,3e-5,1e-5` relatiu a escala normalitzada de l'escenari) i es reporta, no es tria per intuïció.
+Els valors exploratoris es poden escombrar i reportar, però un PASS/FAIL de producció exigeix un perfil d'acceptació preregistrat segons V1. La referència numèrica ha de ser més estricta que el candidat i demostrar convergència; cap llindar de producció es fixa després de veure els resultats.
 
 ## Checkpoint Z — gate zenital obligatori
 
-Abans de promoure `DomeProfile`, executar el mateix kernel només a 90° en fixtures sintètiques i almenys una fixture VIIRS/atmosfera/DEM reproduïble. Comparar runtime candidate contra reference solver en radiància física per banda. Reportar error, `coldMs`, `warmMs`, peak RSS i dependències tocades. El checkpoint falla si necessita un factor de calibratge opac o si 90° segueix una ruta diferent.
+Abans de promoure `DomeProfile`, executar el mateix kernel només a 90° en fixtures sintètiques i almenys una fixture VNP46/model de font/atmosfera/DEM reproduïble. Comparar runtime contra l'oracle escollit per S1 en radiància física per banda. Runtime i oracle reben el mateix `SourceModel`; el checkpoint no valida la inferència d'emissió. Reportar error, `coldMs`, `warmMs`, peak RSS i dependències tocades. El checkpoint falla si necessita un factor de calibratge opac o si 90° segueix una ruta diferent.
 
 ## B0 — infraestructura
 
@@ -67,7 +67,7 @@ Afegir núvol single-scattering amb una capa òpticament prima/moderada. No usar
 
 ## B7 FULL
 
-Configuració candidata completa, AD OFF/ON i propagació d'incertesa OFF/ON. Incloure cache cold, warm hit, small-motion hit, moviment continu 3D, precàrrega predictiva ON/OFF, teleport, atmospheric-tile change i occlusion flip obligatòriament miss. El moviment ràpid ha de demostrar coalescing/cancel·lació i absència d'integració per frame.
+Configuració candidata completa, AD OFF/ON i propagació d'incertesa OFF/ON. Incloure cache cold, warm hit, small-motion hit, moviment continu 3D, precàrrega predictiva ON/OFF, teleport, atmospheric-tile change i occlusion flip obligatòriament miss. Si existeix backend LUT/FFT/precomputat, B7 executa també `directe vs accelerat` en el domini declarat i mesura l'error de l'acceleració. El moviment ràpid ha de demostrar coalescing/cancel·lació i absència d'integració per frame.
 
 ## Mètriques
 
@@ -89,4 +89,4 @@ latència vs error; ordre Legendre vs error; bases vs temps; `ε_quad` vs nodes/
 
 ## Criteri de selecció
 
-No hi ha «guanyador» per un únic score. El nombre de bandes no forma part de la selecció per benchmark. La configuració activa només és candidata si compleix simultàniament l'error físic acordat, latència p95 acordada, freqüència de recompute acordada i stutter zero. Els llindars es fixen després de mesures i proves perceptuals.
+No hi ha «guanyador» per un únic score. El nombre de bandes no forma part de la selecció per benchmark. La configuració activa només és candidata si compleix simultàniament l'error físic acordat, latència p95 acordada, freqüència de recompute acordada i stutter zero. Els llindars de PASS/FAIL es fixen **abans** de la campanya de decisió, amb origen declarat segons V1. Les mesures exploratòries poden servir per dissenyar el sistema, però no per reescriure retrospectivament el criteri d'acceptació.

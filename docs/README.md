@@ -8,7 +8,7 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 > **Següent pas executable: [Pas 7.1 — Skyglow físic: benchmark B0 i infraestructura de mesura](tasques/pendent/pas7.1-skyglow-b0.md).**
 >
-> Els subpassos **7.1–7.50** pertanyen exclusivament a contaminació lumínica artificial; els **7.51+** al cel físic solar/lunar. El Pas 7 històric manté l'estat completat per la seva visualització actual. Les dues noves verticals són **pendents**, documentades a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
+> Els subpassos **7.1–7.50** pertanyen exclusivament a contaminació lumínica artificial; la font operativa acordada és VNP46, interpretada amb el model de mesura VIIRS DNB i propagada espectralment. Els **7.51+** pertanyen al cel físic solar/lunar. El Pas 7 històric manté l'estat completat per la seva visualització actual. Les dues noves verticals són **pendents**, documentades a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README, seguir el punter anterior i executar només el primer pas que encara no compleixi el seu criteri de sortida.
 
@@ -73,9 +73,9 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 | 7.3 | [Rayleigh + HG i B1a](tasques/pendent/pas7.3-rayleigh-hg-b1a.md) | `pendent` | 7.2 |
 | 7.4 | [Forward AD i B1b](tasques/pendent/pas7.4-forward-ad-b1b.md) | `pendent` | 7.3 |
 | 7.5 | [Infraestructura espectral i B2a](tasques/pendent/pas7.5-spectral-bandset-b2a.md) | `pendent` | 7.3 |
-| 7.6 | [RSR real NOAA-20/J1](tasques/pendent/pas7.6-viirs-rsr.md) | `pendent` | 7.5 |
-| 7.7 | [SpectralSourceModel i B2b](tasques/pendent/pas7.7-spectral-source-b2b.md) | `pendent` | 7.6 |
-| 7.8 | [Adaptador VIIRS/VNL/Black Marble](tasques/pendent/pas7.8-viirs-adapter.md) | `pendent` | 7.6 |
+| 7.6 | [Model de mesura DNB, RSR real i BAND_INTEGRATED](tasques/pendent/pas7.6-viirs-rsr.md) | `pendent` | 7.5 |
+| 7.7 | [SourceModel espectral/angular i B2b](tasques/pendent/pas7.7-spectral-source-b2b.md) | `pendent` | 7.6 |
+| 7.8 | [Adaptador VNP46 i baixa radiància](tasques/pendent/pas7.8-vnp46-adapter.md) | `pendent` | 7.6, 7.7 |
 | 7.9 | [EmissionRegion i watershed](tasques/pendent/pas7.9-emission-region-watershed.md) | `pendent` | 7.8 |
 | 7.10 | [RadiancePatch i quadtree](tasques/pendent/pas7.10-radiance-patch-quadtree.md) | `pendent` | 7.9 |
 | 7.11 | [OpticalField tiled](tasques/pendent/pas7.11-optical-field.md) | `pendent` | 7.5 |
@@ -87,7 +87,7 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 | 7.17 | [Terreny i curvatura al kernel](tasques/pendent/pas7.17-terrain-curvature.md) | `pendent` | 7.10, 7.2 |
 | 7.18 | [Cache error-based](tasques/pendent/pas7.18-cache-error-based.md) | `pendent` | 7.4, 7.11, 7.17 |
 | 7.19 | [Incertesa i provenance](tasques/pendent/pas7.19-uncertainty-registry.md) | `pendent` | 7.7, 7.16, 7.18 |
-| 7.20 | [Gate zenital radiomètric absolut](tasques/pendent/pas7.20-zenith-absolute-gate.md) | `pendent` | 7.8, 7.17, 7.19 |
+| 7.20 | [Gate zenital radiomètric absolut](tasques/pendent/pas7.20-zenith-absolute-gate.md) | `pendent` | 7.8, 7.17, 7.19 + decisió S1 |
 | 7.21 | [DomeProfile i PCHIP](tasques/pendent/pas7.21-dome-profile-pchip.md) | `pendent` | 7.2, 7.10, 7.18, 7.20 |
 | 7.22 | [Projeccions fotomètriques, SQM/TESS i BortleEquivalent](tasques/pendent/pas7.22-photometric-projections.md) | `pendent` | 7.20, 7.21 |
 | 7.23 | [Composició física del cel](tasques/pendent/pas7.23-sky-radiance-composition.md) | `pendent` | 7.22 |

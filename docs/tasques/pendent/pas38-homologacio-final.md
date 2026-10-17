@@ -21,7 +21,7 @@ Decisions tancades de referència:
 
 ## Objectiu
 
-Incloure la vertical de skyglow artificial **7.1–7.28** i la vertical de cel físic solar/lunar **7.51–7.68** en l'homologació final quan estiguin implementades, sense modificar l'estat històric del Pas 7. El mode simulat/real és permanent; la fotometria instrumental no es dedueix de SkyView RGB.
+Incloure la vertical de skyglow artificial **7.1–7.28** i la vertical de cel físic solar/lunar **7.51–7.68** en l'homologació final quan estiguin implementades, sense modificar l'estat històric del Pas 7. Per skyglow, l'homologació ha de congelar producte/release VNP46, model de mesura DNB/RSR, `SourceModel`, política de baixa radiància i qualsevol backend accelerat homologat. El mode simulat/real és permanent; la fotometria instrumental no es dedueix de SkyView RGB.
 
 Completar la vertical de «homologació final, recuperació i rendiment» de punta a punta, mantenint la separació de responsabilitats, contractes tipats i integració amb el renderer Three.js sense anticipar capacitats posteriors.
 
