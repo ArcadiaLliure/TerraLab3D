@@ -4,7 +4,7 @@
 
 ## Descripció funcional
 
-Vectoritza la física amb el nombre de bandes seleccionat per configuració, sense nombre fix ni benchmark per triar-lo.
+Vectoritza la física amb el nombre de bandes seleccionat per configuració, sense nombre fix ni benchmark de rendiment per triar-lo. Cada configuració activa s'ha de poder contrastar contra una referència espectral fina; el criteri PASS/FAIL queda pendent de V3.
 
 ## Fonts a consultar
 
@@ -53,7 +53,7 @@ compartir geometria i tiles entre bandes; vectors identificats per `bandSetId` i
 
 ## Criteri de sortida
 
-B2a verifica la configuració espectral activa, les unitats, els límits i la longitud dels vectors; no executa cap sweep de temps ni benchmark per seleccionar N. El resultat queda reproduïble i no anticipa capacitats posteriors.
+B2a verifica la configuració espectral activa, les unitats, els límits i la longitud dels vectors i deixa preparada la comparació de convergència contra espectre fi. No executa cap sweep de temps ni benchmark per seleccionar N; V3 definirà el pressupost d'error espectral. El resultat queda reproduïble i no anticipa capacitats posteriors.
 
 ## Proves i evidències obligatòries
 

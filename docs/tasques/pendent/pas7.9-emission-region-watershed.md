@@ -4,7 +4,7 @@
 
 ## Descripció funcional
 
-Implementa log-radiance, denoise, threshold, maxima/prominence, watershed i merge.
+Implementa log-radiance, denoise, threshold, maxima/prominence, watershed i merge **després** del `SourceModel`, només sobre estimacions artificials físicament admissibles.
 
 ## Fonts a consultar
 
@@ -19,7 +19,7 @@ Segmentar fonts per estructura radiomètrica, no per municipis.
 ## Dependències
 
 **Depèn de:**
-- [Pas 7.8](pas7.8-viirs-adapter.md)
+- [Pas 7.8](pas7.8-vnp46-adapter.md)
 
 **En depenen:**
 - [Pas 7.10](pas7.10-radiance-patch-quadtree.md)
@@ -32,7 +32,7 @@ Segmentar fonts per estructura radiomètrica, no per municipis.
 
 ## Flux tècnic
 
-raster validat → log-radiance → watershed → merge → `EmissionRegion[]` amb geometria i moments.
+`radiancia_artificial_estimada` + mask usable → log-radiance → watershed → merge → `EmissionRegion[]`. Valors VNP46 negatius/indeterminats no entren al log mitjançant clipping silenciós.
 
 ## Errors, cancel·lació i recursos
 
@@ -66,7 +66,7 @@ Quadtree intern i oclusió parcial.
 
 ## Instrucció per a Codex
 
-raster validat → log-radiance → watershed → merge → `EmissionRegion[]` amb geometria i moments. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
+Segmenta la sortida admissible de `SourceModel`, no el raster VNP46 cru. Qualsevol exclusió per baixa radiància ha de provenir de LOW-RAD, no de `max(0,·)`. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
 ## Treball pendent
 

@@ -35,7 +35,7 @@ Separar PredictionUncertainty de CacheValidityUncertainty i modelar correlacions
 
 ## Flux tècnic
 
-provider metadata + registry → components/covariàncies → propagació per Jacobians/ensemble → resultats separats.
+VNP46 product/release/low-radiance + prior SPD/model angular + provider atmosfèric → components/covariàncies/ensembles → propagació → `PredictionUncertainty` separada de `CacheValidityUncertainty`.
 
 ## Errors, cancel·lació i recursos
 
@@ -54,7 +54,7 @@ provider metadata + registry → components/covariàncies → propagació per Ja
 
 ## Criteri de sortida
 
-biaix sistemàtic constant no força miss; correlació ρ=1 vs 0. Mesurar overhead d'incertesa per preparar B7. La decisió queda traçable i reproduïble.
+El contracte pot representar components desconeguts com a `unavailable` sense inventar sigmes. El gate 7.20 pot quantificar error numèric encara que alguns models quantitatius de producte restin pendents; la validació empírica 7.26/7.28 no els pot ometre. Biaix sistemàtic constant no força cache miss; correlació ρ=1 vs 0 queda provada.
 
 ## Proves i evidències obligatòries
 
@@ -69,7 +69,7 @@ Matriu densa enorme al runtime.
 
 ## Instrucció per a Codex
 
-provider metadata + registry → components/covariàncies → propagació per Jacobians/ensemble → resultats separats. No converteixis aproximacions de cache o renderer en física del kernel.
+No inventis incerteses de VNP46 ni del punt zero. Separa components coneguts, desconeguts i estructurals; 7.20 necessita la infraestructura, 7.26/7.28 els models quantitatius que siguin necessaris per declarar precisió. No converteixis aproximacions de cache o renderer en física del kernel.
 
 ## Treball pendent
 

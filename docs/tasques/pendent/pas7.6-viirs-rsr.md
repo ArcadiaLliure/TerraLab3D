@@ -1,10 +1,10 @@
-# Pas 7.6 — Skyglow físic — RSR real NOAA-20/J1
+# Pas 7.6 — Skyglow físic — model de mesura DNB, RSR real i BAND_INTEGRATED
 
-> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Incorporar loader/repository de RSR amb procedència i checksum sense assumir redistribució.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Incorporar el model de mesura DNB amb RSR versionada, `BAND_INTEGRATED`, procedència i resolució compatible amb release/data sense assumir redistribució.
 
 ## Descripció funcional
 
-Elimina aproximacions per centre, FWHM o rectangle.
+Interpreta VNP46 mitjançant la semàntica DNB sense aproximar la RSR per centre/FWHM/rectangle.
 
 ## Fonts a consultar
 
@@ -14,7 +14,7 @@ Elimina aproximacions per centre, FWHM o rectangle.
 
 ## Objectiu
 
-Incorporar loader/repository de RSR amb procedència i checksum sense assumir redistribució.
+Incorporar loader/repository de RSR i l'operador `BAND_INTEGRATED`, amb procedència/checksum i resolució per release + data d'adquisició. La unitat exacta DNB queda pendent de verificació directa contra l'ATBD.
 
 ## Dependències
 
@@ -23,7 +23,7 @@ Incorporar loader/repository de RSR amb procedència i checksum sense assumir re
 
 **En depenen:**
 - [Pas 7.7](pas7.7-spectral-source-b2b.md)
-- [Pas 7.8](pas7.8-viirs-adapter.md)
+- [Pas 7.8](pas7.8-vnp46-adapter.md)
 
 ## Codi existent a reutilitzar
 
@@ -33,7 +33,7 @@ Incorporar loader/repository de RSR amb procedència i checksum sense assumir re
 
 ## Flux tècnic
 
-recurs NOAA → validació λ/RSR → `ViirsSpectralResponse` → integració de normalització.
+observació VNP46(producte/release/data) + recurs RSR → resolució RSR compatible → `ViirsSpectralResponse` + `measurementOperatorId=BAND_INTEGRATED` → normalització `A=L/∫S·R dλ`.
 
 ## Errors, cancel·lació i recursos
 
@@ -52,7 +52,7 @@ recurs NOAA → validació λ/RSR → `ViirsSpectralResponse` → integració de
 
 ## Criteri de sortida
 
-sanity checks dels paràmetres NOAA-20 i integral contra fixture. Mesurar cost de normalització offline; no entra al LOS. Cap capacitat posterior queda marcada com a implementada.
+fixture RSR/release/data, invariant de l'operador `BAND_INTEGRATED` i integral contra referència. No es dona per verificat cap unitat de l'ATBD encara pendent. Mesurar cost de normalització offline; no entra al LOS. Cap capacitat posterior queda marcada com a implementada.
 
 ## Proves i evidències obligatòries
 
@@ -67,7 +67,7 @@ Detector-specific raw SDR si no és necessari a la primera vertical.
 
 ## Instrucció per a Codex
 
-recurs NOAA → validació λ/RSR → `ViirsSpectralResponse` → integració de normalització. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
+RSR + release/data → `ViirsSpectralResponse` → `BAND_INTEGRATED` → normalització. No normalitzis la RSR per la seva integral per defecte i no codifiquis una unitat DNB no verificada. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
 ## Treball pendent
 

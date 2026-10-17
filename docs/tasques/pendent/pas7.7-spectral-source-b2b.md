@@ -1,10 +1,10 @@
-# Pas 7.7 — Skyglow físic — SpectralSourceModel, bases SPD i proves de bases SPD i benchmark B2b
+# Pas 7.7 — Skyglow físic — SourceModel espectral/angular, bases SPD i B2b
 
-> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Implementar bases normalitzades, priors i ensemble sense inferir un SPD únic.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Implementar la inferència de font separant SPD, escala DNB, model angular i incertesa, sense inferir un SPD ni una emissió hemisfèrica únics a partir de VNP46.
 
 ## Descripció funcional
 
-Separa escala DNB i composició espectral.
+Separa observació VNP46, model de mesura DNB, composició espectral i emissió angular.
 
 ## Fonts a consultar
 
@@ -14,7 +14,7 @@ Separa escala DNB i composició espectral.
 
 ## Objectiu
 
-Implementar bases normalitzades, priors i ensemble sense inferir un SPD únic.
+Implementar bases normalitzades, priors/ensemble i el contracte de model angular. F1 continua oberta: el pas no imposa Lambert ni calibra l'hemisferi amb VNP46 quasi-nadir.
 
 ## Dependències
 
@@ -22,6 +22,7 @@ Implementar bases normalitzades, priors i ensemble sense inferir un SPD únic.
 - [Pas 7.6](pas7.6-viirs-rsr.md)
 
 **En depenen:**
+- [Pas 7.8](pas7.8-vnp46-adapter.md)
 - [Pas 7.19](pas7.19-uncertainty-registry.md)
 
 ## Codi existent a reutilitzar
@@ -32,7 +33,7 @@ Implementar bases normalitzades, priors i ensemble sense inferir un SPD únic.
 
 ## Flux tècnic
 
-`Φ_f` + pesos `c_jf` + RSR → `A_j` → `L_j,k,f`; vectorització per bases.
+`ViirsSourceObservation` sintètica + RSR/BAND_INTEGRATED + `Φ_f`/pesos → escala/espectre per bandes + `UpwardEmissionModel` explícit → `SpectralSourceEstimate`; F1 no es tanca.
 
 ## Errors, cancel·lació i recursos
 
@@ -51,7 +52,7 @@ Implementar bases normalitzades, priors i ensemble sense inferir un SPD únic.
 
 ## Criteri de sortida
 
-conservació d'energia, suma de pesos i absència de doble comptatge. B2b amb 1/2/3/5 bases. Cap capacitat posterior queda marcada com a implementada.
+normalització DNB coherent, suma de pesos i absència de doble comptatge. B2b amb diverses bases només per cost/robustesa de l'ensemble, no per convertir-lo en un SPD únic. Fixtures angulars demostren que el model no assumeix Lambert implícitament. Cap capacitat posterior queda marcada com a implementada.
 
 ## Proves i evidències obligatòries
 
@@ -66,7 +67,7 @@ Biblioteca SPD definitiva o calibratge regional.
 
 ## Instrucció per a Codex
 
-`Φ_f` + pesos `c_jf` + RSR → `A_j` → `L_j,k,f`; vectorització per bases. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
+Separa SPD i emissió angular. VNP46 restringeix la mesura DNB però no autoritza una funció hemisfèrica única. Mantén F1 oberta i propaga la seva incertesa. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
 ## Treball pendent
 

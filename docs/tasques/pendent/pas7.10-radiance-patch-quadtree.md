@@ -33,14 +33,15 @@ Representar cada regió amb error controlat i calcular `W_physical/W_effective`.
 
 ## Flux tècnic
 
-EmissionRegion → quadtree intern → error `I/r²×T×V` → patches → projecció topocèntrica i widths.
+EmissionRegion → quadtree intern → aproximació puntual candidata → contrast amb integració/submostreig d'àrea independent → refinament per error → patches → projecció topocèntrica i widths.
 
 ## Errors, cancel·lació i recursos
 
 - Dades absents/corruptes tenen estat explícit i procedència.
 - Resultats tardans es descarten; recursos grans no es dupliquen pel bridge.
 - Risc: Explosió de patches propers.
-- Rollback: Refinament més conservador; mai fusió no controlada.
+- Risc: estimar `ε_patch` amb la mateixa aproximació puntual i no detectar el seu biaix.
+- Rollback: integració d'àrea/subcel·les per patches que no compleixen el pressupost; mai fusió no controlada.
 
 ## Tasques
 
@@ -52,7 +53,7 @@ EmissionRegion → quadtree intern → error `I/r²×T×V` → patches → proje
 
 ## Criteri de sortida
 
-regió allargada, wrap 359°/1°, outlier feble i oclusió parcial. B5 preliminar `ε_patch` vs patches/error. Cap capacitat posterior queda marcada com a implementada.
+regió allargada, wrap 359°/1°, outlier feble i oclusió parcial. Comparació explícita punt vs integració d'àrea en camp proper. B5 preliminar `ε_patch` vs patches/error sense usar la mateixa fórmula com a únic oracle. Cap capacitat posterior queda marcada com a implementada.
 
 ## Proves i evidències obligatòries
 

@@ -14,12 +14,12 @@ Converteix el zenit en un gate científic reproduïble: mateixa font, atmosfera,
 
 ## Objectiu
 
-Obtenir `PropagationResult` zenital en unitats radiomètriques físiques, sense factor de calibratge opac, i demostrar convergència contra el reference solver.
+Obtenir `PropagationResult` zenital sense factor de calibratge opac i demostrar convergència del **transport donat el mateix `SourceModel`** contra un oracle independent. La validació empírica de l'emissió és separada.
 
 ## Dependències
 
 **Depèn de:**
-- [Pas 7.8](pas7.8-viirs-adapter.md)
+- [Pas 7.8](pas7.8-vnp46-adapter.md)
 - [Pas 7.17](pas7.17-terrain-curvature.md)
 - [Pas 7.19](pas7.19-uncertainty-registry.md)
 
@@ -30,12 +30,12 @@ Obtenir `PropagationResult` zenital en unitats radiomètriques físiques, sense 
 ## Codi existent a reutilitzar
 
 - `PropagationKernel`, `SourceModel`, `OpticalField`, terreny/geodèsia i contractes dels passos previs.
-- Reference solver offline; no crear un `ZenithSolver` paral·lel.
+- Oracle offline independent; no crear un `ZenithSolver` paral·lel. **S1 continua bloquejant el tancament del pas:** opció A `SG-REF`; opció B dependència creuada amb 7.65.
 - Infraestructura de benchmark/cancel·lació/cache, sense obligar encara el renderer.
 
 ## Flux tècnic
 
-fixture/VIIRS → model de font → OpticalField + DEM → `DirectionSet={90°}` → PropagationKernel → radiància per banda → reference solver → informe error/cost.
+fixture/VNP46 → model de mesura DNB → mateix `SourceModel` a runtime i oracle → OpticalField + DEM → `DirectionSet={90°}` → PropagationKernel/oracle → radiància per banda → informe error/cost.
 
 ## Errors, cancel·lació i recursos
 
@@ -53,7 +53,7 @@ fixture/VIIRS → model de font → OpticalField + DEM → `DirectionSet={90°}`
 
 ## Criteri de sortida
 
-90° usa la mateixa ruta que qualsevol direcció, convergeix, conserva unitats físiques, no usa calibratge arbitrari i compleix el pressupost provisional d'error contra la referència. El cost zenital queda caracteritzat abans de construir la compressió angular.
+90° usa la mateixa ruta que qualsevol direcció, convergeix, conserva la cadena d'unitats definida, no usa calibratge arbitrari i compleix el pressupost d'error preregistrat contra l'oracle escollit a S1. Un PASS valida transport, no `SourceModel`. El pas no es pot completar mentre S1 no estigui resolta.
 
 ## Proves i evidències obligatòries
 
@@ -69,7 +69,7 @@ SQM/TESS/Bortle, composició amb cel natural/Lluna i renderer.
 
 ## Instrucció per a Codex
 
-Implementa el gate com una configuració del mateix `PropagationKernel`; no creïs un solver zenital separat ni introdueixis factors d'escala per forçar coincidència amb una magnitud observacional.
+Implementa el gate com una configuració del mateix `PropagationKernel`; no creïs un solver zenital separat ni introdueixis factors d'escala. No presentis el PASS com a validació de l'emissió VNP46→font i no tanquis S1 implícitament.
 
 ## Treball pendent
 

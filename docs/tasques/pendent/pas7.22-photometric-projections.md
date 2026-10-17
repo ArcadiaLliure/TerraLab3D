@@ -13,7 +13,7 @@ Afegeix adaptadors post-kernel per luminància fotòpica, SQM, TESS-W i sensors 
 
 ## Objectiu
 
-Produir projeccions auditables a partir de `PropagationResult`/`DomeProfile`, sense cap nova integral LOS ni conversió directa VIIRS→SQM.
+Produir projeccions auditables a partir de `PropagationResult`/`DomeProfile`, sense cap nova integral LOS ni conversió directa VNP46/DNB→SQM.
 
 ## Dependències
 
@@ -46,12 +46,13 @@ radiància espectral/de bandes → pesos CIE o sensor precomputats → integraci
 - [ ] Implementar contracte `PhotometricProjection`.
 - [ ] Implementar luminància fotòpica amb funció CIE versionada.
 - [ ] Implementar models SQM/TESS amb resposta espectral, FOV i calibratge identificables.
+- [ ] Propagar a `predictionUncertainty` la incertesa del prior/ensemble espectral; un valor central no pot ocultar aquesta dependència.
 - [ ] Definir `bortlePolicyId` i semàntica `BortleEquivalent`.
 - [ ] Vectoritzar/cachejar pesos de projecció per evitar cost per LOS.
 
 ## Criteri de sortida
 
-Les projeccions coincideixen amb integració espectral fina dins tolerància, SQM/TESS respecten el model de sensor, cap factor universal substitueix la resposta real i el cost és post-processament petit respecte del kernel.
+Les projeccions coincideixen amb integració espectral fina dins la tolerància preregistrada, SQM/TESS respecten la resposta real del sensor i la incertesa espectral, cap factor universal substitueix el model de sensor i el cost és post-processament petit respecte del kernel.
 
 ## Proves i evidències obligatòries
 

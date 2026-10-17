@@ -1,10 +1,10 @@
-# Pas 7.8 — Skyglow físic — adaptador de productes VIIRS/VNL/Black Marble
+# Pas 7.8 — Skyglow físic — adaptador VNP46 i qualitat de baixa radiància
 
-> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Convertir productes reals a observacions de font amb semàntica, unitats i qualitat explícites.
+> **Estat:** pendent. **Estat funcional:** no implementat. **Origen:** planificat. **Abast vigent:** Convertir el producte VNP46 seleccionat a `ViirsSourceObservation` preservant producte/release/data, unitat, qualitat i baixa radiància sense confondre observació i emissió.
 
 ## Descripció funcional
 
-Diferencia DNB SDR, VNL i Black Marble abans del model de font.
+VNP46 és la família operativa. DNB SDR/VNL resten com a documentació/fixtures del model de mesura, no com a entrada primària de la v1.
 
 ## Fonts a consultar
 
@@ -14,12 +14,13 @@ Diferencia DNB SDR, VNL i Black Marble abans del model de font.
 
 ## Objectiu
 
-Convertir productes reals a observacions de font amb semàntica, unitats i qualitat explícites.
+Convertir el producte/release VNP46 que es decideixi a una observació mínima i traçable, sense `max(0,·)`, registrant la restricció de baixa radiància pre/post-2017 i sense duplicar correccions ja aplicades pel producte.
 
 ## Dependències
 
 **Depèn de:**
 - [Pas 7.6](pas7.6-viirs-rsr.md)
+- [Pas 7.7](pas7.7-spectral-source-b2b.md)
 
 **En depenen:**
 - [Pas 7.9](pas7.9-emission-region-watershed.md)
@@ -33,14 +34,15 @@ Convertir productes reals a observacions de font amb semàntica, unitats i quali
 
 ## Flux tècnic
 
-raster/producte → quality/nodata/CRS/unitats → `ViirsSourceObservation` + provenance.
+VNP46 producte/release/data → quality/nodata/CRS/unitat declarada → `ViirsSourceObservation` → model DNB/RSR → `SourceModel`. Stray light: a confirmar segons producte; no corregir dues vegades.
 
 ## Errors, cancel·lació i recursos
 
 - Dades absents/corruptes tenen estat explícit i procedència.
 - Resultats tardans es descarten; recursos grans no es dupliquen pel bridge.
-- Risc: Confondre radiància TOA amb emissió de superfície.
-- Rollback: Mantenir adapter legacy separat.
+- Risc: Confondre radiància observada amb emissió de superfície o aplicar dues vegades una correcció del producte.
+- Risc: clippar valors negatius/prop de zero i crear un biaix sistemàtic de fonts febles.
+- Rollback: observació `unavailable`/no usable; no fabricar emissió.
 
 ## Tasques
 
@@ -52,7 +54,7 @@ raster/producte → quality/nodata/CRS/unitats → `ViirsSourceObservation` + pr
 
 ## Criteri de sortida
 
-fixtures de raster, unit conversion, nodata i mismatch de producte. Throughput d'ingestió separat del kernel. Cap capacitat posterior queda marcada com a implementada.
+fixtures VNP46 de producte/release/data, unitat, nodata/quality, valors negatius/prop de zero i restricció temporal 2017. Cap `max(0,·)` silenciós. La unitat DNB no es hardcodeja des de l'ATBD pendent. Cap capacitat posterior queda marcada com a implementada.
 
 ## Proves i evidències obligatòries
 
@@ -67,7 +69,7 @@ Gestor de descàrregues complet del Pas 24.
 
 ## Instrucció per a Codex
 
-raster/producte → quality/nodata/CRS/unitats → `ViirsSourceObservation` + provenance. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
+VNP46 → observació immutable → model DNB/RSR → SourceModel. No assumeixis Lambert, no clipis baixa radiància i no apliquis stray light si el producte/release ja la incorpora. Mantén les decisions congelades del dossier i registra qualsevol desviació amb evidència.
 
 ## Treball pendent
 
