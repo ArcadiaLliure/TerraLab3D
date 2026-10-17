@@ -10,6 +10,10 @@ Accés públic no equival automàticament a permís de redistribució. Cada recu
 
 Cada recurs registra producte, release, data/període d'adquisició, checksum, unitat declarada, qualitat i transformacions. No s'assumeix que dues releases siguin equivalents a baixa radiància.
 
+**Adquisició VNP46:** el Pas 7.2 valida el lector contra un grànul local real, però no és propietari de la descàrrega. L'ús ordinari s'integra al gestor únic del [Pas 24](../tasques/pendent/pas24-cataleg-recursos-descarregues.md): un provider/resolver LAADS/Earthdata resol `producte + collection + data + tile/AOI` a un grànul immutable, el gestor autentica quan cal, descarrega, verifica i instal·la, i només llavors lliura el path local al lector VNP46. Cap token o secret pot aparèixer al catàleg, perfil científic, provenance, logs o repositori.
+
+La integritat diferencia el **checksum de font** publicat/verificable pel proveïdor (`algorithm + value`) del **SHA-256 local** calculat per TerraLab3D sobre els bytes instal·lats. El segon serveix d'identitat interna reproduïble però no substitueix ni es presenta com una verificació externa del primer.
+
 Correccions com stray light són **a confirmar segons producte/release**. Si el producte ja les aplica, TerraLab3D no les duplica.
 
 La restricció de punt zero al voltant de 2017 documentada per Coesfeld et al. (2020, §2.3.1) obliga a tractar amb cautela sèries de baixa radiància que travessen aquesta data. El treball no estableix una correcció per a `VNP46A2.002`; no s'aplica cap constant universal. El rang vàlid publicat per a la capa és no negatiu: els valors negatius crus es conserven com a invàlids, sense clipping; zero i positius febles no es transformen en emissió inferida sense un model verificat.

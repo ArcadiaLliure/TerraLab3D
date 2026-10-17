@@ -10,6 +10,17 @@ Tots els contractes serialitzables tenen `schemaVersion`, unitats explícites, i
 {"provider":"NOAA-NCC","product":"NOAA20_VIIRS_DNB_RSR","releaseId":"final-prelaunch","sourceUrl":"...","retrievedAt":"ISO-8601","sha256":"hex","accessMode":"public-download","redistributionStatus":"UNVERIFIED","transformations":[]}
 ~~~
 
+### Integritat i adquisició de recursos
+
+Per a assets gestionats pel [Pas 24](../tasques/pendent/pas24-cataleg-recursos-descarregues.md), la provenance pot conservar dues evidències d'integritat amb semàntica diferent:
+
+- `sourceChecksum = {algorithm, value, origin}`: checksum publicat o verificable contra el proveïdor/catàleg. L'algoritme no s'assumeix que sigui SHA-256.
+- `localSha256`: SHA-256 calculat per TerraLab3D sobre els bytes finals instal·lats, utilitzat com a fingerprint intern reproduïble.
+
+`localSha256` no pot substituir silenciosament un `sourceChecksum` absent ni presentar-se com a verificació externa. Les credencials d'un proveïdor autenticat no formen part de `Provenance`: només s'hi pot registrar el mode/proveïdor d'accés i una referència no secreta a la resolució de l'asset.
+
+Els recursos dinàmics es documenten amb selectors estables i amb la identitat immutable final resolta. Per VNP46A2.002, el resolver del gestor de descàrregues transforma producte/collection/data/tile o AOI en un grànul concret; `ViirsSourceObservation` consumeix després el fitxer local verificat i no coneix tokens ni implementa transferències.
+
 ## EmissionRegion
 
 Python conceptual: `EmissionRegion(id, polygon_wgs84, total_dnb_radiance, radiance_centroid, covariance, patches, source_estimate, provenance)`.
