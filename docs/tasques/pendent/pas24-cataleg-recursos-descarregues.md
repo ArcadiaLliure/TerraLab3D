@@ -18,6 +18,10 @@ Decisions tancades de referència:
 - La instal·lació és atòmica: temporal → verificació de mida/checksum → `rename` → registre. Un fitxer parcial mai compta com a disponible.
 - En arrencar, els treballs interromputs es reconcilien una sola vegada i es presenta una decisió clara; no es creen descàrregues automàtiques.
 - Progrés indeterminat, bytes, MB/s i temps estimat tenen semàntica separada.
+- El gestor admet **proveïdors autenticats** sense incorporar secrets al catàleg, al `DownloadJob`, als logs ni a la provenance. Els descriptors només poden conservar una referència opaca a la credencial/sessió gestionada fora del recurs.
+- Un recurs pot ser **dinàmic**: el catàleg descriu proveïdor, producte/release i selectors (data, tile, AOI o equivalent), i un resolver del proveïdor materialitza l'asset immutable concret abans de transferir-lo. La identitat resolta queda persistida per poder reproduir i auditar la descàrrega.
+- El checksum de font és estructurat com a mínim per `algorithm + value` i conserva el seu origen. TerraLab3D calcula a més un SHA-256 local dels bytes instal·lats; el hash local no es presenta com si fos una verificació independent del proveïdor.
+- **VNP46A2.002 via LAADS/Earthdata és el primer cas d'acceptació d'aquest flux autenticat i dinàmic**: l'usuari no ha de conèixer noms de grànul, HDF5 ni URLs d'arxiu per a l'ús ordinari.
 
 ## Objectiu
 
@@ -47,7 +51,9 @@ Completar la vertical de «catàleg de recursos i descàrregues persistents» de
 
 ## Flux tècnic
 
-Catàleg versionat → selecció de variant/bundle → `DownloadJob` persistent → adquisidor cancel·lable → temporal reanudable → verificació → instal·lació atòmica → registre → delta de disponibilitat cap a la UI.
+Catàleg versionat → selecció de variant/bundle o petició dinàmica → resolució de proveïdor/asset (amb autenticació si cal) → `DownloadJob` persistent amb identitat resolta → adquisidor cancel·lable → temporal reanudable → verificació del checksum de font + SHA-256 local → instal·lació atòmica → registre → delta de disponibilitat cap a la UI.
+
+Per a recursos dinàmics, la resolució i la transferència són fases diferents: una resposta del resolver mai es converteix directament en dada científica. En el cas VNP46, `product=VNP46A2`, `collection=002`, data i tile/AOI resolen un grànul concret; el lector científic del Pas 7.2 només consumeix el fitxer local ja adquirit i verificat.
 
 ## Errors, cancel·lació i recursos
 
@@ -55,6 +61,9 @@ Catàleg versionat → selecció de variant/bundle → `DownloadJob` persistent 
 - Canvis d'ETag, checksum incorrecte o espai insuficient produeixen error accionable i mai promocionen el temporal.
 - Reiniciar recupera una cua coherent i no duplica treballs pel mateix recurs/variant.
 - Streams, fitxers temporals, tasks i subscripcions es tanquen en tots els camins.
+- Credencial absent, caducada o rebutjada és un estat accionable del proveïdor, no un error de dades ni un motiu per degradar silenciosament a una URL alternativa.
+- La UI pot demanar configurar/autenticar un proveïdor quan una acció ho requereix, però una credencial mai s'exporta amb manifests, evidències o còpies de projecte.
+- Un canvi del grànul/asset resolt, ETag o checksum després de reprendre obliga a revalidar la transferència; no es concatena contingut de dues revisions.
 
 ## Tasques
 
@@ -65,13 +74,18 @@ Catàleg versionat → selecció de variant/bundle → `DownloadJob` persistent 
 - [ ] Persistir cues, temporals, offsets, ETag/Last-Modified, intents i últim error de manera transaccional.
 - [ ] Implementar pausa, reanudació, cancel·lació cooperativa, reintents amb backoff i eliminació segura.
 - [ ] Verificar mida/checksum i fer instal·lació atòmica; reconciliar temporals i registres després d'un crash.
+- [ ] Formalitzar `ChecksumSpec` amb algoritme, valor i origen; conservar el checksum de font quan existeix i calcular sempre un SHA-256 local separat per identitat interna.
+- [ ] Formalitzar proveïdors/resolvers d'assets dinàmics perquè selectors estables (producte/release/data/tile/AOI) es resolguin a un asset concret abans de crear o iniciar la transferència.
+- [ ] Admetre autenticació de proveïdor mitjançant referències opaques a credencials o sessions gestionades fora dels manifests i jobs; cap secret pot persistir al catàleg, logs o provenance.
+- [ ] Integrar LAADS/Earthdata + `VNP46A2.002` com a fixture/cas d'acceptació del flux autenticat: resolució d'un grànul, descàrrega, verificació, instal·lació i lliurament del path local al consumidor del Pas 7.2.
 - [ ] Representar variants, bundles, dependències, recursos externs i llicències a la UI.
+- [ ] Mostrar estat d'autenticació/requisit de credencial de forma accionable sense exposar el secret; l'ús ordinari de VNP46 no ha d'exigir enganxar URLs o seleccionar manualment fitxers HDF5.
 - [ ] Mostrar progrés determinat o indeterminat, bytes, velocitat i ETA sense confondre transferència amb instal·lació.
 - [ ] Unificar tots els punts d'entrada en el mateix gestor i emetre deltes, no snapshots globals continus.
 
 ## Criteri de sortida
 
-Qualsevol recurs gestionat passa per un únic cicle persistent i auditable; les transferències es poden recuperar i la disponibilitat només canvia després d'una verificació i instal·lació atòmiques.
+Qualsevol recurs gestionat passa per un únic cicle persistent i auditable; les transferències es poden recuperar i la disponibilitat només canvia després d'una verificació i instal·lació atòmiques. El mateix cicle cobreix recursos públics, autenticats i resolts dinàmicament sense filtrar secrets ni crear downloaders específics per vertical.
 
 ## Proves i evidències obligatòries
 
@@ -82,7 +96,11 @@ Qualsevol recurs gestionat passa per un únic cicle persistent i auditable; les 
 - [ ] Matriu automatitzada de recuperació i cancel·lació.
 - [ ] Vídeo de pausa, reinici de l'aplicació i reanudació.
 - [ ] Registre de checksum fallit sense recurs disponible.
-- [ ] Captures de variants, bundles, llicència i progrés indeterminat.
+- [ ] Checksum de font amb almenys dos algoritmes admesos i SHA-256 local independent; demostrar que no es confonen els dos rols.
+- [ ] Proveïdor autenticat: credencial absent, vàlida, caducada/rebutjada i reintent després de reautenticar; cap secret apareix en logs, manifests, jobs o provenance.
+- [ ] Resolver dinàmic: mateix selector → mateixa identitat d'asset mentre el proveïdor no canvia la revisió; canvi de revisió/checksum → nova identitat verificable.
+- [ ] Cas d'acceptació LAADS/Earthdata amb un grànul real `VNP46A2.002`, lliurat com a fitxer local verificat al lector del Pas 7.2.
+- [ ] Captures de variants, bundles, llicència, requisit d'autenticació i progrés indeterminat.
 
 ## Fora d'abast
 
@@ -90,7 +108,7 @@ Descobriment específic de DEM, UX de capes Cel/Terra i dades base que s'empaque
 
 ## Instrucció per a Codex
 
-Evoluciona el gestor existent; no en creïs un de paral·lel. Separa recurs, capa i treball, conserva temporals verificables i demostra recuperació després de reinici abans de marcar el pas complet.
+Evoluciona el gestor existent; no en creïs un de paral·lel. Separa recurs, capa i treball, conserva temporals verificables i demostra recuperació després de reinici abans de marcar el pas complet. Els adapters científics (inclòs VNP46 del Pas 7.2) no poden implementar un downloader propi: demanen un recurs al gestor i consumeixen únicament l'asset local verificat.
 
 ## Treball pendent
 
