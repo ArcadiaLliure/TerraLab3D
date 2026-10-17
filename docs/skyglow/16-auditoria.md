@@ -2,15 +2,15 @@
 
 ## Decisions confirmades
 
-Un kernel únic; radiància lineal; cúpules comprimides; PCHIP log; watershed+quadtree; RSR real; separació espectral; provider atmosfèric; OpticalField tiled; fase unificada; absorció gasosa; single-scattering v1 com a simplificació pròpia; cache error-based; AD només en branques diferenciables; benchmark abans d'optimitzar.
+VNP46 com a font operativa; VIIRS DNB com a model de mesura `BAND_INTEGRATED`; observació separada d'emissió estimada; RSR resolta per release/data; un kernel espectral únic; radiància lineal; cúpules comprimides; PCHIP log; watershed+quadtree; provider atmosfèric; OpticalField tiled; fase unificada; absorció gasosa; single-scattering v1; LUT/FFT només com a acceleracions homologades del mateix operador; cache error-based; AD només en branques diferenciables.
 
 ## Candidats pendents de benchmark
 
 Mostra 1°, 95% `W_effective`, 8 hipòtesis SPD, H_TOA 80/100/120 km, Legendre 4/8/12/20, GK tolerances, `ε_patch`, cache envelopes, SLO. **Bandes:** `spectralBandCount` configurable; cap N fix ni benchmark de selecció.
 
-## Dades pendents
+## Dades i decisions pendents
 
-Biblioteca SPD, biblioteca aerosol, biblioteca núvols, models d'incertesa per producte, selecció final VIIRS/VNL/Black Marble per cas d'ús.
+Producte/release VNP46 concret, política de baixa radiància i punt zero 2017, model angular d'emissió, oracle S1/F5, biblioteca SPD, biblioteca aerosol, biblioteca núvols i models d'incertesa per producte. Vegeu `18-decisions-obertes.md`.
 
 ## Verificacions científiques resoltes
 
@@ -26,11 +26,11 @@ No bloquegen B0/B1. Bloquegen producció: aerosols, SPD, llicències i benchmark
 
 ## Revisió matemàtica
 
-Les unitats del kernel són consistents si `I↑/r²` es tracta com irradiància incident a P i `Γ ds` com probabilitat/densitat direccional de dispersió; no s'introdueix `1/r_PO²`. La funció de fase està normalitzada a 1 sobre 4π. La suma de fonts es fa en radiància.
+Les unitats del kernel són consistents si `I↑` és intensitat radiant direccional produïda pel `SourceModel`, de manera que `I↑/r²` és irradiància incident al node. VNP46 no entra directament en aquesta fórmula. `Γ ds` aporta la dispersió direccional i no s'introdueix un segon `1/r_PO²`. La funció de fase està normalitzada a 1 sobre 4π. La suma de fonts es fa en radiància.
 
 ## Revisió d'unitats
 
-VIIRS VNL (`nW cm⁻² sr⁻¹`) no es barreja directament amb `W m⁻² sr⁻¹`; la conversió és explícita. SPD normalitzada té `nm⁻¹`. Coeficients d'extinció/dispersió són `m⁻¹`. Angles i distàncies tenen unitat al contracte.
+La unitat del producte VNP46 es llegeix del producte/metadata i es conserva explícita. La unitat exacta de l'operador DNB de l'ATBD continua pendent de verificació; no es codifica a partir d'una suposició. SPD normalitzada té `nm⁻¹`. Coeficients d'extinció/dispersió són `m⁻¹`. Angles i distàncies tenen unitat al contracte.
 
 ## Revisió Python/TypeScript
 

@@ -6,13 +6,19 @@
 
 ## Fonts de PredictionUncertainty
 
-Radiometria VIIRS aleatòria; calibratge sistemàtic; product processing; prior espectral; model angular d'emissió; atmosfera; aerosol/núvol; gas; DEM/oclusió; error numèric; error estructural single-scattering; compressió de cúpula.
+Radiometria VNP46; calibratge/processament/release; model de mesura DNB/RSR; règim de baixa radiància/punt zero; prior espectral; model angular d'emissió; atmosfera; aerosol/núvol; gas; DEM/oclusió; error numèric; error estructural single-scattering; compressió de cúpula.
 
 No es combina tot en quadratura. Un ensemble SPD és epistèmic; un biaix de calibratge és sistemàtic; errors locals atmosfèrics poden estar correlacionats.
 
-## VIIRS
+## VNP46 / VIIRS DNB
 
-Guardar la incertesa del producte concret. Els valors 5/10/30/100% de l'ATBD són especificacions per gain/radiance del SDR, no una incertesa genèrica de VNL. Un composite pot tenir altres fonts d'error i correlació temporal.
+La incertesa conserva per separat radiometria del producte VNP46, processament/release, model de mesura DNB/RSR, prior espectral, inferència angular i règim de baixa radiància.
+
+No es transfereixen automàticament percentatges del DNB SDR a VNP46. Un composite pot tenir altres fonts d'error i correlació.
+
+La comparabilitat de baixa radiància pre/post-2017 és una restricció de producte fins que es tanqui la política de punt zero. Valors negatius o febles no es transformen en zero abans de representar-ne la incertesa.
+
+Stray light i altres correccions només entren com a transformació/incertesa pròpia si el producte/release no les ha resolt ja.
 
 ## Ensemble espectral
 

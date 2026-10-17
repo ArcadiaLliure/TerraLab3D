@@ -20,15 +20,21 @@
 
 **FET PUBLICAT.** Garstang 1986, PASP 98, 364–375, DOI 10.1086/131768, modela brillantor artificial amb dispersió molecular i aerosol i paràmetres de ciutat/atmosfera. És precedent, no especificació de runtime.
 
-## VIIRS DNB
+## VNP46 i VIIRS DNB
 
-**FET PUBLICAT.** NOAA documenta DNB com una banda molt ampla. Per NOAA-20, el NCC publica centre LGS 694,8 nm, punts de mitja alçada 499,1 i 890,5 nm i FWHM 391,4 nm: https://ncc.nesdis.noaa.gov/NOAA-20/StandardizedCalibrationParameters.php. La RSR oficial NOAA-20/J1 és accessible a https://ncc.nesdis.noaa.gov/NOAA-20/J1VIIRS_NOAA20_SpectralResponseFunctions.php.
+**DECISIÓ NOSTRA:** la família NASA Black Marble **VNP46** és la font operativa de la primera vertical. El producte/release concret es tanca al Pas 7.8 després de verificar unitats, quality flags, correccions aplicades i drets.
 
-**FET PUBLICAT.** L'ATBD de calibratge VIIRS indica que la incertesa especificada del DNB depèn del gain state i del nivell de radiància: LGS 5–10%, MGS 10–30%, HGS 30–100% als punts de prova especificats. Font: https://ncc.nesdis.noaa.gov/documents/documentation/gsfc-474-00027-jpss-npp-viirs-radiometric-calibration-atbd--alt.-doc.-no.-d43777-.pdf. **DECISIÓ NOSTRA:** no aplicar aquests percentatges cegament a composites VNL/Black Marble.
+**DECISIÓ NOSTRA:** VIIRS DNB no desapareix de l'arquitectura. Es conserva com a model de mesura espectral: RSR oficial, procedència temporal i `measurementOperatorId=BAND_INTEGRATED`.
 
-**FET PUBLICAT.** VNL V2 de l'Earth Observation Group publica radiància en `nW/cm²/sr`, 15 arcsec, amb composites i màscares; Black Marble VNP46A1 és radiància nocturna TOA a sensor i VNP46A2 aplica correccions lunar/atmosfèrica/BRDF. Fonts: https://eogdata.mines.edu/products/vnl/ i https://viirsland.gsfc.nasa.gov/Products/NASA/BlackMarble.html.
+**PENDENT DE VERIFICACIÓ:** unitat exacta de la magnitud DNB del contracte i localització exacta a l'ATBD. No es dona per verificat `W·cm⁻²·sr⁻¹` ni la §2.1.2.1.
 
-**DECISIÓ NOSTRA.** Cap producte VIIRS es tracta com skyglow a nivell de terra. Sempre passa per un model de font amb procedència.
+**DECISIÓ NOSTRA:** la RSR es resol de manera compatible amb release/procedència i data d'adquisició; no es tria automàticament l'última.
+
+**FET PUBLICAT, referència concreta:** Coesfeld et al. (2020), §2.3.1, tracten un canvi del valor zero el 2017 en la seva sèrie VIIRS DNB. **DECISIÓ NOSTRA:** les comparacions de baixa radiància pre/post-2017 no es consideren directament homogènies sense política explícita de producte; la correcció numèrica del treball no és una constant universal.
+
+**DECISIÓ NOSTRA:** `radiancia_observada` i `radiancia_artificial_estimada` es mantenen separades. Valors negatius o propers a zero no es clippen silenciosament. Stray light i altres correccions es confirmen per producte/release per evitar doble correcció.
+
+**DECISIÓ NOSTRA:** VNP46 no determina l'SPD ni la distribució angular hemisfèrica. Aquestes inferències pertanyen a `SourceModel` i conserven incertesa.
 
 ## Espectre
 

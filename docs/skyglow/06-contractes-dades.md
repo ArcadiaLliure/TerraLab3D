@@ -18,7 +18,7 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 ## RadiancePatch
 
-`id`, `regionId`, `centroidEcefM`, `footprint`, `areaM2`, `dnbRadianceNwCm2Sr`, `upwardEmissionModelId`, `spectralSourceEstimateId`, `childrenIds?`, `errorBound`.
+`id`, `regionId`, `centroidEcefM`, `footprint`, `areaM2`, `upwardEmissionModelId`, `spectralSourceEstimateId`, `childrenIds?`, `errorBound`. La magnitud VNP46 observada no es duplica dins el patch; queda a l'observació/procedència que origina l'estimació de font.
 
 ## SpectralBasis / SpectrumHint / SpectralSourceEstimate
 
@@ -32,9 +32,19 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 `SpectralBandSet`: `id`, llista ordenada de bandes amb límits nm i funció de ponderació. `BandRadiance`: `bandSetId`, `values`, `unit`. `SpectralConfiguration`: `spectralBandCount` (enter positiu), `bandSetId`, rang, regla determinista de partició o límits explícits i revisió; el nombre d'elements ha de coincidir. No s'accepta `double[8]`/`number[8]` a la frontera ni un N fix. Canviar N invalida caches i projeccions dependents; no es fan benchmarks per seleccionar-lo.
 
+## ViirsSourceObservation
+
+`productId`, `releaseId`, `acquisitionDate`, `radianciaObservada`, `radianceUnit`, `measurementOperatorId=BAND_INTEGRATED`, `qualityFlags`, `provenance`.
+
+`radianciaObservada` no equival a `radianciaArtificialEstimada`; aquesta segona pertany a `SourceModel`. El valor original no es trunca silenciosament a zero.
+
 ## ViirsSpectralResponse
 
-`sensor`, `platform`, `band=DNB`, `detectorMode=band-averaged|detector-specific`, vector λ/RSR, `releaseId`, `sourceUrl`, `retrievedAt`, `sha256`, `accessMode`, `redistributionStatus`, `provenance`.
+`sensor`, `platform`, `band=DNB`, `detectorMode=band-averaged|detector-specific`, vector λ/RSR, `releaseId`, `measurementOperatorId=BAND_INTEGRATED`, `sourceUrl`, `retrievedAt`, `sha256`, `accessMode`, `redistributionStatus`, `provenance`.
+
+La selecció de RSR utilitza també `acquisitionDate` de `ViirsSourceObservation`; no es duplica la data al recurs. Si no es pot establir la correspondència release/data, la RSR és `unavailable`.
+
+**Unitat DNB exacta pendent de verificació contra l'ATBD.**
 
 ## OpticalParameter<T>
 
@@ -64,7 +74,7 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 ## PhotometricProjection
 
-`projectionId`, `sourceRevision`, `kind=PHOTOPIC_LUMINANCE|SQM|TESS_W|CUSTOM_SENSOR`, `value`, `unit`, `spectralResponseId`, `fovModelId?`, `zeroPointId?`, `predictionUncertainty`, `provenance`. Sense resposta/calibratge identificable, la projecció és `unavailable`.
+`projectionId`, `sourceRevision`, `kind=PHOTOPIC_LUMINANCE|SQM|TESS_W|CUSTOM_SENSOR`, `value`, `unit`, `spectralResponseId`, `fovModelId?`, `zeroPointId?`, `predictionUncertainty`, `provenance`. Sense resposta/calibratge identificable, la projecció és `unavailable`. Per SQM/TESS, `predictionUncertainty` inclou l'efecte del prior/ensemble espectral quan sigui material; no s'afegeix un camp duplicat d'ensemble.
 
 ## SkyRadianceComponents
 
@@ -114,3 +124,8 @@ Els noms wire són camelCase. Python tradueix explícitament des de noms interns
 ## Selector visual independent
 
 `skyRenderingMode=simulated|physical` és un contracte de presentació persistent, ortogonal a `lightPollutionMode` i `atmosphereEnabled`. `skyPhysicalAvailability=initializing|available|unavailable` incorpora causa i revisió. Les respostes SQM/TESS provenen de radiància espectral i respostes instrumentals, no del mode visual. Vegeu [contractes del cel físic](../cel-fisic/04-contractes-validacio.md).
+
+
+## Restriccions de producte VNP46
+
+La família VNP46 és l'entrada operativa, però el producte/release concret continua versionat. La comparabilitat de baixa radiància pre/post-2017 no s'assumeix. La política de punt zero és una decisió pendent i no introdueix encara cap camp nou. Les correccions de producte, inclosa stray light, només s'apliquen a TerraLab3D si el producte/release no les ha aplicat.

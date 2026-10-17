@@ -4,13 +4,19 @@
 
 Accés públic no equival automàticament a permís de redistribució. Cada recurs registra URL, propietari, versió, data d'accés, checksum, llicència/termes, redistribució, atribució, transformacions, volum, resolució, actualització i fallback.
 
-## VIIRS VNL — Earth Observation Group
+## NASA Black Marble VNP46 — font operativa
 
-Font: https://eogdata.mines.edu/products/vnl/. Radiància `nW/cm²/sr`, 15 arcsec. VNL V2/V2.1/V2.2 segons any. El catàleg Earth Engine de V2.1/V2.2 declara dades de Colorado School of Mines en domini públic sense restriccions posteriors; cal conservar citació EOG. Política TerraLab3D: preferir origen EOG i registrar exactament la versió.
+**Decisió:** la família VNP46 és la font operativa de la primera vertical de skyglow. El producte/release concret es tanca al Pas 7.8 després de verificar documentació oficial, unitats, quality flags, correccions aplicades i drets.
 
-## NASA Black Marble VNP46
+Cada recurs registra producte, release, data/període d'adquisició, checksum, unitat declarada, qualitat i transformacions. No s'assumeix que dues releases siguin equivalents a baixa radiància.
 
-Font oficial: https://viirsland.gsfc.nasa.gov/Products/NASA/BlackMarble.html i DOI de producte LAADS. VNP46A1/A2/A3/A4 tenen semàntiques diferents. Cal revisar els termes del DAAC/producte concret abans d'empaquetar; preferència per descàrrega gestionada i cache local.
+Correccions com stray light són **a confirmar segons producte/release**. Si el producte ja les aplica, TerraLab3D no les duplica.
+
+La restricció de punt zero al voltant de 2017 documentada per Coesfeld et al. (2020, §2.3.1) obliga a tractar amb cautela sèries de baixa radiància que travessen aquesta data; la correcció numèrica del treball no és una constant universal.
+
+## VIIRS DNB/VNL — referència i model de mesura
+
+DNB SDR i VNL deixen de ser la font operativa primària de la v1, però continuen com a documentació, fixtures o contrast per interpretar mesura, calibratge i RSR. Cap producte es tracta automàticament com emissió hemisfèrica de superfície.
 
 ## NOAA-20 VIIRS DNB RSR
 

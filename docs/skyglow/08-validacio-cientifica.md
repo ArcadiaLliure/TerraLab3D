@@ -8,13 +8,19 @@ Proves: convergència GK; comparació amb quadratura d'ordre alt; invariància s
 
 ## 1.1. Gate zenital absolut
 
-Abans de validar cúpules, la direcció 90° ha de superar un gate propi amb la mateixa implementació del kernel: unitats físiques completes, convergència de quadratura, comparació amb reference solver, sensibilitat a extinció/oclusió i absència de factors de calibratge opacs.
+Abans de validar cúpules, la direcció 90° ha de superar un gate amb la mateixa implementació del kernel: unitats, convergència, extinció/oclusió i comparació amb un oracle independent.
+
+El gate valida **propagació donat un model de font**. Runtime i oracle consumeixen la mateixa hipòtesi de `SourceModel`; un PASS no valida la inferència VNP46→SPD ni VNP46→emissió angular. Aquesta validació necessita dades externes separades.
+
+L'oracle concret és la decisió S1. La quantificació del biaix single-scattering exigeix un oracle amb multiple scattering segons F5.
 
 ## 2. Validació espectral
 
-Reference spectrum de pas fi (≤1 nm o prou fi per convergir les mètriques) sobre el rang necessari per CIE/sensors i RSR DNB real. Comprovar **només la configuració espectral activa** definida per `spectralBandCount`, `bandSetId` i límits/ponderacions. Mètriques: coherència de luminància fotòpica, resposta SQM, resposta TESS-W, XYZ, radiància de banda i resultat després de Rayleigh/aerosol/gas. **No** comparar candidats N ni executar benchmarks per seleccionar el nombre de bandes.
+Cada `SpectralBandSet` actiu es compara contra un espectre de referència prou fi per demostrar convergència de radiància propagada i de les projeccions actives (fotòpica, SQM, TESS-W, XYZ quan apliqui).
 
-La precisió declarada correspon a la configuració activa i a les SPD/atmosferes cobertes; no s'atribueix precisió universal a un N arbitrari.
+No es fan sweeps de rendiment per escollir N. V3 continua obert perquè falta decidir el pressupost d'error espectral que converteix aquesta comparació en PASS/FAIL.
+
+La normalització DNB usa `BAND_INTEGRATED`; la unitat exacta queda pendent de verificació contra l'ATBD.
 
 ## 3. Validació atmosfèrica
 
@@ -30,11 +36,17 @@ Mètriques mínimes: MAE hemisferi ponderat per angle sòlid, MAE 0–20°, P95 
 
 ## 5. Ground truth
 
-Fonts prioritàries: TESS-W i SQM amb resposta espectral coneguda; all-sky fotomètric calibrat quan estigui disponible. La comparació amb un sensor simula la seva banda, FOV, zero point/calibratge i resposta espacial; no es converteix una radiància espectral a «SQM» amb una constant universal.
+La comparació amb el reference solver valida implementació i aproximacions numèriques; no substitueix la validació física externa.
 
-Quan l'observació inclou cel natural, Lluna o crepuscle, la comparació usa `instantaneous` amb els mateixos components o aïlla explícitament la contribució artificial. No s'ajusta el model artificial per absorbir una contribució natural no modelada.
+Fonts prioritàries: TESS-W i SQM amb resposta espectral coneguda i all-sky fotomètric calibrat quan estigui disponible. La simulació del sensor usa resposta espectral, FOV i calibratge i propaga la incertesa del prior espectral.
 
-Per cada observació registrar: posició, elevació, hora UTC, lluna, núvols, transparència/AOD si disponible, instrument/serial, calibratge, FOV, temperatura, dades VIIRS corresponents i versió atmosfèrica.
+La validació del `SourceModel` és separada: calen dades independents capaces de restringir l'emissió angular/espectral. Una observació VNP46 quasi-nadir no valida per si sola la distribució hemisfèrica.
+
+Si no hi ha dataset extern suficient, l'estat màxim és numèricament validat però no empíricament homologat; la manca de dades no es converteix en PASS.
+
+### Baixa radiància
+
+Les fixtures inclouen valors febles, prop de zero i negatius quan el producte ho permeti, sense clipping silenciós. També cobreixen sèries que travessen 2017. LOW-RAD determina si aquestes mostres s'exclouen o es propaguen amb incertesa.
 
 ## 6. Disseny estadístic
 
@@ -48,7 +60,11 @@ Bortle és una escala observacional qualitativa. Només es pot mostrar com `Bort
 
 ## 8. Criteris d'acceptació
 
-No s'inventen llindars ara. Cada pas fixa una tolerància provisional només si deriva d'una referència numèrica o d'un requisit de producte. La congelació de producció es fa amb SLO multidimensional: `E_physical≤E_max`, `L_p95≤L_max`, `F_recompute≤F_max`, `renderThreadStutter=0`.
+Cada gate de producció necessita un perfil d'acceptació congelat **abans** de la comparació que decidirà PASS/FAIL. Cada llindar indica origen: referència publicada, requisit de producte o error/convergència numèrica.
+
+Un llindar modificat després de veure els resultats crea una nova versió i no reescriu l'avaluació anterior. Els valors de V1 continuen pendents mentre no existeixi aquest origen.
+
+L'error estructural single-scattering es registra separat de l'error numèric. F5 no es pot tancar amb un oracle exclusivament single-scattering.
 
 ## 9. Evidència
 

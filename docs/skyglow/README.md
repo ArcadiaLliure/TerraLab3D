@@ -12,9 +12,13 @@ TerraLab3D és actualment Python 3.12+ al backend (`aiohttp`, `astropy`, `numpy`
 
 ## Decisió central congelada
 
-Hi haurà un únic `PropagationKernel`. Zenit, direccions arbitràries i cúpules són avaluacions del mateix operador físic. Les cúpules són una compressió angular del camp, no un segon model. La moneda interna és radiància lineal; magnituds, SQM, luminància, XYZ/RGB i Bortle són projeccions posteriors.
+La font operativa de la primera vertical és la **família NASA Black Marble VNP46**. VIIRS DNB continua essent el **model de mesura**: RSR real, operador `BAND_INTEGRATED`, procedència temporal i semàntica radiomètrica. VNP46 no es tracta com a flux hemisfèric ni com a skyglow.
 
-Abans de promoure les cúpules com a resultat científic, la mateixa ruta del kernel a 90° ha de superar un **gate zenital radiomètric absolut**: unitats físiques coherents, convergència numèrica, comparació amb el solver de referència i absència de factors de calibratge arbitraris. No es crea un solver zenital paral·lel.
+El pipeline canònic és `VNP46 → observació → model de mesura DNB → SourceModel (SPD + emissió angular + incertesa) → PropagationKernel espectral → cúpules/projeccions`.
+
+Hi haurà un únic `PropagationKernel`. Zenit, direccions arbitràries i cúpules són avaluacions del mateix operador físic. Precomputació, LUT i FFT només poden ser **backends d'acceleració** del mateix operador i han de demostrar el seu domini de validesa i error; no substitueixen la física ni autoritzen a col·lapsar l'espectre.
+
+Abans de promoure cúpules, la mateixa ruta del kernel a 90° ha de superar el gate zenital. Aquest gate valida la propagació numèrica donat un model de font; la validació empírica de la inferència VNP46→emissió és separada.
 
 ## Ordre de lectura
 
@@ -30,7 +34,8 @@ Abans de promoure les cúpules com a resultat científic, la mateixa ruta del ke
 10. `09-incertesa-proveniencia.md`: pressupostos d'error, correlació i cache validity.
 11. `10-datasets-llicencies.md`: dades, drets, checksums i actualització.
 12. `11-riscs.md`, `12-glossari-unitats.md`, `13-debug.md`, `14-migracio.md`, `15-tracabilitat.md`, `16-auditoria.md` i `17-bibliografia.md`.
-13. `adrs/`: decisions arquitectòniques.
+13. `18-decisions-obertes.md`: decisions científiques i de producte que cap pas pot tancar implícitament.
+14. `adrs/`: decisions arquitectòniques.
 
 ## Decisions congelades
 
@@ -39,7 +44,8 @@ Abans de promoure les cúpules com a resultat científic, la mateixa ruta del ke
 - reconstrucció PCHIP sobre `log(B + ε)` i suma de fonts en radiància lineal;
 - watershed radiomètric per `EmissionRegion` i quadtree intern que no travessa regions;
 - separació `NormalizationSpectrum` / `PropagationBandSet`;
-- RSR real de VIIRS DNB, amb procedència i checksum;
+- VNP46 com a família de dades operativa, sense confondre observació amb emissió;
+- RSR real de VIIRS DNB, resolta amb release/procedència i data d'adquisició, amb `measurementOperatorId=BAND_INTEGRATED`;
 - `AtmosphericOpticsProvider` separat del kernel i `OpticalField` en tiles/capes;
 - `PhaseFunction` unificada; HG és fallback;
 - absorció gasosa no nul·la i LUT offline;
@@ -48,7 +54,9 @@ Abans de promoure les cúpules com a resultat científic, la mateixa ruta del ke
 - cache invalidada per error de canvi, amb discontinuïtats geomètriques comprovades abans de la linealització;
 - benchmark B0–B7 per rendiment, ordre de Legendre, H_TOA i SLO; **el nombre de bandes no es tria amb benchmarks** i és configurable;
 - gate zenital absolut abans de donar per vàlida la compressió direccional;
-- projeccions fotomètriques i de sensor sempre posteriors al kernel: cap conversió directa VIIRS→SQM ni `calibrationFactor` opac;
+- projeccions fotomètriques i de sensor sempre posteriors al kernel: cap conversió directa VNP46/DNB→SQM ni `calibrationFactor` opac;
+- `radiancia_observada` i `radiancia_artificial_estimada` separades, sense `max(0,·)` silenciós;
+- precomputació/LUT/FFT només com a acceleració homologada contra el mateix operador físic;
 - `BortleEquivalent` és una projecció orientativa versionada, no una magnitud física ni ground truth;
 - composició del cel en radiància lineal separant com a mínim artificial, natural sense Lluna, Lluna dispersada i crepuscle;
 - cap integral LOS al render loop ni una integral nova per frame: cache, coalescing, cancel·lació i precàrrega només si preserven una cota d'error mesurable.
@@ -63,7 +71,7 @@ Cinzano & Falchi (2012) sí descriuen, per a la funció de fase atmosfèrica usa
 
 ## Qüestions encara obertes
 
-La biblioteca d'aerosols de producció, la parametrització de núvols, el prior espectral regional/temporal, la política exacta de producte VIIRS/VNL/Black Marble, els models d'incertesa per proveïdor i els SLO de rendiment requereixen passos i evidència propis.
+El registre autoritatiu és [18-decisions-obertes.md](18-decisions-obertes.md). Hi consten el producte VNP46 concret, emissió angular, oracle de multiple scattering/reference solver, percepció nocturna, radi de fonts, llindars d'acceptació, convergència espectral, punt zero 2017 i política de baixa radiància. Biblioteca d'aerosols/núvols, models d'incertesa per proveïdor i SLO continuen requerint evidència pròpia.
 
 ## Relació amb el pla
 

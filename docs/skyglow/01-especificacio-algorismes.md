@@ -6,53 +6,77 @@ La sortida autoritativa del sistema és radiància espectral o radiància integr
 
 Per a una direcció unitària `ω` des de l'observador `O`, el punt de quadratura és `P(s)=O+sω`. El límit és `s_max=min(s_TOA,s_terrain)`. La intersecció amb terreny trunca la integral; no es representa com una transparència artificial.
 
-## 2. Font radiomètrica VIIRS
+## 2. Font operativa VNP46 i model de mesura VIIRS DNB
 
-Un producte VIIRS/VNL no és skyglow des de terra. És una observació de radiància ascendent en la geometria i processament del producte. El pipeline obligatori és:
+La família **NASA Black Marble VNP46** és la font operativa de la primera vertical. El producte/release concret continua obert fins que el Pas 7.8 verifiqui unitats, qualitat, correccions aplicades i drets.
 
-`VIIRS product → ViirsSourceObservation → SourceModel → EmissionRegion → RadiancePatch`.
+VNP46 no és skyglow a nivell de terra ni flux hemisfèric d'una font. VIIRS DNB continua definint la semàntica espectral de la mesura.
 
-VNL V2 publica radiància mitjana/mediana en `nW cm⁻² sr⁻¹` a 15 arcsec; Black Marble diferencia VNP46A1 (radiància TOA a sensor) i VNP46A2/A3/A4 amb correccions atmosfèriques/lunars/BRDF. El producte escollit s'ha de registrar perquè la transformació inversa cap a emissió de font depèn del processament.
+Pipeline obligatori:
+
+`VNP46 → ViirsSourceObservation → model de mesura DNB/RSR → SourceModel → EmissionRegion → RadiancePatch`.
+
+Es mantenen separades `radiancia_observada` i `radiancia_artificial_estimada`. No s'aplica silenciosament `max(0, radiancia_observada)`. Valors negatius, nuls o febles conserven qualitat i incertesa fins que la política de baixa radiància decideixi com tractar-los.
+
+Les correccions pròpies del producte, inclosa stray light, són **a confirmar segons producte/release**. TerraLab3D no aplica una correcció si el producte ja l'ha incorporada.
+
+Les sèries de baixa radiància que travessen el canvi de punt zero documentat per Coesfeld et al. (2020, §2.3.1) no es consideren directament homogènies abans/després de 2017 sense una política explícita de producte. La correcció concreta d'aquell treball no es converteix en una constant universal.
+
+### 2.1. SourceModel
+
+VNP46 no determina unívocament ni l'SPD ni la distribució angular hemisfèrica. `SourceModel` conserva separats prior/ensemble espectral, escala compatible amb DNB, model angular d'emissió i incertesa.
+
+El `PropagationKernel` no rep directament una radiància DNB com si fos intensitat. Rep una intensitat radiant direccional `I↑(direccio_font_punt)` produïda pel `SourceModel`, amb unitats de potència per estereoradiant. No es fixa una llei lambertiana per defecte; F1 continua oberta.
 
 ## 3. Segmentació radiomètrica
 
-Pipeline inicial:
+La segmentació s'aplica a un camp d'emissió artificial interpretat pel `SourceModel`, no a valors crus que s'hagin forçat a ser positius.
 
 ~~~text
-radiance raster
-  → valid mask / quality mask
-  → log-radiance
-  → denoise lleu, radiomètricament conservador
+VNP46 observation
+  → quality/nodata/product semantics
+  → SourceModel
+  → artificial-radiance estimate + uncertainty
+  → valid-for-segmentation mask
+  → log-radiance només sobre valors físicament admissibles
+  → denoise radiomètricament conservador
   → background threshold
   → local maxima + prominence
-  → watershed
-  → merge de conques insignificants
+  → watershed + merge
   → EmissionRegion[]
   → quadtree adaptatiu intern
   → RadiancePatch[]
 ~~~
 
-El watershed respon quines fonts diferenciades existeixen. El quadtree només controla la resolució interna. Cap node del quadtree pot creuar una frontera d'`EmissionRegion`.
+El watershed respon quines fonts diferenciades existeixen. El quadtree només controla la resolució interna. Cap node pot creuar una frontera d'`EmissionRegion`.
 
-El refinament d'un patch compara la substitució del conjunt de fills pel pare. S'ha de refinar si l'error estimat en `I_up/r² × T × V` supera `ε_patch`. `V` és binari per raig. Una visibilitat parcial de regió només emergeix de la suma de patches visibles i ocults.
+L'aproximació puntual d'un patch és una acceleració. La seva validació ha de comparar-la contra integració/submostreig d'àrea independent; no és suficient comparar pare i fills que reutilitzen la mateixa fórmula puntual. No es fixa ara un quocient universal distància/mida: el criteri és el pressupost d'error geomètric.
 
 ## 4. Geometria angular
 
 Per font compacta: `W≈2 atan(R/d)`. Per font extensa, es projecten els patches/polígon a coordenades topocèntriques i es calcula l'arc azimutal visible. `W_physical` cobreix la regió visible; `W_effective` és l'arc mínim que conté una fracció candidata del 95% de radiància projectada. Cal tractar circularitat azimutal, escorç i regions que travessen 0°/360°.
 
-## 5. Base espectral i normalització DNB
+## 5. Base espectral i operador DNB
 
-Cada base `Φ_f(λ)` compleix `∫[400,900] Φ_f(λ)dλ=1`, amb unitats `nm⁻¹`. Una font normalitzada és `S_j(λ)=Σ_f c_j,f Φ_f(λ)`, `Σ_f c_j,f=1`.
+Cada base `Φ_f(λ)` compleix integral unitària sobre el rang declarat. Una font normalitzada és `S_j(λ)=Σ_f c_j,f Φ_f(λ)`, amb pesos que sumen 1.
 
-Amb la RSR real `R_DNB(λ)`:
+La RSR aplicable es resol amb plataforma/sensor, `releaseId`, procedència i la **data d'adquisició** de l'observació. No se selecciona simplement la RSR més nova.
 
-`A_j = L_DNB,j / ∫ S_j(λ) R_DNB(λ)dλ`
+Per la vertical actual:
+
+`measurementOperatorId = BAND_INTEGRATED`.
+
+La normalització conserva la fórmula:
+
+`A_j = L_DNB,j / ∫ S_j(λ) R_DNB(λ)dλ`.
+
+No es divideix `R_DNB` per `∫R_DNB dλ` per defecte. Si un producte defineix radiància espectral mitjana o un operador diferent, ha d'usar un `measurementOperatorId` propi.
+
+**Unitat exacta de `L_DNB,j`: PENDENT DE VERIFICACIÓ contra l'ATBD aplicable.** No es dona per verificada aquí `W·cm⁻²·sr⁻¹` ni la §2.1.2.1 fins que es llegeixi directament.
 
 `L_j,k,f = A_j c_j,f ∫_{Δλ_k} Φ_f(λ)dλ`.
 
-`A_j` és escala; `c_j,f` és composició; `L_j,k,f` és entrada radiomètrica de banda/base. No es poden multiplicar dues vegades.
-
-El DNB no identifica unívocament l'SPD. La zona blava queda sobretot governada pel prior, però l'escala global també pot quedar esbiaixada si el prior és erroni dins la zona sensible del DNB. Per això el resultat porta `priorId`, `priorConfidence`, ensemble i separació `DIRECT_DNB`/`INDIRECT_PRIOR`.
+VNP46 continua essent una observació panchromàtica: no justifica col·lapsar el transport atmosfèric a un únic flux. `spectralBandCount` i `bandSetId` continuen definint la propagació.
 
 ## 6. Extinció i transmissió
 
@@ -88,25 +112,33 @@ Per patch `j`, banda `k`, base `f` i node `P`:
 
 `E_j,k,f(P)=I↑_j,k,f(direction_jP)/r_jP² · T_jP,k,f · V_jP`.
 
+`I↑` és **intensitat radiant direccional produïda pel `SourceModel`**, no radiància VNP46. Així `I↑/r²` és irradiància incident al node.
+
 `Γ_k,f(P,θ)=β_R,k P_R(θ)+β_sca,aer,k P_aer(θ)+β_sca,cloud,k P_cloud(θ)`.
 
 `dB_j,k,f=E_j,k,f(P) Γ_k,f(P,θ) T_PO,k,f ds`.
 
 `B_j,k,f(O,ω)=∫_0^smax dB_j,k,f`.
 
-No hi ha un segon `1/r_PO²`: la radiància que viatja de P a O conserva la seva geometria i només pateix extinció. La v1 és single-scattering per decisió de TerraLab3D; Cinzano–Falchi 2012 és explícitament més general i tracta dispersió múltiple.
+No hi ha un segon `1/r_PO²`: després de la dispersió es transporta radiància. La v1 candidata continua sent single-scattering; el biaix respecte de multiple scattering es valida segons F5 i no s'assumeix nul.
 
 ## 8.1. Gate zenital radiomètric absolut
 
-El primer resultat científic que es promou fora de fixtures és la direcció `ω_zenith` (elevació 90°) avaluada pel **mateix** `PropagationKernel`. No és un solver separat ni una aproximació especial.
+El zenit és la mateixa avaluació del `PropagationKernel` a elevació 90°. No hi ha un solver zenital separat.
 
-El gate exigeix cadena d'unitats completa, cap `calibrationFactor` opac, convergència contra el reference solver, comprovacions de linealitat/positivitat/transmissió i benchmark cold/warm. El resultat de 90° queda com a invariant: qualsevol `DomeProfile` posterior ha de reproduir-lo dins el pressupost d'error declarat.
+El gate valida la **propagació numèrica donat un model de font**. Runtime i oracle han de consumir la mateixa hipòtesi de `SourceModel`; per tant, un PASS no valida empíricament la inferència VNP46→SPD ni VNP46→emissió angular.
+
+La validació del model d'emissió necessita dades externes independents. L'oracle concret del gate continua sent la decisió S1; la quantificació de single vs multiple scattering segueix F5.
+
+La mostra de 90° d'un `DomeProfile` és un test de regressió/cablejat contra el zenit homologat, no un oracle físic independent.
 
 ## 9. Integració numèrica
 
 Cada direcció és una integral LOS. Les 100 fonts × 9 elevacions són aproximadament 900 integrals, no 900 operacions. El LOS es parteix als límits d'`OpticalTile`, capes i discontinuïtats. Per cada segment s'aplica Gauss–Kronrod 7/15 adaptatiu; l'estimador inicial és `|Q15-Q7|`, amb subdivisió fins al pressupost local.
 
 El tall anticipat només és admissible si existeix una cota conservadora `B_remaining_max < ε_B`. No s'atura perquè `T<ε` sense cota de la font i de la dispersió restant.
+
+El radi màxim de fonts és la decisió F7: no es fixa per intuïció mentre no hi hagi una cota d'error o un perfil de producte justificat.
 
 ## 10. Cúpules direccionals
 
@@ -116,11 +148,13 @@ Fonts diferents se sumen abans de qualsevol logaritme o transformació perceptua
 
 ## 10.1. Projeccions fotomètriques i instrumentals
 
-El kernel retorna radiància física. Les magnituds perceptuals o instrumentals són adaptadors posteriors i **no poden retroalimentar la física**.
+El kernel retorna radiància física. Les magnituds perceptuals o instrumentals són adaptadors posteriors i no retroalimenten la física.
 
-Per luminància fotòpica, quan hi ha radiància espectral suficient: `L_v = K_cd ∫ V(λ) L_e,λ dλ`, amb `K_cd = 683 lm W⁻¹` i la funció d'eficiència lluminosa CIE declarada/versionada.
+Per luminància fotòpica s'utilitza `V(λ)` i la constant CIE declarada/versionada.
 
-Per SQM, TESS-W o un sensor futur s'aplica la seva resposta espectral i el seu FOV/calibratge: `S_sensor = ∫∫ R_sensor(λ,ω) L_e,λ(ω) dλ dΩ`. El zero point i la transformació final a `mag/arcsec²` formen part del model/calibratge de l'instrument. No hi ha una constant universal per convertir DNB o radiància genèrica a «SQM».
+Per SQM, TESS-W o un sensor futur s'aplica la **resposta espectral real** de l'instrument, el seu FOV i calibratge; no es substitueix per una `V(λ)` genèrica. La projecció SQM propaga a `predictionUncertainty` la incertesa del prior/ensemble espectral, perquè la relació radiància→magnitud depèn de l'espectre assumit i de les condicions.
+
+Una eventual magnitud de percepció nocturna humana és F6 i queda separada de SQM/TESS.
 
 `BortleEquivalent` és una política de presentació versionada, no una sortida del kernel ni ground truth físic.
 
@@ -129,6 +163,12 @@ Per SQM, TESS-W o un sensor futur s'aplica la seva resposta espectral i el seu F
 Els canals es mantenen separats fins a la composició lineal: `B_total = B_artificial + B_natural_moonless + B_moon + B_twilight`.
 
 Es distingeix **reference sky** (nit de referència sense Lluna ni crepuscle, candidat per a `BortleEquivalent`) d'**instantaneous sky** (estat real a data/hora). La Lluna pot canviar el cel instantani, però no reclassifica per si sola la contaminació lumínica intrínseca del lloc.
+
+## 10.3. Precomputació, LUT i FFT
+
+La precomputació offline és una **estratègia d'acceleració del mateix operador físic**, no una física alternativa. LUT, kernels tabulats o FFT només són admissibles quan conserven les mateixes entrades/sortides, tenen domini de validesa explícit i es comparen contra la ruta directa/reference solver dins un pressupost d'error.
+
+Una convolució FFT exigeix demostrar la invariància translacional necessària. Atmosfera espacialment variable, models de font locals, curvatura o terreny poden trencar aquesta hipòtesi. Fora del domini homologat s'utilitza una ruta més general. El transport continua sent espectral encara que es precalculi.
 
 ## 11. Cache i derivades
 
