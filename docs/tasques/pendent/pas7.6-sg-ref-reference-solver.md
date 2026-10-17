@@ -23,10 +23,11 @@ Crear una veritat numèrica offline més estricta que el runtime i independent d
 - [ ] Afegir fases de referència d’alta resolució i ruta espectral fina per fixtures.
 - [ ] Quantificar offline el biaix single-scattering (`F5`) en el domini v1 amb una referència més rica o oracle extern quan sigui necessari.
 - [ ] Crear fixtures sintètiques analítiques i escenaris reproduïbles que seran consumits pels gates posteriors.
+- [ ] Registrar convergència, incertesa numèrica i domini de SG-REF perquè 7.12 pugui justificar una tolerància sense usar resultats del runtime candidat.
 
 ## Criteri de sortida
 
-`S1` és executable: SG-REF demostra convergència i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime.
+`S1` és executable: SG-REF demostra convergència i incertesa numèrica i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime. El PASS/FAIL del runtime queda per a 7.12.
 
 ## Evidències obligatòries
 

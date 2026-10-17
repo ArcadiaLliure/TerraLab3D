@@ -20,8 +20,9 @@ Tancar la vertical només després que ciència, rendiment i integració hagin p
 
 - [ ] Executar B7 amb AD OFF/ON, uncertainty OFF/ON, cold/warm/movement/prefetch/teleport/tile-change/occlusion-flip i backend 7.22 si existeix.
 - [ ] Auditar que DATA-VNP46, F1, F5, F7, V1, V3, S1, DNB-2017 i LOW-RAD estan tancades per al domini declarat.
+- [ ] Verificar la procedència, versió i congelació prèvia de tots els criteris PASS/FAIL aplicables; consumir-los sense crear-ne ni modificar-ne cap a 7.28.
 - [ ] Reexecutar gate zenital, regressions all-sky, projeccions i validació empírica congelada.
-- [ ] Verificar `kernelIntegralsPerRenderFrame=0`, stutter zero dins SLO, memòria i lifecycle.
+- [ ] Verificar `kernelIntegralsPerRenderFrame=0`, stutter i memòria segons els SLO de producte aprovats, i lifecycle.
 - [ ] Decidir shadow/default i retirar només els fallbacks que l’evidència autoritza; actualitzar inventari, README i evidències finals.
 
 ## Criteri de sortida
@@ -38,6 +39,6 @@ La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, 
 
 ## Instrucció per a Codex
 
-No reescriguis els llindars després de veure B7. No homologuis una acceleració perquè sigui ràpida ni una font perquè runtime i SG-REF coincideixin.
+Consumeix només criteris ja congelats; no creïs ni modifiquis llindars a 7.28 o després de veure B7. No homologuis una acceleració perquè sigui ràpida ni una font perquè runtime i SG-REF coincideixin.
 
 Quan el criteri de sortida no es pugui demostrar, **no continuïs al pas següent**. Corregeix aquest pas o marca’l `bloquejat` amb la causa i l’evidència.

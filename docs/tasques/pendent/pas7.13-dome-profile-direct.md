@@ -22,10 +22,11 @@ Estendre el mateix operador homologat del zenit a direccions arbitràries sense 
 - [ ] Verificar wrap d’azimut, positivitat i invariant del zenit.
 - [ ] Comparar reconstrucció angular contra SG-REF/all-sky densa.
 - [ ] Mesurar error de compressió direccional separat de l’error del kernel.
+- [ ] Si l'error angular o de compressió necessita un PASS/FAIL propi, justificar i preregistrar el pressupost abans de comparar el candidat; reutilitzar el criteri de 7.12 només dins el seu domini declarat.
 
 ## Criteri de sortida
 
-`DomeProfile` reprodueix zenit i camp angular directe dins el pressupost V1; la compressió angular té error quantificat independent.
+`DomeProfile` reprodueix zenit i camp angular directe dins el pressupost V1 aplicable; la compressió angular té error quantificat independent. Un criteri angular nou sense procedència bloqueja 7.13 abans del seu PASS/FAIL.
 
 ## Evidències obligatòries
 

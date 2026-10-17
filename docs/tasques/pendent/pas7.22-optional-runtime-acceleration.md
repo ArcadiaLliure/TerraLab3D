@@ -4,7 +4,7 @@
 
 ## Finalitat
 
-Afegir una acceleració global només si la ruta directa+cache no compleix els SLO preregistrats.
+Afegir una acceleració global només si la ruta directa+cache no compleix els SLO de producte TerraLab3D aprovats.
 
 ## Dependències
 
@@ -18,7 +18,8 @@ Afegir una acceleració global només si la ruta directa+cache no compleix els S
 
 ## Tasques
 
-- [ ] Executar perfil de rendiment previ amb la ruta actual i comparar-lo amb els SLO de V1.
+- [ ] Fixar i preregistrar els SLO de producte aprovats, amb propietari, plataforma i condicions de mesura, abans d'usar-los per decidir si cal LUT/precomputació/FFT; sense requisit aprovat, bloquejar 7.22.
+- [ ] Executar perfil de rendiment amb la ruta actual i comparar-lo amb aquests SLO congelats.
 - [ ] Si els SLO ja es compleixen, tancar el pas com `no necessari` amb evidència i no afegir complexitat.
 - [ ] Si no es compleixen, seleccionar LUT/precomputació/FFT només dins hipòtesis matemàtiques declarades.
 - [ ] Comparar backend accelerat contra la ruta directa en error radiomètric/angular i casos límit.
@@ -26,7 +27,7 @@ Afegir una acceleració global només si la ruta directa+cache no compleix els S
 
 ## Criteri de sortida
 
-O bé hi ha evidència que no cal backend addicional, o bé existeix un backend accelerat homologat contra la ruta directa amb domini/error/fallback explícits.
+Els SLO provenen d'un requisit de producte aprovat i precedeixen la decisió d'acceleració; si no existeixen, 7.22 queda bloquejat. Després, o bé hi ha evidència que no cal backend addicional, o bé existeix un backend accelerat homologat contra la ruta directa amb domini/error/fallback explícits.
 
 ## Evidències obligatòries
 

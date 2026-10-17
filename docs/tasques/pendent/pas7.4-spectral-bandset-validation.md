@@ -20,13 +20,14 @@ Tancar `V3` abans que el nombre de bandes entri al kernel de producció.
 
 - [ ] Construir una integració espectral fina independent per fixtures i projeccions de sensor.
 - [ ] Definir SPDs adverses i representatives, incloses mescles LED i espectres amb estructura estreta.
+- [ ] Justificar i preregistrar mètrica, domini i pressupost numèric d'error espectral, amb font metrològica/literatura o convergència de l'oracle fi, **abans de seleccionar cap candidat**; sense justificació, bloquejar 7.4.
 - [ ] Avaluar candidats `SpectralBandSet` per error científic, no per temps d’execució.
 - [ ] Seleccionar i versionar el `bandSetId` v1 amb pressupost d’error preregistrat i criteri de rehomologació.
 - [ ] Afegir golden tests perquè qualsevol canvi de bandes invalida caches i exigeix nova homologació.
 
 ## Criteri de sortida
 
-`V3` queda tancada: existeix un `SpectralBandSet` v1 que compleix el pressupost espectral contra l’oracle fi. Cap benchmark de rendiment ha decidit N.
+`V3` queda tancada: el pressupost justificat és anterior a la selecció i un `SpectralBandSet` v1 el compleix contra l'oracle fi. Si manca pressupost amb procedència, 7.4 queda bloquejat. Cap benchmark de rendiment ha decidit N.
 
 ## Evidències obligatòries
 

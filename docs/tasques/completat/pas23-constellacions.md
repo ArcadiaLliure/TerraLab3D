@@ -34,6 +34,7 @@ A més, el Pas 23 incorpora l'homologació visual dels traçats i la base comuna
 - [Pas 22.5 — Normalització de la documentació viva](pas22.5-normalitzacio-documental.md)
 
 **En depenen:**
+- [Pas 7.1 — contracte científic del skyglow](pas7.1-contracte-cientific-v1.md)
 - [Pas 31 — “El millor d'aquesta nit” i planificador](../pendent/pas31-millor-nit-planificador.md)
 - [Pas 38 — Homologació final, recuperació i rendiment](../pendent/pas38-homologacio-final.md)
 

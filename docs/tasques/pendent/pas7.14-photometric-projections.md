@@ -21,11 +21,12 @@ Projectar radiància espectral física a magnituds/instruments sense retroalimen
 - [ ] Implementar zero points/calibratge només des de fonts documentades.
 - [ ] Comparar cada projecció contra integració espectral/focal fina.
 - [ ] Propagar l’error espectral a la projecció.
+- [ ] Justificar i preregistrar qualsevol tolerància de projecció pròpia abans de comparar el candidat amb l'oracle, amb incertesa de resposta/FOV i error espectral pertinents.
 - [ ] Mantenir `BortleEquivalent` com a diagnòstic versionat i mai com a ground truth.
 
 ## Criteri de sortida
 
-SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies preregistrades i cap projecció modifica la radiància física.
+SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies justificades i preregistrades a 7.14 abans de la comparació decisòria; sense aquestes toleràncies, 7.14 es bloqueja. Cap projecció modifica la radiància física.
 
 ## Evidències obligatòries
 

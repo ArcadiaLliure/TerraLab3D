@@ -27,11 +27,11 @@ Warm-up: 5 passades completes descartades. Mesura: 30 passades per configuració
 
 ## Toleràncies
 
-Els valors exploratoris es poden escombrar i reportar, però un PASS/FAIL de producció exigeix un perfil d'acceptació preregistrat segons V1. La referència numèrica ha de ser més estricta que el candidat i demostrar convergència; cap llindar de producció es fixa després de veure els resultats.
+Els valors exploratoris es poden escombrar i reportar, però un PASS/FAIL de producció exigeix la política d'acceptació preregistrada segons V1 i un valor justificat, congelat abans del resultat del candidat. La referència numèrica ha de demostrar convergència i quantificar la incertesa; cap llindar de producció es fixa després de veure els resultats. Els passos 7.9–7.11 poden comparar diagnòsticament amb SG-REF; el primer PASS/FAIL numèric de transport és 7.12.
 
 ## Checkpoint Z — gate zenital obligatori
 
-Abans de promoure `DomeProfile`, executar el mateix kernel només a 90° en fixtures sintètiques i almenys una fixture VNP46/model de font/atmosfera/DEM reproduïble. Comparar runtime contra l'oracle escollit per S1 en radiància física per banda. Runtime i oracle reben el mateix `SourceModel`; el checkpoint no valida la inferència d'emissió. Reportar error, `coldMs`, `warmMs`, peak RSS i dependències tocades. El checkpoint falla si necessita un factor de calibratge opac o si 90° segueix una ruta diferent.
+Abans de promoure `DomeProfile`, preregistrar a 7.12 la tolerància runtime↔SG-REF amb l'evidència d'incertesa/convergència de 7.6, sense mirar el residual del runtime candidat. Executar el mateix kernel només a 90° en fixtures sintètiques i almenys una fixture VNP46/model de font/atmosfera/DEM reproduïble. Comparar runtime contra SG-REF en radiància física per banda. Runtime i oracle reben el mateix `SourceModel`; el checkpoint no valida la inferència d'emissió. Reportar error, `coldMs`, `warmMs`, peak RSS i dependències tocades. El checkpoint falla si necessita un factor de calibratge opac o si 90° segueix una ruta diferent.
 
 ## B0 — infraestructura
 
@@ -89,4 +89,4 @@ latència vs error; ordre Legendre vs error; bases vs temps; `ε_quad` vs nodes/
 
 ## Criteri de selecció
 
-No hi ha «guanyador» per un únic score. El nombre de bandes no forma part de la selecció per benchmark. La configuració activa només és candidata si compleix simultàniament l'error físic acordat, latència p95 acordada, freqüència de recompute acordada i stutter zero. Els llindars de PASS/FAIL es fixen **abans** de la campanya de decisió, amb origen declarat segons V1. Les mesures exploratòries poden servir per dissenyar el sistema, però no per reescriure retrospectivament el criteri d'acceptació.
+No hi ha «guanyador» per un únic score. El nombre de bandes no forma part de la selecció per benchmark. La configuració activa només és candidata si compleix l'error físic congelat al gate pertinent i els SLO de producte aprovats a 7.22. Els llindars de PASS/FAIL es fixen **abans** de la campanya de decisió, amb origen declarat segons V1; els SLO inclouen les mètriques, plataforma i condicions que el requisit aprovat estableixi, sense presumir una constant de stutter. Les mesures exploratòries poden servir per dissenyar el sistema, però no per reescriure retrospectivament el criteri d'acceptació.

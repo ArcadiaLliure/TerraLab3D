@@ -26,7 +26,7 @@ Passar del B1 monocromàtic a transport espectral v1 complet amb absorció.
 
 ## Criteri de sortida
 
-La ruta directa clear-sky espectral compleix V1 contra SG-REF i oracle espectral en fixtures; cap absorció es tracta com zero per conveniència.
+La ruta directa clear-sky espectral supera invariants de banda, unitats i absorció, amb comparació diagnòstica reproduïble contra SG-REF i l'oracle espectral; cap absorció es tracta com zero per conveniència. El primer PASS/FAIL numèric de transport és 7.12.
 
 ## Evidències obligatòries
 

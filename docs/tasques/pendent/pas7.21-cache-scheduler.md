@@ -22,6 +22,7 @@ Fer interactiu el runtime sense alterar el resultat físic.
 - [ ] Aplicar guards topològics abans del bound d’AD/error.
 - [ ] Implementar latest-wins, cancel·lació/coalescing, queue efectiva acotada i descarte de stale results.
 - [ ] Implementar prefetch només si clau/envelope/error continuen vàlids en acceptació.
+- [ ] Si l'envelope/cache aplica un nou pressupost PASS/FAIL d'error, justificar-lo i preregistrar-lo abans de decidir hits; no deduir-lo dels errors del candidat.
 - [ ] Mesurar cold/warm/small-motion/moviment continu/teleport/tile-change/occlusion-flip.
 
 ## Criteri de sortida

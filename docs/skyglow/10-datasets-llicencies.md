@@ -6,13 +6,13 @@ Accés públic no equival automàticament a permís de redistribució. Cada recu
 
 ## NASA Black Marble VNP46 — font operativa
 
-**Decisió:** la família VNP46 és la font operativa de la primera vertical de skyglow. El producte/release concret es tanca al Pas 7.8 després de verificar documentació oficial, unitats, quality flags, correccions aplicades i drets.
+**Decisió del Pas 7.1:** `VNP46A2.002` de LAADS, processament estàndard (ArchiveSet 5200), capa diària `DNB_BRDF-Corrected_NTL` sense ompliment de buits. La [guia Collection 2](https://landweb.modaps.eosdis.nasa.gov/data/userguide/BlackMarbleUserGuide_Collection2.0_20241203.pdf) i la [fitxa LAADS](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2) verifiquen unitat `nW cm⁻² sr⁻¹`, fill `-999.9` i QA 0–5. La [política LAADS](https://ladsweb.modaps.eosdis.nasa.gov/learn) permet ús i redistribució amb citació sol·licitada. Vegeu [perfil versionat](skyglow-v1-profile.json) i [auditoria](../evidencies/pas7.1/auditoria-fonts.md). La política PASS/FAIL `V1` és preregistrada; els valors resten assignats als seus gates.
 
 Cada recurs registra producte, release, data/període d'adquisició, checksum, unitat declarada, qualitat i transformacions. No s'assumeix que dues releases siguin equivalents a baixa radiància.
 
 Correccions com stray light són **a confirmar segons producte/release**. Si el producte ja les aplica, TerraLab3D no les duplica.
 
-La restricció de punt zero al voltant de 2017 documentada per Coesfeld et al. (2020, §2.3.1) obliga a tractar amb cautela sèries de baixa radiància que travessen aquesta data; la correcció numèrica del treball no és una constant universal.
+La restricció de punt zero al voltant de 2017 documentada per Coesfeld et al. (2020, §2.3.1) obliga a tractar amb cautela sèries de baixa radiància que travessen aquesta data. El treball no estableix una correcció per a `VNP46A2.002`; no s'aplica cap constant universal. El rang vàlid publicat per a la capa és no negatiu: els valors negatius crus es conserven com a invàlids, sense clipping; zero i positius febles no es transformen en emissió inferida sense un model verificat.
 
 ## VIIRS DNB/VNL — referència i model de mesura
 

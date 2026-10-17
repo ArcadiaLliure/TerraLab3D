@@ -21,12 +21,12 @@ Introduir la primera física de scattering sobre la ruta directa i auditable.
 - [ ] Implementar Rayleigh normalitzat i una `PhaseFunction` comuna.
 - [ ] Implementar HG només com a fallback i una fase de referència tabulada/alta resolució per tests.
 - [ ] Calcular extinció, scattering source→P→observer i transmissió sense dobles factors geomètrics.
-- [ ] Executar B1 en 1 banda amb fixtures analítiques i comparar contra SG-REF.
+- [ ] Executar B1 en 1 banda amb fixtures analítiques i comparació diagnòstica reproduïble contra SG-REF, sense dictar encara PASS/FAIL numèric de transport.
 - [ ] Verificar linealitat, positivitat, normalització 4π i casos isòtrops.
 
 ## Criteri de sortida
 
-El runtime clear-sky d’una banda coincideix amb SG-REF dins el perfil V1 en fixtures B1.
+B1 supera invariants analítics de normalització, linealitat, positivitat i geometria, i documenta la discrepància contra SG-REF. El primer PASS/FAIL numèric runtime↔SG-REF és 7.12.
 
 ## Evidències obligatòries
 

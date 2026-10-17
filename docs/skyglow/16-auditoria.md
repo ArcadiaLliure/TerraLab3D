@@ -10,7 +10,7 @@ Mostra 1°, 95% `W_effective`, 8 hipòtesis SPD, H_TOA 80/100/120 km, Legendre 4
 
 ## Dades i decisions pendents
 
-Producte/release VNP46 concret, política de baixa radiància i punt zero 2017, model angular d'emissió, oracle S1/F5, biblioteca SPD, biblioteca aerosol, biblioteca núvols i models d'incertesa per producte. Vegeu `18-decisions-obertes.md`.
+El producte/release VNP46, la política de baixa radiància i 2017, `S1`, `F5`, `F7` i la política V1 estan documentats al [perfil](skyglow-v1-profile.json). Resten pendents el model angular d'emissió, les biblioteques SPD/aerosol/núvols, els models d'incertesa per producte i els valors numèrics dels gates 7.4, 7.12, 7.17 i 7.22. Vegeu [decisions](18-decisions-obertes.md).
 
 ## Verificacions científiques resoltes
 
@@ -22,7 +22,7 @@ Redistribució del ZIP RSR; termes de derivats HITRAN; font/llicència de cada S
 
 ## Riscos bloquejants
 
-No bloquegen B0/B1. Bloquegen producció: aerosols, SPD, llicències i benchmark/ground truth.
+No bloquegen l'adaptador d'observació de 7.2 ni el model de mesura de 7.3. Cadascun dels passos posteriors es bloqueja quan necessita aplicar una decisió PASS/FAIL sense origen i valor justificats. Aerosols, SPD, llicències i ground truth s'han de resoldre al primer gate que els requereixi.
 
 ## Revisió matemàtica
 
@@ -38,4 +38,4 @@ El model conceptual és compartit però les classes internes no travessen el bri
 
 ## Següent pas executable
 
-`Pas 7.1 — Benchmark B0 i infraestructura de mesura`, un cop incorporat formalment a `docs/README.md` i les dependències. No cal esperar la biblioteca aerosol definitiva per començar-lo.
+El [Pas 7.1](../tasques/completat/pas7.1-contracte-cientific-v1.md) és completat documentalment. El [Pas 7.2](../tasques/pendent/pas7.2-vnp46-observation-adapter.md) és el punt de represa executable; encara no s'ha implementat.

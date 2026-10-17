@@ -22,7 +22,7 @@
 
 ## VNP46 i VIIRS DNB
 
-**DECISIÓ NOSTRA:** la família NASA Black Marble **VNP46** és la font operativa de la primera vertical. El producte/release concret es tanca al Pas 7.8 després de verificar unitats, quality flags, correccions aplicades i drets.
+**DECISIÓ NOSTRA:** `VNP46A2.002` de NASA LAADS és la font operativa de la primera vertical. El Pas 7.1 n'ha verificat la capa diària sense ompliment de buits, la unitat, els flags, la política de dades i les discrepàncies de la documentació oficial. Vegeu [perfil](skyglow-v1-profile.json) i [auditoria](../evidencies/pas7.1/auditoria-fonts.md). El contracte i la política `V1` estan completats; els valors numèrics es justificaran als gates que els apliquin.
 
 **DECISIÓ NOSTRA:** VIIRS DNB no desapareix de l'arquitectura. Es conserva com a model de mesura espectral: RSR oficial, procedència temporal i `measurementOperatorId=BAND_INTEGRATED`.
 

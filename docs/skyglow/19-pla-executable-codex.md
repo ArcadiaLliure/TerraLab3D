@@ -14,11 +14,23 @@ No s’accepta cap d’aquests patrons:
 - fer que VNP46 impliqui Lambert, flux hemisfèric o skyglow directament;
 - executar integrals radiatives al render loop.
 
+`V1` és una [política preregistrada](skyglow-v1-profile.json), congelada a 7.1: cap llindar PASS/FAIL es pot ajustar després de veure el resultat del candidat a validar. Cada llindar exigeix mètrica, valor, unitat, domini, categoria d'origen, referència verificable, justificació, propietari, moment de congelació i revisió. L'origen ha de ser literatura o font metrològica, incertesa demostrada d'un oracle, requisit de producte aprovat o convergència justificada científicament. Constants «raonables» sense procedència estan prohibides. La manca d'un llindar bloqueja el **primer pas que n'aplica el PASS/FAIL**, no els passos anteriors d'infraestructura o construcció d'oracles. Una revisió posterior és prospectiva i no requalifica el candidat ni el conjunt de validació ja observats.
+
+| Primer gate que aplica el valor | Preregistre obligatori | Evidència necessària |
+|---:|---|---|
+| 7.4 | Pressupost d'error espectral abans de seleccionar el `SpectralBandSet` candidat | Oracle espectral fi, metrologia o convergència justificada; sense justificació, es bloqueja 7.4. |
+| 7.12 | Tolerància runtime↔SG-REF abans de la comparació decisòria del candidat | Convergència i incertesa numèrica demostrades per SG-REF a 7.6, mai residuals del runtime candidat. |
+| 7.17 | Criteris empírics abans d'avaluar el conjunt reservat `held-out` | Incerteses instrumental, de dades i del model; sense ajustar als residuals observats. |
+| 7.22 | SLO de producte TerraLab3D abans de decidir si cal LUT/precomputació/FFT | Requisit de producte aprovat, plataforma i condicions de mesura; si falta, es bloqueja 7.22. |
+| 7.28 | Cap valor nou: només consumir els criteris congelats | Evidències i versions dels gates previs. |
+
+Els passos que necessitin un criteri addicional propi el preregistren abans de la seva primera aplicació amb la mateixa política; no traslladen un PASS/FAIL a 7.1 ni creen llindars a 7.28.
+
 ## Ordre lineal
 
 | Pas | Capacitat | Dependència |
 |---:|---|---|
-| 7.1 | Contracte científic v1, dades i criteris d’acceptació | 7, 22.5, 23 |
+| 7.1 | Contracte científic v1, dades i política d'acceptació | 7, 22.5, 23 |
 | 7.2 | Adaptador VNP46 d’observació, qualitat i procedència | 7.1 |
 | 7.3 | Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED | 7.2 |
 | 7.4 | Oracle espectral fi i homologació del SpectralBandSet v1 | 7.3 |
@@ -61,13 +73,13 @@ No s’accepta cap d’aquests patrons:
 
 ## Detall dels gates
 
-### 7.1 — Contracte científic v1, dades i criteris d’acceptació
+### 7.1 — Contracte científic v1, dades i política d'acceptació
 
 **Finalitat.** Convertir les decisions que bloquegen la implementació en un perfil v1 explícit abans d’escriure física de producció.
 
-**Gate de sortida.** No queda cap decisió necessària per implementar 7.2–7.4 sense propietari, origen i valor. Si manca evidència oficial per una decisió bloquejant, el pas queda `bloquejat`: Codex no pot inventar constants ni continuar.
+**Gate de sortida.** Producte i polítiques de dades, `S1`, `F5`, `F7` i abast `F6` permeten iniciar 7.2 i 7.3; `V1` congela política, procedència admissible i distribució dels gates. No exigeix valors numèrics que depenen d'oracles, conjunts de validació o requisits de producte posteriors. **Estat: completat documentalment**; el skyglow físic no està implementat.
 
-**Fitxer executable:** [pas7.1-contracte-cientific-v1.md](../tasques/pendent/pas7.1-contracte-cientific-v1.md)
+**Fitxer executable:** [pas7.1-contracte-cientific-v1.md](../tasques/completat/pas7.1-contracte-cientific-v1.md)
 
 ### 7.2 — Adaptador VNP46 d’observació, qualitat i procedència
 
@@ -89,7 +101,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Tancar `V3` abans que el nombre de bandes entri al kernel de producció.
 
-**Gate de sortida.** `V3` queda tancada: existeix un `SpectralBandSet` v1 que compleix el pressupost espectral contra l’oracle fi. Cap benchmark de rendiment ha decidit N.
+**Gate de sortida.** Abans de seleccionar cap `SpectralBandSet` candidat, el pressupost numèric d'error espectral queda justificat i preregistrat; sense aquesta evidència, 7.4 queda bloquejat. `V3` es tanca només quan un candidat compleix el pressupost contra l'oracle fi. Cap benchmark de rendiment decideix N.
 
 **Fitxer executable:** [pas7.4-spectral-bandset-validation.md](../tasques/pendent/pas7.4-spectral-bandset-validation.md)
 
@@ -105,7 +117,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Crear una veritat numèrica offline més estricta que el runtime i independent de les seves aproximacions.
 
-**Gate de sortida.** `S1` és executable: SG-REF demostra convergència i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime.
+**Gate de sortida.** `S1` és executable: SG-REF demostra convergència, quantifica la seva incertesa numèrica i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime. Aquesta evidència pot fonamentar la tolerància de 7.12, que no es fixa aquí mirant el runtime.
 
 **Fitxer executable:** [pas7.6-sg-ref-reference-solver.md](../tasques/pendent/pas7.6-sg-ref-reference-solver.md)
 
@@ -129,7 +141,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Introduir la primera física de scattering sobre la ruta directa i auditable.
 
-**Gate de sortida.** El runtime clear-sky d’una banda coincideix amb SG-REF dins el perfil V1 en fixtures B1.
+**Gate de sortida.** B1 implementa Rayleigh/aerosol d'una banda amb invariants físics i comparació diagnòstica reproduïble contra SG-REF. El PASS/FAIL numèric runtime↔SG-REF es reserva a 7.12.
 
 **Fitxer executable:** [pas7.9-rayleigh-aerosol-b1.md](../tasques/pendent/pas7.9-rayleigh-aerosol-b1.md)
 
@@ -137,7 +149,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Passar del B1 monocromàtic a transport espectral v1 complet amb absorció.
 
-**Gate de sortida.** La ruta directa clear-sky espectral compleix V1 contra SG-REF i oracle espectral en fixtures; cap absorció es tracta com zero per conveniència.
+**Gate de sortida.** La ruta directa clear-sky espectral supera invariants de banda, unitats i absorció, amb comparació diagnòstica reproduïble contra SG-REF i l'oracle espectral; cap absorció es tracta com zero per conveniència. El PASS/FAIL numèric de transport és 7.12.
 
 **Fitxer executable:** [pas7.10-gas-spectral-kernel.md](../tasques/pendent/pas7.10-gas-spectral-kernel.md)
 
@@ -145,7 +157,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Afegir l’oclusió i la geometria terrestre a la ruta directa abans del gate zenital.
 
-**Gate de sortida.** Els casos sintètics de terreny/curvatura coincideixen amb SG-REF i els flips d’oclusió són detectables com a discontinuïtats.
+**Gate de sortida.** Els casos sintètics de terreny/curvatura verifiquen topologia i oclusió, comparen diagnòsticament amb SG-REF i detecten els flips com a discontinuïtats. El PASS/FAIL numèric de transport és 7.12.
 
 **Fitxer executable:** [pas7.11-terrain-curvature.md](../tasques/pendent/pas7.11-terrain-curvature.md)
 
@@ -153,7 +165,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Validar el transport complet abans de cúpules, compressions o caches.
 
-**Gate de sortida.** El mateix `PropagationKernel` supera el perfil V1 al zenit contra SG-REF sense calibratge arbitrari. El PASS valida transport donat un SourceModel, no la inferència d’emissió.
+**Gate de sortida.** Abans de comparar el candidat, es preregistra la tolerància runtime↔SG-REF amb origen justificat, que pot usar la convergència/incertesa de SG-REF demostrades a 7.6 però mai els residuals del runtime candidat. Sense tolerància justificada, 7.12 es bloqueja. El mateix `PropagationKernel` supera el gate al zenit sense calibratge arbitrari; el PASS valida transport donat un SourceModel, no la inferència d'emissió.
 
 **Fitxer executable:** [pas7.12-zenith-transport-gate.md](../tasques/pendent/pas7.12-zenith-transport-gate.md)
 
@@ -161,7 +173,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Estendre el mateix operador homologat del zenit a direccions arbitràries sense acceleracions de fonts.
 
-**Gate de sortida.** `DomeProfile` reprodueix zenit i camp angular directe dins el pressupost V1; la compressió angular té error quantificat independent.
+**Gate de sortida.** `DomeProfile` reprodueix zenit i camp angular directe dins el pressupost V1 aplicable; si cal una mètrica angular nova, el seu valor justificat es preregistra abans de comparar el candidat a 7.13. La compressió angular té error quantificat independent.
 
 **Fitxer executable:** [pas7.13-dome-profile-direct.md](../tasques/pendent/pas7.13-dome-profile-direct.md)
 
@@ -169,7 +181,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Projectar radiància espectral física a magnituds/instruments sense retroalimentar el kernel.
 
-**Gate de sortida.** SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies preregistrades i cap projecció modifica la radiància física.
+**Gate de sortida.** SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies justificades i preregistrades a 7.14 abans de comparar el candidat; sense justificació, 7.14 es bloqueja. Cap projecció modifica la radiància física.
 
 **Fitxer executable:** [pas7.14-photometric-projections.md](../tasques/pendent/pas7.14-photometric-projections.md)
 
@@ -193,7 +205,7 @@ No s’accepta cap d’aquests patrons:
 
 **Finalitat.** Contrastar el sistema físic directe amb observacions externes abans de qualsevol acceleració espacial o cache.
 
-**Gate de sortida.** Existeix una validació empírica clear-sky reproduïble. Si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5; no es compensa amb calibratge del kernel.
+**Gate de sortida.** Els criteris empírics, amb incerteses instrumental, de dades i del model, es preregistren abans de mirar el conjunt reservat `held-out`; sense criteris justificats, 7.17 es bloqueja. Existeix una validació clear-sky reproduïble; si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5, sense calibratge compensatori del kernel ni ajust als residuals observats.
 
 **Fitxer executable:** [pas7.17-clear-sky-ground-truth.md](../tasques/pendent/pas7.17-clear-sky-ground-truth.md)
 
@@ -231,9 +243,9 @@ No s’accepta cap d’aquests patrons:
 
 ### 7.22 — Decisió i backend opcional LUT/precomputació/FFT
 
-**Finalitat.** Afegir una acceleració global només si la ruta directa+cache no compleix els SLO preregistrats.
+**Finalitat.** Afegir una acceleració global només si la ruta directa+cache no compleix els SLO de producte TerraLab3D aprovats.
 
-**Gate de sortida.** O bé hi ha evidència que no cal backend addicional, o bé existeix un backend accelerat homologat contra la ruta directa amb domini/error/fallback explícits.
+**Gate de sortida.** Abans d'usar-los per decidir LUT/precomputació/FFT, els SLO de producte es fixen amb aprovació, plataforma i condicions de mesura; no són constants científiques. Si manca el requisit aprovat, 7.22 queda bloquejat. Després, o bé hi ha evidència que no cal backend addicional, o bé existeix un backend accelerat homologat contra la ruta directa amb domini/error/fallback explícits.
 
 **Fitxer executable:** [pas7.22-optional-runtime-acceleration.md](../tasques/pendent/pas7.22-optional-runtime-acceleration.md)
 
@@ -280,6 +292,8 @@ No s’accepta cap d’aquests patrons:
 ### 7.28 — B7 FULL, SLO i homologació del skyglow artificial
 
 **Finalitat.** Tancar la vertical només després que ciència, rendiment i integració hagin passat gates independents.
+
+**Regla d'homologació.** 7.28 només consumeix els criteris congelats als gates previs i les seves versions; no crea ni modifica cap llindar PASS/FAIL.
 
 **Gate de sortida.** La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat està explícit. En cas contrari roman parcial/bloquejada amb fallback legacy.
 

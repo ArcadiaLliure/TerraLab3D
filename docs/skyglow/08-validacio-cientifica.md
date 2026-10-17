@@ -62,7 +62,7 @@ Bortle és una escala observacional qualitativa. Només es pot mostrar com `Bort
 
 Cada gate de producció necessita un perfil d'acceptació congelat **abans** de la comparació que decidirà PASS/FAIL. Cada llindar indica origen: referència publicada, requisit de producte o error/convergència numèrica.
 
-Un llindar modificat després de veure els resultats crea una nova versió i no reescriu l'avaluació anterior. Els valors de V1 continuen pendents mentre no existeixi aquest origen.
+Un llindar modificat després de veure els resultats només pot crear una nova versió prospectiva i no reescriu l'avaluació anterior ni revalida el mateix candidat/conjunt observat. El [perfil v1](skyglow-v1-profile.json) registra les decisions de dades i la política `V1` preregistrada al Pas 7.1, completat documentalment. Els valors numèrics no estan fixats: 7.4 preregistra l'error espectral abans de seleccionar bandes; 7.12 preregistra runtime↔SG-REF abans del PASS/FAIL, amb l'evidència de convergència/incertesa de 7.6; 7.17 preregistra criteris empírics amb incerteses instrumental, de dades i del model abans d'avaluar el conjunt `held-out`; 7.22 preregistra SLO de producte aprovats abans de decidir acceleracions. La manca d'un valor bloqueja aquell primer gate, no 7.2 ni 7.3. 7.28 només consumeix els criteris ja congelats.
 
 L'error estructural single-scattering es registra separat de l'error numèric. F5 no es pot tancar amb un oracle exclusivament single-scattering.
 

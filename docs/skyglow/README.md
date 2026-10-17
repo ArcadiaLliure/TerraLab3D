@@ -6,7 +6,7 @@
 
 ## Autoritat documental
 
-`AGENTS.md` exigeix la skill `plan`. Aquesta skill local no és accessible des de l'entorn actual; per tant s'aplica el protocol de contingència que el mateix `AGENTS.md` prescriu: `docs/README.md`, `docs/normes-arquitectura.md`, passos afectats, inventari funcional i validador documental del repositori. No s'ha inferit cap estat funcional a partir d'esquelets.
+`AGENTS.md` exigeix la skill `plan`. S'ha carregat i aplicat el 2026-10-17 per continuar des del Pas 7.1. L'estat del codi i les evidències prevalen sobre els esquelets; no s'ha inferit cap nova capacitat funcional.
 
 ## Estat real del repositori
 
@@ -14,7 +14,7 @@ TerraLab3D és actualment Python 3.12+ al backend (`aiohttp`, `astropy`, `numpy`
 
 ## Decisió central congelada
 
-La font operativa de la primera vertical és la **família NASA Black Marble VNP46**. VIIRS DNB continua essent el **model de mesura**: RSR real, operador `BAND_INTEGRATED`, procedència temporal i semàntica radiomètrica. VNP46 no es tracta com a flux hemisfèric ni com a skyglow.
+La font operativa de la primera vertical és **NASA Black Marble VNP46A2 Collection 2**, concretada al [perfil v1](skyglow-v1-profile.json). El Pas 7.1 ha completat el contracte documental i la política PASS/FAIL `V1`; els valors es preregistren amb evidència als gates 7.4, 7.12, 7.17 i 7.22. El punt de represa és 7.2. VIIRS DNB continua essent el **model de mesura**: RSR real, operador `BAND_INTEGRATED`, procedència temporal i semàntica radiomètrica. VNP46 no es tracta com a flux hemisfèric ni com a skyglow.
 
 El pipeline canònic és `VNP46 → observació → model de mesura DNB → SourceModel (SPD + emissió angular + incertesa) → PropagationKernel espectral → cúpules/projeccions`.
 
@@ -73,7 +73,7 @@ Cinzano & Falchi (2012) sí descriuen, per a la funció de fase atmosfèrica usa
 
 ## Qüestions encara obertes
 
-El registre autoritatiu continua sent [18-decisions-obertes.md](18-decisions-obertes.md), però aquestes qüestions **ja no poden quedar flotant fins al final**: cada bloqueig té ara un pas de resolució. DATA-VNP46, DNB-2017, LOW-RAD, V1, S1, F5/F7 es tanquen o bloquegen a 7.1; V3 a 7.4; F1 a 7.5. Una decisió que no disposi d’evidència suficient deixa el pas en estat `bloquejat` i atura Codex.
+El registre autoritatiu continua sent [18-decisions-obertes.md](18-decisions-obertes.md). `DATA-VNP46`, `DNB-2017`, `LOW-RAD`, `S1`, `F5`, `F7`, l'abast de `F6` i la política `V1` estan documentats al perfil v1. Els valors numèrics `V1` resten pendents als seus gates; `V3` es resol a 7.4 i `F1` a 7.5. Una decisió sense evidència suficient bloqueja el primer pas que l'ha d'aplicar, sense retrobloquejar la infraestructura precedent.
 
 ## Relació amb el pla
 

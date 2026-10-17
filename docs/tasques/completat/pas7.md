@@ -31,6 +31,7 @@ Completar aquesta vertical funcional de punta a punta, mantenint la separació d
 - [Pas 3 — Rellotge de simulació, temps sideral i moviment visible](pas3.md)
 
 **En depenen:**
+- [Pas 7.1 — contracte científic del skyglow](pas7.1-contracte-cientific-v1.md)
 - [Pas 7.51 — Llicències i recursos del cel físic](../pendent/pas7.51-llicencies-i-recursos.md)
 - [Pas 8.7 — Il·luminació física de l'escena](pas8.7.md)
 - [Pas 10 — Via Làctia i pols galàctica Planck](pas10.md)

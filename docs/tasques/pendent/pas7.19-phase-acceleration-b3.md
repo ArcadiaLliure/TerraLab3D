@@ -20,6 +20,7 @@ Aproximar la fase només contra la representació de referència ja validada.
 - [ ] Implementar representació Legendre o equivalent com a backend de `PhaseFunction`.
 - [ ] Comparar ordres/candidats contra taula Mie/mesurada o fase d’alta resolució, sobretot forward scattering.
 - [ ] Executar B3 amb mateixa geometria/nodes per a tots els candidats.
+- [ ] Justificar i preregistrar l'error angular/radiomètric de fase abans de seleccionar ordres o candidats B3.
 - [ ] Seleccionar la configuració que compleixi l’error preregistrat; rendiment només desempata configuracions vàlides.
 - [ ] Conservar fallback de referència per debug/oracle.
 

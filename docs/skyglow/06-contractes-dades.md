@@ -128,4 +128,4 @@ Els noms wire són camelCase. Python tradueix explícitament des de noms interns
 
 ## Restriccions de producte VNP46
 
-La família VNP46 és l'entrada operativa, però el producte/release concret continua versionat. La comparabilitat de baixa radiància pre/post-2017 no s'assumeix. La política de punt zero és una decisió pendent i no introdueix encara cap camp nou. Les correccions de producte, inclosa stray light, només s'apliquen a TerraLab3D si el producte/release no les ha aplicat.
+`VNP46A2.002` és l'entrada operativa congelada al [perfil v1](skyglow-v1-profile.json), amb la capa `DNB_BRDF-Corrected_NTL` i qualitat 0 com a mostra candidata. La comparabilitat de baixa radiància pre/post-2017 no s'assumeix i no s'aplica cap correcció de punt zero universal. El valor cru i els flags es conserven; fill, negatius i qualitat degradada no s'infereixen com a font. Les correccions de producte, inclosa stray light, només s'apliquen a TerraLab3D si el producte/release no les ha aplicat. La política `V1` està preregistrada; cap llindar numèric no es fixa aquí sense procedència.

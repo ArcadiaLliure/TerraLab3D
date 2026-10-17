@@ -20,12 +20,13 @@ Contrastar el sistema físic directe amb observacions externes abans de qualsevo
 - [ ] Construir dataset de validació clear-sky TESS/SQM/all-sky amb metadata temporal/geogràfica i control de leakage.
 - [ ] Separar mètriques de `SourceModel` de mètriques de transport; no usar runtime↔SG-REF com a prova empírica de F1.
 - [ ] Aplicar leave-one-site-out o partició equivalent preregistrada.
+- [ ] Reservar el conjunt `held-out` i preregistrar mètriques, dominis i criteris empírics abans d'avaluar-lo, amb incerteses instrumental, de dades i del model; bloquejar 7.17 si no hi ha justificació.
 - [ ] Simular exactament resposta/FOV dels sensors via 7.14.
 - [ ] Publicar intervals, biaixos i casos fora de domini sense retocar V1 després de veure els resultats.
 
 ## Criteri de sortida
 
-Existeix una validació empírica clear-sky reproduïble. Si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5; no es compensa amb calibratge del kernel.
+Els criteris empírics justificats precedeixen l'avaluació del conjunt reservat i no s'ajusten als residuals observats. Existeix una validació clear-sky reproduïble; si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5, sense calibratge compensatori del kernel.
 
 ## Evidències obligatòries
 

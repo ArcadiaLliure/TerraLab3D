@@ -18,7 +18,7 @@
 | AOD | aerosol optical depth; adimensional, especificar longitud d'ona |
 | SPD | spectral power distribution; en aquest dossier, forma espectral normalitzada o radiància espectral segons context |
 | RSR | relative spectral response; funció adimensional relativa del sensor |
-| VNP46 | família NASA Black Marble escollida com a font operativa; producte/release concret versionat |
+| VNP46 | família NASA Black Marble; per a v1, producte operatiu `VNP46A2.002` amb capa diària sense ompliment de buits segons el [perfil](skyglow-v1-profile.json) |
 | DNB | canal VIIRS que defineix el model de mesura espectral de l'observació VNP46 |
 | `BAND_INTEGRATED` | operador de mesura adoptat per normalitzar la resposta DNB; unitat exacta del contracte pendent de verificació ATBD |
 | radiància observada | valor del producte VNP46 abans de la inferència de font |

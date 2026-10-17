@@ -25,7 +25,7 @@ Afegir l’oclusió i la geometria terrestre a la ruta directa abans del gate ze
 
 ## Criteri de sortida
 
-Els casos sintètics de terreny/curvatura coincideixen amb SG-REF i els flips d’oclusió són detectables com a discontinuïtats.
+Els casos sintètics de terreny/curvatura verifiquen topologia i oclusió, documenten la comparació diagnòstica amb SG-REF i detecten els flips com a discontinuïtats. El primer PASS/FAIL numèric de transport és 7.12.
 
 ## Evidències obligatòries
 

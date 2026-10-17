@@ -8,7 +8,7 @@ Per a una direcció unitària `ω` des de l'observador `O`, el punt de quadratur
 
 ## 2. Font operativa VNP46 i model de mesura VIIRS DNB
 
-La família **NASA Black Marble VNP46** és la font operativa de la primera vertical. El producte/release concret continua obert fins que el Pas 7.8 verifiqui unitats, qualitat, correccions aplicades i drets.
+**NASA Black Marble VNP46A2 Collection 2** és la font operativa de la primera vertical, amb capa diària sense ompliment de buits segons el [perfil del Pas 7.1](skyglow-v1-profile.json). Les unitats, els flags, les correccions documentades i els drets s'han auditat al [registre de fonts](../evidencies/pas7.1/auditoria-fonts.md). El Pas 7.1 ha completat el contracte i la política `V1`; l'adaptador verificarà cada grànul al Pas 7.2. Els valors numèrics es congelaran als gates que els apliquin.
 
 VNP46 no és skyglow a nivell de terra ni flux hemisfèric d'una font. VIIRS DNB continua definint la semàntica espectral de la mesura.
 

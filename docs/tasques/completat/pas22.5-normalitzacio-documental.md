@@ -23,6 +23,7 @@ Adoptar l'estructura obligatòria `docs/tasques/{pendent,completat,idees-per-mad
 - Cap pas previ.
 
 **En depenen:**
+- [Pas 7.1 — contracte científic del skyglow](pas7.1-contracte-cientific-v1.md)
 - [Pas 23 — Constel·lacions IAU, traçat de referència i documents d'usuari](pas23-constellacions.md)
 
 ## Codi existent a reutilitzar
