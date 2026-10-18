@@ -1,0 +1,11 @@
+C:\Users\Manel\AppData\Local\Programs\Python\Python313\python.exe -m ruff check backend/src/terralab3d/domain/light_pollution/geometric_transport.py backend/src/terralab3d/domain/light_pollution/gauss_kronrod.py backend/src/terralab3d/domain/light_pollution/propagation_kernel.py backend/src/terralab3d/application/geometric_propagation.py backend/tests/test_propagation_geometry_step7_7.py tools/benchmark_skyglow_b0.py tools/plot_skyglow_b0.py
+All checks passed!
+
+
+Exit code: 0
+
+C:\Users\Manel\AppData\Local\Programs\Python\Python313\python.exe -m pyright backend/src/terralab3d/domain/light_pollution/geometric_transport.py backend/src/terralab3d/domain/light_pollution/gauss_kronrod.py backend/src/terralab3d/domain/light_pollution/propagation_kernel.py backend/src/terralab3d/application/geometric_propagation.py backend/tests/test_propagation_geometry_step7_7.py tools/benchmark_skyglow_b0.py tools/plot_skyglow_b0.py
+0 errors, 0 warnings, 0 informations
+
+
+Exit code: 0

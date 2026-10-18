@@ -12,7 +12,7 @@
 | SourceModel S | SPD, geometria, amplitud i emissió angular definides independentment de VIIRS; gate L3 preexistent segregat | 7.5 completat en el domini definit | [Validació S](../evidencies/pas7.5/validacio-source-model-s-v1.md), [política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) i [auditoria observacional històrica](../evidencies/pas7.5/estat-inferencia-font-2026.md) |
 | Configuració realista/K i font C | 42 SPD CIE verificades, RSR pública NOAA-20, normalització relativa, control lliscant accessible connectat a Python | 7.5.1 completat | [Validació](../evidencies/pas7.5.1/validacio-simulacio-condicionada.md) i [pas](../tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) |
 | oracle transport | SG-REF GK21 + àrea/raster GL i Monte Carlo F5 independents; S/C offline | 7.6 completat | [Convergència, error estimat, 401 nusos i 18 alternatives C](../evidencies/pas7.6/validacio-sg-ref.md); només slab pla homogeni, sense gate 7.12 ni H |
-| kernel únic | zenit=direcció ordinària | 7.7 | B0 + invariants geomètrics |
+| kernel únic | zenit=direcció ordinària, esfera ECEF/ENU, GK7/15 propi i revisions | 7.7 completat geomètricament | [B0: 180 passades, 900 LOS principals i invariants](../evidencies/pas7.7/validacio-b0.md), sense radiància ni gate 7.12 |
 | camp òptic | provider estàndard tiled | 7.8 | fixtures multi-tile |
 | Rayleigh/aerosol | fase de referència primer, comparació diagnòstica | 7.9 | B1, invariants i residuals SG-REF sense PASS/FAIL numèric |
 | gas/espectral | absorció no nul·la, comparació diagnòstica i revalidació del pressupost de bandes de 7.4 amb gasos/dispersió | 7.10 | B2/B4, invariants i error de discretització ≤0,01 mag o bandset nou rehomologat; el PASS/FAIL de transport és 7.12 |

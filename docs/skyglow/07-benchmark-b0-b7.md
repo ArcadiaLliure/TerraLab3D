@@ -90,3 +90,9 @@ latència vs error; ordre Legendre vs error; bases vs temps; `ε_quad` vs nodes/
 ## Criteri de selecció
 
 No hi ha «guanyador» per un únic score. El nombre de bandes no forma part de la selecció per benchmark. La configuració activa només és candidata si compleix l'error físic congelat al gate pertinent i els SLO de producte aprovats a 7.22. Els llindars de PASS/FAIL es fixen **abans** de la campanya de decisió, amb origen declarat segons V1; els SLO inclouen les mètriques, plataforma i condicions que el requisit aprovat estableixi, sense presumir una constant de stutter. Les mesures exploratòries poden servir per dissenyar el sistema, però no per reescriure retrospectivament el criteri d'acceptació.
+
+## B0 executat a 7.7
+
+La [campanya B0](../evidencies/pas7.7/validacio-b0.md) aplica el [protocol congelat](../evidencies/pas7.7/protocol-b0-v1.json): seed canònica, nou elevacions, cinc warm-ups i trenta passades per N=1/10/25/50/100/200. Els 100 rectangles SourceModel S de la sèrie principal són les fixtures geomètriques equivalents a regions sintètiques; encara no existeix EmissionRegion de producte. Només els ancoratges orienten els LOS i no s’integra emissió ni se n’aproxima l’àrea al centre.
+
+Es mesura `FLAT_CLEAR_NEAR_GEOMETRY_ONLY` amb esfera ECEF/ENU i cel·les cartesianes/altures definides, no OpticalTiles reals. El CSV conté una fila per passada i `run_id` compartit amb el JSON. Errors radiomètrics/magnituds són null/buits, no zeros ficticis. RSS és working set i peak de vida del procés; flags del compilador, temperatura o throttling desconeguts queden null amb causa. Els gràfics d’escalat i distribució de latència són observacions de B0, sense SLO ni selecció de bandes. Plots de Legendre/AD/cache/òptica i els altres escenaris continuen als benchmarks posteriors.

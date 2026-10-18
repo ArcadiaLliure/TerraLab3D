@@ -75,4 +75,4 @@ La inspecció de codi anterior es manté històrica. La decisió inicial **VNP46
 
 ## Estat verificat després de 7.6
 
-La inspecció anterior és històrica. [7.6](../tasques/completat/pas7.6-sg-ref-reference-solver.md) incorpora SG-REF offline S/C, GK21/GL, 401 nusos CIE i un segon transport Monte Carlo per F5 en el domini pla homogeni declarat. El runtime continua pendent des de 7.7; cap homologació urbana H. La skill `plan` ha estat accessible i aplicada en aquesta iteració. [Evidència](../evidencies/pas7.6/validacio-sg-ref.md).
+La inspecció anterior és històrica. [7.6](../tasques/completat/pas7.6-sg-ref-reference-solver.md) incorpora SG-REF offline S/C, GK21/GL, 401 nusos CIE i un segon transport Monte Carlo per F5 en el domini pla homogeni declarat. 7.7 incorpora la infraestructura geomètrica B0, ECEF/ENU esfèrics i GK7/15 propis. Camp òptic i transport radiomètric continuen pendents des de 7.8; cap homologació urbana H. La skill `plan` ha estat accessible i aplicada en aquesta iteració. [Evidència](../evidencies/pas7.6/validacio-sg-ref.md).

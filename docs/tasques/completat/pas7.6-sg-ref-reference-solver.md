@@ -26,7 +26,7 @@ Disposar d’una referència numèrica independent abans de construir el runtime
 
 **En depenen:**
 
-- [Pas 7.7 — Kernel geomètric B0](../pendent/pas7.7-kernel-geometry-b0.md)
+- [Pas 7.7 — Kernel geomètric B0](../completat/pas7.7-kernel-geometry-b0.md)
 
 ## Codi existent a reutilitzar
 

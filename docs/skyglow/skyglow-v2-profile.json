@@ -2,7 +2,7 @@
   "profileId": "skyglow-v2-multisat-policy",
   "schemaVersion": 2,
   "decisionDate": "2026-10-18",
-  "status": "conditional_noaa20_sources_and_offline_SG_REF_verified_runtime_pending",
+  "status": "sources_reference_and_geometry_B0_verified_physical_transport_pending",
   "owner": "TerraLab3D",
   "migration": {
     "preserves": "skyglow-v1-profile.json",
@@ -205,5 +205,20 @@
     "runtimeGateStatus": "not_evaluated",
     "newDomainRule": "extend_and_revalidate_reference_when_introducing_variable_atmosphere_terrain_or_curvature_before_gates",
     "empiricalValidation": "not_evaluated;H_not_homologated"
+  },
+  "geometryKernel": {
+    "modelVersion": "propagation-geometry-b0-v1",
+    "status": "verified_step_7.7_geometry_only",
+    "coordinateModel": "sphere_geocentric_ENU",
+    "earthRadiusM": 6371008.8,
+    "quadrature": "independent_GK7_15",
+    "integrand": "unit;integral_in_metres;not_radiance",
+    "partition": "observer_ENU_cells_and_spherical_heights;not_OpticalField",
+    "revisionGuard": "cooperative_cancel_and_stale_publication_check;not_scheduler",
+    "benchmarkRef": "../evidencies/pas7.7/validacio-b0.md",
+    "protocolRef": "../evidencies/pas7.7/protocol-b0-v1.json",
+    "physicalTransportStatus": "pending_from_step_7.8",
+    "radiometricGate": "not_evaluated_step_7.12",
+    "productSLOGate": "not_evaluated_step_7.22"
   }
 }

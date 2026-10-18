@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "B0-GEOMETRY-v1",
+  "frozenBefore": "first_test_or_benchmark_evaluation",
+  "modelVersion": "propagation-geometry-b0-v1",
+  "coordinateModel": "sphere_geocentric_ENU",
+  "earthRadiusM": 6371008.8,
+  "fixtureVersion": "b0-defined-rectangles-v1",
+  "seed": "0x544C3344534B5947",
+  "sourceCounts": [1, 10, 25, 50, 100, 200],
+  "primarySourceCount": 100,
+  "elevationsDeg": [0.5, 2, 5, 10, 20, 30, 45, 60, 90],
+  "sourceDistancesM": [5000, 80000],
+  "observer": {"latitudeDeg": 41.3875, "longitudeDeg": 2.1666667, "heightM": 100},
+  "topM": 10000,
+  "geometricCellSizeM": 20000,
+  "layerHeightsM": [1000, 5000],
+  "quadrature": {"relativeTolerance": 1e-9, "absoluteToleranceM": 1e-6, "maxIntervals": 4096},
+  "warmupPasses": 5,
+  "measuredPasses": 30,
+  "minimumPassesIfCampaignExceeds600s": 10,
+  "configurationOrder": "seeded_permutation_each_iteration",
+  "checks": {
+    "losCount": "9 * source_count",
+    "nodeIdentity": "15 * initial_segments + 30 * subdivisions",
+    "leafIdentity": "initial_segments + subdivisions",
+    "unitIntegralRoundoffBudget": "64 * float64_epsilon * max(1, path_length_m)",
+    "coordinateRoundoffBudgetM": "64 * float64_epsilon * earth_radius_m",
+    "repeatability": "same_input_signature_result_signature_and_integer_counters_each_pass"
+  },
+  "acceptanceMeaning": "infrastructure_invariants_and_analytic_diagnostics_only;not_radiometric_or_product_SLO_gate",
+  "pending": ["OpticalField_step7.8", "scattering_step7.9", "terrain_visibility_step7.11", "radiometric_gate_step7.12", "scheduler_step7.21"],
+  "sources": [
+    "https://www.netlib.org/quadpack/dqk15.f",
+    "https://gssc.esa.int/navipedia/index.php/Transformations_between_ECEF_and_ENU_coordinates"
+  ]
+}

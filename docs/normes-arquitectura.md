@@ -349,3 +349,7 @@ Les dues modalitats realista/K comparteixen `SourceModel` i el futur motor. Una 
 ## ADR 0008 — Independència i domini de SG-REF
 
 El [Pas 7.6](tasques/completat/pas7.6-sg-ref-reference-solver.md) introdueix SciPy per a la quadratura GK21 offline i GL d’àrea. El futur runtime manté el seu integrador/geometria propis; compartir SourceModel, espectres i constants autoritatives no implica compartir aproximacions de transport. F5 usa un transport Monte Carlo independent dels nodes i la LOS deterministes. La referència actual és plana i homogènia: qualsevol nou domini requereix ampliació i revalidació abans d’un gate. Error numèric estimat, error mostral, cua truncada i incertesa física es reporten separadament; cap resultat numèric homologa H.
+
+## ADR 0009 — Infraestructura geomètrica B0 i revisió de publicació
+
+[7.7](tasques/completat/pas7.7-kernel-geometry-b0.md) implementa el baseline ECEF/ENU sobre una esfera explícita i GK7/15 propi. Els resultats B0 porten unitats geomètriques i no es publiquen com a radiància. Les cel·les geomètriques no són OpticalTiles; el camp òptic arribarà a 7.8. El guard cooperatiu valida revisió/cancel·lació també sota lock en publicar i no anticipa el scheduler de 7.21. SG-REF conserva el seu integrador independent.

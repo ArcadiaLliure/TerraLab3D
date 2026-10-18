@@ -1,0 +1,20 @@
+{
+  "scope": "same_geometric_inputs_results_and_counters_across_two_campaigns;timings_not_expected_identical",
+  "previousResultSignatures": {
+    "1": "e4a0ef6ac902a9a5e863ec304223c690a5cac5b1743c5359f59f1ce5eafa1ba9",
+    "10": "b730599c4880e081e4fca74c04e54e1a3727de980f4600e280f2f08dba2fcbb0",
+    "25": "5e9078bdef3619db1ab50d55310b2d0eed7cfb55cfda47e72ea2a2a9dfed9a61",
+    "50": "21f6ce63308aa766fd81aacd072b0bd1f63b874751b4fb43b85364cd1b2cf779",
+    "100": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "200": "e10ac386d85b9b5b40019d7006ff8f03d4940b55d4ee65be123b6813ee01e04a"
+  },
+  "currentResultSignatures": {
+    "1": "e4a0ef6ac902a9a5e863ec304223c690a5cac5b1743c5359f59f1ce5eafa1ba9",
+    "10": "b730599c4880e081e4fca74c04e54e1a3727de980f4600e280f2f08dba2fcbb0",
+    "25": "5e9078bdef3619db1ab50d55310b2d0eed7cfb55cfda47e72ea2a2a9dfed9a61",
+    "50": "21f6ce63308aa766fd81aacd072b0bd1f63b874751b4fb43b85364cd1b2cf779",
+    "100": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "200": "e10ac386d85b9b5b40019d7006ff8f03d4940b55d4ee65be123b6813ee01e04a"
+  },
+  "identicalResults": true
+}

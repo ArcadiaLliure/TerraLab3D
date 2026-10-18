@@ -532,3 +532,19 @@ Al JSON, `referenceRadiance.values` conté radiància espectral per direcció; `
 La referència actual usa un pla local amb atmosfera espectral homogènia, terra negre i cel clar escalar. L’error estimat de quadratura no és un interval garantit ni la incertesa urbana. F5 afegeix error mostral i cota de la cua d’ordres múltiples dels seus benchmarks. Terreny, curvatura, atmosfera real, validació H i connexió a la UI continuen als passos posteriors. [Resultats verificats](evidencies/pas7.6/resultats-sg-ref-v1.json).
 
 ![Convergència de fase i biaix de dispersió múltiple en els benchmarks SG-REF](evidencies/pas7.6/convergencia-i-biaix-f5.png)
+
+## B0: geometria del kernel i benchmark
+
+El [Pas 7.7](tasques/completat/pas7.7-kernel-geometry-b0.md) és una eina CPU de diagnòstic. Des de l’arrel, amb el backend instal·lat:
+
+```powershell
+python -X utf8 tools/benchmark_skyglow_b0.py --output-dir .runtime-b0-resultats
+```
+
+La figura es pot regenerar amb `tools/plot_skyglow_b0.py --input <resultats-b0-v1.json> --output <figura.png>`; aquesta eina auxiliar requereix matplotlib opcional.
+
+La consola mostra cinc warm-ups i trenta passades mesurades per cada mida de fonts. La sortida inclou `resultats-b0-v1.json` amb maquinari, versions, fixtures, signatures, agregats i exemples de LOS, i `passades-b0-v1.csv` amb les 180 mesures individuals. `runId`/`run_id` permeten relacionar els dos fitxers. Ctrl+C cancel·la la campanya; els fitxers finals se substitueixen després del càlcul, sense publicar un resultat parcial com a vàlid.
+
+L’integrand és 1 i el resultat són metres de trajecte. El zenit passa pel mateix operador i les mateixes regles GK7/15 que les altres elevacions. La geometria és una esfera explícita, amb ENU local i cel·les geomètriques: no és un model atmosfèric o DEM. Els temps són una línia base del maquinari mesurat, no un SLO de producte. La UI i el cel físic encara no reben radiància d’aquest kernel. [Resultats i límits](evidencies/pas7.7/validacio-b0.md).
+
+![Escalat i distribució de latència del benchmark geomètric B0](evidencies/pas7.7/escalat-i-latencia-b0.png)

@@ -150,7 +150,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** B0 és reproduïble i el kernel retorna resultats geomètrics/unitaris sense NaN; zenit és només una direcció del mateix operador.
 
-**Fitxer executable:** [pas7.7-kernel-geometry-b0.md](../tasques/pendent/pas7.7-kernel-geometry-b0.md)
+**Estat verificat:** completat geomètricament, amb esfera ECEF/ENU, segmentació, GK7/15 propi i guard de revisions; 48 proves noves, 330 proves backend i 180 passades B0. [Resultats i límits](../evidencies/pas7.7/validacio-b0.md). No calcula encara radiància ni implementa OpticalField.
+
+**Fitxer executable:** [pas7.7-kernel-geometry-b0.md](../tasques/completat/pas7.7-kernel-geometry-b0.md)
 
 ### 7.8 — OpticalField tiled i atmosfera estàndard determinista
 
