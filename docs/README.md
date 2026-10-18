@@ -6,11 +6,11 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.5 — SourceModel v1, bloquejat](tasques/pendent/pas7.5-source-model-v1.md).** El [Pas 7.4](tasques/completat/pas7.4-spectral-bandset-validation.md) ha homologat la discretització tabulada amb `0,01 mag` i 238/238 casos PASS. A 7.5, el [contrast de fonts 2026](evidencies/pas7.5/estat-inferencia-font-2026.md) no acredita cap RSR/guany/L3 operatius ni una inversió L3→SPD/emissió angular per a una font real. El gate i el perfil angular genèric implementats només produeixen diagnòstics; les RSR històriques continuen diagnòstiques. No es comença 7.6 fins a satisfer el criteri de sortida de 7.5.
+> **Punt de represa: [Pas 7.5 — SourceModel físic S](tasques/pendent/pas7.5-source-model-v1.md), pendent d'implementació.** La [revisió de política RSR i dominis](skyglow/20-politica-rsr-i-validacio-per-dominis.md) elimina el bloqueig global de la RSR exacta 2026: es construiran fonts SPD/angulars definides independentment de Black Marble. El gate d'admissibilitat L3/RSR ja verificat es manté només per a C/H. [7.4](tasques/completat/pas7.4-spectral-bandset-validation.md) conserva el criteri 0,01 mag i 238/238 PASS del domini tabulat. 7.6 no s'ha iniciat.
 >
 > Els subpassos **7.1–7.50** pertanyen a contaminació lumínica artificial: VNP46, VJ146 i VJ246 són fonts Black Marble candidates amb models de mesura propis; cap skyglow físic de producte no està implementat. Els **7.51+** són del cel físic solar/lunar. El Pas 7 històric conserva la visualització actual. Les verticals pendents es documenten a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
-**Estat del punt de represa, 2026-10-18:** 7.5 és `bloquejat` amb infraestructura parcial verificada. El [registre RSR de 7.5](evidencies/pas7.5/auditoria-rsr-2026.json) conté sis respostes locals i cap coincidència L3 operativa per al 2026-09-13. Una observació L3 no determina per si sola SPD ni emissió hemisfèrica; resten pendents priors i model angular aplicables, inversió L3→font i incertesa estructural. El 7.4 completat continua limitat al seu domini numèric.
+**Revisió prospectiva del punt de represa (2026-10-18):** 7.5 S ja no és bloquejat per RSR, però encara no està implementat. El bloqueig històric de les fonts observacionals C/H continua documentat. El [registre RSR de 7.5](evidencies/pas7.5/auditoria-rsr-2026.json) conté sis respostes locals i cap coincidència L3 operativa per al 2026-09-13. Una observació L3 no determina per si sola SPD ni emissió hemisfèrica; resten pendents priors i model angular aplicables, inversió L3→font i incertesa estructural. El 7.4 completat continua limitat al seu domini numèric.
 
 Auditoria documental del 2026-10-17: els passos 7.1–7.3 no generaven incidències estructurals; en normalitzar 7.3, el recompte integral va passar de 720 a 708 incidències heretades d'altres passos. El 2026-10-18, després de completar 7.4 i documentar el bloqueig de 7.5 amb les seccions obligatòries, el validador informa de **613 incidències mecàniques heretades**; cap enllaç trencat ni incidència nova del contingut de 7.5. Les duplicitats d'identificador dels fitxers històrics `pas7.4-forward-ad-b1b.md` i `pas7.5-spectral-bandset-b2a.md` continuen sense corregir-se en aquesta vertical. La validació del canvi de 7.3 consta a les [evidències actualitzades](evidencies/pas7.3/validacio-model-dnb.md); les incidències alienes no es corregeixen ara. Vegeu també [7.1](evidencies/pas7.1/validacio-contracte.txt), [7.2](evidencies/pas7.2/validacio-adaptador.md), [7.3 — RSR](evidencies/pas7.3/recerca-rsr-2026.md), [7.3 — guia/grànuls](evidencies/pas7.3/contrast-granuls-black-marble-c2.md) i [7.5](evidencies/pas7.5/estat-inferencia-font-2026.md). El normalitzador antic no s'ha executat perquè utilitza un mapa de passos anterior al pla canònic actual.
 
@@ -31,7 +31,7 @@ Estats admesos:
 - `completat`: vertical executable amb criteri de sortida i evidències verificats.
 - `parcial`: hi ha comportament observable reutilitzable, però falta part del resultat funcional.
 - `pendent`: només hi ha especificació, contractes, esquelets o cap implementació útil.
-- `bloquejat`: el pas és executable però manca una dada/decisió científica externa imprescindible; Codex ha de documentar el bloqueig i **aturar la seqüència**, no inventar-la ni saltar al pas següent.
+- `bloquejat`: manca evidència imprescindible per al domini de sortida del pas; una RSR observacional absent C/H **no bloqueja** 7.5 S. Cap bloqueig no es resol inventant dades o saltant un gate real.
 - `per madurar`: la idea encara té decisions funcionals o tècniques obertes i queda fora de l'ordre executable.
 
 ## Passos completats
@@ -77,7 +77,7 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.5 | [SourceModel v1: SPD, emissió angular i incertesa](tasques/pendent/pas7.5-source-model-v1.md) | `bloquejat` (gate parcial; cap font admissible) | 7.3, 7.4 |
+| 7.5 | [SourceModel físic S independent de VIIRS](tasques/pendent/pas7.5-source-model-v1.md) | `pendent` (gate L3 parcial verificat) | 7.3, 7.4 |
 | 7.6 | [SG-REF: oracle independent de transport i integració d’àrea](tasques/pendent/pas7.6-sg-ref-reference-solver.md) | `pendent` | 7.5 |
 | 7.7 | [PropagationKernel geomètric i benchmark B0](tasques/pendent/pas7.7-kernel-geometry-b0.md) | `pendent` | 7.6 |
 | 7.8 | [OpticalField tiled i atmosfera estàndard determinista](tasques/pendent/pas7.8-optical-field-standard.md) | `pendent` | 7.7 |

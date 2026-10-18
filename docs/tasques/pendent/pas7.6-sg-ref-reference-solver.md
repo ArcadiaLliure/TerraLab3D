@@ -8,7 +8,7 @@ Crear una veritat numèrica offline més estricta que el runtime i independent d
 
 ## Dependències
 
-7.5
+[7.5 — SourceModel físic S](pas7.5-source-model-v1.md). No requereix RSR nocturna 2026 ni una inversió Black Marble L3→emissió.
 
 ## Referències obligatòries
 

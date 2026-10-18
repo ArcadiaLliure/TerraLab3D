@@ -77,8 +77,8 @@
     "l3CorrectedLayerMeaning": "DNB_BRDF-Corrected_NTL is corrected upward nighttime surface band radiance for VNP46A2 and VJ146A2 according to User Guide C2 section 5.2",
     "l3CorrectionEvidence": "https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf",
     "sourceSpectrumIdentifiability": "not_unique_from_one_panchromatic_band",
-    "sourceInferenceOwnerStep": "7.5",
-    "sourceInferenceStatus": "blocked_no_accredited_2026_rsr_gain_l3_chain_or_applicable_l3_to_spd_angular_inversion",
+    "sourceInferenceOwnerStep": "7.16_conditional_C;7.5_defined_S",
+    "sourceInferenceStatus": "L3_conditional_pending_not_blocking_defined_physical_source_S",
     "sourceInferenceEvidence": "../evidencies/pas7.5/estat-inferencia-font-2026.md",
     "spectralAndStructuralUncertaintyOwnerStep": "7.16",
     "empiricalValidationOwnerStep": "7.17",
@@ -95,16 +95,69 @@
     "step7_4_scope": "verified_piecewise_linear_tabulated_domain_only; historical_DNB_RSR_diagnostic_only",
     "step7_4_criterionRef": "../evidencies/pas7.4/criteri-preregistrat-v1.json",
     "step7_4_verificationRef": "../evidencies/pas7.4/homologacio-bandset-v1.md",
-    "newDomainRevalidationSteps": ["7.10", "7.14"],
-    "pendingNumericGateLocations": ["7.12", "7.17", "7.22"],
-    "gateLocations": ["7.4", "7.12", "7.17", "7.22"],
+    "newDomainRevalidationSteps": [
+      "7.10",
+      "7.14"
+    ],
+    "pendingNumericGateLocations": [
+      "7.12",
+      "7.17",
+      "7.22"
+    ],
+    "gateLocations": [
+      "7.4",
+      "7.12",
+      "7.17",
+      "7.22"
+    ],
     "homologationConsumesOnly": "7.28"
   },
   "resourceManagement": {
     "ownerStep": "24",
     "provider": "LAADS/Earthdata",
-    "products": ["VNP46A2.002", "VJ146A2.002", "VJ246A2.002"],
+    "products": [
+      "VNP46A2.002",
+      "VJ146A2.002",
+      "VJ246A2.002"
+    ],
     "sourceChecksumSeparateFromLocalSha256": true,
     "credentialsOutsideManifests": true
+  },
+  "planningRevision": {
+    "revisionDate": "2026-10-18",
+    "policyRef": "20-politica-rsr-i-validacio-per-dominis.md",
+    "historicalV1Unchanged": true,
+    "step7_4EvidenceUnchanged": true,
+    "documentationOnly": true
+  },
+  "sourceModelStrategy": {
+    "domains": [
+      {
+        "id": "S",
+        "status": "pending_implementation",
+        "requiresVIIRS": false,
+        "requiresRSR": false
+      },
+      {
+        "id": "C",
+        "status": "pending_conditional_research",
+        "rsrReferenceHypothesisAllowed": true,
+        "noAutomaticAbsoluteCalibration": true
+      },
+      {
+        "id": "H",
+        "status": "not_homologated",
+        "requiresIndependentValidation": true,
+        "requiresUncertaintyEvidence": true
+      }
+    ],
+    "noGlobal2026RsrBlocker": true,
+    "firstExperimentalPair": {
+      "platform": "NOAA-20",
+      "productId": "VJ146A2",
+      "collection": "002",
+      "rsr": "NOAA20_DNB_prelaunch_reference",
+      "status": "diagnostic_not_operational_2026_certified"
+    }
   }
 }

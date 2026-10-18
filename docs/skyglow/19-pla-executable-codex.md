@@ -4,7 +4,7 @@
 
 ## Regla d’execució
 
-Codex executa un únic pas cada vegada. No pot començar el següent fins que el criteri de sortida de l’actual estigui verificat amb proves/evidències i l’estat/documentació s’hagi actualitzat. Si una dada o decisió científica imprescindible no es pot justificar amb una font autoritativa o evidència reproduïble, el pas passa a `bloquejat` i la seqüència s’atura.
+Codex executa un únic pas cada vegada. No pot començar el següent fins que el criteri de sortida de l’actual estigui verificat amb proves/evidències i l’estat/documentació s’hagi actualitzat. Si una dada o decisió científica imprescindible **per al domini de sortida del pas** no es pot justificar amb una font autoritativa o evidència reproduïble, el pas passa a `bloquejat` i la seqüència s’atura. La manca d'una RSR instrumental de 2026 limita C/H, no el transport S.
 
 No s’accepta cap d’aquests patrons:
 - implementar una optimització abans del baseline directe que ha de validar;
@@ -30,6 +30,10 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + model de mesura admissible**. Si hi ha diverses fonts admissibles, la prioritat necessita dades de disponibilitat Black Marble, qualitat, calibratge i cobertura; l'estat primari de NOAA-21 a la distribució general NOAA no decideix la prioritat de Black Marble. La selecció manual avançada conserva la identitat i les limitacions. Cap fallback temporal o entre sensors és silenciós; fonts superposades es retenen separades i no es sumen. Un SBAF requereix gate científic propi. La descoberta, autenticació i instal·lació de grànuls són del [Pas 24](../tasques/pendent/pas24-cataleg-recursos-descarregues.md), que ha de cobrir els tres productes amb un únic gestor.
 
+## Revisió prospectiva: fonts S, escenaris C i homologació H
+
+La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elimina l'obligació de RSR exacta 2026 a 7.5. **S** construeix una font física independent i permet 7.6–7.15; **C** assaja Black Marble amb hipòtesis SPD/angular i RSR pública de referència, no invertible de forma única; **H** només es declara després de validació independent. NOAA-20/VJ146A2.002 és la **primera parella experimental** amb RSR prelanzament, no una certificació nocturna 2026. 7.16 estudiarà C, 7.17 separarà gate numèric S de gate empíric C/H, i 7.24/7.28 mantindran estats per domini. Cap resultats ni llindars de 7.1–7.4 no es requalifiquen.
+
 ## Ordre lineal
 
 | Pas | Capacitat | Dependència |
@@ -38,7 +42,7 @@ El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + m
 | 7.2 | Adaptador VNP46 d’observació, qualitat i procedència | 7.1 |
 | 7.3 | Model de mesura VIIRS DNB multisatèl·lit, RSR TOA i transformació L3 | 7.1, 7.2 |
 | 7.4 | Oracle espectral fi i homologació del SpectralBandSet v1 | 7.3 |
-| 7.5 | SourceModel v1: SPD, emissió angular i incertesa | 7.3, 7.4 |
+| 7.5 | SourceModel S independent; admissibilitat L3 separada | 7.3, 7.4 |
 | 7.6 | SG-REF: oracle independent de transport i integració d’àrea | 7.5 |
 | 7.7 | PropagationKernel geomètric i benchmark B0 | 7.6 |
 | 7.8 | OpticalField tiled i atmosfera estàndard determinista | 7.7 |
@@ -49,8 +53,8 @@ El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + m
 | 7.13 | Camp angular i DomeProfile sobre ruta directa | 7.12 |
 | 7.14 | Projeccions fotomètriques i sensors SQM/TESS; revalidació de bandes | 7.13, 7.4 |
 | 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14 |
-| 7.16 | Incertesa quantitativa i provenance completa | 7.3, 7.5, 7.15 |
-| 7.17 | Validació empírica clear-sky de SourceModel i transport | 7.3, 7.5, 7.16 |
+| 7.16 | Incertesa S, escenaris condicionats Black Marble C | 7.3, 7.5(S), 7.15 |
+| 7.17 | Gate de transport S; validació empírica C/H separada | 7.3, 7.5(S), 7.16 |
 | 7.18 | Watershed, EmissionRegion i quadtree com acceleració B5 | 7.17 |
 | 7.19 | Compressió de PhaseFunction i benchmark B3 | 7.18 |
 | 7.20 | Forward AD i RadiativeErrorBudget | 7.19 |
@@ -111,17 +115,17 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.4-spectral-bandset-validation.md](../tasques/completat/pas7.4-spectral-bandset-validation.md)
 
-### 7.5 — SourceModel v1: SPD, emissió angular i incertesa
+### 7.5 — SourceModel físic independent (S)
 
-**Finalitat.** Tancar `F1` i transformar observacions DNB en una distribució de font explícita, versionada i falsable.
+**Finalitat.** Definir SPD, geometria, emissió angular i amplitud física explícita d'una font sense satèl·lit. L'admissibilitat Black Marble és una branca C/H separada.
 
-**Gate de sortida.** `F1` queda resolta per al domini d'almenys una font admesa o el pas queda `bloquejat`. Cal acreditar la RSR efectiva/família, mapping de guany i vincle producte/període de la font escollida; una observació L3 tipada produeix `SourceModel` amb priors/ensembles SPD, emissió angular i incertesa estructural justificada, sense aplicar directament la integral TOA al valor L3. Les fonts no acreditades resten indisponibles per a inferència. El lector VNP46 de 7.2 segueix vàlid com a cas concret. **Estat 2026-10-18: bloquejat.** El [gate parcial i l'auditoria de fonts](../evidencies/pas7.5/estat-inferencia-font-2026.md) confirmen que cap resposta dels manifests locals és L3 operativa per al 2026-09-13; tampoc hi ha inversió L3→SPD/angular aplicable. 7.6 no comença.
+**Gate de sortida.** Constructor `SourceModel` S versionat, normalització, unitats, fixtures, conservació i tests independents; **no** cal RSR operativa 2026 ni inferència L3. Estat actual: pendent de completar S; el gate parcial L3 segueix verificat i sense font H admissible.
 
 **Fitxer executable:** [pas7.5-source-model-v1.md](../tasques/pendent/pas7.5-source-model-v1.md)
 
 ### 7.6 — SG-REF: oracle independent de transport i integració d’àrea
 
-**Finalitat.** Crear una veritat numèrica offline més estricta que el runtime i independent de les seves aproximacions.
+**Finalitat.** Crear una veritat numèrica offline més estricta que el runtime i independent de les seves aproximacions, utilitzant fonts físiques S sense RSR VIIRS.
 
 **Gate de sortida.** `S1` és executable: SG-REF demostra convergència, quantifica la seva incertesa numèrica i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime. Aquesta evidència pot fonamentar la tolerància de 7.12, que no es fixa aquí mirant el runtime.
 
