@@ -217,8 +217,25 @@
     "revisionGuard": "cooperative_cancel_and_stale_publication_check;not_scheduler",
     "benchmarkRef": "../evidencies/pas7.7/validacio-b0.md",
     "protocolRef": "../evidencies/pas7.7/protocol-b0-v1.json",
-    "physicalTransportStatus": "pending_from_step_7.8",
+    "physicalTransportStatus": "field_and_number_columns_verified_step_7.8;scattering_pending_step_7.9",
     "radiometricGate": "not_evaluated_step_7.12",
     "productSLOGate": "not_evaluated_step_7.22"
+  },
+  "opticalField": {
+    "revision": "optical-field-tabulated-v1",
+    "status": "verified_step_7.8_pressure_temperature_number_density_and_dependencies",
+    "providerRevision": "coesa1975-nasa-tr459-dry-0-50km-v1",
+    "domain": "dry_standard_0_50km_geometric;not_observed_weather",
+    "coordinateModel": "fixed_field_ENU_prisms_and_spherical_height",
+    "defaultVerticalStepM": 100,
+    "interpolation": "log_pressure_linear_temperature;number_density_from_modern_exact_SI_Boltzmann",
+    "dependencyIdentity": "tile_id_version_layer_index_two_knot_data_hash;frame_time_revision",
+    "columnReference": "sg-ref-optical-column-gk21-v1",
+    "columnUnit": "m^-2",
+    "radiativeCoefficients": "not_computed_steps_7.9_7.10",
+    "evidenceRef": "../evidencies/pas7.8/validacio-optical-field.md",
+    "protocolRef": "../evidencies/pas7.8/protocol-optical-field-v1.json",
+    "radiometricGate": "not_evaluated_step_7.12",
+    "empiricalValidation": "not_evaluated;H_not_homologated"
   }
 }

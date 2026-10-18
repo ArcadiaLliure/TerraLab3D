@@ -33,7 +33,7 @@ Ancoratge històric L3, font base estimada i substitució hipotètica es conserv
 ## Seqüència executable
 
 1. 7.5 continua completat per S; 7.5.1 incorpora biblioteca, escenaris C NOAA-20 i controls amb estat científic real.
-2. [7.6 completat](../tasques/completat/pas7.6-sg-ref-reference-solver.md) consumeix S i C al mateix oracle pla homogeni, amb 18 alternatives C reals verificades i contrast F5 independent. No exigeix ni acredita H. 7.7 verifica el kernel geomètric B0; camp òptic i transport radiomètric pendents des de 7.8.
+2. [7.6 completat](../tasques/completat/pas7.6-sg-ref-reference-solver.md) consumeix S i C al mateix oracle pla homogeni, amb 18 alternatives C reals verificades i contrast F5 independent. No exigeix ni acredita H. 7.7 verifica el kernel geomètric B0; 7.8 verifica el camp estàndard P/T/n i columnes multi-tile; dispersió i transport radiomètric pendents des de 7.9.
 3. 7.10/7.14 revaliden SPD, mescles i operadors nous amb el pressupost de 0,01 mag sense relaxar-lo.
 4. 7.16 propaga incerteses del transport i hipòtesis; 7.17 separa verificació física de contrast empíric; 7.24 congela resultats per domini.
 5. 7.25–7.27 connecten els controls ja existents als resultats, invaliden revisions/caches i visualitzen radiància lineal. Mentre falta transport no hi ha filtre RGB ni radiància fictícia.

@@ -352,4 +352,8 @@ El [Pas 7.6](tasques/completat/pas7.6-sg-ref-reference-solver.md) introdueix Sci
 
 ## ADR 0009 — Infraestructura geomètrica B0 i revisió de publicació
 
-[7.7](tasques/completat/pas7.7-kernel-geometry-b0.md) implementa el baseline ECEF/ENU sobre una esfera explícita i GK7/15 propi. Els resultats B0 porten unitats geomètriques i no es publiquen com a radiància. Les cel·les geomètriques no són OpticalTiles; el camp òptic arribarà a 7.8. El guard cooperatiu valida revisió/cancel·lació també sota lock en publicar i no anticipa el scheduler de 7.21. SG-REF conserva el seu integrador independent.
+[7.7](tasques/completat/pas7.7-kernel-geometry-b0.md) implementa el baseline ECEF/ENU sobre una esfera explícita i GK7/15 propi. Els resultats B0 porten unitats geomètriques i no es publiquen com a radiància. Les cel·les geomètriques no són els OpticalTiles de 7.8: B0 conserva el seu esquema i resultats quan no es facilita camp. El guard cooperatiu valida revisió/cancel·lació també sota lock en publicar i no anticipa el scheduler de 7.21. SG-REF conserva el seu integrador independent.
+
+## ADR 0010 — Camp estàndard immutable darrere un port
+
+[7.8](tasques/completat/pas7.8-optical-field-standard.md) materialitza el camp P/T/n mitjançant `AtmosphericOpticsProvider` a aplicació i el provider estàndard a infraestructura. Domini/kernel només coneixen perfils immutables, origen ENU fix, altura esfèrica i dependències de capes mostrejades amb hashes; no coneixen COESA ni serveis. Camps absents no es converteixen en coeficients òptics zero. La signatura d’entrada completa i la de dependències utilitzades tenen funcions separades; no anticipen cache. L’oracle GK21 de columnes és independent del mostreig/travessa/GK7/15 del runtime i no valida radiància. La dispersió i els nous dominis requereixen revalidació de la referència corresponent. [Evidència](evidencies/pas7.8/validacio-optical-field.md).

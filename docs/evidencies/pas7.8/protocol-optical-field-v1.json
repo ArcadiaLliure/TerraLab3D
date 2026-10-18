@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "OPTICAL-FIELD-7.8-v1",
+  "freezeBefore": "first_test_or_diagnostic_evaluation",
+  "decisionDate": "2026-10-19",
+  "domain": "fixed_field_ENU_tiles;spherical_geometric_height;dry_standard_model_0_50km;positive_elevation_rays;no_scattering",
+  "provider": "coesa1975-nasa-tr459-dry-0-50km-v1",
+  "defaultVerticalStepM": 100,
+  "fixtures": [1, 2, 8],
+  "runtimeRelativeTolerance": 1e-9,
+  "referenceRelativeTolerance": 1e-10,
+  "columnDiagnosticRelativeTolerance": 1e-8,
+  "columnDiagnosticOrigin": "prospective_10_times_runtime_quadrature_control;independent_GK21_and_known_tabulated_model;not_product_gate",
+  "profileConvergenceStepsM": [1000, 500, 250, 125, 100],
+  "profileConvergenceRule": "report_error_against_independent_analytic_equations_and_require_refinement_decrease;no_empirical_accuracy_claim",
+  "dependencyChecks": ["exact_visited_tiles_and_layers", "unused_tile_change_preserves_dependency_signature", "visited_tile_or_layer_change_invalidates", "fixed_origin_independent_of_observer", "time_and_frame_in_signature"],
+  "regressionChecks": ["B0_values_counters_and_serialization_preserved", "SG_REF_homogeneous_revision_unchanged", "no_partial_publish_on_cancel_or_stale"],
+  "acceptanceMeaning": "offline_numerical_and_contract_validation_only;runtime_radiometric_gate_is_step7.12;no_H",
+  "sources": [
+    "https://ntrs.nasa.gov/api/citations/19760017709/downloads/19760017709.pdf",
+    "https://physics.nist.gov/cgi-bin/cuu/Value?k%7Csearch_for=Boltzmann"
+  ]
+}

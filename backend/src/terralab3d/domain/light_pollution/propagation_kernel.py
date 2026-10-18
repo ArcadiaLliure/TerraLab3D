@@ -1,10 +1,11 @@
-"""Frontera única de propagació: etapa geomètrica B0, encara sense radiància."""
+"""Frontera de propagació: geometria B0 i columnes atmosfèriques, sense radiància."""
 
 from __future__ import annotations
 
 import hashlib
 import json
 import math
+from bisect import bisect_right
 from dataclasses import asdict, dataclass
 from typing import Callable, Literal
 
@@ -17,6 +18,12 @@ from .geometric_transport import (
     make_ray,
 )
 from .source_model import GeodeticPosition, PointSourceGeometry, SourceModel
+from .optical_field import (
+    OpticalDependency,
+    OpticalField,
+    OpticalPathSegment,
+    OpticalState,
+)
 
 MODEL_VERSION = "propagation-geometry-b0-v1"
 
@@ -74,6 +81,7 @@ class PropagationRequest:
     directions: DirectionSet
     options: PropagationOptions = PropagationOptions()
     revision: int = 0
+    optical_field: OpticalField | None = None
 
     def __post_init__(self) -> None:
         if (
@@ -85,6 +93,13 @@ class PropagationRequest:
             raise ValueError("Fonts buides/duplicades o revisió invàlida")
         if not 0 <= self.observer.altitude_m < self.options.top_m:
             raise ValueError("Observador fora del domini geomètric B0")
+        if (
+            self.optical_field is not None
+            and self.optical_field.radius_m != self.options.earth_radius_m
+        ):
+            raise ValueError(
+                "Camp atmosfèric i geometria amb referencials incompatibles"
+            )
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,11 +107,19 @@ class GeometrySample:
     distance_observer_m: float
     position_ecef_m: Vector3
     source_anchor_distance_m: float
+    optical_state: OpticalState | None = None
 
 
 def unit_integrand(sample: GeometrySample, source: SourceModel) -> float:
     """Funció de diagnòstic 1: ∫1 ds retorna metres, no radiància."""
     return 1.0
+
+
+def number_density_integrand(sample: GeometrySample, source: SourceModel) -> float:
+    """Diagnòstic ∫n ds en m⁻²; cap emissió ni scattering."""
+    if sample.optical_state is None:
+        raise ValueError("La columna molecular requereix un OpticalField")
+    return sample.optical_state.number_density_m3
 
 
 @dataclass(frozen=True, slots=True)
@@ -130,17 +153,38 @@ class PropagationResult:
     rays: tuple[GeometricRayResult, ...]
     counters: KernelCounters
     model_version: str = MODEL_VERSION
+    optical_field_signature: str | None = None
+    optical_dependency_signature: str | None = None
+    optical_traces: tuple[OpticalRayTrace, ...] = ()
 
     def to_dict(self) -> dict[str, object]:
+        values = asdict(self)
+        if self.optical_field_signature is None:
+            for key in (
+                "optical_field_signature",
+                "optical_dependency_signature",
+                "optical_traces",
+            ):
+                values.pop(key)
         return {
-            "schemaVersion": 1,
-            **asdict(self),
-            "stage": "geometry_B0_not_radiance",
+            "schemaVersion": 2 if self.optical_field_signature is not None else 1,
+            **values,
+            "stage": "optical_field_column_diagnostic_not_radiance"
+            if self.optical_field_signature is not None
+            else "geometry_B0_not_radiance",
             "physicalTransportStatus": "pending_step_7.9",
             "numericalErrorMeaning": "GK15_minus_G7_with_roundoff_floor;estimated_not_rigorous",
             "coordinateModel": "sphere_geocentric_ENU;not_WGS84_ellipsoid_or_DEM",
             "runtimeRadiometricGate": "not_evaluated_step_7.12",
         }
+
+
+@dataclass(frozen=True, slots=True)
+class OpticalRayTrace:
+    source_id: str
+    direction_id: str
+    traversed_segments: tuple[OpticalPathSegment, ...]
+    sampled_dependencies: tuple[OpticalDependency, ...]
 
 
 class PropagationKernel:
@@ -167,6 +211,8 @@ class PropagationKernel:
         frame = SphericalFrame(request.observer, request.options.earth_radius_m)
         origin = frame.position_ecef(request.observer)
         rows = []
+        traces: list[OpticalRayTrace] = []
+        field = request.optical_field
         for source in request.sources:
             checkpoint()
             geometry = source.geometry
@@ -199,23 +245,46 @@ class PropagationKernel:
                     view.elevation_deg,
                 )
                 ray = make_ray(frame, direction, request.options.top_m)
-                segments = request.options.partition.segments(
-                    ray, request.options.top_m, request.options.max_segments_per_ray
-                )
+                optical_segments: tuple[OpticalPathSegment, ...] = ()
+                sampled: set[OpticalDependency] = set()
+                if field is None:
+                    segments = request.options.partition.segments(
+                        ray, request.options.top_m, request.options.max_segments_per_ray
+                    )
+                    intervals = tuple((s.start_m, s.end_m) for s in segments)
+                    geometric_cells = tuple(s.cell_id for s in segments)
+                else:
+                    optical_segments = field.traverse(
+                        ray, request.options.max_segments_per_ray, checkpoint
+                    )
+                    intervals = tuple((s.start_m, s.end_m) for s in optical_segments)
+                    geometric_cells = ()
+                segment_ends = tuple(segment.end_m for segment in optical_segments)
 
                 def function(s: float) -> float:
                     position = ray.point(s)
-                    sample = GeometrySample(s, position, math.dist(position, anchor))
+                    state = None
+                    if field is not None:
+                        # GK avalua els panells en qualsevol ordre; cap cursor mutable.
+                        index = min(
+                            bisect_right(segment_ends, s),
+                            len(optical_segments) - 1,
+                        )
+                        state = field.sample(position, optical_segments[index])
+                        sampled.add(state.dependency)
+                    sample = GeometrySample(
+                        s, position, math.dist(position, anchor), state
+                    )
                     return integrand(sample, source)
 
                 q = integrate_gk15(
                     function,
-                    tuple((s.start_m, s.end_m) for s in segments),
+                    intervals,
                     request.options.quadrature,
                     checkpoint=checkpoint,
                 )
                 counters = KernelCounters(
-                    1, len(segments), q.evaluations, q.subdivisions, q.leaf_intervals
+                    1, len(intervals), q.evaluations, q.subdivisions, q.leaf_intervals
                 )
                 rows.append(
                     GeometricRayResult(
@@ -226,10 +295,19 @@ class PropagationKernel:
                         ray.length_m,
                         q.value,
                         q.estimated_error,
-                        tuple(s.cell_id for s in segments),
+                        geometric_cells,
                         counters,
                     )
                 )
+                if field is not None:
+                    traces.append(
+                        OpticalRayTrace(
+                            source.source_model_id,
+                            view.direction_id,
+                            optical_segments,
+                            tuple(sorted(sampled)),
+                        )
+                    )
         checkpoint()
         total = KernelCounters(
             *(
@@ -247,6 +325,11 @@ class PropagationKernel:
                     "revision": request.revision,
                     "integrandId": integrand_id,
                     "integralUnit": integral_unit,
+                    **(
+                        {"opticalFieldSignature": field.signature}
+                        if field is not None
+                        else {}
+                    ),
                 },
                 sort_keys=True,
                 allow_nan=False,
@@ -254,5 +337,17 @@ class PropagationKernel:
         ).hexdigest()
         checkpoint()
         return PropagationResult(
-            request.revision, signature, integrand_id, integral_unit, tuple(rows), total
+            request.revision,
+            signature,
+            integrand_id,
+            integral_unit,
+            tuple(rows),
+            total,
+            optical_field_signature=field.signature if field is not None else None,
+            optical_dependency_signature=field.dependency_signature(
+                tuple(d for trace in traces for d in trace.sampled_dependencies)
+            )
+            if field is not None
+            else None,
+            optical_traces=tuple(traces),
         )

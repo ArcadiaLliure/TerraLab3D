@@ -548,3 +548,18 @@ La consola mostra cinc warm-ups i trenta passades mesurades per cada mida de fon
 L’integrand és 1 i el resultat són metres de trajecte. El zenit passa pel mateix operador i les mateixes regles GK7/15 que les altres elevacions. La geometria és una esfera explícita, amb ENU local i cel·les geomètriques: no és un model atmosfèric o DEM. Els temps són una línia base del maquinari mesurat, no un SLO de producte. La UI i el cel físic encara no reben radiància d’aquest kernel. [Resultats i límits](evidencies/pas7.7/validacio-b0.md).
 
 ![Escalat i distribució de latència del benchmark geomètric B0](evidencies/pas7.7/escalat-i-latencia-b0.png)
+
+## Camp òptic estàndard: perfils i travesses multi-tile
+
+El [Pas 7.8](tasques/completat/pas7.8-optical-field-standard.md) ofereix un diagnòstic CPU offline. Des de l’arrel, amb el backend instal·lat:
+
+```powershell
+python -X utf8 tools/validate_optical_field_step7_8.py --output .runtime-optical/resultats.json
+python -X utf8 tools/plot_optical_field_step7_8.py --input .runtime-optical/resultats.json --output .runtime-optical/perfils.png
+```
+
+La segona ordre requereix matplotlib opcional. La consola informa de les columnes amb 1, 2 i 8 tiles i una fixture de contrast lateral; el JSON conserva els perfils P/T, procedències, instants, bounds ENU fixos, versions, segments i dependències realment utilitzades. `integral_unit=m^-2` indica columna molecular ∫n ds; `stage=optical_field_column_diagnostic_not_radiance` indica el domini del resultat. El fitxer final es reemplaça després de tots els controls; una fallada o Ctrl+C no publica un resultat parcial vàlid.
+
+El model és COESA 1975, NASA TR R-459 publicat el 1976, sec i limitat a 0–50 km. El perfil per defecte usa nusos cada 100 m, log(P) i T lineals, i densitat derivada del gas ideal. Les fixtures cobreixen fins a 10 km; no són meteorologia observada. La figura mostra l’error d’interpolació separat de la quadratura. La consulta fora de cobertura falla, sense extrapolació. Aerosols, absorció gasosa i núvols continuen absents; la dispersió arribarà a 7.9. La UI encara no rep radiància d’aquest kernel. [Resultats i límits](evidencies/pas7.8/validacio-optical-field.md).
+
+![Perfils del camp atmosfèric sec i convergència vertical](evidencies/pas7.8/perfils-i-convergencia.png)

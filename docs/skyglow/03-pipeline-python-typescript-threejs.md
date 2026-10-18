@@ -24,7 +24,7 @@ El segmentador treballa sobre `radiancia_artificial_estimada` o equivalent físi
 
 ### Atmosfera
 
-`AtmosphericOpticsProvider.resolve(position, altitude, time)` compon camps per variable. Cada `OpticalParameter` conserva valor, sigma/model d'incertesa, font, temps de validesa i qualitat. `OpticalFieldBuilder` materialitza tiles/capes versionats. Rayleigh es deriva de P/T/composició; aerosols de AOD/composició/RH i biblioteca òptica; gasos via LUT; núvols només quan la parametrització estigui disponible.
+A 7.8, `AtmosphericOpticsProvider.resolve(OpticalFieldRequest) -> OpticalField` materialitza offline perfils estàndard secs P/T/n; `OpticalField.sample` resol l’estat per posició. La composició per variable amb dades reals continua prevista a 7.15. Cada `OpticalParameter` conserva valor, sigma/model d'incertesa, font, temps de validesa i qualitat. `OpticalFieldBuilder` materialitza tiles/capes versionats. Rayleigh es deriva de P/T/composició; aerosols de AOD/composició/RH i biblioteca òptica; gasos via LUT; núvols només quan la parametrització estigui disponible.
 
 ### Kernel
 

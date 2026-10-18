@@ -24,7 +24,7 @@ Construir una frontera geomètrica executable i mesurar-ne el cost abans d’afe
 
 **En depenen:**
 
-- [Pas 7.8 — OpticalField](../pendent/pas7.8-optical-field-standard.md)
+- [Pas 7.8 — OpticalField](pas7.8-optical-field-standard.md)
 
 ## Codi existent a reutilitzar
 

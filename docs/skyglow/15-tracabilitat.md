@@ -13,7 +13,7 @@
 | Configuració realista/K i font C | 42 SPD CIE verificades, RSR pública NOAA-20, normalització relativa, control lliscant accessible connectat a Python | 7.5.1 completat | [Validació](../evidencies/pas7.5.1/validacio-simulacio-condicionada.md) i [pas](../tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) |
 | oracle transport | SG-REF GK21 + àrea/raster GL i Monte Carlo F5 independents; S/C offline | 7.6 completat | [Convergència, error estimat, 401 nusos i 18 alternatives C](../evidencies/pas7.6/validacio-sg-ref.md); només slab pla homogeni, sense gate 7.12 ni H |
 | kernel únic | zenit=direcció ordinària, esfera ECEF/ENU, GK7/15 propi i revisions | 7.7 completat geomètricament | [B0: 180 passades, 900 LOS principals i invariants](../evidencies/pas7.7/validacio-b0.md), sense radiància ni gate 7.12 |
-| camp òptic | provider estàndard tiled | 7.8 | fixtures multi-tile |
+| camp òptic | provider estàndard sec tiled P/T/n, dependències de capa | [7.8 completat](../tasques/completat/pas7.8-optical-field-standard.md) | [1/2/8 tiles, oracle de columnes i convergència](../evidencies/pas7.8/validacio-optical-field.md) |
 | Rayleigh/aerosol | fase de referència primer, comparació diagnòstica | 7.9 | B1, invariants i residuals SG-REF sense PASS/FAIL numèric |
 | gas/espectral | absorció no nul·la, comparació diagnòstica i revalidació del pressupost de bandes de 7.4 amb gasos/dispersió | 7.10 | B2/B4, invariants i error de discretització ≤0,01 mag o bandset nou rehomologat; el PASS/FAIL de transport és 7.12 |
 | terreny/curvatura | visibilitat física, comparació diagnòstica | 7.11 | topologia i oclusió, sense PASS/FAIL de transport |

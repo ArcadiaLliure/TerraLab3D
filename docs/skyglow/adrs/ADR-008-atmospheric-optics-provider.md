@@ -1,6 +1,6 @@
 # ADR-008 — AtmosphericOpticsProvider
 
-- **Estat:** Acceptada — implementació pendent
+- **Estat:** Acceptada — camp estàndard implementat; composició/transport futurs pendents
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
@@ -10,7 +10,7 @@ El kernel no ha de dependre de ERA5/CAMS/API concreta.
 
 ## Decisió
 
-Un provider resol `OpticalState` per posició/altura/temps i conserva procedència per camp.
+Un provider materialitza un `OpticalField` immutable a partir d’origen, temps, tiles i resolució vertical; el camp resol `OpticalState` per posició i conserva procedència per magnitud. A 7.8 només es materialitza l’atmosfera estàndard seca; la composició amb dades reals correspon a 7.15.
 
 ## Conseqüències
 
@@ -22,8 +22,8 @@ Es mantenen documentades al TDD i a l'especificació d'algorismes; qualsevol alt
 
 ## Validació
 
-Contract tests i fallbacks per camp.
+Contract tests del port, determinisme, P/T analítics, idealitat, cobertura i procedència. Fallbacks per camp amb dades reals pendents de 7.15.
 
 ## Estat d'implementació
 
-No implementat per aquest ADR. El tancament depèn del pas de TerraLab3D corresponent i de les seves evidències.
+[7.8](../../tasques/completat/pas7.8-optical-field-standard.md) implementa el camp estàndard sec P/T/n, port/provider, interpolació i dependències per capes. [Fixtures 1/2/8 tiles, regressió B0 i oracle de columnes](../../evidencies/pas7.8/validacio-optical-field.md). Encara no hi ha composició ERA5/CAMS, β espectrals, transport radiomètric ni cache.

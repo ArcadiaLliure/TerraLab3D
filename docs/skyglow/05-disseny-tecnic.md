@@ -16,7 +16,7 @@ Dispersió múltiple general en runtime, inferir un SPD únic o una emissió ang
 
 `PropagationKernel.evaluate(request: PropagationRequest) -> PropagationResult`.
 
-`AtmosphericOpticsProvider.resolve(query: OpticalQuery) -> OpticalState`.
+`AtmosphericOpticsProvider.resolve(request: OpticalFieldRequest) -> OpticalField` és el port implementat a 7.8; `OpticalField.sample(position_ecef_m) -> OpticalState` consulta el snapshot immutable. Només P/T/n i RH prescrita estan disponibles; composició real i coeficients òptics continuen als passos següents.
 
 `SourceModel(source_model_id, revision, definition_reference, geometry, spectrum, angular, amplitude)` és el contracte de transport S/C implementat. `build_conditional_scenarios(observation, response, library, configuration)` de 7.5.1 construeix fonts C relatives; inferència absoluta i H continuen a 7.16–7.24.
 

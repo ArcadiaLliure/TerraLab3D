@@ -160,7 +160,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** El kernel pot recórrer un camp òptic determinista i registrar exactament quins tiles/versions ha utilitzat.
 
-**Fitxer executable:** [pas7.8-optical-field-standard.md](../tasques/pendent/pas7.8-optical-field-standard.md)
+**Estat verificat:** completat per a camp COESA sec P/T/n, interpolació, dependències exactes i fixtures 1/2/8 tiles. 33 proves noves, 363 proves backend, B0 idèntic i oracle GK21 independent de columnes; sense dispersió ni radiància. [Resultats i límits](../evidencies/pas7.8/validacio-optical-field.md).
+
+**Fitxer executable:** [pas7.8-optical-field-standard.md](../tasques/completat/pas7.8-optical-field-standard.md)
 
 ### 7.9 — Rayleigh, aerosol de referència i benchmark B1
 

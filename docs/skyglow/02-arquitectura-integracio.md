@@ -147,3 +147,7 @@ El [cel físic astral](../cel-fisic/01-arquitectura-i-modes.md) és un integrado
 ## 14. Acceleració offline
 
 La ruta directa del `PropagationKernel` defineix la semàntica física. LUT, kernels precalculats o FFT són implementacions d'acceleració admissibles només dins un domini on es demostri equivalència dins el pressupost d'error. Una FFT exigeix invariància translacional suficient; atmosfera espacialment variable, geometria/terreny o models de font locals poden trencar aquesta hipòtesi. L'acceleració no converteix VNP46 en un camp escalar acromàtic ni elimina el transport espectral.
+
+## Implementació atmosfèrica verificada a 7.8
+
+El port d’aplicació rep `OpticalFieldRequest` i retorna `OpticalField`; el provider COESA resideix a infraestructura. Domini conserva perfils P/T/n, procedències, ENU fix i versions/capes. El kernel travessa i mostreja sense conèixer el model del provider; registra dependències en la mateixa quadratura. [Contractes i límits](06-contractes-dades.md). La resta del diagrama continua sent la destinació de la integració: 7.8 només calcula columnes moleculars offline, sense radiància, ERA5/CAMS, cache ni bridge.

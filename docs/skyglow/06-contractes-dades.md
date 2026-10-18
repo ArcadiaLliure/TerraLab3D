@@ -79,11 +79,15 @@ El [gate estricte H conservat](../../backend/src/terralab3d/domain/light_polluti
 
 `position`, `altitudeM`, `time`, `pressurePa`, `temperatureK`, `relativeHumidity`, `gasState`, `aerosolState`, `cloudLayers`, `fieldsProvenance`.
 
+Contracte objectiu. El subconjunt immutable P/T/n implementat i els camps òptics encara absents es concreten a «OpticalField estàndard i columnes (7.8)» al final d’aquest document.
+
 ## OpticalTile / OpticalTileBand
 
 `OpticalTile`: `tileId`, `version`, bounds 3D/temps, `bands`, `dependencyHash`.
 
 `OpticalTileBand`: `betaRayleighScaM1`, `betaAerosolExtM1`, `aerosolSingleScatteringAlbedo`, `aerosolPhaseFunctionId`, `gasTransmissionModelRef`, `betaCloudExtM1`, `cloudSingleScatteringAlbedo`, `cloudPhaseFunctionId`.
+
+Les bandes i els coeficients anteriors continuen planificats. Els tiles de 7.8 contenen perfils P/T versionats amb bounds ENU fixos i dependències de capa, sense β calculats.
 
 ## PhaseFunction
 
@@ -180,3 +184,13 @@ El CLI embolcalla cada `ConditionalScenario` de 7.5.1 amb `referenceRadiance`, o
 `PropagationRequest` declara `sources`, observador, `DirectionSet`, `PropagationOptions` i revisió entera. `DirectionSet` resol azimut absolut o offset respecte del rumb de font; l’elevació admesa és 0,5–90°. `PropagationOptions` versiona radi/sostre de l’esfera, partició geomètrica, toleràncies GK i límits de treball. `PropagationResult` retorna revisió, signatura SHA-256 de totes les entrades/identitat de l’integrand, unitat, resultats per font/direcció i comptadors LOS/segments/nodes/subdivisions/intervals finals. El DTO offline manté els noms Python; no és un DTO d’escena ni un canvi de bridge.
 
 `stage=geometry_B0_not_radiance` i `integral_unit=m` identifiquen ∫1 ds. Ni watts ni escala relativa C es converteixen en radiància. Les fonts rectangulars aporten un ancoratge geomètric, sense aproximació d’emissió puntual. `geometric_cells` identifica cel·les ENU/altures, no versions d’OpticalField. L’error GK és estimat, no un interval garantit. `GeometricPropagationSession` aplica revisió/cancel·lació també en publicar; no és el scheduler de 7.21. [Contracte verificat](../tasques/completat/pas7.7-kernel-geometry-b0.md).
+
+## OpticalField estàndard i columnes (7.8)
+
+La implementació vigent és un subconjunt atmosfèric dels contractes objectiu anteriors. `OpticalFieldRequest` declara origen fix, instant amb zona, `OpticalTileSpec` (id/versió/bounds ENU en m), radi, sostre i pas vertical. `AtmosphericOpticsProvider.resolve` materialitza `OpticalField` immutable; el provider estàndard és COESA sec 0–50 km amb nusos predeterminats cada 100 m. No hi ha `OpticalTileBand` amb β encara.
+
+`VerticalProfile` declara altures geomètriques (m), pressions (Pa), temperatures (K), RH prescrita, revisió i procedència per camp. `OpticalState` afegeix posició ECEF, altura radial, instant UTC, n=P/(kBT) (m⁻³), `OpticalDependency` i procedències. Absorció gasosa, aerosol i núvols són `None`; estat de coeficients `not_computed_steps_7.9_7.10` i incertesa estructural `not_quantified`. El DTO d’estat té esquema 1 i unitats als noms. RH=0 és hipòtesi seca, no dada absent convertida en zero.
+
+`OpticalField` esquema 1 versiona origen/radi/instant, tiles, model d’interpolació log(P)/T lineals i factor 8 ε per paral·lelisme numèric. Tiles semioberts sense solapament, buits ni extrapolació; són fixos al món. `OpticalPathSegment` porta distàncies inicial/final en m i `OpticalDependency(tile_id, tile_version, layer_index, layer_signature)`. El hash de capa inclou els dos nusos i dades/procedència que la interpolació utilitza. La signatura completa incorpora tot el camp; `optical_dependency_signature` incorpora només dependències utilitzades més el referencial, instant i revisió. No implica cache implementada.
+
+`PropagationRequest.optical_field` és opcional. Sense camp conserva B0/esquema 1 exactes; amb camp, `PropagationResult` usa esquema 2, `stage=optical_field_column_diagnostic_not_radiance`, signatura completa i utilitzada i `optical_traces` per font/direcció amb segments i dependències realment mostrejades. L’integrand `number_density_integrand` retorna columna ∫n ds en m⁻²; ni espectre ni amplitud de font hi intervenen. `ReferenceOpticalColumn` esquema 1 retorna columna, error GK21 estimat, nombre d’avaluacions i revisió independent; no és radiància ni incertesa empírica. [Contracte verificat](../tasques/completat/pas7.8-optical-field-standard.md).
