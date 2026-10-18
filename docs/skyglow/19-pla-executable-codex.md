@@ -115,7 +115,7 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Finalitat.** Tancar `F1` i transformar observacions DNB en una distribució de font explícita, versionada i falsable.
 
-**Gate de sortida.** `F1` queda resolta per al domini d'almenys una font admesa o el pas queda `bloquejat`. Cal acreditar la RSR efectiva/família, mapping de guany i vincle producte/període de la font escollida; una observació L3 tipada produeix `SourceModel` amb priors/ensembles SPD, emissió angular i incertesa estructural justificada, sense aplicar directament la integral TOA al valor L3. Les fonts no acreditades resten indisponibles per a inferència. El lector VNP46 de 7.2 segueix vàlid com a cas concret.
+**Gate de sortida.** `F1` queda resolta per al domini d'almenys una font admesa o el pas queda `bloquejat`. Cal acreditar la RSR efectiva/família, mapping de guany i vincle producte/període de la font escollida; una observació L3 tipada produeix `SourceModel` amb priors/ensembles SPD, emissió angular i incertesa estructural justificada, sense aplicar directament la integral TOA al valor L3. Les fonts no acreditades resten indisponibles per a inferència. El lector VNP46 de 7.2 segueix vàlid com a cas concret. **Estat 2026-10-18: bloquejat.** El [gate parcial i l'auditoria de fonts](../evidencies/pas7.5/estat-inferencia-font-2026.md) confirmen que cap resposta dels manifests locals és L3 operativa per al 2026-09-13; tampoc hi ha inversió L3→SPD/angular aplicable. 7.6 no comença.
 
 **Fitxer executable:** [pas7.5-source-model-v1.md](../tasques/pendent/pas7.5-source-model-v1.md)
 

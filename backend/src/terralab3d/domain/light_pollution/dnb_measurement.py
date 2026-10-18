@@ -72,18 +72,30 @@ class ViirsSpectralResponse:
             raise ValueError("Estat de la incertesa espectral desconegut")
 
     @property
-    def product_homologation_candidate(self) -> bool:
-        """Una RSR sola no acredita la cadena completa L1B→L3."""
+    def source_model_candidate(self) -> bool:
+        """Condicions necessàries de RSR/L3 per a 7.5; no acredita el model de font.
+
+        La quantificació d'incertesa de producte correspon a 7.16. Aquesta
+        propietat no exigeix una sigma fictícia per construir el SourceModel,
+        però sí la correspondència espectral, de guany i de cadena L3.
+        """
         return (
             self.application == "operational_l3"
             and self.evidence_class in {"official_direct", "official_reconstructed"}
             and self.l3_link_status == "verified"
-            and self.spectral_uncertainty_status == "quantified"
-            and self.gain_mapping_evidence is not None
-            and self.evidence_reference is not None
-            and self.l3_link_evidence is not None
-            and self.spectral_uncertainty_evidence is not None
+            and bool(self.gain_mapping_evidence and self.gain_mapping_evidence.strip())
+            and bool(self.evidence_reference and self.evidence_reference.strip())
+            and bool(self.l3_link_evidence and self.l3_link_evidence.strip())
             and all(x >= 0 for x in self.relative_response)
+        )
+
+    @property
+    def product_homologation_candidate(self) -> bool:
+        """Una RSR sola no acredita la cadena completa L1B→L3."""
+        return (
+            self.source_model_candidate
+            and self.spectral_uncertainty_status == "quantified"
+            and self.spectral_uncertainty_evidence is not None
         )
 
 

@@ -57,4 +57,6 @@ La font de veritat de l'ordre i del tancament és el [pla de millores](README.md
 
 El [Pas 7.4](tasques/completat/pas7.4-spectral-bandset-validation.md) deixa un oracle i `SpectralBandSet` numèric verificats [dins el domini tabulat declarat](evidencies/pas7.4/homologacio-bandset-v1.md). Encara no hi ha connexió a l'entrypoint ni skyglow físic observable; la capacitat roman en aquesta secció.
 
+El [Pas 7.5](tasques/pendent/pas7.5-source-model-v1.md) ha afegit un gate offline que retorna causes d'indisponibilitat i una forma angular tabulada normalitzable. El [contrast real i l'auditoria RSR](evidencies/pas7.5/estat-inferencia-font-2026.md) no permeten construir cap `SourceModel` físic de 2026; el pas queda `bloquejat` i no hi ha cap canvi visible al producte.
+
 Quan es completa un pas, aquest inventari s'ha d'actualitzar amb l'enllaç a la implementació observable i a les proves. No es promociona una fila perquè s'hagin creat carpetes, protocols, DTOs o renderers de només interfície.

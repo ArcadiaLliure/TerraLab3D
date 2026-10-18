@@ -80,6 +80,8 @@ No es divideix `R_DNB` per `∫R_DNB dλ` per defecte. Si un producte defineix r
 
 VNP46 continua essent una observació panchromàtica: no justifica col·lapsar el transport atmosfèric a un únic flux. `spectralBandCount` i `bandSetId` continuen definint la propagació.
 
+El [gate parcial de 7.5](../evidencies/pas7.5/estat-inferencia-font-2026.md) només comprova si la base QA/RSR/guany/L3 d'una observació és admissible. Encara no hi ha una RSR operativa de 2026 ni un operador que converteixi la radiància L3 corregida en normalització, priors SPD i emissió angular de ciutat. `AngularEmissionProfile` representa formes axials normalitzades aportades amb procedència, però cap forma es dedueix de L3 ni s'adopta per defecte. Per això les expressions d'aquesta secció continuen sent contractes condicionals per al futur `SourceModel`, no càlculs executats sobre el grànul real.
+
 ## 6. Extinció i transmissió
 
 `τ_k(A,B)=∫_A^B β_ext,k(s) ds` i `T_k(A,B)=exp(-τ_k(A,B))`.

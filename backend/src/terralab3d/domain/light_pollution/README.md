@@ -6,6 +6,8 @@ Resoldre Bortle, magnitud límit, modes automàtics i efectes sobre el cel i els
 
 El [model DNB de 7.3](dnb_measurement.py) integra radiància espectral TOA al sensor amb una RSR tabulada sense renormalitzar-la; conserva plataforma, producte, guany, data i procedència en el resultat serialitzat. La [User Guide Black Marble C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) documenta la correcció TOA→radiància nocturna ascendent de superfície L3. L'[observació VNP46](vnp46.py) etiqueta aquesta etapa; el [contrast amb VJ146 real](../../../../../docs/evidencies/pas7.3/contrast-granuls-black-marble-c2.md) en confirma capa, unitats i QA. La resposta concreta aplicable el 2026 i la inferència L3→SPD/emissió angular amb incertesa corresponen a 7.5/7.16/7.17; cap font de skyglow està homologada.
 
+El [gate parcial de 7.5](source_model.py) classifica una base de mesura VNP46 com a disponible o `unavailable_for_physical_inference` amb causes per QA, identitat, dia, unitat i evidència RSR/guany/L3. El mateix mòdul normalitza formes angulars axials aportades sense adoptar-ne cap per defecte. La [matriu de fonts](../../../../../docs/evidencies/pas7.5/estat-inferencia-font-2026.md) manté 7.5 bloquejat: no hi ha encara `SourceModel` físic ni ruta de producte nova.
+
 ## 2. Pertinença arquitectònica
 
 **Model / Domini científic.** El paquet conté dades pures, invariants, contractes de càlcul i serveis de domini. No conté accés a fitxers, xarxa, threads, UI ni Three.js.
