@@ -71,4 +71,4 @@ No s'ha localitzat un solver físic VNP46/DNB/RT ja implementat al repositori in
 
 ## Decisió de dades posterior a la inspecció
 
-La inspecció de codi anterior es manté històrica. La decisió vigent del dossier és usar **VNP46 com a font operativa**, mantenint VIIRS DNB com a model de mesura espectral. Aquesta decisió és documental i encara no està implementada al codi.
+La inspecció de codi anterior es manté històrica. La decisió inicial **VNP46 com a font operativa v1** continua registrada al [perfil v1](skyglow-v1-profile.json), amb lector verificat al Pas 7.2. La decisió vigent [multisatèl·lit v2](skyglow-v2-profile.json) contempla VNP46, VJ146 i VJ246 com a fonts candidates independents; encara no hi ha cap font homologada per al skyglow nocturn L3. VIIRS DNB és el model de mesura, amb resposta i correcció pròpies de cada plataforma/producte.

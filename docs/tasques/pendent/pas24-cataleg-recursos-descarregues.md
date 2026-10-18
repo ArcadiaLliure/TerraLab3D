@@ -21,7 +21,7 @@ Decisions tancades de referència:
 - El gestor admet **proveïdors autenticats** sense incorporar secrets al catàleg, al `DownloadJob`, als logs ni a la provenance. Els descriptors només poden conservar una referència opaca a la credencial/sessió gestionada fora del recurs.
 - Un recurs pot ser **dinàmic**: el catàleg descriu proveïdor, producte/release i selectors (data, tile, AOI o equivalent), i un resolver del proveïdor materialitza l'asset immutable concret abans de transferir-lo. La identitat resolta queda persistida per poder reproduir i auditar la descàrrega.
 - El checksum de font és estructurat com a mínim per `algorithm + value` i conserva el seu origen. TerraLab3D calcula a més un SHA-256 local dels bytes instal·lats; el hash local no es presenta com si fos una verificació independent del proveïdor.
-- **VNP46A2.002 via LAADS/Earthdata és el primer cas d'acceptació d'aquest flux autenticat i dinàmic**: l'usuari no ha de conèixer noms de grànul, HDF5 ni URLs d'arxiu per a l'ús ordinari.
+- **Black Marble C2 via LAADS/Earthdata és el cas d'acceptació d'aquest flux autenticat i dinàmic** per `VNP46A2.002`, `VJ146A2.002` i `VJ246A2.002`: l'usuari ordinari no ha de conèixer noms de grànul, HDF5 ni URLs d'arxiu. El [perfil multisatèl·lit](../../skyglow/skyglow-v2-profile.json), el [contracte de mesura de 7.3](../completat/pas7.3-dnb-rsr-measurement.md) i l'admissibilitat científica de 7.5 decideixen l'ús físic; el gestor de transferència només obté recursos.
 
 ## Objectiu
 
@@ -32,6 +32,7 @@ Completar la vertical de «catàleg de recursos i descàrregues persistents» de
 **Depèn de:**
 - [Pas 8.6 — Planetes, anells i satèl·lits naturals](../completat/pas8.6.md)
 - [Pas 12 — Cerca astronòmica, focus i seguiment](../completat/pas12.md)
+- [Pas 7.3 — contracte Black Marble TOA/L3](../completat/pas7.3-dnb-rsr-measurement.md) per al cas d'acceptació VNP46/VJ146/VJ246; el gestor comú no decideix admissibilitat científica.
 
 **En depenen:**
 - [Pas 25 — Gestor de capes Cel/Terra](pas25-gestor-capes.md)
@@ -53,7 +54,7 @@ Completar la vertical de «catàleg de recursos i descàrregues persistents» de
 
 Catàleg versionat → selecció de variant/bundle o petició dinàmica → resolució de proveïdor/asset (amb autenticació si cal) → `DownloadJob` persistent amb identitat resolta → adquisidor cancel·lable → temporal reanudable → verificació del checksum de font + SHA-256 local → instal·lació atòmica → registre → delta de disponibilitat cap a la UI.
 
-Per a recursos dinàmics, la resolució i la transferència són fases diferents: una resposta del resolver mai es converteix directament en dada científica. En el cas VNP46, `product=VNP46A2`, `collection=002`, data i tile/AOI resolen un grànul concret; el lector científic del Pas 7.2 només consumeix el fitxer local ja adquirit i verificat.
+Per a recursos dinàmics, la resolució i la transferència són fases diferents: una resposta del resolver mai es converteix directament en dada científica. Per a Black Marble, `product∈{VNP46A2,VJ146A2,VJ246A2}`, `collection=002`, dia exacte i tile/AOI resolen un grànul concret. La cadena és `catàleg → producte/dia/AOI → resolució LAADS → autenticació Earthdata → descàrrega persistent → checksum de font + SHA-256 local → instal·lació atòmica → lectura científica específica`. El gestor retorna identitat i path verificat, i conserva les alternatives/fallades sense triar una font com a científicament equivalent. El lector VNP46 del Pas 7.2 només consumeix el fitxer local; els adaptadors J1/J2 requeriran proves pròpies.
 
 ## Errors, cancel·lació i recursos
 
@@ -77,9 +78,9 @@ Per a recursos dinàmics, la resolució i la transferència són fases diferents
 - [ ] Formalitzar `ChecksumSpec` amb algoritme, valor i origen; conservar el checksum de font quan existeix i calcular sempre un SHA-256 local separat per identitat interna.
 - [ ] Formalitzar proveïdors/resolvers d'assets dinàmics perquè selectors estables (producte/release/data/tile/AOI) es resolguin a un asset concret abans de crear o iniciar la transferència.
 - [ ] Admetre autenticació de proveïdor mitjançant referències opaques a credencials o sessions gestionades fora dels manifests i jobs; cap secret pot persistir al catàleg, logs o provenance.
-- [ ] Integrar LAADS/Earthdata + `VNP46A2.002` com a fixture/cas d'acceptació del flux autenticat: resolució d'un grànul, descàrrega, verificació, instal·lació i lliurament del path local al consumidor del Pas 7.2.
+- [ ] Integrar LAADS/Earthdata + els tres productes C2 com a casos d'acceptació del mateix flux autenticat: resolució per dia/AOI, descàrrega, verificació, instal·lació i lliurament del path local a l'adaptador de cada producte. Cobrir absència, QA insuficient i model científic no homologat com a estats diferents; l'últim és propietat del consumidor, no un error de descàrrega.
 - [ ] Representar variants, bundles, dependències, recursos externs i llicències a la UI.
-- [ ] Mostrar estat d'autenticació/requisit de credencial de forma accionable sense exposar el secret; l'ús ordinari de VNP46 no ha d'exigir enganxar URLs o seleccionar manualment fitxers HDF5.
+- [ ] Mostrar estat d'autenticació/requisit de credencial sense exposar secrets; l'ús ordinari de Black Marble no ha d'exigir URLs o fitxers HDF5 manuals. Permetre selecció avançada de plataforma amb provenance i fallback explícit, sense substituir un sensor en silenci.
 - [ ] Mostrar progrés determinat o indeterminat, bytes, velocitat i ETA sense confondre transferència amb instal·lació.
 - [ ] Unificar tots els punts d'entrada en el mateix gestor i emetre deltes, no snapshots globals continus.
 
@@ -99,7 +100,7 @@ Qualsevol recurs gestionat passa per un únic cicle persistent i auditable; les 
 - [ ] Checksum de font amb almenys dos algoritmes admesos i SHA-256 local independent; demostrar que no es confonen els dos rols.
 - [ ] Proveïdor autenticat: credencial absent, vàlida, caducada/rebutjada i reintent després de reautenticar; cap secret apareix en logs, manifests, jobs o provenance.
 - [ ] Resolver dinàmic: mateix selector → mateixa identitat d'asset mentre el proveïdor no canvia la revisió; canvi de revisió/checksum → nova identitat verificable.
-- [ ] Cas d'acceptació LAADS/Earthdata amb un grànul real `VNP46A2.002`, lliurat com a fitxer local verificat al lector del Pas 7.2.
+- [ ] Cas d'acceptació LAADS/Earthdata amb grànuls reals dels tres productes, lliurats com a fitxers locals verificats; el grànul VNP46 ja aportat localment a 7.2 no prova l'adquisició comuna ni els contractes J1/J2.
 - [ ] Captures de variants, bundles, llicència, requisit d'autenticació i progrés indeterminat.
 
 ## Fora d'abast

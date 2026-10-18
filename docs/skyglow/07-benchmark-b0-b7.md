@@ -31,7 +31,7 @@ Els valors exploratoris es poden escombrar i reportar, però un PASS/FAIL de pro
 
 ## Checkpoint Z — gate zenital obligatori
 
-Abans de promoure `DomeProfile`, preregistrar a 7.12 la tolerància runtime↔SG-REF amb l'evidència d'incertesa/convergència de 7.6, sense mirar el residual del runtime candidat. Executar el mateix kernel només a 90° en fixtures sintètiques i almenys una fixture VNP46/model de font/atmosfera/DEM reproduïble. Comparar runtime contra SG-REF en radiància física per banda. Runtime i oracle reben el mateix `SourceModel`; el checkpoint no valida la inferència d'emissió. Reportar error, `coldMs`, `warmMs`, peak RSS i dependències tocades. El checkpoint falla si necessita un factor de calibratge opac o si 90° segueix una ruta diferent.
+Abans de promoure `DomeProfile`, preregistrar a 7.12 la tolerància runtime↔SG-REF amb l'evidència d'incertesa/convergència de 7.6, sense mirar el residual del runtime candidat. Executar el mateix kernel només a 90° en fixtures sintètiques i almenys una fixture reproduïble amb un model de font derivat d'una observació Black Marble admissible, atmosfera i DEM. Identificar explícitament plataforma, producte i domini; la fixture VNP46 inicial es pot reutilitzar només quan la seva cadena de mesura sigui acreditada. Comparar runtime contra SG-REF en radiància física per banda. Runtime i oracle reben el mateix `SourceModel`; el checkpoint no valida la inferència d'emissió. Reportar error, `coldMs`, `warmMs`, peak RSS i dependències tocades. El checkpoint falla si necessita un factor de calibratge opac o si 90° segueix una ruta diferent.
 
 ## B0 — infraestructura
 

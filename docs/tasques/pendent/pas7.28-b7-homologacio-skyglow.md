@@ -19,7 +19,7 @@ Tancar la vertical només després que ciència, rendiment i integració hagin p
 ## Tasques
 
 - [ ] Executar B7 amb AD OFF/ON, uncertainty OFF/ON, cold/warm/movement/prefetch/teleport/tile-change/occlusion-flip i backend 7.22 si existeix.
-- [ ] Auditar que DATA-VNP46, F1, F5, F7, V1, V3, S1, DNB-2017 i LOW-RAD estan tancades per al domini declarat.
+- [ ] Auditar DATA-VNP46 històric i DATA-MULTISAT, DNB-TOA-L3, F1, F5, F7, V1, V3, S1, DNB-2017 i LOW-RAD **per cada plataforma/producte/release/període declarat**, sense exigir homologació de sensors fora de l'abast publicat.
 - [ ] Verificar la procedència, versió i congelació prèvia de tots els criteris PASS/FAIL aplicables; consumir-los sense crear-ne ni modificar-ne cap a 7.28.
 - [ ] Reexecutar gate zenital, regressions all-sky, projeccions i validació empírica congelada.
 - [ ] Verificar `kernelIntegralsPerRenderFrame=0`, stutter i memòria segons els SLO de producte aprovats, i lifecycle.
@@ -27,7 +27,7 @@ Tancar la vertical només després que ciència, rendiment i integració hagin p
 
 ## Criteri de sortida
 
-La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat està explícit. En cas contrari roman parcial/bloquejada amb fallback legacy.
+La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat identifica plataforma/producte/release/període/QA. Les altres fonts resten pendents explícitament; 7.28 no crea ni modifica criteris. En cas contrari roman parcial/bloquejada amb fallback legacy.
 
 ## Evidències obligatòries
 

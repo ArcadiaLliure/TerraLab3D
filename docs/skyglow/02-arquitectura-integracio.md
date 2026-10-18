@@ -9,15 +9,16 @@ El backend ja segueix domini/aplicació/infraestructura/scene. Existeixen `domai
 - REUSE: coordenades, observador, DEM/horizon, bridge, workers, lifecycle, resource registry, escena persistent.
 - ADAPT: `domain/light_pollution` com a namespace de domini; `SkyEnvironmentSnapshot`; scheduler d'actualitzacions; infraestructura cache.
 - REWRITE progressiu: l'ús de Bortle com a font de `u_artificialBrightness` al shader.
-- NEW: adaptador VNP46, model de mesura VIIRS DNB/RSR, `SourceModel`, `EmissionRegion`, `RadiancePatch`, espectre, òptica atmosfèrica, kernel, cache física, `DomeProfile`, `PhotometricProjectionService`, `SkyRadianceComposer` i oracle(s) de referència.
+- NEW: adaptadors Black Marble específics (VNP46 verificat, VJ146/VJ246 pendents), registre versionat de models DNB/RSR, `SourceModel`, `EmissionRegion`, `RadiancePatch`, espectre, òptica atmosfèrica, kernel, cache física, `DomeProfile`, `PhotometricProjectionService`, `SkyRadianceComposer` i oracle(s) de referència.
 - DISCARD només al final de migració: glow Bortle artístic com a autoritat física. Es pot conservar temporalment com a fallback explícit.
 
 ## 3. Components proposats
 
 ~~~mermaid
 flowchart LR
-  V[VNP46] --> A[adaptador VNP46]
-  A --> O[ViirsSourceObservation]
+  V[LAADS: VNP46 / VJ146 / VJ246] --> A[gestor de recursos Pas 24]
+  A --> X[adaptador científic per producte]
+  X --> O[ViirsSourceObservation + identitat]
   R[RSR DNB + BAND_INTEGRATED] --> S[SourceModel]
   O --> S
   S --> ER[EmissionRegion + RadiancePatch]
@@ -36,7 +37,7 @@ flowchart LR
   RT --> GPU[Three.js DomeSkyglowRenderer]
 ~~~
 
-VNP46 és entrada de dades; VIIRS DNB continua essent semàntica de mesura. `SourceModel` resol la inferència espectral/angular abans del transport. Cap backend accelerat pot canviar aquesta frontera.
+Black Marble és entrada de dades tipada per plataforma/producte/release; VIIRS DNB defineix la mesura TOA i cada producte L3 necessita la seva transformació i incertesa. El selector admet una font només per dia/AOI/QA/model verificats, conserva fallback explícit i no suma observacions entre sensors. `SourceModel` resol la inferència espectral/angular abans del transport. Cap backend accelerat pot canviar aquesta frontera.
 
 ## 4. Fronteres de responsabilitat
 

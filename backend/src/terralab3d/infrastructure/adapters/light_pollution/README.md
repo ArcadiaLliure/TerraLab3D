@@ -11,6 +11,17 @@ amb radiància crua, QA, coordenades i procedència; no estima emissió ni skygl
 La descàrrega i la cache queden fora del lector. El lector s'ha contrastat
 amb un [grànul VNP46A2.002 real aportat localment](../../../../../../docs/evidencies/pas7.2/validacio-adaptador.md).
 
+El lector [`viirs_rsr.py`](viirs_rsr.py) del Pas 7.3 obre taules RSR locals amb
+manifest, SHA-256 i selector plataforma/producte/col·lecció/release/guany/data/aplicació.
+S'ha contrastat amb una [taula SNPP LGS real](../../../../../../docs/evidencies/pas7.3/validacio-model-dnb.md)
+i corbes LGS/MGS [NOAA-20/NOAA-21](../../../../../../docs/evidencies/pas7.3/revisio-multisatel-lit.md)
+per diagnosticar l'operador TOA. Els manifests v2 separen classe d'evidència,
+vincle L3 i incertesa; cap d'aquestes corbes acredita encara el producte L3 de 2026.
+Dos [grànuls NOAA-20 reals](../../../../../../docs/evidencies/pas7.3/contrast-granuls-black-marble-c2.md)
+s'han inspeccionat offline amb `h5py`, inclòs QA 0 urbà. El lector VNP46 els
+rebutja per identitat; l'script d'inspecció no és un adaptador ni un downloader
+del producte.
+
 ## Pertinença arquitectònica
 
 **Infraestructura / Adaptador.** Implementa un port propietat de l’aplicació.

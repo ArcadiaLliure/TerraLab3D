@@ -22,11 +22,11 @@
 
 ## VNP46 i VIIRS DNB
 
-**DECISIÓ NOSTRA:** `VNP46A2.002` de NASA LAADS és la font operativa de la primera vertical. El Pas 7.1 n'ha verificat la capa diària sense ompliment de buits, la unitat, els flags, la política de dades i les discrepàncies de la documentació oficial. Vegeu [perfil](skyglow-v1-profile.json) i [auditoria](../evidencies/pas7.1/auditoria-fonts.md). El contracte i la política `V1` estan completats; els valors numèrics es justificaran als gates que els apliquin.
+**DECISIÓ NOSTRA, revisada:** el [perfil v1](skyglow-v1-profile.json) va fixar `VNP46A2.002` com a primera font i 7.1/7.2 en van verificar contracte i lector. El [perfil v2](skyglow-v2-profile.json) amplia el disseny a `VJ146A2.002` i `VJ246A2.002` sense reescriure aquella evidència. La [matriu multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) mostra per què les tres fonts són candidates, no encara intercanviables ni homologades. La política `V1` continua preregistrada; els valors numèrics es justificaran als gates que els apliquin.
 
 **DECISIÓ NOSTRA:** VIIRS DNB no desapareix de l'arquitectura. Es conserva com a model de mesura espectral: RSR oficial, procedència temporal i `measurementOperatorId=BAND_INTEGRATED`.
 
-**PENDENT DE VERIFICACIÓ:** unitat exacta de la magnitud DNB del contracte i localització exacta a l'ATBD. No es dona per verificat `W·cm⁻²·sr⁻¹` ni la §2.1.2.1.
+**FET PUBLICAT, verificat directament:** l'[ATBD VIIRS SDR](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf) defineix radiància DNB integrada `W·cm⁻²·sr⁻¹` i RSR energètica amb `λ` incorporat; la [User Guide Black Marble C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) explicita la transformació a radiància nocturna ascendent de superfície L3 corregida, comprovada amb [grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md). [NASA](https://viirsland.gsfc.nasa.gov/Val/BM_Val.html) documenta RSR anual SNPP, estabilitat relativa J1/J2 i cap ajust RSR intersensor C2. [NOAA J2](https://ncc.nesdis.noaa.gov/NOAA-21/J2VIIRS_SpectralResponseFunctions.php) publica LGS/MGS de prelanzament; el README recomana MGS com a proxy HGS sense cota. **PENDENT PER A FONT FÍSICA:** acreditar RSR/guany de 2026, inferència SPD/angular i incertesa per almenys una font a 7.5/7.16/7.17; la RSR anual SNPP és una via oberta.
 
 **DECISIÓ NOSTRA:** la RSR es resol de manera compatible amb release/procedència i data d'adquisició; no es tria automàticament l'última.
 

@@ -6,13 +6,13 @@
 
 ## Fonts de PredictionUncertainty
 
-Radiometria VNP46; calibratge/processament/release; model de mesura DNB/RSR; règim de baixa radiància/punt zero; prior espectral; model angular d'emissió; atmosfera; aerosol/núvol; gas; DEM/oclusió; error numèric; error estructural single-scattering; compressió de cúpula.
+Radiometria per plataforma/producte Black Marble; calibratge/processament/release; RSR, proxy de guany i transformació TOA→L3 com a components diferenciats; règim de baixa radiància/punt zero; prior espectral; model angular d'emissió; atmosfera; aerosol/núvol; gas; DEM/oclusió; error numèric; error estructural single-scattering; compressió de cúpula.
 
 No es combina tot en quadratura. Un ensemble SPD és epistèmic; un biaix de calibratge és sistemàtic; errors locals atmosfèrics poden estar correlacionats.
 
-## VNP46 / VIIRS DNB
+## Black Marble multisatèl·lit / VIIRS DNB
 
-La incertesa conserva per separat radiometria del producte VNP46, processament/release, model de mesura DNB/RSR, prior espectral, inferència angular i règim de baixa radiància.
+La incertesa conserva per separat radiometria de VNP46/VJ146/VJ246, processament/release, model DNB/RSR, mapping MGS/HGS, correcció L3, prior espectral, inferència angular i règim de baixa radiància. Cada terme té font, domini, estat quantitatiu i correlacions; l'etiqueta «RSR oficial» no dona per si sola una cota.
 
 No es transfereixen automàticament percentatges del DNB SDR a VNP46. Un composite pot tenir altres fonts d'error i correlació.
 

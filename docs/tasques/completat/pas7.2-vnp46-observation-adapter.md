@@ -26,7 +26,7 @@ Ingerir la font operativa congelada a 7.1 sense confondre radiància observada a
 
 **En depenen:**
 
-- [Pas 7.3 — model de mesura DNB i RSR](../pendent/pas7.3-dnb-rsr-measurement.md).
+- [Pas 7.3 — model de mesura DNB i RSR](pas7.3-dnb-rsr-measurement.md).
 
 ## Codi existent a reutilitzar
 
@@ -69,8 +69,8 @@ Inferència `SourceModel`, normalització espectral DNB/RSR, propagació i visua
 
 ## Instrucció per a Codex
 
-Per continuar, obre el [Pas 7.3](../pendent/pas7.3-dnb-rsr-measurement.md) i conserva la distinció entre radiància observada i inferència d'emissió. Qualsevol ambigüitat del producte torna al contracte de 7.1.
+El [Pas 7.3](pas7.3-dnb-rsr-measurement.md) ha completat el contracte de mesura i la interpretació L3; el punt de represa actual és [7.4](../pendent/pas7.4-spectral-bandset-validation.md). Es conserva la distinció entre radiància observada i inferència d'emissió. Qualsevol ambigüitat del producte torna al contracte de 7.1.
 
 ## Treball pendent
 
-Cap tasca pendent del Pas 7.2. A 7.3 cal validar la resposta espectral i l'operador DNB sense reinterpretar `Vnp46Observation` com a imatge ni emissió. En la gestió posterior de recursos, un checksum publicat o URL de descàrrega verificat permetria autenticar independentment l'origen del grànul local; el SHA-256 actual només acredita la identitat dels bytes traslladats.
+Cap tasca pendent del Pas 7.2. El Pas 7.3 ha validat l'operador DNB i ha etiquetat `Vnp46Observation` com a radiància Black Marble L3 corregida, sense reinterpretar-la com a imatge ni emissió espectral/angular. En la gestió posterior de recursos, un checksum publicat o URL de descàrrega verificat permetria autenticar independentment l'origen del grànul local; el SHA-256 actual només acredita la identitat dels bytes traslladats.

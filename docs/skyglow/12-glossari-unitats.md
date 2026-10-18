@@ -18,10 +18,10 @@
 | AOD | aerosol optical depth; adimensional, especificar longitud d'ona |
 | SPD | spectral power distribution; en aquest dossier, forma espectral normalitzada o radiància espectral segons context |
 | RSR | relative spectral response; funció adimensional relativa del sensor |
-| VNP46 | família NASA Black Marble; per a v1, producte operatiu `VNP46A2.002` amb capa diària sense ompliment de buits segons el [perfil](skyglow-v1-profile.json) |
-| DNB | canal VIIRS que defineix el model de mesura espectral de l'observació VNP46 |
-| `BAND_INTEGRATED` | operador de mesura adoptat per normalitzar la resposta DNB; unitat exacta del contracte pendent de verificació ATBD |
-| radiància observada | valor del producte VNP46 abans de la inferència de font |
+| Black Marble C2 | família NASA de productes L3 nocturns; [v1](skyglow-v1-profile.json) fixa `VNP46A2.002`/Suomi-NPP i [v2](skyglow-v2-profile.json) registra també `VJ146A2.002`/NOAA-20 i `VJ246A2.002`/NOAA-21 com a candidats independents |
+| DNB | canal VIIRS que defineix el model de mesura espectral TOA; plataforma, guany i resposta poden variar |
+| `BAND_INTEGRATED` | operador DNB amb RSR energètica adimensional i integral de radiància espectral al sensor; sortida `nW cm⁻² sr⁻¹`, mateixa unitat que els L3 Black Marble però sense equivalència física directa TOA↔L3 acreditada; cada nW equival a `10⁻⁹ W` |
+| radiància observada | valor del producte Black Marble L3 abans de la inferència de font |
 | radiància artificial estimada | resultat de `SourceModel`; no és sinònim de radiància observada |
 | mag/arcsec² | magnitud logarítmica per angle sòlid aparent; depèn de banda/zero point |
 | SQM | instrument/banda pròpia, no sinònim exacte de Johnson V |
@@ -35,14 +35,14 @@
 ## Regles
 
 1. No usar «brillantor» sense indicar si és radiància, luminància o magnitud.
-2. No convertir VNP46/DNB directament a `cd/m²` sense SPD/resposta; la unitat concreta es llegeix del producte i la de l'ATBD continua pendent de verificació.
+2. No convertir cap Black Marble/DNB directament a `cd/m²` sense SPD/resposta; la unitat es llegeix del producte i l'[ATBD VIIRS SDR](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf#page=38) verifica la radiància integrada DNB.
 3. No sumar magnituds; convertir a radiància, sumar i tornar a projectar.
 4. No confondre intensitat radiant de font amb radiància del cel.
 5. `P(θ)` sempre documenta la normalització.
 6. Angles wire en graus només si el camp ho diu; càlcul intern pot usar radians.
 7. Distàncies del kernel en metres; km només presentació/configuració.
 8. Qualsevol LUT indica les unitats dels eixos.
-9. No hi ha conversió directa VNP46/DNB→SQM ni `relativeRadiance×calibrationFactor→cd/m²` sense model físic/calibratge explicitat.
+9. No hi ha conversió directa Black Marble/DNB→SQM ni `relativeRadiance×calibrationFactor→cd/m²` sense model físic/calibratge explicitat.
 10. No aplicar `max(0, radiancia_observada)` silenciosament; baixa radiància conserva qualitat/incertesa.
 11. LUT/FFT són acceleracions del mateix operador físic i han de declarar domini/error.
 12. Cel artificial, natural, lunar i crepuscular se sumen en radiància lineal compatible, mai en magnituds.

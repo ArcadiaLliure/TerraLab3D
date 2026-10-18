@@ -20,6 +20,7 @@ Repetir la validació del sistema ja optimitzat i amb núvols abans d’integrar
 - [ ] Reexecutar clear-sky per demostrar que acceleracions 7.18–7.22 no han degradat la validesa.
 - [ ] Afegir subset cloudy només dins el domini de 7.23 amb metadata suficient.
 - [ ] Validar intervals d’incertesa, cobertura i biaixos per sensor/lloc/condició.
+- [ ] Separar els resultats per plataforma Black Marble, producte, release i període; contrastar superposicions sense sumar radiàncies ni ampliar el domini d'una font amb dades d'una altra.
 - [ ] Fer data-leakage checks i mantenir particions preregistrades.
 - [ ] Congelar versions de producte, SourceModel, atmosfera, phase/backend i criteris que passin.
 

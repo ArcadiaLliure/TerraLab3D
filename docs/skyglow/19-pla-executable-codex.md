@@ -11,7 +11,7 @@ No s’accepta cap d’aquests patrons:
 - usar el mateix algoritme aproximat com a únic oracle;
 - “resoldre” una decisió oberta amb una constant de conveniència;
 - ajustar llindars PASS/FAIL després de veure els resultats;
-- fer que VNP46 impliqui Lambert, flux hemisfèric o skyglow directament;
+- fer que VNP46/VJ146/VJ246 impliquin Lambert, flux hemisfèric o skyglow directament;
 - executar integrals radiatives al render loop.
 
 `V1` és una [política preregistrada](skyglow-v1-profile.json), congelada a 7.1: cap llindar PASS/FAIL es pot ajustar després de veure el resultat del candidat a validar. Cada llindar exigeix mètrica, valor, unitat, domini, categoria d'origen, referència verificable, justificació, propietari, moment de congelació i revisió. L'origen ha de ser literatura o font metrològica, incertesa demostrada d'un oracle, requisit de producte aprovat o convergència justificada científicament. Constants «raonables» sense procedència estan prohibides. La manca d'un llindar bloqueja el **primer pas que n'aplica el PASS/FAIL**, no els passos anteriors d'infraestructura o construcció d'oracles. Una revisió posterior és prospectiva i no requalifica el candidat ni el conjunt de validació ja observats.
@@ -26,15 +26,19 @@ No s’accepta cap d’aquests patrons:
 
 Els passos que necessitin un criteri addicional propi el preregistren abans de la seva primera aplicació amb la mateixa política; no traslladen un PASS/FAIL a 7.1 ni creen llindars a 7.28.
 
+**Revisió de contracte 2026-10-18.** El [perfil v1](skyglow-v1-profile.json) i les evidències de 7.1/7.2 són històricament vàlids per a `VNP46A2.002`. El [perfil v2](skyglow-v2-profile.json) amplia la política a tres fonts candidates sense requalificar aquell lector: `VNP46A2.002`/Suomi-NPP, `VJ146A2.002`/NOAA-20 i `VJ246A2.002`/NOAA-21. La [revisió de la User Guide C2 §2.2 Eq. (1) i dos grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) separa la integral instrumental TOA, la radiància Black Marble L3 corregida i la inferència L3→font. **7.3 tanca el contracte de mesura**, inclòs QA 0 real h18v04, mentre que l'homologació d'una RSR/SourceModel operatius de 2026 es resol per domini a 7.5, la incertesa a 7.16 i la validació empírica a 7.17. Cap font es considera homologada per al skyglow nocturn de 2026 només per aparèixer al catàleg o disposar d'una RSR de prelanzament.
+
+El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + model de mesura admissible**. Si hi ha diverses fonts admissibles, la prioritat necessita dades de disponibilitat Black Marble, qualitat, calibratge i cobertura; l'estat primari de NOAA-21 a la distribució general NOAA no decideix la prioritat de Black Marble. La selecció manual avançada conserva la identitat i les limitacions. Cap fallback temporal o entre sensors és silenciós; fonts superposades es retenen separades i no es sumen. Un SBAF requereix gate científic propi. La descoberta, autenticació i instal·lació de grànuls són del [Pas 24](../tasques/pendent/pas24-cataleg-recursos-descarregues.md), que ha de cobrir els tres productes amb un únic gestor.
+
 ## Ordre lineal
 
 | Pas | Capacitat | Dependència |
 |---:|---|---|
 | 7.1 | Contracte científic v1, dades i política d'acceptació | 7, 22.5, 23 |
 | 7.2 | Adaptador VNP46 d’observació, qualitat i procedència | 7.1 |
-| 7.3 | Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED | 7.2 |
+| 7.3 | Model de mesura VIIRS DNB multisatèl·lit, RSR TOA i transformació L3 | 7.1, 7.2 |
 | 7.4 | Oracle espectral fi i homologació del SpectralBandSet v1 | 7.3 |
-| 7.5 | SourceModel v1: SPD, emissió angular i incertesa | 7.4 |
+| 7.5 | SourceModel v1: SPD, emissió angular i incertesa | 7.3, 7.4 |
 | 7.6 | SG-REF: oracle independent de transport i integració d’àrea | 7.5 |
 | 7.7 | PropagationKernel geomètric i benchmark B0 | 7.6 |
 | 7.8 | OpticalField tiled i atmosfera estàndard determinista | 7.7 |
@@ -45,8 +49,8 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 | 7.13 | Camp angular i DomeProfile sobre ruta directa | 7.12 |
 | 7.14 | Projeccions fotomètriques i sensors SQM/TESS | 7.13 |
 | 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14 |
-| 7.16 | Incertesa quantitativa i provenance completa | 7.15 |
-| 7.17 | Validació empírica clear-sky de SourceModel i transport | 7.16 |
+| 7.16 | Incertesa quantitativa i provenance completa | 7.3, 7.5, 7.15 |
+| 7.17 | Validació empírica clear-sky de SourceModel i transport | 7.3, 7.5, 7.16 |
 | 7.18 | Watershed, EmissionRegion i quadtree com acceleració B5 | 7.17 |
 | 7.19 | Compressió de PhaseFunction i benchmark B3 | 7.18 |
 | 7.20 | Forward AD i RadiativeErrorBudget | 7.19 |
@@ -91,17 +95,19 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 ### 7.3 — Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED
 
-**Finalitat.** Modelar què mesura DNB amb la RSR real i semàntica radiomètrica versionada.
+**Finalitat.** Modelar la resposta DNB per plataforma/producte/release/data i verificar tres contractes diferents: integral espectral SPD/TOA→DNB amb RSR versionada; interpretació de la radiància Black Marble L3 corregida segons la guia NASA; inferència L3→SPD i emissió angular, que correspon a 7.5/7.16/7.17.
 
-**Gate de sortida.** La mateixa SPD produeix una mesura DNB reproduïble i auditada contra una referència fina; la unitat i la RSR queden versionades i traçables.
+La verificació científica amb un grànul J1/J2 real pot emprar una fixture local aportada o obtinguda per recerca offline, amb SHA-256 i procedència, tal com 7.2 va fer amb VNP46. Això permet completar 7.3 sense avançar el wizard del Pas 24; l'adquisició ordinària dels tres productes continua allà.
 
-**Fitxer executable:** [pas7.3-dnb-rsr-measurement.md](../tasques/pendent/pas7.3-dnb-rsr-measurement.md)
+**Gate de sortida.** Integral TOA, unitats, identitat i repositori RSR reproduïbles; transformació TOA→L3 explícitament documentada per NASA; capa, unitat, QA i procedència L3 contrastades amb dades reals; estats d'homologació RSR explícits per sensor/període. **Estat: completat per al contracte de mesura.** La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i els [grànuls VJ146 h00v01/h18v04](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), inclòs QA 0 urbà, satisfan el contracte L3. La RSR efectiva de 2026 i la inferència espectral/angular física no estan homologades; 7.5, 7.16 i 7.17 n'assumeixen els gates. 7.4 queda preparat, sense inici d'implementació en aquesta execució.
+
+**Fitxer executable:** [pas7.3-dnb-rsr-measurement.md](../tasques/completat/pas7.3-dnb-rsr-measurement.md)
 
 ### 7.4 — Oracle espectral fi i homologació del SpectralBandSet v1
 
 **Finalitat.** Tancar `V3` abans que el nombre de bandes entri al kernel de producció.
 
-**Gate de sortida.** Abans de seleccionar cap `SpectralBandSet` candidat, el pressupost numèric d'error espectral queda justificat i preregistrat; sense aquesta evidència, 7.4 queda bloquejat. `V3` es tanca només quan un candidat compleix el pressupost contra l'oracle fi. Cap benchmark de rendiment decideix N.
+**Gate de sortida.** Abans de seleccionar cap `SpectralBandSet` candidat, el pressupost numèric d'error espectral queda justificat i preregistrat per al domini i les famílies RSR declarades a 7.3, distingint respostes diagnòstiques de les acreditades per a producte; inclou sensibilitat a RSR/priors SPD quan sigui material. Sense evidència, 7.4 queda bloquejat. `V3` es tanca només quan un candidat compleix el pressupost contra l'oracle fi. Cap benchmark de rendiment decideix N.
 
 **Fitxer executable:** [pas7.4-spectral-bandset-validation.md](../tasques/pendent/pas7.4-spectral-bandset-validation.md)
 
@@ -109,7 +115,7 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 **Finalitat.** Tancar `F1` i transformar observacions DNB en una distribució de font explícita, versionada i falsable.
 
-**Gate de sortida.** `F1` queda resolta per al domini v1 o el pas queda `bloquejat`. Un `Vnp46Observation` pot produir un `SourceModel` complet amb provenance i incertesa declarada.
+**Gate de sortida.** `F1` queda resolta per al domini d'almenys una font admesa o el pas queda `bloquejat`. Cal acreditar la RSR efectiva/família, mapping de guany i vincle producte/període de la font escollida; una observació L3 tipada produeix `SourceModel` amb priors/ensembles SPD, emissió angular i incertesa estructural justificada, sense aplicar directament la integral TOA al valor L3. Les fonts no acreditades resten indisponibles per a inferència. El lector VNP46 de 7.2 segueix vàlid com a cas concret.
 
 **Fitxer executable:** [pas7.5-source-model-v1.md](../tasques/pendent/pas7.5-source-model-v1.md)
 
@@ -197,7 +203,7 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 **Finalitat.** Construir intervals i components d’error després que font, atmosfera i transport ja tinguin models concrets.
 
-**Gate de sortida.** Cada resultat físic pot explicar quines incerteses coneix, quines desconeix i com s’han propagat; no hi ha sigmes fictícies.
+**Gate de sortida.** Cada resultat físic separa incertesa RSR i mapping de guany, correcció Black Marble L3, prior SPD/angular, radiometria, atmosfera, model estructural i error numèric, amb correlacions i domini per sensor. Una incertesa no quantificada queda explícita i impedeix l'homologació que en depèn; no hi ha sigmes fictícies.
 
 **Fitxer executable:** [pas7.16-uncertainty-provenance.md](../tasques/pendent/pas7.16-uncertainty-provenance.md)
 
@@ -205,7 +211,7 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 **Finalitat.** Contrastar el sistema físic directe amb observacions externes abans de qualsevol acceleració espacial o cache.
 
-**Gate de sortida.** Els criteris empírics, amb incerteses instrumental, de dades i del model, es preregistren abans de mirar el conjunt reservat `held-out`; sense criteris justificats, 7.17 es bloqueja. Existeix una validació clear-sky reproduïble; si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5, sense calibratge compensatori del kernel ni ajust als residuals observats.
+**Gate de sortida.** Els criteris empírics, amb incerteses instrumental, de dades i del model, es preregistren abans de mirar el conjunt reservat `held-out`; inclouen estrats per plataforma/producte/release quan s'hagin admès. Sense criteris justificats, 7.17 es bloqueja. Existeix una validació clear-sky reproduïble; si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5, sense calibratge compensatori del kernel ni ajust als residuals observats.
 
 **Fitxer executable:** [pas7.17-clear-sky-ground-truth.md](../tasques/pendent/pas7.17-clear-sky-ground-truth.md)
 
@@ -261,7 +267,7 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 **Finalitat.** Repetir la validació del sistema ja optimitzat i amb núvols abans d’integrar-lo al renderer.
 
-**Gate de sortida.** Existeix un informe empíric final per al domini homologable. Si només clear-sky és defensable, el domini de producció queda explícitament limitat i cloud no es declara homologat.
+**Gate de sortida.** Existeix un informe empíric final per plataforma/producte/release i domini homologable; superposicions entre sensors es contrasten sense sumar ni aplicar SBAF per defecte. Si només clear-sky és defensable, el domini de producció queda explícitament limitat i cloud no es declara homologat.
 
 **Fitxer executable:** [pas7.24-full-ground-truth.md](../tasques/pendent/pas7.24-full-ground-truth.md)
 
@@ -295,7 +301,7 @@ Els passos que necessitin un criteri addicional propi el preregistren abans de l
 
 **Regla d'homologació.** 7.28 només consumeix els criteris congelats als gates previs i les seves versions; no crea ni modifica cap llindar PASS/FAIL.
 
-**Gate de sortida.** La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat està explícit. En cas contrari roman parcial/bloquejada amb fallback legacy.
+**Gate de sortida.** La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat inclou explícitament plataforma/producte/release/període/QA. Una altra plataforma pot continuar pendent sense falsificar l'abast completat. En cas contrari roman parcial/bloquejada amb fallback legacy.
 
 **Fitxer executable:** [pas7.28-b7-homologacio-skyglow.md](../tasques/pendent/pas7.28-b7-homologacio-skyglow.md)
 

@@ -4,7 +4,7 @@
 
 ### Ingestió
 
-1. `LightPollutionDatasetAdapter` consumeix la família VNP46 com a font operativa.
+1. El gestor comú del Pas 24 resol i instal·la VNP46/VJ146/VJ246; `LightPollutionDatasetAdapter` delega a un adaptador científic per producte i retorna observació tipada amb identitat i QA. Avui només el lector VNP46 està contrastat amb HDF5 real.
 2. Resol producte, release, data/període d'adquisició, quality mask, nodata, cobertura, geometria i unitat declarada pel producte.
 3. Publica `ViirsSourceObservation` immutable conservant `radiancia_observada`; no aplica `max(0,·)` ni confon observació amb emissió.
 4. Confirma per producte/release quines correccions ja s'han aplicat; stray light no es corregeix dues vegades.
@@ -18,7 +18,7 @@ El segmentador treballa sobre `radiancia_artificial_estimada` o equivalent físi
 
 ### Espectre
 
-`SpectralBasisLibrary` conté formes normalitzades i metadades. `ViirsSpectralResponseRepository` resol la RSR compatible amb plataforma/release i data d'adquisició. L'operador vigent és `BAND_INTEGRATED`; la unitat exacta del DNB queda pendent de verificació directa contra l'ATBD.
+`SpectralBasisLibrary` conté formes normalitzades i metadades. `ViirsSpectralResponseRepository` resol RSR per plataforma/producte/release/guany/data/aplicació; les corbes NOAA de prelanzament són diagnòstiques fins a demostrar-ne la transferència al producte. L'operador `BAND_INTEGRATED` calcula TOA `nW·cm⁻²·sr⁻¹`; la correcció Black Marble L3 és un model diferent documentat a la [User Guide C2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i contrastat amb [grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md). 7.3 ha completat el contracte de mesura; l'admissibilitat espectral i la inferència L3→font queden per a 7.5/7.16/7.17. Vegeu també [RSR SNPP](../evidencies/pas7.3/recerca-rsr-2026.md) i [revisió J1/J2](../evidencies/pas7.3/revisio-multisatel-lit.md).
 
 `SpectralSourceModel` produeix `SpectralSourceEstimate` i ensemble. VNP46 continua sent una observació panchromàtica: el kernel rep `BandRadiance` per `SpectralBandSet` i no un únic flux acromàtic.
 

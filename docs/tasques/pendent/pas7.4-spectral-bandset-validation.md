@@ -8,7 +8,7 @@ Tancar `V3` abans que el nombre de bandes entri al kernel de producció.
 
 ## Dependències
 
-7.3
+[Pas 7.3 — model de mesura DNB multisatèl·lit](../completat/pas7.3-dnb-rsr-measurement.md), completat per al contracte matemàtic i la interpretació L3. Cap RSR de 2026 s'ha homologat com a operador de font; això es controla per domini a 7.5 i 7.16.
 
 ## Referències obligatòries
 
@@ -20,6 +20,7 @@ Tancar `V3` abans que el nombre de bandes entri al kernel de producció.
 
 - [ ] Construir una integració espectral fina independent per fixtures i projeccions de sensor.
 - [ ] Definir SPDs adverses i representatives, incloses mescles LED i espectres amb estructura estreta.
+- [ ] Incloure a l'oracle les famílies RSR amb procedència i estat explícits de 7.3; distingir escenaris diagnòstics de respostes operatives acreditades i quantificar-ne la sensibilitat abans de fixar el pressupost, sense donar per validat un proxy sense cota.
 - [ ] Justificar i preregistrar mètrica, domini i pressupost numèric d'error espectral, amb font metrològica/literatura o convergència de l'oracle fi, **abans de seleccionar cap candidat**; sense justificació, bloquejar 7.4.
 - [ ] Avaluar candidats `SpectralBandSet` per error científic, no per temps d’execució.
 - [ ] Seleccionar i versionar el `bandSetId` v1 amb pressupost d’error preregistrat i criteri de rehomologació.

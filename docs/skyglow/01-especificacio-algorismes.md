@@ -8,13 +8,13 @@ Per a una direcció unitària `ω` des de l'observador `O`, el punt de quadratur
 
 ## 2. Font operativa VNP46 i model de mesura VIIRS DNB
 
-**NASA Black Marble VNP46A2 Collection 2** és la font operativa de la primera vertical, amb capa diària sense ompliment de buits segons el [perfil del Pas 7.1](skyglow-v1-profile.json). Les unitats, els flags, les correccions documentades i els drets s'han auditat al [registre de fonts](../evidencies/pas7.1/auditoria-fonts.md). El Pas 7.1 ha completat el contracte i la política `V1`; l'adaptador verificarà cada grànul al Pas 7.2. Els valors numèrics es congelaran als gates que els apliquin.
+**NASA Black Marble Collection 2** aporta tres fonts candidates: VNP46A2/Suomi-NPP, VJ146A2/NOAA-20 i VJ246A2/NOAA-21, registrades al [perfil v2](skyglow-v2-profile.json). El [perfil v1 del Pas 7.1](skyglow-v1-profile.json) i el lector verificat de 7.2 conserven l'abast VNP46. Les unitats/QA VJ146 provenen de la seva especificació; VJ246 i els grànuls J1/J2 reals resten pendents. La [revisió multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) separa TOA/L3 i RSR; cap de les tres fonts no és encara homologada per a skyglow físic. Els valors PASS/FAIL es congelen als primers gates que els apliquen.
 
 VNP46 no és skyglow a nivell de terra ni flux hemisfèric d'una font. VIIRS DNB continua definint la semàntica espectral de la mesura.
 
 Pipeline obligatori:
 
-`VNP46 → ViirsSourceObservation → model de mesura DNB/RSR → SourceModel → EmissionRegion → RadiancePatch`.
+`{VNP46,VJ146,VJ246} → adaptador específic → observació tipada → model DNB/RSR TOA + correcció L3 per producte → SourceModel → EmissionRegion → RadiancePatch`.
 
 Es mantenen separades `radiancia_observada` i `radiancia_artificial_estimada`. No s'aplica silenciosament `max(0, radiancia_observada)`. Valors negatius, nuls o febles conserven qualitat i incertesa fins que la política de baixa radiància decideixi com tractar-los.
 
@@ -70,9 +70,11 @@ La normalització conserva la fórmula:
 
 `A_j = L_DNB,j / ∫ S_j(λ) R_DNB(λ)dλ`.
 
+Aquí `L_DNB,j` ha de ser una restricció de banda **físicament compatible amb la RSR seleccionada**. El valor cru de `DNB_BRDF-Corrected_NTL` de VNP46A2 és L3 corregit i no es pot inserir automàticament en aquesta equació com si fos una radiància TOA del sensor. La transformació o interpretació efectiva C2 és una part pendent del gate de 7.3; cap `normalizationScale` operatiu es deriva fins que s'acrediti.
+
 No es divideix `R_DNB` per `∫R_DNB dλ` per defecte. Si un producte defineix radiància espectral mitjana o un operador diferent, ha d'usar un `measurementOperatorId` propi.
 
-**Unitat exacta de `L_DNB,j`: PENDENT DE VERIFICACIÓ contra l'ATBD aplicable.** No es dona per verificada aquí `W·cm⁻²·sr⁻¹` ni la §2.1.2.1 fins que es llegeixi directament.
+**Unitat de `L_DNB,j` verificada a TOA:** l'[ATBD VIIRS SDR](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf) identifica DNB com a radiància integrada `W·cm⁻²·sr⁻¹` i RSR energètica amb `λ` ja incorporat. El model de 7.3 integra radiància espectral al sensor en `nW·cm⁻²·sr⁻¹·nm⁻¹`; la sortida és `nW·cm⁻²·sr⁻¹`. Black Marble L3 comparteix unitat però no necessàriament operador directe. La [RSR SNPP anual](../evidencies/pas7.3/recerca-rsr-2026.md) i la [correspondència J1/J2 L3](../evidencies/pas7.3/revisio-multisatel-lit.md) resten pendents.
 
 `L_j,k,f = A_j c_j,f ∫_{Δλ_k} Φ_f(λ)dλ`.
 

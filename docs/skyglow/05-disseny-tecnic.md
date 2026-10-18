@@ -2,11 +2,11 @@
 
 ## Context
 
-El Pas 7 actual resol una necessitat visual i de visibilitat amb Bortle/magnitud límit, però no propaga fonts artificials a través d'una atmosfera física. La nova vertical usa VNP46 com a observació operativa, conserva VIIRS DNB com a model de mesura i infereix la font abans del transport espectral.
+El Pas 7 actual resol una necessitat visual i de visibilitat amb Bortle/magnitud límit, però no propaga fonts artificials a través d'una atmosfera física. La nova vertical admet VNP46/VJ146/VJ246 com a observacions candidates diferenciades, conserva VIIRS DNB com a model de mesura per sensor i infereix la font abans del transport espectral.
 
 ## Goals
 
-Radiància artificial direccional físicament traçable; VNP46 com a font operativa sense confondre observació i emissió; model de mesura DNB/RSR `BAND_INTEGRATED`; `SourceModel` espectral/angular; zenit i cúpules amb un únic kernel; terreny/curvatura; atmosfera extensible; projeccions de sensor separades; acceleracions offline homologades; cache error-based; renderer sense stutter; validació científica reproduïble.
+Radiància artificial direccional físicament traçable; selecció d'una font Black Marble admissible per dia/AOI/QA/model sense confondre observació i emissió; model DNB/RSR `BAND_INTEGRATED` TOA separat de la correcció L3; `SourceModel` espectral/angular; zenit i cúpules amb un únic kernel; terreny/curvatura; atmosfera extensible; projeccions de sensor separades; acceleracions offline homologades; cache error-based; renderer sense stutter; validació científica reproduïble.
 
 ## Non-goals v1
 

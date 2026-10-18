@@ -1,7 +1,8 @@
-"""Contracte pur de l'observació diària VNP46A2 Collection 2.
+"""Observació Black Marble L3 corregida de VNP46A2 Collection 2.
 
-La radiància és la mostra DNB observada. Cap camp d'aquest mòdul representa
-SPD, flux hemisfèric, emissió estimada o brillantor del cel.
+La radiància de DNB_BRDF-Corrected_NTL és la mostra de radiància nocturna
+ascendent de superfície corregida segons Black Marble, no la radiància TOA.
+No és una SPD, un flux hemisfèric ni una distribució angular de la font.
 """
 
 from __future__ import annotations
@@ -131,7 +132,15 @@ class Vnp46Observation:
     provenance: Vnp46Provenance
 
     @property
+    def physical_stage(self) -> str:
+        """Etapa física de la capa primària, separada de l'operador DNB TOA."""
+
+        return "black_marble_l3_corrected_surface_upward_ntl"
+
+    @property
     def source_inference_candidate(self) -> bool:
+        """Només qualitat local QA; no acredita RSR, SPD o SourceModel."""
+
         return self.classification == "candidate"
 
     def to_dict(self) -> dict[str, Any]:
@@ -149,6 +158,7 @@ class Vnp46Observation:
             "longitudeDeg": self.longitude_deg,
             "rawRadiance": self.raw_radiance,
             "radianceUnit": self.radiance_unit,
+            "physicalStage": self.physical_stage,
             "qualityFlag": self.quality_flag,
             "qfCloudMask": self.qf_cloud_mask,
             "snowFlag": self.snow_flag,

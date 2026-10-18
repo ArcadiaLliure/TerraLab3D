@@ -2,7 +2,7 @@
 
 > **Pla executable canònic per a Codex:** [19-pla-executable-codex.md](19-pla-executable-codex.md). Des del redisseny de 2026-10-17, la numeració 7.1–7.28 es conserva només com a espai de la vertical; **l’ordre i la descomposició antics queden substituïts**. Si una referència de passos dins els documents 00–18 entra en conflicte amb el pla executable, prevalen `docs/README.md`, el document 19 i el fitxer del pas actual.
 
-> Estat documental: especificació aprovada per implementar. El lector local de 7.2 té [proves i contrast amb un grànul real](../evidencies/pas7.2/validacio-adaptador.md); cap skyglow físic de producte no està homologat. Base de repositori inspeccionada: `main@e432454273befdcc7f33cb552d2b58cb0719298f`.
+> Estat documental: especificació aprovada per implementar. El lector local de 7.2 té [proves i contrast amb un grànul VNP46 real](../evidencies/pas7.2/validacio-adaptador.md). El Pas 7.3 ha tancat el [contracte de mesura TOA i interpretació Black Marble L3](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), amb dos VJ146 reals i QA 0 urbà. La [recerca SNPP](../evidencies/pas7.3/recerca-rsr-2026.md) i la [revisió NOAA-20/NOAA-21](../evidencies/pas7.3/revisio-multisatel-lit.md) encara no acrediten cap RSR aplicable de 2026 ni la inferència física L3→font; cap skyglow físic de producte no està homologat. Base de repositori inspeccionada: `main@e432454273befdcc7f33cb552d2b58cb0719298f`.
 
 ## Autoritat documental
 
@@ -14,9 +14,9 @@ TerraLab3D és actualment Python 3.12+ al backend (`aiohttp`, `astropy`, `numpy`
 
 ## Decisió central congelada
 
-La font operativa de la primera vertical és **NASA Black Marble VNP46A2 Collection 2**, concretada al [perfil v1](skyglow-v1-profile.json). El Pas 7.1 ha completat el contracte documental i la política PASS/FAIL `V1`; els valors es preregistren amb evidència als gates 7.4, 7.12, 7.17 i 7.22. El Pas 7.2 ha validat l'adaptador d'observació i el punt de represa és 7.3. VIIRS DNB continua essent el **model de mesura**: RSR real, operador `BAND_INTEGRATED`, procedència temporal i semàntica radiomètrica. VNP46 no es tracta com a flux hemisfèric ni com a skyglow.
+El [perfil v1](skyglow-v1-profile.json) conserva **VNP46A2 Collection 2** com a font inicial històrica. El [perfil v2](skyglow-v2-profile.json) amplia la política a tres candidats Black Marble independents: Suomi-NPP/VNP46A2, NOAA-20/VJ146A2 i NOAA-21/VJ246A2. El Pas 7.1 ha completat el contracte documental i la política PASS/FAIL `V1`; els valors es preregistren amb evidència als gates 7.4, 7.12, 7.17 i 7.22. El Pas 7.2 ha validat l'adaptador VNP46; el [Pas 7.3](../tasques/completat/pas7.3-dnb-rsr-measurement.md) ha tancat el contracte matemàtic DNB i la semàntica L3 documentada per NASA, amb dos VJ146 reals inspeccionats offline. El punt de represa és **7.4**. VIIRS DNB conserva l'operador `BAND_INTEGRATED` al sensor amb RSR versionada; la correcció L3 és separada i la inferència SPD/angular correspon a 7.5/7.16/7.17. Cap RSR no homologada s'usa com a resposta operativa.
 
-El pipeline canònic és `VNP46 → observació → model de mesura DNB → SourceModel (SPD + emissió angular + incertesa) → PropagationKernel espectral → cúpules/projeccions`.
+El pipeline canònic és `font Black Marble admissible → observació L3 i QA → model de mesura DNB i correcció L3 per producte → SourceModel (SPD + emissió angular + incertesa) → PropagationKernel espectral → cúpules/projeccions`.
 
 Hi haurà un únic `PropagationKernel`. Zenit, direccions arbitràries i cúpules són avaluacions del mateix operador físic. Precomputació, LUT i FFT només poden ser **backends d'acceleració** del mateix operador i han de demostrar el seu domini de validesa i error; no substitueixen la física ni autoritzen a col·lapsar l'espectre.
 
@@ -46,7 +46,7 @@ Abans de promoure cúpules, la mateixa ruta del kernel a 90° ha de superar el g
 - reconstrucció PCHIP sobre `log(B + ε)` i suma de fonts en radiància lineal;
 - watershed/`EmissionRegion`/quadtree només com a **acceleració posterior** a la validació de la integració directa d’àrea;
 - separació `NormalizationSpectrum` / `PropagationBandSet`;
-- VNP46 com a família de dades operativa, sense confondre observació amb emissió;
+- VNP46/VJ146/VJ246 com a candidats Black Marble independents, amb domini i llinatge propis i sense confondre observació amb emissió;
 - RSR real de VIIRS DNB, resolta amb release/procedència i data d'adquisició, amb `measurementOperatorId=BAND_INTEGRATED`;
 - `AtmosphericOpticsProvider` separat del kernel i `OpticalField` en tiles/capes;
 - `PhaseFunction` unificada; HG és fallback;
@@ -87,4 +87,4 @@ La taula 23.50–23.74 només conserva valor **històric**. Ja no existeix equiv
 
 ## Actualitzacions documentals del projecte
 
-`docs/README.md`, l'inventari funcional i el Pas 38 s'han actualitzat en aquest lot. `docs/MANUAL.md` i el `README.md` d'arrel es mantenen deliberadament sense canvis perquè no hi ha cap comportament d'usuari nou implementat; el protocol del projecte prohibeix documentar com a observable una capacitat només especificada.
+`docs/README.md`, l'inventari funcional i els passos afectats registren la política multisatèl·lit. `docs/MANUAL.md` descriu només el comportament d'usuari observable; els models de 7.3 encara no estan connectats al producte.

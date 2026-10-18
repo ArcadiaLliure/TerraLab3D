@@ -1,0 +1,101 @@
+{
+  "profileId": "skyglow-v2-multisat-policy",
+  "schemaVersion": 2,
+  "decisionDate": "2026-10-18",
+  "status": "measurement_contract_verified_sources_not_homologated",
+  "owner": "TerraLab3D",
+  "migration": {
+    "preserves": "skyglow-v1-profile.json",
+    "legacyReader": "Vnp46Policy.from_profile continues to consume v1 without reinterpretation",
+    "newContract": "source identity is platform + instrument + product + collection + acquisition day + processing lineage",
+    "historicalEvidence": "steps 7.1 and 7.2 remain valid only for VNP46A2.002"
+  },
+  "sources": [
+    {
+      "platform": "Suomi-NPP",
+      "instrument": "VIIRS DNB",
+      "productId": "VNP46A2",
+      "collection": "002",
+      "archiveSet": "5200",
+      "sourceContractRef": "skyglow-v1-profile.json#operationalSource",
+      "observationAdapterStatus": "verified_with_real_granule_step_7.2",
+      "spectralModelStatus": "unverified_for_2026_nighttime_L3",
+      "automaticSelectionStatus": "inadmissible_until_sensor_product_domain_verified",
+      "historicalUse": "preserved",
+      "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2"
+    },
+    {
+      "platform": "NOAA-20",
+      "instrument": "VIIRS DNB",
+      "productId": "VJ146A2",
+      "collection": "002",
+      "archiveSet": "5200",
+      "primaryLayerCandidate": "DNB_BRDF-Corrected_NTL",
+      "gapFilledLayerIsPrimary": false,
+      "observationAdapterStatus": "two_real_granules_inspected_offline_including_urban_QA0; product_adapter_pending",
+      "spectralModelStatus": "official_at_launch_LGS_MGS_diagnostic_only",
+      "automaticSelectionStatus": "inadmissible_until_sensor_product_domain_verified",
+      "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ146A2",
+      "fileSpecificationUrl": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/2/VJ146A2_v2.0",
+      "doi": "10.5067/VIIRS/VJ146A2.002"
+    },
+    {
+      "platform": "NOAA-21",
+      "instrument": "VIIRS DNB",
+      "productId": "VJ246A2",
+      "collection": "002",
+      "archiveSet": "5200",
+      "primaryLayerCandidate": null,
+      "observationAdapterStatus": "product_catalog_only_file_spec_and_real_granule_pending",
+      "spectralModelStatus": "official_at_launch_LGS_MGS_HGS_proxy_diagnostic_only",
+      "automaticSelectionStatus": "inadmissible_until_sensor_product_domain_verified",
+      "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ246A2",
+      "fileSpecificationUrl": null,
+      "doi": null
+    }
+  ],
+  "temporalPolicy": {
+    "selection": "exact_acquisition_day",
+    "missingDay": "unavailable",
+    "interpolation": "forbidden",
+    "gapFilling": "forbidden_in_primary_observation",
+    "crossSensorSubstitution": "explicit_and_provenance_preserving_only"
+  },
+  "selectionPolicy": {
+    "automatic": "only_among_verified_admissible_candidates_for_same_day_and_AOI",
+    "priority": "not_frozen_without_black_marble_availability_quality_and_calibration_evidence",
+    "manual": "advanced_selection_must_report_capability_and_uncertainty",
+    "ambiguousCandidate": "unavailable_with_reason_until_priority_justified",
+    "noData": "distinct_from_low_quality_and_unverified_spectral_model",
+    "overlap": "retain_separate_observations_and_discrepancy; no_radiance_summation",
+    "crossSensorHarmonization": "none_without_domain_specific_validated_SBAF"
+  },
+  "measurementModel": {
+    "measurementOperatorId": "BAND_INTEGRATED",
+    "physicalStage": "at_sensor_toa",
+    "l3CorrectionOperator": "NASA_Black_Marble_C2_User_Guide_section_2.2_equation_1_documented; no_per_pixel_reconstruction_claimed",
+    "l3CorrectedLayerMeaning": "DNB_BRDF-Corrected_NTL is corrected upward nighttime surface band radiance for VNP46A2 and VJ146A2 according to User Guide C2 section 5.2",
+    "l3CorrectionEvidence": "https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf",
+    "sourceSpectrumIdentifiability": "not_unique_from_one_panchromatic_band",
+    "sourceInferenceOwnerStep": "7.5",
+    "spectralAndStructuralUncertaintyOwnerStep": "7.16",
+    "empiricalValidationOwnerStep": "7.17",
+    "spectralUncertainty": "must_be_quantified_before_product_homologation; not_a_step_7.3_measurement_contract_exit_condition",
+    "unverifiedModelAction": "exclude_from_automatic_source_inference"
+  },
+  "acceptanceProfile": {
+    "status": "policy_preregistered",
+    "inheritedPolicyRef": "skyglow-v1-profile.json#acceptanceProfile",
+    "revisionRule": "new_sensor_and_domain_require_prospective_gate_records_before_candidate_evaluation",
+    "numericThresholds": null,
+    "gateLocations": ["7.4", "7.12", "7.17", "7.22"],
+    "homologationConsumesOnly": "7.28"
+  },
+  "resourceManagement": {
+    "ownerStep": "24",
+    "provider": "LAADS/Earthdata",
+    "products": ["VNP46A2.002", "VJ146A2.002", "VJ246A2.002"],
+    "sourceChecksumSeparateFromLocalSha256": true,
+    "credentialsOutsideManifests": true
+  }
+}

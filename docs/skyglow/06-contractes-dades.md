@@ -45,7 +45,7 @@ TypeScript DTO només si la UI/debug el necessita; el renderer normalment rep `D
 
 ## ViirsSourceObservation
 
-`productId`, `releaseId`, `acquisitionDate`, `radianciaObservada`, `radianceUnit`, `measurementOperatorId=BAND_INTEGRATED`, `qualityFlags`, `provenance`.
+`platform`, `instrument`, `productId`, `collection`, `releaseId`, `acquisitionDate`, `granuleId`, `radianciaObservada`, `radianceUnit`, `observationStage=L3_BRDF_CORRECTED`, `measurementModelId`, `qualityFlags`, `provenance`. El model TOA declara separadament `measurementOperatorId=BAND_INTEGRATED`. La [User Guide Black Marble C2, §2.2, equació (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) documenta la transformació de radiància `L_DNB` TOA en radiància nocturna ascendent de superfície `L_NTL`, incloent trajecte atmosfèric, transmissions, albedo/retrodispersió, component lunar i escapament pel dosser. La capa `DNB_BRDF-Corrected_NTL` és aquesta observació L3 corregida; els seus atributs no proporcionen tots els auxiliars per reproduir la correcció píxel a píxel. La inferència L3→SPD/emissió angular és un tercer contracte de 7.5/7.16/7.17. [Contrast amb grànuls reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md).
 
 `radianciaObservada` no equival a `radianciaArtificialEstimada`; aquesta segona pertany a `SourceModel`. El valor original no es trunca silenciosament a zero.
 
@@ -55,11 +55,13 @@ El [lector implementat](../../backend/src/terralab3d/infrastructure/adapters/lig
 
 ## ViirsSpectralResponse
 
-`sensor`, `platform`, `band=DNB`, `detectorMode=band-averaged|detector-specific`, vector λ/RSR, `releaseId`, `measurementOperatorId=BAND_INTEGRATED`, `sourceUrl`, `retrievedAt`, `sha256`, `accessMode`, `redistributionStatus`, `provenance`.
+`sensor`, `platform`, `band=DNB`, `gainStage`, `application`, `productId`, `collection`, `releaseId`, `validFrom`, `validThrough`, vector λ/RSR, `measurementOperatorId=BAND_INTEGRATED`, `evidenceClass`, `gainMappingEvidence?`, `l3LinkStatus`, `spectralUncertaintyStatus`, `sourceUrl`, `retrievedAt`, `localSha256`, `sourceChecksum?`, `redistributionStatus`, `provenance`. El lector local de 7.3 exigeix les claus de selecció, SHA-256 local i unitats `nm`/adimensional; no presenta el fingerprint com a checksum de font. La classe d'evidència distingeix RSR directa, reconstruïda, proxy oficial, històrica/experimental, família incerta i indisponible. Cap etiqueta de RSR implica vincle L3 ni cota d'error.
 
-La selecció de RSR utilitza també `acquisitionDate` de `ViirsSourceObservation`; no es duplica la data al recurs. Si no es pot establir la correspondència release/data, la RSR és `unavailable`.
+La selecció de RSR utilitza `acquisitionDate`; el recurs declara l'interval de validesa. `gainStage` identifica guany o resposta efectiva **només amb evidència**; el lector no l'infereix del fitxer L3. Absència, ambigüitat o model no homologat són estats separats. Les corbes NOAA de prelanzament estan registrades sota `VIIRS_DNB_TOA`/`at_launch_reference` i no es resolen com a `VJ146A2.002` o `VJ246A2.002` L3 de 2026; la LGS SNPP de 2013 tampoc és fallback. [Evidència](../evidencies/pas7.3/revisio-multisatel-lit.md).
 
-**Unitat DNB exacta pendent de verificació contra l'ATBD.**
+**Unitat DNB verificada:** l'[ATBD VIIRS SDR](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf) especifica radiància integrada `W cm⁻² sr⁻¹` i RSR energètica amb `λ` incorporat. El [model local](../../backend/src/terralab3d/domain/light_pollution/dnb_measurement.py) integra radiància espectral TOA en `nW cm⁻² sr⁻¹ nm⁻¹` amb RSR adimensional i retorna `nW cm⁻² sr⁻¹`, etiquetat `at_sensor_toa`; no torna a multiplicar per `λ`. Black Marble L3 és la radiància corregida de superfície de la mateixa dimensió, però no la mateixa magnitud física. La correcció és documentada per NASA; [SNPP anual](../evidencies/pas7.3/recerca-rsr-2026.md) i [J1/J2](../evidencies/pas7.3/revisio-multisatel-lit.md) no aporten encara una RSR operativa de 2026 amb incertesa per inferir la font.
+
+`DnbBandMeasurement.to_dict()` serialitza `schemaVersion=1`, `physicalStage=at_sensor_toa`, radiància/unitat, identitat de plataforma/producte/col·lecció, dia quan es facilita `MeasurementTarget`, release/guany/aplicació/finestra de la RSR, URL, data de recuperació, SHA-256 local, checksum de font opcional, arxiu/membre d'origen i els seus fingerprints si consten al manifest, redistribució, classe/referència d'evidència, mapping de guany i estats/evidències separats de vincle L3 i incertesa. Aquest DTO és diagnòstic; no afirma que el resultat TOA sigui una observació L3 ni que un text d'evidència o un hash local siguin verificació externa suficient.
 
 ## OpticalParameter<T>
 
@@ -143,4 +145,4 @@ Els noms wire són camelCase. Python tradueix explícitament des de noms interns
 
 ## Restriccions de producte VNP46
 
-`VNP46A2.002` és l'entrada operativa congelada al [perfil v1](skyglow-v1-profile.json), amb la capa `DNB_BRDF-Corrected_NTL` i qualitat 0 com a mostra candidata. La comparabilitat de baixa radiància pre/post-2017 no s'assumeix i no s'aplica cap correcció de punt zero universal. El valor cru i els flags es conserven; fill, negatius i qualitat degradada no s'infereixen com a font. Les correccions de producte, inclosa stray light, només s'apliquen a TerraLab3D si el producte/release no les ha aplicat. La política `V1` està preregistrada; cap llindar numèric no es fixa aquí sense procedència.
+`VNP46A2.002` és el contracte inicial congelat al [perfil v1](skyglow-v1-profile.json) i verificat a 7.2; el [perfil v2](skyglow-v2-profile.json) afegeix `VJ146A2.002` i `VJ246A2.002` com a candidates. Dos grànuls VJ146 reals comparteixen l'estructura de les nou capes i la semàntica QA 0–5 de la guia amb VNP46, però el lector VNP46 continua restringit a la seva plataforma/DOI. VJ246 no s'ha contrastat amb HDF5 real. El valor cru i els flags es conserven; fill, negatius i qualitat degradada no s'infereixen com a font. No hi ha correcció de punt zero universal ni doble correcció de stray light. Dia exacte, sense gap-fill/interpolació o substitució de sensor silenciosa. La política `V1` està preregistrada; cap llindar numèric no es fixa aquí sense procedència.

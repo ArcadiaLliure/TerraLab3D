@@ -4,11 +4,11 @@
 
 ## Finalitat
 
-Tancar `F1` i transformar observacions DNB en una distribució de font explícita, versionada i falsable.
+Tancar `F1` i transformar observacions DNB admissibles per sensor/producte/release en una distribució de font explícita, versionada i falsable.
 
 ## Dependències
 
-7.4
+[Pas 7.4 — oracle espectral i SpectralBandSet](pas7.4-spectral-bandset-validation.md) i [Pas 7.3 — contracte de mesura](../completat/pas7.3-dnb-rsr-measurement.md). La conclusió matemàtica de 7.3 no homologa automàticament cap sensor nocturn de 2026.
 
 ## Referències obligatòries
 
@@ -22,12 +22,15 @@ Tancar `F1` i transformar observacions DNB en una distribució de font explícit
 - [ ] Definir `SourceModel` separant normalització DNB, pesos SPD, distribució angular i components d’incertesa.
 - [ ] Adoptar un model angular publicat/empíric/ensemble amb domini declarat; Lambert no és fallback implícit.
 - [ ] Documentar inputs auxiliars necessaris i comportament quan falten.
-- [ ] Propagar la incertesa estructural de la inferència VNP46→font sense confondre-la amb error numèric.
+- [ ] Per cada font candidata i període, acreditar la RSR efectiva o família aplicable, el mapping de guany i el vincle amb la cadena Black Marble C2; si manca, mantenir aquella font `unavailable_for_physical_inference` sense convertir una corba diagnòstica en operativa.
+- [ ] Definir la inferència L3 corregit → prior/ensemble SPD i emissió angular amb la semàntica de l'equació (1) de NASA; no aplicar la integral TOA directament al valor L3 ni reconstruir correccions auxiliars absents com si fossin mesurades.
+- [ ] Propagar la incertesa estructural de la inferència Black Marble L3→font, incloent RSR, correccions L3 i prior SPD per plataforma, sense confondre-la amb error numèric; una SPD única no es dedueix d'una banda pancromàtica.
+- [ ] Conservar observacions superposades de plataformes diferents sense sumar-les; el fallback i la selecció manual mantenen la procedència i la causa de no admissibilitat. Cap SBAF per defecte.
 - [ ] Validar fixtures sintètiques i, si existeixen, dades angulars externes independents; versionar `sourceModelId`.
 
 ## Criteri de sortida
 
-`F1` queda resolta per al domini v1 o el pas queda `bloquejat`. Un `Vnp46Observation` pot produir un `SourceModel` complet amb provenance i incertesa declarada.
+`F1` queda resolta per al domini concret d'almenys una font **espectralment admissible** o el pas queda `bloquejat`. Una observació L3 tipada i qualificada produeix `SourceModel` amb provenance, SPD prior/ensemble, model angular i incertesa estructural justificats. La correspondència RSR/guany/producte/període ha d'estar acreditada per a la font escollida; les altres poden romandre no homologades. `Vnp46Observation` continua sent el cas implementat de lectura, sense validar automàticament VJ146/VJ246.
 
 ## Evidències obligatòries
 

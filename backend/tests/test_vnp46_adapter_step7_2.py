@@ -100,6 +100,7 @@ def test_raw_values_quality_geolocation_and_serialization(tmp_path: Path) -> Non
         assert values[0].provenance.radiance_dataset_path.endswith("/DNB_BRDF-Corrected_NTL")
         encoded = json.dumps(values[1].to_dict(), allow_nan=False)
         assert json.loads(encoded)["rawRadiance"] == values[1].raw_radiance
+        assert json.loads(encoded)["physicalStage"] == "black_marble_l3_corrected_surface_upward_ntl"
         assert "emission" not in encoded.lower()
         assert "spd" not in encoded.lower()
     assert adapter._file is None

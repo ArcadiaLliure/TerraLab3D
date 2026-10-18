@@ -4,11 +4,12 @@
 
 | Requeriment | Decisió | Pas | Test/evidència |
 |---|---|---:|---|
-| contracte/dades v1 | manifest i política V1 preregistrada; valors diferits als gates | 7.1 completat | [perfil](skyglow-v1-profile.json), [fonts](../evidencies/pas7.1/auditoria-fonts.md) i [validació](../evidencies/pas7.1/validacio-contracte.txt) |
-| VNP46 operatiu | observació immutable, no emissió; lector local verificat amb grànul real | 7.2 completat | [fixtures, proves i contrast binari](../evidencies/pas7.2/validacio-adaptador.md) en verd; QA 0 real encara no contrastada |
-| mesura DNB | RSR real + BAND_INTEGRATED | 7.3 | oracle espectral fi de mesura |
+| contracte/dades v1 | manifest i política V1 preregistrada per SNPP; valors diferits als gates | 7.1 completat | [perfil v1](skyglow-v1-profile.json), [fonts](../evidencies/pas7.1/auditoria-fonts.md) i [validació](../evidencies/pas7.1/validacio-contracte.txt) |
+| VNP46 inicial | observació immutable, no emissió; lector local verificat amb grànul real, sense ampliar resultat a J1/J2 | 7.2 completat | [fixtures, proves i contrast binari](../evidencies/pas7.2/validacio-adaptador.md) en verd; QA 0 real encara no contrastada |
+| política multisatèl·lit | tres candidates C2, identitat i estat d'admissibilitat específic; cap fallback silenciós | 7.3 contracte completat; admissibilitat física 7.5 | [perfil v2](skyglow-v2-profile.json), [matriu J1/J2](../evidencies/pas7.3/revisio-multisatel-lit.md) i [dos grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) |
+| mesura DNB | operador TOA `BAND_INTEGRATED`, RSR versionada, Eq. (1) NASA TOA→L3 corregit, QA/unitats/llinatge VNP46 i VJ146 reals; RSR concretes de 2026 no homologades | 7.3 completat | [proves](../evidencies/pas7.3/validacio-model-dnb.md), [LUT SNPP](../evidencies/pas7.3/recerca-rsr-2026.md), [revisió multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) i [guia/grànuls](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) |
 | error espectral V1 | pressupost justificat abans de seleccionar bandes; manca de valor bloqueja aquí | 7.4 | oracle fi, origen i registre congelat + SPDs adverses + bandSetId homologat |
-| SourceModel | SPD + angular + incertesa | 7.5 | F1 tancada o pas bloquejat |
+| SourceModel | inferència L3→SPD prior/ensemble i emissió angular; RSR/guany/producte/període acreditats per font; incertesa estructural | 7.5 | F1 tancada per domini o pas bloquejat; cap corba diagnòstica promovida |
 | oracle transport | SG-REF independent + àrea directa | 7.6 | convergència, incertesa numèrica i fixtures analítiques per fonamentar 7.12 |
 | kernel únic | zenit=direcció ordinària | 7.7 | B0 + invariants geomètrics |
 | camp òptic | provider estàndard tiled | 7.8 | fixtures multi-tile |
@@ -19,19 +20,20 @@
 | cúpules | DomeProfile des de ruta directa | 7.13 | all-sky dens + invariant zenit |
 | projeccions | SQM/TESS/CIE post-kernel | 7.14 | sensor golden |
 | atmosfera real | ERA5/CAMS com providers | 7.15 | fixtures/camps parcials |
-| incertesa | ledger quantitatiu | 7.16 | coverage/provenance |
-| ground truth clear V1 | criteris empírics preregistrats abans del conjunt reservat, amb incerteses instrumental, de dades i del model | 7.17 | partició `held-out`, origen i validació leave-one-site-out |
+| incertesa | ledger quantitatiu separat de l'operador TOA, RSR/guany, correcció L3, inferència SPD/angular, radiometria, atmosfera i estructura per sensor | 7.16 | coverage/provenance; indisponible explícit sense sigma inventada |
+| ground truth clear V1 | validació empírica de la inferència L3→font i del transport amb mètriques separades; criteris preregistrats abans del conjunt reservat, amb incerteses instrumental, de dades i del model | 7.17 | partició `held-out`, origen i validació leave-one-site-out |
 | compressió fonts | watershed/quadtree com backend | 7.18 | B5 vs àrea directa |
 | compressió fase | Legendre com backend | 7.19 | B3 vs fase ref |
 | AD/error budget | cotes conservadores | 7.20 | FD + bounds |
 | cache/scheduler | reuse només dins error | 7.21 | cold/warm/movement/teleport |
 | LUT/FFT opcional V1 | SLO de producte aprovats abans de decidir; manca de requisit bloqueja 7.22 | 7.22 | aprovació, plataforma, SLO congelats i directe vs accelerat |
 | núvols | CloudOpticalState + B6 | 7.23 | clear limit + oracle |
-| validació final | domini homologable congelat | 7.24 | clear/cloudy report |
+| validació final | domini homologable per plataforma/producte/release/període congelat | 7.24 | clear/cloudy report i discrepàncies intersensor sense suma/SBAF per defecte |
 | bridge | DTO + revisions | 7.25 | stale discard/bytes |
 | renderer/debug | doble buffer lineal | 7.26 | frame/stutter/leaks |
 | composició | canals lineals separats | 7.27 | reference/instantaneous |
-| homologació | B7 + SLO + cap bloqueig ocult; només criteris congelats, cap llindar nou | 7.28 | informe final amb versions i procedència dels gates previs |
+| homologació | B7 + SLO + cap bloqueig ocult; només criteris congelats, cap llindar nou | 7.28 | informe final amb versions, dominis per font i procedència dels gates previs |
+| adquisició Black Marble | un únic gestor autenticat i persistent per VNP46/VJ146/VJ246, checksum de font separat del SHA local | 24 | [pas executable](../tasques/pendent/pas24-cataleg-recursos-descarregues.md); proves de grànuls reals pendents |
 
 ## Frontera amb el cel astral
 

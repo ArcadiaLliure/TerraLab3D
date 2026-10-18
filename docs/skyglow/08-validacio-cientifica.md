@@ -20,7 +20,7 @@ Cada `SpectralBandSet` actiu es compara contra un espectre de referència prou f
 
 No es fan sweeps de rendiment per escollir N. V3 continua obert perquè falta decidir el pressupost d'error espectral que converteix aquesta comparació en PASS/FAIL.
 
-La normalització DNB usa `BAND_INTEGRATED`; la unitat exacta queda pendent de verificació contra l'ATBD.
+La normalització DNB usa `BAND_INTEGRATED` al **sensor TOA**; la [unitat integrada DNB](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf#page=38) està verificada. La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) documenta la correcció TOA→radiància L3 de superfície i els [grànuls VJ146](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) en confirmen capa/QA/unitats; el valor L3 no s'equipara a la integral TOA. La [RSR anual SNPP](../evidencies/pas7.3/recerca-rsr-2026.md) continua pendent i les [corbes J1/J2 de prelanzament](../evidencies/pas7.3/revisio-multisatel-lit.md) són diagnòstiques; 7.5/7.16/7.17 han d'acreditar la inferència física i la incertesa per almenys una plataforma. Les superposicions entre sensors es comparen, no se sumen; no s'aplica SBAF per defecte.
 
 ## 3. Validació atmosfèrica
 

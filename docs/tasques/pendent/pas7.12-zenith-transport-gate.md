@@ -19,7 +19,7 @@ Validar el transport complet abans de cúpules, compressions o caches.
 
 - [ ] Preregistrar tolerància, mètrica, unitat i domini runtime↔SG-REF abans de veure el resultat PASS/FAIL del runtime candidat; justificar-los amb font admissible, incloses convergència i incertesa numèrica de SG-REF demostrades a 7.6.
 - [ ] Executar fixtures zenitals sintètiques amb SourceModel conegut contra SG-REF.
-- [ ] Executar almenys una fixture VNP46→SourceModel amb atmosfera estàndard i DEM reproduïble.
+- [ ] Executar almenys una fixture d'una observació Black Marble científicament admesa → SourceModel, amb atmosfera estàndard i DEM reproduïble; mantenir VNP46 com a regressió si el seu domini ha estat acreditat.
 - [ ] Auditar cadena d’unitats, convergència, error numèric, memòria, nodes i dependències.
 - [ ] Separar explícitament l’error de transport de la incertesa del SourceModel.
 - [ ] Bloquejar qualsevol pas posterior si necessita un factor de calibratge opac o una ruta especial a 90°.

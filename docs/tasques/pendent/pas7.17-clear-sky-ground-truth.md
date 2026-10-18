@@ -8,7 +8,7 @@ Contrastar el sistema físic directe amb observacions externes abans de qualsevo
 
 ## Dependències
 
-7.16
+[Pas 7.16 — incertesa i provenance](pas7.16-uncertainty-provenance.md), [Pas 7.5 — SourceModel](pas7.5-source-model-v1.md) i [Pas 7.3 — contracte de mesura TOA/L3](../completat/pas7.3-dnb-rsr-measurement.md).
 
 ## Referències obligatòries
 
@@ -19,8 +19,10 @@ Contrastar el sistema físic directe amb observacions externes abans de qualsevo
 
 - [ ] Construir dataset de validació clear-sky TESS/SQM/all-sky amb metadata temporal/geogràfica i control de leakage.
 - [ ] Separar mètriques de `SourceModel` de mètriques de transport; no usar runtime↔SG-REF com a prova empírica de F1.
+- [ ] Contrastar empíricament la inferència Black Marble L3→font del domini homologable, amb diagnòstic separat dels efectes de RSR, correcció L3, SPD i emissió angular; un QA 0 real per si sol no valida aquests efectes.
 - [ ] Aplicar leave-one-site-out o partició equivalent preregistrada.
 - [ ] Reservar el conjunt `held-out` i preregistrar mètriques, dominis i criteris empírics abans d'avaluar-lo, amb incerteses instrumental, de dades i del model; bloquejar 7.17 si no hi ha justificació.
+- [ ] Estratificar validació per plataforma/producte/release i domini d'admissibilitat; registrar discrepàncies en dies/àrees solapats sense calibrar un SBAF amb el mateix conjunt reservat.
 - [ ] Simular exactament resposta/FOV dels sensors via 7.14.
 - [ ] Publicar intervals, biaixos i casos fora de domini sense retocar V1 després de veure els resultats.
 
