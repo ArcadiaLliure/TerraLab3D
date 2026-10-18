@@ -26,7 +26,7 @@
 
 **DECISIÓ NOSTRA:** VIIRS DNB no desapareix de l'arquitectura. Es conserva com a model de mesura espectral: RSR oficial, procedència temporal i `measurementOperatorId=BAND_INTEGRATED`.
 
-**FET PUBLICAT, verificat directament:** l'[ATBD VIIRS SDR](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf) defineix radiància DNB integrada `W·cm⁻²·sr⁻¹` i RSR energètica amb `λ` incorporat; la [User Guide Black Marble C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) explicita la transformació a radiància nocturna ascendent de superfície L3 corregida, comprovada amb [grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md). [NASA](https://viirsland.gsfc.nasa.gov/Val/BM_Val.html) documenta RSR anual SNPP, estabilitat relativa J1/J2 i cap ajust RSR intersensor C2. [NOAA J2](https://ncc.nesdis.noaa.gov/NOAA-21/J2VIIRS_SpectralResponseFunctions.php) publica LGS/MGS de prelanzament; el README recomana MGS com a proxy HGS sense cota. **PENDENT PER A FONT FÍSICA:** acreditar RSR/guany de 2026, inferència SPD/angular i incertesa per almenys una font a 7.5/7.16/7.17; la RSR anual SNPP és una via oberta.
+**FET PUBLICAT, verificat directament:** l'[ATBD VIIRS SDR](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf) defineix radiància DNB integrada `W·cm⁻²·sr⁻¹` i RSR energètica amb `λ` incorporat; la [User Guide Black Marble C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) explicita la transformació a radiància nocturna ascendent de superfície L3 corregida, comprovada amb [grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md). [NASA](https://viirsland.gsfc.nasa.gov/Val/BM_Val.html) documenta RSR anual SNPP, estabilitat relativa J1/J2 i cap ajust RSR intersensor C2. [NOAA J2](https://ncc.nesdis.noaa.gov/NOAA-21/J2VIIRS_SpectralResponseFunctions.php) publica LGS/MGS de prelanzament; el README recomana MGS com a proxy HGS sense cota. **PENDENT PER A C/H OBSERVACIONAL:** acreditar RSR/guany de 2026 o alternativa justificable, inferència L3→SPD/angular i incertesa a 7.16–7.24. El [SourceModel S](../evidencies/pas7.5/validacio-source-model-s-v1.md) ja es verifica sense VIIRS.
 
 **DECISIÓ NOSTRA:** la RSR es resol de manera compatible amb release/procedència i data d'adquisició; no es tria automàticament l'última.
 
@@ -34,11 +34,11 @@
 
 **DECISIÓ NOSTRA:** `radiancia_observada` i `radiancia_artificial_estimada` es mantenen separades. Valors negatius o propers a zero no es clippen silenciosament. Stray light i altres correccions es confirmen per producte/release per evitar doble correcció.
 
-**DECISIÓ NOSTRA:** VNP46 no determina l'SPD ni la distribució angular hemisfèrica. Aquestes inferències pertanyen a `SourceModel` i conserven incertesa.
+**DECISIÓ NOSTRA:** VNP46 no determina l'SPD ni la distribució angular hemisfèrica. La inferència observacional pertany a C/H i ha de conservar incertesa; el model S només defineix hipòtesis físiques explícites, sense reconstruir VNP46.
 
 ## Espectre
 
-**FET FÍSIC.** Una única mesura panchromàtica no determina un SPD únic. **DECISIÓ NOSTRA:** representar la forma amb una base/ensemble i normalitzar-la contra la RSR real. Les famílies LED/HPS/LPS/halogenur són candidates de biblioteca, no una base científica definitiva.
+**FET FÍSIC.** Una única mesura pancromàtica no determina un SPD únic. **DECISIÓ NOSTRA:** S pot utilitzar formes SPD definides i ensembles sense RSR; C/H haurà de declarar RSR de referència, hipòtesis i sensibilitat abans de qualsevol normalització observacional. Les famílies LED/HPS/LPS/halogenur són candidates de biblioteca, no una base científica definitiva.
 
 **DECISIÓ ACTUAL:** nombre de bandes de propagació configurable per `spectralBandCount` i `bandSetId`, sense valor fix ni benchmark per determinar N. La configuració activa es verifica en unitats, integració espectral, luminància fotòpica, SQM/TESS, XYZ i radiància propagada; això no és una campanya de selecció del nombre de bandes.
 

@@ -78,8 +78,9 @@
     "l3CorrectionEvidence": "https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf",
     "sourceSpectrumIdentifiability": "not_unique_from_one_panchromatic_band",
     "sourceInferenceOwnerStep": "7.16_conditional_C;7.5_defined_S",
-    "sourceInferenceStatus": "L3_conditional_pending_not_blocking_defined_physical_source_S",
+    "sourceInferenceStatus": "defined_source_S_verified_step_7.5;L3_conditional_C_H_pending",
     "sourceInferenceEvidence": "../evidencies/pas7.5/estat-inferencia-font-2026.md",
+    "definedSourceEvidence": "../evidencies/pas7.5/validacio-source-model-s-v1.md",
     "spectralAndStructuralUncertaintyOwnerStep": "7.16",
     "empiricalValidationOwnerStep": "7.17",
     "spectralUncertainty": "must_be_quantified_before_product_homologation; not_a_step_7.3_measurement_contract_exit_condition",
@@ -134,7 +135,7 @@
     "domains": [
       {
         "id": "S",
-        "status": "pending_implementation",
+        "status": "verified_defined_tabulated_point_and_uniform_rectangle_v1",
         "requiresVIIRS": false,
         "requiresRSR": false
       },
@@ -152,6 +153,9 @@
       }
     ],
     "noGlobal2026RsrBlocker": true,
+    "definedSourceSchemaVersion": 1,
+    "definedSourceEvidenceRef": "../evidencies/pas7.5/validacio-source-model-s-v1.md",
+    "definedSourceDoesNotAssertMeasuredCity": true,
     "firstExperimentalPair": {
       "platform": "NOAA-20",
       "productId": "VJ146A2",

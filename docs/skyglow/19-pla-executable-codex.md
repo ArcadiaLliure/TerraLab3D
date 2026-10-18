@@ -26,7 +26,7 @@ No s’accepta cap d’aquests patrons:
 
 Els passos que necessitin un criteri addicional propi el preregistren abans de la seva primera aplicació amb la mateixa política; no traslladen un PASS/FAIL a 7.1 ni creen llindars a 7.28.
 
-**Revisió de contracte 2026-10-18.** El [perfil v1](skyglow-v1-profile.json) i les evidències de 7.1/7.2 són històricament vàlids per a `VNP46A2.002`. El [perfil v2](skyglow-v2-profile.json) amplia la política a tres fonts candidates sense requalificar aquell lector: `VNP46A2.002`/Suomi-NPP, `VJ146A2.002`/NOAA-20 i `VJ246A2.002`/NOAA-21. La [revisió de la User Guide C2 §2.2 Eq. (1) i dos grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) separa la integral instrumental TOA, la radiància Black Marble L3 corregida i la inferència L3→font. **7.3 tanca el contracte de mesura**, inclòs QA 0 real h18v04, mentre que l'homologació d'una RSR/SourceModel operatius de 2026 es resol per domini a 7.5, la incertesa a 7.16 i la validació empírica a 7.17. Cap font es considera homologada per al skyglow nocturn de 2026 només per aparèixer al catàleg o disposar d'una RSR de prelanzament.
+**Revisió de contracte 2026-10-18.** El [perfil v1](skyglow-v1-profile.json) i les evidències de 7.1/7.2 són històricament vàlids per a `VNP46A2.002`. El [perfil v2](skyglow-v2-profile.json) amplia la política a tres fonts candidates sense requalificar aquell lector: `VNP46A2.002`/Suomi-NPP, `VJ146A2.002`/NOAA-20 i `VJ246A2.002`/NOAA-21. La [revisió de la User Guide C2 §2.2 Eq. (1) i dos grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) separa la integral instrumental TOA, la radiància Black Marble L3 corregida i la inferència L3→font. **7.3 tanca el contracte de mesura**, inclòs QA 0 real h18v04. **7.5 completa una font definida S sense observació VIIRS**; la RSR efectiva de 2026, la inferència L3 i l'homologació observacional es tracten per domini a 7.16–7.24. Cap font urbana es considera homologada per aparèixer al catàleg o disposar d'una RSR de prelanzament.
 
 El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + model de mesura admissible**. Si hi ha diverses fonts admissibles, la prioritat necessita dades de disponibilitat Black Marble, qualitat, calibratge i cobertura; l'estat primari de NOAA-21 a la distribució general NOAA no decideix la prioritat de Black Marble. La selecció manual avançada conserva la identitat i les limitacions. Cap fallback temporal o entre sensors és silenciós; fonts superposades es retenen separades i no es sumen. Un SBAF requereix gate científic propi. La descoberta, autenticació i instal·lació de grànuls són del [Pas 24](../tasques/pendent/pas24-cataleg-recursos-descarregues.md), que ha de cobrir els tres productes amb un únic gestor.
 
@@ -99,11 +99,11 @@ La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elim
 
 ### 7.3 — Model de mesura VIIRS DNB, RSR real i BAND_INTEGRATED
 
-**Finalitat.** Modelar la resposta DNB per plataforma/producte/release/data i verificar tres contractes diferents: integral espectral SPD/TOA→DNB amb RSR versionada; interpretació de la radiància Black Marble L3 corregida segons la guia NASA; inferència L3→SPD i emissió angular, que correspon a 7.5/7.16/7.17.
+**Finalitat.** Modelar la resposta DNB per plataforma/producte/release/data i verificar tres contractes diferents: integral espectral SPD/TOA→DNB amb RSR versionada; interpretació de la radiància Black Marble L3 corregida segons la guia NASA; inferència L3→SPD i emissió angular, que correspon a C/H de 7.16–7.24. La font definida S independent correspon a 7.5.
 
 La verificació científica amb un grànul J1/J2 real pot emprar una fixture local aportada o obtinguda per recerca offline, amb SHA-256 i procedència, tal com 7.2 va fer amb VNP46. Això permet completar 7.3 sense avançar el wizard del Pas 24; l'adquisició ordinària dels tres productes continua allà.
 
-**Gate de sortida.** Integral TOA, unitats, identitat i repositori RSR reproduïbles; transformació TOA→L3 explícitament documentada per NASA; capa, unitat, QA i procedència L3 contrastades amb dades reals; estats d'homologació RSR explícits per sensor/període. **Estat: completat per al contracte de mesura.** La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i els [grànuls VJ146 h00v01/h18v04](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), inclòs QA 0 urbà, satisfan el contracte L3. La RSR efectiva de 2026 i la inferència espectral/angular física no estan homologades; 7.5, 7.16 i 7.17 n'assumeixen els gates.
+**Gate de sortida.** Integral TOA, unitats, identitat i repositori RSR reproduïbles; transformació TOA→L3 explícitament documentada per NASA; capa, unitat, QA i procedència L3 contrastades amb dades reals; estats d'homologació RSR explícits per sensor/període. **Estat: completat per al contracte de mesura.** La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i els [grànuls VJ146 h00v01/h18v04](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), inclòs QA 0 urbà, satisfan el contracte L3. La RSR efectiva de 2026 i la inferència espectral/angular observacional no estan homologades; 7.16–7.24 n'assumeixen els gates C/H.
 
 **Fitxer executable:** [pas7.3-dnb-rsr-measurement.md](../tasques/completat/pas7.3-dnb-rsr-measurement.md)
 
@@ -119,9 +119,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Finalitat.** Definir SPD, geometria, emissió angular i amplitud física explícita d'una font sense satèl·lit. L'admissibilitat Black Marble és una branca C/H separada.
 
-**Gate de sortida.** Constructor `SourceModel` S versionat, normalització, unitats, fixtures, conservació i tests independents; **no** cal RSR operativa 2026 ni inferència L3. Estat actual: pendent de completar S; el gate parcial L3 segueix verificat i sense font H admissible.
+**Gate de sortida.** Constructor `SourceModel` S versionat, normalització, unitats, fixtures, conservació i tests independents; **no** cal RSR operativa 2026 ni inferència L3. **Estat: completat en el domini S declarat** amb [SPD CIE verificades, geometries i proves de conservació](../evidencies/pas7.5/validacio-source-model-s-v1.md). El gate L3 continua separat i sense font H admissible.
 
-**Fitxer executable:** [pas7.5-source-model-v1.md](../tasques/pendent/pas7.5-source-model-v1.md)
+**Fitxer executable:** [pas7.5-source-model-v1.md](../tasques/completat/pas7.5-source-model-v1.md)
 
 ### 7.6 — SG-REF: oracle independent de transport i integració d’àrea
 

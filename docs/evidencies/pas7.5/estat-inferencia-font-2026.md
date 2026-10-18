@@ -1,5 +1,7 @@
 # Pas 7.5 — Estat verificat de la inferència Black Marble L3→font
 
+> **Evidència històrica del gate observacional C/H.** El bloqueig de 7.5 descrit a continuació correspon al criteri anterior, que exigia una font Black Marble admissible. La [revisió prospectiva S/C/H](../../skyglow/20-politica-rsr-i-validacio-per-dominis.md) trasllada aquesta exigència a C/H; el [SourceModel S](validacio-source-model-s-v1.md) es valida independentment. Cap resultat observacional d'aquesta auditoria s'ha requalificat.
+
 Data: 2026-10-18. **Resultat:** encara no hi ha una font Black Marble de 2026 admissible per construir un `SourceModel` físic. El Pas 7.5 resta bloquejat. Aquest estat no invalida el contracte de mesura de 7.3 ni l'homologació numèrica acotada de 7.4.
 
 ## Evidència directa

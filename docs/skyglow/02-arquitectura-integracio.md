@@ -9,7 +9,7 @@ El backend ja segueix domini/aplicació/infraestructura/scene. Existeixen `domai
 - REUSE: coordenades, observador, DEM/horizon, bridge, workers, lifecycle, resource registry, escena persistent.
 - ADAPT: `domain/light_pollution` com a namespace de domini; `SkyEnvironmentSnapshot`; scheduler d'actualitzacions; infraestructura cache.
 - REWRITE progressiu: l'ús de Bortle com a font de `u_artificialBrightness` al shader.
-- NEW: adaptadors Black Marble específics (VNP46 verificat, VJ146/VJ246 pendents), registre versionat de models DNB/RSR, `SourceModel`, `EmissionRegion`, `RadiancePatch`, espectre, òptica atmosfèrica, kernel, cache física, `DomeProfile`, `PhotometricProjectionService`, `SkyRadianceComposer` i oracle(s) de referència.
+- NEW: adaptadors Black Marble específics (VNP46 verificat, VJ146/VJ246 pendents), registre versionat de models DNB/RSR, `EmissionRegion`, `RadiancePatch`, òptica atmosfèrica, kernel, cache física, `DomeProfile`, `PhotometricProjectionService`, `SkyRadianceComposer` i oracle(s) de referència. `SourceModel` S i espectre tabulat ja existeixen offline.
 - DISCARD només al final de migració: glow Bortle artístic com a autoritat física. Es pot conservar temporalment com a fallback explícit.
 
 ## 3. Components proposats
@@ -19,8 +19,10 @@ flowchart LR
   V[LAADS: VNP46 / VJ146 / VJ246] --> A[gestor de recursos Pas 24]
   A --> X[adaptador científic per producte]
   X --> O[ViirsSourceObservation + identitat]
-  R[RSR DNB + BAND_INTEGRATED] --> S[SourceModel]
-  O --> S
+  DS[SPD + geometria + potència definida + patró angular] --> S[SourceModel S implementat]
+  R[RSR DNB + BAND_INTEGRATED] -. model C/H futur .-> C[Escenari L3 condicionat]
+  O -. C/H futur .-> C
+  C -. validació independent pendent .-> ER
   S --> ER[EmissionRegion + RadiancePatch]
   MET[Atmosfera estàndard / ERA5 / CAMS] --> AP[AtmosphericOpticsProvider]
   AP --> OF[OpticalField tiled]
@@ -37,7 +39,7 @@ flowchart LR
   RT --> GPU[Three.js DomeSkyglowRenderer]
 ~~~
 
-Black Marble és entrada de dades tipada per plataforma/producte/release; VIIRS DNB defineix la mesura TOA i cada producte L3 necessita la seva transformació i incertesa. El selector admet una font només per dia/AOI/QA/model verificats, conserva fallback explícit i no suma observacions entre sensors. `SourceModel` resol la inferència espectral/angular abans del transport. Cap backend accelerat pot canviar aquesta frontera.
+Black Marble és entrada de dades tipada per plataforma/producte/release; VIIRS DNB defineix la mesura TOA i cada producte L3 necessita la seva transformació i incertesa. El selector C/H admetrà una observació només per dia/AOI/QA/model verificats, conservarà fallback explícit i no sumarà sensors. El `SourceModel` S ja defineix espectre i angularitat sense observació; la inferència L3→font és una branca futura separada. Cap backend accelerat pot canviar aquesta frontera.
 
 ## 4. Fronteres de responsabilitat
 

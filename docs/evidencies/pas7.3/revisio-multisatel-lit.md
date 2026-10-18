@@ -1,5 +1,7 @@
 # Revisió multisatèl·lit del model de mesura DNB — 2026-10-18
 
+> **Lectura prospectiva:** les conclusions instrumentals següents conserven el resultat històric. La [política S/C/H posterior](../../skyglow/20-politica-rsr-i-validacio-per-dominis.md) assigna la verificació de RSR i la inferència Black Marble C/H a 7.16–7.24; el [Pas 7.5 completat](../pas7.5/validacio-source-model-s-v1.md) només construeix fonts definides independents de VIIRS.
+
 Aquest registre amplia la [recerca de Suomi-NPP 2026](recerca-rsr-2026.md); no en substitueix els resultats. La [revisió posterior de la guia C2 i de dos grànuls VJ146 reals](contrast-granuls-black-marble-c2.md) corregeix el criteri de sortida de 7.3: la transformació TOA→L3 és documentada per NASA; el que continua sense acreditar-se és l'aplicabilitat d'una RSR concreta i la inferència física L3→font per a 2026. Els ZIP i les corbes extretes viuen a `I:/TerraLab/data/earth/light-pollution/viirs-rsr/research/noaa-multisat/`, fora del repositori. L'script reproduïble és [`tools/prepare_multisat_viirs_rsr.py`](../../../tools/prepare_multisat_viirs_rsr.py). «Oficial» descriu l'origen de la caracterització, no una equivalència provada amb Black Marble L3.
 
 ## Diagnòstic científic

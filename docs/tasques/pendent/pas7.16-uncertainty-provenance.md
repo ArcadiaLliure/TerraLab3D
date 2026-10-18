@@ -8,7 +8,7 @@ Construir intervals i components d’error després que font, atmosfera i transp
 
 ## Dependències
 
-[Pas 7.15 — atmosfera real](pas7.15-atmos-era5-cams.md), [Pas 7.5 — inferència de font](pas7.5-source-model-v1.md) i [Pas 7.3 — model de mesura](../completat/pas7.3-dnb-rsr-measurement.md).
+[Pas 7.15 — atmosfera real](pas7.15-atmos-era5-cams.md), [Pas 7.5 — font física definida S](../completat/pas7.5-source-model-v1.md) i [Pas 7.3 — model de mesura](../completat/pas7.3-dnb-rsr-measurement.md). La inferència condicionada L3→font C comença aquí, no a 7.5.
 
 ## Referències obligatòries
 

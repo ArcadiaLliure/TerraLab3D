@@ -27,7 +27,7 @@ Tancar `V3` abans que el nombre de bandes entri al kernel. Fixar mètrica, domin
 
 **En depenen:**
 
-- [Pas 7.5 — SourceModel v1](../pendent/pas7.5-source-model-v1.md). La inferència SPD/angular i la seva incertesa no s'anticipen aquí.
+- [Pas 7.5 — SourceModel físic S](pas7.5-source-model-v1.md). La inferència observacional SPD/angular C/H i la seva incertesa no s'anticipen aquí ni es resolen amb S.
 - [Pas 7.10 — transport espectral i gasos](../pendent/pas7.10-gas-spectral-kernel.md), revalidació del pressupost de bandes en un domini físic nou.
 - [Pas 7.14 — projeccions fotomètriques](../pendent/pas7.14-photometric-projections.md), revalidació amb respostes SQM/TESS/CIE.
 
@@ -80,4 +80,4 @@ En reprendre el pla, continua a 7.5 sense usar les RSR històriques com a respos
 
 ## Treball pendent
 
-Cap dins del domini numèric verificat de 7.4. L'acreditació de la font física correspon a [7.5](../pendent/pas7.5-source-model-v1.md); els operadors nous es revaliden a [7.10](../pendent/pas7.10-gas-spectral-kernel.md) i [7.14](../pendent/pas7.14-photometric-projections.md).
+Cap dins del domini numèric verificat de 7.4. La font física **definida S** correspon a [7.5](pas7.5-source-model-v1.md); la inferència Black Marble C/H continua a 7.16–7.24. Els operadors nous es revaliden a [7.10](../pendent/pas7.10-gas-spectral-kernel.md) i [7.14](../pendent/pas7.14-photometric-projections.md).

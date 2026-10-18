@@ -8,7 +8,7 @@ Contrastar el sistema físic directe amb observacions externes abans de qualsevo
 
 ## Dependències
 
-[Pas 7.16 — incertesa i provenance](pas7.16-uncertainty-provenance.md), [Pas 7.5 — SourceModel](pas7.5-source-model-v1.md) i [Pas 7.3 — contracte de mesura TOA/L3](../completat/pas7.3-dnb-rsr-measurement.md).
+[Pas 7.16 — incertesa i provenance](pas7.16-uncertainty-provenance.md), [Pas 7.5 — SourceModel](../completat/pas7.5-source-model-v1.md) i [Pas 7.3 — contracte de mesura TOA/L3](../completat/pas7.3-dnb-rsr-measurement.md).
 
 ## Referències obligatòries
 

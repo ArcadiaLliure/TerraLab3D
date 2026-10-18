@@ -1,5 +1,7 @@
 # Pas 7.3 — Model de mesura DNB multisatèl·lit
 
+> **Revisió prospectiva posterior:** les referències històriques a 7.5 com a propietari de la inferència observacional s'han desdoblat per la [política S/C/H](../../skyglow/20-politica-rsr-i-validacio-per-dominis.md). [7.5](pas7.5-source-model-v1.md) completa fonts físiques definides S sense VIIRS; la inferència i homologació Black Marble C/H pertanyen a 7.16–7.24. Els resultats i les proves originals de 7.3 no canvien.
+
 > Estat: **completat** per al contracte matemàtic i de mesura; cap font nocturna de 2026 homologada per a inferència física. **Estat funcional:** operador TOA, repositori RSR, interpretació L3 NASA i contrast VNP46/VJ146 reals verificats. **Origen:** planificat, criteri de sortida revisat el 2026-10-18. **Abast:** identitat, RSR, guany, unitats i frontera TOA/L3/SourceModel. **Pla:** [19](../../skyglow/19-pla-executable-codex.md).
 
 ## Descripció funcional
@@ -20,7 +22,7 @@ Definir i verificar **tres contractes separats**: (1) la integral SPD/radiància
 
 **Depèn de:** [7.1 — política V1](pas7.1-contracte-cientific-v1.md) i [7.2 — lector VNP46](pas7.2-vnp46-observation-adapter.md), l'abast verificat del qual no s'estén retrospectivament a VJ146/VJ246.
 
-**En depenen:** [7.4 — bandes espectrals](pas7.4-spectral-bandset-validation.md), [7.5 — SourceModel](../pendent/pas7.5-source-model-v1.md), [7.16 — incertesa](../pendent/pas7.16-uncertainty-provenance.md), [7.17 — validació empírica](../pendent/pas7.17-clear-sky-ground-truth.md) i la integració de grànuls amb el [gestor comú del Pas 24](../pendent/pas24-cataleg-recursos-descarregues.md).
+**En depenen:** [7.4 — bandes espectrals](pas7.4-spectral-bandset-validation.md), [7.5 — SourceModel](pas7.5-source-model-v1.md), [7.16 — incertesa](../pendent/pas7.16-uncertainty-provenance.md), [7.17 — validació empírica](../pendent/pas7.17-clear-sky-ground-truth.md) i la integració de grànuls amb el [gestor comú del Pas 24](../pendent/pas24-cataleg-recursos-descarregues.md).
 
 ## Codi existent a reutilitzar
 

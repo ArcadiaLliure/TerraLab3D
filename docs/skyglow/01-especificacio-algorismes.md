@@ -6,13 +6,13 @@ La sortida autoritativa del sistema és radiància espectral o radiància integr
 
 Per a una direcció unitària `ω` des de l'observador `O`, el punt de quadratura és `P(s)=O+sω`. El límit és `s_max=min(s_TOA,s_terrain)`. La intersecció amb terreny trunca la integral; no es representa com una transparència artificial.
 
-## 2. Font operativa VNP46 i model de mesura VIIRS DNB
+## 2. Fonts candidates Black Marble i model de mesura VIIRS DNB
 
 **NASA Black Marble Collection 2** aporta tres fonts candidates: VNP46A2/Suomi-NPP, VJ146A2/NOAA-20 i VJ246A2/NOAA-21, registrades al [perfil v2](skyglow-v2-profile.json). El [perfil v1 del Pas 7.1](skyglow-v1-profile.json) i el lector verificat de 7.2 conserven l'abast VNP46. Les unitats/QA VJ146 provenen de la seva especificació i de [dos grànuls J1 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md); J2 real resta pendent. La [revisió multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) separa TOA/L3 i RSR; cap de les tres fonts no és encara homologada per a skyglow físic. Els valors PASS/FAIL es congelen als primers gates que els apliquen.
 
 VNP46 no és skyglow a nivell de terra ni flux hemisfèric d'una font. VIIRS DNB continua definint la semàntica espectral de la mesura.
 
-Pipeline obligatori:
+Pipeline observacional **C/H planificat**, encara sense font urbana homologada:
 
 `{VNP46,VJ146,VJ246} → adaptador específic → observació tipada → model DNB/RSR TOA + correcció L3 per producte → SourceModel → EmissionRegion → RadiancePatch`.
 
@@ -22,15 +22,17 @@ Les correccions pròpies del producte, inclosa stray light, són **a confirmar s
 
 Les sèries de baixa radiància que travessen el canvi de punt zero documentat per Coesfeld et al. (2020, §2.3.1) no es consideren directament homogènies abans/després de 2017 sense una política explícita de producte. La correcció concreta d'aquell treball no es converteix en una constant universal.
 
-### 2.1. SourceModel
+### 2.1. SourceModel S definit i branca observacional C/H
 
-VNP46 no determina unívocament ni l'SPD ni la distribució angular hemisfèrica. `SourceModel` conserva separats prior/ensemble espectral, escala compatible amb DNB, model angular d'emissió i incertesa.
+El [SourceModel S implementat a 7.5](../evidencies/pas7.5/validacio-source-model-s-v1.md) defineix `s(λ)` amb integral unitària per nm, patró angular `a(θ,φ)` amb integral hemisfèrica unitària, geometria puntual o rectangle i amplitud `P` en watts definits o escala relativa paramètrica. Retorna `Pλ=P·s(λ)` i `Iλ=P·s(λ)·a(θ,φ)` amb unitats explícites, independentment de VIIRS. Per a rectangle uniforme, `Mλ=Pλ/A` i `Lλ=Mλ·a/cosθ` quan `cosθ>0`. No equival a una font urbana mesurada.
 
-El `PropagationKernel` no rep directament una radiància DNB com si fos intensitat. Rep una intensitat radiant direccional `I↑(direccio_font_punt)` produïda pel `SourceModel`, amb unitats de potència per estereoradiant. No es fixa una llei lambertiana per defecte; F1 continua oberta.
+VNP46 no determina unívocament ni l'SPD ni la distribució angular hemisfèrica. La branca C/H futura conserva separats prior/ensemble espectral, normalització condicionada, model angular, correcció L3 i incertesa; no hereta watts d'una fixture S.
+
+El `PropagationKernel` no rep directament una radiància DNB com si fos intensitat. Rebrà intensitat radiant direccional `I↑(direccio_font_punt)` produïda pel `SourceModel`, amb unitats de potència per estereoradiant. No es fixa una llei lambertiana per defecte; F1 observacional continua oberta.
 
 ## 3. Segmentació radiomètrica
 
-La segmentació s'aplica a un camp d'emissió artificial interpretat pel `SourceModel`, no a valors crus que s'hagin forçat a ser positius.
+La segmentació futura de C/H s'aplicarà a un camp d'emissió artificial interpretat, no a valors Black Marble crus forçats a ser positius. Una font S definida no necessita segmentació satel·lital.
 
 ~~~text
 VNP46 observation
@@ -70,7 +72,7 @@ La normalització conserva la fórmula:
 
 `A_j = L_DNB,j / ∫ S_j(λ) R_DNB(λ)dλ`.
 
-Aquí `L_DNB,j` ha de ser una restricció de banda **físicament compatible amb la RSR seleccionada**. El valor cru de `DNB_BRDF-Corrected_NTL` de VNP46A2 és L3 corregit i no es pot inserir automàticament en aquesta equació com si fos una radiància TOA del sensor. La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) documenta la transformació TOA→L3 i tanca la seva interpretació al Pas 7.3; cap `normalizationScale` operatiu d'inferència de font es deriva fins que s'acrediti el model de 7.5.
+Aquí `L_DNB,j` ha de ser una restricció de banda **físicament compatible amb la RSR seleccionada**. El valor cru de `DNB_BRDF-Corrected_NTL` de VNP46A2 és L3 corregit i no es pot inserir automàticament en aquesta equació com si fos una radiància TOA del sensor. La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) documenta la transformació TOA→L3 i tanca la seva interpretació al Pas 7.3; cap `normalizationScale` observacional operatiu es deriva fins que s'acrediti el model C/H de 7.16–7.24.
 
 No es divideix `R_DNB` per `∫R_DNB dλ` per defecte. Si un producte defineix radiància espectral mitjana o un operador diferent, ha d'usar un `measurementOperatorId` propi.
 
@@ -80,7 +82,7 @@ No es divideix `R_DNB` per `∫R_DNB dλ` per defecte. Si un producte defineix r
 
 VNP46 continua essent una observació panchromàtica: no justifica col·lapsar el transport atmosfèric a un únic flux. `spectralBandCount` i `bandSetId` continuen definint la propagació.
 
-El [gate parcial de 7.5](../evidencies/pas7.5/estat-inferencia-font-2026.md) només comprova si la base QA/RSR/guany/L3 d'una observació és admissible. Encara no hi ha una RSR operativa de 2026 ni un operador que converteixi la radiància L3 corregida en normalització, priors SPD i emissió angular de ciutat. `AngularEmissionProfile` representa formes axials normalitzades aportades amb procedència, però cap forma es dedueix de L3 ni s'adopta per defecte. Per això les expressions d'aquesta secció continuen sent contractes condicionals per al futur `SourceModel`, no càlculs executats sobre el grànul real.
+El [gate observacional històric](../evidencies/pas7.5/estat-inferencia-font-2026.md) només comprova si la base QA/RSR/guany/L3 d'una observació és admissible. Encara no hi ha una RSR operativa de 2026 ni un operador que converteixi la radiància L3 corregida en normalització, priors SPD i emissió angular de ciutat. Els perfils angulars definits S no es dedueixen de L3. Les expressions d'inversió d'aquesta secció continuen sent contractes condicionals C/H, no càlculs executats sobre un grànul real.
 
 ## 6. Extinció i transmissió
 

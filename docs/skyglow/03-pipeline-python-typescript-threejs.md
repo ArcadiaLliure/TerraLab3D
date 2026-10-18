@@ -12,15 +12,15 @@
 
 ### Preprocessament i fonts
 
-`SourceModelBuilder` consumeix l'observació VNP46 junt amb el model de mesura DNB. Aplica el prior espectral i el model angular d'emissió seleccionat, amb incertesa explícita. VNP46 no es tracta com a flux hemisfèric ni imposa Lambert.
+El [SourceModel S implementat](../evidencies/pas7.5/validacio-source-model-s-v1.md) consumeix una SPD definida, geometria, amplitud i patró angular explícits; no consumeix VNP46 ni RSR. Un futur constructor C/H podrà consumir observacions Black Marble i hipòtesis amb incertesa, sense tractar VNP46 com a flux hemisfèric ni imposar Lambert.
 
 El segmentador treballa sobre `radiancia_artificial_estimada` o equivalent físicament admissible, no sobre valors crus clipats. Després executa log-radiance, denoise conservador, llindar, màxims/prominence, watershed i merge. `EmissionRegionBuilder` conserva geometria, moments radiomètrics i patches. `RadiancePatchTree` refina segons error físic i valida l'aproximació puntual contra integració d'àrea independent en fixtures de control.
 
 ### Espectre
 
-`SpectralBasisLibrary` conté formes normalitzades i metadades. `ViirsSpectralResponseRepository` resol RSR per plataforma/producte/release/guany/data/aplicació; les corbes NOAA de prelanzament són diagnòstiques fins a demostrar-ne la transferència al producte. L'operador `BAND_INTEGRATED` calcula TOA `nW·cm⁻²·sr⁻¹`; la correcció Black Marble L3 és un model diferent documentat a la [User Guide C2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i contrastat amb [grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md). 7.3 ha completat el contracte de mesura; l'admissibilitat espectral i la inferència L3→font queden per a 7.5/7.16/7.17. Vegeu també [RSR SNPP](../evidencies/pas7.3/recerca-rsr-2026.md) i [revisió J1/J2](../evidencies/pas7.3/revisio-multisatel-lit.md).
+`DefinedSpectrum` conserva formes normalitzades, llicència i procedència; el [model S](../evidencies/pas7.5/validacio-source-model-s-v1.md) permet LED CIE i mescles sense VIIRS. `ViirsSpectralResponseRepository` resol RSR per plataforma/producte/release/guany/data/aplicació; les corbes NOAA de prelanzament són diagnòstiques fins a demostrar-ne la transferència al producte. L'operador `BAND_INTEGRATED` calcula TOA `nW·cm⁻²·sr⁻¹`; la correcció Black Marble L3 és un model diferent documentat a la [User Guide C2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i contrastat amb [grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md). 7.3 ha completat el contracte de mesura; l'admissibilitat i la inferència observacionals L3→font queden per a 7.16–7.24.
 
-`SpectralSourceModel` produeix `SpectralSourceEstimate` i ensemble. VNP46 continua sent una observació panchromàtica: el kernel rep `BandRadiance` per `SpectralBandSet` i no un únic flux acromàtic.
+`SourceModelEnsemble` conserva alternatives S sense pesos probabilístics inferits. VNP46 continua sent una observació pancromàtica; el futur kernel rebrà espectre i intensitat direccional del model S, i eventualment fonts C/H acreditades, no un únic flux acromàtic.
 
 ### Atmosfera
 
@@ -32,7 +32,7 @@ El `PropagationKernel` rep `SourceSet`, `Observer`, `OpticalField`, `TerrainVisi
 
 ### Reference solver
 
-Ha d'existir un camí offline independent per validar el transport. La decisió S1 continua oberta: pot ser un `SG-REF` propi de skyglow o una dependència creuada amb el Pas 7.65. Si es quantifica el biaix single-scattering, l'oracle ha d'incloure multiple scattering segons F5. El gate 7.20 valida transport donat el mateix `SourceModel`; no valida empíricament la inferència VNP46→emissió.
+El camí offline independent de transport és **SG-REF propi de 7.6**, segons S1. Si es quantifica el biaix single-scattering, l'oracle ha d'incloure multiple scattering segons F5. El gate zenital de **7.12** valida transport S donat el mateix `SourceModel` a oracle i runtime; no valida empíricament la inferència VNP46→emissió.
 
 ### Projeccions fotomètriques i composició
 
@@ -82,7 +82,7 @@ LOD de renderer i LOD físic són independents. El renderer pot reduir resoluci�
 
 ## Píxel final
 
-`VNP46 observation → DNB measurement model/RSR → SourceModel spectrum+angular emission → spectral propagation radiance → dome compression → bridge → linear artificial field → + natural moonless + moon + twilight → camera/exposure → tone mapping → display transform → pixel`.
+`SourceModel S definit → propagació espectral → compressió de cúpula → bridge → camp artificial lineal → + natural sense Lluna + Lluna + crepuscle → càmera/exposició → tone mapping → visualització`. La branca C/H futura incorpora Black Marble L3/RSR i validació abans de connectar-se al mateix transport.
 
 En paral·lel, el resultat físic pot passar per `PhotometricProjectionService` per obtenir luminància, SQM/TESS simulats i `BortleEquivalent`; aquestes projeccions no són la font del kernel.
 

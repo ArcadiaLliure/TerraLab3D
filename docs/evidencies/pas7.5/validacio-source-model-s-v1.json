@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "domain": "S_DEFINED_SOURCE_ONLY",
+  "cieManifest": "docs/evidencies/pas7.4/cie-asset-manifest.json",
+  "externalAssets": [
+    {
+      "file": "CIE_illum_LEDs_1nm.csv",
+      "sha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+      "publishedMd5": "99d1bc3974902d5e02e4c3fe539bea3d"
+    },
+    {
+      "file": "CIE_illum_HPs.csv",
+      "sha256": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552",
+      "publishedMd5": "423e996fd3ee17eaf783633e4fd2f62c"
+    }
+  ],
+  "spectra": [
+    {
+      "spectrumId": "CIE_LED_B1_reference",
+      "knots": 401,
+      "independentNormalizedIntegral": 1.0,
+      "inputIsRelative": true
+    },
+    {
+      "spectrumId": "CIE_HP1_reference",
+      "knots": 81,
+      "independentNormalizedIntegral": 1.0,
+      "inputIsRelative": true
+    },
+    {
+      "spectrumId": "LED_B1_HP1_equal_shape",
+      "knots": 401,
+      "independentNormalizedIntegral": 1.0,
+      "inputIsRelative": true
+    }
+  ],
+  "angularIndependentIntegral": {
+    "axial": 1.0,
+    "anisotropic": 1.0
+  },
+  "models": [
+    {
+      "sourceModelId": "defined_point_cie_led_b1",
+      "sourceMode": "DEFINED_SOURCE",
+      "absoluteCalibrationStatus": "defined_absolute",
+      "spectralFluxUnit": "W nm^-1"
+    },
+    {
+      "sourceModelId": "defined_area_cie_mix",
+      "sourceMode": "DEFINED_SOURCE",
+      "absoluteCalibrationStatus": "parametric",
+      "spectralFluxUnit": "relative nm^-1"
+    }
+  ],
+  "assertionBoundary": "CIE shapes and fixture geometry/power only; no VIIRS, L3, city, atmospheric transport or product accuracy"
+}

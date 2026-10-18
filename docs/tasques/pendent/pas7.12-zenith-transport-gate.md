@@ -19,14 +19,14 @@ Validar el transport complet abans de cúpules, compressions o caches.
 
 - [ ] Preregistrar tolerància, mètrica, unitat i domini runtime↔SG-REF abans de veure el resultat PASS/FAIL del runtime candidat; justificar-los amb font admissible, incloses convergència i incertesa numèrica de SG-REF demostrades a 7.6.
 - [ ] Executar fixtures zenitals sintètiques amb SourceModel conegut contra SG-REF.
-- [ ] Executar almenys una fixture d'una observació Black Marble científicament admesa → SourceModel, amb atmosfera estàndard i DEM reproduïble; mantenir VNP46 com a regressió si el seu domini ha estat acreditat.
+- [ ] Executar fonts S definides puntuals i extenses del [Pas 7.5](../completat/pas7.5-source-model-v1.md), amb atmosfera estàndard i DEM reproduïble. Una fixture Black Marble C/H s'afegeix només si el seu domini observacional ja està acreditat; no és prerequisit del gate S.
 - [ ] Auditar cadena d’unitats, convergència, error numèric, memòria, nodes i dependències.
 - [ ] Separar explícitament l’error de transport de la incertesa del SourceModel.
 - [ ] Bloquejar qualsevol pas posterior si necessita un factor de calibratge opac o una ruta especial a 90°.
 
 ## Criteri de sortida
 
-La tolerància runtime↔SG-REF està justificada i congelada abans de la comparació decisòria; si manca, 7.12 queda bloquejat. El mateix `PropagationKernel` supera el perfil V1 al zenit sense calibratge arbitrari. El PASS valida transport donat un SourceModel, no la inferència d'emissió.
+La tolerància runtime↔SG-REF està justificada i congelada abans de la comparació decisòria; si manca, 7.12 queda bloquejat. El mateix `PropagationKernel` supera el perfil V1 al zenit amb fonts S, sense calibratge arbitrari. El PASS valida transport donat un SourceModel S, no la inferència d'emissió C/H.
 
 ## Evidències obligatòries
 

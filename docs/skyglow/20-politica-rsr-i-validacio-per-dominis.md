@@ -35,4 +35,4 @@ Fonts per a l'auditoria:
 5. **7.18–7.23:** accelerar i ampliar el motor en el domini científic verificat.
 6. **7.24–7.28:** gates i homologació per domini. Integració de S com a simulació física etiquetada és possible sense H; no activar cap skyglow urbà absolut «real» sense validació observacional.
 
-Preservar tots els resultats passats i la política V1 de llindars (incloent 0,01 mag i 238/238 de 7.4). Aquesta revisió és documental: cap motor S ni predicció C/H no es declara implementat.
+Preservar tots els resultats passats i la política V1 de llindars (incloent 0,01 mag i 238/238 de 7.4). La revisió de criteri fou documental; posteriorment el [Pas 7.5 ha implementat i verificat `SourceModel` S](../evidencies/pas7.5/validacio-source-model-s-v1.md). El transport S comença a 7.6; cap predicció C/H no es declara implementada.
