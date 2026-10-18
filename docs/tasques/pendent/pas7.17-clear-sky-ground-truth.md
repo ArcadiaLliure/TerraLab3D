@@ -19,14 +19,19 @@ Contrastar el sistema físic directe amb observacions externes abans de qualsevo
 
 ## Tasques
 
-- [ ] Construir dataset de validació clear-sky TESS/SQM/all-sky amb metadata temporal/geogràfica i control de leakage.
-- [ ] Separar mètriques de `SourceModel` de mètriques de transport; no usar runtime↔SG-REF com a prova empírica de F1.
-- [ ] Contrastar empíricament la inferència Black Marble L3→font del domini homologable, amb diagnòstic separat dels efectes de RSR, correcció L3, SPD i emissió angular; un QA 0 real per si sol no valida aquests efectes.
-- [ ] Aplicar leave-one-site-out o partició equivalent preregistrada.
-- [ ] Reservar el conjunt `held-out` i preregistrar mètriques, dominis i criteris empírics abans d'avaluar-lo, amb incerteses instrumental, de dades i del model; bloquejar 7.17 si no hi ha justificació.
-- [ ] Estratificar validació per plataforma/producte/release i domini d'admissibilitat; registrar discrepàncies en dies/àrees solapats sense calibrar un SBAF amb el mateix conjunt reservat.
-- [ ] Simular exactament resposta/FOV dels sensors via 7.14.
-- [ ] Publicar intervals, biaixos i casos fora de domini sense retocar V1 després de veure els resultats.
+**Gate S obligatori per autoritzar acceleracions:**
+
+- [ ] Registrar abans de la comparació un pressupost d'error físic/numèric, mètriques, domini de fonts S, referència independent i criteris amb procedència.
+- [ ] Comparar SG-REF/ruta directa contra casos analítics o altres oracles independents, sense reutilitzar la mateixa aproximació crítica.
+- [ ] Verificar transport zenital/all-sky, projeccions i invariants per fonts S del domini aprovat, incloent casos adversos.
+- [ ] Documentar PASS/FAIL S amb evidència reproduïble; una fallada obliga a reparar el model físic, mai a relaxar retrospectivament el pressupost.
+- [ ] Permetre 7.18 únicament dins el domini S realment validat.
+
+**Gate empíric C/H separat, no bloquejant si encara no és avaluable:**
+
+- [ ] Preparar, si hi ha dades adequades, observacions externes TESS/SQM/all-sky i estratificació per plataforma/lloc/data; mantenir metadata i prevenir filtració de dades.
+- [ ] Preregistrar criteris empírics, incertesa i partició `held-out` abans d'avaluar, amb leave-one-site-out o equivalent, sense reajustar al conjunt reservat.
+- [ ] Contrastar explícitament la inferència L3→font/transport quan C sigui avaluable; si no, deixar `not_evaluated` documentat, **no** un PASS ni un obstacle al gate S.
 
 ## Criteri de sortida
 

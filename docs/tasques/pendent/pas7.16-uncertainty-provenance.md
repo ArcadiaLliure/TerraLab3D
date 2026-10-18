@@ -19,13 +19,19 @@ Construir intervals i components d’error després que font, atmosfera i transp
 
 ## Tasques
 
-- [ ] Implementar `UncertaintyModelRegistry` amb components numèrics, font, atmosfera, dades i estructurals.
-- [ ] Representar explícitament `unavailable` en lloc d’inventar sigmes.
-- [ ] Modelar correlacions quan siguin necessàries i separar biaix sistemàtic de variació temporal.
-- [ ] Propagar incertesa a radiància i projeccions instrumentals.
-- [ ] Separar incertesa RSR/mapping de guany, correccions L3 per producte, prior SPD/angular, radiometria, atmosfera, estructura i error numèric; registrar correlacions i domini plataforma/release/període. La manca de cota espectral bloqueja només la homologació que en depèn.
-- [ ] Propagar explícitament la incertesa de la inferència L3→SPD i emissió angular del `SourceModel` de 7.5; distingir-la dels errors de l'operador TOA, de la correcció Black Marble documentada i del transport posterior.
-- [ ] Produir un ledger de provenance/error per resultat.
+**Obligatòries per al criteri de sortida S:**
+
+- [ ] Implementar `UncertaintyModelRegistry` i `Provenance` dels resultats físics S, separant error numèric, atmosfera, font i model estructural.
+- [ ] Representar absència de sigma amb `unavailable`; mai derivar-lo d'una etiqueta de confiança ni usar un valor inventat.
+- [ ] Propagar incerteses conegudes fins a radiància i projeccions de S; documentar correlacions quan siguin materials, biaixos i domini.
+- [ ] Generar un ledger per resultat S, amb identitat d'inputs, revisions de model i hipòtesis.
+- [ ] Demostrar amb tests que aquesta via no exigeix RSR, ni producte Black Marble, ni una inversió L3→emissió.
+
+**Branca C/H addicional, no bloquejant de S:**
+
+- [ ] Investigar la parella NOAA-20 VJ146A2.002 + RSR pública de referència, el mode nocturn, el mapping de guany i la semàntica TOA→L3; registrar precisament què no és verificable.
+- [ ] Si hi ha evidència suficient, implementar escenaris condicionats amb priors SPD/angular, ensembles i anàlisi de sensibilitat, sense atribuir precisió absoluta fictícia.
+- [ ] Si no n'hi ha, publicar l'estat C/H `unavailable` o `not_evaluated` amb causes; no falsificar PASS ni retocar la calibració S.
 
 ## Criteri de sortida
 

@@ -4,6 +4,9 @@
 
 > Estat documental: especificació aprovada per implementar. El lector local de 7.2 té [proves i contrast amb un grànul VNP46 real](../evidencies/pas7.2/validacio-adaptador.md). El Pas 7.3 ha tancat el [contracte de mesura TOA i interpretació Black Marble L3](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), amb dos VJ146 reals i QA 0 urbà. La [recerca SNPP](../evidencies/pas7.3/recerca-rsr-2026.md) i la [revisió NOAA-20/NOAA-21](../evidencies/pas7.3/revisio-multisatel-lit.md) encara no acrediten cap RSR aplicable de 2026 ni la inferència física L3→font; cap skyglow físic de producte no està homologat. Base de repositori inspeccionada: `main@e432454273befdcc7f33cb552d2b58cb0719298f`.
 
+
+**Revisió prospectiva 2026-10-18:** [RSR opcional i tres dominis S/C/H](20-politica-rsr-i-validacio-per-dominis.md). El 7.5 continua per fonts físiques definides S sense exigir RSR exacta 2026, mentre Black Marble C/H es tracta als gates posteriors amb qualificació explícita.
+
 ## Autoritat documental
 
 `AGENTS.md` exigeix la skill `plan`. S'ha carregat i aplicat el 2026-10-17 per continuar des del Pas 7.1. L'estat del codi i les evidències prevalen sobre els esquelets; no s'ha inferit cap nova capacitat funcional.

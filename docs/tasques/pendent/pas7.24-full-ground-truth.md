@@ -18,10 +18,10 @@ Repetir la validació del sistema ja optimitzat i amb núvols abans d’integrar
 ## Tasques
 
 - [ ] Reexecutar clear-sky per demostrar que acceleracions 7.18–7.22 no han degradat la validesa.
-- [ ] Afegir subset cloudy només dins el domini de 7.23 amb metadata suficient.
+- [ ] Afegir subset cloudy només dins el domini de 7.23 amb metadata suficient, per a fonts S verificades; el fet de simular núvols no demostra calibratge observacional C/H.
 - [ ] Validar intervals d’incertesa, cobertura i biaixos per sensor/lloc/condició.
 - [ ] Separar els resultats per plataforma Black Marble, producte, release i període; contrastar superposicions sense sumar radiàncies ni ampliar el domini d'una font amb dades d'una altra.
-- [ ] Fer data-leakage checks i mantenir particions preregistrades.
+- [ ] Fer data-leakage checks i mantenir particions preregistrades **quan s'avalua una afirmació C/H**; si no hi ha campanya empírica, registrar `not_evaluated` en lloc de marcar fals PASS.
 - [ ] Congelar versions de producte, SourceModel, atmosfera, phase/backend i criteris que passin.
 
 - [ ] Informar S (simulació física, gates propis), C (escenari condicionat) i H (validació empírica independent) per separat; sense H, cap «skyglow urbà absolut real» homologat.

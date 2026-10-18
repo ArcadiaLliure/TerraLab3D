@@ -69,11 +69,11 @@ La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elim
 
 ## Fases
 
-**A — Contracte científic i inferència (7.1–7.6).** Tanca producte/dades, DNB, espectre, SourceModel i oracle. Quan acaba, la pregunta “què és la font i contra què validem?” ja no està oberta.
+**A — Contracte científic i font física definida (7.1–7.6).** Conserva dades/DNB i discretització; tanca un SourceModel S de SPD, emissió angular i escala definides, i crea l'oracle SG-REF. No afirma haver reconstruït la font urbana real L3, que és la branca C/H posterior.
 
-**B — Transport directe i gates (7.7–7.17).** Implementa la física sense acceleracions, supera el zenit, construeix all-sky/projeccions i la contrasta amb observacions clear-sky.
+**B — Transport directe i gates per domini (7.7–7.17).** Implementa la física S sense acceleracions, supera el zenit, construeix all-sky/projeccions i valida el transport amb un oracle independent. La comparació empírica Black Marble C/H és un gate separat i només s'aplica si hi ha observacions i criteris justificats.
 
-**C — Acceleracions homologades (7.18–7.22).** Només ara entren quadtree, fase comprimida, AD, cache i un backend LUT/FFT opcional. Tots es comparen contra la ruta directa.
+**C — Acceleracions homologades per domini (7.18–7.22).** Només ara entren quadtree, fase comprimida, AD, cache i un backend LUT/FFT opcional. Es comparen contra la ruta directa de S; no hereten una homologació C/H absent.
 
 **D — Núvols i validació final (7.23–7.24).** Amplia el domini atmosfèric i congela què és realment homologable.
 
