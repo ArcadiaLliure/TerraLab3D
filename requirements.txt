@@ -7,6 +7,8 @@ aiohttp>=3.9
 astropy>=6.1
 hpgeom>=1.3
 numpy>=2.0
+# Quadratura independent de SG-REF (offline, no render loop).
+scipy>=1.15
 skyfield==1.55
 skyfield-data==7.0.0
 spiceypy==7.0.0

@@ -40,7 +40,7 @@ Si un càlcul falla, es manté l'últim resultat físic vàlid amb indicador `st
 
 ## Testing
 
-Unitari: fórmules, unitats, RSR, `BAND_INTEGRATED`, espectre, fase, quadratura, PCHIP, geometria i baixa radiància. El 7.5 ja prova conservació i unitats de S; 7.6–7.15 han de provar `SourceModel S→SG-REF/kernel→DTO`. La integració NOAA-20→font C relativa està verificada a 7.5.1; H exigeix els gates observacionals de 7.16–7.24. El contracte de configuració Python/TS es verifica amb el bridge real a 7.5.1; golden tests de resultats radiatius amb SG-REF són futurs. Property tests: positivitat, linealitat en intensitat de font, invariància d'unitats, monotonia de transmissió amb τ i suma commutativa de fonts.
+Unitari: fórmules, unitats, RSR, `BAND_INTEGRATED`, espectre, fase, quadratura, PCHIP, geometria i baixa radiància. El 7.5 ja prova conservació i unitats de S; 7.6 ja prova `SourceModel S/C→SG-REF` en el domini pla homogeni; 7.7–7.15 han de provar el kernel/DTO en els nous dominis. La integració NOAA-20→font C relativa està verificada a 7.5.1; H exigeix els gates observacionals de 7.16–7.24. El contracte de configuració Python/TS es verifica amb el bridge real a 7.5.1; les fixtures radiatives de referència existeixen a 7.6; el seu contrast amb el runtime és futur. Property tests: positivitat, linealitat en intensitat de font, invariància d'unitats, monotonia de transmissió amb τ i suma commutativa de fonts.
 
 ## Alternatives descartades
 

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "criterionId": "SGREF-7.6-NUMERICAL-REFERENCE-v1",
+  "decisionDate": "2026-10-18",
+  "freezeBefore": "first_evaluation_of_reference_candidate",
+  "domain": "flat_tangent_plane; homogeneous_spectral_slab; positive_elevations; finite_rectangles_and_non_singular_points; S_and_relative_C",
+  "deterministic": {
+    "losRelativeTolerance": 1e-08,
+    "losAbsoluteTolerance": 1e-20,
+    "areaRelativeTolerance": 1e-06,
+    "areaOrders": [
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "requiredConsecutiveSpatialRefinements": 2,
+    "referenceChecks": "analytic_vertical_point_finite_extinction_E1; independent_composite_GL; rectangle_subdivision; spectral_knots"
+  },
+  "multipleScattering": {
+    "method": "independent_backward_analog_Monte_Carlo",
+    "seed": 7601,
+    "photonCount": 262144,
+    "maxScatterings": 128,
+    "phase": [
+      "isotropic",
+      "rayleigh",
+      "HG_g0.6"
+    ],
+    "singleScatteringAlbedo": 0.8,
+    "opticalDepths": [
+      0.1,
+      0.3,
+      1.0
+    ],
+    "firstOrderCheck": "within_6_empirical_standard_errors_plus_deterministic_error",
+    "statisticalRuleOrigin": "prospective_six_standard_error_check_for_bounded_iid_estimator; diagnostic_not_product_certification",
+    "tailBound": "L_max * albedo**(maxScatterings+1)",
+    "domain": "finite_surface_radiance_rectangles_in_same_flat_homogeneous_slab; no_universal_urban_F5_bound"
+  },
+  "boundary": "reference_accuracy_controls_and_offline_validation_only; no_runtime_PASS_FAIL; 7.12_owns_prospective_runtime_tolerance; numerical_estimates_not_rigorous_interval_arithmetic",
+  "sources": [
+    "https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quad_vec.html",
+    "https://academic.oup.com/mnras/article/427/4/3337/973668"
+  ]
+}

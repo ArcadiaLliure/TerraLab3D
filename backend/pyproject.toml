@@ -13,6 +13,7 @@ dependencies = [
     "hpgeom>=1.3",
     "h5py>=3.16",
     "numpy>=2.0",
+    "scipy>=1.15",
     "skyfield==1.55",
     "skyfield-data==7.0.0",
     "spiceypy==7.0.0",

@@ -72,3 +72,7 @@ No s'ha localitzat un solver físic VNP46/DNB/RT ja implementat al repositori in
 ## Decisió de dades posterior a la inspecció
 
 La inspecció de codi anterior es manté històrica. La decisió inicial **VNP46 com a font operativa v1** continua registrada al [perfil v1](skyglow-v1-profile.json), amb lector verificat al Pas 7.2. La decisió vigent [multisatèl·lit v2](skyglow-v2-profile.json) contempla VNP46, VJ146 i VJ246 com a fonts candidates independents; encara no hi ha cap font homologada per al skyglow nocturn L3. VIIRS DNB és el model de mesura, amb resposta i correcció pròpies de cada plataforma/producte.
+
+## Estat verificat després de 7.6
+
+La inspecció anterior és històrica. [7.6](../tasques/completat/pas7.6-sg-ref-reference-solver.md) incorpora SG-REF offline S/C, GK21/GL, 401 nusos CIE i un segon transport Monte Carlo per F5 en el domini pla homogeni declarat. El runtime continua pendent des de 7.7; cap homologació urbana H. La skill `plan` ha estat accessible i aplicada en aquesta iteració. [Evidència](../evidencies/pas7.6/validacio-sg-ref.md).

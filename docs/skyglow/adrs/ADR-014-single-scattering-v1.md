@@ -22,8 +22,8 @@ Es mantenen documentades al TDD i a l'especificació d'algorismes; qualsevol alt
 
 ## Validació
 
-Comparació offline amb un oracle que inclogui multiple scattering. La decisió F5 continua oberta: A) `SG-REF` incorpora una variant pròpia; B) la quantificació queda pendent del path tracer del Pas 7.65 amb dependència creuada explícita. Un oracle single-scattering no tanca aquest biaix.
+El [Pas 7.6](../../tasques/completat/pas7.6-sg-ref-reference-solver.md) implementa l’alternativa pròpia: Monte Carlo invers escalar independent, amb totes les ordres fins al truncament explícit i cota de cua. Nou benchmarks plans homogenis quantifiquen F5 amb errors mostrals. No depèn del Pas 7.65 ni acredita una cota universal urbana; els nous dominis s’han de revalidar. [Evidències](../../evidencies/pas7.6/validacio-sg-ref.md).
 
 ## Estat d'implementació
 
-No implementat per aquest ADR. El tancament depèn del pas de TerraLab3D corresponent i de les seves evidències.
+Referència i contrast F5 offline implementats a 7.6 en el domini declarat. La implementació productiva candidata i la propagació d’incertesa estructural continuen pendents als passos runtime i 7.16.

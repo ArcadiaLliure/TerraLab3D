@@ -1,0 +1,22 @@
+{
+  "command": "python -m pyright backend/src --outputjson",
+  "baselineRef": "../pas7.5.1/pyright-base.json",
+  "comparisonNormalization": "repository_relative_path; repair_base_file_mojibake_C2_A0_only; ignore_line_numbers",
+  "baselineSummary": {
+    "filesAnalyzed": 284,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 8.804
+  },
+  "currentSummary": {
+    "filesAnalyzed": 291,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 12.969
+  },
+  "newDiagnostics": [],
+  "removedDiagnostics": [],
+  "identicalDiagnosticMultiset": true
+}

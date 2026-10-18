@@ -345,3 +345,7 @@ La vertical **7.1–7.50** és del skyglow artificial. Un `SourceModel` de domin
 ## ADR 0007 — Configuració espectral i referència RSR condicionada
 
 Les dues modalitats realista/K comparteixen `SourceModel` i el futur motor. Una RSR oficial pública del mateix sensor es pot usar com a aproximació C amb guany i procedència explícits, sense allargar la validesa instrumental ni certificar H. Configuració i CCT pertanyen a Python; el control no altera RGB. Es conserva la magnitud de comparació explícita i es registra la incertesa no quantificada. [Política vigent](skyglow/20-politica-rsr-i-validacio-per-dominis.md).
+
+## ADR 0008 — Independència i domini de SG-REF
+
+El [Pas 7.6](tasques/completat/pas7.6-sg-ref-reference-solver.md) introdueix SciPy per a la quadratura GK21 offline i GL d’àrea. El futur runtime manté el seu integrador/geometria propis; compartir SourceModel, espectres i constants autoritatives no implica compartir aproximacions de transport. F5 usa un transport Monte Carlo independent dels nodes i la LOS deterministes. La referència actual és plana i homogènia: qualsevol nou domini requereix ampliació i revalidació abans d’un gate. Error numèric estimat, error mostral, cua truncada i incertesa física es reporten separadament; cap resultat numèric homologa H.

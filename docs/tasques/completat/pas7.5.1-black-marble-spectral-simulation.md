@@ -22,7 +22,7 @@ Fer executable Black Marble → SourceModel C abans de SG-REF i conservar l’es
 - [Pas 7.5 — SourceModel S](pas7.5-source-model-v1.md), que reutilitza els contractes i l’oracle 7.2–7.4.
 
 **En depenen:**
-- [Pas 7.6](../pendent/pas7.6-sg-ref-reference-solver.md)
+- [Pas 7.6](../completat/pas7.6-sg-ref-reference-solver.md)
 - [Pas 7.10](../pendent/pas7.10-gas-spectral-kernel.md)
 - [Pas 7.14](../pendent/pas7.14-photometric-projections.md)
 - [Pas 7.16](../pendent/pas7.16-uncertainty-provenance.md)

@@ -20,7 +20,7 @@ Un `SourceModel` S físic, immutable, amb procedència, unitats i proves indepen
 
 **Depèn de:** [7.3](pas7.3-dnb-rsr-measurement.md) i [7.4](pas7.4-spectral-bandset-validation.md); **no** depèn de RSR operativa 2026, HGS ni inversió L3→font.
 
-**En depenen:** [Pas 7.5.1 — Black Marble i configuració](pas7.5.1-black-marble-spectral-simulation.md), [7.6 SG-REF](../pendent/pas7.6-sg-ref-reference-solver.md), [7.16 C](../pendent/pas7.16-uncertainty-provenance.md), [7.17 gates](../pendent/pas7.17-clear-sky-ground-truth.md).
+**En depenen:** [Pas 7.5.1 — Black Marble i configuració](pas7.5.1-black-marble-spectral-simulation.md), [7.6 SG-REF](../completat/pas7.6-sg-ref-reference-solver.md), [7.16 C](../pendent/pas7.16-uncertainty-provenance.md), [7.17 gates](../pendent/pas7.17-clear-sky-ground-truth.md).
 
 ## Codi existent a reutilitzar
 

@@ -32,7 +32,7 @@ El `PropagationKernel` rep `SourceSet`, `Observer`, `OpticalField`, `TerrainVisi
 
 ### Reference solver
 
-El camí offline independent de transport és **SG-REF propi de 7.6**, segons S1. Si es quantifica el biaix single-scattering, l'oracle ha d'incloure multiple scattering segons F5. El gate zenital de **7.12** valida transport S/C dins les seves unitats i escales declarades donat el mateix `SourceModel` a oracle i runtime; no valida empíricament la inferència VNP46→emissió.
+El camí offline independent de transport és **SG-REF propi de 7.6**, segons S1: GK21/GL en slab homogeni pla, verificat amb fonts S i 18 alternatives C reals. F5 té un segon transport Monte Carlo d’ordre superior independent; [resultats i límits](../evidencies/pas7.6/validacio-sg-ref.md). El gate zenital de **7.12** valida transport S/C dins les seves unitats i escales declarades donat el mateix `SourceModel` a oracle i runtime; no valida empíricament la inferència VNP46→emissió. Qualsevol nou domini físic necessita ampliar i revalidar SG-REF abans del gate.
 
 ### Projeccions fotomètriques i composició
 

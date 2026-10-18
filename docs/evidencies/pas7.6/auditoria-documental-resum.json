@@ -1,0 +1,22 @@
+{
+  "baselineIncidenceCount": 558,
+  "finalIncidenceCount": 546,
+  "newIncidences": [],
+  "removedIncidences": [
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la capçalera de metadades (> **Estat:** ...)",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Codi existent a reutilitzar'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Descripció funcional'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Flux tècnic'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Fonts a consultar'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Fora d'abast'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Objectiu'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Proves i evidències obligatòries'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: Falta la secció obligatòria '## Treball pendent'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: La secció ## Dependències no té '**Depèn de:**'",
+    "  - docs\\tasques\\pendent\\pas7.7-kernel-geometry-b0.md: La secció ## Dependències no té '**En depenen:**'"
+  ],
+  "localLinksExitCode": 0,
+  "localLinksOutput": "Documentación: enlaces locales válidos",
+  "scope": "SG-REF executable 7.6 and incoming dependency 7.7; inherited historical aliases preserved"
+}

@@ -140,7 +140,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** `S1` és executable: SG-REF demostra convergència, quantifica la seva incertesa numèrica i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime. Aquesta evidència pot fonamentar la tolerància de 7.12, que no es fixa aquí mirant el runtime.
 
-**Fitxer executable:** [pas7.6-sg-ref-reference-solver.md](../tasques/pendent/pas7.6-sg-ref-reference-solver.md)
+**Estat verificat:** completat offline en el slab espectral homogeni pla: integració d’àrea/raster, 401 nusos CIE, fases fines, contrast F5 Monte Carlo i 18 alternatives C reals. [Convergència, errors i límits](../evidencies/pas7.6/validacio-sg-ref.md). Els nous medis/geometries de 7.8–7.11 requeriran ampliar i revalidar la referència abans dels seus contrasts; cap gate runtime/H anticipat.
+
+**Fitxer executable:** [pas7.6-sg-ref-reference-solver.md](../tasques/completat/pas7.6-sg-ref-reference-solver.md)
 
 ### 7.7 — PropagationKernel geomètric i benchmark B0
 

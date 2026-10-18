@@ -168,3 +168,9 @@ La clau d’escenari inclou configuració completa, revisions, components i hash
 
 
 El gate estricte exposa `validated_l3_basis_candidate` i `unavailable_for_validated_l3_inference`; la manca de cadena acreditada H no és una indisponibilitat global de la simulació C. Les evidències històriques conserven els identificadors i estats emesos al seu moment.
+
+## SG-REF offline (7.6)
+
+`ReferenceOptics` declara longituds d’ona, extinció/dispersió en m⁻¹, altura superior, fase i procedència d’un slab homogeni. `ReferenceSettings` controla LOS GK21, error absolut, refinament d’àrea GL i límits de treball. `ReferenceRadiance` retorna longituds d’ona, valors en `W m^-2 sr^-1 nm^-1` o `relative m^-2 sr^-1 nm^-1`, fonts/modes, signatura de totes les entrades, historial espacial i nombre d’avaluacions. `numerical_error_estimate` combina estimació LOS i diferència espacial; no és un interval rigorós ni incertesa de dades/model. `runtimeGate=not_evaluated_step_7.12` i `empiricalValidation=not_evaluated` són explícits.
+
+El CLI embolcalla cada `ConditionalScenario` de 7.5.1 amb `referenceRadiance`, observador, direcció, òptica i `calculationStatus=offline_reference_complete`. El context conserva l’estat original de producte `transport_pending`; són nivells diferents. Sis alternatives per configuració es propaguen separadament. `MultipleScatteringEstimate` registra primer ordre, total truncat, ordres superiors, errors estàndard iid, error aparellat de la ràtio F5, llavor/N i cota de cua; el seu domini exigeix radiància superficial limitada i 0<albedo<1. [Contracte executable i límits](../tasques/completat/pas7.6-sg-ref-reference-solver.md).

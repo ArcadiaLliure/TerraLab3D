@@ -23,3 +23,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 ## Taules espectrals CIE (Pas 7.5.1)
 
 International Commission on Illumination (CIE), Viena, 2018. Dades LED/HP/FL/L41, CMF CIE 1931 2° i V(λ), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Originals, metadades, DOI, fonts i checksums a `terralab3d/infrastructure/catalogs/spectra/`. Derivats espectrals amb atribució i mateixa llicència; codi separat de la llicència de dades.
+
+## SciPy — quadratura de referència offline (Pas 7.6)
+
+Dependència SciPy ≥1.15 per `integrate.quad_vec` i contrasts analítics `special.exp1`; versió verificada 1.16.2. Copyright (c) 2001–2002 Enthought, Inc.; 2003, SciPy Developers. Llicència BSD-3-Clause comprovada a les metadades de la distribució instal·lada. No s’ha copiat ni modificat codi de SciPy: la distribució de la dependència conserva els seus fitxers LICENSE i avisos dels components inclosos. Cap codi extern LPTRAN incorporat.

@@ -2,7 +2,7 @@
   "profileId": "skyglow-v2-multisat-policy",
   "schemaVersion": 2,
   "decisionDate": "2026-10-18",
-  "status": "conditional_noaa20_sources_and_configuration_verified_transport_pending",
+  "status": "conditional_noaa20_sources_and_offline_SG_REF_verified_runtime_pending",
   "owner": "TerraLab3D",
   "migration": {
     "preserves": "skyglow-v1-profile.json",
@@ -183,7 +183,27 @@
     ],
     "mixtureBasis": "radiant_flux",
     "probabilisticWeights": false,
-    "transportStatus": "pending",
+    "transportStatus": "offline_flat_homogeneous_reference_verified;product_runtime_pending",
     "evidenceRef": "../evidencies/pas7.5.1/validacio-simulacio-condicionada.md"
+  },
+  "transportReference": {
+    "revision": "sg-ref-flat-homogeneous-v1",
+    "status": "verified_step_7.6",
+    "domain": "flat_tangent_homogeneous_spectral_slab;non_singular_points_and_rectangles;S_and_relative_C",
+    "deterministic": "scipy_GK21_LOS_and_direct_GL_area;two_consecutive_spatial_refinements",
+    "fineSpectralNodes": 401,
+    "referencePhaseSamples": [
+      4097,
+      8193,
+      16385
+    ],
+    "multipleScatteringReference": "independent_backward_Monte_Carlo;bounded_surface_rectangle;albedo_less_than_one",
+    "f5Scope": "nine_defined_benchmarks_only;not_universal_urban_bound",
+    "evidenceRef": "../evidencies/pas7.6/validacio-sg-ref.md",
+    "criterionRef": "../evidencies/pas7.6/criteri-oracle-v1.json",
+    "runtimeGateOwnerStep": "7.12",
+    "runtimeGateStatus": "not_evaluated",
+    "newDomainRule": "extend_and_revalidate_reference_when_introducing_variable_atmosphere_terrain_or_curvature_before_gates",
+    "empiricalValidation": "not_evaluated;H_not_homologated"
   }
 }

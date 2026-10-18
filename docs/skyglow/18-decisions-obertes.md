@@ -8,8 +8,8 @@ Aquest registre conserva la traçabilitat històrica, però els bloquejos nous s
 | DNB-2017 | Canvi de baixa radiància al voltant de 2017 | **Documentat:** comparació feble pre/post-2017 no validada; cap correcció universal. La validació del grànul és 7.2. | 7.1–7.2 |
 | LOW-RAD | Negatius/prop de zero/no fiables | **Documentat:** preservar cru; fill/negatius/QA degradada fora de la inferència; cap `max(0,·)` silenciós. | 7.1–7.2 |
 | V1 | Política PASS/FAIL i valors per gate | **Política preregistrada a 7.1.** Valors justificats al primer gate que els aplica: error espectral 7.4, transport zenital 7.12, empíric clear-sky 7.17 i SLO de producte 7.22. 7.28 només els consumeix. La manca d'un valor bloqueja aquell gate, no 7.2 ni 7.3. Les especificacions de detecció NASA no substitueixen aquests criteris. | 7.1; 7.4, 7.12, 7.17, 7.22; consum 7.28 |
-| S1 | Oracle del gate zenital | **Decidit:** SG-REF propi del skyglow, sense dependència de 7.65; implementació a 7.6. | 7.1 i 7.6 |
-| F5 | Biaix single-scattering | **Decidit:** contrast offline amb oracle d'ordre superior; quantificació a 7.6. | 7.1 i 7.6 |
+| S1 | Oracle del gate zenital | **Executable a 7.6:** GK21 + àrea GL independents del futur runtime; domini pla homogeni i [convergència verificada](../evidencies/pas7.6/validacio-sg-ref.md), sense dependència de 7.65. Ampliació/revalidació exigida per a nous dominis. | 7.1 i 7.6 |
+| F5 | Biaix single-scattering | **Quantificat a 7.6 en nou benchmarks plans homogenis:** Monte Carlo invers d'ordre superior, errors estàndard aparellats i cota de cua. [Resultats i límits](../evidencies/pas7.6/validacio-sg-ref.md); no cota universal urbana ni correcció per a C/H. | 7.1 i 7.6 |
 | F7 | Radi màxim de fonts | **Decidit:** radi adaptatiu per cota d'error, sense tall fix arbitrari. | 7.1 |
 | F6 | Magnitud perceptiva nocturna | **Fora de v1** mentre no s'exposi una magnitud única; el model futur requereix decisió pròpia. | 7.1 |
 | DNB-RSR-ANNUAL | Resposta efectiva SNPP anual de 2026 | RSR anual exacta no exigida per S/C; referència del mateix sensor amb limitacions explícites. H continua requerint evidència instrumental. | 7.5.1 C; 7.17/7.24 H |

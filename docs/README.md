@@ -6,15 +6,19 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.6 — SG-REF](tasques/pendent/pas7.6-sg-ref-reference-solver.md).** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. SG-REF, radiància atmosfèrica i homologació H continuen pendents.
+> **Punt de represa: [Pas 7.7 — Kernel geomètric i B0](tasques/pendent/pas7.7-kernel-geometry-b0.md).** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. El runtime, la radiància física del producte i H continuen pendents.
 >
 > Els subpassos **7.1–7.50** pertanyen a contaminació lumínica artificial: VNP46, VJ146 i VJ246 són fonts Black Marble candidates amb models de mesura propis; cap skyglow físic de producte no està implementat. Els **7.51+** són del cel físic solar/lunar. El Pas 7 històric conserva la visualització actual. Les verticals pendents es documenten a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
-**Estat verificat del 2026-10-18:** [7.5.1](evidencies/pas7.5.1/validacio-simulacio-condicionada.md) genera fonts C diferenciades amb el grànul urbà real; 247 proves backend i suite frontend superades. UI de kelvins 2.800–6.500 K verificada amb teclat, ratolí, tacte i bridge Python real; transport pendent, sense alteració RGB fictícia. Pyright dels mòduls científics nous passa; la comprovació global manté els 67 errors i 3 avisos presents a `HEAD`. El criteri de 7.4 continua limitat al domini homologat.
+**Estat verificat de 7.6, 2026-10-18:** [oracle SG-REF](evidencies/pas7.6/validacio-sg-ref.md) executable amb fonts S i 18 alternatives C reals; convergència, fase fina i dispersions múltiples quantificades en el domini de benchmarks declarat. 35 proves noves, 282 proves backend superades; Ruff/Pyright dels mòduls nous i CLI sense errors. No és una homologació urbana ni un gate del runtime.
+
+**Estat verificat de 7.5.1, 2026-10-18:** [7.5.1](evidencies/pas7.5.1/validacio-simulacio-condicionada.md) genera fonts C diferenciades amb el grànul urbà real; 247 proves backend i suite frontend superades. UI de kelvins 2.800–6.500 K verificada amb teclat, ratolí, tacte i bridge Python real; transport pendent, sense alteració RGB fictícia. Pyright dels mòduls científics nous passa; la comprovació global manté els 67 errors i 3 avisos presents a `HEAD`. El criteri de 7.4 continua limitat al domini homologat.
 
 Auditoria documental del 2026-10-17: els passos 7.1–7.3 no generaven incidències estructurals; en normalitzar 7.3, el recompte integral va passar de 720 a 708 incidències heretades d'altres passos. El 2026-10-18, després de completar 7.4 i 7.5 S amb les seccions obligatòries, el validador informa de **613 incidències mecàniques heretades**; cap enllaç trencat ni incidència nova del pas vigent. Les duplicitats d'identificador dels fitxers històrics `pas7.4-forward-ad-b1b.md` i `pas7.5-spectral-bandset-b2a.md` continuen sense corregir-se en aquesta vertical. La validació de 7.3 consta a les [evidències](evidencies/pas7.3/validacio-model-dnb.md); les incidències alienes no es corregeixen ara. Vegeu [7.1](evidencies/pas7.1/validacio-contracte.txt), [7.2](evidencies/pas7.2/validacio-adaptador.md), [7.3 — RSR](evidencies/pas7.3/recerca-rsr-2026.md), [7.3 — guia/grànuls](evidencies/pas7.3/contrast-granuls-black-marble-c2.md), [7.5 — observacional històric](evidencies/pas7.5/estat-inferencia-font-2026.md) i [7.5 — S verificat](evidencies/pas7.5/validacio-source-model-s-v1.md). El normalitzador antic no s'ha executat perquè utilitza un mapa de passos anterior al pla canònic actual.
 
 **Auditoria de 7.5.1:** recompte real inicial 688 i final 558 incidències heretades; zero enllaços locals trencats i cap incidència del nou pas o dels passos executables normalitzats. Les xifres històriques anteriors es conserven com a traça. [Informe actual](evidencies/pas7.5.1/auditoria-documental.txt).
+
+**Auditoria de 7.6:** 558 incidències mecàniques heretades a l’inici i 546 al tancament, després de normalitzar la dependència 7.7. Zero enllaços locals trencats; cap incidència dels passos executables 7.6/7.7. [Informe](evidencies/pas7.6/auditoria-documental.txt).
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README i executar **exactament un pas cada vegada**. Per a la vertical 7.1–7.28, l’ordre és una linealització científica deliberada: cap optimització pot precedir el seu baseline directe/oracle i cap decisió bloquejant es pot resoldre amb una constant implícita.
 
@@ -54,6 +58,7 @@ Estats admesos:
 | 7.4 | [Oracle espectral fi i SpectralBandSet tabulat v1](tasques/completat/pas7.4-spectral-bandset-validation.md) | `completat` (domini numèric acotat; 238/238 PASS) |
 | 7.5 | [SourceModel físic S independent de VIIRS](tasques/completat/pas7.5-source-model-v1.md) | `completat` (fonts definides; C/H sense homologar) |
 | 7.5.1 | [Black Marble NOAA-20, biblioteca espectral, modalitats realista/K i controls científics](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) | `completat` en escala condicionada relativa; transport pendent |
+| 7.6 | [SG-REF independent, àrea/raster i contrast F5](tasques/completat/pas7.6-sg-ref-reference-solver.md) | `completat` offline en domini pla homogeni S/C |
 | 8 | [Sol, Lluna i planetes amb posicions i aparença reals](tasques/completat/pas8.md) | `completat` |
 | 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](tasques/completat/pas8.5.md) | `completat` |
 | 8.6 | [Planetes, anells i satèl·lits naturals](tasques/completat/pas8.6.md) | `completat` |
@@ -81,7 +86,6 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.6 | [SG-REF: oracle independent de transport i integració d’àrea](tasques/pendent/pas7.6-sg-ref-reference-solver.md) | `pendent` | 7.5, 7.5.1 |
 | 7.7 | [PropagationKernel geomètric i benchmark B0](tasques/pendent/pas7.7-kernel-geometry-b0.md) | `pendent` | 7.6 |
 | 7.8 | [OpticalField tiled i atmosfera estàndard determinista](tasques/pendent/pas7.8-optical-field-standard.md) | `pendent` | 7.7 |
 | 7.9 | [Rayleigh, aerosol de referència i benchmark B1](tasques/pendent/pas7.9-rayleigh-aerosol-b1.md) | `pendent` | 7.8 |

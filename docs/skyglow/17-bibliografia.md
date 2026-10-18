@@ -61,3 +61,10 @@
 ## Notes de verificació
 
 Les atribucions específiques de Cinzano–Falchi sobre 20 coeficients de Legendre, graella 80–100 km i límit horitzontal 120 km constaven com a verificades en la revisió anterior. La §2.1.2.1 de l'ATBD i la unitat integrada DNB `W·cm⁻²·sr⁻¹` s'han verificat directament a 7.3. Continuem sense donar per verificades les Figures 3–4 de Sánchez de Miguel et al. (2017) ni una afirmació concreta de Cinzano–Falchi sobre la precisió de dues dispersions. La redistribució de les taules RSR i els drets de derivats HITRAN continuen pendents de verificació legal específica.
+
+## Referències de SG-REF consultades el 2026-10-18
+
+- [SciPy `quad_vec`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.quad_vec.html): quadratura vectorial adaptativa GK21 i diagnòstics. Dependència emprada, versió verificada 1.16.2; BSD-3-Clause.
+- [Cinzano i Falchi (2012), The propagation of light pollution in the atmosphere](https://arxiv.org/abs/1209.2031): abast de models que incorporen dispersions múltiples. Cap implementació LPTRAN importada ni equivalència completa declarada.
+- [Whitney (2011), Monte Carlo Radiative Transfer](https://arxiv.org/abs/1104.4990): referència metodològica de transport estocàstic.
+- [NASA (2019), Modeling Atmosphere-Ocean Radiative Transfer: A PACE Mission Perspective](https://ntrs.nasa.gov/api/citations/20190026727/downloads/20190026727.pdf): transport invers detector→font i estimadors locals. SG-REF usa un algorisme escalar propi, amb límits diferents.

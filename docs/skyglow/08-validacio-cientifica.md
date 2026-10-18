@@ -69,3 +69,9 @@ L'error estructural single-scattering es registra separat de l'error numèric. F
 ## 9. Evidència
 
 Cada campanya genera manifest de datasets/checksums, configuració, commit, hardware, resultats raw CSV/JSON, plots i informe. Els resultats històrics no s'esborren; es marquen vigents/obsolets amb causa.
+
+## Referència disponible després de 7.6
+
+[SG-REF verificat](../evidencies/pas7.6/validacio-sg-ref.md) cobreix slab homogeni espectral, fonts puntuals no singulars i rectangles/raster en pla local. Contrasta E1 i GL compost, subdivisió i fases fines; F5 usa un segon transport Monte Carlo d'ordre superior sense compartir la quadratura. Les toleràncies de control de l’oracle i la regla diagnòstica de 6 errors estàndard són [prospectives](../evidencies/pas7.6/criteri-oracle-v1.json), no criteris de producte ni intervals garantits.
+
+Els benchmarks F5 mesuren biaix dins els seus escenaris definits; no fixen una correcció urbana i no quantifiquen la incertesa SPD/angular/atmosfèrica de C/H. 7.8–7.11 han d’ampliar i revalidar la referència abans de comparar medis variables, terreny o curvatura. 7.12 només pot usar evidència de convergència corresponent al mateix domini físic que valida.

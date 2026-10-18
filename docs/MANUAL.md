@@ -514,3 +514,21 @@ En **Simulació realista**, el model considera un ensemble determinista de mescl
 ![Selector de simulació realista i estat del transport](evidencies/pas7.5.1/simulacio-realista.png)
 
 La UI indica **transport atmosfèric pendent**: els controls configuren fonts científiques, però encara no alteren físicament el cel ni mostren una brillantor atmosfèrica calculada. La visualització física continua obligatòria a 7.25–7.27; no es fa servir un filtre RGB per representar aquest resultat.
+
+## SG-REF: càlcul de referència offline
+
+Implementat al [Pas 7.6](tasques/completat/pas7.6-sg-ref-reference-solver.md). Amb el backend i les dependències instal·lats, executeu des de l’arrel:
+
+```powershell
+python -X utf8 tools/run_sg_ref_step7_6.py --output .runtime-sgref-resultats.json
+```
+
+El CLI calcula fixtures analítiques, un rectangle i el raster equivalent, 401 longituds d’ona CIE, refinaments de fase i nou contrasts de dispersió múltiple. El fitxer només es reemplaça quan tots els contrasts han acabat. Ctrl+C cancel·la el treball; una fallada de convergència provoca sortida no nul·la i no publica un resultat parcial.
+
+Per reproduir també les 18 alternatives C del píxel NOAA-20 real verificat, afegiu `--with-real-black-marble`. `--data-root I:\TerraLab` permet indicar l’arrel dels assets instal·lats; sense aquesta opció s’utilitza la configuració de dades de l’aplicació. Calen el grànul i el manifest RSR exactes documentats a l’[informe](evidencies/pas7.6/validacio-sg-ref.md); el CLI no els descarrega ni substitueix. Els perfils cosinus tabulats poden requerir desenes de milers d’avaluacions LOS: aquesta eina és offline.
+
+Al JSON, `referenceRadiance.values` conté radiància espectral per direcció; `unit` diferencia watts de l’escala relativa C. `refinement_history`, `numerical_error_estimate`, `input_signature`, revisions i context de font permeten reproduir el càlcul. Cada alternativa C té el seu resultat: no se sumen les sis hipòtesis d’un mateix píxel.
+
+La referència actual usa un pla local amb atmosfera espectral homogènia, terra negre i cel clar escalar. L’error estimat de quadratura no és un interval garantit ni la incertesa urbana. F5 afegeix error mostral i cota de la cua d’ordres múltiples dels seus benchmarks. Terreny, curvatura, atmosfera real, validació H i connexió a la UI continuen als passos posteriors. [Resultats verificats](evidencies/pas7.6/resultats-sg-ref-v1.json).
+
+![Convergència de fase i biaix de dispersió múltiple en els benchmarks SG-REF](evidencies/pas7.6/convergencia-i-biaix-f5.png)
