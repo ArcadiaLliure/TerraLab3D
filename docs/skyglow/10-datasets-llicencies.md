@@ -26,6 +26,10 @@ DNB SDR i VNL deixen de ser la font operativa primària de la v1, però continue
 
 [NOAA-20](https://ncc.nesdis.noaa.gov/NOAA-20/J1VIIRS_NOAA20_SpectralResponseFunctions.php) i [NOAA-21](https://ncc.nesdis.noaa.gov/NOAA-21/J2VIIRS_SpectralResponseFunctions.php): ZIP DAWG de prelanzament obtinguts i inspeccionats directament, amb LGS/MGS numèriques i README. [Matriu, hashes i límits](../evidencies/pas7.3/revisio-multisatel-lit.md). La redistribució dels ZIP específics és **pendent de verificar**; binaris a la biblioteca externa, al repositori només script i metadata. La recomanació NOAA-21 MGS→HGS no inclou cota d'incertesa ni acredita el vincle amb VJ246A2.002 L3. No es trasllada aquesta recomanació a NOAA-20 sense evidència.
 
+### RSR no bloquejant i NOAA-20 com a primer candidat C
+
+La [política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) separa el motor físic independent de satèl·lit S de la inferència L3. Primer candidat experimental C: NOAA-20/VJ146A2.002, grànul urbà QA 0 real i RSR oficial de prelanzament, etiquetada diagnòstica. L'estabilitat espectral reportada no acredita resposta HGS/L3 efectiva de 2026, incertesa ni emissió angular. Conservar versió, gainStage, fingerprints, llicències i limitacions. NOAA-21 i Suomi-NPP continuen com a alternatives candidates/històriques.
+
 ## HITRAN
 
 Font: https://www.hitran.org/. Versió actual: HITRAN2024. Ús previst: generació/validació offline de LUT, no runtime line-by-line. **PENDENT LEGAL:** revisar termes de dades HITRAN per redistribució de derivats/LUT abans de publicar-los; no assumir que l'article open access implica llicència de la base.

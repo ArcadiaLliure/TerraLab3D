@@ -24,9 +24,11 @@ Repetir la validació del sistema ja optimitzat i amb núvols abans d’integrar
 - [ ] Fer data-leakage checks i mantenir particions preregistrades.
 - [ ] Congelar versions de producte, SourceModel, atmosfera, phase/backend i criteris que passin.
 
+- [ ] Informar S (simulació física, gates propis), C (escenari condicionat) i H (validació empírica independent) per separat; sense H, cap «skyglow urbà absolut real» homologat.
+- [ ] Si les dades C/H no permeten validació, registrar `not_evaluated`/`unavailable`; permetre la integració del motor S només amb etiqueta de simulació.
 ## Criteri de sortida
 
-Existeix un informe empíric final per al domini homologable. Si només clear-sky és defensable, el domini de producció queda explícitament limitat i cloud no es declara homologat.
+Existeix informe reproduïble dels gates físics S i, quan hi hagi dades, informes empírics C/H separats. Si C/H no es pot validar, roman explícitament no homologat mentre S pot continuar com a simulació. Els núvols només es qualifiquen al domini provat.
 
 ## Evidències obligatòries
 

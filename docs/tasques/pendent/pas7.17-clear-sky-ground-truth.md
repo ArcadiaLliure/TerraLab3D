@@ -15,6 +15,8 @@ Contrastar el sistema físic directe amb observacions externes abans de qualsevo
 - [08-validacio-cientifica.md](../../skyglow/08-validacio-cientifica.md)
 - [09-incertesa-proveniencia.md](../../skyglow/09-incertesa-proveniencia.md)
 
+**Separació obligatòria:** (1) gate numèric/físic preacceleracions S amb fonts definides i oracle independent, criteris justificats/preregistrats, permet 7.18 només en S; (2) gate empíric observacional C/H amb ground truth extern i `held-out`, criteris i incerteses preregistrats. Si (2) no és avaluable, registrar `not_evaluated`, no PASS; no impedir la continuació de S. Un oracle numèric no és una observació empírica. [Política](../../skyglow/20-politica-rsr-i-validacio-per-dominis.md).
+
 ## Tasques
 
 - [ ] Construir dataset de validació clear-sky TESS/SQM/all-sky amb metadata temporal/geogràfica i control de leakage.
@@ -28,7 +30,7 @@ Contrastar el sistema físic directe amb observacions externes abans de qualsevo
 
 ## Criteri de sortida
 
-Els criteris empírics justificats precedeixen l'avaluació del conjunt reservat i no s'ajusten als residuals observats. Existeix una validació clear-sky reproduïble; si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5, sense calibratge compensatori del kernel.
+El gate S contra oracle físic independent supera els criteris preregistrats i només habilita acceleracions S. Els criteris empírics C/H precedeixen l'avaluació `held-out` i no s'ajusten als residuals; absència de dades C/H implica `not_evaluated`, sense frenar acceleracions S ni declarar skyglow Black Marble homologat.
 
 ## Evidències obligatòries
 

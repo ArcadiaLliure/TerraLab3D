@@ -203,19 +203,19 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.15-atmos-era5-cams.md](../tasques/pendent/pas7.15-atmos-era5-cams.md)
 
-### 7.16 — Incertesa quantitativa i provenance completa
+### 7.16 — Incertesa i escenaris Black Marble condicionats C
 
-**Finalitat.** Construir intervals i components d’error després que font, atmosfera i transport ja tinguin models concrets.
+**Finalitat.** Construir ledger físic/numeric de S i modelar C amb observació L3, priors SPD/angular, corbes RSR de referència identificades i anàlisi de sensibilitat. NOAA-20 VJ146A2.002 és la primera parella experimental, no una cadena calibrada 2026.
 
-**Gate de sortida.** Cada resultat físic separa incertesa RSR i mapping de guany, correcció Black Marble L3, prior SPD/angular, radiometria, atmosfera, model estructural i error numèric, amb correlacions i domini per sensor. Una incertesa no quantificada queda explícita i impedeix l'homologació que en depèn; no hi ha sigmes fictícies.
+**Gate de sortida.** Per S, provenance i incerteses numèriques/físiques o absències explícites; per C, escenaris condicionats amb incerteses declarades o indisponibilitat de calibratge absolut. L'absència d'evidència H no bloqueja el ledger S. Cap sigma fictícia.
 
 **Fitxer executable:** [pas7.16-uncertainty-provenance.md](../tasques/pendent/pas7.16-uncertainty-provenance.md)
 
-### 7.17 — Validació empírica clear-sky de SourceModel i transport
+### 7.17 — Gate de transport S preacceleracions; empírica C/H separada
 
-**Finalitat.** Contrastar el sistema físic directe amb observacions externes abans de qualsevol acceleració espacial o cache.
+**Finalitat.** Verificar les prediccions de fonts definides S contra SG-REF i altres oracles independents abans d'accelerar; si hi ha dades adequades, validar empíricament C/H per separat.
 
-**Gate de sortida.** Els criteris empírics, amb incerteses instrumental, de dades i del model, es preregistren abans de mirar el conjunt reservat `held-out`; inclouen estrats per plataforma/producte/release quan s'hagin admès. Sense criteris justificats, 7.17 es bloqueja. Existeix una validació clear-sky reproduïble; si el SourceModel no compleix el domini declarat, el pas falla i torna a 7.5, sense calibratge compensatori del kernel ni ajust als residuals observats.
+**Gate de sortida.** Criteri numèric S científicament justificat i preregistrat, sense ajustar-lo als residuals del candidat; superar-lo habilita només acceleracions de S. El gate observacional de C/H exigeix `held-out`, criteris preregistrats, incerteses i observacions independents; si no existeixen, `not_evaluated`, mai PASS empíric. La manca de RSR exacta 2026 no bloqueja les acceleracions S.
 
 **Fitxer executable:** [pas7.17-clear-sky-ground-truth.md](../tasques/pendent/pas7.17-clear-sky-ground-truth.md)
 
@@ -267,17 +267,17 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.23-clouds-b6.md](../tasques/pendent/pas7.23-clouds-b6.md)
 
-### 7.24 — Validació empírica final clear/cloudy i congelació de model
+### 7.24 — Validació final clear/cloudy per dominis S/C/H
 
-**Finalitat.** Repetir la validació del sistema ja optimitzat i amb núvols abans d’integrar-lo al renderer.
+**Finalitat.** Reexecutar gates S del transport optimitzat i núvols; publicar C/H només si hi ha validació observacional independent.
 
-**Gate de sortida.** Existeix un informe empíric final per plataforma/producte/release i domini homologable; superposicions entre sensors es contrasten sense sumar ni aplicar SBAF per defecte. Si només clear-sky és defensable, el domini de producció queda explícitament limitat i cloud no es declara homologat.
+**Gate de sortida.** Informes reproduïbles amb S validat en el seu domini i C/H `conditional`, `not_evaluated` o `validated` segons proves específiques. Permetre integració etiquetada de S sense presentar el skyglow derivat de L3 com a predicció absoluta calibrada.
 
 **Fitxer executable:** [pas7.24-full-ground-truth.md](../tasques/pendent/pas7.24-full-ground-truth.md)
 
 ### 7.25 — Bridge Python→TypeScript i SkyglowRuntime
 
-**Finalitat.** Transportar resultats físics ja homologats sense portar integració radiativa al frontend.
+**Finalitat.** Transportar resultats físics versionats i qualificats S/C/H, sense portar integració radiativa al frontend ni representar un escenari C com una predicció H.
 
 **Gate de sortida.** TypeScript pot rebre/validar/swap resultats de skyglow amb revisió monotònica i sense executar física de propagació.
 
@@ -305,7 +305,7 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Regla d'homologació.** 7.28 només consumeix els criteris congelats als gates previs i les seves versions; no crea ni modifica cap llindar PASS/FAIL.
 
-**Gate de sortida.** La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat inclou explícitament plataforma/producte/release/període/QA. Una altra plataforma pot continuar pendent sense falsificar l'abast completat. En cas contrari roman parcial/bloquejada amb fallback legacy.
+**Gate de sortida.** El motor S es pot completar com a simulació física amb els seus gates; C només es pot presentar com a condicional; H exigeix validació observacional per plataforma/producte/release/període/QA amb incertesa i preregistre. No confondre un PASS numèric S amb skyglow urbà absolut real homologat.
 
 **Fitxer executable:** [pas7.28-b7-homologacio-skyglow.md](../tasques/pendent/pas7.28-b7-homologacio-skyglow.md)
 

@@ -15,6 +15,8 @@ Construir intervals i components d’error després que font, atmosfera i transp
 - [09-incertesa-proveniencia.md](../../skyglow/09-incertesa-proveniencia.md)
 - [08-validacio-cientifica.md](../../skyglow/08-validacio-cientifica.md)
 
+**Ampliació executiva del domini C:** estudiar VJ146A2.002/NOAA-20 amb RSR de prelanzament com a referència **condicionada**, priors SPD/angular, mapping de guany i relació TOA/L3 identificats com a verificats o desconeguts. Quantificar sensibilitat o retornar `absoluteCalibrationStatus=unavailable`, mai inferir flux hemisfèric únic. Construir independentment el ledger d'incertesa de S perquè l'absència d'H no freni el transport. [Política](../../skyglow/20-politica-rsr-i-validacio-per-dominis.md).
+
 ## Tasques
 
 - [ ] Implementar `UncertaintyModelRegistry` amb components numèrics, font, atmosfera, dades i estructurals.
@@ -27,7 +29,7 @@ Construir intervals i components d’error després que font, atmosfera i transp
 
 ## Criteri de sortida
 
-Cada resultat físic pot explicar quines incerteses coneix, quines desconeix i com s’han propagat; no hi ha sigmes fictícies.
+Cada resultat S identifica incertesa numèrica/física i les absències de dades; C té escenaris condicionats o estat `unavailable` sense sigmes ni amplituds fictícies; H exigeix evidència externa. La manca de RSR 2026 no impedeix acabar el ledger físic S.
 
 ## Evidències obligatòries
 

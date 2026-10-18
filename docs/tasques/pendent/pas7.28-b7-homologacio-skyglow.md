@@ -25,9 +25,11 @@ Tancar la vertical només després que ciència, rendiment i integració hagin p
 - [ ] Verificar `kernelIntegralsPerRenderFrame=0`, stutter i memòria segons els SLO de producte aprovats, i lifecycle.
 - [ ] Decidir shadow/default i retirar només els fallbacks que l’evidència autoritza; actualitzar inventari, README i evidències finals.
 
+- [ ] Auditar resultats i UI per domini S/C/H; completar S no implica validar un skyglow urbà absolut C/H.
+
 ## Criteri de sortida
 
-La vertical queda `completat` només si no hi ha decisions bloquejants ocultes, tots els gates preregistrats passen i el domini científic homologat identifica plataforma/producte/release/període/QA. Les altres fonts resten pendents explícitament; 7.28 no crea ni modifica criteris. En cas contrari roman parcial/bloquejada amb fallback legacy.
+Els resultats es completen per domini: S pot ser simulació física verificada per B7; C es publica només com a condicionat; H exigeix incertesa/validació empírica i producte/release/període/QA comprovats. Sense H no es declara cap predicció Black Marble absoluta homologada. No crear o modificar llindars a 7.28.
 
 ## Evidències obligatòries
 

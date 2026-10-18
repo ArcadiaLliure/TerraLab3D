@@ -9,7 +9,7 @@
 | política multisatèl·lit | tres candidates C2, identitat i estat d'admissibilitat específic; cap fallback silenciós | 7.3 contracte completat; admissibilitat física 7.5 | [perfil v2](skyglow-v2-profile.json), [matriu J1/J2](../evidencies/pas7.3/revisio-multisatel-lit.md) i [dos grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) |
 | mesura DNB | operador TOA `BAND_INTEGRATED`, RSR versionada, Eq. (1) NASA TOA→L3 corregit, QA/unitats/llinatge VNP46 i VJ146 reals; RSR concretes de 2026 no homologades | 7.3 completat | [proves](../evidencies/pas7.3/validacio-model-dnb.md), [LUT SNPP](../evidencies/pas7.3/recerca-rsr-2026.md), [revisió multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) i [guia/grànuls](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) |
 | error espectral V1 | `0,01 mag` de producte congelat abans de candidats; màxim per cas i regla absoluta prop de zero | 7.4 completat en domini tabulat; repetir 7.10/7.14 | [criteri preregistrat](../evidencies/pas7.4/criteri-preregistrat-v1.json), [238/238 casos i `bandSetId`](../evidencies/pas7.4/homologacio-bandset-v1.md); RSR històriques diagnòstiques, incertesa instrumental separada |
-| SourceModel | inferència L3→SPD prior/ensemble i emissió angular; RSR/guany/producte/període acreditats per font; incertesa estructural | 7.5 `bloquejat` | [gate parcial i matriu de fonts](../evidencies/pas7.5/estat-inferencia-font-2026.md): 0/6 respostes locals L3 operatives el 2026-09-13; cap corba diagnòstica promoguda |
+| SourceModel S | SPD, geometria, amplitud i emissió angular definides independentment de VIIRS; gate L3 preexistent segregat | 7.5 pendent | [Política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) i [auditoria històrica 7.5](../evidencies/pas7.5/estat-inferencia-font-2026.md) |
 | oracle transport | SG-REF independent + àrea directa | 7.6 | convergència, incertesa numèrica i fixtures analítiques per fonamentar 7.12 |
 | kernel únic | zenit=direcció ordinària | 7.7 | B0 + invariants geomètrics |
 | camp òptic | provider estàndard tiled | 7.8 | fixtures multi-tile |
@@ -20,8 +20,8 @@
 | cúpules | DomeProfile des de ruta directa | 7.13 | all-sky dens + invariant zenit |
 | projeccions | SQM/TESS/CIE post-kernel i revalidació de `0,01 mag` de 7.4 en aquest nou domini | 7.14 | oracles de projecció i bandset versionat si el pressupost falla |
 | atmosfera real | ERA5/CAMS com providers | 7.15 | fixtures/camps parcials |
-| incertesa | ledger quantitatiu separat de l'operador TOA, RSR/guany, correcció L3, inferència SPD/angular, radiometria, atmosfera i estructura per sensor | 7.16 | coverage/provenance; indisponible explícit sense sigma inventada |
-| ground truth clear V1 | validació empírica de la inferència L3→font i del transport amb mètriques separades; criteris preregistrats abans del conjunt reservat, amb incerteses instrumental, de dades i del model | 7.17 | partició `held-out`, origen i validació leave-one-site-out |
+| incertesa i escenaris C | Ledger físic S, priors SPD/angular, RSR de referència com hipòtesi i incerteses explícites; H pendent de validació | 7.16 | [Política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) |
+| gate S i validació C/H | Gate de transport S per oracles, independent de RSR; empírica `held-out` C/H separada amb criteris preregistrats | 7.17 | oracle de S; `held-out` C/H si existeix; no PASS empíric fictici |
 | compressió fonts | watershed/quadtree com backend | 7.18 | B5 vs àrea directa |
 | compressió fase | Legendre com backend | 7.19 | B3 vs fase ref |
 | AD/error budget | cotes conservadores | 7.20 | FD + bounds |
@@ -34,6 +34,8 @@
 | composició | canals lineals separats | 7.27 | reference/instantaneous |
 | homologació | B7 + SLO + cap bloqueig ocult; només criteris congelats, cap llindar nou | 7.28 | informe final amb versions, dominis per font i procedència dels gates previs |
 | adquisició Black Marble | un únic gestor autenticat i persistent per VNP46/VJ146/VJ246, checksum de font separat del SHA local | 24 | [pas executable](../tasques/pendent/pas24-cataleg-recursos-descarregues.md); proves de grànuls reals pendents |
+
+**Revisió de dependències 2026-10-18:** [política S/C/H i candidat NOAA-20/RSR](20-politica-rsr-i-validacio-per-dominis.md). És un canvi prospectiu; es conserven totes les evidències de 7.1–7.5.
 
 ## Frontera amb el cel astral
 

@@ -15,6 +15,8 @@ Transportar resultats físics ja homologats sense portar integració radiativa a
 - [03-pipeline-python-typescript-threejs.md](../../skyglow/03-pipeline-python-typescript-threejs.md)
 - [06-contractes-dades.md](../../skyglow/06-contractes-dades.md)
 
+**Etiqueta de domini obligatòria a la integració:** `sourceMode=DEFINED_SOURCE|CONDITIONAL_L3|OBSERVATION_VALIDATED`, `absoluteCalibrationStatus`, procedència i estats d'incertesa. S pot mostrar-se com a simulació, C només com a escenari hipotètic, H com a validat empíricament quan superi gates. Cap conversió silenciosa C→H.
+
 ## Tasques
 
 - [ ] Definir DTO versionat per `PropagationResultSummary`/`DomeProfile`, bandSetId, unitats, revisions i provenance compacta.
