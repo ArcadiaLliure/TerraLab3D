@@ -10,7 +10,7 @@ Mostra 1°, 95% `W_effective`, 8 hipòtesis SPD, H_TOA 80/100/120 km, Legendre 4
 
 ## Dades i decisions pendents
 
-El producte/release VNP46, la política de baixa radiància i 2017, `S1`, `F5`, `F7` i la política V1 estan documentats al [perfil](skyglow-v1-profile.json). Resten pendents el model angular d'emissió, les biblioteques SPD/aerosol/núvols, els models d'incertesa per producte i els valors numèrics dels gates 7.4, 7.12, 7.17 i 7.22. Vegeu [decisions](18-decisions-obertes.md).
+El producte/release VNP46, la política de baixa radiància i 2017, `S1`, `F5`, `F7` i la política V1 estan documentats al [perfil](skyglow-v1-profile.json). El valor de 7.4 ja està congelat i verificat per al domini tabulat. Resten pendents el model angular d'emissió, les biblioteques SPD/aerosol/núvols, els models d'incertesa per producte i els valors numèrics dels gates 7.12, 7.17 i 7.22. Vegeu [decisions](18-decisions-obertes.md).
 
 ## Verificacions científiques resoltes
 
@@ -22,7 +22,7 @@ Redistribució del ZIP RSR; termes de derivats HITRAN; font/llicència de cada S
 
 ## Riscos bloquejants
 
-Els valors PASS/FAIL encara nuls no bloquegen l'adaptador de 7.2 ni l'operador TOA de 7.3. **El bloqueig propi de 7.3 és la manca d'una cadena nocturna L3 acreditada, amb resposta espectral, correspondència de correccions i incertesa, per almenys un producte i període explícits**, diferent dels llindars V1. La [matriu SNPP](../evidencies/pas7.3/recerca-rsr-2026.md) descarta com a substituts les LUT de guany/DN0 i les RSR de 2011/2013; la [matriu NOAA-20/NOAA-21](../evidencies/pas7.3/revisio-multisatel-lit.md) limita les RSR de prelanzament i el proxy MGS→HGS a ús diagnòstic. Cadascun dels passos posteriors es bloqueja quan necessita aplicar una decisió PASS/FAIL sense origen i valor justificats. Aerosols, SPD, llicències i ground truth s'han de resoldre al primer gate que els requereixi.
+Els valors PASS/FAIL pendents no bloquejaven l'adaptador de 7.2 ni el contracte de mesura TOA/L3 de 7.3, ja completats. **7.4 ha resolt el pressupost de discretització** amb el [requisit de producte preregistrat](../evidencies/pas7.4/criteri-preregistrat-v1.json) i l'[avaluació de 238 integrals](../evidencies/pas7.4/homologacio-bandset-v1.md). El domini és estrictament tabulat i la incertesa de la RSR instrumental continua separada i no quantificada. La [matriu SNPP](../evidencies/pas7.3/recerca-rsr-2026.md) descarta com a substituts les LUT de guany/DN0 i les RSR de 2011/2013; la [matriu NOAA-20/NOAA-21](../evidencies/pas7.3/revisio-multisatel-lit.md) limita les RSR de prelanzament i el proxy MGS→HGS a ús diagnòstic. La inferència física L3→SPD/emissió angular i la seva incertesa corresponen a 7.5/7.16/7.17; 7.10 i 7.14 revalidaran el pressupost per als operadors nous. Aerosols, llicències i ground truth es resolen al primer gate que els requereixi.
 
 ## Revisió matemàtica
 
@@ -30,7 +30,7 @@ Les unitats del kernel són consistents si `I↑` és intensitat radiant direcci
 
 ## Revisió d'unitats
 
-La unitat del VNP46 es llegeix dels atributs del grànul i es conserva explícita. L'[ATBD VIIRS SDR, §2.1.2.1](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf#page=38) verifica que DNB és radiància integrada `W cm⁻² sr⁻¹`; VNP46A2.002 usa `nW cm⁻² sr⁻¹`, però és L3 corregit. L'[especificació VJ146](https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/2/VJ146A2_v2.0) declara la mateixa unitat L3; els atributs VJ146/VJ246 reals resten pendents. SPD normalitzada té `nm⁻¹`. Coeficients d'extinció/dispersió són `m⁻¹`. Angles i distàncies tenen unitat al contracte. El vincle TOA→L3 i el pressupost d'incertesa aplicable continuen pendents per cada font candidata.
+La unitat del VNP46 es llegeix dels atributs del grànul i es conserva explícita. L'[ATBD VIIRS SDR, §2.1.2.1](https://ncc.nesdis.noaa.gov/documents/documentation/ATBD-VIIRS-RadiometricCal_20131212.pdf#page=38) verifica que DNB és radiància integrada `W cm⁻² sr⁻¹`; VNP46A2.002 usa `nW cm⁻² sr⁻¹`, però és L3 corregit. L'[especificació VJ146](https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/2/VJ146A2_v2.0) declara la mateixa unitat L3; els atributs de dos VJ146 reals estan [contrastats a 7.3](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), i VJ246 real resta pendent. SPD normalitzada té `nm⁻¹`. Coeficients d'extinció/dispersió són `m⁻¹`. Angles i distàncies tenen unitat al contracte. La transformació TOA→L3 està documentada a la guia C2; la inferència espectral/angular i el pressupost d'incertesa aplicable continuen pendents per cada font candidata.
 
 ## Revisió Python/TypeScript
 
@@ -38,4 +38,4 @@ El model conceptual és compartit però les classes internes no travessen el bri
 
 ## Següent pas executable
 
-El [Pas 7.1](../tasques/completat/pas7.1-contracte-cientific-v1.md) és completat documentalment i el [Pas 7.2](../tasques/completat/pas7.2-vnp46-observation-adapter.md) ha validat l'adaptador VNP46 amb fixtures i un grànul real. **Actualització 2026-10-18:** el [Pas 7.3](../tasques/completat/pas7.3-dnb-rsr-measurement.md) ha completat el contracte de mesura TOA/L3 amb la [guia C2 i dos grànuls VJ146](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md); el punt de represa és [7.4](../tasques/pendent/pas7.4-spectral-bandset-validation.md). Les RSR 2026 i la inferència física continuen no homologades; cap ZIP oficial per si sol les acredita.
+Els [Passos 7.1](../tasques/completat/pas7.1-contracte-cientific-v1.md), [7.2](../tasques/completat/pas7.2-vnp46-observation-adapter.md), [7.3](../tasques/completat/pas7.3-dnb-rsr-measurement.md) i [7.4](../tasques/completat/pas7.4-spectral-bandset-validation.md) estan completats en els seus dominis declarats. **Actualització 2026-10-18:** el punt de represa és [7.5 — SourceModel v1](../tasques/pendent/pas7.5-source-model-v1.md). Les RSR 2026 i la inferència física continuen no homologades; cap ZIP oficial per si sol les acredita.

@@ -20,7 +20,7 @@ Definir i verificar **tres contractes separats**: (1) la integral SPD/radiància
 
 **Depèn de:** [7.1 — política V1](pas7.1-contracte-cientific-v1.md) i [7.2 — lector VNP46](pas7.2-vnp46-observation-adapter.md), l'abast verificat del qual no s'estén retrospectivament a VJ146/VJ246.
 
-**En depenen:** [7.4 — bandes espectrals](../pendent/pas7.4-spectral-bandset-validation.md), [7.5 — SourceModel](../pendent/pas7.5-source-model-v1.md), [7.16 — incertesa](../pendent/pas7.16-uncertainty-provenance.md), [7.17 — validació empírica](../pendent/pas7.17-clear-sky-ground-truth.md) i la integració de grànuls amb el [gestor comú del Pas 24](../pendent/pas24-cataleg-recursos-descarregues.md).
+**En depenen:** [7.4 — bandes espectrals](pas7.4-spectral-bandset-validation.md), [7.5 — SourceModel](../pendent/pas7.5-source-model-v1.md), [7.16 — incertesa](../pendent/pas7.16-uncertainty-provenance.md), [7.17 — validació empírica](../pendent/pas7.17-clear-sky-ground-truth.md) i la integració de grànuls amb el [gestor comú del Pas 24](../pendent/pas24-cataleg-recursos-descarregues.md).
 
 ## Codi existent a reutilitzar
 

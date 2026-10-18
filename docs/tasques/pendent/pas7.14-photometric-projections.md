@@ -8,7 +8,7 @@ Projectar radiància espectral física a magnituds/instruments sense retroalimen
 
 ## Dependències
 
-7.13
+[Pas 7.13 — perfils de cúpula](pas7.13-dome-profile-direct.md) i [Pas 7.4 — bandset tabulat v1](../completat/pas7.4-spectral-bandset-validation.md). Les noves respostes fotomètriques requereixen revalidació espectral pròpia.
 
 ## Referències obligatòries
 
@@ -21,12 +21,13 @@ Projectar radiància espectral física a magnituds/instruments sense retroalimen
 - [ ] Implementar zero points/calibratge només des de fonts documentades.
 - [ ] Comparar cada projecció contra integració espectral/focal fina.
 - [ ] Propagar l’error espectral a la projecció.
+- [ ] Revalidar el pressupost de discretització `0,01 mag` de [7.4](../../evidencies/pas7.4/criteri-preregistrat-v1.json) sobre les respostes SQM/TESS/CIE realment implementades. Si falla, versionar i rehomologar el `SpectralBandSet`, sense relaxació retroactiva.
 - [ ] Justificar i preregistrar qualsevol tolerància de projecció pròpia abans de comparar el candidat amb l'oracle, amb incertesa de resposta/FOV i error espectral pertinents.
 - [ ] Mantenir `BortleEquivalent` com a diagnòstic versionat i mai com a ground truth.
 
 ## Criteri de sortida
 
-SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies justificades i preregistrades a 7.14 abans de la comparació decisòria; sense aquestes toleràncies, 7.14 es bloqueja. Cap projecció modifica la radiància física.
+SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies justificades i preregistrades a 7.14 abans de la comparació decisòria; sense aquestes toleràncies, 7.14 es bloqueja. La discretització també compleix el criteri heretat de 7.4 en aquest domini nou o el bandset es versiona i rehomologa. Cap projecció modifica la radiància física.
 
 ## Evidències obligatòries
 

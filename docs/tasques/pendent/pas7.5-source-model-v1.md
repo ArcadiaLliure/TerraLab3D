@@ -8,7 +8,7 @@ Tancar `F1` i transformar observacions DNB admissibles per sensor/producte/relea
 
 ## Dependències
 
-[Pas 7.4 — oracle espectral i SpectralBandSet](pas7.4-spectral-bandset-validation.md) i [Pas 7.3 — contracte de mesura](../completat/pas7.3-dnb-rsr-measurement.md). La conclusió matemàtica de 7.3 no homologa automàticament cap sensor nocturn de 2026.
+[Pas 7.4 — oracle espectral i SpectralBandSet](../completat/pas7.4-spectral-bandset-validation.md) i [Pas 7.3 — contracte de mesura](../completat/pas7.3-dnb-rsr-measurement.md). La homologació numèrica acotada de 7.4 i la conclusió matemàtica de 7.3 no homologuen automàticament cap sensor nocturn de 2026.
 
 ## Referències obligatòries
 

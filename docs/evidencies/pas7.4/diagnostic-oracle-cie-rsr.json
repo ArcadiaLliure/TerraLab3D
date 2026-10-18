@@ -1,0 +1,245 @@
+{
+  "scope": "diagnostic_only_no_bandset_candidate_no_pass_fail",
+  "domainNm": [
+    380,
+    780
+  ],
+  "rsrCommonVisibleDomainNm": [
+    417.012,
+    780.0
+  ],
+  "cieFilesVerified": [
+    "CIE_RefSpectrum_L41.csv",
+    "CIE_illum_HPs.csv",
+    "CIE_illum_LEDs_1nm.csv",
+    "CIE_sle_photopic.csv",
+    "CIE_xyz_1931_2deg.csv"
+  ],
+  "cieSpdCases": [
+    {
+      "source": "CIE_LED_1",
+      "photopicRelativeNm": 1464.1074871353755,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_2",
+      "photopicRelativeNm": 1464.1048671509182,
+      "quadratureOrder4Vs16Abs": 2.2737367544323206e-13,
+      "quadratureOrder8Vs16Abs": 2.2737367544323206e-13,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_3",
+      "photopicRelativeNm": 1464.1007850277176,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 2.2737367544323206e-13,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_4",
+      "photopicRelativeNm": 1464.085389124954,
+      "quadratureOrder4Vs16Abs": 2.2737367544323206e-13,
+      "quadratureOrder8Vs16Abs": 2.2737367544323206e-13,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_5",
+      "photopicRelativeNm": 1464.0910167229817,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_6",
+      "photopicRelativeNm": 1464.0971922278632,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_7",
+      "photopicRelativeNm": 1464.1398155655122,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_8",
+      "photopicRelativeNm": 1464.1341184929422,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_LED_9",
+      "photopicRelativeNm": 1464.1293431228999,
+      "quadratureOrder4Vs16Abs": 2.2737367544323206e-13,
+      "quadratureOrder8Vs16Abs": 2.2737367544323206e-13,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_HP1",
+      "photopicRelativeNm": 7318.925940915313,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_HP2",
+      "photopicRelativeNm": 7321.061341034669,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_HP3",
+      "photopicRelativeNm": 7318.598277310632,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_HP4",
+      "photopicRelativeNm": 7318.428003823067,
+      "quadratureOrder4Vs16Abs": 9.094947017729282e-13,
+      "quadratureOrder8Vs16Abs": 9.094947017729282e-13,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_HP5",
+      "photopicRelativeNm": 7319.607817556136,
+      "quadratureOrder4Vs16Abs": 0.0,
+      "quadratureOrder8Vs16Abs": 0.0,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "CIE_L41",
+      "photopicRelativeNm": 1464.1007880032425,
+      "quadratureOrder4Vs16Abs": 2.2737367544323206e-13,
+      "quadratureOrder8Vs16Abs": 2.2737367544323206e-13,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "SYNTH_LED_B1_HP1_equal_visible_area",
+      "photopicRelativeNm": 0.5175193424596288,
+      "quadratureOrder4Vs16Abs": 1.1102230246251565e-16,
+      "quadratureOrder8Vs16Abs": 1.1102230246251565e-16,
+      "ciePhotopicVsXyzYAbs": 0.0
+    },
+    {
+      "source": "SYNTH_LED_RGB1_HP1_equal_visible_area",
+      "photopicRelativeNm": 0.5025774017987333,
+      "quadratureOrder4Vs16Abs": 1.1102230246251565e-16,
+      "quadratureOrder8Vs16Abs": 1.1102230246251565e-16,
+      "ciePhotopicVsXyzYAbs": 0.0
+    }
+  ],
+  "rsrProvenance": [
+    {
+      "id": "Suomi-NPP_LGS_SNPP-MODULATED-RSR-R1-LGS-ORBIT6557",
+      "sourceUrl": "https://ncc.nesdis.noaa.gov/documents/documentation/GT_F1_RSR_DNBLGS_v5_response_orbit6557_ccm.dat",
+      "validFrom": "2013-04-05",
+      "validThrough": "2013-04-05",
+      "evidenceClass": "diagnostic_historical",
+      "l3LinkStatus": "unverified",
+      "sha256": "7e60ac55d1610ee3825fa70184b6dd976e013277dacabf88165a2108da155aeb"
+    },
+    {
+      "id": "NOAA-20_LGS_J1_DAWG_at_launch_V2.1",
+      "sourceUrl": "https://ncc.nesdis.noaa.gov/NOAA-20/docs/J1_VIIRS_RSR_DAWG_At-Launch_Public_Release_V2.1_Nov2016.zip",
+      "validFrom": "2017-11-18",
+      "validThrough": "2017-11-18",
+      "evidenceClass": "diagnostic_historical",
+      "l3LinkStatus": "unverified",
+      "sha256": "71d4028b230426571ce3164e942dd283f5c9626db15fcc9d172ef15723d0dcb8"
+    },
+    {
+      "id": "NOAA-20_MGS_J1_DAWG_at_launch_V2.1",
+      "sourceUrl": "https://ncc.nesdis.noaa.gov/NOAA-20/docs/J1_VIIRS_RSR_DAWG_At-Launch_Public_Release_V2.1_Nov2016.zip",
+      "validFrom": "2017-11-18",
+      "validThrough": "2017-11-18",
+      "evidenceClass": "diagnostic_historical",
+      "l3LinkStatus": "unverified",
+      "sha256": "6ce4adcb73972a27c1d688b8ea7b741086cd60d0178cf8dd432802dd89ffe73a"
+    },
+    {
+      "id": "NOAA-21_LGS_J2_DAWG_at_launch_V2",
+      "sourceUrl": "https://ncc.nesdis.noaa.gov/NOAA-21/docs/J2_VIIRS_RSR_DAWG_At-Launch_Public_Release_V2_Jul2019.zip",
+      "validFrom": "2022-11-10",
+      "validThrough": "2022-11-10",
+      "evidenceClass": "diagnostic_historical",
+      "l3LinkStatus": "unverified",
+      "sha256": "dd173f592947aa2adca3ca1d7f14c5435cea1cfbc39c948de282c4c3496badd3"
+    },
+    {
+      "id": "NOAA-21_MGS_J2_DAWG_at_launch_V2",
+      "sourceUrl": "https://ncc.nesdis.noaa.gov/NOAA-21/docs/J2_VIIRS_RSR_DAWG_At-Launch_Public_Release_V2_Jul2019.zip",
+      "validFrom": "2022-11-10",
+      "validThrough": "2022-11-10",
+      "evidenceClass": "diagnostic_historical",
+      "l3LinkStatus": "unverified",
+      "sha256": "a4a135f72c667fe9f30a392086c499530829d1f9a2fa8a6eb9fd6bb2c9b0257e"
+    }
+  ],
+  "rsrVisibleOnlyCases": [
+    {
+      "source": "CIE_LED_1",
+      "commonVisibleNormalizedResponse": {
+        "Suomi-NPP_LGS_SNPP-MODULATED-RSR-R1-LGS-ORBIT6557": 9.910948235885476,
+        "NOAA-20_LGS_J1_DAWG_at_launch_V2.1": 9.7329850307081,
+        "NOAA-20_MGS_J1_DAWG_at_launch_V2.1": 9.83887410229769,
+        "NOAA-21_LGS_J2_DAWG_at_launch_V2": 9.708682115071312,
+        "NOAA-21_MGS_J2_DAWG_at_launch_V2": 10.01790918403253
+      }
+    },
+    {
+      "source": "CIE_LED_7",
+      "commonVisibleNormalizedResponse": {
+        "Suomi-NPP_LGS_SNPP-MODULATED-RSR-R1-LGS-ORBIT6557": 10.741503308883301,
+        "NOAA-20_LGS_J1_DAWG_at_launch_V2.1": 10.547475341904839,
+        "NOAA-20_MGS_J1_DAWG_at_launch_V2.1": 10.705384808326064,
+        "NOAA-21_LGS_J2_DAWG_at_launch_V2": 10.506428486905165,
+        "NOAA-21_MGS_J2_DAWG_at_launch_V2": 10.886365580554443
+      }
+    },
+    {
+      "source": "CIE_HP1",
+      "commonVisibleNormalizedResponse": {
+        "Suomi-NPP_LGS_SNPP-MODULATED-RSR-R1-LGS-ORBIT6557": 40.022409057850076,
+        "NOAA-20_LGS_J1_DAWG_at_launch_V2.1": 39.73533151874391,
+        "NOAA-20_MGS_J1_DAWG_at_launch_V2.1": 39.62417472919043,
+        "NOAA-21_LGS_J2_DAWG_at_launch_V2": 39.62896308392586,
+        "NOAA-21_MGS_J2_DAWG_at_launch_V2": 41.19721262946364
+      }
+    },
+    {
+      "source": "CIE_HP3",
+      "commonVisibleNormalizedResponse": {
+        "Suomi-NPP_LGS_SNPP-MODULATED-RSR-R1-LGS-ORBIT6557": 47.3366593425185,
+        "NOAA-20_LGS_J1_DAWG_at_launch_V2.1": 46.814083735394945,
+        "NOAA-20_MGS_J1_DAWG_at_launch_V2.1": 47.35269219088817,
+        "NOAA-21_LGS_J2_DAWG_at_launch_V2": 46.779293924801415,
+        "NOAA-21_MGS_J2_DAWG_at_launch_V2": 48.07792334031121
+      }
+    },
+    {
+      "source": "CIE_L41",
+      "commonVisibleNormalizedResponse": {
+        "Suomi-NPP_LGS_SNPP-MODULATED-RSR-R1-LGS-ORBIT6557": 8.333161909604781,
+        "NOAA-20_LGS_J1_DAWG_at_launch_V2.1": 8.19435418008882,
+        "NOAA-20_MGS_J1_DAWG_at_launch_V2.1": 8.304477614115827,
+        "NOAA-21_LGS_J2_DAWG_at_launch_V2": 8.18694917110401,
+        "NOAA-21_MGS_J2_DAWG_at_launch_V2": 8.508924586863788
+      }
+    }
+  ],
+  "limitations": [
+    "CIE SPDs are relative and approximated, not measured site emissions",
+    "HP tables have 5 nm grid; sub-grid narrow lines are not recovered",
+    "CIE source support ends at 780/830 nm, so DNB full-band response is not characterized",
+    "All RSRs are historical or at-launch diagnostic curves, not verified 2026 Black Marble L3 responses",
+    "No atmosphere, gas absorption, SQM/TESS response, or product error budget is included"
+  ]
+}

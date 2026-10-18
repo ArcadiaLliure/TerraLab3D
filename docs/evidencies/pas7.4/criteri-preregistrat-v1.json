@@ -1,0 +1,76 @@
+{
+  "criterionId": "TL3D-SKY-V3-SPECTRAL-001",
+  "criterionVersion": 1,
+  "profileRevision": 1,
+  "status": "frozen_before_candidate_evaluation",
+  "freezeTimeUtc": "2026-10-18T11:59:32Z",
+  "owner": "TerraLab3D",
+  "originCategory": "approved_product_requirement",
+  "approvalEvidence": "Instrucció explícita de l'usuari del 2026-10-18 en aquesta conversa, Pas 7.4",
+  "literatureContext": {
+    "doi": "10.3390/s19061336",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6470928/",
+    "scope": "Incertesa 1 sigma de 0,06 mag del punt zero AB per als dispositius TESS-W i SQM-LU-DL estudiats; motiva un pressupost numèric subordinat, no valida VIIRS ni el skyglow."
+  },
+  "metric": {
+    "quantity": "Integral espectral radiomètrica positiva de SPD per una o dues respostes adimensionals tabulades",
+    "formula": "abs(2.5 * log10(I_candidate / I_reference))",
+    "unit": "magnituds equivalents",
+    "maximumInclusive": 0.01,
+    "equivalentUpperRadianceRatio": "10^(0.01/2.5)",
+    "aggregation": "maximum_over_every_declared_case_not_mean",
+    "reference": "independent_fine_spectral_oracle"
+  },
+  "nearZeroRule": {
+    "radianceFractionFromApprovedMagnitude": "eta = 10^(0.01/2.5)-1",
+    "oracleNumericalUncertainty": "u_ref=max(abs(Q8-Q16),abs(Q16-Q32),abs(Q32-D50),N*ulp(A))",
+    "definitions": {
+      "Qk": "Gauss-Legendre d'ordre k, partit a tots els nusos de les corbes d'entrada",
+      "D50": "integral analítica per intervals de polinomis lineals a trossos en aritmètica Decimal de 50 xifres",
+      "N": "nombre d'intervals de l'oracle",
+      "A": "integral no ponderada de la SPD no negativa multiplicada pel producte dels màxims absoluts de cada resposta; escala superior de l'integral ponderada",
+      "ulp": "distància de representació binària IEEE-754 al voltant d'A"
+    },
+    "nearZeroCondition": "I_reference <= u_ref/eta, inclòs I_reference=0",
+    "absoluteMetric": "abs(I_candidate-I_reference)",
+    "absoluteMaximumInclusive": "u_ref",
+    "absoluteUnit": "mateixa unitat que la integral radiomètrica",
+    "negativeReference": "fora del gate de magnituds; registrar separadament com a diagnòstic d'una RSR signada",
+    "rationale": "Quan el senyal no supera la resolució numèrica de l'oracle respecte al pressupost de magnitud, no es divideix per un valor gairebé nul. L'error absolut admès és només la incertesa numèrica prèvia del mateix oracle, sense introduir una escala radiomètrica inventada."
+  },
+  "domain": {
+    "wavelengthNm": [380, 780],
+    "integrationSupport": "intersecció del domini declarat i del suport tabulat de totes les corbes; cap extrapolació RSR no publicada",
+    "sourceFamilies": [
+      "CIE LED-B1..B5, LED-BH1, LED-RGB1, LED-V1, LED-V2",
+      "CIE HP1..HP5",
+      "CIE L41",
+      "mescles convexes de SPD de les famílies anteriors amb normalització d'àrea visible explícita",
+      "línies triangulars sintètiques estretes, no negatives, amb nusos explícits"
+    ],
+    "weightFamilies": [
+      "CIE V(lambda)",
+      "CIE XYZ 1931 2 graus: X(lambda), Y(lambda), Z(lambda)",
+      "RSR DNB SNPP LGS 2013, NOAA-20 LGS/MGS prelanzament i NOAA-21 LGS/MGS prelanzament, només diagnòstiques"
+    ],
+    "maximumSimultaneousWeightCurves": 2,
+    "inputSemantics": "corbes lineals a trossos segons la interpolació declarada; cap estructura subgraella no es pot reconstruir",
+    "rsrOperationalStatus": "no_2026_black_marble_l3_rsr_homologated",
+    "exclusions": [
+      "RSR efectiva Black Marble nocturna del 2026",
+      "fonts físiques inferides de Black Marble",
+      "absorció gasosa i dispersió espectral del transport",
+      "projeccions SQM/TESS no tabulades i no validades"
+    ]
+  },
+  "errorLedger": [
+    "quadrature_and_oracle_numerical_error",
+    "spectral_bandset_discretization_error",
+    "instrumental_rsr_uncertainty_unquantified"
+  ],
+  "futureRevalidation": {
+    "step7_10": "revalidar amb absorció gasosa i dispersió espectral; versionar bandSetId si falla",
+    "step7_14": "revalidar amb les projeccions fotomètriques; versionar bandSetId si falla",
+    "thresholdRetroactiveRelaxation": "forbidden"
+  }
+}

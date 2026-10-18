@@ -8,7 +8,7 @@ Per a una direcció unitària `ω` des de l'observador `O`, el punt de quadratur
 
 ## 2. Font operativa VNP46 i model de mesura VIIRS DNB
 
-**NASA Black Marble Collection 2** aporta tres fonts candidates: VNP46A2/Suomi-NPP, VJ146A2/NOAA-20 i VJ246A2/NOAA-21, registrades al [perfil v2](skyglow-v2-profile.json). El [perfil v1 del Pas 7.1](skyglow-v1-profile.json) i el lector verificat de 7.2 conserven l'abast VNP46. Les unitats/QA VJ146 provenen de la seva especificació; VJ246 i els grànuls J1/J2 reals resten pendents. La [revisió multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) separa TOA/L3 i RSR; cap de les tres fonts no és encara homologada per a skyglow físic. Els valors PASS/FAIL es congelen als primers gates que els apliquen.
+**NASA Black Marble Collection 2** aporta tres fonts candidates: VNP46A2/Suomi-NPP, VJ146A2/NOAA-20 i VJ246A2/NOAA-21, registrades al [perfil v2](skyglow-v2-profile.json). El [perfil v1 del Pas 7.1](skyglow-v1-profile.json) i el lector verificat de 7.2 conserven l'abast VNP46. Les unitats/QA VJ146 provenen de la seva especificació i de [dos grànuls J1 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md); J2 real resta pendent. La [revisió multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) separa TOA/L3 i RSR; cap de les tres fonts no és encara homologada per a skyglow físic. Els valors PASS/FAIL es congelen als primers gates que els apliquen.
 
 VNP46 no és skyglow a nivell de terra ni flux hemisfèric d'una font. VIIRS DNB continua definint la semàntica espectral de la mesura.
 
@@ -70,7 +70,7 @@ La normalització conserva la fórmula:
 
 `A_j = L_DNB,j / ∫ S_j(λ) R_DNB(λ)dλ`.
 
-Aquí `L_DNB,j` ha de ser una restricció de banda **físicament compatible amb la RSR seleccionada**. El valor cru de `DNB_BRDF-Corrected_NTL` de VNP46A2 és L3 corregit i no es pot inserir automàticament en aquesta equació com si fos una radiància TOA del sensor. La transformació o interpretació efectiva C2 és una part pendent del gate de 7.3; cap `normalizationScale` operatiu es deriva fins que s'acrediti.
+Aquí `L_DNB,j` ha de ser una restricció de banda **físicament compatible amb la RSR seleccionada**. El valor cru de `DNB_BRDF-Corrected_NTL` de VNP46A2 és L3 corregit i no es pot inserir automàticament en aquesta equació com si fos una radiància TOA del sensor. La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) documenta la transformació TOA→L3 i tanca la seva interpretació al Pas 7.3; cap `normalizationScale` operatiu d'inferència de font es deriva fins que s'acrediti el model de 7.5.
 
 No es divideix `R_DNB` per `∫R_DNB dλ` per defecte. Si un producte defineix radiància espectral mitjana o un operador diferent, ha d'usar un `measurementOperatorId` propi.
 
@@ -191,4 +191,4 @@ Cost aproximat: `O(N_source_effective × N_direction × N_segment × N_node × N
 Sense dades atmosfèriques reals: atmosfera estàndard versionada. Sense aerosol detallat: HG amb paràmetres explícits i confiança baixa. Sense prior SPD local: ensemble global documentat. Sense núvols fiables: cel clar declarat; mai inventar cobertura. Sense VIIRS: mantenir modes manuals existents com a fallback de producte, però no etiquetar-los com a simulació física.
 ## Configuració espectral de la vertical 7.1–7.50
 
-El nombre de bandes del kernel és un paràmetre de configuració (`spectralBandCount`) amb límits/ponderacions i `bandSetId` versionats. No existeix un N fix ni un benchmark per triar-lo; es comproven unitats, integració i coherència de la configuració activa. El cel solar/lunar i el limbe terrestre són responsabilitat de la [vertical 7.51+](../cel-fisic/README.md), que comparteix òptica però no el `PropagationKernel` artificial.
+El nombre de bandes del kernel és un paràmetre de configuració (`spectralBandCount`) amb límits/ponderacions i `bandSetId` versionats. L'[operador offline verificat a 7.4](../evidencies/pas7.4/homologacio-bandset-v1.md) forma els intervals amb la unió dels nusos de la SPD i de les respostes tabulades i integra amb Simpson; la cardinalitat varia amb les corbes. La identitat de bandes i la signatura completa de les corbes han d'acompanyar qualsevol resultat reutilitzable. Aquest resultat numèric no autoritza encara cap partició fixa del kernel de transport: 7.10 i 7.14 revaliden el criteri en ampliar els operadors. No existeix un N fix ni un benchmark per triar-lo; es comproven unitats, integració i coherència de la configuració activa. El cel solar/lunar i el limbe terrestre són responsabilitat de la [vertical 7.51+](../cel-fisic/README.md), que comparteix òptica però no el `PropagationKernel` artificial.

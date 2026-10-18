@@ -18,7 +18,7 @@ No s’accepta cap d’aquests patrons:
 
 | Primer gate que aplica el valor | Preregistre obligatori | Evidència necessària |
 |---:|---|---|
-| 7.4 | Pressupost d'error espectral abans de seleccionar el `SpectralBandSet` candidat | Oracle espectral fi, metrologia o convergència justificada; sense justificació, es bloqueja 7.4. |
+| 7.4 | `0,01 mag` equivalents, requisit de producte TerraLab3D congelat abans d'avaluar candidats | [Criteri preregistrat](../evidencies/pas7.4/criteri-preregistrat-v1.json) i [homologació del domini tabulat](../evidencies/pas7.4/homologacio-bandset-v1.md); les RSR històriques només són diagnòstiques. |
 | 7.12 | Tolerància runtime↔SG-REF abans de la comparació decisòria del candidat | Convergència i incertesa numèrica demostrades per SG-REF a 7.6, mai residuals del runtime candidat. |
 | 7.17 | Criteris empírics abans d'avaluar el conjunt reservat `held-out` | Incerteses instrumental, de dades i del model; sense ajustar als residuals observats. |
 | 7.22 | SLO de producte TerraLab3D abans de decidir si cal LUT/precomputació/FFT | Requisit de producte aprovat, plataforma i condicions de mesura; si falta, es bloqueja 7.22. |
@@ -43,11 +43,11 @@ El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + m
 | 7.7 | PropagationKernel geomètric i benchmark B0 | 7.6 |
 | 7.8 | OpticalField tiled i atmosfera estàndard determinista | 7.7 |
 | 7.9 | Rayleigh, aerosol de referència i benchmark B1 | 7.8 |
-| 7.10 | Kernel espectral complet i absorció gasosa | 7.9 |
+| 7.10 | Kernel espectral complet i absorció gasosa; revalidació de bandes | 7.9, 7.4 |
 | 7.11 | Terreny, curvatura i visibilitat física | 7.10 |
 | 7.12 | Gate zenital de transport radiomètric | 7.11 |
 | 7.13 | Camp angular i DomeProfile sobre ruta directa | 7.12 |
-| 7.14 | Projeccions fotomètriques i sensors SQM/TESS | 7.13 |
+| 7.14 | Projeccions fotomètriques i sensors SQM/TESS; revalidació de bandes | 7.13, 7.4 |
 | 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14 |
 | 7.16 | Incertesa quantitativa i provenance completa | 7.3, 7.5, 7.15 |
 | 7.17 | Validació empírica clear-sky de SourceModel i transport | 7.3, 7.5, 7.16 |
@@ -99,7 +99,7 @@ El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + m
 
 La verificació científica amb un grànul J1/J2 real pot emprar una fixture local aportada o obtinguda per recerca offline, amb SHA-256 i procedència, tal com 7.2 va fer amb VNP46. Això permet completar 7.3 sense avançar el wizard del Pas 24; l'adquisició ordinària dels tres productes continua allà.
 
-**Gate de sortida.** Integral TOA, unitats, identitat i repositori RSR reproduïbles; transformació TOA→L3 explícitament documentada per NASA; capa, unitat, QA i procedència L3 contrastades amb dades reals; estats d'homologació RSR explícits per sensor/període. **Estat: completat per al contracte de mesura.** La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i els [grànuls VJ146 h00v01/h18v04](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), inclòs QA 0 urbà, satisfan el contracte L3. La RSR efectiva de 2026 i la inferència espectral/angular física no estan homologades; 7.5, 7.16 i 7.17 n'assumeixen els gates. 7.4 queda preparat, sense inici d'implementació en aquesta execució.
+**Gate de sortida.** Integral TOA, unitats, identitat i repositori RSR reproduïbles; transformació TOA→L3 explícitament documentada per NASA; capa, unitat, QA i procedència L3 contrastades amb dades reals; estats d'homologació RSR explícits per sensor/període. **Estat: completat per al contracte de mesura.** La [User Guide C2 §2.2 Eq. (1)](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf) i els [grànuls VJ146 h00v01/h18v04](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md), inclòs QA 0 urbà, satisfan el contracte L3. La RSR efectiva de 2026 i la inferència espectral/angular física no estan homologades; 7.5, 7.16 i 7.17 n'assumeixen els gates.
 
 **Fitxer executable:** [pas7.3-dnb-rsr-measurement.md](../tasques/completat/pas7.3-dnb-rsr-measurement.md)
 
@@ -107,9 +107,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Finalitat.** Tancar `V3` abans que el nombre de bandes entri al kernel de producció.
 
-**Gate de sortida.** Abans de seleccionar cap `SpectralBandSet` candidat, el pressupost numèric d'error espectral queda justificat i preregistrat per al domini i les famílies RSR declarades a 7.3, distingint respostes diagnòstiques de les acreditades per a producte; inclou sensibilitat a RSR/priors SPD quan sigui material. Sense evidència, 7.4 queda bloquejat. `V3` es tanca només quan un candidat compleix el pressupost contra l'oracle fi. Cap benchmark de rendiment decideix N.
+**Gate de sortida.** Abans d'avaluar candidats es va congelar el [requisit de producte de 0,01 mag equivalents](../evidencies/pas7.4/criteri-preregistrat-v1.json), amb mètrica, domini, responsable i regla absoluta prop de zero. L'oracle Gauss–Legendre es contrasta amb una integral analítica Decimal de 50 xifres; quadratura, discretització i incertesa RSR consten per separat. **Estat 2026-10-18: completat només per al domini tabulat declarat.** El `SpectralBandSet` adaptatiu d'unió de nusos i Simpson supera [238/238 casos](../evidencies/pas7.4/homologacio-bandset-v1.md), sense triar bandes per rendiment. Les RSR històriques mantenen estat diagnòstic; aquest PASS no homologa cap resposta Black Marble nocturna de 2026 ni el transport atmosfèric. `V3` es revalida en ampliar el domini a 7.10 i 7.14; un error superior al pressupost obliga a versionar les bandes, sense relaxar el criteri.
 
-**Fitxer executable:** [pas7.4-spectral-bandset-validation.md](../tasques/pendent/pas7.4-spectral-bandset-validation.md)
+**Fitxer executable:** [pas7.4-spectral-bandset-validation.md](../tasques/completat/pas7.4-spectral-bandset-validation.md)
 
 ### 7.5 — SourceModel v1: SPD, emissió angular i incertesa
 
@@ -155,7 +155,7 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Finalitat.** Passar del B1 monocromàtic a transport espectral v1 complet amb absorció.
 
-**Gate de sortida.** La ruta directa clear-sky espectral supera invariants de banda, unitats i absorció, amb comparació diagnòstica reproduïble contra SG-REF i l'oracle espectral; cap absorció es tracta com zero per conveniència. El PASS/FAIL numèric de transport és 7.12.
+**Gate de sortida.** La ruta directa clear-sky espectral supera invariants de banda, unitats i absorció, amb comparació diagnòstica reproduïble contra SG-REF i l'oracle espectral; cap absorció es tracta com zero per conveniència. També revalida el pressupost de discretització `0,01 mag` de 7.4 amb absorció gasosa i dispersió espectral. Si falla, revisa i versiona el `SpectralBandSet` i repeteix la validació sense relaxar el criteri. El PASS/FAIL numèric de transport és 7.12.
 
 **Fitxer executable:** [pas7.10-gas-spectral-kernel.md](../tasques/pendent/pas7.10-gas-spectral-kernel.md)
 
@@ -187,7 +187,7 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Finalitat.** Projectar radiància espectral física a magnituds/instruments sense retroalimentar el kernel.
 
-**Gate de sortida.** SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies justificades i preregistrades a 7.14 abans de comparar el candidat; sense justificació, 7.14 es bloqueja. Cap projecció modifica la radiància física.
+**Gate de sortida.** SQM/TESS/CIE coincideixen amb oracles de projecció dins toleràncies justificades i preregistrades a 7.14 abans de comparar el candidat; sense justificació, 7.14 es bloqueja. Revalida també el pressupost de discretització `0,01 mag` de 7.4 per a les projeccions reals; si falla, versiona i rehomologa el `SpectralBandSet` sense relaxar el criteri. Cap projecció modifica la radiància física.
 
 **Fitxer executable:** [pas7.14-photometric-projections.md](../tasques/pendent/pas7.14-photometric-projections.md)
 

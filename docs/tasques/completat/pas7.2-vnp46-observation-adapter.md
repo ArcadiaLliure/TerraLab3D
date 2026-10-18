@@ -69,7 +69,7 @@ Inferència `SourceModel`, normalització espectral DNB/RSR, propagació i visua
 
 ## Instrucció per a Codex
 
-El [Pas 7.3](pas7.3-dnb-rsr-measurement.md) ha completat el contracte de mesura i la interpretació L3; el punt de represa actual és [7.4](../pendent/pas7.4-spectral-bandset-validation.md). Es conserva la distinció entre radiància observada i inferència d'emissió. Qualsevol ambigüitat del producte torna al contracte de 7.1.
+El [Pas 7.3](pas7.3-dnb-rsr-measurement.md) ha completat el contracte de mesura i la interpretació L3; [7.4](pas7.4-spectral-bandset-validation.md) ha homologat l'operador espectral tabulat i el punt de represa actual és [7.5](../pendent/pas7.5-source-model-v1.md). Es conserva la distinció entre radiància observada i inferència d'emissió. Qualsevol ambigüitat del producte torna al contracte de 7.1.
 
 ## Treball pendent
 

@@ -86,8 +86,25 @@
         "step": "7.4",
         "criterion": "spectral_discretization_error",
         "freezeBefore": "SpectralBandSet_candidate_selection",
-        "status": "awaiting_gate_evidence",
-        "thresholds": null,
+        "status": "verified_for_declared_tabulated_domain",
+        "thresholds": {
+          "maximumEquivalentMagnitudeErrorInclusive": 0.01,
+          "unit": "equivalent_magnitude",
+          "metric": "abs(2.5*log10(candidate_integral/reference_integral))",
+          "aggregation": "maximum_per_verified_case",
+          "nearZeroMetric": "absolute_error_at_most_oracle_numerical_uncertainty",
+          "domain": "piecewise_linear_CIE_LED_HP_L41_mixtures_narrow_lines_CIE_V_XYZ_and_historical_diagnostic_RSR_380_to_780_nm",
+          "originCategory": "approved_product_requirement",
+          "owner": "TerraLab3D",
+          "freezeTime": "2026-10-18T11:59:32Z",
+          "profileRevision": 1
+        },
+        "evidenceReference": "../evidencies/pas7.4/criteri-preregistrat-v1.json",
+        "candidateEvaluationEvidence": "../evidencies/pas7.4/avaluacio-bandset-v1.json",
+        "selectedBandSetStrategy": "tl3d-sky-v1-knot-union-simpson-1",
+        "verifiedCases": 238,
+        "futureDomainRevalidationSteps": ["7.10", "7.14"],
+        "historicalRsrStatus": "diagnostic_only; no_2026_Black_Marble_RSR_homologated",
         "missingThresholdAction": "block_step_7.4"
       },
       {
@@ -124,7 +141,7 @@
         "mayCreateOrModifyThresholds": false
       }
     ],
-    "note": "No published source or approved product requirement in the repository establishes numeric PASS/FAIL limits for transport, spectral discretization, runtime latency and recomputation. NASA VNP46A2 detection goals are product-performance metrics, not those limits."
+    "note": "TerraLab3D ha aprovat i preregistrat 0,01 magnituds equivalents per a la discretització espectral del domini tabulat verificat a 7.4. Els llindars de transport, validació empírica i rendiment resten pendents als seus gates. Els objectius de detecció NASA VNP46A2 no estableixen aquests límits del producte."
   },
   "sourcesConsulted": [
     "https://landweb.modaps.eosdis.nasa.gov/data/userguide/BlackMarbleUserGuide_Collection2.0_20241203.pdf",

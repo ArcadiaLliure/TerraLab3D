@@ -87,7 +87,14 @@
     "status": "policy_preregistered",
     "inheritedPolicyRef": "skyglow-v1-profile.json#acceptanceProfile",
     "revisionRule": "new_sensor_and_domain_require_prospective_gate_records_before_candidate_evaluation",
-    "numericThresholds": null,
+    "numericThresholds": {
+      "step7_4_spectral_discretization_max_equivalent_magnitude": 0.01
+    },
+    "step7_4_scope": "verified_piecewise_linear_tabulated_domain_only; historical_DNB_RSR_diagnostic_only",
+    "step7_4_criterionRef": "../evidencies/pas7.4/criteri-preregistrat-v1.json",
+    "step7_4_verificationRef": "../evidencies/pas7.4/homologacio-bandset-v1.md",
+    "newDomainRevalidationSteps": ["7.10", "7.14"],
+    "pendingNumericGateLocations": ["7.12", "7.17", "7.22"],
     "gateLocations": ["7.4", "7.12", "7.17", "7.22"],
     "homologationConsumesOnly": "7.28"
   },
