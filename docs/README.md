@@ -6,13 +6,15 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.6 — SG-REF](tasques/pendent/pas7.6-sg-ref-reference-solver.md).** El [Pas 7.5 — SourceModel físic S](tasques/completat/pas7.5-source-model-v1.md) ha verificat fonts definides amb SPD, geometria, amplitud i patró angular independents de VIIRS. La [política S/C/H](skyglow/20-politica-rsr-i-validacio-per-dominis.md) manté el gate L3/RSR observacional per a C/H. [7.4](tasques/completat/pas7.4-spectral-bandset-validation.md) conserva el criteri 0,01 mag i 238/238 PASS del seu domini tabulat. 7.6 encara no s'ha executat.
+> **Punt de represa: [Pas 7.6 — SG-REF](tasques/pendent/pas7.6-sg-ref-reference-solver.md).** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. SG-REF, radiància atmosfèrica i homologació H continuen pendents.
 >
 > Els subpassos **7.1–7.50** pertanyen a contaminació lumínica artificial: VNP46, VJ146 i VJ246 són fonts Black Marble candidates amb models de mesura propis; cap skyglow físic de producte no està implementat. Els **7.51+** són del cel físic solar/lunar. El Pas 7 històric conserva la visualització actual. Les verticals pendents es documenten a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
-**Estat verificat del 2026-10-18:** [7.5 S](evidencies/pas7.5/validacio-source-model-s-v1.md) passa conservació espectral/angular i coherència dimensional amb fixtures analítiques i taules LED/HP CIE verificades. S'han superat 216 proves backend. La potència de les fixtures és definida o relativa, no estimada d'una ciutat. El [registre RSR observacional](evidencies/pas7.5/auditoria-rsr-2026.json) continua sense coincidència L3 operativa per al 2026-09-13; inferència i homologació C/H resten a 7.16–7.24. El 7.4 continua limitat al seu domini numèric.
+**Estat verificat del 2026-10-18:** [7.5.1](evidencies/pas7.5.1/validacio-simulacio-condicionada.md) genera fonts C diferenciades amb el grànul urbà real; 247 proves backend i suite frontend superades. UI de kelvins 2.800–6.500 K verificada amb teclat, ratolí, tacte i bridge Python real; transport pendent, sense alteració RGB fictícia. Pyright dels mòduls científics nous passa; la comprovació global manté els 67 errors i 3 avisos presents a `HEAD`. El criteri de 7.4 continua limitat al domini homologat.
 
 Auditoria documental del 2026-10-17: els passos 7.1–7.3 no generaven incidències estructurals; en normalitzar 7.3, el recompte integral va passar de 720 a 708 incidències heretades d'altres passos. El 2026-10-18, després de completar 7.4 i 7.5 S amb les seccions obligatòries, el validador informa de **613 incidències mecàniques heretades**; cap enllaç trencat ni incidència nova del pas vigent. Les duplicitats d'identificador dels fitxers històrics `pas7.4-forward-ad-b1b.md` i `pas7.5-spectral-bandset-b2a.md` continuen sense corregir-se en aquesta vertical. La validació de 7.3 consta a les [evidències](evidencies/pas7.3/validacio-model-dnb.md); les incidències alienes no es corregeixen ara. Vegeu [7.1](evidencies/pas7.1/validacio-contracte.txt), [7.2](evidencies/pas7.2/validacio-adaptador.md), [7.3 — RSR](evidencies/pas7.3/recerca-rsr-2026.md), [7.3 — guia/grànuls](evidencies/pas7.3/contrast-granuls-black-marble-c2.md), [7.5 — observacional històric](evidencies/pas7.5/estat-inferencia-font-2026.md) i [7.5 — S verificat](evidencies/pas7.5/validacio-source-model-s-v1.md). El normalitzador antic no s'ha executat perquè utilitza un mapa de passos anterior al pla canònic actual.
+
+**Auditoria de 7.5.1:** recompte real inicial 688 i final 558 incidències heretades; zero enllaços locals trencats i cap incidència del nou pas o dels passos executables normalitzats. Les xifres històriques anteriors es conserven com a traça. [Informe actual](evidencies/pas7.5.1/auditoria-documental.txt).
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README i executar **exactament un pas cada vegada**. Per a la vertical 7.1–7.28, l’ordre és una linealització científica deliberada: cap optimització pot precedir el seu baseline directe/oracle i cap decisió bloquejant es pot resoldre amb una constant implícita.
 
@@ -51,6 +53,7 @@ Estats admesos:
 | 7.3 | [Model de mesura DNB multisatèl·lit](tasques/completat/pas7.3-dnb-rsr-measurement.md) | `completat` (contractes TOA i Black Marble L3; fonts físiques 2026 no homologades) |
 | 7.4 | [Oracle espectral fi i SpectralBandSet tabulat v1](tasques/completat/pas7.4-spectral-bandset-validation.md) | `completat` (domini numèric acotat; 238/238 PASS) |
 | 7.5 | [SourceModel físic S independent de VIIRS](tasques/completat/pas7.5-source-model-v1.md) | `completat` (fonts definides; C/H sense homologar) |
+| 7.5.1 | [Black Marble NOAA-20, biblioteca espectral, modalitats realista/K i controls científics](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) | `completat` en escala condicionada relativa; transport pendent |
 | 8 | [Sol, Lluna i planetes amb posicions i aparença reals](tasques/completat/pas8.md) | `completat` |
 | 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](tasques/completat/pas8.5.md) | `completat` |
 | 8.6 | [Planetes, anells i satèl·lits naturals](tasques/completat/pas8.6.md) | `completat` |
@@ -78,29 +81,29 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.6 | [SG-REF: oracle independent de transport i integració d’àrea](tasques/pendent/pas7.6-sg-ref-reference-solver.md) | `pendent` | 7.5 |
+| 7.6 | [SG-REF: oracle independent de transport i integració d’àrea](tasques/pendent/pas7.6-sg-ref-reference-solver.md) | `pendent` | 7.5, 7.5.1 |
 | 7.7 | [PropagationKernel geomètric i benchmark B0](tasques/pendent/pas7.7-kernel-geometry-b0.md) | `pendent` | 7.6 |
 | 7.8 | [OpticalField tiled i atmosfera estàndard determinista](tasques/pendent/pas7.8-optical-field-standard.md) | `pendent` | 7.7 |
 | 7.9 | [Rayleigh, aerosol de referència i benchmark B1](tasques/pendent/pas7.9-rayleigh-aerosol-b1.md) | `pendent` | 7.8 |
-| 7.10 | [Kernel espectral complet i absorció gasosa](tasques/pendent/pas7.10-gas-spectral-kernel.md) | `pendent` | 7.9, 7.4 (revalidació espectral) |
+| 7.10 | [Kernel espectral complet i absorció gasosa](tasques/pendent/pas7.10-gas-spectral-kernel.md) | `pendent` | 7.9, 7.4 (revalidació espectral), 7.5.1 |
 | 7.11 | [Terreny, curvatura i visibilitat física](tasques/pendent/pas7.11-terrain-curvature.md) | `pendent` | 7.10 |
 | 7.12 | [Gate zenital de transport radiomètric](tasques/pendent/pas7.12-zenith-transport-gate.md) | `pendent` | 7.11 |
 | 7.13 | [Camp angular i DomeProfile sobre ruta directa](tasques/pendent/pas7.13-dome-profile-direct.md) | `pendent` | 7.12 |
-| 7.14 | [Projeccions fotomètriques i sensors SQM/TESS](tasques/pendent/pas7.14-photometric-projections.md) | `pendent` | 7.13, 7.4 (revalidació espectral) |
+| 7.14 | [Projeccions fotomètriques i sensors SQM/TESS](tasques/pendent/pas7.14-photometric-projections.md) | `pendent` | 7.13, 7.4 (revalidació espectral), 7.5.1 |
 | 7.15 | [Atmosfera real ERA5/CAMS i composició de camps](tasques/pendent/pas7.15-atmos-era5-cams.md) | `pendent` | 7.14 |
-| 7.16 | [Incertesa quantitativa i provenance completa](tasques/pendent/pas7.16-uncertainty-provenance.md) | `pendent` | 7.3, 7.5, 7.15 |
-| 7.17 | [Validació empírica clear-sky de SourceModel i transport](tasques/pendent/pas7.17-clear-sky-ground-truth.md) | `pendent` | 7.3, 7.5, 7.16 |
+| 7.16 | [Incertesa quantitativa i provenance completa](tasques/pendent/pas7.16-uncertainty-provenance.md) | `pendent` | 7.3, 7.5, 7.15, 7.5.1 |
+| 7.17 | [Validació empírica clear-sky de SourceModel i transport](tasques/pendent/pas7.17-clear-sky-ground-truth.md) | `pendent` | 7.3, 7.5, 7.16, 7.5.1 |
 | 7.18 | [Watershed, EmissionRegion i quadtree com acceleració B5](tasques/pendent/pas7.18-source-spatial-acceleration.md) | `pendent` | 7.17 |
 | 7.19 | [Compressió de PhaseFunction i benchmark B3](tasques/pendent/pas7.19-phase-acceleration-b3.md) | `pendent` | 7.18 |
 | 7.20 | [Forward AD i RadiativeErrorBudget](tasques/pendent/pas7.20-ad-error-budget.md) | `pendent` | 7.19 |
 | 7.21 | [Cache error-based, scheduler latest-wins i prefetch](tasques/pendent/pas7.21-cache-scheduler.md) | `pendent` | 7.20 |
 | 7.22 | [Decisió i backend opcional LUT/precomputació/FFT](tasques/pendent/pas7.22-optional-runtime-acceleration.md) | `pendent` | 7.21 |
 | 7.23 | [CloudOpticalState i núvols single-scattering B6](tasques/pendent/pas7.23-clouds-b6.md) | `pendent` | 7.22 |
-| 7.24 | [Validació empírica final clear/cloudy i congelació de model](tasques/pendent/pas7.24-full-ground-truth.md) | `pendent` | 7.23 |
-| 7.25 | [Bridge Python→TypeScript i SkyglowRuntime](tasques/pendent/pas7.25-bridge-runtime.md) | `pendent` | 7.24 |
-| 7.26 | [Renderer Three.js lineal i modes diagnòstics](tasques/pendent/pas7.26-three-renderer-debug.md) | `pendent` | 7.25 |
-| 7.27 | [Composició lineal del cel i estats reference/instantaneous](tasques/pendent/pas7.27-sky-composition.md) | `pendent` | 7.26 |
-| 7.28 | [B7 FULL, SLO i homologació del skyglow artificial](tasques/pendent/pas7.28-b7-homologacio-skyglow.md) | `pendent` | 7.1–7.27 |
+| 7.24 | [Validació empírica final clear/cloudy i congelació de model](tasques/pendent/pas7.24-full-ground-truth.md) | `pendent` | 7.23, 7.5.1 |
+| 7.25 | [Bridge Python→TypeScript i SkyglowRuntime](tasques/pendent/pas7.25-bridge-runtime.md) | `pendent` | 7.24, 7.5.1 |
+| 7.26 | [Renderer Three.js lineal i modes diagnòstics](tasques/pendent/pas7.26-three-renderer-debug.md) | `pendent` | 7.25, 7.5.1 |
+| 7.27 | [Composició lineal del cel i estats reference/instantaneous](tasques/pendent/pas7.27-sky-composition.md) | `pendent` | 7.26, 7.5.1 |
+| 7.28 | [B7 FULL, SLO i homologació del skyglow artificial](tasques/pendent/pas7.28-b7-homologacio-skyglow.md) | `pendent` | 7.1–7.27, 7.5.1 |
 | 7.51 | [Llicències comercials i recursos del cel físic](tasques/pendent/pas7.51-llicencies-i-recursos.md) | `pendent` | 7, 8, 8.7 |
 | 7.52 | [Selector permanent cel simulat/real](tasques/pendent/pas7.52-selector-cel-simulat-real.md) | `pendent` | 7.51 |
 | 7.53 | [Estat òptic, geodèsia i altura](tasques/pendent/pas7.53-optica-observador-altura.md) | `pendent` | 7.52 |
@@ -119,7 +122,7 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 | 7.66 | [Matriu de validació científica del cel físic](tasques/pendent/pas7.66-validacio-cel-fisic.md) | `pendent` | 7.65 |
 | 7.67 | [SLO de rendiment, memòria i latència interactiva](tasques/pendent/pas7.67-slo-rendiment-cel-fisic.md) | `pendent` | 7.66 |
 | 7.68 | [Homologació final del cel físic real/simulat](tasques/pendent/pas7.68-homologacio-cel-fisic.md) | `pendent` | 7.67 |
-| 24 | [Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 7.3 (cas Black Marble), 8.6, 12 |
+| 24 | [Catàleg de recursos i descàrregues persistents](tasques/pendent/pas24-cataleg-recursos-descarregues.md) | `parcial` | 7.3 (cas Black Marble), 8.6, 12, 7.5.1 |
 | 25 | [Gestor de capes Cel/Terra](tasques/pendent/pas25-gestor-capes.md) | `pendent` | 24 |
 | 26 | [Vista de recursos del Sistema Solar](tasques/pendent/pas26-recursos-sistema-solar.md) | `parcial` | 24, 25 |
 | 27 | [Carta de recursos d'espai profund](tasques/pendent/pas27-recursos-espai-profund.md) | `parcial` | 10, 11, 24, 25 |
@@ -152,7 +155,7 @@ La taula registra la destinació actual de cadascun dels vuit pendents històric
 | 21 | pendent 21 | Mesures esfèriques editables. |
 | 22 | novetat 28 | Trajectòries comunes i visibilitat contra l'horitzó real. |
 | 23 | pendent 22 + novetat 29 | Constel·lacions oficials, observables, editables i persistents. |
-| 24 | part de pendent 23 + novetat 42 | Catàleg i treballs de descàrrega. |
+| 24 | part de pendent 23 + novetat 42 |Catàleg i treballs de descàrrega., 7.5.1 |
 | 25 | resta de pendent 23 + novetat 39 | Capes, AOI, disponibilitat, visibilitat i preferències. |
 | 26 | novetat 40 | Recursos del Sistema Solar. |
 | 27 | novetat 41 | Recursos d'espai profund. |

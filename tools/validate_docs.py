@@ -31,7 +31,7 @@ REQUIRED_H2_SECTIONS = [
 ]
 
 LINK_PATTERN = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
-H1_PATTERN = re.compile(r"^#\s+Pas\s+([0-9]+(?:\.[0-9]+)?)\s*—\s*(.+)$", re.MULTILINE)
+H1_PATTERN = re.compile(r"^#\s+Pas\s+([0-9]+(?:\.[0-9]+)*)\s*—\s*(.+)$", re.MULTILINE)
 H2_PATTERN = re.compile(r"^##\s+(.+)$", re.MULTILINE)
 META_PATTERN = re.compile(
     r">\s*\*\*Estat:\*\*\s*([^.]+?)\.\s*\*\*Estat funcional:\*\*\s*([^.]+?)\.\s*\*\*Origen:\*\*\s*([^.]+?)\.\s*\*\*Abast vigent:\*\*\s*(.+)",
@@ -164,9 +164,9 @@ def parse_step_file(doc: Path, errors: list[str]) -> dict | None:
         elif "**Depèn de:**" in dep_text:
             dep_de_part = dep_text
 
-        for m in re.finditer(r"pas([0-9]+(?:\.[0-9]+)?)[^)]*\.md", dep_de_part):
+        for m in re.finditer(r"pas([0-9]+(?:\.[0-9]+)*)[^)]*\.md", dep_de_part):
             depends_on.append(m.group(1))
-        for m in re.finditer(r"pas([0-9]+(?:\.[0-9]+)?)[^)]*\.md", en_dep_part):
+        for m in re.finditer(r"pas([0-9]+(?:\.[0-9]+)*)[^)]*\.md", en_dep_part):
             depended_by.append(m.group(1))
 
     return {

@@ -307,7 +307,7 @@ class SpectralEmissionValue:
 
 @dataclass(frozen=True, slots=True)
 class SourceModel:
-    """Font definida S; Pλ=P·s(λ), Iλ=Pλ·a(θ,φ).
+    """Contracte de transport compartit S/C; Pλ=P·s(λ), Iλ=Pλ·a(θ,φ).
 
     Per a una àrea A uniforme, Mλ=Pλ/A i Lλ=Mλ·a/cosθ per θ<90°.
     Una font puntual no té radiància superficial. Els watts d'una fixture
@@ -321,14 +321,14 @@ class SourceModel:
     spectrum: DefinedSpectrum
     angular: AngularEmissionProfile | AzimuthalAngularEmissionProfile
     amplitude: EmissionAmplitude
-    source_mode: Literal["DEFINED_SOURCE"] = "DEFINED_SOURCE"
+    source_mode: Literal["DEFINED_SOURCE", "CONDITIONAL_L3"] = "DEFINED_SOURCE"
     schema_version: int = 1
     uncertainty_status: Literal["not_quantified"] = "not_quantified"
 
     def __post_init__(self) -> None:
         if not self.source_model_id or not self.revision or not self.definition_reference:
             raise ValueError("Cal identitat, revisió i procedència del SourceModel")
-        if self.source_mode != "DEFINED_SOURCE" or self.schema_version != 1 or self.uncertainty_status != "not_quantified":
+        if self.source_mode not in {"DEFINED_SOURCE", "CONDITIONAL_L3"} or self.schema_version != 1 or self.uncertainty_status != "not_quantified":
             raise ValueError("Mode, versió o estat d'incertesa de SourceModel desconegut")
         if not isinstance(self.geometry, (PointSourceGeometry, RectangularAreaGeometry)):
             raise ValueError("Geometria de font desconeguda")
@@ -336,6 +336,8 @@ class SourceModel:
             self.angular, (AngularEmissionProfile, AzimuthalAngularEmissionProfile)
         ) or not isinstance(self.amplitude, EmissionAmplitude):
             raise ValueError("Contracte físic de font incomplet")
+        if self.source_mode == "CONDITIONAL_L3" and self.amplitude.unit != "relative":
+            raise ValueError("L3 condicionat no acredita watts hemisfèrics absoluts")
 
     def spectral_flux(self, wavelength_nm: float) -> SpectralEmissionValue:
         return SpectralEmissionValue(
@@ -470,9 +472,9 @@ class SourceModelEnsemble:
 
 @dataclass(frozen=True, slots=True)
 class SourceMeasurementAssessment:
-    """Condicions necessàries C/H; no afecta l'existència d'una font definida S."""
+    """Gate de base observacional H; no prohibeix escenaris condicionats C."""
 
-    status: Literal["measurement_basis_admissible", "unavailable_for_physical_inference"]
+    status: Literal["measurement_basis_admissible", "unavailable_for_validated_l3_inference"]
     reasons: tuple[str, ...]
     product_id: str
     collection: str
@@ -498,7 +500,7 @@ def assess_vnp46_measurement_basis(
 ) -> SourceMeasurementAssessment:
     """Comprova QA i vincle RSR/L3 sense aplicar la integral TOA al valor L3.
 
-    Un resultat admissible només satisfà la base de mesura C/H: calen priors
+    Un resultat admissible només satisfà la base de mesura H: calen priors
     SPD, model angular, operador L3→font i incertesa estructural abans de
     formular cap predicció observacional.
     """
@@ -526,10 +528,10 @@ def assess_vnp46_measurement_basis(
         )
         if not target.matches(response):
             reasons.append("rsr_product_or_date_mismatch")
-        if not response.source_model_candidate:
+        if not response.validated_l3_basis_candidate:
             reasons.append("rsr_l3_gain_chain_not_accredited")
     return SourceMeasurementAssessment(
-        status="unavailable_for_physical_inference" if reasons else "measurement_basis_admissible",
+        status="unavailable_for_validated_l3_inference" if reasons else "measurement_basis_admissible",
         reasons=tuple(reasons),
         product_id=observation.product_id,
         collection=observation.collection,

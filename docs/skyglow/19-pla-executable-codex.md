@@ -4,7 +4,7 @@
 
 ## Regla d’execució
 
-Codex executa un únic pas cada vegada. No pot començar el següent fins que el criteri de sortida de l’actual estigui verificat amb proves/evidències i l’estat/documentació s’hagi actualitzat. Si una dada o decisió científica imprescindible **per al domini de sortida del pas** no es pot justificar amb una font autoritativa o evidència reproduïble, el pas passa a `bloquejat` i la seqüència s’atura. La manca d'una RSR instrumental de 2026 limita C/H, no el transport S.
+Codex executa un únic pas cada vegada. No pot començar el següent fins que el criteri de sortida de l’actual estigui verificat amb proves/evidències i l’estat/documentació s’hagi actualitzat. Si una dada o decisió científica imprescindible **per al domini de sortida del pas** no es pot justificar amb una font autoritativa o evidència reproduïble, el pas passa a `bloquejat` i la seqüència s’atura. La manca d'una RSR instrumental de 2026 limita H; C admet referència documentada del mateix sensor.
 
 No s’accepta cap d’aquests patrons:
 - implementar una optimització abans del baseline directe que ha de validar;
@@ -20,19 +20,19 @@ No s’accepta cap d’aquests patrons:
 |---:|---|---|
 | 7.4 | `0,01 mag` equivalents, requisit de producte TerraLab3D congelat abans d'avaluar candidats | [Criteri preregistrat](../evidencies/pas7.4/criteri-preregistrat-v1.json) i [homologació del domini tabulat](../evidencies/pas7.4/homologacio-bandset-v1.md); les RSR històriques només són diagnòstiques. |
 | 7.12 | Tolerància runtime↔SG-REF abans de la comparació decisòria del candidat | Convergència i incertesa numèrica demostrades per SG-REF a 7.6, mai residuals del runtime candidat. |
-| 7.17 | Criteris empírics abans d'avaluar el conjunt reservat `held-out` | Incerteses instrumental, de dades i del model; sense ajustar als residuals observats. |
+| 7.17 | Criteris empírics abans d'avaluar el conjunt reservat `held-out` |Incerteses instrumental, de dades i del model; sense ajustar als residuals observats., 7.5.1 |
 | 7.22 | SLO de producte TerraLab3D abans de decidir si cal LUT/precomputació/FFT | Requisit de producte aprovat, plataforma i condicions de mesura; si falta, es bloqueja 7.22. |
-| 7.28 | Cap valor nou: només consumir els criteris congelats | Evidències i versions dels gates previs. |
+| 7.28 | Cap valor nou: només consumir els criteris congelats |Evidències i versions dels gates previs., 7.5.1 |
 
 Els passos que necessitin un criteri addicional propi el preregistren abans de la seva primera aplicació amb la mateixa política; no traslladen un PASS/FAIL a 7.1 ni creen llindars a 7.28.
 
-**Revisió de contracte 2026-10-18.** El [perfil v1](skyglow-v1-profile.json) i les evidències de 7.1/7.2 són històricament vàlids per a `VNP46A2.002`. El [perfil v2](skyglow-v2-profile.json) amplia la política a tres fonts candidates sense requalificar aquell lector: `VNP46A2.002`/Suomi-NPP, `VJ146A2.002`/NOAA-20 i `VJ246A2.002`/NOAA-21. La [revisió de la User Guide C2 §2.2 Eq. (1) i dos grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) separa la integral instrumental TOA, la radiància Black Marble L3 corregida i la inferència L3→font. **7.3 tanca el contracte de mesura**, inclòs QA 0 real h18v04. **7.5 completa una font definida S sense observació VIIRS**; la RSR efectiva de 2026, la inferència L3 i l'homologació observacional es tracten per domini a 7.16–7.24. Cap font urbana es considera homologada per aparèixer al catàleg o disposar d'una RSR de prelanzament.
+**Revisió de contracte 2026-10-18.** El [perfil v1](skyglow-v1-profile.json) i les evidències de 7.1/7.2 són històricament vàlids per a `VNP46A2.002`. El [perfil v2](skyglow-v2-profile.json) amplia la política a tres fonts candidates sense requalificar aquell lector: `VNP46A2.002`/Suomi-NPP, `VJ146A2.002`/NOAA-20 i `VJ246A2.002`/NOAA-21. La [revisió de la User Guide C2 §2.2 Eq. (1) i dos grànuls VJ146 reals](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) separa la integral instrumental TOA, la radiància Black Marble L3 corregida i la inferència L3→font. **7.3 tanca el contracte de mesura**, inclòs QA 0 real h18v04. **7.5 completa una font definida S sense observació VIIRS**; 7.5.1 implementa C relatiu amb RSR pública de referència; incertesa propagada i homologació H es tracten a 7.16–7.24. Cap font urbana es considera homologada per aparèixer al catàleg o disposar d'una RSR de prelanzament.
 
 El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + model de mesura admissible**. Si hi ha diverses fonts admissibles, la prioritat necessita dades de disponibilitat Black Marble, qualitat, calibratge i cobertura; l'estat primari de NOAA-21 a la distribució general NOAA no decideix la prioritat de Black Marble. La selecció manual avançada conserva la identitat i les limitacions. Cap fallback temporal o entre sensors és silenciós; fonts superposades es retenen separades i no es sumen. Un SBAF requereix gate científic propi. La descoberta, autenticació i instal·lació de grànuls són del [Pas 24](../tasques/pendent/pas24-cataleg-recursos-descarregues.md), que ha de cobrir els tres productes amb un únic gestor.
 
 ## Revisió prospectiva: fonts S, escenaris C i homologació H
 
-La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elimina l'obligació de RSR exacta 2026 a 7.5. **S** construeix una font física independent i permet 7.6–7.15; **C** assaja Black Marble amb hipòtesis SPD/angular i RSR pública de referència, no invertible de forma única; **H** només es declara després de validació independent. NOAA-20/VJ146A2.002 és la **primera parella experimental** amb RSR prelanzament, no una certificació nocturna 2026. 7.16 estudiarà C, 7.17 separarà gate numèric S de gate empíric C/H, i 7.24/7.28 mantindran estats per domini. Cap resultats ni llindars de 7.1–7.4 no es requalifiquen.
+La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elimina l'obligació de RSR exacta 2026 a 7.5. **S** construeix una font física independent; C relatiu s’incorpora a 7.5.1 i ambdós alimenten 7.6–7.15; **C** assaja Black Marble amb hipòtesis SPD/angular i RSR pública de referència, no invertible de forma única; **H** només es declara després de validació independent. NOAA-20/VJ146A2.002 és la **primera parella experimental** amb RSR prelanzament, no una certificació nocturna 2026. 7.5.1 implementa C abans de SG-REF; 7.16 en propagarà les incerteses, 7.17 separarà gate numèric S/C de gate empíric H, i 7.24/7.28 mantindran estats per domini. Cap resultats ni llindars de 7.1–7.4 no es requalifiquen.
 
 ## Ordre lineal
 
@@ -43,37 +43,38 @@ La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elim
 | 7.3 | Model de mesura VIIRS DNB multisatèl·lit, RSR TOA i transformació L3 | 7.1, 7.2 |
 | 7.4 | Oracle espectral fi i homologació del SpectralBandSet v1 | 7.3 |
 | 7.5 | SourceModel S independent; admissibilitat L3 separada | 7.3, 7.4 |
-| 7.6 | SG-REF: oracle independent de transport i integració d’àrea | 7.5 |
+| 7.5.1 | Black Marble real, biblioteca CIE, modalitats K/realista i UI científica | 7.5 |
+| 7.6 | SG-REF compartit per S i C, oracle independent i integració d’àrea | 7.5, 7.5.1 |
 | 7.7 | PropagationKernel geomètric i benchmark B0 | 7.6 |
 | 7.8 | OpticalField tiled i atmosfera estàndard determinista | 7.7 |
 | 7.9 | Rayleigh, aerosol de referència i benchmark B1 | 7.8 |
-| 7.10 | Kernel espectral complet i absorció gasosa; revalidació de bandes | 7.9, 7.4 |
+| 7.10 | Kernel espectral complet i absorció gasosa; revalidació de bandes | 7.9, 7.4, 7.5.1 |
 | 7.11 | Terreny, curvatura i visibilitat física | 7.10 |
 | 7.12 | Gate zenital de transport radiomètric | 7.11 |
 | 7.13 | Camp angular i DomeProfile sobre ruta directa | 7.12 |
-| 7.14 | Projeccions fotomètriques i sensors SQM/TESS; revalidació de bandes | 7.13, 7.4 |
+| 7.14 | Projeccions fotomètriques i sensors SQM/TESS; revalidació de bandes | 7.13, 7.4, 7.5.1 |
 | 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14 |
-| 7.16 | Incertesa S, escenaris condicionats Black Marble C | 7.3, 7.5(S), 7.15 |
-| 7.17 | Gate de transport S; validació empírica C/H separada | 7.3, 7.5(S), 7.16 |
+| 7.16 | Incertesa S/C i propagació de sensibilitat espectral/angular | 7.3, 7.5, 7.5.1, 7.15 |
+| 7.17 | Gate de transport S; validació empírica C/H separada | 7.3, 7.5(S), 7.16, 7.5.1 |
 | 7.18 | Watershed, EmissionRegion i quadtree com acceleració B5 | 7.17 |
 | 7.19 | Compressió de PhaseFunction i benchmark B3 | 7.18 |
 | 7.20 | Forward AD i RadiativeErrorBudget | 7.19 |
 | 7.21 | Cache error-based, scheduler latest-wins i prefetch | 7.20 |
 | 7.22 | Decisió i backend opcional LUT/precomputació/FFT | 7.21 |
 | 7.23 | CloudOpticalState i núvols single-scattering B6 | 7.22 |
-| 7.24 | Validació empírica final clear/cloudy i congelació de model | 7.23 |
-| 7.25 | Bridge Python→TypeScript i SkyglowRuntime | 7.24 |
-| 7.26 | Renderer Three.js lineal i modes diagnòstics | 7.25 |
-| 7.27 | Composició lineal del cel i estats reference/instantaneous | 7.26 |
-| 7.28 | B7 FULL, SLO i homologació del skyglow artificial | 7.1–7.27 |
+| 7.24 | Validació empírica final clear/cloudy i congelació de model | 7.23, 7.5.1 |
+| 7.25 | Bridge Python→TypeScript i SkyglowRuntime | 7.24, 7.5.1 |
+| 7.26 | Renderer Three.js lineal i modes diagnòstics | 7.25, 7.5.1 |
+| 7.27 | Composició lineal del cel i estats reference/instantaneous | 7.26, 7.5.1 |
+| 7.28 | B7 FULL, SLO i homologació del skyglow artificial | 7.1–7.27, 7.5.1 |
 
 ## Fases
 
-**A — Contracte científic i font física definida (7.1–7.6).** Conserva dades/DNB i discretització; tanca un SourceModel S de SPD, emissió angular i escala definides, i crea l'oracle SG-REF. No afirma haver reconstruït la font urbana real L3, que és la branca C/H posterior.
+**A — Contracte científic i font física definida (7.1–7.6).** Conserva dades/DNB i discretització; tanca un SourceModel S de SPD, emissió angular i escala definides, i crea l'oracle SG-REF. Inclou escenaris C relatius des de L3 a 7.5.1, sense reconstrucció única ni homologació H.
 
-**B — Transport directe i gates per domini (7.7–7.17).** Implementa la física S sense acceleracions, supera el zenit, construeix all-sky/projeccions i valida el transport amb un oracle independent. La comparació empírica Black Marble C/H és un gate separat i només s'aplica si hi ha observacions i criteris justificats.
+**B — Transport directe i gates per domini (7.7–7.17).** Implementa el transport compartit S/C sense acceleracions, supera el zenit, construeix all-sky/projeccions i valida el transport amb un oracle independent. La comparació empírica Black Marble C/H és un gate separat i només s'aplica si hi ha observacions i criteris justificats.
 
-**C — Acceleracions homologades per domini (7.18–7.22).** Només ara entren quadtree, fase comprimida, AD, cache i un backend LUT/FFT opcional. Es comparen contra la ruta directa de S; no hereten una homologació C/H absent.
+**C — Acceleracions homologades per domini (7.18–7.22).** Només ara entren quadtree, fase comprimida, AD, cache i un backend LUT/FFT opcional. Es comparen contra la ruta directa dels dominis S/C verificats; no hereten una homologació C/H absent.
 
 **D — Núvols i validació final (7.23–7.24).** Amplia el domini atmosfèric i congela què és realment homologable.
 
@@ -123,9 +124,19 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.5-source-model-v1.md](../tasques/completat/pas7.5-source-model-v1.md)
 
+### 7.5.1 — Black Marble i configuració espectral executable
+
+**Finalitat i estat.** Biblioteca CIE, RSR pública de referència NOAA-20, ancoratge L3 relatiu, ensembles deterministes i intervencions K amb magnitud conservada. Controls a «Contaminació lumínica» connectats a Python; completat en el domini relatiu declarat.
+
+**UI obligatòria.** Selector «Simulació realista» / «Simulació per kelvins»; etiqueta superior «Temperatura de color», lliscant horitzontal, mínim 2.800 K a l’esquerra, màxim 6.500 K a la dreta, valor actual visible i etiqueta inferior «Exemple: ...». Família LED CIE estable i font visibles. Teclat, ratolí i tacte; exemple informatiu sense canvi silenciós de tecnologia.
+
+**Gate de sortida.** El mateix grànul NOAA-20 amb QA 0 alimenta ambdues modalitats i retorna `SourceModel` C amb unitats relatives, SPD, angles, procedència i normalització coherent. Cap resultat atmosfèric inventat. La connexió a radiància/render continua obligatòria a 7.25–7.27.
+
+**Fitxer executable:** [pas7.5.1-black-marble-spectral-simulation.md](../tasques/completat/pas7.5.1-black-marble-spectral-simulation.md).
+
 ### 7.6 — SG-REF: oracle independent de transport i integració d’àrea
 
-**Finalitat.** Crear una veritat numèrica offline més estricta que el runtime i independent de les seves aproximacions, utilitzant fonts físiques S sense RSR VIIRS.
+**Finalitat.** Crear una veritat numèrica offline més estricta que el runtime i independent de les seves aproximacions, utilitzant fonts S definides i C relatives de 7.5.1 amb el mateix contracte de transport; S no requereix RSR i C conserva la seva referència/hipòtesis.
 
 **Gate de sortida.** `S1` és executable: SG-REF demostra convergència, quantifica la seva incertesa numèrica i pot comparar radiància espectral per direcció i fonts extenses sense quadtree, cache ni LUT de runtime. Aquesta evidència pot fonamentar la tolerància de 7.12, que no es fixa aquí mirant el runtime.
 
@@ -205,17 +216,17 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 ### 7.16 — Incertesa i escenaris Black Marble condicionats C
 
-**Finalitat.** Construir ledger físic/numeric de S i modelar C amb observació L3, priors SPD/angular, corbes RSR de referència identificades i anàlisi de sensibilitat. NOAA-20 VJ146A2.002 és la primera parella experimental, no una cadena calibrada 2026.
+**Finalitat.** Construir el ledger físic/numèric de S/C i propagar incertesa dels escenaris de 7.5.1 amb hipòtesis SPD/angular i referències RSR identificades. NOAA-20 VJ146A2.002 és la primera parella experimental, no una cadena calibrada 2026.
 
 **Gate de sortida.** Per S, provenance i incerteses numèriques/físiques o absències explícites; per C, escenaris condicionats amb incerteses declarades o indisponibilitat de calibratge absolut. L'absència d'evidència H no bloqueja el ledger S. Cap sigma fictícia.
 
 **Fitxer executable:** [pas7.16-uncertainty-provenance.md](../tasques/pendent/pas7.16-uncertainty-provenance.md)
 
-### 7.17 — Gate de transport S preacceleracions; empírica C/H separada
+### 7.17 — Gate de transport S/C preacceleracions; empírica C/H separada
 
-**Finalitat.** Verificar les prediccions de fonts definides S contra SG-REF i altres oracles independents abans d'accelerar; si hi ha dades adequades, validar empíricament C/H per separat.
+**Finalitat.** Verificar transport de fonts S/C contra SG-REF i altres oracles independents abans d'accelerar; si hi ha dades adequades, validar empíricament C/H per separat.
 
-**Gate de sortida.** Criteri numèric S científicament justificat i preregistrat, sense ajustar-lo als residuals del candidat; superar-lo habilita només acceleracions de S. El gate observacional de C/H exigeix `held-out`, criteris preregistrats, incerteses i observacions independents; si no existeixen, `not_evaluated`, mai PASS empíric. La manca de RSR exacta 2026 no bloqueja les acceleracions S.
+**Gate de sortida.** Criteri numèric S científicament justificat i preregistrat, sense ajustar-lo als residuals del candidat; superar-lo habilita acceleracions dels dominis de transport S/C verificats. El gate observacional de C/H exigeix `held-out`, criteris preregistrats, incerteses i observacions independents; si no existeixen, `not_evaluated`, mai PASS empíric. La manca de RSR exacta 2026 no bloqueja les acceleracions dels dominis de transport S/C verificats.
 
 **Fitxer executable:** [pas7.17-clear-sky-ground-truth.md](../tasques/pendent/pas7.17-clear-sky-ground-truth.md)
 

@@ -83,6 +83,7 @@ export interface FocusFromBackend {
 }
 
 export interface BackendMessageListener {
+  onSkyglowConfigurationSnapshot?(snapshot: import("../contracts/skyglow_contracts").SkyglowConfigurationSnapshot): void;
   onSetCameraPose?(pose: CameraPoseFromBackend): void;
   onFocusDirection?(focus: FocusFromBackend): void;
   onShutdownRequested?(): void;
@@ -362,6 +363,10 @@ export class WebSocketBridge {
     this.sendMessage({ type: "set_light_pollution_mode", mode });
   }
 
+  sendConfigureSkyglow(configuration: import("../contracts/skyglow_contracts").SkyglowConfiguration): void {
+    this.sendMessage({ type: "configure_skyglow", configuration });
+  }
+
   sendSetBortleClass(bortleClass: number): void {
     this.sendMessage({ type: "set_bortle_class", bortleClass });
   }
@@ -458,6 +463,9 @@ export class WebSocketBridge {
         for (const l of this.messageListeners) {
           l.onSkyEnvironmentSnapshot?.(msg as any);
         }
+        break;
+      case "skyglow_configuration_snapshot":
+        for (const l of this.messageListeners) l.onSkyglowConfigurationSnapshot?.(msg);
         break;
       case "solar_system_snapshot":
         for (const l of this.messageListeners) {

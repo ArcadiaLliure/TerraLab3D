@@ -93,7 +93,7 @@ def _response() -> ViirsSpectralResponse:
 def test_missing_and_historical_rsr_remain_unavailable() -> None:
     observation = _observation()
     missing = assess_vnp46_measurement_basis(observation, None)
-    assert missing.status == "unavailable_for_physical_inference"
+    assert missing.status == "unavailable_for_validated_l3_inference"
     assert missing.reasons == ("operational_rsr_unavailable",)
     assert missing.granule_sha256 == observation.provenance.sha256
 

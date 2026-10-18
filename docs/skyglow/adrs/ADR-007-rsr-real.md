@@ -31,3 +31,8 @@ Test integral amb fixtures, SNPP LGS diagnòstica i quatre corbes DAWG NOAA-20/N
 ## Estat d'implementació
 
 Implementació parcial documentada a l'[evidència de 7.3](../../evidencies/pas7.3/validacio-model-dnb.md). El tancament exigeix correspondència i incertesa L3 nocturna per una font i període explícits.
+
+
+## Aplicació prospectiva del 2026-10-18
+
+La [política RSR vigent](../20-politica-rsr-i-validacio-per-dominis.md) manté RSR i provenance obligatòries per a caracterització DNB, però permet una referència pública del mateix sensor/mode en escenaris C relatius (7.5.1), sense certificació anual exacta. Dates, guany, detectors i límits originals no s’allarguen. Els requisits de correspondència instrumental acreditada continuen aplicant-se a H.

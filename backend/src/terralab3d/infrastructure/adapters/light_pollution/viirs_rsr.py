@@ -137,6 +137,25 @@ class LocalViirsSpectralResponseRepository:
         except (OSError, UnicodeError, ValueError, KeyError, TypeError) as exc:
             raise RsrQuarantineError(f"RSR incompatible: {exc}") from exc
 
+    def resolve_reference(self, *, platform: str, gain_stage: str) -> ViirsSpectralResponse:
+        """Millor referència del mateix sensor/mode, sense allargar-ne validesa.
+
+        L'ordre temporal s'aplica als epochs publicats del mateix sensor i
+        guany. Una ambigüitat al mateix epoch requereix selecció documentada.
+        El consumidor C ha d'etiquetar l'aproximació, sense usar matches().
+        """
+        entries = [e for e in self._entries() if e.get("platform") == platform and e.get("gainStage") == gain_stage]
+        if not entries:
+            raise RsrUnavailableError("No hi ha referència del mateix sensor i guany")
+        latest = max(e["validFrom"] for e in entries)
+        candidates = [e for e in entries if e["validFrom"] == latest]
+        if len(candidates) != 1:
+            raise RsrUnavailableError("Referència ambigua; cal prioritat científica explícita")
+        response = self._load(candidates[0])
+        if not response.source_url.startswith("https://ncc.nesdis.noaa.gov/"):
+            raise RsrQuarantineError("La referència requereix procedència oficial NOAA")
+        return response
+
     def _schema_version(self) -> int:
         try:
             return int(json.loads(self.manifest_path.read_text(encoding="utf-8"))["schemaVersion"])

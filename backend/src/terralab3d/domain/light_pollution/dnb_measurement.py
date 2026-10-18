@@ -72,8 +72,8 @@ class ViirsSpectralResponse:
             raise ValueError("Estat de la incertesa espectral desconegut")
 
     @property
-    def source_model_candidate(self) -> bool:
-        """Condicions necessàries de RSR/L3 per a 7.5; no acredita el model de font.
+    def validated_l3_basis_candidate(self) -> bool:
+        """Condicions necessàries de RSR/L3 per a H; no limita els escenaris C.
 
         La quantificació d'incertesa de producte correspon a 7.16. Aquesta
         propietat no exigeix una sigma fictícia per construir el SourceModel,
@@ -93,7 +93,7 @@ class ViirsSpectralResponse:
     def product_homologation_candidate(self) -> bool:
         """Una RSR sola no acredita la cadena completa L1B→L3."""
         return (
-            self.source_model_candidate
+            self.validated_l3_basis_candidate
             and self.spectral_uncertainty_status == "quantified"
             and self.spectral_uncertainty_evidence is not None
         )

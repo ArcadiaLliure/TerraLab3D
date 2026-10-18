@@ -8,7 +8,11 @@ Substituir el provider estàndard per dades reals sense canviar la física del k
 
 ## Dependències
 
+**Depèn de:**
 7.14
+
+**En depenen:**
+- [Pas següent](pas7.16-uncertainty-provenance.md)
 
 ## Referències obligatòries
 

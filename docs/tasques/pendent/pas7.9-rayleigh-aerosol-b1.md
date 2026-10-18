@@ -8,7 +8,11 @@ Introduir la primera física de scattering sobre la ruta directa i auditable.
 
 ## Dependències
 
+**Depèn de:**
 7.8
+
+**En depenen:**
+- [Pas següent](pas7.10-gas-spectral-kernel.md)
 
 ## Referències obligatòries
 

@@ -403,6 +403,7 @@ export interface ClearStarTrailsMessage {
 }
 
 export type FrontendMessage =
+  | import("./skyglow_contracts").ConfigureSkyglowMessage
   | FrontendReadyMessage
   | SetSurfaceModeMessage
   | CameraChangedMessage
@@ -664,6 +665,7 @@ export interface StarTrailsSnapshotMessage {
 // ─── Tipus Unió ──────────────────────────────────────────────────────
 
 export type BackendMessage =
+  | import("./skyglow_contracts").SkyglowConfigurationSnapshot
   | HandshakeAckMessage
   | SetCameraPoseMessage
   | FocusDirectionMessage

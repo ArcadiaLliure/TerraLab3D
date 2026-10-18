@@ -8,7 +8,11 @@ Incorporar núvols com a estat òptic físic i no com un multiplicador arbitrari
 
 ## Dependències
 
+**Depèn de:**
 7.22
+
+**En depenen:**
+- [Pas següent](pas7.24-full-ground-truth.md)
 
 ## Referències obligatòries
 

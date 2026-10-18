@@ -28,7 +28,7 @@ DNB SDR i VNL deixen de ser la font operativa primària de la v1, però continue
 
 ### RSR no bloquejant i NOAA-20 com a primer candidat C
 
-La [política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) separa el motor físic independent de satèl·lit S de la inferència L3. Primer candidat experimental C: NOAA-20/VJ146A2.002, grànul urbà QA 0 real i RSR oficial de prelanzament, etiquetada diagnòstica. L'estabilitat espectral reportada no acredita resposta HGS/L3 efectiva de 2026, incertesa ni emissió angular. Conservar versió, gainStage, fingerprints, llicències i limitacions. NOAA-21 i Suomi-NPP continuen com a alternatives candidates/històriques.
+La [política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) separa el motor físic independent de satèl·lit S de la inferència L3. Connexió C relativa executable a 7.5.1: NOAA-20/VJ146A2.002, grànul urbà QA 0 real i RSR oficial de prelanzament, etiquetada aproximació pública de referència. L'estabilitat espectral reportada no acredita resposta HGS/L3 efectiva de 2026, incertesa ni emissió angular. Conservar versió, gainStage, fingerprints, llicències i limitacions. NOAA-21 i Suomi-NPP continuen com a alternatives candidates/històriques.
 
 ## HITRAN
 

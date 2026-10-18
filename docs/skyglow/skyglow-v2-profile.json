@@ -2,7 +2,7 @@
   "profileId": "skyglow-v2-multisat-policy",
   "schemaVersion": 2,
   "decisionDate": "2026-10-18",
-  "status": "measurement_contract_verified_sources_not_homologated",
+  "status": "conditional_noaa20_sources_and_configuration_verified_transport_pending",
   "owner": "TerraLab3D",
   "migration": {
     "preserves": "skyglow-v1-profile.json",
@@ -32,9 +32,9 @@
       "archiveSet": "5200",
       "primaryLayerCandidate": "DNB_BRDF-Corrected_NTL",
       "gapFilledLayerIsPrimary": false,
-      "observationAdapterStatus": "two_real_granules_inspected_offline_including_urban_QA0; product_adapter_pending",
-      "spectralModelStatus": "official_at_launch_LGS_MGS_diagnostic_only",
-      "automaticSelectionStatus": "inadmissible_until_sensor_product_domain_verified",
+      "observationAdapterStatus": "verified_with_real_urban_granule_step_7.5.1",
+      "spectralModelStatus": "public_reference_MGS_LGS_conditional_only",
+      "automaticSelectionStatus": "conditional_explicit_local_selection_only;not_observation_validated",
       "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ146A2",
       "fileSpecificationUrl": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/2/VJ146A2_v2.0",
       "doi": "10.5067/VIIRS/VJ146A2.002"
@@ -77,14 +77,14 @@
     "l3CorrectedLayerMeaning": "DNB_BRDF-Corrected_NTL is corrected upward nighttime surface band radiance for VNP46A2 and VJ146A2 according to User Guide C2 section 5.2",
     "l3CorrectionEvidence": "https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf",
     "sourceSpectrumIdentifiability": "not_unique_from_one_panchromatic_band",
-    "sourceInferenceOwnerStep": "7.16_conditional_C;7.5_defined_S",
-    "sourceInferenceStatus": "defined_source_S_verified_step_7.5;L3_conditional_C_H_pending",
+    "sourceInferenceOwnerStep": "7.5.1_conditional_C;7.5_defined_S;7.16_uncertainty",
+    "sourceInferenceStatus": "defined_S_and_conditional_relative_C_verified;H_pending",
     "sourceInferenceEvidence": "../evidencies/pas7.5/estat-inferencia-font-2026.md",
     "definedSourceEvidence": "../evidencies/pas7.5/validacio-source-model-s-v1.md",
     "spectralAndStructuralUncertaintyOwnerStep": "7.16",
     "empiricalValidationOwnerStep": "7.17",
-    "spectralUncertainty": "must_be_quantified_before_product_homologation; not_a_step_7.3_measurement_contract_exit_condition",
-    "unverifiedModelAction": "exclude_from_automatic_source_inference"
+    "spectralUncertainty": "quantify_when_supported;unquantified_explicitly_allowed_for_conditional_C;validated_H_requires_evidence",
+    "unverifiedModelAction": "allow_explicit_conditional_reference;exclude_unjustified_absolute_inference"
   },
   "acceptanceProfile": {
     "status": "policy_preregistered",
@@ -129,7 +129,7 @@
     "policyRef": "20-politica-rsr-i-validacio-per-dominis.md",
     "historicalV1Unchanged": true,
     "step7_4EvidenceUnchanged": true,
-    "documentationOnly": true
+    "documentationOnly": false
   },
   "sourceModelStrategy": {
     "domains": [
@@ -141,7 +141,7 @@
       },
       {
         "id": "C",
-        "status": "pending_conditional_research",
+        "status": "verified_conditional_relative_noaa20_step_7.5.1",
         "rsrReferenceHypothesisAllowed": true,
         "noAutomaticAbsoluteCalibration": true
       },
@@ -160,8 +160,30 @@
       "platform": "NOAA-20",
       "productId": "VJ146A2",
       "collection": "002",
-      "rsr": "NOAA20_DNB_prelaunch_reference",
-      "status": "diagnostic_not_operational_2026_certified"
+      "rsr": "J1_DAWG_at_launch_V2.1:MGS_reference;LGS_sensitivity",
+      "status": "executable_conditional_relative;not_operational_2026_certified"
     }
+  },
+  "simulationConfiguration": {
+    "revision": "black-marble-conditional-v1",
+    "modes": [
+      "realistic",
+      "kelvin"
+    ],
+    "kelvinRange": [
+      2800,
+      6500
+    ],
+    "spectralFamily": "CIE_LED_B1_B5",
+    "normalizations": [
+      "constant_photopic_flux",
+      "constant_radiant_power",
+      "constant_dnb_reference",
+      "conditional_relative"
+    ],
+    "mixtureBasis": "radiant_flux",
+    "probabilisticWeights": false,
+    "transportStatus": "pending",
+    "evidenceRef": "../evidencies/pas7.5.1/validacio-simulacio-condicionada.md"
   }
 }

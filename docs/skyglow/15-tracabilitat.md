@@ -10,6 +10,7 @@
 | mesura DNB | operador TOA `BAND_INTEGRATED`, RSR versionada, Eq. (1) NASA TOA→L3 corregit, QA/unitats/llinatge VNP46 i VJ146 reals; RSR concretes de 2026 no homologades | 7.3 completat | [proves](../evidencies/pas7.3/validacio-model-dnb.md), [LUT SNPP](../evidencies/pas7.3/recerca-rsr-2026.md), [revisió multisatèl·lit](../evidencies/pas7.3/revisio-multisatel-lit.md) i [guia/grànuls](../evidencies/pas7.3/contrast-granuls-black-marble-c2.md) |
 | error espectral V1 | `0,01 mag` de producte congelat abans de candidats; màxim per cas i regla absoluta prop de zero | 7.4 completat en domini tabulat; repetir 7.10/7.14 | [criteri preregistrat](../evidencies/pas7.4/criteri-preregistrat-v1.json), [238/238 casos i `bandSetId`](../evidencies/pas7.4/homologacio-bandset-v1.md); RSR històriques diagnòstiques, incertesa instrumental separada |
 | SourceModel S | SPD, geometria, amplitud i emissió angular definides independentment de VIIRS; gate L3 preexistent segregat | 7.5 completat en el domini definit | [Validació S](../evidencies/pas7.5/validacio-source-model-s-v1.md), [política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) i [auditoria observacional històrica](../evidencies/pas7.5/estat-inferencia-font-2026.md) |
+| Configuració realista/K i font C | 42 SPD CIE verificades, RSR pública NOAA-20, normalització relativa, control lliscant accessible connectat a Python | 7.5.1 completat | [Validació](../evidencies/pas7.5.1/validacio-simulacio-condicionada.md) i [pas](../tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) |
 | oracle transport | SG-REF independent + àrea directa | 7.6 | convergència, incertesa numèrica i fixtures analítiques per fonamentar 7.12 |
 | kernel únic | zenit=direcció ordinària | 7.7 | B0 + invariants geomètrics |
 | camp òptic | provider estàndard tiled | 7.8 | fixtures multi-tile |
@@ -20,7 +21,7 @@
 | cúpules | DomeProfile des de ruta directa | 7.13 | all-sky dens + invariant zenit |
 | projeccions | SQM/TESS/CIE post-kernel i revalidació de `0,01 mag` de 7.4 en aquest nou domini | 7.14 | oracles de projecció i bandset versionat si el pressupost falla |
 | atmosfera real | ERA5/CAMS com providers | 7.15 | fixtures/camps parcials |
-| incertesa i escenaris C | Ledger físic S, priors SPD/angular, RSR de referència com hipòtesi i incerteses explícites; H pendent de validació | 7.16 | [Política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) |
+| incertesa i escenaris C | Ledger físic S/C, escenaris de 7.5.1, hipòtesis SPD/angular, RSR de referència com hipòtesi i incerteses explícites; H pendent de validació | 7.16 | [Política S/C/H](20-politica-rsr-i-validacio-per-dominis.md) |
 | gate S i validació C/H | Gate de transport S per oracles, independent de RSR; empírica `held-out` C/H separada amb criteris preregistrats | 7.17 | oracle de S; `held-out` C/H si existeix; no PASS empíric fictici |
 | compressió fonts | watershed/quadtree com backend | 7.18 | B5 vs àrea directa |
 | compressió fase | Legendre com backend | 7.19 | B3 vs fase ref |

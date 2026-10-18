@@ -33,7 +33,7 @@ class Vnp46CancelledError(Exception):
 
 
 _GRANULE_NAME = re.compile(
-    r"^VNP46A2\.A(?P<year>\d{4})(?P<doy>\d{3})\.h\d{2}v\d{2}\."
+    r"^(?P<product>VNP46A2|VJ146A2)\.A(?P<year>\d{4})(?P<doy>\d{3})\.h\d{2}v\d{2}\."
     r"(?P<collection>\d{3})\.\d+\.h5$"
 )
 _FIELDS = "HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields"
@@ -138,7 +138,7 @@ class Vnp46GranuleAdapter:
     def _validate(self) -> None:
         assert self._file is not None
         name = _GRANULE_NAME.fullmatch(self.path.name)
-        if name is None or name.group("collection") != self.policy.collection:
+        if name is None or name.group("collection") != self.policy.collection or name.group("product") != self.policy.product_id:
             raise Vnp46QuarantineError("Producte o col·lecció incompatibles al nom del grànul")
         year = int(name.group("year"))
         day_of_year = int(name.group("doy"))
@@ -159,7 +159,8 @@ class Vnp46GranuleAdapter:
         if short_name is not None and short_name != self.policy.product_id:
             raise Vnp46QuarantineError("ShortName incompatible")
         platform = self._global_attribute("PlatformShortName")
-        if platform is not None and platform.upper() != "SUOMI-NPP":
+        expected_platforms = {"VNP46A2": {"SUOMI-NPP"}, "VJ146A2": {"JPSS-1", "NOAA-20"}}
+        if platform is not None and platform.upper() not in expected_platforms.get(self.policy.product_id, set()):
             raise Vnp46QuarantineError("Plataforma incompatible")
         doi = self._global_attribute("identifier_product_doi")
         if doi is not None and doi != self.policy.doi:

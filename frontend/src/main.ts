@@ -1016,6 +1016,9 @@ function main(): void {
       (locationHUD as any).updateSkyEnvironment?.(snapshot);
       skyPage.updateSkyEnvironment(snapshot);
     },
+    onSkyglowConfigurationSnapshot(snapshot) {
+      skyPage.updateSkyglowConfiguration(snapshot);
+    },
     onSolarSystemSnapshot(snapshot) {
       const bridgeBytes = new TextEncoder().encode(JSON.stringify(snapshot)).byteLength;
       sceneHost.getSolarSystemRenderer().updateSnapshot(snapshot, bridgeBytes);

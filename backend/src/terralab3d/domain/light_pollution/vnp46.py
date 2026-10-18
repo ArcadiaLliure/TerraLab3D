@@ -150,6 +150,8 @@ class Vnp46Observation:
             "schemaVersion": self.schema_version,
             "profileId": self.profile_id,
             "productId": self.product_id,
+            "platform": {"VNP46A2": "Suomi-NPP", "VJ146A2": "NOAA-20"}.get(self.product_id, "unknown"),
+            "instrument": "VIIRS DNB",
             "collection": self.collection,
             "acquisitionDate": self.acquisition_date.isoformat(),
             "row": self.row,

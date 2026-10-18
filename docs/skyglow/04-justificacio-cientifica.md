@@ -38,7 +38,7 @@
 
 ## Espectre
 
-**FET FÍSIC.** Una única mesura pancromàtica no determina un SPD únic. **DECISIÓ NOSTRA:** S pot utilitzar formes SPD definides i ensembles sense RSR; C/H haurà de declarar RSR de referència, hipòtesis i sensibilitat abans de qualsevol normalització observacional. Les famílies LED/HPS/LPS/halogenur són candidates de biblioteca, no una base científica definitiva.
+**FET FÍSIC.** Una única mesura pancromàtica no determina un SPD únic. **DECISIÓ NOSTRA:** S pot utilitzar formes SPD definides i ensembles sense RSR; C declara RSR de referència, hipòtesis i sensibilitat a 7.5.1. La biblioteca implementada conté LED CIE, HPS, halurs metàl·lics i fluorescents tabulats; LPS i mercuri pur continuen pendents de dades verificades. H exigeix validació addicional.
 
 **DECISIÓ ACTUAL:** nombre de bandes de propagació configurable per `spectralBandCount` i `bandSetId`, sense valor fix ni benchmark per determinar N. La configuració activa es verifica en unitats, integració espectral, luminància fotòpica, SQM/TESS, XYZ i radiància propagada; això no és una campanya de selecció del nombre de bandes.
 

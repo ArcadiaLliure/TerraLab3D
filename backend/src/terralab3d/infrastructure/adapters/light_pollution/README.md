@@ -54,3 +54,8 @@ Rep DTO tipats o peticions del port i retorna DTO tipats, handles binaris o esde
 ## Migració des de TerraLab
 
 S’ha de traslladar només la part d’I/O, integració, caché o execució que correspongui. Qualsevol fórmula o decisió científica s’ha d’extreure al paquet de domini funcional apropiat.
+
+
+## Assets científics verificats (7.5.1)
+
+El lector A2 compartit admet VNP46/NOAA-20 amb polítiques explícites de producte, plataforma, DOI i versió. `black_marble_sources.py` connecta el grànul local verificat amb el constructor C de domini. `spectral_library.py` carrega CSV/metadades CIE empaquetats i verifica MD5/SHA-256 sense xarxa. `viirs_rsr.py` separa la selecció operativa estricta de `resolve_reference`, que conserva la validesa original i el mateix sensor/guany per a aproximacions C. Adquisició de grànuls i variants opcionals al gestor comú del Pas 24.

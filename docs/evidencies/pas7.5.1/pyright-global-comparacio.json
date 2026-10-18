@@ -1,0 +1,19 @@
+{
+  "baselineCommit": "b7cfaba37da9b08ef265b350243e92e9e902f674",
+  "baseline": {
+    "filesAnalyzed": 284,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 10.821
+  },
+  "current": {
+    "filesAnalyzed": 289,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 10.276
+  },
+  "newDiagnostics": [],
+  "identicalDiagnosticMultiset": true
+}

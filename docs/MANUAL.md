@@ -497,3 +497,20 @@ Aneu a la pestanya **Eines**, seleccioneu el mode **Càmera**, trieu el vostre s
 ---
 
 > **TerraLab3D** — Desenvolupat amb rigor científic i tecnologies web d'última generació.
+
+
+## Contaminació lumínica: configuració espectral realista i per kelvins
+
+Implementat a [7.5.1](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md). Obriu el calaix **Cel** i desplaceu-vos a **Contaminació lumínica**. El selector principal ofereix «Simulació realista» i «Simulació per kelvins». El model visual històric de Bortle/magnitud conserva els controls identificats a sota.
+
+En mode Kelvin, l’etiqueta superior **Temperatura de color** mostra el valor actual. El lliscant horitzontal té **2.800 K a l’esquerra** i **6.500 K a la dreta**, amb etiqueta inferior **«Exemple: ...»**. S’ajusta amb ratolí, tacte i teclat (fletxes, Inici i Fi). El text d’exemple és orientatiu i no canvia la tecnologia: la família estable és LED de fòsfor CIE B1–B5, amb la font de dades visible. El domini 1.800–2.800 K encara no està cobert per aquesta família i no s’extrapola.
+
+![Control de kelvins, escala i exemple dins del panell Cel](evidencies/pas7.5.1/control-kelvins.png)
+
+La normalització permet conservar flux lluminós fotòpic, potència radiant, resposta DNB de referència o escala relativa. Python calcula una SPD interpolada i la seva CCT efectiva. Aquest valor no és una temperatura urbana mesurada ni una garantia de tolerància de fabricació.
+
+En **Simulació realista**, el model considera un ensemble determinista de mescles espectrals hipotètiques amb pesos de flux radiant; no dedueix els kelvins de la ciutat d’una banda DNB. La connexió local al grànul NOAA-20 real genera fonts relatives amb QA i procedència. L’adquisició ordinària geogràfica arribarà pel gestor comú del Pas 24.
+
+![Selector de simulació realista i estat del transport](evidencies/pas7.5.1/simulacio-realista.png)
+
+La UI indica **transport atmosfèric pendent**: els controls configuren fonts científiques, però encara no alteren físicament el cel ni mostren una brillantor atmosfèrica calculada. La visualització física continua obligatòria a 7.25–7.27; no es fa servir un filtre RGB per representar aquest resultat.

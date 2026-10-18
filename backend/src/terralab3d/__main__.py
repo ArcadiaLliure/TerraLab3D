@@ -31,6 +31,8 @@ from datetime import datetime, timedelta, timezone
 from terralab3d.domain.time.engine import AstronomicalEngine
 from terralab3d.domain.time.models import ClockMode, SimulationInstant, ClockState
 from terralab3d.domain.sky_background.sky_environment import SkyEnvironmentComposer
+from terralab3d.application.skyglow_configuration import SkyglowConfigurationController
+from terralab3d.infrastructure.adapters.light_pollution.spectral_library import load_spectral_library
 from terralab3d.domain.light_pollution.models import LightPollutionMode
 from terralab3d.domain.geometry import HorizontalCoordinate
 from terralab3d.domain.solar_system.models import (
@@ -1236,6 +1238,7 @@ async def run() -> int:
         # Cada entrada/reconnexió comença en ull nu; els paràmetres dels
         # instruments es conserven, però el mode actiu no és persistent.
         await observation_coordinator.set_mode("eye")
+        await bridge.send(skyglow_configuration.snapshot())
         await measurement_coordinator.publish_current()
         await constellation_coordinator.publish_current(include_catalog=True)
         await bridge.send_moon_surface_resource(moon_surface_assets.descriptor)
@@ -1277,6 +1280,7 @@ async def run() -> int:
     # ── 3.2. Lògica de Temps (Fase 3) i Cel (Fase 7) ─────────────────
     engine = AstronomicalEngine()
     sky_composer = SkyEnvironmentComposer()
+    skyglow_configuration = SkyglowConfigurationController(load_spectral_library())
     lighting_composer = LightingEnvironmentComposer()
     sim_time_utc = datetime.now(timezone.utc)
     is_realtime = True
@@ -2033,6 +2037,15 @@ async def run() -> int:
     bridge.on("set_light_pollution_mode", _handle_set_light_pollution_mode)
     bridge.on("set_bortle_class", _handle_set_bortle_class)
     bridge.on("set_manual_magnitude_limit", _handle_set_manual_magnitude_limit)
+
+    async def _handle_configure_skyglow(data: dict[str, Any]) -> None:
+        try:
+            await skyglow_configuration.configure(data["configuration"])
+        except (ValueError, TypeError, KeyError):
+            skyglow_configuration.error = "Configuració espectral incompatible amb el catàleg CIE"
+        await bridge.send(skyglow_configuration.snapshot())
+
+    bridge.on("configure_skyglow", _handle_configure_skyglow)
 
     # ── 3.4. Handlers de Traces Circumpolars (Star Trails) ───────────
     async def _handle_start_star_trails(data: dict[str, Any]) -> None:

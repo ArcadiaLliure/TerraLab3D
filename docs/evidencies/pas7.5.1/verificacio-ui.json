@@ -1,0 +1,64 @@
+{
+  "resultat": "PASS",
+  "keyboard": true,
+  "mouse": true,
+  "touch": true,
+  "latestWins": true,
+  "layout": {
+    "min": "2800",
+    "max": "6500",
+    "aria": "6.500 K",
+    "text": "Temperatura de color: 6.500 K2.800 K6.500 KExemple: LED tipus llum de dia. Orientatiu; no canvia la família SPD.Família SPD estable: LED de fòsfor CIE B1–B5. Font: CIE 015:2018, taules a 1 nm. Interpolació espectral amb CCT comprovada; sense extrapolació.",
+    "scale": [
+      {
+        "text": "2.800 K",
+        "x": 1005
+      },
+      {
+        "text": "6.500 K",
+        "x": 1174.5
+      }
+    ],
+    "label": "Temperatura de color: 6.500 K"
+  },
+  "configuration": {
+    "type": "skyglow_configuration_snapshot",
+    "schemaVersion": 1,
+    "generation": 36,
+    "configuration": {
+      "mode": "kelvin",
+      "kelvin": 6500,
+      "spectral_family": "CIE_LED_B1_B5",
+      "normalization": "constant_dnb_reference",
+      "mixture_model": "deterministic_reference_ensemble_v1",
+      "revision": "black-marble-conditional-v1"
+    },
+    "configurationKey": "50afce7fa6b25340248043c0e3b1c577373fc2c780a1ea5ae5938326c13d12ec",
+    "spectralRevision": "cie-tables-2026-10-18-v1",
+    "effectiveSpectrum": {
+      "spectrumId": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "components": [
+        [
+          "LED-B4",
+          "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+          0.0518798828125
+        ],
+        [
+          "LED-B5",
+          "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+          0.9481201171875
+        ]
+      ],
+      "effectiveCctK": 6500.063684091917,
+      "distanceUv": 0.0008093086678338106
+    },
+    "mixtureBasis": "radiant_flux",
+    "scientificQuality": "conditional_relative",
+    "calculationStatus": "transport_pending",
+    "blackMarble": null,
+    "rsr": null,
+    "skyRadiance": null,
+    "error": null
+  },
+  "renderResult": null
+}

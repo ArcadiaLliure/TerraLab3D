@@ -1,4 +1,6 @@
 import type { SkyEnvironmentSnapshot } from "../../../contracts/sky_environment_contracts";
+import { SkyglowControls } from "../components/SkyglowControls";
+import type { SkyglowConfigurationSnapshot } from "../../../contracts/skyglow_contracts";
 import type {
   MoonSurfaceResourceDescriptor,
   SatelliteCatalogManifest,
@@ -64,6 +66,7 @@ export class SkyPage {
   private pureColorsToggleBtn!: HTMLButtonElement;
   
   private lpToggleBtn!: HTMLButtonElement;
+  private skyglowControls!: SkyglowControls;
   private lpModeSelect!: HTMLSelectElement;
   private lpBortleInput!: HTMLInputElement;
   private lpMagInput!: HTMLInputElement;
@@ -331,6 +334,11 @@ export class SkyPage {
       this.options.onLightPollutionToggled?.(state);
     });
     titleRow.appendChild(this.lpToggleBtn);
+    this.skyglowControls = new SkyglowControls(configuration => this.bridge.sendConfigureSkyglow(configuration));
+    group.appendChild(this.skyglowControls.element);
+    const legacyLabel = document.createElement("div");
+    legacyLabel.textContent = "Visualització actual (model visual històric)";
+    group.appendChild(legacyLabel);
 
     // Mode Selector
     const modeRow = document.createElement("div");
@@ -485,6 +493,10 @@ export class SkyPage {
 
     this.starTrailsPanel = new StarTrailsPanel(this.bridge);
     this.element.appendChild(this.starTrailsPanel.getElement());
+  }
+
+  public updateSkyglowConfiguration(snapshot: SkyglowConfigurationSnapshot): void {
+    this.skyglowControls.update(snapshot);
   }
 
   public updateTrajectoryCalculating(displayName: string): void {

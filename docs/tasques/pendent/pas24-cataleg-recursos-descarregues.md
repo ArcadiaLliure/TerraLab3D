@@ -30,6 +30,7 @@ Completar la vertical de «catàleg de recursos i descàrregues persistents» de
 ## Dependències
 
 **Depèn de:**
+- [Pas 7.5.1 — contractes d’assets Black Marble/RSR/SPD](../completat/pas7.5.1-black-marble-spectral-simulation.md)
 - [Pas 8.6 — Planetes, anells i satèl·lits naturals](../completat/pas8.6.md)
 - [Pas 12 — Cerca astronòmica, focus i seguiment](../completat/pas12.md)
 - [Pas 7.3 — contracte Black Marble TOA/L3](../completat/pas7.3-dnb-rsr-measurement.md) per al cas d'acceptació VNP46/VJ146/VJ246; el gestor comú no decideix admissibilitat científica.
@@ -54,7 +55,7 @@ Completar la vertical de «catàleg de recursos i descàrregues persistents» de
 
 Catàleg versionat → selecció de variant/bundle o petició dinàmica → resolució de proveïdor/asset (amb autenticació si cal) → `DownloadJob` persistent amb identitat resolta → adquisidor cancel·lable → temporal reanudable → verificació del checksum de font + SHA-256 local → instal·lació atòmica → registre → delta de disponibilitat cap a la UI.
 
-Per a recursos dinàmics, la resolució i la transferència són fases diferents: una resposta del resolver mai es converteix directament en dada científica. Per a Black Marble, `product∈{VNP46A2,VJ146A2,VJ246A2}`, `collection=002`, dia exacte i tile/AOI resolen un grànul concret. La cadena és `catàleg → producte/dia/AOI → resolució LAADS → autenticació Earthdata → descàrrega persistent → checksum de font + SHA-256 local → instal·lació atòmica → lectura científica específica`. El gestor retorna identitat i path verificat, i conserva les alternatives/fallades sense triar una font com a científicament equivalent. El lector VNP46 del Pas 7.2 només consumeix el fitxer local; els adaptadors J1/J2 requeriran proves pròpies.
+Per a recursos dinàmics, la resolució i la transferència són fases diferents: una resposta del resolver mai es converteix directament en dada científica. Per a Black Marble, `product∈{VNP46A2,VJ146A2,VJ246A2}`, `collection=002`, dia exacte i tile/AOI resolen un grànul concret. La cadena és `catàleg → producte/dia/AOI → resolució LAADS → autenticació Earthdata → descàrrega persistent → checksum de font + SHA-256 local → instal·lació atòmica → lectura científica específica`. El gestor retorna identitat i path verificat, i conserva les alternatives/fallades sense triar una font com a científicament equivalent. El lector VNP46 del Pas 7.2 només consumeix el fitxer local; l’adaptador J1 queda verificat localment a 7.5.1; J2 requereix proves pròpies.
 
 ## Errors, cancel·lació i recursos
 
@@ -67,6 +68,9 @@ Per a recursos dinàmics, la resolució i la transferència són fases diferents
 - Un canvi del grànul/asset resolt, ETag o checksum després de reprendre obliga a revalidar la transferència; no es concatena contingut de dues revisions.
 
 ## Tasques
+
+- [ ] Adquirir ordinàriament grànuls Black Marble, RSR per sensor/mode i biblioteques SPD opcionals mitjançant el gestor comú, preservant fonts, llicències, checksums i revisions. Les petites taules CIE obligatòries empaquetades de 7.5.1 segueixen ADR 0005; evitar gestors científics de descàrrega paral·lels.
+
 
 - [x] Backend i frontend ja modelen recursos, adquisició, instal·lació i progrés bàsic.
 - [x] Existeixen modal central, cards de recurs i base de dades de capes.

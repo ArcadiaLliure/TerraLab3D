@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "retrievedAt": "2026-10-18",
+  "producer": "Commission Internationale de l'Éclairage (CIE)",
+  "license": "CC BY-SA 4.0",
+  "storage": "package:terralab3d.infrastructure.catalogs/spectra",
+  "assets": [
+    {
+      "file": "CIE_illum_LEDs_1nm.csv",
+      "metadataFile": "CIE_illum_LEDs_1nm.csv_metadata.json",
+      "sourcePage": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+      "publishedMd5": "99d1bc3974902d5e02e4c3fe539bea3d",
+      "sha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+      "quality": "approximated",
+      "grid": "380–780 nm; 1 nm; 9 LED types",
+      "metadataSha256": "8e95fe131cfff2534aa161846b1b7d113f74781338e85787104661b887f8ff48"
+    },
+    {
+      "file": "CIE_illum_HPs.csv",
+      "metadataFile": "CIE_illum_HPs.csv_metadata_v2.json",
+      "sourcePage": "https://cie.co.at/datatable/relative-spectral-power-distributions-high-pressure-discharge-lamp-illuminants",
+      "publishedMd5": "423e996fd3ee17eaf783633e4fd2f62c",
+      "sha256": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552",
+      "quality": "approximated",
+      "grid": "380–780 nm; 5 nm; HP1–HP5",
+      "metadataSha256": "d72f68dcbae8c0bc9361a399e172e8f9beb61dc59119620047538df4840c39b3"
+    },
+    {
+      "file": "CIE_RefSpectrum_L41.csv",
+      "metadataFile": "CIE_RefSpectrum_L41.csv_metadata_v2.json",
+      "sourcePage": "https://cie.co.at/datatable/cie-reference-spectrum-l41",
+      "publishedMd5": "01dba8b4ebdbd2a3ebb9fa6cc8719939",
+      "sha256": "23e07c6b8a2f5273f9e3abb3c64a374f3456eee0a70dd447fdb14c617f55224e",
+      "quality": "approximated",
+      "grid": "360–830 nm; 1 nm; reference LED",
+      "metadataSha256": "27875e7a4291996bd17af9fa1a64257e13cf3ae2011f6272de4d0a4937969a26"
+    },
+    {
+      "file": "CIE_sle_photopic.csv",
+      "metadataFile": "CIE_sle_photopic.csv_metadata.json",
+      "sourcePage": "https://cie.co.at/datatable/cie-spectral-luminous-efficiency-photopic-vision",
+      "publishedMd5": "f389958555461a7d9a7562145e8ca9c0",
+      "sha256": "ee5d5d17922ae645d4af52cacf6a50bdb9385749f9d2181ca312eb2b08febac2",
+      "quality": "nominal",
+      "grid": "360–830 nm; 1 nm; photopic V(λ)",
+      "metadataSha256": "e6786484f9c1d45b75e05156947382bf37519d1195d52571eaee8fc8d3d21840"
+    },
+    {
+      "file": "CIE_xyz_1931_2deg.csv",
+      "metadataFile": "CIE_xyz_1931_2deg.csv_metadata.json",
+      "sourcePage": "https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer",
+      "publishedMd5": "17cca777db64b17170f06f67ce9d3ab7",
+      "sha256": "fa663e3535a7e0763a745993a1f0a192eb0275ac46ad2d1befd7626841e713c1",
+      "quality": "nominal",
+      "grid": "360–830 nm; 1 nm; CIE 1931 2° XYZ",
+      "metadataSha256": "03abcaecf4e63d77045ef57c4514b52c8bb1a46dd18e1f93a50044a0f4f481c8"
+    },
+    {
+      "file": "CIE_illum_FLs_1nm.csv",
+      "metadataFile": "CIE_illum_FLs_1nm.csv_metadata.json",
+      "sourcePage": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+      "publishedMd5": "77df774b47c2de724211d5f26592759e",
+      "sha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+      "quality": "approximated",
+      "grid": "380–780 nm; 1 nm",
+      "metadataSha256": "8c1cab93137267f74c116f04c10db2e89791c2da2368ae6113782e6dcd3d4f3c"
+    }
+  ]
+}

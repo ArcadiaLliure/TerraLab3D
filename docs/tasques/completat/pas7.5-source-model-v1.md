@@ -1,10 +1,10 @@
 # Pas 7.5 — SourceModel físic independent de VIIRS (S)
 
-> Estat: **completat** per al domini S declarat. **Funcionalitat:** `SourceModel` definit amb SPD, geometria, amplitud i distribució angular; el gate observacional L3/RSR continua separat per C/H. **Execució:** seqüencial. **Pla canònic:** [19-pla-executable-codex.md](../../skyglow/19-pla-executable-codex.md).
+> **Estat:** completat. **Estat funcional:** observable. **Origen:** planificat. **Abast vigent:** SourceModel S físic independent de VIIRS; extensió C separada a 7.5.1.
 
 ## Descripció funcional
 
-Desenvolupar fonts amb SPD, emissió angular i geometria definides que es puguin simular sense una observació VIIRS. La inferència observacional Black Marble és **C/H**, un contracte separat de 7.16/7.17 segons la [política S/C/H](../../skyglow/20-politica-rsr-i-validacio-per-dominis.md).
+Desenvolupar fonts amb SPD, emissió angular i geometria definides que es puguin simular sense una observació VIIRS. L’extensió Black Marble C relativa s’implementa prospectivament a 7.5.1; H és un contracte separat de 7.16/7.17 segons la [política S/C/H](../../skyglow/20-politica-rsr-i-validacio-per-dominis.md).
 
 ## Fonts a consultar
 
@@ -20,7 +20,7 @@ Un `SourceModel` S físic, immutable, amb procedència, unitats i proves indepen
 
 **Depèn de:** [7.3](pas7.3-dnb-rsr-measurement.md) i [7.4](pas7.4-spectral-bandset-validation.md); **no** depèn de RSR operativa 2026, HGS ni inversió L3→font.
 
-**En depenen:** [7.6 SG-REF](../pendent/pas7.6-sg-ref-reference-solver.md), [7.16 C](../pendent/pas7.16-uncertainty-provenance.md), [7.17 gates](../pendent/pas7.17-clear-sky-ground-truth.md).
+**En depenen:** [Pas 7.5.1 — Black Marble i configuració](pas7.5.1-black-marble-spectral-simulation.md), [7.6 SG-REF](../pendent/pas7.6-sg-ref-reference-solver.md), [7.16 C](../pendent/pas7.16-uncertainty-provenance.md), [7.17 gates](../pendent/pas7.17-clear-sky-ground-truth.md).
 
 ## Codi existent a reutilitzar
 
@@ -32,7 +32,7 @@ Un `SourceModel` S físic, immutable, amb procedència, unitats i proves indepen
 
 SPD tabulada/sintètica energètica relativa → normalització integral per nm → font puntual geodèsica o rectangle uniforme al pla tangent local → patró angular axial o separable azimutal normalitzat a l'hemisferi → amplitud en W definida/mesurada o paràmetre relatiu → `SourceModel` S immutable i versionat. Els mètodes retornen flux, intensitat, exitància i, només per a l'àrea i `cosθ>0`, radiància espectrals amb unitats explícites. Aquesta sortida queda preparada com a entrada de SG-REF; el transport no s'executa a 7.5.
 
-El flux observacional C/H queda diferit: píxel Black Marble L3 i QA → hipòtesis SPD/angular amb RSR de referència explícita → normalització condicionada i anàlisi de sensibilitat (7.16) → contrast empíric per a H (7.17/7.24). **No aplicar la integral TOA directament com a inversa de L3.**
+L’abast original d’aquest pas no implementa C/H. L’extensió prospectiva C de 7.5.1 executa: píxel Black Marble L3 i QA → hipòtesis SPD/angular amb RSR de referència explícita → normalització condicionada (7.5.1) i propagació d’incertesa (7.16) → contrast empíric per a H (7.17/7.24). **No aplicar la integral TOA directament com a inversa de L3.**
 
 ## Errors, cancel·lació i recursos
 
@@ -67,7 +67,7 @@ Hi ha un `SourceModel` S executable amb SPD, geometria, emissió angular, unitat
 
 ## Fora d'abast
 
-Inferència L3→font (7.16), validació empírica de ciutats (7.17/7.24), transport (7.6+), render, descàrregues. No eliminar infraestructura o resultats anteriors.
+Extensió condicionada L3→font (7.5.1), incertesa propagada (7.16), validació empírica de ciutats (7.17/7.24), transport (7.6+), render, descàrregues. No eliminar infraestructura o resultats anteriors.
 
 ## Instrucció per a Codex
 

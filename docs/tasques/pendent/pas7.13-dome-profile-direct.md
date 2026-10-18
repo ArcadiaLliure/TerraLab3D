@@ -8,7 +8,11 @@ Estendre el mateix operador homologat del zenit a direccions arbitràries sense 
 
 ## Dependències
 
+**Depèn de:**
 7.12
+
+**En depenen:**
+- [Pas següent](pas7.14-photometric-projections.md)
 
 ## Referències obligatòries
 

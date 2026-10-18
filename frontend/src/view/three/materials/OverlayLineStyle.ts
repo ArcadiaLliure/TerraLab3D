@@ -274,7 +274,7 @@ export function withOverlayColor(
   color: THREE.ColorRepresentation,
   opacity = base.coreOpacity,
   depthTest = base.depthTest,
-  dashed = base.dashed,
+  dashed = base.dashed ?? false,
 ): OverlayLineProfile {
   const opacityRatio = base.coreOpacity > 0 ? opacity / base.coreOpacity : 1;
   return {

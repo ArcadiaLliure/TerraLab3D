@@ -2,7 +2,7 @@
 
 ## Context
 
-El Pas 7 actual resol una necessitat visual i de visibilitat amb Bortle/magnitud límit, però no propaga fonts artificials a través d'una atmosfera física. El [Pas 7.5](../evidencies/pas7.5/validacio-source-model-s-v1.md) ja defineix fonts físiques S independents de satèl·lit per alimentar el futur transport. VNP46/VJ146/VJ246 continuen com a observacions candidates C/H diferenciades, amb model de mesura VIIRS DNB per sensor i inferència/validació pròpies encara pendents.
+El Pas 7 actual resol una necessitat visual i de visibilitat amb Bortle/magnitud límit, però no propaga fonts artificials a través d'una atmosfera física. El [Pas 7.5](../evidencies/pas7.5/validacio-source-model-s-v1.md) ja defineix fonts físiques S independents de satèl·lit per alimentar el futur transport. VNP46/VJ146/VJ246 continuen com a observacions candidates C/H diferenciades, amb model de mesura VIIRS DNB per sensor i C relatiu NOAA-20 executable a 7.5.1 i homologació H pendent.
 
 ## Goals
 
@@ -18,7 +18,7 @@ Dispersió múltiple general en runtime, inferir un SPD únic o una emissió ang
 
 `AtmosphericOpticsProvider.resolve(query: OpticalQuery) -> OpticalState`.
 
-`SourceModel(source_model_id, revision, definition_reference, geometry, spectrum, angular, amplitude)` és el contracte S implementat. Un constructor C/H `build(observation, spectralHint, emissionModel)` continua planificat a 7.16–7.24, sense declarar-lo API existent.
+`SourceModel(source_model_id, revision, definition_reference, geometry, spectrum, angular, amplitude)` és el contracte de transport S/C implementat. `build_conditional_scenarios(observation, response, library, configuration)` de 7.5.1 construeix fonts C relatives; inferència absoluta i H continuen a 7.16–7.24.
 
 `DomeCompressor.compress(directionSamples) -> DomeProfile`.
 
@@ -40,7 +40,7 @@ Si un càlcul falla, es manté l'últim resultat físic vàlid amb indicador `st
 
 ## Testing
 
-Unitari: fórmules, unitats, RSR, `BAND_INTEGRATED`, espectre, fase, quadratura, PCHIP, geometria i baixa radiància. El 7.5 ja prova conservació i unitats de S; 7.6–7.15 han de provar `SourceModel S→SG-REF/kernel→DTO`. La integració VNP46→font C/H exigeix els gates observacionals de 7.16–7.24. Contract tests Python/TS i golden tests amb reference solver són futurs. Property tests: positivitat, linealitat en intensitat de font, invariància d'unitats, monotonia de transmissió amb τ i suma commutativa de fonts.
+Unitari: fórmules, unitats, RSR, `BAND_INTEGRATED`, espectre, fase, quadratura, PCHIP, geometria i baixa radiància. El 7.5 ja prova conservació i unitats de S; 7.6–7.15 han de provar `SourceModel S→SG-REF/kernel→DTO`. La integració NOAA-20→font C relativa està verificada a 7.5.1; H exigeix els gates observacionals de 7.16–7.24. El contracte de configuració Python/TS es verifica amb el bridge real a 7.5.1; golden tests de resultats radiatius amb SG-REF són futurs. Property tests: positivitat, linealitat en intensitat de font, invariància d'unitats, monotonia de transmissió amb τ i suma commutativa de fonts.
 
 ## Alternatives descartades
 

@@ -1,0 +1,800 @@
+[
+  {
+    "spectrumId": "LED-B1",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Phosphor-type LEDs in different CCT categories",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2733.4004558369415,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0007002357282162868,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-B2",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Phosphor-type LEDs in different CCT categories",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2997.6335306145716,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0009844141804186471,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-B3",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Phosphor-type LEDs in different CCT categories",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4102.737925623536,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0006546309668539323,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-B4",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Phosphor-type LEDs in different CCT categories",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 5108.865284922512,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0004717713087393992,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-B5",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Phosphor-type LEDs in different CCT categories",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 6597.19907665097,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0008950147778099078,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-BH1",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Hybrid-type",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2851.374256281334,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.00030711437056968734,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-RGB1",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": " RGB-type",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2840.1804679671604,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.004259573666521009,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-V1",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "violet-pumped phosphor-type LEDs",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2723.976535610346,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0018853678345764982,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "LED-V2",
+    "assetSha256": "2a065526e1502f138d5b96aa8c9b337320e08667aac028ab5ad428bf1179a4b7",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "violet-pumped phosphor-type LEDs",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4070.0670390722926,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0010310726562082222,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "HP1",
+    "assetSha256": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-high-pressure-discharge-lamp-illuminants",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 81,
+    "technology": "Standard high pressure sodium lamp",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 1962.5166674895058,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0008364891835449076,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "HP2",
+    "assetSha256": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-high-pressure-discharge-lamp-illuminants",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 81,
+    "technology": "Colour enhanced high pressure sodium lamp",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2505.838917891372,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0007180098388298953,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "HP3",
+    "assetSha256": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-high-pressure-discharge-lamp-illuminants",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 81,
+    "technology": "High pressure metal halide lamps",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 3146.471651251408,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0024040899726478363,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "HP4",
+    "assetSha256": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-high-pressure-discharge-lamp-illuminants",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 81,
+    "technology": "High pressure metal halide lamps",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4004.4592723951723,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.001195741173732788,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "HP5",
+    "assetSha256": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-high-pressure-discharge-lamp-illuminants",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 81,
+    "technology": "High pressure metal halide lamps",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4041.2005485865257,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0016835152452132776,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "S_L41(lambda)",
+    "assetSha256": "23e07c6b8a2f5273f9e3abb3c64a374f3456eee0a70dd447fdb14c617f55224e",
+    "sourceUrl": "https://cie.co.at/datatable/cie-reference-spectrum-l41",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 471,
+    "technology": "reference LED",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      360.0,
+      830.0
+    ],
+    "cctK": 4102.737532112264,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0006546385295027694,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL1",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "standard",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 6427.843108817404,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0071322819239947105,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL2",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "standard",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4224.482054034168,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.001795215084880725,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "standard",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 3446.133640807667,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0006743834560042907,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL4",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "standard",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2938.0460752802614,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0008121274034772517,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL5",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "standard",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 6344.941968050788,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.010753673151992212,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL6",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "standard",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4148.472771248977,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.006043283712899908,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL7",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "broad-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 6494.263532839182,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0032234970991120255,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL8",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "broad-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4996.944645510859,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.003211993594804738,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL9",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "broad-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4148.856499515356,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 2.4655207787443515e-06,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL10",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "narrow-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4998.300709858978,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.003293453559763856,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL11",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "narrow-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 3998.745306198262,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 5.9133456569090116e-05,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL12",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "narrow-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2999.822511888954,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 5.104211480212111e-05,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.1",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Standard halophosphate",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2931.6528349044333,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0007921923586414731,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.2",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Standard halophosphate",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 3965.25391297908,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.00168911976657359,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.3",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Standard halophosphate",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 6279.363273254754,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.00938747733249265,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.4",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "DeLuxe type",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2903.709282014587,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0006662841540083438,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.5",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "DeLuxe type",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4085.5044825348823,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.002902918113312582,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.6",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "DeLuxe type",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4893.291459410545,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0027128118268883697,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.7",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Three-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2978.9230426505765,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 1.237455903533411e-05,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.8",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Three-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4005.609141950005,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.002546732530222976,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.9",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": " Three-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4852.1855465337285,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0018604276275164323,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.10",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": " Three-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 4999.535527507986,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.002019518881613384,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.11",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": " Three-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 5852.439227347321,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0047962322143906356,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.12",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Multi-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 2984.29140975057,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.00025928182850476754,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.13",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Multi-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 3895.8144968114425,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0027736386864464628,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.14",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": "Multi-band",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 5044.003853550856,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.004781049508886873,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  },
+  {
+    "spectrumId": "FL3.15",
+    "assetSha256": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc",
+    "sourceUrl": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-0",
+    "license": "CC BY-SA 4.0",
+    "knotCount": 401,
+    "technology": " D65 simulator",
+    "revision": "cie-tables-2026-10-18-v1",
+    "relativePowerUnit": "dimensionless",
+    "wavelengthUnit": "nm",
+    "validDomainNm": [
+      380.0,
+      780.0
+    ],
+    "cctK": 6507.226262975989,
+    "cctMethod": "nearest_planckian_CIE1960uv_CIE1931_2deg",
+    "distanceUv": 0.0031007926821615653,
+    "cctIsCalculatedNotManufacturerSpecification": true
+  }
+]

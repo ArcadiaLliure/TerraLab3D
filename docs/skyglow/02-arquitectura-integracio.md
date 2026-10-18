@@ -20,8 +20,8 @@ flowchart LR
   A --> X[adaptador científic per producte]
   X --> O[ViirsSourceObservation + identitat]
   DS[SPD + geometria + potència definida + patró angular] --> S[SourceModel S implementat]
-  R[RSR DNB + BAND_INTEGRATED] -. model C/H futur .-> C[Escenari L3 condicionat]
-  O -. C/H futur .-> C
+  R[RSR DNB + BAND_INTEGRATED] -. referència C condicionada .-> C[Escenari L3 condicionat]
+  O -. C relatiu de 7.5.1 .-> C
   C -. validació independent pendent .-> ER
   S --> ER[EmissionRegion + RadiancePatch]
   MET[Atmosfera estàndard / ERA5 / CAMS] --> AP[AtmosphericOpticsProvider]

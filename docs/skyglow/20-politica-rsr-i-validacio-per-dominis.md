@@ -1,38 +1,40 @@
-# Política científica de skyglow — RSR opcional i tres dominis de validació
+# Política científica de skyglow — RSR de referència aplicable i dominis S/C/H
 
-> **Revisió prospectiva, 2026-10-18.** Aquesta decisió corregeix dependències del pla, no modifica l'evidència històrica ni els gates preregistrats de 7.1–7.4.
+Revisió prospectiva del 2026-10-18. No hem renunciat a la RSR: retirem l’exigència d’una RSR anual exacta com a condició universal de desenvolupament. Les evidències històriques 7.1–7.5 i el pressupost preregistrat de 0,01 mag de 7.4 es conserven.
 
-## Decisió
+## Pipeline i modalitats
 
-**Es retira l'exigència de trobar la RSR operativa exacta de 2026 per poder desenvolupar el transport físic.** VIIRS DNB és una observació pancromàtica: fins i tot coneixent la RSR exacta, Black Marble L3 no determina de forma única l'SPD, la potència hemisfèrica i l'emissió angular d'una ciutat.
+Black Marble amb QA i procedència → caracterització espectral/angular → `SourceModel` → únic SG-REF/PropagationKernel espectral → radiància del cel → visualització. Les fonts S entren directament al mateix contracte de transport. Les dues modalitats són «Simulació realista» i «Simulació per kelvins»; difereixen en les hipòtesis de font, no en el motor atmosfèric.
 
-S'han de separar tres dominis, amb estat propi per resultat:
+- **S — DEFINED_SOURCE:** font definida independent de VIIRS, absoluta definida o paramètrica; 7.5 completat en el domini original.
+- **C — CONDITIONAL_L3:** observació real L3 amb QA, sensor/producte/release/data/píxel, SPD i angularitat hipotètiques, RSR pública de referència i escala condicionada. Implementat a [7.5.1](../tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) com a font relativa consumible pel futur transport. Cap pes de mescla és una estadística observada; les alternatives no tenen probabilitats inventades.
+- **H — OBSERVATION_VALIDATED:** exigeix cadena instrumental/guany/calibratge/TOA–L3 o model empíric acreditat, incerteses justificades, observacions independents i criteris preregistrats. Continua pendent.
 
-- **S — DEFINED_SOURCE (font física definida):** SPD, geometria, radiància/intensitat o potència física coneguda o escala paramètrica explícita, emissió angular definida. SG-REF i el kernel poden propagar S **sense VIIRS ni RSR**; cap font sintètica no es presenta com una ciutat mesurada.
-- **C — CONDITIONAL_L3 (escenari condicionat Black Marble):** L3 amb QA, sensor/producte/data, hipòtesis SPD/angular, RSR pública de referència *identificada com a aproximació*, normalització condicionada i anàlisi de sensibilitat. Pot expressar intervals o famílies d'escenaris; si l'escala absoluta no és defensable, només resultat relatiu o `unavailable`, mai watts inventats.
-- **H — OBSERVATION_VALIDATED:** cal cadena sensor/RSR/calibratge/guany/TOA–L3 documentada o model empíric validat dins del seu domini; incertesa justificada, dades observacionals independents, preregistre dels criteris i resultats reproduïbles. Ni QA 0, ni estabilitat del sensor, ni una RSR històrica, ni l'èxit numèric de S fan H automàticament.
+Una RSR històrica no certificada per al dia exacte permet C identificat com a aproximació; només es bloquegen afirmacions H o amplituds absolutes injustificades. L’absència d’una publicació anual no demostra estabilitat ni irrellevància del calibratge.
 
-**Regla de bloqueig:** mancar una RSR exacta 2026 bloqueja, si escau, només l'afirmació observacional H per aquell producte/període. No bloqueja el SourceModel físic S, SG-REF ni l'optimització validada per S. Les evidències anteriors d'indisponibilitat observacional no es reinterpreten com a èxit.
+## Conclusió executable RSR
 
-## Selecció de parella Black Marble–RSR per a recerca
+Consulta acotada el 2026-10-18: [NOAA-20 NCC](https://ncc.nesdis.noaa.gov/NOAA-20/J1VIIRS_NOAA20_SpectralResponseFunctions.php) publica la referència final de prel llançament J1 DAWG V2.1 (novembre 2016). El seu README conserva DNB MGS V1 basada en SpMA i LGS fusionada V2 amb filtre de densitat neutra; no són equivalents. S’utilitza **MGS band-average com a hipòtesi de referència**, amb LGS com a contrast; no s’afirma que MGS sigui la resposta efectiva HGS del píxel L3. Els detectors individuals no se substitueixen ni s’agreguen implícitament.
 
-**Primera candidata:** NOAA-20 VIIRS DNB / `VJ146A2.002` + RSR oficial de NOAA-20 de prelanzament, mantenint-ne el mode LGS/MGS/detector i la identitat real. És preferible per **començar a investigar**, perquè hi ha grànuls C2 reals ja contrastats a TerraLab3D, inclòs `h18v04` del 2026-09-13 amb QA 0, i NASA descriu estabilitat espectral del DNB NOAA-20/21 respecte a Suomi-NPP. **Això no verifica una RSR efectiva nocturna de 2026 ni autoritza l'extrapolació automàtica de validesa.** No alterar `l3LinkStatus`, `spectralUncertaintyStatus`, mapping de guany ni `validThrough` sense proves.
+[NOAA-21 NCC](https://ncc.nesdis.noaa.gov/NOAA-21/J2VIIRS_SpectralResponseFunctions.php) publica J2 DAWG V2 (juliol 2019): LGS/MGS mesurades amb GLAMR; el README recomana MGS com a proxy d’HGS no mesurada, sense cota numèrica. No es transfereix aquesta recomanació a NOAA-20. [SNPP NCC](https://ncc.nesdis.noaa.gov/VIIRS/VIIRSSpectralResponseFunctions.php) conserva respostes de 2011/2012 i modulated RSR Release 1.0 de 2013, no una certificació de 2026.
 
-**NOAA-21 / `VJ246A2.002`:** alternativa comparable quan s'hagin verificat grànuls reals i modes; el proxy MGS→HGS no és homologat sense cota. **Suomi-NPP / `VNP46A2.002`:** conservar sèries històriques; no perseguir una LUT SNPP anual 2026 com a prerequisit global. Si una altra combinació temporal *més antiga* té millor correspondència documentada de resposta nocturna, processament Black Marble i incertesa, comparar-la i prioritzar-la per qualitat d'evidència, no per recència.
+[NASA Black Marble](https://viirsland.gsfc.nasa.gov/Val/BM_Val.html) informa d’estabilitat de forma espectral NOAA-20/21 davant la degradació SNPP, calibratge mensual i absència d’ajust interplataforma RSR a C2. Això dona suport a una referència condicionada del mateix sensor; no equipara sensibilitat absoluta, forma normalitzada, guanys ni correccions TOA–L3. La [guia C2](https://landweb.modaps.eosdis.nasa.gov/data/userguide/BlackMarbleUserGuide_Collection2.0_20241203.pdf), §2.2 i §5.2, preserva la distinció L3/TOA.
 
-Fonts per a l'auditoria:
-- [NASA Black Marble VJ146](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ146A2) i [validació](https://viirsland.gsfc.nasa.gov/Val/BM_Val.html).
-- [NOAA RSR NOAA-20](https://ncc.nesdis.noaa.gov/NOAA-20/J1VIIRS_NOAA20_SpectralResponseFunctions.php) i [NOAA-21](https://ncc.nesdis.noaa.gov/NOAA-21/J2VIIRS_SpectralResponseFunctions.php).
-- [Black Marble Collection 2 User Guide](https://landweb.modaps.eosdis.nasa.gov/data/userguide/BlackMarbleUserGuide_Collection2.0_20241203.pdf).
-- [Auditoria real de 7.5](../evidencies/pas7.5/estat-inferencia-font-2026.md).
+Primera connexió executable: `VJ146A2.A2026256.h18v04.002.2026264085938.h5`, NOAA-20, 2026-09-13, capa `DNB_BRDF-Corrected_NTL`, QA 0. `resolve_reference` selecciona mateix sensor i guany entre els epochs publicats instal·lats, rebutja ambigüitat i conserva `validFrom/validThrough`. `resolve` manté la selecció estricta d’operació. No s’allarga cap interval per simular validesa instrumental. Si manca MGS es pot sol·licitar LGS explícitament; si manca una referència verificable del mateix sensor, el cas queda indisponible, sense substituir NOAA-21 ni fabricar una RSR.
+
+No s’ha identificat una parella antiga Black Marble–RSR amb cadena nocturna L3 millor acreditada. Les referències SNPP de 2013 continuen com a contrast històric, no com a validació observacional. Incertesa de mapping HGS, estructura urbana i escala L3→flux: **no quantificada**. La sensibilitat entre MGS/LGS, SPD i angles és una dispersió d’escenaris, no sigma ni interval de confiança.
+
+## Normalització i espectres
+
+42 SPD CIE verificades, amb unitats relatives, suport, resolució, font, llicència i hashes. Família estable de LED de fòsfor B1–B5: rang UI 2.800–6.500 K, interpolació convexa radiant entre veïns i resolució de la CCT efectiva amb CIE 1931 2° / locus de Planck CIE 1960 uv. Planck només defineix el locus, mai fabrica l’SPD LED. La precisió numèrica de cerca és 0,1 K; no acredita exactitud de fabricació. No es fabrica mercuri, LPS ni LED ambre absent del catàleg.
+
+Ancoratge històric L3, font base estimada i substitució hipotètica es conserven separats. Es permet conservar flux fotòpic, potència radiant, resposta DNB de referència o amplitud relativa. En C aquestes magnituds són paramètriques, no lúmens o watts mesurats. La resposta DNB relativa predita varia si es conserva una altra magnitud. Mai es converteix L3 a watts hemisfèrics amb una constant universal.
 
 ## Seqüència executable
 
-1. **7.5:** construir un `SourceModel` S físic (SPD/angles/geometria/normalització/amplitud/units), reusar el gate observacional ja implementat però sense imposar-lo a S. No començar 7.6 durant la mateixa execució.
-2. **7.6–7.15:** SG-REF, transport directe, atmosfera, absorció i projeccions sobre S. Revalidar el `SpectralBandSet` a 7.10 i 7.14.
-3. **7.16:** ledger d'incerteses S + estudi implementable de C, incloses respostes de referència i priors, sense inventar interval d'error.
-4. **7.17:** gate preacceleracions físic/numèric de S amb oracle independent, amb pressupost preregistrat; **separar** l'eventual validació empírica C/H sobre dades reservades i criteris preregistrats. Si C/H no és avaluable, registrar `not_evaluated` i permetre acceleracions **només de S**. Un oracle numèric no prova el cel real.
-5. **7.18–7.23:** accelerar i ampliar el motor en el domini científic verificat.
-6. **7.24–7.28:** gates i homologació per domini. Integració de S com a simulació física etiquetada és possible sense H; no activar cap skyglow urbà absolut «real» sense validació observacional.
-
-Preservar tots els resultats passats i la política V1 de llindars (incloent 0,01 mag i 238/238 de 7.4). La revisió de criteri fou documental; posteriorment el [Pas 7.5 ha implementat i verificat `SourceModel` S](../evidencies/pas7.5/validacio-source-model-s-v1.md). El transport S comença a 7.6; cap predicció C/H no es declara implementada.
+1. 7.5 continua completat per S; 7.5.1 incorpora biblioteca, escenaris C NOAA-20 i controls amb estat científic real.
+2. 7.6 consumeix S i C al mateix oracle sense exigir H; no s’executa en aquesta iteració.
+3. 7.10/7.14 revaliden SPD, mescles i operadors nous amb el pressupost de 0,01 mag sense relaxar-lo.
+4. 7.16 propaga incerteses del transport i hipòtesis; 7.17 separa verificació física de contrast empíric; 7.24 congela resultats per domini.
+5. 7.25–7.27 connecten els controls ja existents als resultats, invaliden revisions/caches i visualitzen radiància lineal. Mentre falta transport no hi ha filtre RGB ni radiància fictícia.
+6. 7.28 homologa per domini sense convertir una simulació plausible C en H. Pas 24 manté l’adquisició ordinària Black Marble/RSR/SPD al gestor comú; les petites taules CIE verificades són dades base empaquetades.
