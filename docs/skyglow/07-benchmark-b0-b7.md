@@ -10,6 +10,14 @@ Mesurar la frontera precisió↔cost de la configuració de runtime **ja escolli
 
 Seed canònica inicial: `0x544C3344534B5947` (ASCII-like «TL3DSKYG»). No té significat científic; només reproductibilitat.
 
+## Benchmark prospectiu d'interactivitat i paral·lelisme (7.18–7.22)
+
+Cal registrar quatre famílies de canvis amb semàntica diferent: **Kelvin/SPD o mescla amb geometria fixa; petit moviment/teleport; canvi d'atmosfera; canvi de DEM i flip d'oclusió**, i distingir inicialització freda, primera resposta vàlida, refinament complet i renderer. Una visualització objectiu de 60 FPS no obliga a recomputar radiància cada frame. Les metes orientatives de 1–3 s i 10–30 s no són SLO; el gate de 7.22 n'ha d'aprovar formalment els llindars i la plataforma abans del PASS/FAIL.
+
+Al 7.18 comparar serial, vectoritzat/compilat si és admissible i CPU multicore **1/2/4/6 nuclis quan l'equip ho permeti**, per a punts, fonts extenses/oclusions i atmosfera variable, reportant P50/P95/P99 amb mida mostral declarada, throughput LOS/s, wall/CPU, sobrecàrrega d'inici/IPC, RAM/RSS i error. Al 7.21 repetir amb workers persistents, cache i càrrega de moviments/kelvins; al 7.22 avaluar opcions GPU/LUT/FFT contra la mateixa referència quan els SLO no es compleixin. No usar el nombre de bandes com a variable d'optimització ni acceptar divergències radiomètriques ocultes.
+
+Referència conceptual, límits de costs històrics i responsabilitats: [estratègia de rendiment interactiu](21-estrategia-rendiment-interactiu.md).
+
 ## Escenaris fixos
 
 1. `FLAT_CLEAR_NEAR`: observador 100 m, 100 fonts sintètiques entre 5–80 km, atmosfera clara homogènia.

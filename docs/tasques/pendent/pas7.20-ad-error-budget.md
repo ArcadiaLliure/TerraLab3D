@@ -22,6 +22,7 @@ Crear cotes conservadores per reutilització/pruning sense convertir l’AD en p
 - [ ] Implementar `RadiativeErrorBudget` per banda i ledger acumulat.
 - [ ] Projectar cotes a SQM/TESS/CIE amb pesos absoluts.
 - [ ] Executar B1b i mesurar overhead AD; si no hi ha cota conservadora, la política és no reutilitzar/no podar.
+- [ ] Comprovar sensibilitats, reduccions numèriques i cotes quan LOS/fonts es distribueixen entre workers o executors vectoritzats; demostrar que la reorganització del càlcul no altera els guards topològics ni consumeix el pressupost d'error sense declarar-lo.
 
 ## Criteri de sortida
 

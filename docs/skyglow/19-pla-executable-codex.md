@@ -34,6 +34,10 @@ El selector futur comprova **dia exacte + AOI + tile + producte/release + QA + m
 
 La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elimina l'obligació de RSR exacta 2026 a 7.5. **S** construeix una font física independent; C relatiu s’incorpora a 7.5.1 i ambdós alimenten 7.6–7.15; **C** assaja Black Marble amb hipòtesis SPD/angular i RSR pública de referència, no invertible de forma única; **H** només es declara després de validació independent. NOAA-20/VJ146A2.002 és la **primera parella experimental** amb RSR prelanzament, no una certificació nocturna 2026. 7.5.1 implementa C abans de SG-REF; 7.16 en propagarà les incerteses, 7.17 separarà gate numèric S/C de gate empíric H, i 7.24/7.28 mantindran estats per domini. Cap resultats ni llindars de 7.1–7.4 no es requalifiquen.
 
+## Requisit prospectiu de rendiment interactiu
+
+L'objectiu de producte és un cel físic actualitzable en directe, no executar 60 integrals radiatives per segon. [Estratègia de rendiment interactiu](21-estrategia-rendiment-interactiu.md) explicita les mesures i responsabilitats: **7.18** audita vectorització/compilació i paral·lelisme multicore amb B5; **7.19** caracteritza el cost de fases; **7.20** valida els pressupostos d'error sota particions; **7.21** integra workers persistents, cues, cache i cancel·lació; **7.22** aprova SLO abans de decidir GPU/LUT/FFT o altres backends opcionals. Comparar 1/2/4/6 nuclis quan l'entorn ho permeti, així com els escenaris Kelvin, moviment i canvis atmosfèrics. Les metes orientatives **60 FPS de renderització, 1–3 s primera resposta i 10–30 s refinament** no són SLO aprovats ni resultats de benchmark. No reobrir l'ordre de 7.13–7.17 ni canviar els pressupostos científics per velocitat.
+
 ## Ordre lineal
 
 | Pas | Capacitat | Dependència |
@@ -56,11 +60,11 @@ La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elim
 | 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14 |
 | 7.16 | Incertesa S/C i propagació de sensibilitat espectral/angular | 7.3, 7.5, 7.5.1, 7.15 |
 | 7.17 | Gate de transport S; validació empírica C/H separada | 7.3, 7.5(S), 7.16, 7.5.1 |
-| 7.18 | Watershed, EmissionRegion i quadtree com acceleració B5 | 7.17 |
+| 7.18 | Watershed/EmissionRegion/quadtree B5; auditoria vectorització i CPU multicore | 7.17 |
 | 7.19 | Compressió de PhaseFunction i benchmark B3 | 7.18 |
 | 7.20 | Forward AD i RadiativeErrorBudget | 7.19 |
-| 7.21 | Cache error-based, scheduler latest-wins i prefetch | 7.20 |
-| 7.22 | Decisió i backend opcional LUT/precomputació/FFT | 7.21 |
+| 7.21 | Cache error-based, scheduler latest-wins, workers persistents i prefetch | 7.20 |
+| 7.22 | SLO aprovats i decisió de backend opcional compilat/GPU/LUT/FFT | 7.21 |
 | 7.23 | CloudOpticalState i núvols single-scattering B6 | 7.22 |
 | 7.24 | Validació empírica final clear/cloudy i congelació de model | 7.23, 7.5.1 |
 | 7.25 | Bridge Python→TypeScript i SkyglowRuntime | 7.24, 7.5.1 |

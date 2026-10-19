@@ -4,7 +4,7 @@
 
 ## Finalitat
 
-Afegir una acceleració global només si la ruta directa+cache no compleix els SLO de producte TerraLab3D aprovats.
+Decidir acceleracions globals o backends addicionals (GPU, compilació nativa, LUT/precomputació/FFT) només si la ruta directa, la vectorització, el multicore i la cache no compleixen els SLO aprovats; no duplicar innecessàriament capacitats ja homologades a 7.18–7.21.
 
 ## Dependències
 
@@ -24,6 +24,8 @@ Afegir una acceleració global només si la ruta directa+cache no compleix els S
 - [ ] Si no es compleixen, seleccionar LUT/precomputació/FFT només dins hipòtesis matemàtiques declarades.
 - [ ] Comparar backend accelerat contra la ruta directa en error radiomètric/angular i casos límit.
 - [ ] Definir fallback fora de domini i invalidació per versions.
+- [ ] Proposar SLO diferenciats de presentació (FPS), primera resposta, refinament i latència de canvis de K/mescla/posició/atmosfera, amb dispositius i càrregues representatius; les metes orientatives 60 FPS, 1–3 s i 10–30 s no són automàticament els SLO aprovats.
+- [ ] Amb SLO aprovats, estudiar si cal un backend addicional compilat/Numba/natiu, GPU compute o combinacions amb LUT/precomputació/FFT, incloent temps de transferència, precisió float, latència i memòria; comparar amb ruta directa i configuracions multicore dels passos anteriors.
 
 ## Criteri de sortida
 

@@ -44,6 +44,10 @@ Després del kernel, `PhotometricProjectionService` calcula projeccions fotòpiq
 
 El bridge no envia nodes de quadratura. Envia `PropagationResultSummary` i `DomeProfile[]` amb esquema versionat. Els vectors de radiància han d'indicar `bandSetId` i unitats. Els buffers grans es poden transportar binàriament amb el port existent si el benchmark ho justifica.
 
+### Backend paral·lel i vectoritzat (previst 7.18–7.22)
+
+La ruta actual es manté com a **baseline numèric**. A 7.18 cal comparar bucles Python, NumPy/SIMD, opcions compilades i partició CPU per LOS/fonts (1/2/4/6 nuclis, segons maquinari) amb l'operador directe i SG-REF; a 7.21, integrar workers persistents, cua acotada, revisions i cancel·lació. Una modificació de SPD/K pot reutilitzar geometria, però no radiància espectral obsoleta. GPU/compute, LUT i precomputació són candidats condicionats als SLO aprovats a 7.22. Distingir latència de càlcul, primera resposta i render FPS. [Estratègia de rendiment](21-estrategia-rendiment-interactiu.md).
+
 ## TypeScript
 
 ### Contractes

@@ -130,6 +130,9 @@ El kernel ha de reutilitzar l'autoritat geodèsica/DEM existent, però no assumi
 
 ## 10. Workers
 
+**Contracte prospectiu per al skyglow 7.18–7.22:** preservar el motor directe i SG-REF com a referències. L'avaluació de **vectorització NumPy/SIMD, codi compilat i CPU multicore** comença a 7.18 (amb benchmarks 1/2/4/6 nuclis quan sigui possible) i la integració de pools/workers persistents al runtime correspon a 7.21; GPU/compute o LUT/FFT només després de SLO aprovats a 7.22. Els fils Python no es consideren escalat multicore per defecte: verificar GIL i codi natiu o usar processos mesurant IPC/memòria. Sumes paral·leles, oclusió, versions i cancel·lació han de preservar el pressupost numèric i els guards topològics. [Contracte executable i metes no vinculants](21-estrategia-rendiment-interactiu.md).
+
+
 Els càlculs llargs han d'usar el patró existent de correlació, cancel·lació cooperativa i descart de revisions obsoletes. No s'envien rasters, malles ni `OpticalField` complet pel bridge. El bridge publica resultats compactes i deltes.
 
 ## 11. Persistència

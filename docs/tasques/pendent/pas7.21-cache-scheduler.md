@@ -24,6 +24,8 @@ Fer interactiu el runtime sense alterar el resultat físic.
 - [ ] Implementar prefetch només si clau/envelope/error continuen vàlids en acceptació.
 - [ ] Si l'envelope/cache aplica un nou pressupost PASS/FAIL d'error, justificar-lo i preregistrar-lo abans de decidir hits; no deduir-lo dels errors del candidat.
 - [ ] Mesurar cold/warm/small-motion/moviment continu/teleport/tile-change/occlusion-flip.
+- [ ] Integrar els executors homologats de 7.18–7.20 en workers/pools persistents sense bloquejar render ni bridge; dimensionar concurrència, memòria, cues, cancel·lació cooperativa o terminació segura de feina obsoleta i política de reinici.
+- [ ] Mesurar per separat canvis ràpids de Kelvin/SPD, mescla, posició i atmosfera: latència fins a primera resposta física vàlida, refinament complet, P50/P95/P99 amb mostres suficients, throughput i recomputacions evitades; demostrar que cap resultat anterior sobreescriu l'estat nou.
 
 ## Criteri de sortida
 

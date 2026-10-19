@@ -23,6 +23,7 @@ Aproximar la fase només contra la representació de referència ja validada.
 - [ ] Justificar i preregistrar l'error angular/radiomètric de fase abans de seleccionar ordres o candidats B3.
 - [ ] Seleccionar la configuració que compleixi l’error preregistrat; rendiment només desempata configuracions vàlides.
 - [ ] Conservar fallback de referència per debug/oracle.
+- [ ] Comparar cost i error de l'avaluació de fase tabulada/Legendre amb vectorització, lots SIMD o codi compilat quan els perfils de 7.18 ho justifiquin; mesurar integració amb el transport espectral i conservar el mateix contracte físic.
 
 ## Criteri de sortida
 

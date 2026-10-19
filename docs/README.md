@@ -45,6 +45,12 @@ La instrucció **«continua amb el pla de millores»** és suficient: Codex ha d
 
 **Estat verificat de7.12,2026-10-19:** [gate numèric](evidencies/pas7.12/validacio-gate-transport.md),9 fixtures S PASS,42 sostres,444 proves/17 noves. Cua positiva >75km ≤0,000472296mag sota hipòtesis explícites;0,01mag espectral preservat. Cost de fonts extenses documentat, sense acceleracions;163 evidències anteriors intactes.7.13 encara no s’havia iniciat en aquell tancament.
 
+## Objectiu de rendiment físic interactiu (prospectiu)
+
+La simulació artificial de skyglow ha d'aspirar a respondre interactivament als canvis de **kelvins, fonts, observador i atmosfera**, sense calcular integrals radiatives per frame. Els passos **7.18–7.22** han d'avaluar vectorització/compilació, paral·lelisme CPU multicore, agrupació, cache i eventual GPU/LUT/FFT, sempre contra el baseline directe homologat. Els temps orientatius encara **no són SLO aprovats**; els SLO formals es congelen a 7.22. [Estratègia, matriu de benchmarks i límits](skyglow/21-estrategia-rendiment-interactiu.md).
+
+**7.13 continua pendent amb FAIL angular:** cap fita de rendiment no autoritza saltar 7.14 ni avançar les acceleracions abans dels gates de 7.17.
+
 ## Protocol perquè Codex continuï el pla
 
 1. Llegir aquest README i les [normes d'arquitectura](normes-arquitectura.md).
