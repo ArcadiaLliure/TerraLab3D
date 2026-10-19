@@ -1,0 +1,9 @@
+Processing .\backend
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: terralab3d-core
+  Building wheel for terralab3d-core (pyproject.toml): started
+  Building wheel for terralab3d-core (pyproject.toml): finished with status 'done'
+  Created wheel for terralab3d-core: filename=terralab3d_core-0.1.0-py3-none-any.whl size=3477883 sha256=10bfcfd882e8a65fae6e5740b9c07b11dcae7d9fa966e79fab10b7c19ac33be3
+  Stored in directory: C:\Users\Manel\AppData\Local\Temp\pip-ephem-wheel-cache-eje_vbhz\wheels\cb\8a\ab\8ddf30406ecadc174354e98c9effaf391ad61c666d9462978d
+Successfully built terralab3d-core

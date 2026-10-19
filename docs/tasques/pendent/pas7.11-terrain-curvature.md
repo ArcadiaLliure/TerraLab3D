@@ -8,7 +8,13 @@ Afegir l’oclusió i la geometria terrestre a la ruta directa abans del gate ze
 
 ## Dependències
 
-7.10
+**Depèn de:**
+- [Pas 7.10](../completat/pas7.10-gas-spectral-kernel.md), completat offline en el domini prescrit.
+
+**En depenen:**
+- [Pas 7.12](pas7.12-zenith-transport-gate.md)
+
+Només s'ha actualitzat la dependència després del tancament de 7.10; aquest pas no s'ha executat.
 
 ## Referències obligatòries
 

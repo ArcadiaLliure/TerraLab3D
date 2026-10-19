@@ -14,8 +14,8 @@
 | oracle transport | SG-REF GK21 + àrea/raster GL i Monte Carlo F5 independents; S/C offline | 7.6 completat | [Convergència, error estimat, 401 nusos i 18 alternatives C](../evidencies/pas7.6/validacio-sg-ref.md); només slab pla homogeni, sense gate 7.12 ni H |
 | kernel únic | zenit=direcció ordinària, esfera ECEF/ENU, GK7/15 propi i revisions | 7.7 completat geomètricament | [B0: 180 passades, 900 LOS principals i invariants](../evidencies/pas7.7/validacio-b0.md), sense radiància ni gate 7.12 |
 | camp òptic | provider estàndard sec tiled P/T/n, dependències de capa | [7.8 completat](../tasques/completat/pas7.8-optical-field-standard.md) | [1/2/8 tiles, oracle de columnes i convergència](../evidencies/pas7.8/validacio-optical-field.md) |
-| Rayleigh/aerosol | fase de referència primer, comparació diagnòstica | 7.9 | B1, invariants i residuals SG-REF sense PASS/FAIL numèric |
-| gas/espectral | absorció no nul·la, comparació diagnòstica i revalidació del pressupost de bandes de 7.4 amb gasos/dispersió | 7.10 | B2/B4, invariants i error de discretització ≤0,01 mag o bandset nou rehomologat; el PASS/FAIL de transport és 7.12 |
+| Rayleigh/aerosol | fase comuna 4π, transmissió dels dos trajectes i àrea directa | [7.9 completat](../tasques/completat/pas7.9-rayleigh-aerosol-b1.md) | [B1 mesurat, invariants i SG-REF revalidat](../evidencies/pas7.9/validacio-b1.md); sense gate numèric de transport |
+| gas/espectral | columnes compartides, composició O3 explícita i pressupost 0,01 mag conservat | [7.10 completat offline](../tasques/completat/pas7.10-gas-spectral-kernel.md) | [111.168 casos, 326.040 T_eff, B0/B1/B2/B4 i sostre 10–50 km](../evidencies/pas7.10/validacio-espectral-i-gasos.md); altres gasos/H no acreditats; el gate de transport és 7.12 |
 | terreny/curvatura | visibilitat física, comparació diagnòstica | 7.11 | topologia i oclusió, sense PASS/FAIL de transport |
 | gate zenital V1 | preregistrar tolerància abans del runtime candidat | 7.12 | origen admissible, convergència SG-REF 7.6 i PASS/FAIL runtime↔SG-REF |
 | cúpules | DomeProfile des de ruta directa | 7.13 | all-sky dens + invariant zenit |

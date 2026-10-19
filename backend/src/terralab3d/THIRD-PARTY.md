@@ -27,3 +27,7 @@ International Commission on Illumination (CIE), Viena, 2018. Dades LED/HP/FL/L41
 ## SciPy — quadratura de referència offline (Pas 7.6)
 
 Dependència SciPy ≥1.15 per `integrate.quad_vec` i contrasts analítics `special.exp1`; versió verificada 1.16.2. Copyright (c) 2001–2002 Enthought, Inc.; 2003, SciPy Developers. Llicència BSD-3-Clause comprovada a les metadades de la distribució instal·lada. No s’ha copiat ni modificat codi de SciPy: la distribució de la dependència conserva els seus fitxers LICENSE i avisos dels components inclosos. Cap codi extern LPTRAN incorporat.
+
+## Seccions eficaces d'O3 (Pas 7.10)
+
+Serdyuchenko A., Gorshelev V., Weber M., Burrows J.P., dataset [10.5281/zenodo.5793207](https://doi.org/10.5281/zenodo.5793207), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), llicència comprovada a l'API Zenodo el 2026-10-19. Dades originals visibles i LUT derivada a `infrastructure/catalogs/gases/`, amb atribució, unitats, transformacions, restriccions i checksums al manifest i README. Retall 380–780 nm i 203–293 K; conversió cm² a m² i mostreig de LUT 0,5 nm. Cap codi extern copiat. Referències científiques: Gorshelev et al., AMT 7,609–624 (2014), DOI 10.5194/amt-7-609-2014; Serdyuchenko et al., AMT 7,625–636 (2014), DOI 10.5194/amt-7-625-2014.

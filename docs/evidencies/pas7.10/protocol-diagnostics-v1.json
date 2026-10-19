@@ -1,0 +1,35 @@
+{
+  "protocolId": "TL3D-SKY-7.10-diagnostics-v1",
+  "freezeUtc": "2026-10-19T07:58:34.815684+00:00",
+  "transportGate": "diagnostic only; no numeric runtime threshold selected",
+  "homogeneousSpectralReference": {
+    "S_point": "raw 0.01 nm O3 GL8/16/32, independent GK21 LOS",
+    "C_areas": "persisted real NOAA20 realistic/K3000 sources; same LUT GL2/4/8 and direct area8/12/16; raw LUT discrepancy in separate spectral ledger",
+    "C_observer": "baseline observer latitude +0.1 degree to keep 11 km distance from actual area source; original source unmodified"
+  },
+  "ceiling": {
+    "modes": [
+      "B1_homogeneous_extension",
+      "B1_standard",
+      "B4_standard"
+    ],
+    "topM": [
+      10000,
+      20000,
+      30000,
+      50000
+    ],
+    "elevationsDeg": [
+      0.5,
+      5,
+      30,
+      90
+    ],
+    "direction": "source bearing",
+    "standard": "COESA dry 0–50km with 1km knots; exponential aerosol 1200m; B4 prescribed O3 profile from benchmark fixture",
+    "homogeneous": "historical B1 P/T and aerosol extended explicitly, only sensitivity of that mathematical fixture",
+    "variableColumnReference": "550nm zenith at10/50km; independent SG-REF GL8/12/16",
+    "tailAbove50km": "unknown, not zero"
+  },
+  "spectralBandChoice": "no performance selection"
+}

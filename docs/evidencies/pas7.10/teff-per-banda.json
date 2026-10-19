@@ -1,0 +1,3537 @@
+{
+  "protocolId": "TL3D-SKY-7.10-Teff-v1",
+  "maximumInclusiveMag": 0.01,
+  "weighting": "source SPD only, per band, no response or scattering collapsed into T_eff",
+  "caseCount": 326040,
+  "failed": 0,
+  "unlitBandCases": 26040,
+  "maximumErrorMag": 0.00033307265484480995,
+  "maximumAbsoluteError": 0.0002943743841521407,
+  "maximumReferenceRefinement": 1.1435297153639112e-14,
+  "minimumJensenDifference": -3.3306690738754696e-16,
+  "maximumJensenDifference": 1.0063853943531598e-06,
+  "jensenRoundoffAllowance": 1.1102230246251565e-14,
+  "cases": [
+    {
+      "spd": "LED-B1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1600223361111662e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "LED-B1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1599947263858384e-05,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "LED-B1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003159718654013258,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "LED-B1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.239155735748294e-06,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "LED-B1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.239122014795101e-05,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "LED-B1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003238784802612717,
+      "maximumReferenceRefinement": 5.329070518200751e-15
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1625603036075874e-06,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1625327057982086e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031622567308277696,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2365743251258915e-06,
+      "maximumReferenceRefinement": 7.549516567451064e-15
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.236540636956432e-05,
+      "maximumReferenceRefinement": 8.104628079763643e-15
+    },
+    {
+      "spd": "LED-B2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.000323620377754233,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1522354122848692e-06,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1522077778830035e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003151931415817671,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.234920358738127e-06,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.234886696223018e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "LED-B3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032345500628012106,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.160409611546403e-06,
+      "maximumReferenceRefinement": 7.771561172376096e-15
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.160382005369291e-05,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031601059480766046,
+      "maximumReferenceRefinement": 4.884981308350689e-15
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2282547938006747e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2282212204452314e-05,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "LED-B4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032278854964412634,
+      "maximumReferenceRefinement": 5.329070518200751e-15
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1616095508547635e-06,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.161581948361472e-05,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003161305936931264,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2295240467575223e-06,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2294904560652035e-05,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "LED-B5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003229154558754063,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.152116767563807e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.152089129945818e-05,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.000315181276356202,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.233664112597718e-06,
+      "maximumReferenceRefinement": 8.104628079763643e-15
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.23363046563296e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-BH1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032332940033552116,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1620339964244627e-06,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.162006396548266e-05,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003161730401221104,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.234888925131519e-06,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.234855257842244e-05,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "LED-RGB1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032345186285030714,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.162082468203401e-06,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1620548710826774e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003161778877942433,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2577466017131942e-06,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.257712625389863e-05,
+      "maximumReferenceRefinement": 7.327471962526033e-15
+    },
+    {
+      "spd": "LED-V1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032573728704124796,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1628142119774824e-06,
+      "maximumReferenceRefinement": 7.882583474838611e-15
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1627866166243006e-05,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031625106514146495,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.254623017241268e-06,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2545890854005643e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "LED-V2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003254249758005244,
+      "maximumReferenceRefinement": 5.329070518200751e-15
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1802866075553195e-06,
+      "maximumReferenceRefinement": 9.43689570931383e-15
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.180259080986772e-05,
+      "maximumReferenceRefinement": 1.0325074129013956e-14
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031799838233144493,
+      "maximumReferenceRefinement": 9.325873406851315e-15
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.3311113799641438e-06,
+      "maximumReferenceRefinement": 9.325873406851315e-15
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.331076395941465e-05,
+      "maximumReferenceRefinement": 1.0103029524088925e-14
+    },
+    {
+      "spd": "HP1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00033307265484480995,
+      "maximumReferenceRefinement": 9.325873406851315e-15
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1697346220442015e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.169707051902775e-05,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031694313589670977,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.279772344172987e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2797380641591934e-05,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "HP2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003279395288677622,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.152962584684507e-06,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.152934954230308e-05,
+      "maximumReferenceRefinement": 5.329070518200751e-15
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031526586189151694,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.241734229282682e-06,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.241700471470635e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "HP3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032413629067043243,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.148755766295369e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.148728115726614e-05,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003148451628194851,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2393601397742358e-06,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.239326414176448e-05,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "HP4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003238989174132237,
+      "maximumReferenceRefinement": 4.9960036108132044e-15
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.157123418753654e-06,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1570958026724064e-05,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031568196212271207,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.248028403570202e-06,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2479945628640135e-05,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "HP5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003247656138141513,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1522354146956813e-06,
+      "maximumReferenceRefinement": 7.993605777301127e-15
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.152207781233944e-05,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031519314192665507,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2349203512646114e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2348866845067876e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "S_L41(lambda)",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003234550050639843,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1578311185421223e-06,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157803502501224e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031575273474146833,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2518758433590207e-06,
+      "maximumReferenceRefinement": 5.329070518200751e-15
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251841947558417e-05,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "FL1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032515029962658414,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1577771944713553e-06,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157749580878564e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031574734238253135,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.251792174701305e-06,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251758278335398e-05,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "FL2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032514193383014573,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.157783672563353e-06,
+      "maximumReferenceRefinement": 7.438494264988549e-15
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1577560598135105e-05,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031574799029591006,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2517512555164693e-06,
+      "maximumReferenceRefinement": 7.327471962526033e-15
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251717361651741e-05,
+      "maximumReferenceRefinement": 7.771561172376096e-15
+    },
+    {
+      "spd": "FL3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003251378427433357,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1578529192708336e-06,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157825304226272e-05,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031575491498451064,
+      "maximumReferenceRefinement": 4.884981308350689e-15
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.251705543397396e-06,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251671650981755e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.000325133272254991,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1577621326844614e-06,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157734519871634e-05,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031574583624890485,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2517635130461858e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251729618489454e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003251390682281628,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1576729905127115e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157645374367894e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003157369213556751,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2515796715566493e-06,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251545780556843e-05,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL6",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003251206869627914,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.157791583882879e-06,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157763970178623e-05,
+      "maximumReferenceRefinement": 7.327471962526033e-15
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003157487813707597,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.251730651275364e-06,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2516967579418956e-05,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL7",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003251357826282385,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1601149221271644e-06,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.160087316172245e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031598112473861626,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2533937198972025e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.253359804531721e-05,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL8",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032530206454443514,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1602991148874453e-06,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1602715075549073e-05,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031599954458273396,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2536049713482025e-06,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.253571053082036e-05,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL9",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003253231865240332,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.156176727249389e-06,
+      "maximumReferenceRefinement": 9.658940314238862e-15
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.156149105298508e-05,
+      "maximumReferenceRefinement": 1.1435297153639112e-14
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003155872888460089,
+      "maximumReferenceRefinement": 1.021405182655144e-14
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2451383751095227e-06,
+      "maximumReferenceRefinement": 1.1324274851176597e-14
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.245104565553776e-05,
+      "maximumReferenceRefinement": 1.0769163338864018e-14
+    },
+    {
+      "spd": "FL10",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032447665354106136,
+      "maximumReferenceRefinement": 1.099120794378905e-14
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.156154834909801e-06,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.156127214978112e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003155850997276113,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.244839252231004e-06,
+      "maximumReferenceRefinement": 8.548717289613705e-15
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2448054549639875e-05,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL11",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032444674658733204,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.155616950764901e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.155589326582308e-05,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031553130886138864,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2463910623967815e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.246357239629499e-05,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL12",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032460190385914366,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.157413212056314e-06,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157385596924945e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031571094263820157,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.251636407352147e-06,
+      "maximumReferenceRefinement": 7.327471962526033e-15
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251602516245487e-05,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "FL3.1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.000325126359767549,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1576593732841594e-06,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1576317549403694e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003157355593391188,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2522612506237055e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.252227353233012e-05,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "FL3.2",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032518883492891975,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1576484901571055e-06,
+      "maximumReferenceRefinement": 6.994405055138486e-15
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.157620874099093e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031573447123773945,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2517642305036716e-06,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.251730337663339e-05,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "FL3.3",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032513914016882984,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1598484828398435e-06,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.15982087284677e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031595447941580053,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.255574809454534e-06,
+      "maximumReferenceRefinement": 7.993605777301127e-15
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.255540865191835e-05,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL3.4",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032552014077193126,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.159787881544149e-06,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1597602724633416e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003159484191162917,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.254036119178826e-06,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.254002191984103e-05,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3.5",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003253662944844147,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1598468109419633e-06,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.15981920321057e-05,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031595431244119316,
+      "maximumReferenceRefinement": 5.10702591327572e-15
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2541864031370178e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2541524750466664e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL3.6",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003253813207525447,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.155510445686321e-06,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.155482821685955e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003155206579949135,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.250897340074912e-06,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.250863459339612e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL3.7",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032505246420370124,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.155533826219959e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.155506204332187e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031552299637350507,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2457060749207984e-06,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.245672261327083e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL3.8",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.000324533415381608,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1553365466088535e-06,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.155308922239009e-05,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031550326741691307,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.244358160338905e-06,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2443243670668896e-05,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "FL3.9",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003243986443967062,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 744,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 744,
+      "maximumErrorMag": 3.15810736983337e-06,
+      "maximumReferenceRefinement": 7.771561172376096e-15
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 744,
+      "maximumErrorMag": 3.158079755673733e-05,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 744,
+      "maximumErrorMag": 0.00031578036109940823,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 744,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 744,
+      "maximumErrorMag": 3.2476868026768035e-06,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 744,
+      "maximumErrorMag": 3.247652964682222e-05,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL3.10",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 744,
+      "maximumErrorMag": 0.000324731458612507,
+      "maximumReferenceRefinement": 5.10702591327572e-15
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.155468132807636e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.155440507913094e-05,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003155164264798149,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.244554336505429e-06,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.244520539138792e-05,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "FL3.11",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032441825889201995,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1664851314760144e-06,
+      "maximumReferenceRefinement": 7.882583474838611e-15
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.166457549853269e-05,
+      "maximumReferenceRefinement": 6.8833827526759706e-15
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003166181727875056,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2626020745300703e-06,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.262568031166967e-05,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "FL3.12",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003262227611007873,
+      "maximumReferenceRefinement": 7.549516567451064e-15
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.166495849221302e-06,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.166468266497589e-05,
+      "maximumReferenceRefinement": 8.43769498715119e-15
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003166192445146372,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.260792306359507e-06,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2607582885902286e-05,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "FL3.13",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.000326041811654937,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1650468610220477e-06,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1650192728802004e-05,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031647433946414003,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2590034929588773e-06,
+      "maximumReferenceRefinement": 7.549516567451064e-15
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2589694982133877e-05,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "FL3.14",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032586295708478545,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.160928667491041e-06,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.160901063650149e-05,
+      "maximumReferenceRefinement": 7.549516567451064e-15
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003160625026124962,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2540400025138946e-06,
+      "maximumReferenceRefinement": 7.771561172376096e-15
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2540060756242536e-05,
+      "maximumReferenceRefinement": 7.438494264988549e-15
+    },
+    {
+      "spd": "FL3.15",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032536668280564037,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1608551116990173e-06,
+      "maximumReferenceRefinement": 7.771561172376096e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.1608275078326545e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003160551467342377,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.238353149848288e-06,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.238319438918233e-05,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032379823364815365,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1625098137382427e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.162482215757773e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003162206238626862,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2365688357081524e-06,
+      "maximumReferenceRefinement": 7.327471962526033e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.236535148553833e-05,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.000323619828971286,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.152675070562009e-06,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.152647438292131e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003152371092387109,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2350222434887103e-06,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2349885800255145e-05,
+      "maximumReferenceRefinement": 5.218048215738236e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003234651932374426,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1598313229235985e-06,
+      "maximumReferenceRefinement": 7.771561172376096e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.159803716417526e-05,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003159527637054169,
+      "maximumReferenceRefinement": 6.328271240363392e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2286380352006955e-06,
+      "maximumReferenceRefinement": 6.5503158452884236e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.228604455109052e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003228268678940786,
+      "maximumReferenceRefinement": 7.771561172376096e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1615568772721852e-06,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.161529276569124e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003161253263025518,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.229472836299736e-06,
+      "maximumReferenceRefinement": 5.995204332975845e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.229439245242564e-05,
+      "maximumReferenceRefinement": 5.440092820663267e-15
+    },
+    {
+      "spd": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003229103355038295,
+      "maximumReferenceRefinement": 5.10702591327572e-15
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.16585870907347e-06,
+      "maximumReferenceRefinement": 5.662137425588298e-15
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.165831124653265e-05,
+      "maximumReferenceRefinement": 5.88418203051333e-15
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003165555278343725,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2706271553553464e-06,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2705930023346285e-05,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "LED-B1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003270251481908961,
+      "maximumReferenceRefinement": 7.327471962526033e-15
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.164926429408798e-06,
+      "maximumReferenceRefinement": 7.438494264988549e-15
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.164898839339789e-05,
+      "maximumReferenceRefinement": 6.439293542825908e-15
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00031646229561766456,
+      "maximumReferenceRefinement": 5.329070518200751e-15
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.26592573945079e-06,
+      "maximumReferenceRefinement": 7.105427357601002e-15
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2658916510206003e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "LED-B1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003265550775488445,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.168778878676504e-06,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.168751307871882e-05,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003168475577191778,
+      "maximumReferenceRefinement": 5.10702591327572e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2805969067578535e-06,
+      "maximumReferenceRefinement": 5.773159728050814e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.28056261734242e-05,
+      "maximumReferenceRefinement": 6.661338147750939e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-radiant_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032802197287359344,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.1675432429703793e-06,
+      "maximumReferenceRefinement": 6.217248937900877e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.167515666115456e-05,
+      "maximumReferenceRefinement": 6.106226635438361e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.0003167239886064183,
+      "maximumReferenceRefinement": 7.216449660063518e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 800,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 800,
+      "maximumErrorMag": 3.2734040021800786e-06,
+      "maximumReferenceRefinement": 7.438494264988549e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 800,
+      "maximumErrorMag": 3.2733698117424905e-05,
+      "maximumReferenceRefinement": 6.772360450213455e-15
+    },
+    {
+      "spd": "LED-RGB1-HP1-photopic_flux",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 800,
+      "maximumErrorMag": 0.00032730279102446497,
+      "maximumReferenceRefinement": 5.551115123125783e-15
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 4,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 4,
+      "maximumErrorMag": 2.3079631643020597e-07,
+      "maximumReferenceRefinement": 1.7763568394002505e-15
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 4,
+      "maximumErrorMag": 2.30796402884446e-06,
+      "maximumReferenceRefinement": 2.4424906541753444e-15
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 4,
+      "maximumErrorMag": 2.3079727450786654e-05,
+      "maximumReferenceRefinement": 1.5543122344752192e-15
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 4,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 4,
+      "maximumErrorMag": 1.468678444260275e-07,
+      "maximumReferenceRefinement": 3.1086244689504383e-15
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 4,
+      "maximumErrorMag": 1.4686788993793833e-06,
+      "maximumReferenceRefinement": 1.3322676295501878e-15
+    },
+    {
+      "spd": "triangle-435.25",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 4,
+      "maximumErrorMag": 1.4686835950858763e-05,
+      "maximumReferenceRefinement": 1.7763568394002505e-15
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 2,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 2,
+      "maximumErrorMag": 2.3553236820056936e-07,
+      "maximumReferenceRefinement": 5.551115123125783e-16
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 2,
+      "maximumErrorMag": 2.3553231915752523e-06,
+      "maximumReferenceRefinement": 4.440892098500626e-16
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 2,
+      "maximumErrorMag": 2.355318257703789e-05,
+      "maximumReferenceRefinement": 2.220446049250313e-16
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 2,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 2,
+      "maximumErrorMag": 2.0265555345496056e-07,
+      "maximumReferenceRefinement": 2.220446049250313e-16
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 2,
+      "maximumErrorMag": 2.0265551219171765e-06,
+      "maximumReferenceRefinement": 3.3306690738754696e-16
+    },
+    {
+      "spd": "triangle-500.005",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 2,
+      "maximumErrorMag": 2.0265510115236147e-05,
+      "maximumReferenceRefinement": 5.551115123125783e-16
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 3,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 3,
+      "maximumErrorMag": 1.7125678775608668e-07,
+      "maximumReferenceRefinement": 5.551115123125783e-16
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 3,
+      "maximumErrorMag": 1.7125676188042588e-06,
+      "maximumReferenceRefinement": 8.881784197001252e-16
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 3,
+      "maximumErrorMag": 1.712565024613131e-05,
+      "maximumReferenceRefinement": 2.220446049250313e-16
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 3,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 3,
+      "maximumErrorMag": 2.021249278443229e-06,
+      "maximumReferenceRefinement": 1.1102230246251565e-15
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 3,
+      "maximumErrorMag": 2.021249774444234e-05,
+      "maximumReferenceRefinement": 5.551115123125783e-16
+    },
+    {
+      "spd": "triangle-589.02",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 3,
+      "maximumErrorMag": 0.00020212547249272373,
+      "maximumReferenceRefinement": 3.3306690738754696e-16
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 223.0,
+      "columnM2": 0.0,
+      "bands": 2,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 223.0,
+      "columnM2": 1e+22,
+      "bands": 2,
+      "maximumErrorMag": 1.9311627941579918e-08,
+      "maximumReferenceRefinement": 2.220446049250313e-16
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 223.0,
+      "columnM2": 1e+23,
+      "bands": 2,
+      "maximumErrorMag": 1.9311628686154717e-07,
+      "maximumReferenceRefinement": 3.3306690738754696e-16
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 223.0,
+      "columnM2": 1e+24,
+      "bands": 2,
+      "maximumErrorMag": 1.931163513862502e-06,
+      "maximumReferenceRefinement": 2.220446049250313e-16
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 288.15,
+      "columnM2": 0.0,
+      "bands": 2,
+      "maximumErrorMag": 0.0,
+      "maximumReferenceRefinement": 0.0
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 288.15,
+      "columnM2": 1e+22,
+      "bands": 2,
+      "maximumErrorMag": 4.815515117336928e-08,
+      "maximumReferenceRefinement": 4.440892098500626e-16
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 288.15,
+      "columnM2": 1e+23,
+      "bands": 2,
+      "maximumErrorMag": 4.815515366051292e-07,
+      "maximumReferenceRefinement": 2.220446049250313e-16
+    },
+    {
+      "spd": "triangle-700.005",
+      "temperatureK": 288.15,
+      "columnM2": 1e+24,
+      "bands": 2,
+      "maximumErrorMag": 4.81551756557984e-06,
+      "maximumReferenceRefinement": 4.440892098500626e-16
+    }
+  ],
+  "jensenConsistentWithinRoundoff": true
+}

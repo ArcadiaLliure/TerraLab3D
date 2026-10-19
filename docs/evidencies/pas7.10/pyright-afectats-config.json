@@ -1,0 +1,28 @@
+{
+  "pythonVersion": "3.13",
+  "extraPaths": [
+    "../../../backend/src",
+    "../../../tools"
+  ],
+  "include": [
+    "../../../backend/src/terralab3d/domain/light_pollution/gas_absorption.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/vector_quadrature.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/transport_profiling.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/single_scattering.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/optical_paths.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/reference_single_scattering.py",
+    "../../../backend/src/terralab3d/domain/light_pollution/reference_spectral_transport.py",
+    "../../../backend/src/terralab3d/infrastructure/adapters/atmosphere/gas_catalog.py",
+    "../../../backend/tests/test_spectral_transport_step7_10.py",
+    "../../../tools/diagnose_spectral_transport_step7_10.py",
+    "../../../tools/plot_spectral_transport_step7_10.py",
+    "../../../tools/summarize_spectral_benchmark_step7_10.py",
+    "../../../tools/validate_spectral_transport_step7_10.py",
+    "../../../tools/benchmark_skyglow_spectral.py",
+    "../../../tools/prepare_ozone_step7_10.py",
+    "../../../tools/validate_gas_bands_step7_10.py",
+    "../../../tools/bound_ozone_lut_step7_10.py"
+  ]
+}

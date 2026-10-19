@@ -1,0 +1,130 @@
+{
+  "kind": "single_followup_not_percentile_campaign",
+  "dateUtc": "2026-10-19T08:35:10.236820+00:00",
+  "columnRevision": "temperature_knots_v2",
+  "otherCodexNumericalJobsDuringThisRun": false,
+  "runs": [
+    {
+      "mode": "B0",
+      "wallMs": 378.33919998956844,
+      "inputSignature": "60bafde02c58524e134dbf86070c51312ec8e92fd2cd174644fc79b5480c964f",
+      "sameInputSignatureAsOriginalCampaign": true,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 111.2944,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 253.9755,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "radianceSha256": "4c1c5b52f236c7ef832d5e04cb40c86a654f430a5db799f66f6ca67fc3a09814"
+    },
+    {
+      "mode": "B1",
+      "wallMs": 20412.406799994642,
+      "inputSignature": "6e91533281e1ed52d716be045694315b5ff6519f7e2b50080bb524d114e1fce9",
+      "sameInputSignatureAsOriginalCampaign": true,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 10991.8995,
+          "atmospheric_sampling": 4654.9981,
+          "transmissions": 3440.2325,
+          "quadrature": 1285.9173,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "radianceSha256": "92d848f277733acd3ecb9814c8decc1b02ed9efe7f8e0f698ab0a85167955944"
+    },
+    {
+      "mode": "B2",
+      "wallMs": 26717.66419999767,
+      "inputSignature": "82e11b56b3b815378568d606882ca1e86566fccf7941d525e7ae209cffb46872",
+      "sameInputSignatureAsOriginalCampaign": true,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12691.8638,
+          "atmospheric_sampling": 5203.9242,
+          "transmissions": 3276.847,
+          "quadrature": 4988.9762,
+          "spectral_integration": 477.4044
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "radianceSha256": "c300d1c8677191ead7db6ab81b8e246895e22444a79622d651e2877dd8f59179"
+    },
+    {
+      "mode": "B4",
+      "wallMs": 28476.76849999698,
+      "inputSignature": "b7452f86c31ba5ba6b28a3f77a61f1dbbd9207e861c65e37d5bf278f4059b3be",
+      "sameInputSignatureAsOriginalCampaign": true,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12670.6354,
+          "atmospheric_sampling": 5239.9549,
+          "transmissions": 4407.4149,
+          "quadrature": 5497.7566,
+          "spectral_integration": 563.1492
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 122415,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "radianceSha256": "871208662fb83be5a56a3616f8efca86cfcd3951adf29cc8655dc4f2125673d2"
+    }
+  ],
+  "B1WithoutProfilerSingleMs": 19376.478599995608,
+  "sameB1ResultsWithAndWithoutProfiler": true
+}

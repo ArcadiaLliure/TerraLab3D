@@ -1,0 +1,6 @@
+{
+  "notedUtc": "2026-10-19T08:17:17.661672+00:00",
+  "mainBenchmark": "B0/B1/B2/B4 completat abans d’executar altres campanyes numèriques Codex",
+  "ceilingTiming": "diagnòstic de cost, no benchmark aïllat: part coexecutada amb validació T_eff en un altre procés; la comparació de radiàncies no depèn dels temps",
+  "profiling": "wall-clock exclusiu per etapa; CPU time només global a la campanya principal; no SLO ni aïllament de la resta del sistema declarat"
+}

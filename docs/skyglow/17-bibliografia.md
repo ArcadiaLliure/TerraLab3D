@@ -68,3 +68,9 @@ Les atribucions específiques de Cinzano–Falchi sobre 20 coeficients de Legend
 - [Cinzano i Falchi (2012), The propagation of light pollution in the atmosphere](https://arxiv.org/abs/1209.2031): abast de models que incorporen dispersions múltiples. Cap implementació LPTRAN importada ni equivalència completa declarada.
 - [Whitney (2011), Monte Carlo Radiative Transfer](https://arxiv.org/abs/1104.4990): referència metodològica de transport estocàstic.
 - [NASA (2019), Modeling Atmosphere-Ocean Radiative Transfer: A PACE Mission Perspective](https://ntrs.nasa.gov/api/citations/20190026727/downloads/20190026727.pdf): transport invers detector→font i estimadors locals. SG-REF usa un algorisme escalar propi, amb límits diferents.
+
+- Chance, K. V.; Spurr, R. J. D. (1997). *Ring effect studies: Rayleigh scattering, including molecular parameters for rotational Raman scattering, and the Fraunhofer spectrum*. Applied Optics 36, 5224–5230. [Còpia dels autors](https://lweb.cfa.harvard.edu/atmosphere/publications/1997AOring.pdf), equacions 2–7 consultades el 2026-10-19 per al model escalar quasi-elàstic B1; sense espectre Raman resolt.
+
+## Estat verificat de 7.10 (2026-10-19)
+
+Dades gasoses consultades 2026-10-19: Serdyuchenko, Gorshelev, Weber i Burrows, [Zenodo DOI 10.5281/zenodo.5793207](https://zenodo.org/records/5793207), CC BY 4.0 comprovada a l'API. Papers Gorshelev et al. (2014), [DOI 10.5194/amt-7-609-2014](https://doi.org/10.5194/amt-7-609-2014), i Serdyuchenko et al. (2014), [DOI 10.5194/amt-7-625-2014](https://doi.org/10.5194/amt-7-625-2014). Unitats/columnes contrastades a la [font de Bremen](https://www.iup.uni-bremen.de/gruppen/molspec/databases/referencespectra/o3spectra2011/index.html). Retall/transformacions/llicència i hashes al catàleg; cap derivat HITRAN/LOWTRAN incorporat ni H2O/O2 validat per analogia. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

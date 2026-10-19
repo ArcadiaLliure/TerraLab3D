@@ -1,0 +1,10 @@
+{
+  "o3-serdyuchenko-visible-lut.csv": {
+    "original": "8ec69b7e4e5914e1b16a35667eb5c355d2ce1e2714ebbb7a4830a765be44875e",
+    "reproduced": "533822afcd8f38c3ab043586eb4aac0b4da5d9ea1c43478b781838d3c69e620d"
+  },
+  "o3-serdyuchenko-visible-raw.npz": {
+    "original": "5e61730066d7f4cdd54a9b9e2f799eb90c5f8357587c387a4ce516a59656ff2c",
+    "reproduced": "5e61730066d7f4cdd54a9b9e2f799eb90c5f8357587c387a4ce516a59656ff2c"
+  }
+}

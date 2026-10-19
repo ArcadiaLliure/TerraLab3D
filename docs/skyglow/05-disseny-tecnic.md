@@ -16,7 +16,7 @@ Dispersió múltiple general en runtime, inferir un SPD únic o una emissió ang
 
 `PropagationKernel.evaluate(request: PropagationRequest) -> PropagationResult`.
 
-`AtmosphericOpticsProvider.resolve(request: OpticalFieldRequest) -> OpticalField` és el port implementat a 7.8; `OpticalField.sample(position_ecef_m) -> OpticalState` consulta el snapshot immutable. Només P/T/n i RH prescrita estan disponibles; composició real i coeficients òptics continuen als passos següents.
+`AtmosphericOpticsProvider.resolve(request: OpticalFieldRequest) -> OpticalField` és el port implementat a 7.8; `OpticalField.sample(position_ecef_m) -> OpticalState` consulta el snapshot immutable. El camp base proporciona P/T/n i RH prescrita. 7.9 afegeix Rayleigh/aerosol monocromàtics via `ScatteringConfiguration` independent, sense connectar composició meteorològica real ni gasos espectrals.
 
 `SourceModel(source_model_id, revision, definition_reference, geometry, spectrum, angular, amplitude)` és el contracte de transport S/C implementat. `build_conditional_scenarios(observation, response, library, configuration)` de 7.5.1 construeix fonts C relatives; inferència absoluta i H continuen a 7.16–7.24.
 
@@ -70,3 +70,7 @@ Cap pas nou pot marcar el Pas 7 com a «físic» retrospectivament. El Pas 7 con
 ## Separació de verticals i configuració espectral
 
 El `PropagationKernel` continua exclusivament artificial; Sol/Lluna i limbe són responsabilitat de [7.51+](../cel-fisic/README.md). La configuració espectral del kernel és variable (`spectralBandCount`, `bandSetId`), sense valor fix ni benchmarks per determinar N. El mode simulat/real és permanent i independent del skyglow; no s'elimina el shader actual.
+
+## Estat verificat de 7.10 (2026-10-19)
+
+El transport vectorial comparteix geometria i nodes de quadratura entre λ. Integra columnes de n, aerosol i n·fracció·base(T) abans d'aplicar les seccions eficaces. Les discontinuïtats de derivada de la base tèrmica es parteixen exactament; components zero s'ometen exactament. LUT d'absorció no és una LUT de transport: cap aproximació/cache entre peticions afegida. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

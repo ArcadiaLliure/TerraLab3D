@@ -1,0 +1,14 @@
+{
+  "initialCount": 389,
+  "finalCount": 387,
+  "newAfterAsciiNormalization": [],
+  "removedAfterAsciiNormalization": [
+    "- docs/tasques/pendent/pas7.11-terrain-curvature.md: La secci ## Dependncies no t '**Depn de:**'",
+    "- docs/tasques/pendent/pas7.11-terrain-curvature.md: La secci ## Dependncies no t '**En depenen:**'"
+  ],
+  "comparisonNormalization": "Eliminar no ASCII només per comparar el text legacy amb codificació deficient; originals intactes",
+  "brokenLocalLinks": 0,
+  "step7_10Incidences": 0,
+  "step7_11Implementation": "not_executed; dependency metadata only",
+  "historicalExternalDeletions": "nine old aliases already deleted at start of7.10; preserved without attribution to current task"
+}

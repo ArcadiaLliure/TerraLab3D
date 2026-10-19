@@ -1,0 +1,33 @@
+{
+  "scope": "O3 LUT error only; prescribed COESA0–50km and supplied ozone profile; no physical cross-section uncertainty included",
+  "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+  "maximumTwoLegOzoneColumnM2": 4.3315760322941603e+24,
+  "maximumTwoLegAirColumnM2": 1.6405841369054643e+31,
+  "maximumLutMagnitudeErrorBound": 0.007823995132709443,
+  "maximumInclusiveMagnitudeBudget": 0.01,
+  "temperaturesK": [
+    203,
+    293
+  ],
+  "wavelengthNm": [
+    380,
+    780
+  ],
+  "geometryDomain": {
+    "maximumSourceAnchorHeightM": 100.0,
+    "maximumAreaNodeOffsetM": 500.0,
+    "observerHeightM": 100,
+    "sourceEmission": "upward about centre normal",
+    "observerLOS": "positive elevation",
+    "above50km": "unbounded_not_assumed_zero"
+  },
+  "proof": [
+    "max abs difference of the two piecewise bilinear cross-section tables lies at joint lambda/T knots",
+    "pressure<=max endpoints; temperature>=min endpoints; mixing<=max endpoints within every declared layer",
+    "an upward radial leg has shell length <=sqrt(r_high^2-b^2)-sqrt(r_low^2-b^2), maximum at b=min(impact_cap,r_low)",
+    "an area source may have an initial radial descending prefix of length at most its tangent-plane node offset; add a global density bound for that prefix",
+    "two legs bounded by twice the shell sum plus the source prefix",
+    "positive column-temperature basis implies abs(delta_tau)<=column_bound*max_delta_sigma",
+    "positive source/scattering/response weights preserve exp(+-max_delta_tau) integral-ratio bounds"
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "protocolId": "B1-SINGLE-SCATTERING-v1",
+  "frozenBefore": "first_test_or_benchmark_evaluation",
+  "decisionDate": "2026-10-19",
+  "seed": "0x544C3344534B5947",
+  "wavelengthNm": 550,
+  "domain": "scalar_monochromatic_sphere_geometry;prescribed_clear_medium;no_terrain_visibility_or_gas_absorption;S_and_relative_C",
+  "runtimeQuadrature": {
+    "relativeTolerance": 1e-07,
+    "radianceAbsoluteTolerance": 1e-24,
+    "opticalDepthAbsoluteTolerance": 1e-10,
+    "maxIntervals": 4096
+  },
+  "referenceRefinements": [
+    1e-07,
+    1e-09,
+    1e-11
+  ],
+  "invariantRelativeTolerance": 1e-10,
+  "phaseIntegralAbsoluteTolerance": 1e-10,
+  "analyticIsotropicRelativeTolerance": 1e-07,
+  "phaseSamples": [
+    2049,
+    4097,
+    8193
+  ],
+  "phaseRefinementRule": "report_change_against_independent_analytic_two_lobe_fixture;not_measured_Mie_or_universal_aerosol",
+  "sourceCounts": [
+    1,
+    10,
+    25,
+    50,
+    100,
+    200
+  ],
+  "primarySourceCount": 100,
+  "sourceDistancesM": [
+    5000,
+    80000
+  ],
+  "elevationsDeg": [
+    0.5,
+    2,
+    5,
+    10,
+    20,
+    30,
+    45,
+    60,
+    90
+  ],
+  "warmupPasses": 5,
+  "measuredPasses": 30,
+  "minimumPassesIfCampaignExceeds600s": 10,
+  "benchmarkFixture": "defined_point_S;homogeneous_pressure_temperature;explicit_HG_fallback_aerosol;no_area_collapse",
+  "fixtureTopM": 10000,
+  "fixtureObserverM": 100,
+  "diagnostics": [
+    "Rayleigh_only",
+    "HG_fallback",
+    "tabulated_two_lobe_reference",
+    "prescribed_lateral_gradient",
+    "standard_vertical_profile",
+    "direct_rectangle",
+    "relative_C_scale"
+  ],
+  "runtimeVsReferenceAcceptance": "diagnostic_only;no_residual_PASS_FAIL_until_step7.12",
+  "referenceRule": "require_success_and_report_two_consecutive_refinement_changes_and_error_estimates;analytic_invariants_independent_of_candidate",
+  "sources": [
+    "https://lweb.cfa.harvard.edu/atmosphere/publications/1997AOring.pdf",
+    "https://articles.adsabs.harvard.edu/pdf/1941ApJ....93...70H"
+  ],
+  "pending": [
+    "spectral_gas_7.10",
+    "terrain_visibility_7.11",
+    "radiometric_gate_7.12",
+    "AD_7.20",
+    "renderer_7.25_7.27",
+    "H"
+  ]
+}

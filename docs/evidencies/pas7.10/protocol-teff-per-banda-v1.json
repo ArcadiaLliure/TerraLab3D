@@ -1,0 +1,22 @@
+{
+  "protocolId": "TL3D-SKY-7.10-Teff-v1",
+  "frozenUtc": "2026-10-19T08:15:54.112118+00:00",
+  "metric": "abs(2.5*log10(T_candidate/T_fine))",
+  "maximumInclusiveMag": 0.01,
+  "sources": "same55SPDs as whole spectrum gate",
+  "temperaturesK": [
+    223,
+    288.15
+  ],
+  "columnsM2": [
+    0,
+    1e+22,
+    1e+23,
+    1e+24
+  ],
+  "weights": "SPD only per candidate band",
+  "unlitBands": "undefined, excluded and counted; no fictitious unit transmission",
+  "oracle": "original0.01nm O3 GL8/16/32 with joint SPD and band knots",
+  "jensen": "T_eff>=exp(-weighted mean tau), allowance50*float64eps for numerical roundoff",
+  "scriptSha256": "1404d7f27db972cfa30d3f3ef127605677eb21d9d23e60b77779d11a93242f16"
+}

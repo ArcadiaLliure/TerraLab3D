@@ -6,9 +6,13 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.9 — Rayleigh, aerosol i B1](tasques/pendent/pas7.9-rayleigh-aerosol-b1.md).** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. [7.7 — Kernel B0](tasques/completat/pas7.7-kernel-geometry-b0.md) verifica ECEF/ENU esfèrics, GK7/15 i revisions. [7.8 — OpticalField](tasques/completat/pas7.8-optical-field-standard.md) ja verifica el camp estàndard P/T/n, travesses i dependències exactes. La dispersió, el transport radiomètric, la radiància física del producte i H continuen pendents.
+> **Punt de represa: [Pas 7.11 — Terreny, curvatura i visibilitat física](tasques/pendent/pas7.11-terrain-curvature.md), pendent i no executat.** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. [7.7 — Kernel B0](tasques/completat/pas7.7-kernel-geometry-b0.md) verifica ECEF/ENU esfèrics, GK7/15 i revisions. [7.8 — OpticalField](tasques/completat/pas7.8-optical-field-standard.md) ja verifica el camp estàndard P/T/n, travesses i dependències exactes. [7.9 — B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) ja calcula radiància espectral monocromàtica offline en medis prescrits amb dispersió simple. [7.10](tasques/completat/pas7.10-gas-spectral-kernel.md) verifica transport espectral directe S/C i O3 prescrit offline; l'aire terrestre complet, la radiància física connectada al producte i H continuen pendents.
 >
 > Els subpassos **7.1–7.50** pertanyen a contaminació lumínica artificial: VNP46, VJ146 i VJ246 són fonts Black Marble candidates amb models de mesura propis; cap skyglow físic de producte no està implementat. Els **7.51+** són del cel físic solar/lunar. El Pas 7 històric conserva la visualització actual. Les verticals pendents es documenten a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
+
+**Estat verificat de 7.10, 2026-10-19:** [transport espectral i O3](evidencies/pas7.10/validacio-espectral-i-gasos.md), 111.168 casos espectrals i 326.040 T_eff il·luminats dins de 0,01 mag; 405 proves backend, 21 noves. Comparació B0/B1/B2/B4, cost exclusiu per etapa i sostres 10/20/30/50 km. A B4 estàndard zenital, 10 km dona 22,45% menys que 50 km; cua superior desconeguda. Cap H, SLO ni 7.11 executats.
+
+**Estat verificat de 7.9, 2026-10-19:** [Rayleigh/aerosol B1](evidencies/pas7.9/validacio-b1.md), fases 4π, transmissió dels dos trajectes i rectangle directe a 550 nm amb referència independent revalidada. 21 proves noves i 384 proves backend superades; B0 intacte. Ruff/Pyright dels fitxers afectats passen, Pyright global manté 67 errors/3 avisos previs. B1 mesurat sense gate radiomètric, SLO ni H.
 
 **Estat verificat de 7.8, 2026-10-19:** [camp òptic estàndard](evidencies/pas7.8/validacio-optical-field.md) immutable i provider COESA sec 0–50 km, fixtures 1/2/8 tiles, columna molecular contrastada amb GK21 independent, convergència vertical i regressió B0 exacta. 33 proves noves i 363 proves backend superades. Ruff/Pyright dels fitxers afectats passen; Pyright global conserva 67 errors/3 avisos preexistents. Cap dispersió ni radiància del kernel anticipada.
 
@@ -27,6 +31,10 @@ Auditoria documental del 2026-10-17: els passos 7.1–7.3 no generaven incidènc
 **Auditoria de 7.7 (tancament 2026-10-19):** 546 incidències mecàniques heretades inicials i 534 finals, després de normalitzar la dependència 7.8; cap incidència nova i zero enllaços locals trencats. [Resum diferencial](evidencies/pas7.7/auditoria-documental-resum.json).
 
 **Auditoria de 7.8 (2026-10-19):** 534 incidències mecàniques heretades inicials i 524 finals després de normalitzar la dependència 7.9, que continua pendent. Cap incidència nova, cap dels passos executables 7.8/7.9 i zero enllaços locals trencats. [Resum diferencial](evidencies/pas7.8/auditoria-documental-resum.json).
+
+**Auditoria de 7.9 (2026-10-19):** 524 incidències inicials, 389 abans dels canvis documentals propis i 389 finals. La reducció inicial prové de supressions externes de nou àlies antics, preservades sense atribuir-les a B1. Cap incidència nova ni dels passos executables 7.9/7.10; zero enllaços locals trencats. [Resum diferencial](evidencies/pas7.9/auditoria-documental-resum.json).
+
+**Auditoria de 7.10 (2026-10-19):** 389 incidències mecàniques heretades a l’inici i 387 al tancament; la reducció prové de les metadades de dependència de 7.11, sense executar-lo. Zero incidències noves, cap del pas 7.10 i zero enllaços locals trencats. [Resum diferencial](evidencies/pas7.10/auditoria-documental-resum.json). Les 83 evidències preexistents s’han verificat per hash i es preserven.
 
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README i executar **exactament un pas cada vegada**. Per a la vertical 7.1–7.28, l’ordre és una linealització científica deliberada: cap optimització pot precedir el seu baseline directe/oracle i cap decisió bloquejant es pot resoldre amb una constant implícita.
 
@@ -69,6 +77,8 @@ Estats admesos:
 | 7.6 | [SG-REF independent, àrea/raster i contrast F5](tasques/completat/pas7.6-sg-ref-reference-solver.md) | `completat` offline en domini pla homogeni S/C |
 | 7.7 | [PropagationKernel ECEF/ENU, GK7/15 i benchmark B0](tasques/completat/pas7.7-kernel-geometry-b0.md) | `completat` geomètricament, sense radiància |
 | 7.8 | [OpticalField estàndard, interpolació i dependències multi-tile](tasques/completat/pas7.8-optical-field-standard.md) | `completat` per a P/T/n i columnes, sense radiància |
+| 7.9 | [Rayleigh, aerosol de referència i benchmark B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) | `completat` monocromàtic offline; sense gasos/gate H |
+| 7.10 | [Kernel espectral directe i O3 prescrit, B2/B4 i revalidació 0,01 mag](tasques/completat/pas7.10-gas-spectral-kernel.md) | `completat` offline en domini declarat; producte/H pendents |
 | 8 | [Sol, Lluna i planetes amb posicions i aparença reals](tasques/completat/pas8.md) | `completat` |
 | 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](tasques/completat/pas8.5.md) | `completat` |
 | 8.6 | [Planetes, anells i satèl·lits naturals](tasques/completat/pas8.6.md) | `completat` |
@@ -96,8 +106,6 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.9 | [Rayleigh, aerosol de referència i benchmark B1](tasques/pendent/pas7.9-rayleigh-aerosol-b1.md) | `pendent` | 7.8 |
-| 7.10 | [Kernel espectral complet i absorció gasosa](tasques/pendent/pas7.10-gas-spectral-kernel.md) | `pendent` | 7.9, 7.4 (revalidació espectral), 7.5.1 |
 | 7.11 | [Terreny, curvatura i visibilitat física](tasques/pendent/pas7.11-terrain-curvature.md) | `pendent` | 7.10 |
 | 7.12 | [Gate zenital de transport radiomètric](tasques/pendent/pas7.12-zenith-transport-gate.md) | `pendent` | 7.11 |
 | 7.13 | [Camp angular i DomeProfile sobre ruta directa](tasques/pendent/pas7.13-dome-profile-direct.md) | `pendent` | 7.12 |

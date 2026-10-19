@@ -33,8 +33,8 @@ Ancoratge històric L3, font base estimada i substitució hipotètica es conserv
 ## Seqüència executable
 
 1. 7.5 continua completat per S; 7.5.1 incorpora biblioteca, escenaris C NOAA-20 i controls amb estat científic real.
-2. [7.6 completat](../tasques/completat/pas7.6-sg-ref-reference-solver.md) consumeix S i C al mateix oracle pla homogeni, amb 18 alternatives C reals verificades i contrast F5 independent. No exigeix ni acredita H. 7.7 verifica el kernel geomètric B0; 7.8 verifica el camp estàndard P/T/n i columnes multi-tile; dispersió i transport radiomètric pendents des de 7.9.
-3. 7.10/7.14 revaliden SPD, mescles i operadors nous amb el pressupost de 0,01 mag sense relaxar-lo.
+2. [7.6 completat](../tasques/completat/pas7.6-sg-ref-reference-solver.md) consumeix S i C al mateix oracle pla homogeni, amb 18 alternatives C reals verificades i contrast F5 independent. No exigeix ni acredita H. 7.7 verifica el kernel geomètric B0; 7.8 verifica el camp estàndard P/T/n i columnes multi-tile; 7.9 verifica dispersió monocromàtica a 550 nm en medis prescrits, amb unitats W/relatives separades i sense H; 7.10 verifica espectre complet directe i O3 prescrit, sense acreditar altres absorbidors ni aire terrestre complet.
+3. [7.10 revalidat](../evidencies/pas7.10/validacio-espectral-i-gasos.md): 42 SPD, Kelvin/mescles, Rayleigh/aerosol i O3 prescrit dins de 0,01 mag, sense relaxació; 7.14 revalidarà les projeccions noves. Aquesta verificació numèrica no acredita incertesa física ni altres gasos.
 4. 7.16 propaga incerteses del transport i hipòtesis; 7.17 separa verificació física de contrast empíric; 7.24 congela resultats per domini.
 5. 7.25–7.27 connecten els controls ja existents als resultats, invaliden revisions/caches i visualitzen radiància lineal. Mentre falta transport no hi ha filtre RGB ni radiància fictícia.
 6. 7.28 homologa per domini sense convertir una simulació plausible C en H. Pas 24 manté l’adquisició ordinària Black Marble/RSR/SPD al gestor comú; les petites taules CIE verificades són dades base empaquetades.

@@ -96,3 +96,13 @@ No hi ha «guanyador» per un únic score. El nombre de bandes no forma part de 
 La [campanya B0](../evidencies/pas7.7/validacio-b0.md) aplica el [protocol congelat](../evidencies/pas7.7/protocol-b0-v1.json): seed canònica, nou elevacions, cinc warm-ups i trenta passades per N=1/10/25/50/100/200. Els 100 rectangles SourceModel S de la sèrie principal són les fixtures geomètriques equivalents a regions sintètiques; encara no existeix EmissionRegion de producte. Només els ancoratges orienten els LOS i no s’integra emissió ni se n’aproxima l’àrea al centre.
 
 Es mesura `FLAT_CLEAR_NEAR_GEOMETRY_ONLY` amb esfera ECEF/ENU i cel·les cartesianes/altures definides, no OpticalTiles reals. El CSV conté una fila per passada i `run_id` compartit amb el JSON. Errors radiomètrics/magnituds són null/buits, no zeros ficticis. RSS és working set i peak de vida del procés; flags del compilador, temperatura o throttling desconeguts queden null amb causa. Els gràfics d’escalat i distribució de latència són observacions de B0, sense SLO ni selecció de bandes. Plots de Legendre/AD/cache/òptica i els altres escenaris continuen als benchmarks posteriors.
+
+## B1a executat a 7.9
+
+La [campanya B1](../evidencies/pas7.9/validacio-b1.md) aplica un [protocol prospectiu](../evidencies/pas7.9/protocol-b1-v1.json) monocromàtic de 550 nm. Fonts S puntuals definides i medi homogeni P/T/aerosol prescrit, amb esfera ECEF/ENU; no s’han col·lapsat àrees al centre. Sèrie N=1/10/25/50/100/200, nou elevacions, cinc escalfaments i 60 passades mesurades en total; desviació temporal registrada al JSON si escau. La sèrie principal té 100 fonts/900 LOS.
+
+Els set diagnòstics revaliden la referència per Rayleigh, HG explícit de fallback, fase tabulada vs definició analítica, gradient lateral, perfil vertical, rectangle directe i escala relativa C. El CSV conserva cada mesura i comptadors de transmissió/fase; els residuals runtime↔SG-REF no tenen gate de transport. Plots de fase/residuals i escalat/histograma són actuals. B1b/AD i plots Legendre/cache continuen als seus passos; cap banda, fase comprimida, SLO ni cache no s’ha escollit per aquests temps.
+
+## Estat verificat de 7.10 (2026-10-19)
+
+Campanya 7.10: B0/B1/B2/B4, 100 punts/900 LOS, 5 escalfaments i 10 mesures per configuració segons excepció >600 s. p50 0,391/21,003/27,155/29,493 s. Temps exclusius per etapa, CPU global i RSS raw. SPD B1 històrica i B2/B4 LED-B3 declarades; 400/800 intervals derivats dels nusos, sense sweep de N. La passada final després de la partició T és diagnòstica d'una sola mesura; els perfils variables 0–50 km es documenten separadament i no són SLO. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

@@ -95,3 +95,11 @@ La [vertical 7.51+](../cel-fisic/README.md) calcula fonts solars/lunars i transp
 ### Acceleració offline
 
 Es poden precalcular LUT o kernels i, quan les hipòtesis de simetria ho permetin, usar convolució FFT. Aquesta ruta és un backend del mateix operador físic: ha de conservar bandes, model de font, atmosfera i terreny dins el domini declarat i comparar-se contra la ruta directa. Si la invariància translacional no es compleix, la FFT no és aplicable.
+
+## Franja implementada a 7.9
+
+`PropagationRequest.scattering` activa el mateix kernel amb fases 4π i radiància espectral monocromàtica. Segmenta i integra tant source→P com observer→P, acumula dependències dels dos trajectes i integra rectangles per àrea directa. El provider de 7.8 continua materialitzant P/T/n; òptica aerosol prescrita i banda són configuració explícita. [Contractes](06-contractes-dades.md) i [validació](../evidencies/pas7.9/validacio-b1.md). Espectre/gasos, terreny i bridge de radiància no estan implementats encara.
+
+## Estat verificat de 7.10 (2026-10-19)
+
+La frontera Python ja retorna radiància espectral integrada offline en schema 4 amb identitats de bandes/configuració i estat gasós explícit. Els catàlegs grans continuen fora del DTO per frame. El bridge/renderer no s'ha connectat prematurament: 7.25–7.27 i la radiància de producte continuen pendents. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

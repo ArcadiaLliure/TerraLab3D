@@ -1,4 +1,4 @@
-"""Frontera de propagació: geometria B0 i columnes atmosfèriques, sense radiància."""
+"""Frontera de propagació: geometria B0, columnes i dispersió simple B1."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 from bisect import bisect_right
+from contextlib import nullcontext
 from dataclasses import asdict, dataclass
 from typing import Callable, Literal
 
@@ -17,13 +18,28 @@ from .geometric_transport import (
     ViewDirection,
     make_ray,
 )
-from .source_model import GeodeticPosition, PointSourceGeometry, SourceModel
+from .source_model import (
+    DefinedSpectrum,
+    GeodeticPosition,
+    PointSourceGeometry,
+    SourceModel,
+)
 from .optical_field import (
     OpticalDependency,
     OpticalField,
     OpticalPathSegment,
     OpticalState,
+    fingerprint,
 )
+from .scattering import ScatteringConfiguration
+from .single_scattering import SingleScatteringTransport, TransportDiagnostics
+from .spectral_transport import (
+    SpectralOperator,
+    SpectralScatteringTransport,
+    SpectralTransportConfiguration,
+    SPECTRAL_TRANSPORT_REVISION,
+)
+from .transport_profiling import TransportProfiler
 
 MODEL_VERSION = "propagation-geometry-b0-v1"
 
@@ -82,6 +98,8 @@ class PropagationRequest:
     options: PropagationOptions = PropagationOptions()
     revision: int = 0
     optical_field: OpticalField | None = None
+    scattering: ScatteringConfiguration | None = None
+    spectral: SpectralTransportConfiguration | None = None
 
     def __post_init__(self) -> None:
         if (
@@ -100,6 +118,31 @@ class PropagationRequest:
             raise ValueError(
                 "Camp atmosfèric i geometria amb referencials incompatibles"
             )
+        if self.spectral is not None:
+            if self.scattering is not None or self.optical_field is None:
+                raise ValueError(
+                    "La ruta espectral requereix camp i exclou B1 simultani"
+                )
+            self.spectral.validate_field(self.optical_field)
+        if self.scattering is not None or self.spectral is not None:
+            if self.optical_field is None:
+                raise ValueError("La dispersió requereix un camp atmosfèric")
+            if self.scattering is not None and {
+                t.tile_id for t in self.optical_field.tiles
+            } != {a.tile_id for a in self.scattering.band.aerosols}:
+                raise ValueError("La cobertura aerosol ha de correspondre als tiles")
+            if (
+                len({s.amplitude.unit for s in self.sources}) != 1
+                or len(
+                    {
+                        s.amplitude.parameter_name
+                        for s in self.sources
+                        if s.amplitude.unit == "relative"
+                    }
+                )
+                > 1
+            ):
+                raise ValueError("No es barregen escales radiomètriques incompatibles")
 
 
 @dataclass(frozen=True, slots=True)
@@ -156,9 +199,18 @@ class PropagationResult:
     optical_field_signature: str | None = None
     optical_dependency_signature: str | None = None
     optical_traces: tuple[OpticalRayTrace, ...] = ()
+    scattering: ScatteringConfiguration | None = None
+    transport_diagnostics: tuple[TransportDiagnostics, ...] = ()
+    spectral_metadata: dict[str, object] | None = None
 
     def to_dict(self) -> dict[str, object]:
         values = asdict(self)
+        if self.spectral_metadata is None:
+            values.pop("spectral_metadata")
+        if self.scattering is None:
+            values.pop("scattering")
+            if self.spectral_metadata is None:
+                values.pop("transport_diagnostics")
         if self.optical_field_signature is None:
             for key in (
                 "optical_field_signature",
@@ -167,15 +219,35 @@ class PropagationResult:
             ):
                 values.pop(key)
         return {
-            "schemaVersion": 2 if self.optical_field_signature is not None else 1,
+            "schemaVersion": 4
+            if self.spectral_metadata is not None
+            else 3
+            if self.scattering is not None
+            else (2 if self.optical_field_signature is not None else 1),
             **values,
-            "stage": "optical_field_column_diagnostic_not_radiance"
+            "stage": ("single_scattering_spectral_direct_B2" if self.spectral_metadata and self.spectral_metadata["gasStatus"] == "disabled_explicit_B2_diagnostic" else "single_scattering_spectral_direct_B4")
+            if self.spectral_metadata is not None
+            else "single_scattering_monochromatic_B1"
+            if self.scattering is not None
+            else "optical_field_column_diagnostic_not_radiance"
             if self.optical_field_signature is not None
             else "geometry_B0_not_radiance",
-            "physicalTransportStatus": "pending_step_7.9",
+            "physicalTransportStatus": "spectral_prescribed_medium;gas_status_explicit_in_metadata;terrain_visibility_pending;not_full_terrestrial_air"
+            if self.spectral_metadata is not None
+            else "monochromatic_prescribed_medium;gas_absorption_not_computed;terrain_visibility_pending"
+            if self.scattering is not None
+            else "pending_step_7.9",
             "numericalErrorMeaning": "GK15_minus_G7_with_roundoff_floor;estimated_not_rigorous",
             "coordinateModel": "sphere_geocentric_ENU;not_WGS84_ellipsoid_or_DEM",
             "runtimeRadiometricGate": "not_evaluated_step_7.12",
+            **(
+                {
+                    "numericalErrorMeaning": "outer_GK_estimate;inner_tau_error_reported_separately;area_error_not_quantified",
+                    "empiricalValidation": "not_evaluated;H_pending",
+                }
+                if self.scattering is not None
+                else {}
+            ),
         }
 
 
@@ -197,9 +269,26 @@ class PropagationKernel:
         integral_unit: str = "m",
         cancelled: Callable[[], bool] | None = None,
         is_current: Callable[[], bool] | None = None,
+        profiler: TransportProfiler | None = None,
     ) -> PropagationResult:
         if not integrand_id or not integral_unit:
             raise ValueError("Cal identitat i unitat de l'integrand de diagnòstic")
+        if request.scattering is not None:
+            if integrand is not unit_integrand:
+                raise ValueError(
+                    "La ruta B1 no admet un integrand diagnòstic substitut"
+                )
+            integrand_id = request.scattering.band.revision
+            integral_unit = f"{request.sources[0].amplitude.unit} m^-2 sr^-1 nm^-1"
+        if request.spectral is not None:
+            if integrand is not unit_integrand:
+                raise ValueError("La ruta espectral no admet integrands substituts")
+            integrand_id = SPECTRAL_TRANSPORT_REVISION
+            integral_unit = f"{request.sources[0].amplitude.unit} m^-2 sr^-1"
+            profiler = profiler or TransportProfiler()
+
+        def measure(stage: str):
+            return profiler.measure(stage) if profiler is not None else nullcontext()
 
         def checkpoint() -> None:
             if is_current is not None and not is_current():
@@ -213,8 +302,19 @@ class PropagationKernel:
         rows = []
         traces: list[OpticalRayTrace] = []
         field = request.optical_field
+        diagnostics: list[TransportDiagnostics] = []
+        spectral_sets: dict[str, object] = {}
+        operators: dict[DefinedSpectrum, SpectralOperator] = {}
         for source in request.sources:
             checkpoint()
+            operator = None
+            if request.spectral is not None:
+                with measure("spectral_integration"):
+                    operator = operators.get(source.spectrum)
+                    if operator is None:
+                        operator = SpectralOperator(source, request.spectral)
+                        operators[source.spectrum] = operator
+                    spectral_sets[source.source_model_id] = asdict(operator.band_set)
             geometry = source.geometry
             anchor = frame.position_ecef(
                 geometry.position
@@ -244,25 +344,70 @@ class PropagationKernel:
                     (view.azimuth_deg + bearing) % 360,
                     view.elevation_deg,
                 )
-                ray = make_ray(frame, direction, request.options.top_m)
+                with measure("geometry"):
+                    ray = make_ray(frame, direction, request.options.top_m)
                 optical_segments: tuple[OpticalPathSegment, ...] = ()
                 sampled: set[OpticalDependency] = set()
                 if field is None:
-                    segments = request.options.partition.segments(
-                        ray, request.options.top_m, request.options.max_segments_per_ray
-                    )
+                    with measure("geometry"):
+                        segments = request.options.partition.segments(
+                            ray,
+                            request.options.top_m,
+                            request.options.max_segments_per_ray,
+                        )
                     intervals = tuple((s.start_m, s.end_m) for s in segments)
                     geometric_cells = tuple(s.cell_id for s in segments)
                 else:
-                    optical_segments = field.traverse(
-                        ray, request.options.max_segments_per_ray, checkpoint
-                    )
+                    with measure("geometry"):
+                        optical_segments = field.traverse(
+                            ray, request.options.max_segments_per_ray, checkpoint
+                        )
                     intervals = tuple((s.start_m, s.end_m) for s in optical_segments)
                     geometric_cells = ()
                 segment_ends = tuple(segment.end_m for segment in optical_segments)
+                transport: SingleScatteringTransport | None = None
+                if request.scattering is not None and field is not None:
+                    transport = SingleScatteringTransport(
+                        source,
+                        field,
+                        request.scattering,
+                        ray,
+                        request.options.max_segments_per_ray,
+                        checkpoint,
+                        sampled,
+                        profiler,
+                    )
+                if (
+                    request.spectral is not None
+                    and field is not None
+                    and operator is not None
+                    and profiler is not None
+                ):
+                    transport = SpectralScatteringTransport(
+                        source,
+                        field,
+                        request.spectral,
+                        ray,
+                        request.options.max_segments_per_ray,
+                        checkpoint,
+                        sampled,
+                        profiler,
+                        operator,
+                    )
+                if transport is not None:
+                    cuts = sorted(
+                        {
+                            *(x for pair in intervals for x in pair),
+                            *transport.break_distances,
+                        }
+                    )
+                    intervals = tuple(zip(cuts, cuts[1:]))
+                    if len(intervals) > request.options.max_segments_per_ray:
+                        raise ValueError("Pressupost de segments LOS B1 excedit")
 
                 def function(s: float) -> float:
-                    position = ray.point(s)
+                    with measure("geometry"):
+                        position = ray.point(s)
                     state = None
                     if field is not None:
                         # GK avalua els panells en qualsevol ordre; cap cursor mutable.
@@ -270,19 +415,27 @@ class PropagationKernel:
                             bisect_right(segment_ends, s),
                             len(optical_segments) - 1,
                         )
-                        state = field.sample(position, optical_segments[index])
+                        with measure("atmospheric_sampling"):
+                            state = field.sample(position, optical_segments[index])
                         sampled.add(state.dependency)
                     sample = GeometrySample(
                         s, position, math.dist(position, anchor), state
                     )
+                    if transport is not None and state is not None:
+                        return transport.value(s, position, state)
                     return integrand(sample, source)
 
-                q = integrate_gk15(
-                    function,
-                    intervals,
-                    request.options.quadrature,
-                    checkpoint=checkpoint,
-                )
+                with measure("quadrature"):
+                    q = integrate_gk15(
+                        function,
+                        intervals,
+                        request.spectral.monochromatic().radiance_quadrature
+                        if request.spectral is not None
+                        else request.scattering.radiance_quadrature
+                        if request.scattering is not None
+                        else request.options.quadrature,
+                        checkpoint=checkpoint,
+                    )
                 counters = KernelCounters(
                     1, len(intervals), q.evaluations, q.subdivisions, q.leaf_intervals
                 )
@@ -308,6 +461,8 @@ class PropagationKernel:
                             tuple(sorted(sampled)),
                         )
                     )
+                if transport is not None:
+                    diagnostics.append(transport.diagnostics())
         checkpoint()
         total = KernelCounters(
             *(
@@ -330,11 +485,47 @@ class PropagationKernel:
                         if field is not None
                         else {}
                     ),
+                    **(
+                        {"scattering": asdict(request.scattering)}
+                        if request.scattering is not None
+                        else {}
+                    ),
+                    **(
+                        {"spectral": request.spectral.signature}
+                        if request.spectral is not None
+                        else {}
+                    ),
                 },
                 sort_keys=True,
                 allow_nan=False,
             ).encode()
         ).hexdigest()
+        dependencies = tuple(d for trace in traces for d in trace.sampled_dependencies)
+        used_signature = (
+            field.dependency_signature(dependencies) if field is not None else None
+        )
+        if request.scattering is not None:
+            used_tiles = {d.tile_id for d in dependencies}
+            band = request.scattering.band
+            used_signature = fingerprint(
+                {
+                    "atmosphere": used_signature,
+                    "band": {
+                        **asdict(band),
+                        "aerosols": [
+                            asdict(a) for a in band.aerosols if a.tile_id in used_tiles
+                        ],
+                    },
+                }
+            )
+        if request.spectral is not None:
+            used_signature = fingerprint(
+                {
+                    "atmosphere": used_signature,
+                    "spectral": request.spectral.signature,
+                    "sources": [s.to_dict() for s in request.sources],
+                }
+            )
         checkpoint()
         return PropagationResult(
             request.revision,
@@ -343,11 +534,27 @@ class PropagationKernel:
             integral_unit,
             tuple(rows),
             total,
+            model_version=SPECTRAL_TRANSPORT_REVISION
+            if request.spectral is not None
+            else request.scattering.band.revision
+            if request.scattering is not None
+            else MODEL_VERSION,
             optical_field_signature=field.signature if field is not None else None,
-            optical_dependency_signature=field.dependency_signature(
-                tuple(d for trace in traces for d in trace.sampled_dependencies)
-            )
-            if field is not None
-            else None,
+            optical_dependency_signature=used_signature,
             optical_traces=tuple(traces),
+            scattering=request.scattering,
+            transport_diagnostics=tuple(diagnostics),
+            spectral_metadata={
+                "configurationSignature": request.spectral.signature,
+                "bandSets": spectral_sets,
+                "gasStatus": request.spectral.gas_status,
+                "gasModelSignature": request.spectral.gas.signature
+                if request.spectral.gas
+                else None,
+                "wavelengthConvention": "vacuum_nm",
+                "responseIds": [r.source_id for r in request.spectral.responses],
+                "errorMeaning": "outer_GK_estimate;columns_componentwise_estimates;area_unquantified;spectral_budget_separate",
+            }
+            if request.spectral is not None
+            else None,
         )

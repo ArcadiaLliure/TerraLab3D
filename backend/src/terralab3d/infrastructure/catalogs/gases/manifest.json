@@ -1,0 +1,37 @@
+{
+  "revision": "o3-serdyuchenko-2014-visible-0.5nm-v1",
+  "species": "O3",
+  "license": "CC BY 4.0",
+  "doi": "10.5281/zenodo.5793207",
+  "sourceUrl": "https://zenodo.org/api/records/5793207/files/SerdyuchenkoGorshelev5digits_latest.dat/content",
+  "originalSha256": "b5001c303b8cd74e92b906e443f30b7141432d9f5ff2071e248351f77db51fdb",
+  "temperaturesK": [
+    203,
+    213,
+    223,
+    233,
+    243,
+    253,
+    263,
+    273,
+    283,
+    293
+  ],
+  "wavelengthDomainNm": [
+    380,
+    780
+  ],
+  "crossSectionUnit": "m^2 molecule^-1",
+  "wavelengthConvention": "vacuum_nm",
+  "pressureDependence": "not_parameterized",
+  "transformation": "retall visible i 203–293K, cm2 a m2; LUT mostreig lineal cada 0,5nm; cap valor negatiu alterat",
+  "excluded193K": {
+    "negativeValuesVisible": 69,
+    "minimumCm2": -9.1271e-25
+  },
+  "assets": {
+    "o3-serdyuchenko-visible-lut.csv": "8ec69b7e4e5914e1b16a35667eb5c355d2ce1e2714ebbb7a4830a765be44875e",
+    "o3-serdyuchenko-visible-raw.npz": "5e61730066d7f4cdd54a9b9e2f799eb90c5f8357587c387a4ce516a59656ff2c"
+  },
+  "attribution": "Serdyuchenko A., Gorshelev V., Weber M., Burrows J.P.; Gorshelev et al. AMT 7,609–624 (2014); Serdyuchenko et al. AMT 7,625–636 (2014)."
+}

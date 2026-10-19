@@ -87,11 +87,11 @@ Contracte objectiu. El subconjunt immutable P/T/n implementat i els camps òptic
 
 `OpticalTileBand`: `betaRayleighScaM1`, `betaAerosolExtM1`, `aerosolSingleScatteringAlbedo`, `aerosolPhaseFunctionId`, `gasTransmissionModelRef`, `betaCloudExtM1`, `cloudSingleScatteringAlbedo`, `cloudPhaseFunctionId`.
 
-Les bandes i els coeficients anteriors continuen planificats. Els tiles de 7.8 contenen perfils P/T versionats amb bounds ENU fixos i dependències de capa, sense β calculats.
+El contracte espectral complet de bandes continua planificat; 7.9 calcula Rayleigh/aerosol monocromàtics mitjançant `ScatteringBand`, detallat al final. Els tiles de 7.8 contenen perfils P/T versionats amb bounds ENU fixos i dependències de capa, sense β calculats.
 
 ## PhaseFunction
 
-`phaseFunctionId`, `representation=LEGENDRE`, `coefficients`, `normalization=INTEGRAL_4PI_ONE`, `sourceModel=MIE|MEASURED|TABULATED|DOUBLE_HG|HG_FALLBACK`, `confidence`, `provenance`. Per convenció `a0=1`.
+Contracte objectiu de 7.19: `phaseFunctionId`, `representation=LEGENDRE`, `coefficients`, `normalization=INTEGRAL_4PI_ONE`, `sourceModel=MIE|MEASURED|TABULATED|DOUBLE_HG|HG_FALLBACK`, `confidence`, `provenance`. Per convenció `a0=1`.
 
 ## GasState
 
@@ -194,3 +194,17 @@ La implementació vigent és un subconjunt atmosfèric dels contractes objectiu 
 `OpticalField` esquema 1 versiona origen/radi/instant, tiles, model d’interpolació log(P)/T lineals i factor 8 ε per paral·lelisme numèric. Tiles semioberts sense solapament, buits ni extrapolació; són fixos al món. `OpticalPathSegment` porta distàncies inicial/final en m i `OpticalDependency(tile_id, tile_version, layer_index, layer_signature)`. El hash de capa inclou els dos nusos i dades/procedència que la interpolació utilitza. La signatura completa incorpora tot el camp; `optical_dependency_signature` incorpora només dependències utilitzades més el referencial, instant i revisió. No implica cache implementada.
 
 `PropagationRequest.optical_field` és opcional. Sense camp conserva B0/esquema 1 exactes; amb camp, `PropagationResult` usa esquema 2, `stage=optical_field_column_diagnostic_not_radiance`, signatura completa i utilitzada i `optical_traces` per font/direcció amb segments i dependències realment mostrejades. L’integrand `number_density_integrand` retorna columna ∫n ds en m⁻²; ni espectre ni amplitud de font hi intervenen. `ReferenceOpticalColumn` esquema 1 retorna columna, error GK21 estimat, nombre d’avaluacions i revisió independent; no és radiància ni incertesa empírica. [Contracte verificat](../tasques/completat/pas7.8-optical-field-standard.md).
+
+## Dispersió monocromàtica B1 (7.9)
+
+`PhaseFunction` immutable defineix `kind=isotropic|rayleigh|hg_fallback|tabulated`, procedència, g o δ, i cosinus/valors en cas tabulat. La densitat és sr⁻¹, μ=1 endavant, ∫4π P dΩ=1; la interpolació de taula és lineal en μ i normalitzada exactament. Legendre continua planificat a 7.19.
+
+`ScatteringBand` versiona longitud d’ona (nm), secció Rayleigh (m²), fase molecular i `AerosolReference` per cada tile: id/versió, βext (m⁻¹), albedo, fase, procedència i escala vertical exponencial opcional. El model B1 exclou explícitament gasos/núvols; no reutilitza els `None` de l’estat P/T de 7.8 com si fossin β=0. `ScatteringConfiguration` declara quadratures LOS/τ i ordre GL d’àrea.
+
+`PropagationRequest.scattering` exigeix camp atmosfèric i cobertura aerosol exacta. Resultat esquema 3, `model_version=single-scattering-monochromatic-v1` i `stage=single_scattering_monochromatic_B1`. Les integrals són radiància espectral en W m⁻² sr⁻¹ nm⁻¹ o relativa; no són potència d’una banda finita. `transport_diagnostics` reporta avaluacions de fase, segments/nodes de transmissió, màxim error estimat τ d’un trajecte i nodes d’àrea. L’error LOS és només l’estimació GK exterior; no és una cota total ni incertesa de model.
+
+`optical_traces.sampled_dependencies` inclou capes realment usades en la LOS i en tots dos trajectes de transmissió, incloent segments homogenis avaluats analíticament. `optical_dependency_signature` combina atmosfera i òptica dels tiles utilitzats; la signatura completa conserva totes les entrades. No hi ha cache. B0 i columnes sense `scattering` conserven esquemes/valors previs. [Evidència i límits](../evidencies/pas7.9/validacio-b1.md).
+
+## Estat verificat de 7.10 (2026-10-19)
+
+`SpectralTransportConfiguration` exigeix aerosols espectrals, 1–2 respostes positives, domini nm i estat gasós explícit. `GasCrossSectionLut` usa m²/molècula, nm de buit i K; `GasMixingProfile` fracció molar per tile/altura. El catàleg v1 només acredita O3 203–293 K; el GasState objectiu H2O/O3/O2 no s'interpreta com totalment disponible. Schema 4 inclou identitats/signatures i unitat integrada W m⁻² sr⁻¹ o relativa C; B0/B1 antics preservats. Una composició/λ/T desconeguda falla i no s'assumeix absorció zero. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

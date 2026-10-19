@@ -1,0 +1,25 @@
+........................................................................ [ 17%]
+........................................................................ [ 35%]
+........................................................................ [ 53%]
+........................................................................ [ 70%]
+........................................................................ [ 88%]
+................F.............................                           [100%]
+================================== FAILURES ===================================
+________________ test_unrecognized_radiometric_units_rejected _________________
+backend\tests\test_spectral_transport_step7_10.py:384: in test_unrecognized_radiometric_units_rejected
+    invalid = replace(source.amplitude, unit=cast(Literal["W", "relative"], "mW"))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\dataclasses.py:1596: in replace
+    return _replace(obj, **changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\dataclasses.py:1630: in _replace
+    return self.__class__(**changes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+<string>:8: in __init__
+    ???
+backend\src\terralab3d\domain\light_pollution\source_model.py:295: in __post_init__
+    raise ValueError("Unitat d'amplitud desconeguda")
+E   ValueError: Unitat d'amplitud desconeguda
+=========================== short test summary info ===========================
+FAILED backend\tests\test_spectral_transport_step7_10.py::test_unrecognized_radiometric_units_rejected
+1 failed, 405 passed in 27.24s

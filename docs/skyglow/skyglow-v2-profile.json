@@ -2,7 +2,7 @@
   "profileId": "skyglow-v2-multisat-policy",
   "schemaVersion": 2,
   "decisionDate": "2026-10-18",
-  "status": "sources_reference_and_geometry_B0_verified_physical_transport_pending",
+  "status": "sources_reference_geometry_and_prescribed_spectral_transport_verified_offline;product_runtime_pending",
   "owner": "TerraLab3D",
   "migration": {
     "preserves": "skyglow-v1-profile.json",
@@ -183,7 +183,7 @@
     ],
     "mixtureBasis": "radiant_flux",
     "probabilisticWeights": false,
-    "transportStatus": "offline_flat_homogeneous_reference_verified;product_runtime_pending",
+    "transportStatus": "offline_spectral_single_scattering_prescribed_O3_verified;product_runtime_pending",
     "evidenceRef": "../evidencies/pas7.5.1/validacio-simulacio-condicionada.md"
   },
   "transportReference": {
@@ -217,7 +217,7 @@
     "revisionGuard": "cooperative_cancel_and_stale_publication_check;not_scheduler",
     "benchmarkRef": "../evidencies/pas7.7/validacio-b0.md",
     "protocolRef": "../evidencies/pas7.7/protocol-b0-v1.json",
-    "physicalTransportStatus": "field_and_number_columns_verified_step_7.8;scattering_pending_step_7.9",
+    "physicalTransportStatus": "spectral_single_scattering_prescribed_O3_verified_step_7.10;product_and_H_pending",
     "radiometricGate": "not_evaluated_step_7.12",
     "productSLOGate": "not_evaluated_step_7.22"
   },
@@ -232,10 +232,69 @@
     "dependencyIdentity": "tile_id_version_layer_index_two_knot_data_hash;frame_time_revision",
     "columnReference": "sg-ref-optical-column-gk21-v1",
     "columnUnit": "m^-2",
-    "radiativeCoefficients": "not_computed_steps_7.9_7.10",
+    "radiativeCoefficients": "base_field_PTn;monochromatic_Rayleigh_aerosol_in_ScatteringConfiguration_step_7.9;gas_pending",
     "evidenceRef": "../evidencies/pas7.8/validacio-optical-field.md",
     "protocolRef": "../evidencies/pas7.8/protocol-optical-field-v1.json",
     "radiometricGate": "not_evaluated_step_7.12",
     "empiricalValidation": "not_evaluated;H_not_homologated"
+  },
+  "singleScattering": {
+    "revision": "single-scattering-monochromatic-v1",
+    "status": "verified_step_7.9_offline_prescribed_medium",
+    "referenceRevision": "sg-ref-spherical-monochromatic-v1",
+    "wavelengthNm": 550,
+    "rayleighModel": "Chance_Spurr_1997_equations_2_7;quasi_elastic_scalar_200_1000nm",
+    "phaseKinds": [
+      "isotropic",
+      "rayleigh",
+      "hg_fallback",
+      "tabulated"
+    ],
+    "normalization": "integral_4pi_one;sr^-1",
+    "sourceGeometry": "point_and_direct_GL_uniform_rectangle;S_and_relative_C",
+    "transmission": "two_leg_segmented_GK7_15;analytic_constant_medium",
+    "dependencies": "LOS_and_both_transmission_legs;used_atmosphere_and_aerosol_versions",
+    "unit": "W_or_relative_m^-2_sr^-1_nm^-1",
+    "gasAbsorption": "not_computed_step_7.10",
+    "terrainVisibility": "not_computed_step_7.11",
+    "runtimeGate": "not_evaluated_step_7.12",
+    "empiricalValidation": "not_evaluated;H_pending",
+    "evidenceRef": "../evidencies/pas7.9/validacio-b1.md",
+    "protocolRef": "../evidencies/pas7.9/protocol-b1-v1.json"
+  },
+  "spectralTransport": {
+    "revision": "single-scattering-spectral-direct-v1",
+    "status": "verified_offline_step_7.10_prescribed_domain",
+    "bandStrategy": "tl3d-sky-v1-transport-knot-union-simpson-1",
+    "domainNm": [
+      380,
+      780
+    ],
+    "gasCatalogSpecies": [
+      "O3"
+    ],
+    "gasTemperatureK": [
+      203,
+      293
+    ],
+    "otherGasAbsorption": "unavailable_not_zero",
+    "fullTerrestrialAir": "not_validated",
+    "spectralMaximumInclusiveMag": 0.01,
+    "wholeSpectrumCases": 111168,
+    "maximumObservedWholeSpectrumErrorMag": 0.00011521027790642806,
+    "litBandTeffCases": 326040,
+    "maximumObservedTeffErrorMag": 0.00033307265484480995,
+    "topSensitivityKm": [
+      10,
+      20,
+      30,
+      50
+    ],
+    "above50kmContribution": "unknown_not_zero",
+    "runtimeGate": "pending_step_7.12",
+    "evidenceRef": "../evidencies/pas7.10/validacio-espectral-i-gasos.md",
+    "nextStep": "7.11_pending_not_executed",
+    "backendTestsPassed": 405,
+    "newTests": 21
   }
 }

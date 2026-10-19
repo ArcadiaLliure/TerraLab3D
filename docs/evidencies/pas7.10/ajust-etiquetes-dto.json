@@ -1,0 +1,11 @@
+{
+  "reason": "Correcció exclusiva de les etiquetes DTO B2/B4; evaluate i tots els càlculs temporitzats romanen idèntics",
+  "frozenFileSha256": "a95e192aaeaf0cfb6a3514757f18ee12e90b5fb94ad3d744fda53131e11a0a2b",
+  "currentFileSha256": "f521368bd0c26011fbc65515ab1a08465dfb5d939cd98d5b5070eea7134d87c1",
+  "evaluateAstBefore": "254bb409cf8ee033ffd88528cbae97d9aaf4b9084919a26d9285308b53a67d84",
+  "evaluateAstAfter": "254bb409cf8ee033ffd88528cbae97d9aaf4b9084919a26d9285308b53a67d84",
+  "sameEvaluateAst": true,
+  "benchmarkCallsToResultToDict": false,
+  "latestFileSha256": "f521368bd0c26011fbc65515ab1a08465dfb5d939cd98d5b5070eea7134d87c1",
+  "laterNumericalChanges": "temperature-knot column partition in spectral_transport/optical_paths; corresponding protocols and followup900LOS preserved"
+}

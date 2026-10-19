@@ -1,0 +1,2109 @@
+{
+  "protocol": "TL3D-SKY-7.10-v2",
+  "timestampUtc": "2026-10-19T07:49:21.577785+00:00",
+  "hardware": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": "AMD Ryzen 5 5600X 6-Core Processor",
+    "python": "3.13.7",
+    "numpy": "2.3.3",
+    "compilerFlags": null,
+    "memory": [
+      80633856,
+      81543168,
+      34279714816
+    ]
+  },
+  "gitCommit": "ee35393c459ebee161f660146eeb6f24242092a7",
+  "sourceCount": 100,
+  "warmups": 5,
+  "requestedMeasurements": 30,
+  "runs": [
+    {
+      "mode": "B4",
+      "iteration": 0,
+      "wallMs": 29209.82579997508,
+      "cpuMs": 28718.75,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12919.9626,
+          "atmospheric_sampling": 5411.7523,
+          "transmissions": 4523.4976,
+          "quadrature": 5672.0683,
+          "spectral_integration": 585.8125
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        86712320,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 0,
+      "wallMs": 27119.56099999952,
+      "cpuMs": 26781.25,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12845.7402,
+          "atmospheric_sampling": 5327.9467,
+          "transmissions": 3293.43,
+          "quadrature": 5082.985,
+          "spectral_integration": 486.0232
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        86376448,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 0,
+      "wallMs": 21920.25230001309,
+      "cpuMs": 21593.75,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11754.9119,
+          "atmospheric_sampling": 5022.6971,
+          "transmissions": 3701.3402,
+          "quadrature": 1393.3822,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        85458944,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 0,
+      "wallMs": 391.48049999494106,
+      "cpuMs": 390.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 113.2148,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 263.7156,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        85499904,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 1,
+      "wallMs": 29377.88990000263,
+      "cpuMs": 28953.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13002.2811,
+          "atmospheric_sampling": 5440.9185,
+          "transmissions": 4579.2673,
+          "quadrature": 5667.3733,
+          "spectral_integration": 594.4241
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        85475328,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 1,
+      "wallMs": 390.59990001260303,
+      "cpuMs": 375.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 114.0812,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 261.8716,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        84267008,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 1,
+      "wallMs": 27439.360299991677,
+      "cpuMs": 26984.375,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12998.9551,
+          "atmospheric_sampling": 5382.0144,
+          "transmissions": 3331.2953,
+          "quadrature": 5153.7693,
+          "spectral_integration": 492.0298
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        85450752,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 1,
+      "wallMs": 20915.98089999752,
+      "cpuMs": 20625.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11222.1101,
+          "atmospheric_sampling": 4796.0678,
+          "transmissions": 3532.0158,
+          "quadrature": 1324.7968,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        85618688,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 2,
+      "wallMs": 387.2968000068795,
+      "cpuMs": 390.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 113.0728,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 259.4027,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        85622784,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 2,
+      "wallMs": 27187.28490002104,
+      "cpuMs": 26703.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12900.1053,
+          "atmospheric_sampling": 5345.904,
+          "transmissions": 3294.901,
+          "quadrature": 5082.3944,
+          "spectral_integration": 487.4457
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        85667840,
+        88903680,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 2,
+      "wallMs": 30577.399600006174,
+      "cpuMs": 30125.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13497.3114,
+          "atmospheric_sampling": 5653.5425,
+          "transmissions": 4780.8697,
+          "quadrature": 5930.5341,
+          "spectral_integration": 612.7504
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87511040,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 2,
+      "wallMs": 20936.887299991213,
+      "cpuMs": 20656.25,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11246.4303,
+          "atmospheric_sampling": 4791.9681,
+          "transmissions": 3534.2905,
+          "quadrature": 1323.3575,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        84623360,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 3,
+      "wallMs": 20821.845600003144,
+      "cpuMs": 20578.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11174.4709,
+          "atmospheric_sampling": 4763.4038,
+          "transmissions": 3524.4118,
+          "quadrature": 1320.5072,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        84627456,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 3,
+      "wallMs": 27335.189200006425,
+      "cpuMs": 26984.375,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12980.2638,
+          "atmospheric_sampling": 5379.4514,
+          "transmissions": 3310.2825,
+          "quadrature": 5094.7007,
+          "spectral_integration": 488.9315
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87388160,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 3,
+      "wallMs": 29600.357099989196,
+      "cpuMs": 29218.75,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13138.6863,
+          "atmospheric_sampling": 5472.6596,
+          "transmissions": 4575.9802,
+          "quadrature": 5724.6049,
+          "spectral_integration": 592.3038
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87494656,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 3,
+      "wallMs": 381.35549999424256,
+      "cpuMs": 375.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 110.197,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 256.9518,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        87494656,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 4,
+      "wallMs": 27528.459499997552,
+      "cpuMs": 27046.875,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13048.3373,
+          "atmospheric_sampling": 5408.4488,
+          "transmissions": 3341.6308,
+          "quadrature": 5153.0866,
+          "spectral_integration": 492.2678
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87494656,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 4,
+      "wallMs": 29819.658499996876,
+      "cpuMs": 29234.375,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13226.3141,
+          "atmospheric_sampling": 5522.3179,
+          "transmissions": 4633.7178,
+          "quadrature": 5738.6231,
+          "spectral_integration": 603.0628
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        86167552,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 4,
+      "wallMs": 20931.498099991586,
+      "cpuMs": 20640.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11227.805,
+          "atmospheric_sampling": 4800.6726,
+          "transmissions": 3535.3724,
+          "quadrature": 1326.9107,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        86200320,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 4,
+      "wallMs": 381.3306000083685,
+      "cpuMs": 375.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 111.5599,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 255.6961,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        86265856,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 5,
+      "wallMs": 21221.090399980312,
+      "cpuMs": 20828.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11381.5632,
+          "atmospheric_sampling": 4872.0477,
+          "transmissions": 3575.1124,
+          "quadrature": 1350.2022,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        86265856,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 5,
+      "wallMs": 27009.434700012207,
+      "cpuMs": 26703.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12833.4886,
+          "atmospheric_sampling": 5307.2664,
+          "transmissions": 3279.9202,
+          "quadrature": 5027.8249,
+          "spectral_integration": 484.7722
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        86376448,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 5,
+      "wallMs": 29338.942899979884,
+      "cpuMs": 28812.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12998.7935,
+          "atmospheric_sampling": 5441.0882,
+          "transmissions": 4544.7967,
+          "quadrature": 5667.0358,
+          "spectral_integration": 588.405
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87089152,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 5,
+      "wallMs": 392.7045000018552,
+      "cpuMs": 390.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 114.2695,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 263.5852,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        87089152,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 6,
+      "wallMs": 384.4783999957144,
+      "cpuMs": 359.375,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 111.0258,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 258.8983,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        87191552,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 6,
+      "wallMs": 21945.007400005125,
+      "cpuMs": 21671.875,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11770.1122,
+          "atmospheric_sampling": 5028.6185,
+          "transmissions": 3705.7378,
+          "quadrature": 1392.9541,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        85135360,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 6,
+      "wallMs": 27043.365400022594,
+      "cpuMs": 26687.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12852.5013,
+          "atmospheric_sampling": 5317.1913,
+          "transmissions": 3269.5044,
+          "quadrature": 5048.7629,
+          "spectral_integration": 479.9869
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87437312,
+        89796608,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 6,
+      "wallMs": 29385.510199994314,
+      "cpuMs": 29015.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13010.3283,
+          "atmospheric_sampling": 5444.5034,
+          "transmissions": 4559.0522,
+          "quadrature": 5667.082,
+          "spectral_integration": 588.8979
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87552000,
+        89833472,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 7,
+      "wallMs": 423.39650000212714,
+      "cpuMs": 421.875,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 135.8466,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 272.2341,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        87556096,
+        89833472,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 7,
+      "wallMs": 20960.706499987282,
+      "cpuMs": 20703.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11247.933,
+          "atmospheric_sampling": 4804.7036,
+          "transmissions": 3541.5183,
+          "quadrature": 1326.4558,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        87556096,
+        89833472,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 7,
+      "wallMs": 27027.149100002134,
+      "cpuMs": 26671.875,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12821.2948,
+          "atmospheric_sampling": 5299.2454,
+          "transmissions": 3278.3755,
+          "quadrature": 5070.729,
+          "spectral_integration": 480.7518
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87592960,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 7,
+      "wallMs": 30021.529899997404,
+      "cpuMs": 29687.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13295.3999,
+          "atmospheric_sampling": 5567.1956,
+          "transmissions": 4657.2421,
+          "quadrature": 5798.5403,
+          "spectral_integration": 602.7981
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87400448,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 8,
+      "wallMs": 27343.61940002418,
+      "cpuMs": 26843.75,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12979.037,
+          "atmospheric_sampling": 5375.6451,
+          "transmissions": 3317.6014,
+          "quadrature": 5100.9914,
+          "spectral_integration": 491.2307
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87416832,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 8,
+      "wallMs": 21046.091700001853,
+      "cpuMs": 20687.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11291.0945,
+          "atmospheric_sampling": 4829.7964,
+          "transmissions": 3552.8985,
+          "quadrature": 1331.1766,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        85295104,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 8,
+      "wallMs": 393.4194000030402,
+      "cpuMs": 390.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 114.1287,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 264.315,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        85315584,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 8,
+      "wallMs": 29311.075600009644,
+      "cpuMs": 28968.75,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13003.7911,
+          "atmospheric_sampling": 5448.7823,
+          "transmissions": 4520.3218,
+          "quadrature": 5651.2546,
+          "spectral_integration": 591.3556
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87416832,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": 9,
+      "wallMs": 27123.263700021198,
+      "cpuMs": 26734.375,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12852.8965,
+          "atmospheric_sampling": 5315.1569,
+          "transmissions": 3309.0972,
+          "quadrature": 5082.0782,
+          "spectral_integration": 486.428
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87425024,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": 9,
+      "wallMs": 30066.63899999694,
+      "cpuMs": 29578.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13297.3805,
+          "atmospheric_sampling": 5565.7204,
+          "transmissions": 4665.987,
+          "quadrature": 5826.0702,
+          "spectral_integration": 609.2748
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        87400448,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": 9,
+      "wallMs": 407.2611999872606,
+      "cpuMs": 406.25,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 120.1172,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 271.6963,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        87404544,
+        89882624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": 9,
+      "wallMs": 21188.35099998978,
+      "cpuMs": 20968.75,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11368.11,
+          "atmospheric_sampling": 4858.361,
+          "transmissions": 3576.8329,
+          "quadrature": 1342.4071,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        87404544,
+        89882624,
+        34279714816
+      ]
+    }
+  ],
+  "warmupRuns": [
+    {
+      "mode": "B2",
+      "iteration": -5,
+      "wallMs": 26694.059900008142,
+      "cpuMs": 26406.25,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12637.8208,
+          "atmospheric_sampling": 5222.4599,
+          "transmissions": 3270.4593,
+          "quadrature": 5002.506,
+          "spectral_integration": 485.0224
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        82599936,
+        84885504,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": -5,
+      "wallMs": 21792.474599991692,
+      "cpuMs": 21515.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11687.2613,
+          "atmospheric_sampling": 5005.1451,
+          "transmissions": 3670.3133,
+          "quadrature": 1381.9989,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        83533824,
+        84885504,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": -5,
+      "wallMs": 29337.32599997893,
+      "cpuMs": 28828.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12958.6003,
+          "atmospheric_sampling": 5438.529,
+          "transmissions": 4571.5919,
+          "quadrature": 5682.0738,
+          "spectral_integration": 590.4058
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        83927040,
+        86556672,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": -5,
+      "wallMs": 377.8281999984756,
+      "cpuMs": 359.375,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 108.7953,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 254.1914,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        83939328,
+        86556672,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": -4,
+      "wallMs": 28992.20210002386,
+      "cpuMs": 28703.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12830.2678,
+          "atmospheric_sampling": 5385.4797,
+          "transmissions": 4504.242,
+          "quadrature": 5595.3136,
+          "spectral_integration": 581.4773
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        85286912,
+        87568384,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": -4,
+      "wallMs": 391.04869999573566,
+      "cpuMs": 375.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 113.0414,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 263.2059,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        83771392,
+        87568384,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": -4,
+      "wallMs": 21166.290799999842,
+      "cpuMs": 20781.25,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11365.1682,
+          "atmospheric_sampling": 4840.0327,
+          "transmissions": 3575.1534,
+          "quadrature": 1344.2388,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        83976192,
+        87568384,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": -4,
+      "wallMs": 27014.75020000362,
+      "cpuMs": 26437.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12796.6974,
+          "atmospheric_sampling": 5309.9139,
+          "transmissions": 3294.9349,
+          "quadrature": 5051.091,
+          "spectral_integration": 482.6105
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        84410368,
+        87568384,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": -3,
+      "wallMs": 393.0203999916557,
+      "cpuMs": 390.625,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 113.7547,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 264.8787,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        84439040,
+        87568384,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": -3,
+      "wallMs": 27854.274100012844,
+      "cpuMs": 27437.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13193.5037,
+          "atmospheric_sampling": 5470.7581,
+          "transmissions": 3394.1056,
+          "quadrature": 5213.1877,
+          "spectral_integration": 499.4805
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        83959808,
+        87568384,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": -3,
+      "wallMs": 29275.93400000478,
+      "cpuMs": 29046.875,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12970.0719,
+          "atmospheric_sampling": 5431.029,
+          "transmissions": 4544.6397,
+          "quadrature": 5648.8335,
+          "spectral_integration": 587.1967
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        85417984,
+        87674880,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": -3,
+      "wallMs": 20945.847800001502,
+      "cpuMs": 20656.25,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11236.884,
+          "atmospheric_sampling": 4804.3776,
+          "transmissions": 3536.8878,
+          "quadrature": 1327.5896,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        84414464,
+        87674880,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": -2,
+      "wallMs": 29379.007800016552,
+      "cpuMs": 28953.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12980.5763,
+          "atmospheric_sampling": 5451.189,
+          "transmissions": 4572.4451,
+          "quadrature": 5677.3689,
+          "spectral_integration": 593.6443
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        85958656,
+        88231936,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": -2,
+      "wallMs": 20735.016399994493,
+      "cpuMs": 20437.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11123.9461,
+          "atmospheric_sampling": 4750.6292,
+          "transmissions": 3506.0441,
+          "quadrature": 1313.7601,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        84287488,
+        88231936,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": -2,
+      "wallMs": 374.0502999862656,
+      "cpuMs": 375.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 108.2263,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 251.962,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        84324352,
+        88231936,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": -2,
+      "wallMs": 27116.422999999486,
+      "cpuMs": 26687.5,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 12865.6908,
+          "atmospheric_sampling": 5324.4083,
+          "transmissions": 3291.2568,
+          "quadrature": 5068.5476,
+          "spectral_integration": 486.6282
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        86028288,
+        88313856,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B0",
+      "iteration": -1,
+      "wallMs": 388.1237000168767,
+      "cpuMs": 375.0,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 6638,
+        "quadrature_node_count": 99570,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6638
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 112.5219,
+          "atmospheric_sampling": 0.0,
+          "transmissions": 0.0,
+          "quadrature": 260.5975,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 101370,
+          "atmospheric_sampling": 0,
+          "transmissions": 0,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        86065152,
+        88313856,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B2",
+      "iteration": -1,
+      "wallMs": 28241.71539998497,
+      "cpuMs": 27546.875,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13353.5676,
+          "atmospheric_sampling": 5537.7129,
+          "transmissions": 3448.4326,
+          "quadrature": 5299.6534,
+          "spectral_integration": 509.1184
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        85340160,
+        88313856,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B4",
+      "iteration": -1,
+      "wallMs": 29848.10170001583,
+      "cpuMs": 29203.125,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120615,
+        "gk_subdivision_count": 2604,
+        "leaf_interval_count": 5437
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13187.5079,
+          "atmospheric_sampling": 5529.0942,
+          "transmissions": 4623.7327,
+          "quadrature": 5805.4981,
+          "spectral_integration": 607.3455
+        },
+        "calls": {
+          "geometry": 477330,
+          "atmospheric_sampling": 121515,
+          "transmissions": 362895,
+          "quadrature": 900,
+          "spectral_integration": 112885
+        }
+      },
+      "memory": [
+        86364160,
+        88858624,
+        34279714816
+      ]
+    },
+    {
+      "mode": "B1",
+      "iteration": -1,
+      "wallMs": 21278.717199980747,
+      "cpuMs": 20921.875,
+      "counters": {
+        "los_count": 900,
+        "segment_count": 2833,
+        "quadrature_node_count": 120765,
+        "gk_subdivision_count": 2609,
+        "leaf_interval_count": 5442
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 11419.4471,
+          "atmospheric_sampling": 4869.7054,
+          "transmissions": 3595.4668,
+          "quadrature": 1349.6754,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 356265,
+          "atmospheric_sampling": 120765,
+          "transmissions": 120765,
+          "quadrature": 900,
+          "spectral_integration": 0
+        }
+      },
+      "memory": [
+        86372352,
+        88858624,
+        34279714816
+      ]
+    }
+  ],
+  "inputSignatures": {
+    "B2": "82e11b56b3b815378568d606882ca1e86566fccf7941d525e7ae209cffb46872",
+    "B1": "6e91533281e1ed52d716be045694315b5ff6519f7e2b50080bb524d114e1fce9",
+    "B4": "b7452f86c31ba5ba6b28a3f77a61f1dbbd9207e861c65e37d5bf278f4059b3be",
+    "B0": "60bafde02c58524e134dbf86070c51312ec8e92fd2cd174644fc79b5480c964f"
+  },
+  "instrumentation": "exclusive nested perf_counter_ns; stage sums exclude request setup/signatures/serialization and measured timer overhead",
+  "historicalB1Ms": 20193.3169,
+  "historicalB1IsPaired": false,
+  "bandCounts": {
+    "B2": [
+      400
+    ],
+    "B4": [
+      800
+    ]
+  },
+  "protocolException": "Més de 600 s; mínim 10 mesures/configuració, criteri congelat abans de la campanya",
+  "totalSeconds": 1176.348022100021,
+  "summary": {
+    "B0": {
+      "p50Ms": 391.04020000377204,
+      "p95Ms": 416.1356149954372,
+      "p99Ms": 421.94432300078915,
+      "measurements": 10
+    },
+    "B1": {
+      "p50Ms": 21003.399099994567,
+      "p95Ms": 21933.86760500871,
+      "p99Ms": 21942.77944100584,
+      "measurements": 10
+    },
+    "B2": {
+      "p50Ms": 27155.27430002112,
+      "p95Ms": 27488.36485999491,
+      "p99Ms": 27520.440571997024,
+      "measurements": 10
+    },
+    "B4": {
+      "p50Ms": 29492.933649991755,
+      "p95Ms": 30347.55733000202,
+      "p99Ms": 30531.431146005343,
+      "measurements": 10
+    }
+  }
+}

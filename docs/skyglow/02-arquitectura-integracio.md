@@ -150,4 +150,8 @@ La ruta directa del `PropagationKernel` defineix la semàntica física. LUT, ker
 
 ## Implementació atmosfèrica verificada a 7.8
 
-El port d’aplicació rep `OpticalFieldRequest` i retorna `OpticalField`; el provider COESA resideix a infraestructura. Domini conserva perfils P/T/n, procedències, ENU fix i versions/capes. El kernel travessa i mostreja sense conèixer el model del provider; registra dependències en la mateixa quadratura. [Contractes i límits](06-contractes-dades.md). La resta del diagrama continua sent la destinació de la integració: 7.8 només calcula columnes moleculars offline, sense radiància, ERA5/CAMS, cache ni bridge.
+El port d’aplicació rep `OpticalFieldRequest` i retorna `OpticalField`; el provider COESA resideix a infraestructura. Domini conserva perfils P/T/n, procedències, ENU fix i versions/capes. El kernel travessa i mostreja sense conèixer el model del provider; registra dependències en la mateixa quadratura. [Contractes i límits](06-contractes-dades.md). La resta del diagrama continua sent la destinació de la integració: 7.8 calcula columnes moleculars i 7.9 radiància de dispersió simple monocromàtica offline; ERA5/CAMS, cache i bridge de radiància continuen pendents.
+
+## Estat verificat de 7.10 (2026-10-19)
+
+REUSE: SourceModel, geometria, camp/provider, fases i regles espectrals. ADAPT: PropagationKernel, transmissió i SG-REF per la ruta espectral/gasos. NEW: GasAbsorptionModel, LUT verificada O3, GK vectorial, SpectralOperator, referència espectral homogènia i telemetria exclusiva. El domini només rep dades immutables; la infraestructura verifica l'asset offline. Cap runtime de terreny, cache de moviment ni backend accelerat afegit. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

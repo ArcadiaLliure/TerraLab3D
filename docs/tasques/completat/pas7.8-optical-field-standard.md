@@ -18,7 +18,7 @@ Substituir la partició purament geomètrica de B0 per travesses amb estat òpti
 
 **En depenen:**
 
-- [Pas 7.9 — Rayleigh/aerosol B1](../pendent/pas7.9-rayleigh-aerosol-b1.md)
+- [Pas 7.9 — Rayleigh/aerosol B1](pas7.9-rayleigh-aerosol-b1.md)
 
 ## Fonts a consultar
 
@@ -76,4 +76,4 @@ Quan el criteri de sortida no es pugui demostrar, **no continuïs al pas següen
 
 ## Treball pendent
 
-Cap dins d’aquest pas. [7.9](../pendent/pas7.9-rayleigh-aerosol-b1.md) introduirà dispersió i haurà d’ampliar/revalidar SG-REF per al domini radiomètric corresponent. No s’ha executat aquí.
+Cap dins d’aquest pas. [7.9](pas7.9-rayleigh-aerosol-b1.md) introduirà dispersió i haurà d’ampliar/revalidar SG-REF per al domini radiomètric corresponent. No s’ha executat aquí.

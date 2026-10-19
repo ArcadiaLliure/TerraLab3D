@@ -1,0 +1,12 @@
+{
+  "originalFrozenScriptSha256": "1404d7f27db972cfa30d3f3ef127605677eb21d9d23e60b77779d11a93242f16",
+  "correctedScriptSha256": "74c053cb3f73883e28dc57569c5772833348d44b15e30c5e20aed8cb48ca669e",
+  "changes": [
+    "assert model gasós present per al comprovador de tipus",
+    "conversió np.bool a bool natiu en serialitzar la sanity de Jensen"
+  ],
+  "numericAlgorithmMetricThresholdChanged": false,
+  "rawInitialCasesPreserved": "casos-teff-inicials-serialitzacio.csv.gz",
+  "sameDecompressedCaseFile": true,
+  "decompressedSha256": "2e633895c74b1f554ef0db0f73b97165520b4dcff9d241f3bc4680ddfc641811"
+}

@@ -1,0 +1,1885 @@
+{
+  "transportGate": "diagnostic_only;step7.12_not_executed",
+  "referenceCases": [
+    {
+      "case": "S_point_LED_B3",
+      "unit": "W m^-2 sr^-1",
+      "runtime": 9.157954791715403e-13,
+      "referenceGasInput": "raw_0.01nm",
+      "refinements": [
+        {
+          "value": 9.157954308603222e-13,
+          "los_error_estimate": 3.0502115195629263e-26,
+          "evaluations": 63,
+          "path_order": 8,
+          "area_order": 8,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        },
+        {
+          "value": 9.15795430860322e-13,
+          "los_error_estimate": 3.050211519562926e-26,
+          "evaluations": 63,
+          "path_order": 16,
+          "area_order": 12,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        },
+        {
+          "value": 9.15795430860322e-13,
+          "los_error_estimate": 3.050211519562926e-26,
+          "evaluations": 63,
+          "path_order": 32,
+          "area_order": 16,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        }
+      ],
+      "relativeResidual": 5.275328596177076e-08,
+      "successiveReferenceChanges": [
+        -2.220446049250313e-16,
+        0.0
+      ],
+      "durationSeconds": 4.907452099985676,
+      "sourceId": "b1-point-000"
+    },
+    {
+      "case": "C_realistic_NOAA20",
+      "unit": "relative m^-2 sr^-1",
+      "runtime": 0.0005729813519870879,
+      "referenceGasInput": "same_0.5nm_LUT;raw_error_separate_spectral_ledger",
+      "refinements": [
+        {
+          "value": 0.0005729813870931604,
+          "los_error_estimate": 1.9084113858974594e-17,
+          "evaluations": 63,
+          "path_order": 2,
+          "area_order": 8,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        },
+        {
+          "value": 0.0005729813870933959,
+          "los_error_estimate": 1.908411385898244e-17,
+          "evaluations": 63,
+          "path_order": 4,
+          "area_order": 12,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        },
+        {
+          "value": 0.0005729813870933953,
+          "los_error_estimate": 1.9084113858982415e-17,
+          "evaluations": 63,
+          "path_order": 8,
+          "area_order": 16,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        }
+      ],
+      "relativeResidual": -6.126954243956817e-08,
+      "successiveReferenceChanges": [
+        4.1100456371623295e-13,
+        -1.1102230246251565e-15
+      ],
+      "durationSeconds": 2.2813976999896113,
+      "sourceId": "C:led_dominant:uniform_upward:963ce893260d209d"
+    },
+    {
+      "case": "C_kelvin3000_NOAA20",
+      "unit": "relative m^-2 sr^-1",
+      "runtime": 0.0005829437779437416,
+      "referenceGasInput": "same_0.5nm_LUT;raw_error_separate_spectral_ledger",
+      "refinements": [
+        {
+          "value": 0.0005829438138694067,
+          "los_error_estimate": 1.941592932661852e-17,
+          "evaluations": 63,
+          "path_order": 2,
+          "area_order": 8,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        },
+        {
+          "value": 0.0005829438138696531,
+          "los_error_estimate": 1.9415929326626725e-17,
+          "evaluations": 63,
+          "path_order": 4,
+          "area_order": 12,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        },
+        {
+          "value": 0.0005829438138696525,
+          "los_error_estimate": 1.9415929326626704e-17,
+          "evaluations": 63,
+          "path_order": 8,
+          "area_order": 16,
+          "revision": "sg-ref-homogeneous-spectral-v1"
+        }
+      ],
+      "relativeResidual": -6.162842802748258e-08,
+      "successiveReferenceChanges": [
+        4.227729277772596e-13,
+        -1.1102230246251565e-15
+      ],
+      "durationSeconds": 2.2991935000172816,
+      "sourceId": "C:led_dominant:uniform_upward:46611fa0a8429e28"
+    }
+  ],
+  "ceilingCases": [
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 10000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 8.47868220838055e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 88.76660000532866,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 450,
+        "gk_subdivision_count": 13,
+        "leaf_interval_count": 17
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 51.9199,
+          "atmospheric_sampling": 17.5298,
+          "transmissions": 14.1525,
+          "quadrature": 4.7948,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1352,
+          "atmospheric_sampling": 450,
+          "transmissions": 450,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 6.682403956402696e-19,
+      "fractionOf50km": 0.9999999999300515,
+      "missingFractionTo50km": 6.994849144348336e-11
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 20000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 8.478682208973168e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 90.95299997716211,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 480,
+        "gk_subdivision_count": 14,
+        "leaf_interval_count": 18
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 53.2771,
+          "atmospheric_sampling": 18.0135,
+          "transmissions": 14.5337,
+          "quadrature": 4.7804,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1442,
+          "atmospheric_sampling": 480,
+          "transmissions": 480,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 7.135037558769187e-20,
+      "fractionOf50km": 0.9999999999999466,
+      "missingFractionTo50km": 5.340172748447003e-14
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 30000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 8.47868220897343e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 94.86319997813553,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 480,
+        "gk_subdivision_count": 14,
+        "leaf_interval_count": 18
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 55.4064,
+          "atmospheric_sampling": 18.8078,
+          "transmissions": 15.156,
+          "quadrature": 5.1421,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1442,
+          "atmospheric_sampling": 480,
+          "transmissions": 480,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 4.964458093818964e-19,
+      "fractionOf50km": 0.9999999999999775,
+      "missingFractionTo50km": 2.2537527399890678e-14
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 50000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 8.47868220897362e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 99.80289998929948,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 510,
+        "gk_subdivision_count": 15,
+        "leaf_interval_count": 19
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 58.3785,
+          "atmospheric_sampling": 19.5679,
+          "transmissions": 15.9967,
+          "quadrature": 5.3562,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1532,
+          "atmospheric_sampling": 510,
+          "transmissions": 510,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.42180910408108e-20,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 10000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.1746230062909961e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 46.67829998652451,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 240,
+        "gk_subdivision_count": 6,
+        "leaf_interval_count": 10
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 27.0658,
+          "atmospheric_sampling": 9.2926,
+          "transmissions": 7.4616,
+          "quadrature": 2.5126,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 722,
+          "atmospheric_sampling": 240,
+          "transmissions": 240,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.429009931245138e-20,
+      "fractionOf50km": 0.9999751399346193,
+      "missingFractionTo50km": 2.486006538071628e-05
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 20000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.174652046059328e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 58.34980000508949,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 270,
+        "gk_subdivision_count": 7,
+        "leaf_interval_count": 11
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 34.2013,
+          "atmospheric_sampling": 11.3925,
+          "transmissions": 9.1392,
+          "quadrature": 3.0842,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 812,
+          "atmospheric_sampling": 270,
+          "transmissions": 270,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 2.0706679283089152e-20,
+      "fractionOf50km": 0.999999861948615,
+      "missingFractionTo50km": 1.3805138499023428e-07
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 30000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.1746522057607716e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 63.12370000523515,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 300,
+        "gk_subdivision_count": 8,
+        "leaf_interval_count": 12
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 36.74,
+          "atmospheric_sampling": 12.2307,
+          "transmissions": 10.2762,
+          "quadrature": 3.4184,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 902,
+          "atmospheric_sampling": 300,
+          "transmissions": 300,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 3.096142859106169e-21,
+      "fractionOf50km": 0.9999999979049795,
+      "missingFractionTo50km": 2.095020490422428e-09
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 50000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.1746522082216921e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 57.61190000339411,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 300,
+        "gk_subdivision_count": 8,
+        "leaf_interval_count": 12
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 33.6154,
+          "atmospheric_sampling": 11.3705,
+          "transmissions": 9.2393,
+          "quadrature": 3.0497,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 902,
+          "atmospheric_sampling": 300,
+          "transmissions": 300,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 5.8278136432967e-20,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 10000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 6.81417830530699e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 9.170300007099286,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 5.1975,
+          "atmospheric_sampling": 1.7276,
+          "transmissions": 1.4543,
+          "quadrature": 0.4827,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 137,
+          "atmospheric_sampling": 45,
+          "transmissions": 45,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 6.651772276887259e-23,
+      "fractionOf50km": 0.7353761626807581,
+      "missingFractionTo50km": 0.2646238373192419
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 20000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 8.969663661108219e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 11.819000006653368,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 6.8271,
+          "atmospheric_sampling": 2.2109,
+          "transmissions": 1.8165,
+          "quadrature": 0.6075,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 182,
+          "atmospheric_sampling": 60,
+          "transmissions": 60,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.152303181757663e-22,
+      "fractionOf50km": 0.9679929916870054,
+      "missingFractionTo50km": 0.032007008312994634
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 30000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 9.215119642942597e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 11.592599999858066,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 6.6755,
+          "atmospheric_sampling": 2.2244,
+          "transmissions": 1.783,
+          "quadrature": 0.6053,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 182,
+          "atmospheric_sampling": 60,
+          "transmissions": 60,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 8.19975302668462e-21,
+      "fractionOf50km": 0.9944822424728007,
+      "missingFractionTo50km": 0.005517757527199296
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 50000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 9.266248555659487e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 22.820299986051396,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 120,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 6
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 13.221,
+          "atmospheric_sampling": 4.4286,
+          "transmissions": 3.6604,
+          "quadrature": 1.1974,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 362,
+          "atmospheric_sampling": 120,
+          "transmissions": 120,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.2359191930275794e-22,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 10000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 6.9699378331274685e-15,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 3.11429999419488,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 1,
+        "quadrature_node_count": 15,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 1
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1.6814,
+          "atmospheric_sampling": 0.5573,
+          "transmissions": 0.4408,
+          "quadrature": 0.1528,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 47,
+          "atmospheric_sampling": 15,
+          "transmissions": 15,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 2.5038445131714915e-27,
+      "fractionOf50km": 0.48915710500068915,
+      "missingFractionTo50km": 0.5108428949993109
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 20000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.1022635977714328e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 6.609000003663823,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 2,
+        "quadrature_node_count": 30,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 2
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.7493,
+          "atmospheric_sampling": 1.2205,
+          "transmissions": 1.0052,
+          "quadrature": 0.3409,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 92,
+          "atmospheric_sampling": 30,
+          "transmissions": 30,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.8623772404316613e-23,
+      "fractionOf50km": 0.7735794541392396,
+      "missingFractionTo50km": 0.22642054586076044
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 30000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.2965998928208872e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 5.990199977532029,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 2,
+        "quadrature_node_count": 30,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 2
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.3799,
+          "atmospheric_sampling": 1.117,
+          "transmissions": 0.8951,
+          "quadrature": 0.3037,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 92,
+          "atmospheric_sampling": 30,
+          "transmissions": 30,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.862379240225773e-23,
+      "fractionOf50km": 0.9099665809097752,
+      "missingFractionTo50km": 0.09003341909022478
+    },
+    {
+      "mode": "B1_homogeneous_extension",
+      "topM": 50000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.4248873750116845e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 5.9723999875131994,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 2,
+        "quadrature_node_count": 30,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 2
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.3535,
+          "atmospheric_sampling": 1.1151,
+          "transmissions": 0.8967,
+          "quadrature": 0.3077,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 92,
+          "atmospheric_sampling": 30,
+          "transmissions": 30,
+          "quadrature": 1,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.9329359364156394e-23,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 10000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.624308983581108e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 2209.5731000008527,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 13,
+        "quadrature_node_count": 525,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 24
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 122.363,
+          "atmospheric_sampling": 1760.5494,
+          "transmissions": 30.772,
+          "quadrature": 295.3807,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1577,
+          "atmospheric_sampling": 44400,
+          "transmissions": 525,
+          "quadrature": 2926,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.4199000410461032e-20,
+      "fractionOf50km": 0.9999999540011715,
+      "missingFractionTo50km": 4.59988285239632e-08
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 20000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.62430931522002e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 6104.029400012223,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 24,
+        "quadrature_node_count": 690,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 35
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 272.0388,
+          "atmospheric_sampling": 4940.6458,
+          "transmissions": 63.1865,
+          "quadrature": 827.594,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 2072,
+          "atmospheric_sampling": 126240,
+          "transmissions": 690,
+          "quadrature": 8371,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.419900041047036e-20,
+      "fractionOf50km": 0.9999999974987392,
+      "missingFractionTo50km": 2.501260754073087e-09
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 30000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.624309332172552e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 12737.081600003876,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 35,
+        "quadrature_node_count": 855,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 46
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 517.5509,
+          "atmospheric_sampling": 10368.3182,
+          "transmissions": 116.1515,
+          "quadrature": 1734.454,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 2567,
+          "atmospheric_sampling": 262530,
+          "transmissions": 855,
+          "quadrature": 17446,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.4199000410470707e-20,
+      "fractionOf50km": 0.9999999997222235,
+      "missingFractionTo50km": 2.777764684935846e-10
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 50000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.624309334290405e-12,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 34156.509799999185,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 57,
+        "quadrature_node_count": 1185,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 68
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1287.417,
+          "atmospheric_sampling": 27897.2472,
+          "transmissions": 283.5576,
+          "quadrature": 4687.5279,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 3557,
+          "atmospheric_sampling": 698460,
+          "transmissions": 1185,
+          "quadrature": 46486,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.419900041047078e-20,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 10000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.741484296798147e-13,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 1897.6761999947485,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 13,
+        "quadrature_node_count": 255,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 15
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 91.0893,
+          "atmospheric_sampling": 1531.615,
+          "transmissions": 21.8957,
+          "quadrature": 252.528,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 767,
+          "atmospheric_sampling": 36030,
+          "transmissions": 255,
+          "quadrature": 2386,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.2224580492945964e-20,
+      "fractionOf50km": 0.9997831764782538,
+      "missingFractionTo50km": 0.00021682352174623443
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 20000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.743089862239813e-13,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 5717.665800009854,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 24,
+        "quadrature_node_count": 420,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 26
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 237.4289,
+          "atmospheric_sampling": 4647.2207,
+          "transmissions": 53.8932,
+          "quadrature": 778.2693,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1262,
+          "atmospheric_sampling": 117870,
+          "transmissions": 420,
+          "quadrature": 7831,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.2224580496174931e-20,
+      "fractionOf50km": 0.9999905291325731,
+      "missingFractionTo50km": 9.470867426863983e-06
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 30000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.743156270214922e-13,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 12299.549999996088,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 35,
+        "quadrature_node_count": 585,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 37
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 480.4157,
+          "atmospheric_sampling": 10016.9574,
+          "transmissions": 105.2671,
+          "quadrature": 1696.2854,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1757,
+          "atmospheric_sampling": 254160,
+          "transmissions": 585,
+          "quadrature": 16906,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.2224580496253745e-20,
+      "fractionOf50km": 0.9999991054693261,
+      "missingFractionTo50km": 8.945306738672443e-07
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 50000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.743163196711914e-13,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 33782.49960002722,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 57,
+        "quadrature_node_count": 915,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 59
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1261.7931,
+          "atmospheric_sampling": 27631.9742,
+          "transmissions": 266.4277,
+          "quadrature": 4621.5886,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 2747,
+          "atmospheric_sampling": 690090,
+          "transmissions": 915,
+          "quadrature": 45946,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.2224580496262839e-20,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 10000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 3.2266790374021e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 1614.8719000048004,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 12,
+        "quadrature_node_count": 180,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 12
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 73.274,
+          "atmospheric_sampling": 1305.1341,
+          "transmissions": 16.5965,
+          "quadrature": 219.3315,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 542,
+          "atmospheric_sampling": 33480,
+          "transmissions": 180,
+          "quadrature": 2221,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 6.012712485765569e-28,
+      "fractionOf50km": 0.8087765415703994,
+      "missingFractionTo50km": 0.19122345842960065
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 20000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 3.949590143127423e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 6311.094999982743,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 24,
+        "quadrature_node_count": 360,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 24
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 253.5729,
+          "atmospheric_sampling": 5130.0163,
+          "transmissions": 57.4493,
+          "quadrature": 869.2603,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1082,
+          "atmospheric_sampling": 122310,
+          "transmissions": 360,
+          "quadrature": 8131,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 7.229019481882974e-28,
+      "fractionOf50km": 0.989976325364854,
+      "missingFractionTo50km": 0.010023674635145974
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 30000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 3.986342741195397e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 14351.917399995727,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 35,
+        "quadrature_node_count": 525,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 35
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 541.3315,
+          "atmospheric_sampling": 11665.9997,
+          "transmissions": 129.4837,
+          "quadrature": 2014.4665,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1577,
+          "atmospheric_sampling": 258600,
+          "transmissions": 525,
+          "quadrature": 17206,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 7.2884122800467e-28,
+      "fractionOf50km": 0.9991884716039406,
+      "missingFractionTo50km": 0.0008115283960593578
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 50000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 3.9895803989775293e-14,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 37762.394399993354,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 57,
+        "quadrature_node_count": 855,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 57
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1388.4761,
+          "atmospheric_sampling": 30767.1397,
+          "transmissions": 316.8293,
+          "quadrature": 5289.0997,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 2567,
+          "atmospheric_sampling": 694530,
+          "transmissions": 855,
+          "quadrature": 46246,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 7.293709547514751e-28,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 10000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 4.602652434961289e-15,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 1345.0793999945745,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 10,
+        "quadrature_node_count": 150,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 10
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 61.9418,
+          "atmospheric_sampling": 1086.1511,
+          "transmissions": 14.0786,
+          "quadrature": 182.3579,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 452,
+          "atmospheric_sampling": 27150,
+          "transmissions": 150,
+          "quadrature": 1801,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 8.076154136675983e-29,
+      "fractionOf50km": 0.7720587404936842,
+      "missingFractionTo50km": 0.22794125950631583
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 20000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 5.75628401515403e-15,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 6018.8935000041965,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 22,
+        "quadrature_node_count": 330,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 22
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 242.8023,
+          "atmospheric_sampling": 4894.256,
+          "transmissions": 55.1995,
+          "quadrature": 826.0525,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 992,
+          "atmospheric_sampling": 118680,
+          "transmissions": 330,
+          "quadrature": 7891,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 9.920501409828007e-29,
+      "fractionOf50km": 0.9655713633526024,
+      "missingFractionTo50km": 0.03442863664739759
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 30000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 5.9320924035620865e-15,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 13437.278099998366,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 33,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 33
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 510.3941,
+          "atmospheric_sampling": 10952.7482,
+          "transmissions": 117.3191,
+          "quadrature": 1856.1805,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 1487,
+          "atmospheric_sampling": 254970,
+          "transmissions": 495,
+          "quadrature": 16966,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.0186376897550053e-28,
+      "fractionOf50km": 0.9950618375608055,
+      "missingFractionTo50km": 0.004938162439194538
+    },
+    {
+      "mode": "B1_standard",
+      "topM": 50000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 5.961531414071131e-15,
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "wallMs": 38056.06709999847,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 55,
+        "quadrature_node_count": 825,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 55
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1426.5951,
+          "atmospheric_sampling": 31036.4708,
+          "transmissions": 311.4166,
+          "quadrature": 5280.7801,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 2477,
+          "atmospheric_sampling": 690900,
+          "transmissions": 825,
+          "quadrature": 46006,
+          "spectral_integration": 0
+        }
+      },
+      "estimatedError": 1.023039333549505e-28,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 10000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.0166445238706093e-09,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 5626.825100014685,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 13,
+        "quadrature_node_count": 525,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 24
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 282.8138,
+          "atmospheric_sampling": 3834.5786,
+          "transmissions": 259.8173,
+          "quadrature": 1191.4022,
+          "spectral_integration": 40.2042
+        },
+        "calls": {
+          "geometry": 60738,
+          "atmospheric_sampling": 59161,
+          "transmissions": 4434,
+          "quadrature": 3910,
+          "spectral_integration": 526
+        }
+      },
+      "estimatedError": 1.8466916696059924e-18,
+      "fractionOf50km": 0.9999999255119641,
+      "missingFractionTo50km": 7.448803585052843e-08
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 20000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.0166445973697778e-09,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 16091.269600001397,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 24,
+        "quadrature_node_count": 690,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 35
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 708.7373,
+          "atmospheric_sampling": 11174.1406,
+          "transmissions": 718.5418,
+          "quadrature": 3432.3581,
+          "spectral_integration": 39.9662
+        },
+        "calls": {
+          "geometry": 177663,
+          "atmospheric_sampling": 175591,
+          "transmissions": 12350,
+          "quadrature": 11661,
+          "spectral_integration": 691
+        }
+      },
+      "estimatedError": 1.846691670287687e-18,
+      "fractionOf50km": 0.9999999978077974,
+      "missingFractionTo50km": 2.192202641637664e-09
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 30000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.0166445994194362e-09,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 32326.84359999257,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 35,
+        "quadrature_node_count": 855,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 46
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1366.2342,
+          "atmospheric_sampling": 22554.0751,
+          "transmissions": 1431.6451,
+          "quadrature": 6914.9206,
+          "spectral_integration": 39.9918
+        },
+        "calls": {
+          "geometry": 350688,
+          "atmospheric_sampling": 348121,
+          "transmissions": 24006,
+          "quadrature": 23152,
+          "spectral_integration": 856
+        }
+      },
+      "estimatedError": 1.8466916703363543e-18,
+      "fractionOf50km": 0.9999999998238986,
+      "missingFractionTo50km": 1.7610135571999308e-10
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 50000.0,
+      "elevationDeg": 0.5,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.0166445995984687e-09,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 81011.55749999452,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 57,
+        "quadrature_node_count": 1185,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 68
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3278.2165,
+          "atmospheric_sampling": 56724.9283,
+          "transmissions": 3561.1993,
+          "quadrature": 17387.0766,
+          "spectral_integration": 42.7305
+        },
+        "calls": {
+          "geometry": 888198,
+          "atmospheric_sampling": 884641,
+          "transmissions": 60082,
+          "quadrature": 58898,
+          "spectral_integration": 1186
+        }
+      },
+      "estimatedError": 1.846691670337663e-18,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 10000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.0225600915462242e-10,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 5291.189500014298,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 13,
+        "quadrature_node_count": 255,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 15
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 241.9969,
+          "atmospheric_sampling": 3632.4666,
+          "transmissions": 243.3164,
+          "quadrature": 1120.2844,
+          "spectral_integration": 35.3454
+        },
+        "calls": {
+          "geometry": 55128,
+          "atmospheric_sampling": 54361,
+          "transmissions": 3862,
+          "quadrature": 3608,
+          "spectral_integration": 256
+        }
+      },
+      "estimatedError": 1.5940637405753265e-18,
+      "fractionOf50km": 0.9997914498237301,
+      "missingFractionTo50km": 0.0002085501762698616
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 20000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.022767159864476e-10,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 15621.77490000613,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 24,
+        "quadrature_node_count": 420,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 26
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 654.9233,
+          "atmospheric_sampling": 10854.2343,
+          "transmissions": 704.0621,
+          "quadrature": 3352.9875,
+          "spectral_integration": 37.5685
+        },
+        "calls": {
+          "geometry": 172053,
+          "atmospheric_sampling": 170791,
+          "transmissions": 11778,
+          "quadrature": 11359,
+          "spectral_integration": 421
+        }
+      },
+      "estimatedError": 1.5940638889412244e-18,
+      "fractionOf50km": 0.9999939074942661,
+      "missingFractionTo50km": 6.09250573391229e-06
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 30000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.022772922126688e-10,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 31831.06999998563,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 35,
+        "quadrature_node_count": 585,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 37
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1309.6057,
+          "atmospheric_sampling": 22202.3469,
+          "transmissions": 1435.9523,
+          "quadrature": 6827.3183,
+          "spectral_integration": 38.2605
+        },
+        "calls": {
+          "geometry": 345078,
+          "atmospheric_sampling": 343321,
+          "transmissions": 23434,
+          "quadrature": 22850,
+          "spectral_integration": 586
+        }
+      },
+      "estimatedError": 1.5940639043874857e-18,
+      "fractionOf50km": 0.9999995414521516,
+      "missingFractionTo50km": 4.5854784835874796e-07
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 50000.0,
+      "elevationDeg": 5.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 1.0227733911172258e-10,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 79525.46400000574,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 57,
+        "quadrature_node_count": 915,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 59
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3181.6064,
+          "atmospheric_sampling": 55763.7361,
+          "transmissions": 3523.5306,
+          "quadrature": 16997.7894,
+          "spectral_integration": 40.9898
+        },
+        "calls": {
+          "geometry": 882588,
+          "atmospheric_sampling": 879841,
+          "transmissions": 59510,
+          "quadrature": 58596,
+          "spectral_integration": 916
+        }
+      },
+      "estimatedError": 1.5940639046832726e-18,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 10000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 4.230085058647327e-12,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 4752.159700001357,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 12,
+        "quadrature_node_count": 180,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 12
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 206.1791,
+          "atmospheric_sampling": 3272.7193,
+          "transmissions": 212.7268,
+          "quadrature": 1007.8798,
+          "spectral_integration": 34.6465
+        },
+        "calls": {
+          "geometry": 52083,
+          "atmospheric_sampling": 51541,
+          "transmissions": 3604,
+          "quadrature": 3425,
+          "spectral_integration": 181
+        }
+      },
+      "estimatedError": 2.085516790013163e-22,
+      "fractionOf50km": 0.8119856182540639,
+      "missingFractionTo50km": 0.1880143817459361
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 20000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 5.162004303919316e-12,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 16360.831199999666,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 24,
+        "quadrature_node_count": 360,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 24
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 680.1072,
+          "atmospheric_sampling": 11393.3691,
+          "transmissions": 735.4324,
+          "quadrature": 3497.2062,
+          "spectral_integration": 36.8342
+        },
+        "calls": {
+          "geometry": 179193,
+          "atmospheric_sampling": 178111,
+          "transmissions": 12210,
+          "quadrature": 11851,
+          "spectral_integration": 361
+        }
+      },
+      "estimatedError": 2.0936291417222503e-22,
+      "fractionOf50km": 0.9908720978505312,
+      "missingFractionTo50km": 0.009127902149468792
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 30000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 5.205903611066193e-12,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 32729.88400000031,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 35,
+        "quadrature_node_count": 525,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 35
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1340.6875,
+          "atmospheric_sampling": 22853.0604,
+          "transmissions": 1484.1694,
+          "quadrature": 6990.9906,
+          "spectral_integration": 43.4368
+        },
+        "calls": {
+          "geometry": 352218,
+          "atmospheric_sampling": 350641,
+          "transmissions": 23866,
+          "quadrature": 23342,
+          "spectral_integration": 526
+        }
+      },
+      "estimatedError": 2.0966145283629377e-22,
+      "fractionOf50km": 0.9992987856263985,
+      "missingFractionTo50km": 0.0007012143736014886
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 50000.0,
+      "elevationDeg": 30.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 5.209556627053174e-12,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 80418.95309998654,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 57,
+        "quadrature_node_count": 855,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 57
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3224.1799,
+          "atmospheric_sampling": 56441.5242,
+          "transmissions": 3528.4476,
+          "quadrature": 17166.2404,
+          "spectral_integration": 40.3128
+        },
+        "calls": {
+          "geometry": 889728,
+          "atmospheric_sampling": 887161,
+          "transmissions": 59942,
+          "quadrature": 59088,
+          "spectral_integration": 856
+        }
+      },
+      "estimatedError": 2.0966875363046678e-22,
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 10000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 5.99878840678544e-13,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 3861.159099993529,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 10,
+        "quadrature_node_count": 150,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 10
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 169.7978,
+          "atmospheric_sampling": 2651.4113,
+          "transmissions": 173.4968,
+          "quadrature": 814.4207,
+          "spectral_integration": 34.6241
+        },
+        "calls": {
+          "geometry": 42153,
+          "atmospheric_sampling": 41701,
+          "transmissions": 2920,
+          "quadrature": 2771,
+          "spectral_integration": 151
+        }
+      },
+      "estimatedError": 3.335299367380367e-23,
+      "variableColumnReference550": {
+        "runtimePerNm": 6.1668087575425105e-15,
+        "response": 0.9949501,
+        "refinements": [
+          {
+            "value": 6.198109317009372e-15,
+            "los_error_estimate": 1.2664354494152641e-25,
+            "evaluations": 252,
+            "path_order": 8,
+            "area_order": 8,
+            "revision": "sg-ref-spherical-monochromatic-v1"
+          },
+          {
+            "value": 6.198109309813729e-15,
+            "los_error_estimate": 6.96323949983881e-26,
+            "evaluations": 252,
+            "path_order": 12,
+            "area_order": 8,
+            "revision": "sg-ref-spherical-monochromatic-v1"
+          },
+          {
+            "value": 6.198109294777078e-15,
+            "los_error_estimate": 2.335870820745828e-26,
+            "evaluations": 252,
+            "path_order": 16,
+            "area_order": 8,
+            "revision": "sg-ref-spherical-monochromatic-v1"
+          }
+        ],
+        "relativeResidual": -1.143390074842543e-07
+      },
+      "fractionOf50km": 0.7755124932435898,
+      "missingFractionTo50km": 0.22448750675641016
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 20000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.484654354797689e-13,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 15788.380999991205,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 22,
+        "quadrature_node_count": 330,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 22
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 649.6204,
+          "atmospheric_sampling": 11025.8224,
+          "transmissions": 697.4616,
+          "quadrature": 3361.8296,
+          "spectral_integration": 36.3127
+        },
+        "calls": {
+          "geometry": 171963,
+          "atmospheric_sampling": 170971,
+          "transmissions": 11706,
+          "quadrature": 11377,
+          "spectral_integration": 331
+        }
+      },
+      "estimatedError": 3.345831249376501e-23,
+      "fractionOf50km": 0.9676025500732847,
+      "missingFractionTo50km": 0.03239744992671534
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 30000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.700083254577349e-13,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 32388.17679998465,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 33,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 33
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1321.924,
+          "atmospheric_sampling": 22694.351,
+          "transmissions": 1418.2489,
+          "quadrature": 6898.9877,
+          "spectral_integration": 36.8848
+        },
+        "calls": {
+          "geometry": 344988,
+          "atmospheric_sampling": 343501,
+          "transmissions": 23362,
+          "quadrature": 22868,
+          "spectral_integration": 496
+        }
+      },
+      "estimatedError": 3.3586874175677495e-23,
+      "fractionOf50km": 0.9954528078013072,
+      "missingFractionTo50km": 0.004547192198692818
+    },
+    {
+      "mode": "B4_standard",
+      "topM": 50000.0,
+      "elevationDeg": 90.0,
+      "azimuthDeg": 67.91030652518488,
+      "radiance": 7.735256954656448e-13,
+      "unit": "W m^-2 sr^-1",
+      "wallMs": 81175.152300013,
+      "counters": {
+        "los_count": 1,
+        "segment_count": 55,
+        "quadrature_node_count": 825,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 55
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3245.373,
+          "atmospheric_sampling": 57093.9616,
+          "transmissions": 3540.2498,
+          "quadrature": 17237.0697,
+          "spectral_integration": 40.0319
+        },
+        "calls": {
+          "geometry": 882498,
+          "atmospheric_sampling": 880021,
+          "transmissions": 59438,
+          "quadrature": 58614,
+          "spectral_integration": 826
+        }
+      },
+      "estimatedError": 3.3591678508272607e-23,
+      "variableColumnReference550": {
+        "runtimePerNm": 7.957602486694634e-15,
+        "response": 0.9949501,
+        "refinements": [
+          {
+            "value": 7.997992495922544e-15,
+            "los_error_estimate": 1.2704955559074637e-25,
+            "evaluations": 1197,
+            "path_order": 8,
+            "area_order": 8,
+            "revision": "sg-ref-spherical-monochromatic-v1"
+          },
+          {
+            "value": 7.99799247863236e-15,
+            "los_error_estimate": 6.969176570989362e-26,
+            "evaluations": 1197,
+            "path_order": 12,
+            "area_order": 8,
+            "revision": "sg-ref-spherical-monochromatic-v1"
+          },
+          {
+            "value": 7.997992461315265e-15,
+            "los_error_estimate": 2.3492423733798192e-26,
+            "evaluations": 1197,
+            "path_order": 16,
+            "area_order": 8,
+            "revision": "sg-ref-spherical-monochromatic-v1"
+          }
+        ],
+        "relativeResidual": -1.1466897620326932e-07
+      },
+      "fractionOf50km": 1.0,
+      "missingFractionTo50km": 0.0
+    }
+  ],
+  "above50km": "contribució desconeguda; no assumida nul·la; provider limitat a 50 km",
+  "inputHashes": {
+    "barcelona-realista.json": "612443f94be673cd19ab8a23d3078f5076ae5a97f264dad428feb7b9a58bd8df",
+    "barcelona-kelvin-3000.json": "c609688474bade3ac2fc45cfd3fda4235e36ac6b2a66fb8c913b1567bdef8916"
+  },
+  "jensen": {
+    "columnM2": 1e+24,
+    "litBands": 800,
+    "unlitBands": 0,
+    "minimumTeffMinusExpMeanTau": 6.328271240363392e-15,
+    "maximumTeffMinusExpMeanTau": 9.446591732187315e-07,
+    "teffRange": [
+      0.5997082835118569,
+      0.9995457038710378
+    ],
+    "weights": "SPD times declared positive CIE V diagnostic response; no mean optical depth replacement"
+  },
+  "columnQuadratureRevision": "temperature_knots_exact_partition_and_zero_components_skipped_v2",
+  "preservedPreviousRuns": "diagnostics-abans-particio-termica.json"
+}

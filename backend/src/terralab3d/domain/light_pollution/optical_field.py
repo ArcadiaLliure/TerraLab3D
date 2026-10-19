@@ -319,6 +319,21 @@ class OpticalField:
             height = profile.heights_m[0]
         if profile.heights_m[-1] < height <= profile.heights_m[-1] + tolerance:
             height = profile.heights_m[-1]
+        if segment is not None:
+            expected = segment.dependency.layer_index
+            if not 0 <= expected < len(profile.heights_m) - 1:
+                raise OpticalCoverageError("Índex de capa del segment incompatible")
+            lower, upper = profile.heights_m[expected : expected + 2]
+            # Les arrels i la norma ECEF poden arrodonir a bandes oposades
+            # d'un mateix nus. Només s'ajusta dins l'error geomètric 64 ε R;
+            # això no omple buits de cobertura ni altera fronteres laterals.
+            if lower - tolerance <= height < lower:
+                height = lower
+            if (
+                upper <= height <= upper + tolerance
+                and expected < len(profile.heights_m) - 2
+            ):
+                height = math.nextafter(upper, lower)
         pressure, temperature, index = profile.values(height)
         dependency = OpticalDependency(
             tile.tile_id, tile.version, index, profile.layer_signature(index)

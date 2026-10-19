@@ -1,0 +1,12 @@
+{
+  "wheel": "terralab3d_core-0.1.0-py3-none-any.whl",
+  "sha256": "10bfcfd882e8a65fae6e5740b9c07b11dcae7d9fa966e79fab10b7c19ac33be3",
+  "gasMembersMatchSource": {
+    "terralab3d/infrastructure/catalogs/gases/README.md": true,
+    "terralab3d/infrastructure/catalogs/gases/manifest.json": true,
+    "terralab3d/infrastructure/catalogs/gases/o3-serdyuchenko-visible-lut.csv": true,
+    "terralab3d/infrastructure/catalogs/gases/o3-serdyuchenko-visible-raw.npz": true
+  },
+  "pythonModulesCheckedAgainstFinalSource": 310,
+  "pythonModuleMismatches": []
+}

@@ -23,7 +23,7 @@ Fer executable Black Marble → SourceModel C abans de SG-REF i conservar l’es
 
 **En depenen:**
 - [Pas 7.6](../completat/pas7.6-sg-ref-reference-solver.md)
-- [Pas 7.10](../pendent/pas7.10-gas-spectral-kernel.md)
+- [Pas 7.10](../completat/pas7.10-gas-spectral-kernel.md)
 - [Pas 7.14](../pendent/pas7.14-photometric-projections.md)
 - [Pas 7.16](../pendent/pas7.16-uncertainty-provenance.md)
 - [Pas 7.17](../pendent/pas7.17-clear-sky-ground-truth.md)

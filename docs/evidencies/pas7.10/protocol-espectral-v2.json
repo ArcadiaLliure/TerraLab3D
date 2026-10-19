@@ -1,0 +1,110 @@
+{
+  "protocolId": "TL3D-SKY-7.10-v2",
+  "frozenUtc": "2026-10-19T07:43:13.600246+00:00",
+  "criterion": "TL3D-SKY-V3-SPECTRAL-001",
+  "maximumInclusiveMag": 0.01,
+  "aggregation": "maximum_every_case",
+  "domainNm": [
+    380,
+    780
+  ],
+  "candidate": "knot-union-simpson-1 unchanged; append gas LUT knots, version transport identity separately",
+  "gasLut": {
+    "species": [
+      "O3"
+    ],
+    "rawZenodo": "10.5281/zenodo.5793207",
+    "rawSha256": "b5001c303b8cd74e92b906e443f30b7141432d9f5ff2071e248351f77db51fdb",
+    "gridNm": 0.5,
+    "temperatureK": [
+      203,
+      213,
+      223,
+      233,
+      243,
+      253,
+      263,
+      273,
+      283,
+      293
+    ],
+    "interpolation": "linear lambda and T; pressure independent measured cross sections; prescribed composition only",
+    "rawNegativeValues": "reject if any within visible domain; no clipping",
+    "columnMoleculesPerM2": [
+      0,
+      1e+22,
+      1e+23,
+      1e+24
+    ],
+    "unknownSpecies": "error; no implicit zero"
+  },
+  "validation": {
+    "spectra": "42 CIE + Kelvin 2800/3000/4000/5000/6500 + radiant and photopic mixtures + narrow triangular fixtures from 7.4",
+    "responses": [
+      "X",
+      "Y",
+      "Z",
+      "V",
+      "X*V",
+      "Y*V",
+      "Z*V"
+    ],
+    "scattering": "Rayleigh 200-1000nm Chance-Spurr; aerosol prescribed Angstrom exponents 0/1.3/2, SSA 0.9, HG 0.65",
+    "operatorCases": "gas-only; Rayleigh-only; aerosol-only; combined across columns and source-observer geometry cosines -1/0/1",
+    "oracle": "raw 0.01nm LUT, independent composite GL8/16/32 joint knots; separate LUT and Simpson ledgers; nonpolynomial extension uses GL convergence rather than Decimal polynomial identity",
+    "transport": "independent SG-REF geometry/P/T/path/phase extended with declared gas cross sections; diagnostic no transport gate",
+    "nearZero": "inherited rule eta; reference resolution from GL convergence and accumulated roundoff"
+  },
+  "timing": {
+    "stages": [
+      "geometry",
+      "atmospheric_sampling",
+      "transmissions",
+      "quadrature",
+      "spectral_integration"
+    ],
+    "exclusiveNestedTimers": true,
+    "mainSources": 100,
+    "los": 900,
+    "modes": [
+      "B0",
+      "B1_legacy",
+      "B2_spectral_no_gas",
+      "B4_spectral_gas"
+    ],
+    "warmups": 5,
+    "measurementsRequested": 30,
+    "exceptionAfterSeconds": 600,
+    "minimumMeasurements": 10,
+    "orderSeed": "0x544C3344534B5947",
+    "samePositionsAsB1": true,
+    "spectralSpd": "CIE LED-B3",
+    "noLaterAcceleration": [
+      "AD",
+      "global_cache",
+      "LUT_transport",
+      "FFT",
+      "quadtree",
+      "GPU"
+    ],
+    "benchmarkNSelection": false
+  },
+  "ceiling": {
+    "km": [
+      10,
+      20,
+      30,
+      50
+    ],
+    "atmosphere": "COESA dry at 1km nodes; aerosol scale height 1200m; explicit ozone mixing profile; defined inputs not observed climate",
+    "elevationsDeg": [
+      0.5,
+      5,
+      30,
+      90
+    ],
+    "above50km": "not assumed zero; outside implemented standard field and reported unquantified"
+  },
+  "noStep7_11": true,
+  "inputPreflightRevision": "v1 rebutjat abans de generar LUT o resultats candidats: 69 valors negatius a 193 K; es restringeix el domini a 203–293 K, sense retallar ni alterar les dades publicades ni el pressupost de 0,01 mag."
+}

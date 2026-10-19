@@ -1,0 +1,12 @@
+{
+  "frozenUtc": "2026-10-19T08:22:06.045832+00:00",
+  "change": "partir exactament als creuaments de T amb els nusos de LUT; ometre només columnes exactament zero",
+  "physicalOperatorAndTolerances": "unchanged",
+  "noLaterAcceleration": true,
+  "originalBenchmark": "preserved unchanged; homogeneous paths have no temperature crossings",
+  "newSourceHashes": {
+    "backend/src/terralab3d/domain/light_pollution/optical_paths.py": "fe79a510aaaf739f690da1106ed0cd3432404a2efb831e87b56641e6e2100f17",
+    "backend/src/terralab3d/domain/light_pollution/spectral_transport.py": "8bdb619a327736c0e9bb25249e7cf2e897b73f0b492b8ccbae9d23c78d6cfd3e"
+  },
+  "verification": "repeat variable columns and homogeneous900LOS; retain old cases for exact comparison"
+}

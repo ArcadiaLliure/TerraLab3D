@@ -92,3 +92,8 @@
 - PENDENT DE DADES: biblioteca SPD amb llicències clares i cobertura de tecnologies modernes.
 - PENDENT DE DADES: biblioteca d'aerosols que transformi AOD/RH/composició en `ω0` i coeficients de fase.
 - PENDENT DE DADES: microfísica de núvols i política de multiple scattering.
+
+
+## Estat gasós verificat a 7.10
+
+La LUT O3 mesurada amb font i llicència verificades no és un derivat HITRAN/LOWTRAN ni acredita H2O/O2/NO2 o aire terrestre complet. [Domini i resultats](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

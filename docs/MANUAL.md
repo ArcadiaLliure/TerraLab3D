@@ -563,3 +563,46 @@ La segona ordre requereix matplotlib opcional. La consola informa de les columne
 El model és COESA 1975, NASA TR R-459 publicat el 1976, sec i limitat a 0–50 km. El perfil per defecte usa nusos cada 100 m, log(P) i T lineals, i densitat derivada del gas ideal. Les fixtures cobreixen fins a 10 km; no són meteorologia observada. La figura mostra l’error d’interpolació separat de la quadratura. La consulta fora de cobertura falla, sense extrapolació. Aerosols, absorció gasosa i núvols continuen absents; la dispersió arribarà a 7.9. La UI encara no rep radiància d’aquest kernel. [Resultats i límits](evidencies/pas7.8/validacio-optical-field.md).
 
 ![Perfils del camp atmosfèric sec i convergència vertical](evidencies/pas7.8/perfils-i-convergencia.png)
+
+## B1: radiància monocromàtica de dispersió simple
+
+El [Pas 7.9](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) permet executar la física de Rayleigh/aerosol offline:
+
+```powershell
+python -X utf8 tools/benchmark_skyglow_b1.py --output-dir .runtime-b1-resultats
+python -X utf8 tools/plot_skyglow_b1.py --input .runtime-b1-resultats/resultats-b1-v1.json --output-dir .runtime-b1-resultats
+```
+
+La consola mostra set diagnòstics, cinc escalfaments i les passades mesurades; la ruta directa pot trigar força. `--diagnostics-only` omet la campanya temporal. El JSON conté fonts, medi, banda/fases, procedències, signatures de codi/entrades, residuals SG-REF i agregats. El CSV conserva cada passada amb `run_id`, temps, RSS i comptadors de LOS, fase i transmissió. Una fallada o Ctrl+C no substitueix els fitxers finals amb dades parcials. Les figures requereixen matplotlib opcional.
+
+`stage=single_scattering_monochromatic_B1` identifica el resultat a 550 nm; `integral_unit` diferencia W m⁻² sr⁻¹ nm⁻¹ d’una escala relativa C. El model no inclou absorció gasosa, núvols ni visibilitat física de terreny. La fixture homogènia i l’aerosol HG són prescrits; no representen meteorologia mesurada. El rectangle es calcula per àrea i el zenit usa el mateix kernel que les altres elevacions. La UI continua amb transport físic pendent de connexió a 7.25–7.27.
+
+![Refinament de fase i residuals de B1, sense gate radiomètric](evidencies/pas7.9/fase-i-residuals-b1.png)
+
+![Escalat i latència mesurats del B1 directe](evidencies/pas7.9/escalat-i-latencia-b1.png)
+
+Els temps són observacions d’aquest maquinari, sense SLO de producte. El residual contra SG-REF és diagnòstic; el gate radiomètric és 7.12 i l’homologació urbana H continua pendent. [Resultats i límits](evidencies/pas7.9/validacio-b1.md).
+
+## Transport espectral i diagnòstic de gasos B2/B4
+
+El [Pas 7.10](tasques/completat/pas7.10-gas-spectral-kernel.md) ofereix transport espectral offline amb fonts S/C. Amb el backend instal·lat, executeu des de l'arrel i useu una carpeta nova per preservar les evidències congelades:
+
+```powershell
+python tools/benchmark_skyglow_spectral.py --output .runtime-espectral-local
+python tools/validate_spectral_transport_step7_10.py --output .runtime-espectral-local
+python tools/validate_gas_bands_step7_10.py --output .runtime-espectral-local
+python tools/diagnose_spectral_transport_step7_10.py --output .runtime-espectral-local
+python tools/plot_spectral_transport_step7_10.py --root .runtime-espectral-local
+```
+
+La campanya principal de 900 LOS va durar aproximadament vint minuts en el maquinari verificat. Els JSON/CSV inclouen temps, comptadors, identitats i unitats. Schema 4 diferencia B2 (gasos desactivats explícitament per diagnosi) i B4 (composició prescrita). La radiància integrada té unitat W m⁻² sr⁻¹ o escala relativa C; el pes CIE d'aquest diagnòstic no és encara una projecció SQM/TESS ni una acreditació de lúmens urbans.
+
+La LUT empaquetada només acredita O3 entre 380–780 nm i 203–293 K. La composició i els perfils són explícits; cobertura o espècies absents fallen i no s'extrapolen. No acredita H2O/O2/NO2, aire terrestre complet, meteorologia real ni H. La modalitat per kelvins conserva les SPD CIE i les normalitzacions de 7.5.1, però la radiància encara no arriba al renderer.
+
+![Cost mesurat per etapa i latència B0/B1/B2/B4](evidencies/pas7.10/cost-etapes-i-latencia.png)
+
+![Pressupost espectral de 0,01 mag revalidat](evidencies/pas7.10/pressupost-espectral.png)
+
+![Efecte del sostre 10–50 km segons medi i elevació](evidencies/pas7.10/sensibilitat-sostre-atmosferic.png)
+
+Al zenit de la fixture B4 estàndard, un sostre de 10 km dona 22,45% menys radiància que 50 km. La cua superior a 50 km continua desconeguda: el control del sostre no és una estimació de l'error espectral ni una qualificació física universal. Els temps de perfils variables es documenten separadament de la fixture homogènia de 900 LOS. [Resultats, procedència i límits](evidencies/pas7.10/validacio-espectral-i-gasos.md). El següent pas és 7.11 pendent; no s'ha executat en aquesta iteració.

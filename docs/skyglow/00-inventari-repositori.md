@@ -75,4 +75,8 @@ La inspecció de codi anterior es manté històrica. La decisió inicial **VNP46
 
 ## Estat verificat després de 7.6
 
-La inspecció anterior és històrica. [7.6](../tasques/completat/pas7.6-sg-ref-reference-solver.md) incorpora SG-REF offline S/C, GK21/GL, 401 nusos CIE i un segon transport Monte Carlo per F5 en el domini pla homogeni declarat. 7.7 incorpora la infraestructura geomètrica B0, ECEF/ENU esfèrics i GK7/15 propis. 7.8 incorpora el camp estàndard P/T/n amb travesses/dependències i oracle de columnes; el transport radiomètric continua pendent des de 7.9; cap homologació urbana H. La skill `plan` ha estat accessible i aplicada en aquesta iteració. [Evidència](../evidencies/pas7.6/validacio-sg-ref.md).
+La inspecció anterior és històrica. [7.6](../tasques/completat/pas7.6-sg-ref-reference-solver.md) incorpora SG-REF offline S/C, GK21/GL, 401 nusos CIE i un segon transport Monte Carlo per F5 en el domini pla homogeni declarat. 7.7 incorpora la infraestructura geomètrica B0, ECEF/ENU esfèrics i GK7/15 propis. 7.8 incorpora el camp estàndard P/T/n amb travesses/dependències i oracle de columnes; 7.9 calcula dispersió simple monocromàtica a 550 nm amb transmissió variable i referència revalidada; 7.10 amplia espectre directe i O3 prescrit; aire terrestre complet i connexió de producte continuen pendents, sense homologació urbana H. La skill `plan` ha estat accessible i aplicada en aquesta iteració. [Evidència](../evidencies/pas7.6/validacio-sg-ref.md).
+
+## Estat verificat de 7.10 (2026-10-19)
+
+7.10 incorpora la ruta espectral directa S/C i el catàleg O3 offline; la inspecció anterior continua històrica. Geometria/P/T compartits entre λ, unitats/signatures i 405 proves backend. Aire terrestre complet, H i connexió gràfica continuen pendents. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).

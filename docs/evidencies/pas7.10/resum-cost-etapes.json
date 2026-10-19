@@ -1,0 +1,93 @@
+{
+  "sourceFile": "resultats-b0-b1-b2-b4.json",
+  "seed": "0x544C3344534B5947",
+  "modelVersion": "single-scattering-spectral-direct-v1",
+  "datasetFixtureVersion": "B1_positions_7.9;B2_B4_CIE_LED_B3;O3_prescribed_4e-8",
+  "logicalCpuCountQueriedAfterCampaign": 12,
+  "ramBytesAtCampaignStart": 34279714816,
+  "thermalThrottling": "not_exposed",
+  "gpu": "not_used",
+  "timingDefinition": {
+    "geometry": "rays, LOS partition, optical path intersections and spectral angular geometry",
+    "atmospheric_sampling": "OpticalField.sample and direct homogeneous P/T retrieval",
+    "transmissions": "extinction, phases and exponentials; B1 includes legacy angular arithmetic",
+    "quadrature": "GK plus node dispatch and bookkeeping outside classified child stages",
+    "spectral_integration": "source/response/rule preparation and spectral sums; includes LUT spectral interpolation at setup",
+    "remainder": "request identities, result construction, timer accounting and other untimed setup"
+  },
+  "modes": {
+    "B0": {
+      "p50Ms": 391.04020000377204,
+      "p95Ms": 416.1356149954372,
+      "p99Ms": 421.94432300078915,
+      "measurements": 10,
+      "meanStageMs": {
+        "geometry": 115.75134999999997,
+        "atmospheric_sampling": 0.0,
+        "transmissions": 0.0,
+        "quadrature": 262.83667,
+        "spectral_integration": 0.0
+      },
+      "meanRemainderMs": 14.744310000703233,
+      "meanWallMs": 393.3323300007032,
+      "losPerSecondAtMedian": 2301.553650983501,
+      "peakProcessRssBytes": 89882624
+    },
+    "B1": {
+      "p50Ms": 21003.399099994567,
+      "p95Ms": 21933.86760500871,
+      "p99Ms": 21942.77944100584,
+      "measurements": 10,
+      "meanStageMs": {
+        "geometry": 11368.454110000002,
+        "atmospheric_sampling": 4856.833659999999,
+        "transmissions": 3577.95306,
+        "quadrature": 1343.21502,
+        "spectral_integration": 0.0
+      },
+      "meanRemainderMs": 42.3152699960905,
+      "meanWallMs": 21188.77111999609,
+      "losPerSecondAtMedian": 42.85020704102284,
+      "peakProcessRssBytes": 89882624
+    },
+    "B2": {
+      "p50Ms": 27155.27430002112,
+      "p95Ms": 27488.36485999491,
+      "p99Ms": 27520.440571997024,
+      "measurements": 10,
+      "meanStageMs": {
+        "geometry": 12911.26199,
+        "atmospheric_sampling": 5345.82704,
+        "transmissions": 3302.60383,
+        "quadrature": 5089.73224,
+        "spectral_integration": 486.98675999999995
+      },
+      "meanRemainderMs": 79.2568600098526,
+      "meanWallMs": 27215.668720009853,
+      "losPerSecondAtMedian": 33.14273279129793,
+      "peakProcessRssBytes": 89882624
+    },
+    "B4": {
+      "p50Ms": 29492.933649991755,
+      "p95Ms": 30347.55733000202,
+      "p99Ms": 30531.431146005343,
+      "measurements": 10,
+      "meanStageMs": {
+        "geometry": 13139.02488,
+        "atmospheric_sampling": 5496.84807,
+        "transmissions": 4604.073240000001,
+        "quadrature": 5734.31866,
+        "spectral_integration": 596.9084999999999
+      },
+      "meanRemainderMs": 99.70949999481418,
+      "meanWallMs": 29670.882849994814,
+      "losPerSecondAtMedian": 30.51578424448297,
+      "peakProcessRssBytes": 89882624
+    }
+  },
+  "medianRatios": {
+    "B2_over_B1": 1.2928990289018574,
+    "B4_over_B2": 1.0860849102146177,
+    "B4_over_B1": 1.4041981257214402
+  }
+}

@@ -1,6 +1,6 @@
 # ADR-014 — Single-scattering a la v1
 
-- **Estat:** Acceptada — implementació pendent
+- **Estat:** Acceptada — B1 monocromàtic implementat; espectre i producte pendents
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
@@ -26,4 +26,8 @@ El [Pas 7.6](../../tasques/completat/pas7.6-sg-ref-reference-solver.md) implemen
 
 ## Estat d'implementació
 
-Referència i contrast F5 offline implementats a 7.6 en el domini declarat. La implementació productiva candidata i la propagació d’incertesa estructural continuen pendents als passos runtime i 7.16.
+Referència i contrast F5 offline implementats a 7.6 en el domini declarat. [7.9](../../tasques/completat/pas7.9-rayleigh-aerosol-b1.md) implementa dispersió simple monocromàtica en el mateix kernel amb dos trajectes, dependències i àrea directa. [B1 i referència revalidada](../../evidencies/pas7.9/validacio-b1.md). Espectre/gasos, producte connectat i incertesa estructural continuen als passos 7.10, 7.25–7.27 i 7.16; F5 no es promou a cota universal per al domini nou.
+
+## Extensió espectral verificada a 7.10
+
+Mateix operador directe S/C, amb columnes compartides entre λ i O3 prescrit offline; pressupost 0,01 mag revalidat, SG-REF refinat i sensibilitat 10–50 km mesurada. No homologa aire terrestre complet ni altres absorbidors. El gate radiomètric continua a 7.12 i no s'ha executat 7.11. [Resultats](../../evidencies/pas7.10/validacio-espectral-i-gasos.md).

@@ -170,7 +170,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** B1 implementa Rayleigh/aerosol d'una banda amb invariants físics i comparació diagnòstica reproduïble contra SG-REF. El PASS/FAIL numèric runtime↔SG-REF es reserva a 7.12.
 
-**Fitxer executable:** [pas7.9-rayleigh-aerosol-b1.md](../tasques/pendent/pas7.9-rayleigh-aerosol-b1.md)
+**Estat verificat:** completat monocromàtic a 550 nm, fases normalitzades, Rayleigh/aerosol prescrits, transmissió variable, àrea directa i SG-REF independent revalidat. B1a mesurat; 21 proves noves i 384 proves backend. Espectre/gasos, visibilitat, AD i gates de producte/H continuen pendents. [Resultats](../evidencies/pas7.9/validacio-b1.md).
+
+**Fitxer executable:** [pas7.9-rayleigh-aerosol-b1.md](../tasques/completat/pas7.9-rayleigh-aerosol-b1.md)
 
 ### 7.10 — Kernel espectral complet i absorció gasosa
 
@@ -178,7 +180,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** La ruta directa clear-sky espectral supera invariants de banda, unitats i absorció, amb comparació diagnòstica reproduïble contra SG-REF i l'oracle espectral; cap absorció es tracta com zero per conveniència. També revalida el pressupost de discretització `0,01 mag` de 7.4 amb absorció gasosa i dispersió espectral. Si falla, revisa i versiona el `SpectralBandSet` i repeteix la validació sense relaxar el criteri. El PASS/FAIL numèric de transport és 7.12.
 
-**Fitxer executable:** [pas7.10-gas-spectral-kernel.md](../tasques/pendent/pas7.10-gas-spectral-kernel.md)
+**Fitxer executable:** [pas7.10-gas-spectral-kernel.md](../tasques/completat/pas7.10-gas-spectral-kernel.md)
+
+**Estat verificat de 7.10, 2026-10-19:** completat offline amb columnes compartides, O3 prescrit, SG-REF revalidat i pressupost 0,01 mag conservat: 111.168 casos espectrals i 326.040 T_eff il·luminats; 405 proves backend. B0/B1/B2/B4 i 48 sostres mesurats. [Resultats i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md). No és aire terrestre complet ni H; 7.11 no s'ha executat.
 
 ### 7.11 — Terreny, curvatura i visibilitat física
 
