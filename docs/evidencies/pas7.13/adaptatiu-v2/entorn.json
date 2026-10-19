@@ -1,0 +1,8 @@
+{
+  "os": "Windows-11-10.0.26200-SP0",
+  "python": "3.13.7",
+  "numpy": "2.3.3",
+  "scipy": "1.16.2",
+  "matplotlib": "3.10.8",
+  "scientificExecution": "Serial; sense pools, nous workers ni vectorització de transport. Referències/SciPy existents sense canvis."
+}

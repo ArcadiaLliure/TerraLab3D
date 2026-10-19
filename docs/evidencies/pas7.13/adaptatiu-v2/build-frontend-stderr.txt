@@ -1,0 +1,7 @@
+
+  dist\bundle.js        1.9mb
+  dist\bundle.css      10.4kb
+  dist\bundle.js.map    4.3mb
+  dist\bundle.css.map  17.1kb
+
+Done in 111ms

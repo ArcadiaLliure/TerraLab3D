@@ -1,0 +1,25 @@
+{
+  "reconstructionOnly": true,
+  "additionalTransportCalls": 0,
+  "azimuthGridCount": 759,
+  "elevationGridCount": 110,
+  "relativeCDifferencePercent": {
+    "minimum": 1.4408745670873468,
+    "maximum": 2.003410753578261
+  },
+  "radianceRanges": [
+    {
+      "minimum": 1.2462941643256948e-11,
+      "maximum": 3.3782430163876323e-09
+    },
+    {
+      "minimum": 0.0023116195552824923,
+      "maximum": 0.6362340225023319
+    },
+    {
+      "minimum": 0.0023579307900348395,
+      "maximum": 0.6454013567197248
+    }
+  ],
+  "comparison": "Mateixa escala relativa i normalització C conservada; no calibratge absolut."
+}

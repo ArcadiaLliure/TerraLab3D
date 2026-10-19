@@ -1,0 +1,33 @@
+{
+  "id": "coesa-profile-reconstruction-v2",
+  "registeredAtUtc": "2026-10-19T19:07:52.547787+00:00",
+  "purpose": "Control directe de la reconstrucció PCHIP en camp variable COESA, addicional als controls de transport. No malla física densa.",
+  "fixture": "S_B4_standard_point_5km",
+  "azimuthDeg": 270.7,
+  "trainingElevationsDeg": [
+    30,
+    45,
+    60,
+    90
+  ],
+  "independentElevationsDeg": [
+    48.73,
+    52.19,
+    57.41
+  ],
+  "certifiedEvaluationElevationsDeg": [
+    45,
+    60
+  ],
+  "angularMagnitudeMaximum": 0.01,
+  "transportRelativeMaximum": 0.0001,
+  "referenceRelativeMaximum": 1e-06,
+  "tailMaximumMagnitude": 0.001,
+  "topM": 75000,
+  "verticalProfileStepM": 1000,
+  "kernelPrecision": "Mateixes quadratures7.12; cap canvi de profile1km o sostre75km.",
+  "strategy": "DomeProfile PCHIP_LOG existent; quatre nusos de suport, congelats abans de tres punts independents. No s’ajusta als holdouts.",
+  "costEstimateSeconds": 1406,
+  "costSource": "7LOS×194s de pilot COESA, més3×16s de referències; pressupost de campanya7200s conservat, comprovar cost consumit abans d’executar.",
+  "scope": "Perfil vertical COESA a azimut fix, només contrast registrat45–60°. No valida compressió azimutal COESA ni una semiesfera general."
+}

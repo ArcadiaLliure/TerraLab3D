@@ -20,7 +20,7 @@ Projectar radiància de SPD, interpolacions Kelvin i mescles sense perdre la nor
 ## Dependències
 
 **Depèn de:**
-- [Pas 7.13](pas7.13-dome-profile-direct.md)
+- [Pas 7.13](../completat/pas7.13-dome-profile-direct.md)
 - [Pas 7.4](../completat/pas7.4-spectral-bandset-validation.md)
 - [Pas 7.5.1](../completat/pas7.5.1-black-marble-spectral-simulation.md)
 

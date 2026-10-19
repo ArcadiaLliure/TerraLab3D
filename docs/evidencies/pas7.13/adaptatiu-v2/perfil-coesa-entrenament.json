@@ -1,0 +1,142 @@
+[
+  {
+    "elevationDeg": 30,
+    "runtime": {
+      "value": 1.0339362492767169e-11,
+      "wallSeconds": 178.5841139999975,
+      "cpuSeconds": 175.140625,
+      "inputSignature": "33efb4ac480e097b212a0a9fe9593f099018b6fc966e43be4c73044ff29999a7",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 81,
+        "quadrature_node_count": 1215,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 81
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 7267.705,
+          "occlusion": 0.0,
+          "atmospheric_sampling": 125792.973,
+          "transmissions": 7829.4056,
+          "quadrature": 37630.0651,
+          "spectral_integration": 44.3852
+        },
+        "calls": {
+          "geometry": 1864863,
+          "occlusion": 0,
+          "atmospheric_sampling": 1861216,
+          "transmissions": 125215,
+          "quadrature": 124001,
+          "spectral_integration": 1216
+        }
+      }
+    }
+  },
+  {
+    "elevationDeg": 45,
+    "runtime": {
+      "value": 9.452701346254535e-12,
+      "wallSeconds": 178.2516547999985,
+      "cpuSeconds": 175.125,
+      "inputSignature": "2bb8342352ce334f8943b895934bc579b8f7ddb9aed9405479767b189ce62b6e",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 81,
+        "quadrature_node_count": 1215,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 81
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 7347.2994,
+          "occlusion": 0.0,
+          "atmospheric_sampling": 125546.3875,
+          "transmissions": 7840.5216,
+          "quadrature": 37450.9248,
+          "spectral_integration": 45.1422
+        },
+        "calls": {
+          "geometry": 1864863,
+          "occlusion": 0,
+          "atmospheric_sampling": 1861216,
+          "transmissions": 125215,
+          "quadrature": 124001,
+          "spectral_integration": 1216
+        }
+      }
+    }
+  },
+  {
+    "elevationDeg": 60,
+    "runtime": {
+      "value": 8.900370258177307e-12,
+      "wallSeconds": 178.85457570001017,
+      "cpuSeconds": 175.578125,
+      "inputSignature": "af8fe0ab8cf01c51553897da7a8215ea228bc055740b784a79051023f9802cd7",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 82,
+        "quadrature_node_count": 1230,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 82
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 7350.2725,
+          "occlusion": 0.0,
+          "atmospheric_sampling": 125973.7413,
+          "transmissions": 7844.7367,
+          "quadrature": 37619.4389,
+          "spectral_integration": 46.0771
+        },
+        "calls": {
+          "geometry": 1866273,
+          "occlusion": 0,
+          "atmospheric_sampling": 1862581,
+          "transmissions": 125320,
+          "quadrature": 124091,
+          "spectral_integration": 1231
+        }
+      }
+    }
+  },
+  {
+    "elevationDeg": 90,
+    "runtime": {
+      "value": 9.425988988162318e-12,
+      "wallSeconds": 176.99385619998793,
+      "cpuSeconds": 173.90625,
+      "inputSignature": "a50044617ef1c9e88783f27360b2be2e29efea71102edd1ca4472b904c80350e",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 82,
+        "quadrature_node_count": 1230,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 82
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 7263.2293,
+          "occlusion": 0.0,
+          "atmospheric_sampling": 124769.6306,
+          "transmissions": 7693.9671,
+          "quadrature": 37199.5149,
+          "spectral_integration": 46.6929
+        },
+        "calls": {
+          "geometry": 1868973,
+          "occlusion": 0,
+          "atmospheric_sampling": 1865281,
+          "transmissions": 125500,
+          "quadrature": 124271,
+          "spectral_integration": 1231
+        }
+      }
+    }
+  }
+]

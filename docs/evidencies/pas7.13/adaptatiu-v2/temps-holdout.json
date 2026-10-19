@@ -1,0 +1,8 @@
+{
+  "part": "holdout",
+  "wallSeconds": 200.1838463000022,
+  "exitCode": 0,
+  "estimatedSeconds": 392.31,
+  "serialExecution": true,
+  "includesProcessSetup": true
+}

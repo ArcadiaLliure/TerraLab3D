@@ -152,6 +152,10 @@ Mostres inicials d'elevació: `[0.5,2,5,10,20,30,45,60,90]°`. El zenit és la m
 
 Fonts diferents se sumen abans de qualsevol logaritme o transformació perceptual: `B_total(ω)=Σ_j B_j(ω)`.
 
+La [represa adaptativa v2 de 7.13](../evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md) conserva aquestes elevacions com a inicialització, amb vuit azimuts inicials. Refina independentment els perfils verticals i els intervals azimutals mitjançant probes a 1/4, 1/2 i 3/4; promou punts/perfils mitjans i torna a comprovar les pendents veïnes. La reconstrucció azimutal v2 és PCHIP log periòdic sobre quatre perfils, amb nusos verticals irregulars. El marge intern preregistrat és 0,002 mag; el gate independent continua a 0,01 mag. La convergència interna no concedeix PASS a una petició arbitrària.
+
+Els zeros i les barreres verticals separen els trams PCHIP; no es crea una radiància mínima física amb ε. El constructor adaptatiu rebutja DEM i àrees fins a acreditar-ne el domini angular: es manté transport directe. Per a topologia azimutal amb barreres no acreditades, el camp d’ús és `directOnly=true`; només lliura nodes exactes. No hi ha interpolació garantida a través de discontinuïtats ni fora de la cobertura. El sostre prové de la petició; COESA conserva 75 km i la cota exterior condicionada no nul·la de 7.12.
+
 ## 10.1. Projeccions fotomètriques i instrumentals
 
 El kernel retorna radiància física. Les magnituds perceptuals o instrumentals són adaptadors posteriors i no retroalimenten la física.

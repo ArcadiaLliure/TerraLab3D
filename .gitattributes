@@ -16,3 +16,9 @@
 /tools/*step7_13.py text eol=lf
 /frontend/src/domain/skyglow/domeProfile.ts text eol=lf
 /frontend/src/tests/dome_profile_step7_13.test.ts text eol=lf
+/backend/src/terralab3d/domain/light_pollution/adaptive_dome.py text eol=lf
+/backend/src/terralab3d/application/adaptive_dome_sampling.py text eol=lf
+/backend/tests/test_adaptive_dome_step7_13_v2.py text eol=lf
+/tools/*step7_13_v2.py text eol=lf
+/frontend/src/domain/skyglow/adaptiveDome.ts text eol=lf
+/frontend/src/tests/adaptive_dome_step7_13_v2.test.ts text eol=lf

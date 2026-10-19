@@ -1,0 +1,125 @@
+{
+  "status": "PASS_REGISTERED_ANGULAR_DOMAIN",
+  "angularMagnitudeMaximum": 0.01,
+  "checks": {
+    "angular": true,
+    "reconstructionReplayed": true,
+    "independent": true,
+    "constructionBudgets": true,
+    "transport": true,
+    "controlsComplete": true,
+    "coesaVerticalProfile": true,
+    "conditionalTail": true,
+    "historicalEvidence": true,
+    "measuredCostBelowCampaignLimit": true,
+    "serialScientificPhases": true,
+    "scientificSubprocessesCompleted": true
+  },
+  "cases": [
+    {
+      "name": "S_B4_chamber_point_5km",
+      "independent": true,
+      "complete": true,
+      "angularPass": true,
+      "reconstructionReplayed": true,
+      "budgetsPass": true,
+      "sampleCount": 7736,
+      "azimuthProfiles": 54,
+      "verticalKnots": 717,
+      "buildWallSeconds": 872.723931799992,
+      "buildCpuSeconds": 856.890625,
+      "maximumCompressionErrorMag": 0.0018942969662116003,
+      "maximumGuardedReconstructionErrorMag": 0.0018942969838857892,
+      "maximumGuardedTransportError": 1.2188281381095455e-10,
+      "holdoutRuntimeWallSeconds": 33.65971399992122,
+      "holdoutReferenceWallSeconds": 23.260609199875034,
+      "fieldJsonBytes": 28747
+    },
+    {
+      "name": "C_realista_chamber_point_5km",
+      "independent": true,
+      "complete": true,
+      "angularPass": true,
+      "reconstructionReplayed": true,
+      "budgetsPass": true,
+      "sampleCount": 7736,
+      "azimuthProfiles": 54,
+      "verticalKnots": 717,
+      "buildWallSeconds": 828.3745496000047,
+      "buildCpuSeconds": 815.46875,
+      "maximumCompressionErrorMag": 0.0018824839995815771,
+      "maximumGuardedReconstructionErrorMag": 0.001882484016425426,
+      "maximumGuardedTransportError": 1.227598669761321e-10,
+      "holdoutRuntimeWallSeconds": 33.055697199859424,
+      "holdoutReferenceWallSeconds": 22.831677800248144,
+      "fieldJsonBytes": 27513
+    },
+    {
+      "name": "C_kelvins3000_chamber_point_5km",
+      "independent": true,
+      "complete": true,
+      "angularPass": true,
+      "reconstructionReplayed": true,
+      "budgetsPass": true,
+      "sampleCount": 7736,
+      "azimuthProfiles": 54,
+      "verticalKnots": 717,
+      "buildWallSeconds": 832.0645964999858,
+      "buildCpuSeconds": 820.15625,
+      "maximumCompressionErrorMag": 0.0018867568859360945,
+      "maximumGuardedReconstructionErrorMag": 0.0018867569031285984,
+      "maximumGuardedTransportError": 1.2372134073641945e-10,
+      "holdoutRuntimeWallSeconds": 33.19789940022747,
+      "holdoutReferenceWallSeconds": 23.24194609906408,
+      "fieldJsonBytes": 27506
+    }
+  ],
+  "transportDecisionCounts": {
+    "PASS": 921
+  },
+  "controlGroups": {
+    "coesa": 3,
+    "terrain": 12,
+    "area": 3
+  },
+  "maximumConditionalTailMag": 3.35979481443675e-07,
+  "coesaProfileMaximumGuardedErrorMag": 0.004964470727028981,
+  "coesaProfileDomain": "Perfil vertical COESA a azimut fix, només contrast registrat45–60°. No valida compressió azimutal COESA ni una semiesfera general.",
+  "terrainExactZeros": 6,
+  "historicalEvidenceCount": 247,
+  "historicalDifferences": [],
+  "measuredScientificWallSeconds": 4581.238829000009,
+  "phaseTimes": {
+    "holdout": {
+      "part": "holdout",
+      "wallSeconds": 200.1838463000022,
+      "exitCode": 0,
+      "estimatedSeconds": 392.31,
+      "serialExecution": true,
+      "includesProcessSetup": true
+    },
+    "controls": {
+      "part": "controls",
+      "wallSeconds": 574.2811343000212,
+      "exitCode": 0,
+      "estimatedSeconds": 820.0,
+      "serialExecution": true,
+      "includesProcessSetup": true
+    },
+    "perfil-coesa": {
+      "wallSeconds": 1273.6107705000031,
+      "serialExecution": true,
+      "costBeforeSeconds": 3307.628058500006,
+      "measuredCampaignSeconds": 4581.238829000009,
+      "estimateSeconds": 1406
+    }
+  },
+  "holdoutReferenceAndSetupWallUpperSeconds": 100.27053569999407,
+  "holdoutSetupAndSerializationWallSeconds": 30.936302600806812,
+  "domain": "Control de reconstrucció: tres fonts puntuals S/C prescrites a5km, observador100m, cambra homogènia finita75km i semiesfera0,5–90°. Controls COESA1km 0–75km amb O3 prescrit i cota exterior positive de7.12; no homologació uniforme de COESA. Àrea/DEM compatibles per directe, no reconstruïts sense garanties.",
+  "observationallyValidated": false,
+  "coesaAngularCompressionCertified": false,
+  "demAngularInterpolationCertified": false,
+  "areaAngularCompressionCertified": false,
+  "nextStepExecutionStarted": false
+}

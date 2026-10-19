@@ -1,0 +1,154 @@
+[
+  {
+    "name": "gate",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_adaptive_dome_step7_13_v2.py"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 1.2212221999943722
+  },
+  {
+    "name": "pytest-backend",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "-m",
+      "pytest",
+      "backend/tests",
+      "-q",
+      "-W",
+      "error",
+      "--basetemp",
+      ".runtime-adaptive/pytest-temp-v2-final"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 42.75048099999549
+  },
+  {
+    "name": "tests-frontend",
+    "command": [
+      "npm.cmd",
+      "test"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D\\frontend",
+    "exitCode": 0,
+    "wallSeconds": 4.42896109999856
+  },
+  {
+    "name": "typecheck-frontend",
+    "command": [
+      "npm.cmd",
+      "run",
+      "typecheck"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D\\frontend",
+    "exitCode": 0,
+    "wallSeconds": 5.2657301999861374
+  },
+  {
+    "name": "build-frontend",
+    "command": [
+      "npm.cmd",
+      "run",
+      "build"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D\\frontend",
+    "exitCode": 0,
+    "wallSeconds": 0.572058299992932
+  },
+  {
+    "name": "ruff-format",
+    "command": [
+      "ruff",
+      "format",
+      "--check",
+      "backend/src/terralab3d/domain/light_pollution/adaptive_dome.py",
+      "backend/src/terralab3d/application/adaptive_dome_sampling.py",
+      "backend/tests/test_adaptive_dome_step7_13_v2.py",
+      "tools/audit_adaptive_dome_step7_13_v2.py",
+      "tools/audit_regressions_step7_13_v2.py",
+      "tools/golden_adaptive_dome_step7_13_v2.py",
+      "tools/plot_adaptive_dome_step7_13_v2.py",
+      "tools/run_adaptive_validation_step7_13_v2.py",
+      "tools/validate_adaptive_dome_step7_13_v2.py",
+      "tools/validate_coesa_profile_step7_13_v2.py"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 0.052504499995848164
+  },
+  {
+    "name": "ruff-check",
+    "command": [
+      "ruff",
+      "check",
+      "backend/src/terralab3d/domain/light_pollution/adaptive_dome.py",
+      "backend/src/terralab3d/application/adaptive_dome_sampling.py",
+      "backend/tests/test_adaptive_dome_step7_13_v2.py",
+      "tools/audit_adaptive_dome_step7_13_v2.py",
+      "tools/audit_regressions_step7_13_v2.py",
+      "tools/golden_adaptive_dome_step7_13_v2.py",
+      "tools/plot_adaptive_dome_step7_13_v2.py",
+      "tools/run_adaptive_validation_step7_13_v2.py",
+      "tools/validate_adaptive_dome_step7_13_v2.py",
+      "tools/validate_coesa_profile_step7_13_v2.py"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 0.035117599996738136
+  },
+  {
+    "name": "pyright-afectats",
+    "command": [
+      "pyright",
+      "--project",
+      "F:\\Python\\TerraLab3D\\.runtime-adaptive\\pyright-config-final.json"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 1.3185673000116367
+  },
+  {
+    "name": "pyright-global",
+    "command": [
+      "pyright",
+      "src",
+      "--outputjson"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D\\backend",
+    "exitCode": 1,
+    "wallSeconds": 12.704719800007297
+  },
+  {
+    "name": "columnes-b0",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_optical_field_step7_8.py",
+      "--output",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.13\\adaptatiu-v2\\columnes-b0.json"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 2.101631700003054
+  },
+  {
+    "name": "grafics",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/plot_adaptive_dome_step7_13_v2.py"
+    ],
+    "workingDirectory": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 19.20793799997773
+  }
+]

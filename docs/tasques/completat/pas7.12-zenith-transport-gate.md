@@ -22,7 +22,7 @@ Acreditar resolució numèrica dins del domini de fixtures registrades, amb radi
 - [7.11 — Terreny i visibilitat](../completat/pas7.11-terrain-curvature.md).
 
 **En depenen:**
-- [7.13 — DomeProfile directe](../pendent/pas7.13-dome-profile-direct.md), pendent i no executat.
+- [7.13 — DomeProfile directe](pas7.13-dome-profile-direct.md), completat en el seu domini angular registrat; no s’havia executat durant 7.12.
 
 ## Codi existent a reutilitzar
 
@@ -73,4 +73,4 @@ Aquest és el primer gate dur de física runtime. No triïs la tolerància a par
 ## Treball pendent
 
 - Cap treball pendent del gate registrat. Les incerteses físiques/exosfèriques fora de les hipòtesis continuen explícites; no s'han declarat resoltes observacionalment.
-- [7.13](../pendent/pas7.13-dome-profile-direct.md) queda pendent i no iniciat. El sostre històric 10 km no hereta el PASS.
+- [7.13](pas7.13-dome-profile-direct.md) quedava pendent en aquell tancament; ara està completat en el seu domini angular registrat. El sostre històric 10 km no hereta el PASS.

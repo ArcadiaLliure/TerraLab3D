@@ -206,7 +206,7 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.12-zenith-transport-gate.md](../tasques/completat/pas7.12-zenith-transport-gate.md)
 
-**Estat verificat,2026-10-19:** completat numèricament en domini condicionat:9 S PASS,42 sostres, cua >75km acotada positivament ≤0,000472296mag,444 proves. [Evidències i errors separats](../evidencies/pas7.12/validacio-gate-transport.md).7.13 no iniciat.
+**Estat verificat,2026-10-19:** completat numèricament en domini condicionat:9 S PASS,42 sostres, cua >75km acotada positivament ≤0,000472296mag,444 proves. [Evidències i errors separats](../evidencies/pas7.12/validacio-gate-transport.md). En aquell tancament, 7.13 no iniciat.
 
 ### 7.13 — Camp angular i DomeProfile sobre ruta directa
 
@@ -214,9 +214,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** `DomeProfile` reprodueix zenit i camp angular directe dins el pressupost V1 aplicable; si cal una mètrica angular nova, el seu valor justificat es preregistra abans de comparar el candidat a 7.13. La compressió angular té error quantificat independent.
 
-**Fitxer executable:** [pas7.13-dome-profile-direct.md](../tasques/pendent/pas7.13-dome-profile-direct.md)
+**Fitxer executable:** [pas7.13-dome-profile-direct.md](../tasques/completat/pas7.13-dome-profile-direct.md)
 
-**Resultat de7.13,2026-10-19:** candidat offline implementat, criteri de sortida bloquejat per **FAIL angular**: vertical0,02447mag/camp2,68861mag davant0,01mag preregistrat.952contrasts de transport PASS,474proves backend i mapes científics S/C, amb domini COESA angular incomplet per cost. [Evidències i represa](../evidencies/pas7.13/validacio-camp-angular.md). El pas continua pendent i7.14 no iniciat.
+**Resultat de 7.13, 2026-10-19:** completat offline en [domini numèric registrat](../evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md). Refinament adaptatiu azimut/elevació: 900 holdouts de tres fixtures S/C amb màxim 0,001894297 mag i tres holdouts de perfil COESA amb 0,004964471 mag, davant 0,01 mag preregistrat. 921 contrasts de transport PASS, 495 proves backend, 768 comprovacions frontend noves i sis figures científiques. COESA 75 km amb cua positiva condicionada; el perfil només cobreix azimut 270,7°/45–60°, sense compressió COESA general. DEM/àrea i intervals sense garanties mantenen ruta directa. Campanya científica 4.581,239 s, sense acceleracions. El [FAIL v1](../evidencies/pas7.13/validacio-camp-angular.md) i totes les evidències es preserven. 7.14 pendent i no iniciat.
 
 ### 7.14 — Projeccions fotomètriques i sensors SQM/TESS
 

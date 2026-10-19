@@ -1,6 +1,6 @@
 # ADR-003 — PCHIP en log-radiància
 
-- **Estat:** Acceptada — candidat implementat; gate angular pendent
+- **Estat:** Acceptada — v2 verificada en domini numèric registrat
 - **Data:** 2026-09-28
 - **Àmbit:** skyglow físic
 
@@ -10,7 +10,7 @@ La radiància varia diversos ordres de magnitud i splines cúbiques poden fer ov
 
 ## Decisió
 
-Interpolar `log(B+ε)` amb PCHIP; tornar a radiància abans de sumar.
+Sumar les fonts en radiància lineal abans del logaritme. Interpolar `log(B+ε)` amb PCHIP vertical i, a la v2, PCHIP log periòdic azimutal; tornar a radiància per a composició i presentació. Els perfils tenen nusos irregulars; ε és estabilitzador numèric, no un sòl físic.
 
 ## Conseqüències
 
@@ -22,8 +22,8 @@ Es mantenen documentades al TDD i a l'especificació d'algorismes; qualsevol alt
 
 ## Validació
 
-Comparar amb all-sky i escombrar mostra 1°.
+Preregistrar estratègia, toleràncies i cost; congelar el camp abans de comparar-lo amb kernel directe i SG-REF sobre punts independents. Els probes de refinament no són validació. La validació finita no prova exactitud uniforme per a qualsevol entrada.
 
 ## Estat d'implementació
 
-El candidat Python/TypeScript està implementat a7.13 amb golden SciPy compartit. El [gate angular falla](../../evidencies/pas7.13/validacio-camp-angular.md): les9elevacions inicials no són suficients; no s'ha homologat la reconstrucció. Intervals amb zeros o barreres exigeixen ruta directa. El pas continua pendent.
+La [v2 adaptativa Python/TypeScript](../../evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md) supera 0,01 mag en els dominis i holdouts registrats; golden SciPy compartits. El [FAIL v1](../../evidencies/pas7.13/validacio-camp-angular.md) de les nou elevacions i interpolació azimutal inicial es conserva. Trams verticals positius se separen per zeros/barreres; DEM/àrea sense garanties requereixen transport directe. La v2 no acredita interpolació azimutal segmentada: amb barreres, l’ús aprovat és directOnly. No hi ha homologació COESA angular general ni C/H observacional.

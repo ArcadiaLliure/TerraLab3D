@@ -1,0 +1,10 @@
+Ignoring path "F:\Python\TerraLab3D\backend\src\terralab3d\domain\light_pollution\adaptive_dome.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\backend\src\terralab3d\application\adaptive_dome_sampling.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\backend\tests\test_adaptive_dome_step7_13_v2.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\audit_adaptive_dome_step7_13_v2.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\audit_regressions_step7_13_v2.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\golden_adaptive_dome_step7_13_v2.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\plot_adaptive_dome_step7_13_v2.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\run_adaptive_validation_step7_13_v2.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\validate_adaptive_dome_step7_13_v2.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\validate_coesa_profile_step7_13_v2.py" in "include" array because it is not relative.

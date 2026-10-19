@@ -60,7 +60,7 @@ Els DTO TypeScript reflecteixen exactament els contractes serialitzats Python, n
 
 ### Interpolació
 
-Si el backend envia les 9 mostres verticals, TypeScript reconstrueix PCHIP en `log(B+ε)`. La implementació ha de tenir golden tests compartits amb Python per evitar divergència. Alternativa: backend envia una LUT ja mostrejada; s'ha de benchmarkar cost de bridge vs duplicació numèrica.
+El diagnòstic offline v1 conserva les nou mostres inicials i el seu FAIL històric. La [v2 adaptativa de 7.13](../evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md) serialitza perfils verticals irregulars amb esquema 2, unitats, sostre, revisió i signatura d’entrada; Python i TypeScript reconstrueixen PCHIP log vertical i periòdic azimutal amb golden SciPy compartits. No és el bridge definitiu ni publica radiància al renderer. Un camp cru no hereta el PASS del gate independent: només els camps i dominis vinculats a les evidències poden declarar-lo. Amb DEM/àrea, zeros o barreres sense garanties, es requereix transport directe; `null` és dada pendent de càlcul, no transparència. Les nou elevacions són una inicialització, no un nombre final fix.
 
 ### Observabilitat
 

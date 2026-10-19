@@ -1,0 +1,160 @@
+{
+  "id": "adaptive-dome-v2",
+  "registeredAtUtc": "2026-10-19T17:01:19.720002+00:00",
+  "parentCriterionSha256": "139ad4d4305f7185556cbc98c5102f2dedf901e28105adcc303b7c72c1bca571",
+  "angularMagnitudeMaximum": 0.01,
+  "transportRelativeMaximum": 0.0001,
+  "referenceRelativeMaximum": 1e-06,
+  "origin": "Mateix requisit angular de7.13, sense relaxació. Validació independent tant contra directe com SG-REF amb incertesa protegida.",
+  "algorithm": {
+    "version": "adaptive-pchip-log-az-el-v2",
+    "initialAzimuthsDeg": [
+      0,
+      45,
+      90,
+      135,
+      180,
+      225,
+      270,
+      315
+    ],
+    "initialElevationsDeg": [
+      0.5,
+      2,
+      5,
+      10,
+      20,
+      30,
+      45,
+      60,
+      90
+    ],
+    "verticalProbeFractions": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "azimuthProbeFractions": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "azimuthTestElevationsDeg": [
+      0.5,
+      0.75,
+      1,
+      1.5,
+      2,
+      3.5,
+      5,
+      7.5,
+      10,
+      15,
+      20,
+      25,
+      30,
+      37.5,
+      45,
+      52.5,
+      60,
+      75,
+      90
+    ],
+    "internalMagnitudeMaximum": 0.002,
+    "refinement": "Perfils verticals PCHIP log independents, promoure el punt mitjà als intervals que fallen; després PCHIP log periòdic en azimut, promoure perfils mitjans quan fallen probes. Revalidar pendents veïns després de cada refinament.",
+    "zeroPolicy": "Zero exacte només al node mesurat; zeros/barreres o DEM sense prova de continuïtat exigeixen directe. No alfa ni suavitzat.",
+    "sampleLedger": "Només nodes exactes dins d’una construcció/revisió; cap cache de transport entre peticions, cap vectorització/multicore."
+  },
+  "fixtures": [
+    "S_B4_chamber_point_5km",
+    "C_realista_chamber_point_5km",
+    "C_kelvins3000_chamber_point_5km"
+  ],
+  "holdoutSha256": "68bf759e6d08f1d7b375b18247030b8a045ee304a64988adff30b548b3522247",
+  "referenceLevels": [
+    {
+      "spectralGL": 2,
+      "pathGL": 4,
+      "areaGL": 2,
+      "losEpsrel": 1e-09
+    },
+    {
+      "spectralGL": 4,
+      "pathGL": 8,
+      "areaGL": 4,
+      "losEpsrel": 1e-10
+    },
+    {
+      "spectralGL": 8,
+      "pathGL": 16,
+      "areaGL": 8,
+      "losEpsrel": 1e-11
+    }
+  ],
+  "cost": {
+    "maximumSamplesPerFixture": 8000,
+    "maximumAzimuthProfiles": 128,
+    "maximumVerticalIterations": 12,
+    "maximumAzimuthIterations": 10,
+    "maximumBuildWallSecondsPerFixture": 1800,
+    "maximumScientificCampaignWallSeconds": 7200,
+    "pilotSecondsPerChamberRay": 0.195,
+    "estimateBuildUpperSeconds": 4680,
+    "estimateValidationSeconds": 392.31,
+    "coesaControlCount": 3,
+    "coesaControlEstimateSeconds": 630,
+    "notes": "Cotes de treball i projeccions orientatives prospectives; aturada si pressupost exhaurit sense PASS. Sense malla COESA ni extensa desproporcionada."
+  },
+  "coesaControls": [
+    {
+      "fixture": "S_B4_standard_point_5km",
+      "azimuthDeg": 90.13,
+      "elevationDeg": 0.83
+    },
+    {
+      "fixture": "C_realista_standard_point_5km",
+      "azimuthDeg": 91.3,
+      "elevationDeg": 1.37
+    },
+    {
+      "fixture": "C_kelvins3000_standard_point_5km",
+      "azimuthDeg": 270.7,
+      "elevationDeg": 47.3
+    }
+  ],
+  "terrainControls": {
+    "azimuthsDeg": [
+      89.3,
+      90.2,
+      90.7
+    ],
+    "elevationsDeg": [
+      23.61,
+      23.73,
+      23.77,
+      23.89
+    ],
+    "delivery": "Només directe; transicions desconegudes i cobertura absent no s’interpolen."
+  },
+  "areaControls": {
+    "fixture": "S_B4_chamber_area400m_5km",
+    "directionsDeg": [
+      [
+        270.3,
+        0.83
+      ],
+      [
+        270.7,
+        47.3
+      ],
+      [
+        90.1,
+        83.7
+      ]
+    ],
+    "delivery": "Font extensa400×400m integrada directament; compressió angular no acreditada, ruta directa obligatòria."
+  },
+  "domain": "Control de reconstrucció: tres fonts puntuals S/C prescrites a5km, observador100m, cambra homogènia finita75km i semiesfera0,5–90°. Controls COESA1km 0–75km amb O3 prescrit i cota exterior positive de7.12; no homologació uniforme de COESA. Àrea/DEM compatibles per directe, no reconstruïts sense garanties.",
+  "tailMaximumMag": 0.001,
+  "exitRule": "PASS de reconstrucció només per fixtures/domini/holdouts acreditats, no exactitud observacional. Tancar7.13 només si criteris canònics i domini d’ús amb fallbacks estan demostrats; altrament pendent. Cap7.14."
+}

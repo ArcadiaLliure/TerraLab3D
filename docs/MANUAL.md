@@ -657,14 +657,24 @@ L'ampliació COESA fins a75km és optativa. La contribució superior s'acota pos
 
 L'auditoria final de la campanya arxivada s'executa amb python tools/audit_transport_gate_step7_12.py --root docs/evidencies/pas7.12 --part final. Una campanya nova necessita també regenerar les regressions i els seus manifests; el CLI final retorna error si falten fitxers o falla el criteri. Les primeres/repeticions de rendiment s'obtenen amb diagnose_transport_gate_step7_12.py --part benchmark; els estimadors complets, amb --part diagnostics, i els controls separats d'oracle, amb --part oracle-controls (sempre amb --output). No s'extrapola una font extensa a900LOS ni es declara SLO. En aquell tancament7.13 encara no s’havia iniciat.
 
-### Diagnòstic científic angular — Pas7.13 parcial
+### Diagnòstic científic angular — Pas 7.13 adaptatiu
 
-La[capacitat offline](tasques/pendent/pas7.13-dome-profile-direct.md) genera mapes azimut/elevació amb escala logarítmica i unitats. Les dues modalitats C comparteixen escala relativa i conserven la normalització del model; no comparis aquestes unitats amb watts de S ni amb mesura urbana real. S és una font d'1W definida. Les coordenades i l'atmosfera de la figura són fixtures prescrites, no una reconstrucció observada de Barcelona.
+La [capacitat offline](tasques/completat/pas7.13-dome-profile-direct.md) genera mapes d’azimut/elevació amb escala logarítmica, unitats i procedència. El [candidat v1 fallit](evidencies/pas7.13/validacio-camp-angular.md) es conserva com a evidència històrica; la v2 utilitza mostreig adaptatiu i validació independent.
 
-![Mapa diagnòstic S/C realista i kelvins](evidencies/pas7.13/mapa-calor-azimut-elevacio.png)
+![Mapa adaptatiu S/C realista i kelvins](evidencies/pas7.13/adaptatiu-v2/mapa-calor-adaptatiu-v2.png)
 
-El rètol FAIL avisa que el mapa és una reconstrucció candidata que no supera0,01mag. Es pot inspeccionar, però no és un perfil homologat ni el cel renderitzat de l'aplicació. Gris significa zero o necessitat de càlcul directe, segons les dades; no és transparència. L'error màxim és2,68861mag i el vertical0,02447mag. Les[figures d'error i oclusió](evidencies/pas7.13/validacio-camp-angular.md) mostren el límit preregistrat i les mostres independents de terreny.
+Els dos escenaris C comparteixen escala relativa i mantenen la normalització original. No comparis aquestes unitats amb watts de S o mesures urbanes: S és una font d’1 W definida; C conserva dades/SPD de 7.5.1 amb geometria puntual sintètica traslladada. La figura és una cambra homogènia finita de 75 km, no atmosfera COESA ni cel observat de Barcelona. El rètol PASS es refereix als holdouts i al domini registrats, no al renderer de l’aplicació ni a qualsevol altra ciutat.
 
-Des de l'arrel, `python tools/plot_dome_step7_13.py` regenera les figures a partir de mesures guardades. `python tools/audit_angular_step7_13.py --strict` retorna1 pel FAIL científic registrat. El mostreig genèric és `terralab3d.application.dome_sampling.sample_dome(request, azimuths_deg)`: el sostre és el de la petició, que ha de ser explícitament75km per al domini COESA d'aquest pas. B0 es rebutja com a radiància; cancel·lació i revisió es conserven.
+![Diferència relativa realista/kelvins](evidencies/pas7.13/adaptatiu-v2/diferencia-realista-kelvins.png)
 
-La LOS COESA a0,5° costa aproximadament182–194s; no generis una malla densa assumint que cada raig costa com el control homogeni. Entre nusos de terreny i transicions de zero el consumidor ha de calcular la LOS directa o mostrar dada no disponible.7.13 continua pendent;7.14 i la integració definitiva amb Three.js no estan iniciats.
+A normalització conservada, 3.000 K dona entre un 1,44% i un 2,01% més que realista en la graella diagnòstica. És una diferència entre hipòtesis espectrals C, sense calibratge absolut. La graella de presentació només reconstrueix dades: els píxels no són noves mesures independents.
+
+El [gate](evidencies/pas7.13/adaptatiu-v2/gate-adaptatiu-v2.json) verifica 900 holdouts de cambra amb màxim 0,001894297 mag i tres de perfil COESA amb 0,004964471 mag, davant 0,01 mag. COESA conserva perfil d’1 km, sostre de 75 km i cota exterior positiva condicionada; el perfil només està contrastat a azimut 270,7° i elevacions 45–60°. No hereta una homologació de tota la semiesfera. Es preserva la limitació històrica de 10 km i el 22,45% omès a B4 de 7.10.
+
+![Control de reconstrucció COESA i llindar](evidencies/pas7.13/adaptatiu-v2/perfil-coesa-i-error.png)
+
+Des de l’arrel, `python -X utf8 tools/audit_adaptive_dome_step7_13_v2.py` reprodueix l’auditoria del candidat arxivat i `python -X utf8 tools/plot_adaptive_dome_step7_13_v2.py` regenera les sis figures sense executar noves integrals. `tools/audit_regressions_step7_13_v2.py` compara B0, les quatre columnes i els baselines. El CLI v1 `audit_angular_step7_13.py --strict` continua retornant 1 pel FAIL històric.
+
+El nou cas d’ús és `terralab3d.application.adaptive_dome_sampling.sample_adaptive_dome(request)`: rep sostre i precisions de la petició i retorna un camp cru amb procedència/revisió; no concedeix PASS a entrades arbitràries. Rebutja DEM i àrees sense domini angular acreditat. Per a aquestes geometries, barreres i zeros sense garanties, executa LOS directes amb el kernel existent o mostra dada no disponible. `None/null` no significa zero ni transparència; cobertura absent és error. En camps amb barreres azimutals, l’ús acreditat és `directOnly=true`.
+
+La campanya ha costat 76,35 min. Cada camp ha necessitat 7.736 LOS i conserva 54 perfils/717 nusos. Els controls COESA nous costen uns 173–179 s per LOS de kernel; es preserven els aproximadament 609 s/LOS extensa de 7.12. Abans d’ampliar la campanya, estima el cost i preregistra el domini. No hi ha cache entre peticions, acceleració espacial, vectorització addicional o multicore. 7.14 i Three.js definitiu no s’han iniciat.
