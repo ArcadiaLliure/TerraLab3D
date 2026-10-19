@@ -1,0 +1,15 @@
+{
+  "comparedOriginal": "../pas7.8/resultats-optical-field-v1.json",
+  "sameSerializedColumnResults": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "b0Regression": {
+    "expectedSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "actualSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "identical": true,
+    "scope": "900_LOS_values_counters_and_serialization;not_new_timing_campaign"
+  }
+}

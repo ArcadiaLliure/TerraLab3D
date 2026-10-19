@@ -7,7 +7,7 @@ import json
 import math
 from bisect import bisect_right
 from contextlib import nullcontext
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from typing import Callable, Literal
 
 from .gauss_kronrod import QuadratureSettings, integrate_gk15
@@ -40,6 +40,8 @@ from .spectral_transport import (
     SPECTRAL_TRANSPORT_REVISION,
 )
 from .transport_profiling import TransportProfiler
+
+from .terrain_visibility import TerrainSurface, TerrainVisibility
 
 MODEL_VERSION = "propagation-geometry-b0-v1"
 
@@ -100,6 +102,7 @@ class PropagationRequest:
     optical_field: OpticalField | None = None
     scattering: ScatteringConfiguration | None = None
     spectral: SpectralTransportConfiguration | None = None
+    terrain: TerrainSurface | None = None
 
     def __post_init__(self) -> None:
         if (
@@ -118,6 +121,11 @@ class PropagationRequest:
             raise ValueError(
                 "Camp atmosfèric i geometria amb referencials incompatibles"
             )
+        if (
+            self.terrain is not None
+            and self.terrain.radius_m != self.options.earth_radius_m
+        ):
+            raise ValueError("DEM i kernel tenen radis incompatibles")
         if self.spectral is not None:
             if self.scattering is not None or self.optical_field is None:
                 raise ValueError(
@@ -203,8 +211,12 @@ class PropagationResult:
     transport_diagnostics: tuple[TransportDiagnostics, ...] = ()
     spectral_metadata: dict[str, object] | None = None
 
+    terrain_metadata: dict[str, object] | None = None
+
     def to_dict(self) -> dict[str, object]:
         values = asdict(self)
+        if self.terrain_metadata is None:
+            values.pop("terrain_metadata")
         if self.spectral_metadata is None:
             values.pop("spectral_metadata")
         if self.scattering is None:
@@ -219,13 +231,21 @@ class PropagationResult:
             ):
                 values.pop(key)
         return {
-            "schemaVersion": 4
+            "schemaVersion": 5
+            if self.terrain_metadata is not None
+            else 4
             if self.spectral_metadata is not None
             else 3
             if self.scattering is not None
             else (2 if self.optical_field_signature is not None else 1),
             **values,
-            "stage": ("single_scattering_spectral_direct_B2" if self.spectral_metadata and self.spectral_metadata["gasStatus"] == "disabled_explicit_B2_diagnostic" else "single_scattering_spectral_direct_B4")
+            "stage": (
+                "single_scattering_spectral_direct_B2"
+                if self.spectral_metadata
+                and self.spectral_metadata["gasStatus"]
+                == "disabled_explicit_B2_diagnostic"
+                else "single_scattering_spectral_direct_B4"
+            )
             if self.spectral_metadata is not None
             else "single_scattering_monochromatic_B1"
             if self.scattering is not None
@@ -239,6 +259,16 @@ class PropagationResult:
             else "pending_step_7.9",
             "numericalErrorMeaning": "GK15_minus_G7_with_roundoff_floor;estimated_not_rigorous",
             "coordinateModel": "sphere_geocentric_ENU;not_WGS84_ellipsoid_or_DEM",
+            **(
+                {
+                    "coordinateModel": "sphere_geocentric_ENU;opaque_triangular_DEM;not_WGS84_ellipsoid",
+                    "physicalTransportStatus": "prescribed_medium;binary_terrain_visibility;not_full_terrestrial_air"
+                    if self.scattering is not None or self.spectral_metadata is not None
+                    else "geometry_with_opaque_terrain;not_radiance",
+                }
+                if self.terrain_metadata is not None
+                else {}
+            ),
             "runtimeRadiometricGate": "not_evaluated_step_7.12",
             **(
                 {
@@ -305,6 +335,14 @@ class PropagationKernel:
         diagnostics: list[TransportDiagnostics] = []
         spectral_sets: dict[str, object] = {}
         operators: dict[DefinedSpectrum, SpectralOperator] = {}
+        visibility = (
+            TerrainVisibility(
+                request.terrain, checkpoint, request.options.max_segments_per_ray
+            )
+            if request.terrain
+            else None
+        )
+        terrain_rays = []
         for source in request.sources:
             checkpoint()
             operator = None
@@ -346,6 +384,34 @@ class PropagationKernel:
                 )
                 with measure("geometry"):
                     ray = make_ray(frame, direction, request.options.top_m)
+                if visibility is not None:
+                    with measure("occlusion"):
+                        length = visibility.clip_observer(ray)
+                    terrain_rays.append(
+                        {
+                            "sourceId": source.source_model_id,
+                            "directionId": view.direction_id,
+                            "atmosphericLengthM": ray.length_m,
+                            "visibleLengthM": length,
+                        }
+                    )
+                    ray = replace(ray, length_m=length)
+                if ray.length_m == 0:
+                    counters = KernelCounters(1, 0, 0, 0, 0)
+                    rows.append(
+                        GeometricRayResult(
+                            source.source_model_id,
+                            view.direction_id,
+                            direction.azimuth_deg,
+                            direction.elevation_deg,
+                            0.0,
+                            0.0,
+                            0.0,
+                            (),
+                            counters,
+                        )
+                    )
+                    continue
                 optical_segments: tuple[OpticalPathSegment, ...] = ()
                 sampled: set[OpticalDependency] = set()
                 if field is None:
@@ -394,6 +460,9 @@ class PropagationKernel:
                         profiler,
                         operator,
                     )
+                if transport is not None and visibility is not None:
+                    with measure("occlusion"):
+                        transport.attach_terrain(visibility)
                 if transport is not None:
                     cuts = sorted(
                         {
@@ -481,6 +550,11 @@ class PropagationKernel:
                     "integrandId": integrand_id,
                     "integralUnit": integral_unit,
                     **(
+                        {"terrainSignature": request.terrain.signature}
+                        if request.terrain
+                        else {}
+                    ),
+                    **(
                         {"opticalFieldSignature": field.signature}
                         if field is not None
                         else {}
@@ -526,6 +600,13 @@ class PropagationKernel:
                     "sources": [s.to_dict() for s in request.sources],
                 }
             )
+        if request.terrain is not None:
+            used_signature = fingerprint(
+                {
+                    "atmosphereAndSpectrum": used_signature,
+                    "terrain": request.terrain.signature,
+                }
+            )
         checkpoint()
         return PropagationResult(
             request.revision,
@@ -544,6 +625,16 @@ class PropagationKernel:
             optical_traces=tuple(traces),
             scattering=request.scattering,
             transport_diagnostics=tuple(diagnostics),
+            terrain_metadata={
+                "surfaceSignature": request.terrain.signature,
+                "heightInterpretation": request.terrain.height_interpretation,
+                "provenance": request.terrain.provenance,
+                "visibility": "opaque_binary;explicit_shadow_partitions;area_polygon_clipping",
+                "rays": terrain_rays,
+                "work": asdict(visibility.work),
+            }
+            if request.terrain is not None and visibility is not None
+            else None,
             spectral_metadata={
                 "configurationSignature": request.spectral.signature,
                 "bandSets": spectral_sets,

@@ -126,7 +126,7 @@ flowchart LR
 
 ## 9. Terreny i curvatura
 
-El kernel ha de reutilitzar l'autoritat geodèsica/DEM existent, però no assumir que el perfil d'horitzó 2D és suficient per a tots els raigs font→node. `domain/horizon` és útil per observer→sky i visibilitat local; els trajectes source→P poden requerir consultes DEM/geodèsiques pròpies amb la mateixa convenció d'el·lipsoide i elevació. Cal una ADR específica si s'introdueix una acceleració de visibilitat.
+El kernel ha de reutilitzar l'autoritat geodèsica/DEM existent, però no assumir que el perfil d'horitzó 2D és suficient per a tots els raigs font→node. `domain/horizon` és útil per observer→sky i visibilitat local; els trajectes source→P poden requerir consultes DEM/geodèsiques pròpies amb el mateix model geodèsic declarat (ara ECEF/ENU esfèric) i una conversió d’altures explícita. Cal una ADR específica si s'introdueix una acceleració de visibilitat.
 
 ## 10. Workers
 
@@ -155,3 +155,9 @@ El port d’aplicació rep `OpticalFieldRequest` i retorna `OpticalField`; el pr
 ## Estat verificat de 7.10 (2026-10-19)
 
 REUSE: SourceModel, geometria, camp/provider, fases i regles espectrals. ADAPT: PropagationKernel, transmissió i SG-REF per la ruta espectral/gasos. NEW: GasAbsorptionModel, LUT verificada O3, GK vectorial, SpectralOperator, referència espectral homogènia i telemetria exclusiva. El domini només rep dades immutables; la infraestructura verifica l'asset offline. Cap runtime de terreny, cache de moviment ni backend accelerat afegit. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).
+
+### Terreny opac sobre la geometria compartida (7.11)
+
+El terreny del kernel reutilitza SphericalFrame i el port/adaptador DEM existents. La conversió vertical és explícita; EPSG:4326 no acredita altitud el·lipsoidal ni datum vertical. Superfície triangular ECEF prescrita, visibilitat binària i truncament de LOS, sense alfa ni perfil 2D per resoldre font→P. L'àrea emissora es retalla per ombres i s'integra directament; els salts puntuals es parteixen, inclosos estats exactes de frontera. Les dades absents no es declaren transparents. La cobertura només es requereix abans del primer obstacle conegut.
+
+Les interseccions i màscares es comparteixen entre λ dins la petició, sense moviment, índex espacial nou ni caches entre revisions. SG-REF comparteix dades, no helpers de visibilitat. Schema 5 opcional amb dependència conservadora de tota la superfície; esquemes 1–4 preservats sense terreny. El cost d'oclusió és exclusiu i inclou el retall/mostreig d'àrea. [Evidència de 7.11](../evidencies/pas7.11/validacio-terreny-i-visibilitat.md). Es conserva la limitació del sostre de 7.10: 22,45% omès al zenit B4 a 10 km respecte a 50 km; justificació del domini pendent de 7.12, no executat.

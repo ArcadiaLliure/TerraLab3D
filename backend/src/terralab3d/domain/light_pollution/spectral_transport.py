@@ -376,7 +376,7 @@ class SpectralScatteringTransport(SingleScatteringTransport):
         p, op = self.profiler, self.operator
         observer_tau = self._depth(self.ray.origin_ecef_m, point)
         result = 0.0
-        for node, weight in self.nodes:
+        for node, weight in self.emission_nodes(distance, point):
             self.checkpoint()
             with p.measure("geometry"):
                 incoming = tuple(a - b for a, b in zip(point, node))

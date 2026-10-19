@@ -1,0 +1,27 @@
+{
+  "frozenBeforeFinalReferenceCampaign": true,
+  "transportGate": "diagnostic_only;not_step7.12",
+  "S_B1_area": {
+    "runtime": [
+      2,
+      4,
+      8
+    ],
+    "reference": [
+      2,
+      4,
+      8
+    ]
+  },
+  "C_realistic_kelvin": {
+    "runtime": [
+      2
+    ],
+    "reference": [
+      2,
+      4
+    ],
+    "role": "compatibilitat de fonts C relatives i modalitats existents en muntanya sintetica; no homologacio urbana"
+  },
+  "reason": "refinament geometric complet en S; evitar repetir ordre8 espectral a totes les alternatives C. Preassaigs runtimeC2~10s i4~34s; cap resultat de referencia C emprat per triar tolerancia. No es defineix llindar radiometric."
+}

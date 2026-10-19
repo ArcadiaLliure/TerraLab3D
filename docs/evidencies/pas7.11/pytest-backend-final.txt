@@ -1,0 +1,8 @@
+Comanda: python -X utf8 -m pytest backend/tests -q -p no:cacheprovider --basetemp=.runtime-terrain/test-final2 --tb=short
+Sortida final capturada de la sessió (la passada anterior de 426 proves també es conserva a pytest-backend.txt):
+............................................................ [ 33%]
+........................................................................ [ 50%]
+........................................................................ [ 67%]
+........................................................................ [ 84%]
+...................................................................      [100%]
+427 passed in 27.35s

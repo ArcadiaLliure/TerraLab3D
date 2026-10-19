@@ -12,6 +12,8 @@ import numpy as np
 from scipy.integrate import quad_vec
 from scipy.special import roots_legendre
 
+from .reference_terrain import ReferenceTerrain
+from .terrain_visibility import TerrainSurface
 from .optical_field import OpticalField
 from .reference_single_scattering import ReferenceB1Result, _basis, _position, _phase
 from .source_model import (
@@ -35,6 +37,7 @@ def solve_reference_spectral(
     spectral_order: int = 8,
     area_order: int = 8,
     relative_tolerance: float = 1e-9,
+    terrain: TerrainSurface | None = None,
 ) -> ReferenceB1Result:
     if len(field.tiles) != 1:
         raise ValueError("SG-REF espectral homogeni requereix un sol tile")
@@ -128,6 +131,18 @@ def solve_reference_spectral(
         2 * field.radius_m + top_m + observer.altitude_m
     )
     length = delta / (np.sqrt(projection**2 + delta) + projection)
+    terrain_ref = ReferenceTerrain(terrain) if terrain else None
+    if terrain_ref:
+        length = terrain_ref.clip(origin, direction, float(length))
+        if length == 0:
+            return ReferenceB1Result(
+                0.0,
+                0.0,
+                0,
+                spectral_order,
+                area_order,
+                "sg-ref-opaque-terrain-zero-domain-v1",
+            )
     geo = source.geometry
     position = geo.position if isinstance(geo, PointSourceGeometry) else geo.center
     basis, center = _basis(position), _position(position, field.radius_m)
@@ -167,10 +182,49 @@ def solve_reference_spectral(
         if 0 < s < length:
             breaks.add(s)
 
+    if terrain_ref:
+        if isinstance(geo, PointSourceGeometry):
+            breaks.update(terrain_ref.cuts(center, origin, direction, float(length)))
+        else:
+            angle = np.radians(geo.orientation_deg)
+            uaxis = np.cos(angle) * basis[0] - np.sin(angle) * basis[1]
+            vaxis = np.sin(angle) * basis[0] + np.cos(angle) * basis[1]
+            corners = np.array(
+                [
+                    center
+                    + u * geo.east_width_m / 2 * uaxis
+                    + v * geo.north_height_m / 2 * vaxis
+                    for u, v in ((-1, -1), (1, -1), (1, 1), (-1, 1))
+                ]
+            )
+            breaks.update(
+                terrain_ref.area_cuts(corners, origin, direction, float(length))
+            )
+
     def value(s):
         point = origin + s * direction
         terms = []
-        for node, area in zip(nodes, areas):
+        active_nodes, active_areas = nodes, areas
+        if terrain_ref and not isinstance(geo, PointSourceGeometry):
+            angle = np.radians(geo.orientation_deg)
+            uaxis = np.cos(angle) * basis[0] - np.sin(angle) * basis[1]
+            vaxis = np.sin(angle) * basis[0] + np.cos(angle) * basis[1]
+            active_nodes, active_areas = terrain_ref.area_nodes(
+                point,
+                center,
+                uaxis,
+                vaxis,
+                geo.east_width_m,
+                geo.north_height_m,
+                area_order,
+            )
+        for node, area in zip(active_nodes, active_areas):
+            if (
+                terrain_ref
+                and isinstance(geo, PointSourceGeometry)
+                and not terrain_ref.visible(node, point)
+            ):
+                continue
             vector = point - node
             r = float(np.linalg.norm(vector))
             incoming = vector / r

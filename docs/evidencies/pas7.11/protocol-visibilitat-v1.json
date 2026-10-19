@@ -1,0 +1,66 @@
+{
+  "revision": "TL3D-SKY-7.11-v1",
+  "frozenBeforeFinalCampaign": true,
+  "geometry": "ECEF esfera6371008.8; DEM triangular opac; sense refraccio",
+  "topologyCriterion": "mateixos estats booleans fora de tangencies; primera interseccio concordant a 1e-6 m (>1000 ulp ECEF)",
+  "transportComparison": "diagnostic sense llindar PASS/FAIL; gate7.12 no executat",
+  "areaOrdersRuntime": [
+    2,
+    4,
+    8
+  ],
+  "areaOrdersReference": [
+    2,
+    4,
+    8
+  ],
+  "spectralOrdersReference": [
+    4,
+    8
+  ],
+  "sostreM": 10000,
+  "ceilingLimitation": "22.448750675641016% menys B4 zenit a10km vs50km en7.10; cua superior desconeguda; no es requalifica el domini",
+  "performance": {
+    "modes": [
+      "B0",
+      "B1",
+      "B2",
+      "B4"
+    ],
+    "los": 90,
+    "sources": 10,
+    "elevationsDeg": [
+      0.5,
+      1,
+      2,
+      5,
+      10,
+      20,
+      30,
+      60,
+      90
+    ],
+    "warmups": 1,
+    "measurements": 5,
+    "seed": 711,
+    "comparison": "sense DEM vs DEM muntanya mateixa fixture; cost exclusiu occlusion separat; no extrapolar900LOS; area cost separat",
+    "noConcurrentNumericalWork": true,
+    "additionalPairedControl": "DEM pla de24triangles: mateix treball radiatiu visible, cost de particions/visibilitat mesurat sense confondre amb estalvi per muntanya"
+  },
+  "noLaterAcceleration": true,
+  "areaPerformance": {
+    "los": 1,
+    "areaOrder": 2,
+    "modes": [
+      "B1",
+      "B4"
+    ],
+    "terrain": [
+      "none",
+      "mountain"
+    ],
+    "warmups": 1,
+    "measurements": 3,
+    "noConcurrentNumericalWork": true
+  }
+}

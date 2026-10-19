@@ -28,7 +28,7 @@ Revalidar el domini de les 42 SPD CIE, interpolacions Kelvin, mescles i operador
 - [Pas 7.5.1](../completat/pas7.5.1-black-marble-spectral-simulation.md)
 
 **En depenen:**
-- [Pas 7.11](../pendent/pas7.11-terrain-curvature.md)
+- [Pas 7.11](../completat/pas7.11-terrain-curvature.md)
 
 ## Codi existent a reutilitzar
 

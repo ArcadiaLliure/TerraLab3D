@@ -8,7 +8,13 @@ Validar el transport complet abans de cúpules, compressions o caches.
 
 ## Dependències
 
-7.11
+**Depèn de:**
+- [7.11 — Terreny i visibilitat](../completat/pas7.11-terrain-curvature.md), completat offline.
+
+**En depenen:**
+- [7.13 — DomeProfile directe](pas7.13-dome-profile-direct.md).
+
+Actualització exclusivament documental de dependència: 7.12 no s’ha executat. Cal justificar el domini atmosfèric; es conserva el 22,45% omès amb 10 km al zenit B4 de la fixture de 7.10 respecte a 50 km, i la cua superior desconeguda.
 
 ## Referències obligatòries
 

@@ -1,0 +1,209 @@
+[
+  {
+    "case": "B1_area",
+    "unit": "W m^-2 sr^-1 nm^-1",
+    "runtime": [
+      {
+        "areaOrder": 2,
+        "value": 6.077438295832351e-14,
+        "seconds": 11.00699049999821,
+        "estimatedOuterError": 1.038285429211946e-24,
+        "counters": {
+          "los_count": 1,
+          "segment_count": 32,
+          "quadrature_node_count": 480,
+          "gk_subdivision_count": 0,
+          "leaf_interval_count": 32
+        },
+        "terrain": {
+          "surfaceSignature": "ba9bd3968839f41d3caf8e33079ae452625cb50ead6712bbab4adfa1012941e6",
+          "heightInterpretation": "altura radial esfèrica prescrita; no datum vertical real",
+          "provenance": "muntanya triangular de 1200 m; graella explícita v1",
+          "visibility": "opaque_binary;explicit_shadow_partitions;area_polygon_clipping",
+          "rays": [
+            {
+              "sourceId": "b1-point-000",
+              "directionId": "view",
+              "atmosphericLengthM": 9900.0,
+              "visibleLengthM": 9900.0
+            }
+          ],
+          "work": {
+            "segment_checks": 24722,
+            "triangle_tests": 593328,
+            "shadow_planes": 384,
+            "visibility_intervals": 0,
+            "area_polygons": 2579,
+            "emission_nodes": 24448,
+            "max_area_nodes": 146,
+            "max_area_roundoff_fraction": 2.810032743555346e-10
+          }
+        },
+        "profile": {
+          "exclusiveMs": {
+            "geometry": 1192.5313,
+            "occlusion": 9190.7878,
+            "atmospheric_sampling": 25.715,
+            "transmissions": 589.1863,
+            "quadrature": 7.5987,
+            "spectral_integration": 0.0
+          },
+          "calls": {
+            "geometry": 25410,
+            "occlusion": 482,
+            "atmospheric_sampling": 480,
+            "transmissions": 480,
+            "quadrature": 1,
+            "spectral_integration": 0
+          }
+        },
+        "signature": "548db6551595842b1d5c2ed60f5cd8ef85028cbc85f43b753cd0c688db4ee6da"
+      },
+      {
+        "areaOrder": 4,
+        "value": 6.077439780564042e-14,
+        "seconds": 36.55857170000672,
+        "estimatedOuterError": 1.2148717820112276e-26,
+        "counters": {
+          "los_count": 1,
+          "segment_count": 32,
+          "quadrature_node_count": 480,
+          "gk_subdivision_count": 0,
+          "leaf_interval_count": 32
+        },
+        "terrain": {
+          "surfaceSignature": "ba9bd3968839f41d3caf8e33079ae452625cb50ead6712bbab4adfa1012941e6",
+          "heightInterpretation": "altura radial esfèrica prescrita; no datum vertical real",
+          "provenance": "muntanya triangular de 1200 m; graella explícita v1",
+          "visibility": "opaque_binary;explicit_shadow_partitions;area_polygon_clipping",
+          "rays": [
+            {
+              "sourceId": "b1-point-000",
+              "directionId": "view",
+              "atmosphericLengthM": 9900.0,
+              "visibleLengthM": 9900.0
+            }
+          ],
+          "work": {
+            "segment_checks": 98870,
+            "triangle_tests": 2372880,
+            "shadow_planes": 384,
+            "visibility_intervals": 0,
+            "area_polygons": 2579,
+            "emission_nodes": 97813,
+            "max_area_nodes": 585,
+            "max_area_roundoff_fraction": 2.810032743555346e-10
+          }
+        },
+        "profile": {
+          "exclusiveMs": {
+            "geometry": 4694.9985,
+            "occlusion": 29496.5178,
+            "atmospheric_sampling": 26.5779,
+            "transmissions": 2330.7223,
+            "quadrature": 8.5298,
+            "spectral_integration": 0.0
+          },
+          "calls": {
+            "geometry": 98775,
+            "occlusion": 482,
+            "atmospheric_sampling": 480,
+            "transmissions": 480,
+            "quadrature": 1,
+            "spectral_integration": 0
+          }
+        },
+        "signature": "e5305ebab0122c28228e3d050613266635a6ed50e57efbee626e4c684222e5ca"
+      },
+      {
+        "areaOrder": 8,
+        "value": 6.07743978056399e-14,
+        "seconds": 137.9684711000009,
+        "estimatedOuterError": 1.2139347771264753e-26,
+        "counters": {
+          "los_count": 1,
+          "segment_count": 32,
+          "quadrature_node_count": 480,
+          "gk_subdivision_count": 0,
+          "leaf_interval_count": 32
+        },
+        "terrain": {
+          "surfaceSignature": "ba9bd3968839f41d3caf8e33079ae452625cb50ead6712bbab4adfa1012941e6",
+          "heightInterpretation": "altura radial esfèrica prescrita; no datum vertical real",
+          "provenance": "muntanya triangular de 1200 m; graella explícita v1",
+          "visibility": "opaque_binary;explicit_shadow_partitions;area_polygon_clipping",
+          "rays": [
+            {
+              "sourceId": "b1-point-000",
+              "directionId": "view",
+              "atmosphericLengthM": 9900.0,
+              "visibleLengthM": 9900.0
+            }
+          ],
+          "work": {
+            "segment_checks": 395462,
+            "triangle_tests": 9491088,
+            "shadow_planes": 384,
+            "visibility_intervals": 0,
+            "area_polygons": 2579,
+            "emission_nodes": 391180,
+            "max_area_nodes": 2336,
+            "max_area_roundoff_fraction": 2.810032743555346e-10
+          }
+        },
+        "profile": {
+          "exclusiveMs": {
+            "geometry": 18681.4645,
+            "occlusion": 109859.3376,
+            "atmospheric_sampling": 28.0614,
+            "transmissions": 9389.2129,
+            "quadrature": 9.0376,
+            "spectral_integration": 0.0
+          },
+          "calls": {
+            "geometry": 392142,
+            "occlusion": 482,
+            "atmospheric_sampling": 480,
+            "transmissions": 480,
+            "quadrature": 1,
+            "spectral_integration": 0
+          }
+        },
+        "signature": "0fecedf73f2f605e590891c66d1fd0270caddabb8ba9e0178a05e8d78977d01f"
+      }
+    ],
+    "reference": [
+      {
+        "value": 6.077438849298735e-14,
+        "los_error_estimate": 1.6744164131064017e-27,
+        "evaluations": 714,
+        "path_order": 16,
+        "area_order": 2,
+        "revision": "sg-ref-spherical-monochromatic-v1",
+        "seconds": 8.488039599993499
+      },
+      {
+        "value": 6.077439781412522e-14,
+        "los_error_estimate": 1.6743977286391173e-27,
+        "evaluations": 714,
+        "path_order": 16,
+        "area_order": 4,
+        "revision": "sg-ref-spherical-monochromatic-v1",
+        "seconds": 13.72423229998094
+      },
+      {
+        "value": 6.077439781412494e-14,
+        "los_error_estimate": 1.674399300853717e-27,
+        "evaluations": 714,
+        "path_order": 16,
+        "area_order": 8,
+        "revision": "sg-ref-spherical-monochromatic-v1",
+        "seconds": 35.254451900022104
+      }
+    ],
+    "absoluteResidual": -8.485038383655137e-24,
+    "relativeResidual": -1.3961531930561932e-10,
+    "referenceRefinementRelative": -4.551914400963142e-15,
+    "gate": "diagnostic_only;not7.12"
+  }
+]

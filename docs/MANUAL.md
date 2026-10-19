@@ -605,4 +605,25 @@ La LUT empaquetada només acredita O3 entre 380–780 nm i 203–293 K. La compo
 
 ![Efecte del sostre 10–50 km segons medi i elevació](evidencies/pas7.10/sensibilitat-sostre-atmosferic.png)
 
-Al zenit de la fixture B4 estàndard, un sostre de 10 km dona 22,45% menys radiància que 50 km. La cua superior a 50 km continua desconeguda: el control del sostre no és una estimació de l'error espectral ni una qualificació física universal. Els temps de perfils variables es documenten separadament de la fixture homogènia de 900 LOS. [Resultats, procedència i límits](evidencies/pas7.10/validacio-espectral-i-gasos.md). El següent pas és 7.11 pendent; no s'ha executat en aquesta iteració.
+Al zenit de la fixture B4 estàndard, un sostre de 10 km dona 22,45% menys radiància que 50 km. La cua superior a 50 km continua desconeguda: el control del sostre no és una estimació de l'error espectral ni una qualificació física universal. Els temps de perfils variables es documenten separadament de la fixture homogènia de 900 LOS. [Resultats, procedència i límits](evidencies/pas7.10/validacio-espectral-i-gasos.md). L'ampliació de terreny de 7.11 es descriu a continuació; 7.12 continua pendent.
+
+### Terreny opac del transport offline — Pas 7.11
+
+El [Pas 7.11](tasques/completat/pas7.11-terrain-curvature.md) amplia la mateixa ruta directa B0/B1/B2/B4. No afegeix controls ni radiància física a la pantalla de producte. Per inspeccionar fixtures i radiàncies:
+
+```powershell
+python -X utf8 tools/validate_terrain_step7_11.py --output .runtime-terreny-local --part topology
+python -X utf8 tools/validate_terrain_step7_11.py --output .runtime-terreny-local --part transport
+python -X utf8 tools/validate_terrain_step7_11.py --output .runtime-terreny-local --part area
+python -X utf8 tools/validate_terrain_step7_11.py --output .runtime-terreny-local --part dem
+```
+
+La muntanya trunca el raig de l'observador i oculta contribucions de font, amb salts binaris explícits. Un rectangle parcialment ocult integra només l'àrea visible: no es fa transparent la muntanya ni es multiplica una font puntual per un alfa. Els escenaris C realista/K conserven SPD i escala relativa, amb geometria traslladada expressament a la fixture sintètica.
+
+![Topologia, salt de visibilitat i curvatura](evidencies/pas7.11/topologia-i-visibilitat.png)
+
+El constructor consumeix l'adaptador DEM existent, exigeix convenció/conversió d'altures i límit superior del model, i rebutja nodata i cobertura insuficient. La graella triada és explícita i té pressupost de vèrtexs; no s'afina automàticament. La demostració amb el DEM real de 5 m empra nou nusos i no certifica una conversió geoidal ni representa tot el detall del raster. Per reproduir-la cal la biblioteca configurada; la instantània i els hashes es conserven a les evidències.
+
+![Cost d'oclusió mesurat, sense acceleracions posteriors](evidencies/pas7.11/cost-oclusio.png)
+
+Les fonts extenses amb retall directe són costoses; els ordres alts són eines de diagnòstic. Els resultats de 90 LOS no s'extrapolen a la campanya històrica de 900 LOS. **El sostre de 10 km continua ometent 22,45% respecte a 50 km en el zenit B4 de 7.10**; la cua superior és desconeguda. [Informe i límits](evidencies/pas7.11/validacio-terreny-i-visibilitat.md). El punt de represa és 7.12 pendent i no executat.

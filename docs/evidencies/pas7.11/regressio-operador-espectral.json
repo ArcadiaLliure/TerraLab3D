@@ -1,0 +1,5 @@
+{
+  "SpectralOperatorAstUnchanged": true,
+  "scope": "algorisme espectral sense canvi; nova visibilitat acromatica i pesos de geometria no negatius; no certifica error total de terreny ni transport",
+  "spectralBudgetMag": 0.01
+}

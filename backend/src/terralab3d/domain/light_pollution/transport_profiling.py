@@ -12,6 +12,7 @@ class TransportProfiler:
         self.nanoseconds = dict.fromkeys(
             (
                 "geometry",
+                "occlusion",
                 "atmospheric_sampling",
                 "transmissions",
                 "quadrature",

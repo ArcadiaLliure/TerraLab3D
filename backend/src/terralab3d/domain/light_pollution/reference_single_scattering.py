@@ -18,6 +18,8 @@ from scipy.special import roots_legendre
 from .optical_field import OpticalField, OpticalCoverageError
 from .gas_absorption import GasAbsorptionModel
 from .scattering import PhaseFunction, ScatteringBand
+from .reference_terrain import ReferenceTerrain
+from .terrain_visibility import TerrainSurface
 from .source_model import (
     AzimuthalAngularEmissionProfile,
     GeodeticPosition,
@@ -249,6 +251,7 @@ def solve_reference_b1(
     cancelled: Callable[[], bool] | None = None,
     aerosol_phase_evaluator: Callable[[float], float] | None = None,
     gas: GasAbsorptionModel | None = None,
+    terrain: TerrainSurface | None = None,
 ) -> ReferenceB1Result:
     def checkpoint():
         if cancelled is not None and cancelled():
@@ -267,6 +270,18 @@ def solve_reference_b1(
         2 * field.radius_m + top_m + observer.altitude_m
     )
     length = delta / (np.sqrt(q * q + delta) + q)
+    terrain_ref = ReferenceTerrain(terrain) if terrain else None
+    if terrain_ref:
+        length = terrain_ref.clip(origin, direction, float(length))
+        if length == 0:
+            return ReferenceB1Result(
+                0.0,
+                0.0,
+                0,
+                path_order,
+                area_order,
+                "sg-ref-opaque-terrain-zero-domain-v1",
+            )
     medium = _ReferenceMedium(field, band, path_order, checkpoint, gas)
     geometry = source.geometry
     pos = (
@@ -308,6 +323,24 @@ def solve_reference_b1(
         s = float(offset @ basis[2]) / normal
         if 0 < s < length:
             breaks.add(s)
+    if terrain_ref:
+        if isinstance(geometry, PointSourceGeometry):
+            breaks.update(terrain_ref.cuts(center, origin, direction, float(length)))
+        else:
+            angle = np.radians(geometry.orientation_deg)
+            uaxis = np.cos(angle) * basis[0] - np.sin(angle) * basis[1]
+            vaxis = np.sin(angle) * basis[0] + np.cos(angle) * basis[1]
+            corners = np.array(
+                [
+                    center
+                    + u * geometry.east_width_m / 2 * uaxis
+                    + v * geometry.north_height_m / 2 * vaxis
+                    for u, v in ((-1, -1), (1, -1), (1, 1), (-1, 1))
+                ]
+            )
+            breaks.update(
+                terrain_ref.area_cuts(corners, origin, direction, float(length))
+            )
     flux = source.spectral_flux(band.wavelength_nm).value
     angular = source.angular
     axial = (
@@ -322,7 +355,27 @@ def solve_reference_b1(
         _, rayleigh, _, aerosol = medium.state(point)
         total = []
         tau_o = medium.tau(origin, point)
-        for node, weight in zip(nodes, weights):
+        active_nodes, active_weights = nodes, weights
+        if terrain_ref and not isinstance(geometry, PointSourceGeometry):
+            angle = np.radians(geometry.orientation_deg)
+            uaxis = np.cos(angle) * basis[0] - np.sin(angle) * basis[1]
+            vaxis = np.sin(angle) * basis[0] + np.cos(angle) * basis[1]
+            active_nodes, active_weights = terrain_ref.area_nodes(
+                point,
+                center,
+                uaxis,
+                vaxis,
+                geometry.east_width_m,
+                geometry.north_height_m,
+                area_order,
+            )
+        for node, weight in zip(active_nodes, active_weights):
+            if (
+                terrain_ref
+                and isinstance(geometry, PointSourceGeometry)
+                and not terrain_ref.visible(node, point)
+            ):
+                continue
             vector = point - node
             r = float(np.linalg.norm(vector))
             if r < 1e-7:

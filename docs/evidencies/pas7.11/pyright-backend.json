@@ -1,0 +1,1134 @@
+{
+    "version": "1.1.411",
+    "time": "1792404689521",
+    "generalDiagnostics": [
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\__init__.py",
+            "severity": "warning",
+            "message": "\"application\" is specified in __all__ but is not present in module",
+            "range": {
+                "start": {
+                    "line": 2,
+                    "character": 11
+                },
+                "end": {
+                    "line": 2,
+                    "character": 24
+                }
+            },
+            "rule": "reportUnsupportedDunderAll"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\__init__.py",
+            "severity": "warning",
+            "message": "\"domain\" is specified in __all__ but is not present in module",
+            "range": {
+                "start": {
+                    "line": 2,
+                    "character": 26
+                },
+                "end": {
+                    "line": 2,
+                    "character": 34
+                }
+            },
+            "rule": "reportUnsupportedDunderAll"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\__init__.py",
+            "severity": "warning",
+            "message": "\"scene\" is specified in __all__ but is not present in module",
+            "range": {
+                "start": {
+                    "line": 2,
+                    "character": 36
+                },
+                "end": {
+                    "line": 2,
+                    "character": 43
+                }
+            },
+            "rule": "reportUnsupportedDunderAll"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\__main__.py",
+            "severity": "error",
+            "message": "\"diagonal_deg\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 1124,
+                    "character": 57
+                },
+                "end": {
+                    "line": 1124,
+                    "character": 69
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\__main__.py",
+            "severity": "error",
+            "message": "\"width_deg\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 1124,
+                    "character": 93
+                },
+                "end": {
+                    "line": 1124,
+                    "character": 102
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\__main__.py",
+            "severity": "error",
+            "message": "\"estimated_limit_magnitude\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 1125,
+                    "character": 73
+                },
+                "end": {
+                    "line": 1125,
+                    "character": 98
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\events.py",
+            "severity": "error",
+            "message": "\"DatasetState\" is unknown import symbol",
+            "range": {
+                "start": {
+                    "line": 5,
+                    "character": 47
+                },
+                "end": {
+                    "line": 5,
+                    "character": 59
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Object of type \"None\" is not subscriptable",
+            "range": {
+                "start": {
+                    "line": 582,
+                    "character": 35
+                },
+                "end": {
+                    "line": 582,
+                    "character": 55
+                }
+            },
+            "rule": "reportOptionalSubscript"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Object of type \"None\" is not subscriptable",
+            "range": {
+                "start": {
+                    "line": 585,
+                    "character": 35
+                },
+                "end": {
+                    "line": 585,
+                    "character": 63
+                }
+            },
+            "rule": "reportOptionalSubscript"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"content_key\" of type \"str\" in function \"__init__\"\n  \"object\" is not assignable to \"str\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"source_ids\" of type \"tuple[str, ...]\" in function \"__init__\"\n  \"object\" is not assignable to \"tuple[str, ...]\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"source_fingerprint\" of type \"str\" in function \"__init__\"\n  \"object\" is not assignable to \"str\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"visible_radius_m\" of type \"float\" in function \"__init__\"\n  \"object\" is not assignable to \"float\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"horizon_elevation_deg\" of type \"NDArray[float32]\" in function \"__init__\"\n  \"object\" is not assignable to \"ndarray[_AnyShape, dtype[float32]]\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"occluder_distance_m\" of type \"NDArray[float32]\" in function \"__init__\"\n  \"object\" is not assignable to \"ndarray[_AnyShape, dtype[float32]]\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"occluder_height_m\" of type \"NDArray[float32]\" in function \"__init__\"\n  \"object\" is not assignable to \"ndarray[_AnyShape, dtype[float32]]\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"valid_mask\" of type \"NDArray[uint8]\" in function \"__init__\"\n  \"object\" is not assignable to \"ndarray[_AnyShape, dtype[uint8]]\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"quality\" of type \"HorizonQuality\" in function \"__init__\"\n  \"object\" is not assignable to \"HorizonQuality\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"resolved_fraction\" of type \"float\" in function \"__init__\"\n  \"object\" is not assignable to \"float\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\horizon_coordinator.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"kernel_version\" of type \"str\" in function \"__init__\"\n  \"object\" is not assignable to \"str\"",
+            "range": {
+                "start": {
+                    "line": 641,
+                    "character": 14
+                },
+                "end": {
+                    "line": 641,
+                    "character": 20
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\session.py",
+            "severity": "error",
+            "message": "\"EclipseInstantState\" is unknown import symbol",
+            "range": {
+                "start": {
+                    "line": 6,
+                    "character": 46
+                },
+                "end": {
+                    "line": 6,
+                    "character": 65
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\session.py",
+            "severity": "error",
+            "message": "\"DatasetState\" is unknown import symbol",
+            "range": {
+                "start": {
+                    "line": 17,
+                    "character": 47
+                },
+                "end": {
+                    "line": 17,
+                    "character": 59
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\solar_system_preview.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"vector\" of type \"tuple[float, float, float]\" in function \"_length\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 170,
+                    "character": 49
+                },
+                "end": {
+                    "line": 170,
+                    "character": 65
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\application\\solar_system_preview.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"second\" of type \"tuple[float, float, float]\" in function \"_dot\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 173,
+                    "character": 50
+                },
+                "end": {
+                    "line": 173,
+                    "character": 66
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\deep_sky\\calculations.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"x\" of type \"ConvertibleToFloat\" in function \"__new__\"\n  Type \"object\" is not assignable to type \"ConvertibleToFloat\"\n    \"object\" is not assignable to \"str\"\n    \"object\" is incompatible with protocol \"Buffer\"\n      \"__buffer__\" is not present\n    \"object\" is incompatible with protocol \"SupportsFloat\"\n      \"__float__\" is not present\n    \"object\" is incompatible with protocol \"SupportsIndex\"\n      \"__index__\" is not present",
+            "range": {
+                "start": {
+                    "line": 18,
+                    "character": 20
+                },
+                "end": {
+                    "line": 18,
+                    "character": 25
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\eclipses\\calculations.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"second\" of type \"Vector3\" in function \"dot\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 215,
+                    "character": 40
+                },
+                "end": {
+                    "line": 215,
+                    "character": 44
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\eclipses\\calculations.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"first\" of type \"Vector3\" in function \"dot\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 218,
+                    "character": 27
+                },
+                "end": {
+                    "line": 218,
+                    "character": 40
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\eclipses\\calculations.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"second\" of type \"Vector3\" in function \"dot\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 218,
+                    "character": 42
+                },
+                "end": {
+                    "line": 218,
+                    "character": 55
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\eclipses\\calculations.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"vector\" of type \"Vector3\" in function \"normalize_vector\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 249,
+                    "character": 8
+                },
+                "end": {
+                    "line": 252,
+                    "character": 9
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\horizon\\services.py",
+            "severity": "error",
+            "message": "\"horizon_visible\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 38,
+                    "character": 49
+                },
+                "end": {
+                    "line": 38,
+                    "character": 64
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\measurements\\calculations.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"value\" of type \"tuple[float, float, float]\" in function \"_normalize\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 164,
+                    "character": 24
+                },
+                "end": {
+                    "line": 164,
+                    "character": 110
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\resources\\services.py",
+            "severity": "error",
+            "message": "\"DatasetState\" is unknown import symbol",
+            "range": {
+                "start": {
+                    "line": 5,
+                    "character": 20
+                },
+                "end": {
+                    "line": 5,
+                    "character": 32
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\sky_background\\sky_environment.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"zenith_color_linear\" of type \"tuple[float, float, float]\" in function \"__init__\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 170,
+                    "character": 32
+                },
+                "end": {
+                    "line": 170,
+                    "character": 99
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\sky_background\\sky_environment.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"horizon_color_linear\" of type \"tuple[float, float, float]\" in function \"__init__\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 171,
+                    "character": 33
+                },
+                "end": {
+                    "line": 171,
+                    "character": 101
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\domain\\sky_background\\sky_environment.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"ground_color_linear\" of type \"tuple[float, float, float]\" in function \"__init__\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 172,
+                    "character": 32
+                },
+                "end": {
+                    "line": 172,
+                    "character": 99
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\dem\\adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"bounds_native\" of type \"tuple[float, float, float, float]\" in function \"__init__\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float, float]\"\n    Tuple size mismatch; expected 4 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 153,
+                    "character": 42
+                },
+                "end": {
+                    "line": 153,
+                    "character": 55
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\dem\\adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"bounds\" of type \"tuple[float, float, float, float]\" in function \"_transform_bounds\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float, float]\"\n    Tuple size mismatch; expected 4 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 154,
+                    "character": 59
+                },
+                "end": {
+                    "line": 154,
+                    "character": 72
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\dem\\adapter.py",
+            "severity": "error",
+            "message": "\"errors\" is not a known attribute of module \"rasterio\"",
+            "range": {
+                "start": {
+                    "line": 161,
+                    "character": 42
+                },
+                "end": {
+                    "line": 161,
+                    "character": 48
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\dem\\adapter.py",
+            "severity": "error",
+            "message": "\"errors\" is not a known attribute of module \"rasterio\"",
+            "range": {
+                "start": {
+                    "line": 220,
+                    "character": 34
+                },
+                "end": {
+                    "line": 220,
+                    "character": 40
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\dem\\adapter.py",
+            "severity": "error",
+            "message": "Object of type \"None\" is not subscriptable",
+            "range": {
+                "start": {
+                    "line": 223,
+                    "character": 31
+                },
+                "end": {
+                    "line": 223,
+                    "character": 51
+                }
+            },
+            "rule": "reportOptionalSubscript"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\dem\\adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"NDArray[int16] | None\" cannot be assigned to parameter \"source_indices\" of type \"NDArray[int16]\" in function \"__init__\"\n  Type \"NDArray[int16] | None\" is not assignable to type \"NDArray[int16]\"\n    \"None\" is not assignable to \"ndarray[_AnyShape, dtype[int16]]\"",
+            "range": {
+                "start": {
+                    "line": 395,
+                    "character": 27
+                },
+                "end": {
+                    "line": 395,
+                    "character": 47
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\dem\\adapter.py",
+            "severity": "error",
+            "message": "Expected 0 positional arguments",
+            "range": {
+                "start": {
+                    "line": 626,
+                    "character": 33
+                },
+                "end": {
+                    "line": 626,
+                    "character": 40
+                }
+            },
+            "rule": "reportCallIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\adapter.py",
+            "severity": "error",
+            "message": "Object of type \"None\" is not subscriptable",
+            "range": {
+                "start": {
+                    "line": 267,
+                    "character": 16
+                },
+                "end": {
+                    "line": 267,
+                    "character": 31
+                }
+            },
+            "rule": "reportOptionalSubscript"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\adapter.py",
+            "severity": "error",
+            "message": "Object of type \"None\" is not subscriptable",
+            "range": {
+                "start": {
+                    "line": 268,
+                    "character": 14
+                },
+                "end": {
+                    "line": 268,
+                    "character": 29
+                }
+            },
+            "rule": "reportOptionalSubscript"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\adapter.py",
+            "severity": "error",
+            "message": "Object of type \"None\" is not subscriptable",
+            "range": {
+                "start": {
+                    "line": 269,
+                    "character": 15
+                },
+                "end": {
+                    "line": 269,
+                    "character": 30
+                }
+            },
+            "rule": "reportOptionalSubscript"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\adapter.py",
+            "severity": "error",
+            "message": "\"latlon\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 270,
+                    "character": 31
+                },
+                "end": {
+                    "line": 270,
+                    "character": 37
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\adapter.py",
+            "severity": "error",
+            "message": "Object of type \"None\" is not subscriptable",
+            "range": {
+                "start": {
+                    "line": 309,
+                    "character": 16
+                },
+                "end": {
+                    "line": 309,
+                    "character": 31
+                }
+            },
+            "rule": "reportOptionalSubscript"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\adapter.py",
+            "severity": "error",
+            "message": "Object of type \"None\" cannot be called",
+            "range": {
+                "start": {
+                    "line": 488,
+                    "character": 34
+                },
+                "end": {
+                    "line": 488,
+                    "character": 72
+                }
+            },
+            "rule": "reportOptionalCall"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\spice_adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"vector\" of type \"Vector3\" in function \"normalize_vector\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 598,
+                    "character": 44
+                },
+                "end": {
+                    "line": 598,
+                    "character": 87
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\ephemeris\\spice_adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"vector\" of type \"Vector3\" in function \"normalize_vector\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 754,
+                    "character": 16
+                },
+                "end": {
+                    "line": 754,
+                    "character": 99
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\file_assets\\lunar_limb.py",
+            "severity": "error",
+            "message": "Argument of type \"tuple[float, ...]\" cannot be assigned to parameter \"vector\" of type \"Vector3\" in function \"_quaternion_apply\"\n  \"tuple[float, ...]\" is not assignable to \"tuple[float, float, float]\"\n    Tuple size mismatch; expected 3 but received indeterminate",
+            "range": {
+                "start": {
+                    "line": 82,
+                    "character": 51
+                },
+                "end": {
+                    "line": 82,
+                    "character": 60
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\planck\\converter.py",
+            "severity": "error",
+            "message": "\"names\" is not a known attribute of \"None\"",
+            "range": {
+                "start": {
+                    "line": 51,
+                    "character": 53
+                },
+                "end": {
+                    "line": 51,
+                    "character": 58
+                }
+            },
+            "rule": "reportOptionalMemberAccess"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\planck\\converter.py",
+            "severity": "error",
+            "message": "Argument of type \"Header | _HeaderCommentaryCards | Unknown | None\" cannot be assigned to parameter \"x\" of type \"ConvertibleToInt\" in function \"__new__\"\n  Type \"Header | _HeaderCommentaryCards | Unknown | None\" is not assignable to type \"ConvertibleToInt\"\n    Type \"Header\" is not assignable to type \"ConvertibleToInt\"\n      \"Header\" is not assignable to \"str\"\n      \"Header\" is incompatible with protocol \"Buffer\"\n        \"__buffer__\" is not present\n      \"Header\" is incompatible with protocol \"SupportsInt\"\n        \"__int__\" is not present\n      \"Header\" is incompatible with protocol \"SupportsIndex\"\n  ...",
+            "range": {
+                "start": {
+                    "line": 68,
+                    "character": 20
+                },
+                "end": {
+                    "line": 68,
+                    "character": 46
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\planck\\converter.py",
+            "severity": "error",
+            "message": "Argument of type \"Header | _HeaderCommentaryCards | Unknown | None\" cannot be assigned to parameter \"x\" of type \"ConvertibleToInt\" in function \"__new__\"\n  Type \"Header | _HeaderCommentaryCards | Unknown | None\" is not assignable to type \"ConvertibleToInt\"\n    Type \"Header\" is not assignable to type \"ConvertibleToInt\"\n      \"Header\" is not assignable to \"str\"\n      \"Header\" is incompatible with protocol \"Buffer\"\n        \"__buffer__\" is not present\n      \"Header\" is incompatible with protocol \"SupportsInt\"\n        \"__int__\" is not present\n      \"Header\" is incompatible with protocol \"SupportsIndex\"",
+            "range": {
+                "start": {
+                    "line": 68,
+                    "character": 20
+                },
+                "end": {
+                    "line": 68,
+                    "character": 46
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\planck\\converter.py",
+            "severity": "error",
+            "message": "Argument of type \"Unknown | HDUList | None\" cannot be assigned to parameter \"hdu_list\" of type \"HDUList\" in function \"_first_healpix_table\"\n  Type \"Unknown | HDUList | None\" is not assignable to type \"HDUList\"\n    \"None\" is not assignable to \"HDUList\"",
+            "range": {
+                "start": {
+                    "line": 96,
+                    "character": 31
+                },
+                "end": {
+                    "line": 96,
+                    "character": 47
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\surface\\adapter.py",
+            "severity": "error",
+            "message": "\"errors\" is not a known attribute of module \"rasterio\"",
+            "range": {
+                "start": {
+                    "line": 191,
+                    "character": 38
+                },
+                "end": {
+                    "line": 191,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\surface\\adapter.py",
+            "severity": "error",
+            "message": "\"errors\" is not a known attribute of module \"rasterio\"",
+            "range": {
+                "start": {
+                    "line": 273,
+                    "character": 38
+                },
+                "end": {
+                    "line": 273,
+                    "character": 44
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\surface\\adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"x\" of type \"ConvertibleToInt\" in function \"__new__\"\n  Type \"object\" is not assignable to type \"ConvertibleToInt\"\n    \"object\" is not assignable to \"str\"\n    \"object\" is incompatible with protocol \"Buffer\"\n      \"__buffer__\" is not present\n    \"object\" is incompatible with protocol \"SupportsInt\"\n      \"__int__\" is not present\n    \"object\" is incompatible with protocol \"SupportsIndex\"\n      \"__index__\" is not present\n  ...",
+            "range": {
+                "start": {
+                    "line": 509,
+                    "character": 27
+                },
+                "end": {
+                    "line": 509,
+                    "character": 49
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\surface\\adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"x\" of type \"ConvertibleToInt\" in function \"__new__\"\n  Type \"object\" is not assignable to type \"ConvertibleToInt\"\n    \"object\" is not assignable to \"str\"\n    \"object\" is incompatible with protocol \"Buffer\"\n      \"__buffer__\" is not present\n    \"object\" is incompatible with protocol \"SupportsInt\"\n      \"__int__\" is not present\n    \"object\" is incompatible with protocol \"SupportsIndex\"\n      \"__index__\" is not present",
+            "range": {
+                "start": {
+                    "line": 509,
+                    "character": 27
+                },
+                "end": {
+                    "line": 509,
+                    "character": 49
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\surface\\adapter.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"x\" of type \"ConvertibleToFloat\" in function \"__new__\"\n  Type \"object\" is not assignable to type \"ConvertibleToFloat\"\n    \"object\" is not assignable to \"str\"\n    \"object\" is incompatible with protocol \"Buffer\"\n      \"__buffer__\" is not present\n    \"object\" is incompatible with protocol \"SupportsFloat\"\n      \"__float__\" is not present\n    \"object\" is incompatible with protocol \"SupportsIndex\"\n      \"__index__\" is not present",
+            "range": {
+                "start": {
+                    "line": 513,
+                    "character": 31
+                },
+                "end": {
+                    "line": 513,
+                    "character": 68
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\surface\\adapter.py",
+            "severity": "error",
+            "message": "\"io\" is not a known attribute of module \"rasterio\"",
+            "range": {
+                "start": {
+                    "line": 533,
+                    "character": 51
+                },
+                "end": {
+                    "line": 533,
+                    "character": 53
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\surface\\adapter.py",
+            "severity": "error",
+            "message": "\"errors\" is not a known attribute of module \"rasterio\"",
+            "range": {
+                "start": {
+                    "line": 649,
+                    "character": 45
+                },
+                "end": {
+                    "line": 649,
+                    "character": 51
+                }
+            },
+            "rule": "reportAttributeAccessIssue"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\tile_manifest.py",
+            "severity": "error",
+            "message": "Argument of type \"Unknown | float | None\" cannot be assigned to parameter \"x\" of type \"ConvertibleToFloat\" in function \"__new__\"\n  Type \"Unknown | float | None\" is not assignable to type \"ConvertibleToFloat\"\n    Type \"None\" is not assignable to type \"ConvertibleToFloat\"\n      \"None\" is not assignable to \"str\"\n      \"None\" is incompatible with protocol \"Buffer\"\n        \"__buffer__\" is not present\n      \"None\" is incompatible with protocol \"SupportsFloat\"\n        \"__float__\" is not present\n      \"None\" is incompatible with protocol \"SupportsIndex\"\n  ...",
+            "range": {
+                "start": {
+                    "line": 131,
+                    "character": 34
+                },
+                "end": {
+                    "line": 131,
+                    "character": 115
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\tile_manifest.py",
+            "severity": "error",
+            "message": "Argument of type \"Unknown | float | None\" cannot be assigned to parameter \"x\" of type \"ConvertibleToFloat\" in function \"__new__\"\n  Type \"Unknown | float | None\" is not assignable to type \"ConvertibleToFloat\"\n    Type \"None\" is not assignable to type \"ConvertibleToFloat\"\n      \"None\" is not assignable to \"str\"\n      \"None\" is incompatible with protocol \"Buffer\"\n        \"__buffer__\" is not present\n      \"None\" is incompatible with protocol \"SupportsFloat\"\n        \"__float__\" is not present\n      \"None\" is incompatible with protocol \"SupportsIndex\"",
+            "range": {
+                "start": {
+                    "line": 131,
+                    "character": 34
+                },
+                "end": {
+                    "line": 131,
+                    "character": 115
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\adapters\\tile_manifest.py",
+            "severity": "error",
+            "message": "Argument of type \"object\" cannot be assigned to parameter \"x\" of type \"ConvertibleToFloat\" in function \"__new__\"\n  Type \"object\" is not assignable to type \"ConvertibleToFloat\"\n    \"object\" is not assignable to \"str\"\n    \"object\" is incompatible with protocol \"Buffer\"\n      \"__buffer__\" is not present\n    \"object\" is incompatible with protocol \"SupportsFloat\"\n      \"__float__\" is not present\n    \"object\" is incompatible with protocol \"SupportsIndex\"\n      \"__index__\" is not present",
+            "range": {
+                "start": {
+                    "line": 236,
+                    "character": 17
+                },
+                "end": {
+                    "line": 236,
+                    "character": 22
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\resources\\acquirers.py",
+            "severity": "error",
+            "message": "\"final_path\" is possibly unbound",
+            "range": {
+                "start": {
+                    "line": 232,
+                    "character": 26
+                },
+                "end": {
+                    "line": 232,
+                    "character": 36
+                }
+            },
+            "rule": "reportPossiblyUnboundVariable"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\resources\\acquirers.py",
+            "severity": "error",
+            "message": "\"final_path\" is possibly unbound",
+            "range": {
+                "start": {
+                    "line": 236,
+                    "character": 55
+                },
+                "end": {
+                    "line": 236,
+                    "character": 65
+                }
+            },
+            "rule": "reportPossiblyUnboundVariable"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\resources\\acquirers.py",
+            "severity": "error",
+            "message": "\"final_path\" is possibly unbound",
+            "range": {
+                "start": {
+                    "line": 239,
+                    "character": 24
+                },
+                "end": {
+                    "line": 239,
+                    "character": 34
+                }
+            },
+            "rule": "reportPossiblyUnboundVariable"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\resources\\acquirers.py",
+            "severity": "error",
+            "message": "Argument of type \"str | None\" cannot be assigned to parameter \"content_sha256\" of type \"str\" in function \"_complete_installed_source\"\n  Type \"str | None\" is not assignable to type \"str\"\n    \"None\" is not assignable to \"str\"",
+            "range": {
+                "start": {
+                    "line": 249,
+                    "character": 55
+                },
+                "end": {
+                    "line": 249,
+                    "character": 69
+                }
+            },
+            "rule": "reportArgumentType"
+        },
+        {
+            "file": "f:\\Python\\TerraLab3D\\backend\\src\\terralab3d\\infrastructure\\resources\\download_manager.py",
+            "severity": "error",
+            "message": "Argument of type \"Dict[str, Task[Unknown]]\" cannot be assigned to parameter \"active_tasks\" of type \"set[Unknown]\" in function \"acquire\"\n  \"Dict[str, Task[Unknown]]\" is not assignable to \"set[Unknown]\"",
+            "range": {
+                "start": {
+                    "line": 201,
+                    "character": 60
+                },
+                "end": {
+                    "line": 201,
+                    "character": 78
+                }
+            },
+            "rule": "reportArgumentType"
+        }
+    ],
+    "summary": {
+        "filesAnalyzed": 313,
+        "errorCount": 67,
+        "warningCount": 3,
+        "informationCount": 0,
+        "timeInSec": 11.853
+    }
+}
+

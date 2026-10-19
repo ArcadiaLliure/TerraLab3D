@@ -1,0 +1,673 @@
+{
+  "baselineHead": "c5fc0f75ed25ea5dca8dea7d7e17fb80d3d67cbb",
+  "initialWorkingTree": "",
+  "count": 133,
+  "allUnchanged": true,
+  "files": [
+    {
+      "path": "docs/evidencies/interficie/calaix-pestanyes.png",
+      "before": "6ff03a5f41c9855d506e393f62675cbf0d7bb478559abd6dd31b07647045c97f",
+      "after": "6ff03a5f41c9855d506e393f62675cbf0d7bb478559abd6dd31b07647045c97f"
+    },
+    {
+      "path": "docs/evidencies/interficie/interficie-general.png",
+      "before": "eb177a5a12b364a05ea6b80b996496fe790b93981086e47f18386f188b3f0609",
+      "after": "eb177a5a12b364a05ea6b80b996496fe790b93981086e47f18386f188b3f0609"
+    },
+    {
+      "path": "docs/evidencies/pas19/camera.png",
+      "before": "275eceb2cf47d09c8ce4a9d5a493a5d2e13c23335ec96e5e7700d540c64f02a8",
+      "after": "275eceb2cf47d09c8ce4a9d5a493a5d2e13c23335ec96e5e7700d540c64f02a8"
+    },
+    {
+      "path": "docs/evidencies/pas19/eye.png",
+      "before": "7802cd328e99d84a239c82fd9b130f4b35c12ba30464f823ba596a3e9e54e8a4",
+      "after": "7802cd328e99d84a239c82fd9b130f4b35c12ba30464f823ba596a3e9e54e8a4"
+    },
+    {
+      "path": "docs/evidencies/pas19/telescope.png",
+      "before": "cbf9c7becb965646069b56ca3a2bccf3d82251708dea7121fde6117fef6f4b99",
+      "after": "cbf9c7becb965646069b56ca3a2bccf3d82251708dea7121fde6117fef6f4b99"
+    },
+    {
+      "path": "docs/evidencies/pas21/edit-delete-undo.png",
+      "before": "e20d2f7153fc94937d3302549af08e31ffb97294a0d197d03be8012c79728f04",
+      "after": "e20d2f7153fc94937d3302549af08e31ffb97294a0d197d03be8012c79728f04"
+    },
+    {
+      "path": "docs/evidencies/pas21/four-tools.png",
+      "before": "8c6dced329c4d64e8db0f708531b7683aebf531bc240df1a1b8b876e246513d6",
+      "after": "8c6dced329c4d64e8db0f708531b7683aebf531bc240df1a1b8b876e246513d6"
+    },
+    {
+      "path": "docs/evidencies/pas21/measurement-cycle.webm",
+      "before": "97735e05955ff5f49975e97eb58a1eafa61cdeab3b4329bd59bcb7248835703d",
+      "after": "97735e05955ff5f49975e97eb58a1eafa61cdeab3b4329bd59bcb7248835703d"
+    },
+    {
+      "path": "docs/evidencies/pas22/trajectoria-completa.png",
+      "before": "a294e7c7fca93337ec67368e060a470ca87640bb36f80d14b473d6692821c532",
+      "after": "a294e7c7fca93337ec67368e060a470ca87640bb36f80d14b473d6692821c532"
+    },
+    {
+      "path": "docs/evidencies/pas22.5/auditoria-enllacos.txt",
+      "before": "8c1deda396cbb2c7281d0fb3e0a2befbd61fa855b7355cf1409fb6b65211a50d",
+      "after": "8c1deda396cbb2c7281d0fb3e0a2befbd61fa855b7355cf1409fb6b65211a50d"
+    },
+    {
+      "path": "docs/evidencies/pas22.5/validacio-documental.txt",
+      "before": "2ad277db2add91e70111625c848647acb88bdd03a87d9a8cefd657c6f6d38735",
+      "after": "2ad277db2add91e70111625c848647acb88bdd03a87d9a8cefd657c6f6d38735"
+    },
+    {
+      "path": "docs/evidencies/pas23/constellacio-amb-trajectoria.png",
+      "before": "625d077b1036985137cef1b9698dacd53bda9a613ecbaf58c31218069ec2d592",
+      "after": "625d077b1036985137cef1b9698dacd53bda9a613ecbaf58c31218069ec2d592"
+    },
+    {
+      "path": "docs/evidencies/pas23/edicio-i-visibilitat.png",
+      "before": "2d5aa10c0fabdc5d1818dc5c49f7966dfb3c2ca3dfa2d5225adf5efd4edd8ff5",
+      "after": "2d5aa10c0fabdc5d1818dc5c49f7966dfb3c2ca3dfa2d5225adf5efd4edd8ff5"
+    },
+    {
+      "path": "docs/evidencies/pas23/runtime-i-persistencia.txt",
+      "before": "1eb525b69b94776a92e86095930cf89cd6588e6e6a5e70fbb371baef1e8759bf",
+      "after": "1eb525b69b94776a92e86095930cf89cd6588e6e6a5e70fbb371baef1e8759bf"
+    },
+    {
+      "path": "docs/evidencies/pas23/validacio-cataleg.txt",
+      "before": "bdcdc308aaa697b77b6da8d31da6701c360c413373c903e7cef4bb2f87bc7834",
+      "after": "bdcdc308aaa697b77b6da8d31da6701c360c413373c903e7cef4bb2f87bc7834"
+    },
+    {
+      "path": "docs/evidencies/pas7.1/auditoria-fonts.md",
+      "before": "86abbfbf9d29b05c4353af937d6970ec908551038a48db4fa614892d5b286981",
+      "after": "86abbfbf9d29b05c4353af937d6970ec908551038a48db4fa614892d5b286981"
+    },
+    {
+      "path": "docs/evidencies/pas7.1/validacio-contracte.txt",
+      "before": "60ec03efee325eac95c1392442fa72e2b50d21f5cf3627ddc68b2e43e7494f81",
+      "after": "60ec03efee325eac95c1392442fa72e2b50d21f5cf3627ddc68b2e43e7494f81"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/ajust-etiquetes-dto.json",
+      "before": "1ca0ddb46898bdaf0c6ac64977f73a1546d6adfbe83ad36a9bf46eb13f32d3ee",
+      "after": "1ca0ddb46898bdaf0c6ac64977f73a1546d6adfbe83ad36a9bf46eb13f32d3ee"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/assaig-unitats-ja-rebutjades-al-constructor.txt",
+      "before": "e94b441ca3b09bd1caa7cd52c490e49ccaaf7f2e67b0ef49ff5a620854958e55",
+      "after": "e94b441ca3b09bd1caa7cd52c490e49ccaaf7f2e67b0ef49ff5a620854958e55"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/assets-wheel.json",
+      "before": "9f613edc8c938cde06cb1980bcb90caeddbe42f7df1bd8ef4d42252eca3dd72c",
+      "after": "9f613edc8c938cde06cb1980bcb90caeddbe42f7df1bd8ef4d42252eca3dd72c"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/auditoria-documental-resum.json",
+      "before": "06e9b18199d9f871e6be8c51e9407b148d06248fa56c489f7928a8ee7e0ac848",
+      "after": "06e9b18199d9f871e6be8c51e9407b148d06248fa56c489f7928a8ee7e0ac848"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/auditoria-documental.txt",
+      "before": "6cdf9e351470bfe413796d9b28705e9b677524fedb5c8c17120dcc79e7bf5fef",
+      "after": "6cdf9e351470bfe413796d9b28705e9b677524fedb5c8c17120dcc79e7bf5fef"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/casos-pressupost-espectral.csv.gz",
+      "before": "603210f72654c99209802ccd02bfc62bc4f6306f78a90f6de6adada5b0a2b002",
+      "after": "603210f72654c99209802ccd02bfc62bc4f6306f78a90f6de6adada5b0a2b002"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/casos-teff-inicials-serialitzacio.csv.gz",
+      "before": "84ce86c2ae7c2e096d8bad152f598f43c94f36a313179ae375a83f83cea47221",
+      "after": "84ce86c2ae7c2e096d8bad152f598f43c94f36a313179ae375a83f83cea47221"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/casos-teff-per-banda.csv.gz",
+      "before": "53c48ae81d369f68b37e488f54ee3b3c7b788a634e3665b2b726c1928bf60fea",
+      "after": "53c48ae81d369f68b37e488f54ee3b3c7b788a634e3665b2b726c1928bf60fea"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/codi-campanya-congelat.json",
+      "before": "6f3263ee974450dbce1725f018c5bc97e5949c0354842787044a3aabd1ba72ce",
+      "after": "6f3263ee974450dbce1725f018c5bc97e5949c0354842787044a3aabd1ba72ce"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/codi-i-assets-finals.json",
+      "before": "6c8e248727bc53dd659fc6edf95ca8b1124a130216fe48038ab49e6985decb5a",
+      "after": "6c8e248727bc53dd659fc6edf95ca8b1124a130216fe48038ab49e6985decb5a"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/condicions-diagnostics.json",
+      "before": "2b086fa948b7dc0fbb2dd1ed84df5989f9130fab884e7fe0c63b76baf6974ade",
+      "after": "2b086fa948b7dc0fbb2dd1ed84df5989f9130fab884e7fe0c63b76baf6974ade"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/correccio-serialitzacio-teff.json",
+      "before": "29b907a5ebc63f16e2c3c59bf3ac89d2c6098f75f5aa24a934cb71ad017ed8dc",
+      "after": "29b907a5ebc63f16e2c3c59bf3ac89d2c6098f75f5aa24a934cb71ad017ed8dc"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/cost-etapes-i-latencia.png",
+      "before": "4d7a393c613ec09013946319bfc543ed2c255833ef51c6119826177ae146583a",
+      "after": "4d7a393c613ec09013946319bfc543ed2c255833ef51c6119826177ae146583a"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/cota-lut-atmosfera-50km.json",
+      "before": "5e155b4034d59bc98c3b251d03783d0e3e528f9640b76231c091e01f6dc43821",
+      "after": "5e155b4034d59bc98c3b251d03783d0e3e528f9640b76231c091e01f6dc43821"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/diagnostics-abans-particio-termica.json",
+      "before": "e1b44a9578c4e5a8eeb5a4858036a14538428cce559aa1ba1bede0d4455c00da",
+      "after": "e1b44a9578c4e5a8eeb5a4858036a14538428cce559aa1ba1bede0d4455c00da"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/diagnostics-inicials-aerosol-constant.json",
+      "before": "84f58100065736b453f9392f5d40586f01aed4b125e4882b0a3d44d42faae7fa",
+      "after": "84f58100065736b453f9392f5d40586f01aed4b125e4882b0a3d44d42faae7fa"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/diagnostics-inicials-cobertura-10km.json",
+      "before": "bb88a4fa5ae018c6a24942671204d18cd4572abd5195299be2518688628a4f30",
+      "after": "bb88a4fa5ae018c6a24942671204d18cd4572abd5195299be2518688628a4f30"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/diagnostics-ref-abans-particio-termica.json",
+      "before": "922f896406bc190e14a8c7e689ba87e18776f7a04269fe4d6d0351f5751b384f",
+      "after": "922f896406bc190e14a8c7e689ba87e18776f7a04269fe4d6d0351f5751b384f"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/diagnostics-transport-i-sostre.json",
+      "before": "8670ccee076a229b6535d1bae4f93b770e7add2712119e60625ea96196816125",
+      "after": "8670ccee076a229b6535d1bae4f93b770e7add2712119e60625ea96196816125"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/empaquetatge-wheel.txt",
+      "before": "2077dd4c09a74fa5fcc8ab29921544257307202fd361f286f95c2235be11109a",
+      "after": "2077dd4c09a74fa5fcc8ab29921544257307202fd361f286f95c2235be11109a"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/enllacos-documentals.txt",
+      "before": "00546857853a7d6113fb402a39ba7d6806344d40afeeaa448fe800610b25f0a8",
+      "after": "00546857853a7d6113fb402a39ba7d6806344d40afeeaa448fe800610b25f0a8"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/passades-b0-b1-b2-b4.csv",
+      "before": "837c36e53a768129bf9bd4eec4531408f6ad0b9dbc50061e5b959a1e1caf6978",
+      "after": "837c36e53a768129bf9bd4eec4531408f6ad0b9dbc50061e5b959a1e1caf6978"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/preservacio-historica.json",
+      "before": "1ff6fc6d763e1696f4592caa56e969c602b6dd6db1a09bdf5cbec750fa44713d",
+      "after": "1ff6fc6d763e1696f4592caa56e969c602b6dd6db1a09bdf5cbec750fa44713d"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/pressupost-espectral.json",
+      "before": "4a6e209253b8cdea4ff49581e7d7375cd611d8329288fd74d108207c29eeb188",
+      "after": "4a6e209253b8cdea4ff49581e7d7375cd611d8329288fd74d108207c29eeb188"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/pressupost-espectral.png",
+      "before": "cfbf0727d94d618ed6cc11f03919ed37cdba37bb679badd279b8ea7489609ccd",
+      "after": "cfbf0727d94d618ed6cc11f03919ed37cdba37bb679badd279b8ea7489609ccd"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/protocol-diagnostics-v1.json",
+      "before": "ca05aa6ee90120af120950951d609df0034e9a0cfef9de35d142a4b4479ef288",
+      "after": "ca05aa6ee90120af120950951d609df0034e9a0cfef9de35d142a4b4479ef288"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/protocol-espectral-v1.json",
+      "before": "605ffcb038f07bd02735d176ad9c2c6458bff4c826dd532e54a32e8c6c57834c",
+      "after": "605ffcb038f07bd02735d176ad9c2c6458bff4c826dd532e54a32e8c6c57834c"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/protocol-espectral-v2.json",
+      "before": "7f5280469f5d44902453c03b69f8a2d932ab458caf92a3f651139a8c15d781fb",
+      "after": "7f5280469f5d44902453c03b69f8a2d932ab458caf92a3f651139a8c15d781fb"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/protocol-gate-espectral-v3.json",
+      "before": "e9a71273494c12078058c99c5d2ae55d395e5b5e98fd8c63db1433009735c2cc",
+      "after": "e9a71273494c12078058c99c5d2ae55d395e5b5e98fd8c63db1433009735c2cc"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/protocol-particio-termica-v2.json",
+      "before": "7e63e12b1d4fcf09dc8cadfc325448c742dd75e15199dbd2b93210e6eb5ed71d",
+      "after": "7e63e12b1d4fcf09dc8cadfc325448c742dd75e15199dbd2b93210e6eb5ed71d"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/protocol-teff-per-banda-v1.json",
+      "before": "58573e1f9339415d6574fadf2fa8e2be357546c0793f3051b9b2ee66504a9119",
+      "after": "58573e1f9339415d6574fadf2fa8e2be357546c0793f3051b9b2ee66504a9119"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/proves-backend.txt",
+      "before": "a4049ac7b13686104922eba701e76d8c530c269f0aadf1aa2e0ede5d2cab38fa",
+      "after": "a4049ac7b13686104922eba701e76d8c530c269f0aadf1aa2e0ede5d2cab38fa"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/proves-particio-termica.txt",
+      "before": "3befdd1194ac0edc5b99a0a03ca8abd782fb695f46944d5edd91837832aae4b2",
+      "after": "3befdd1194ac0edc5b99a0a03ca8abd782fb695f46944d5edd91837832aae4b2"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/pyright-afectats-config.json",
+      "before": "76c24d6d9b8674528de0913ad5910086605183de367e2d8e853adabc51049204",
+      "after": "76c24d6d9b8674528de0913ad5910086605183de367e2d8e853adabc51049204"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/pyright-afectats.txt",
+      "before": "48b2ece9985aa0d5ce31fcc374bdc5f0d2a61aa71c76b3d9423d63911eeedcad",
+      "after": "48b2ece9985aa0d5ce31fcc374bdc5f0d2a61aa71c76b3d9423d63911eeedcad"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/pyright-backend.json",
+      "before": "38db193aaaeda5093e804edc1ba571f5f3036e27a46503e87903d62fe78acf1d",
+      "after": "38db193aaaeda5093e804edc1ba571f5f3036e27a46503e87903d62fe78acf1d"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/pyright-comparacio.json",
+      "before": "d22a22094bb87446102a44470aec21a91fdd32e64801bec5c3e005cf5951be4a",
+      "after": "d22a22094bb87446102a44470aec21a91fdd32e64801bec5c3e005cf5951be4a"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/registre-zenodo-consultat.json",
+      "before": "f3e5e6b1b293361de13d2b2f0ddc92d71971075ee5a36b8217cf27e581e4045f",
+      "after": "f3e5e6b1b293361de13d2b2f0ddc92d71971075ee5a36b8217cf27e581e4045f"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/regressio-columnes-i-b0.json",
+      "before": "c8c441a7017fafbe13dab603c0667630dfdda169b561fe92c6a6c14726415811",
+      "after": "c8c441a7017fafbe13dab603c0667630dfdda169b561fe92c6a6c14726415811"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/repeticio-900los-particio-termica.json",
+      "before": "19396dee361c65f0cf4abb76cf55b0d211547025ea98abb67b0291a7e9877564",
+      "after": "19396dee361c65f0cf4abb76cf55b0d211547025ea98abb67b0291a7e9877564"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/reproduccio-assets.json",
+      "before": "e9adb2c46dac7253c0d1844c0617126c7e5bd7f5f129577b98f414f325f2e8cc",
+      "after": "e9adb2c46dac7253c0d1844c0617126c7e5bd7f5f129577b98f414f325f2e8cc"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/reproduccio-inicial-lf.json",
+      "before": "dbd0ccc21871ddd61bbfeced3b81392f86142148ae9aebff34eb0e2ec3fc72f5",
+      "after": "dbd0ccc21871ddd61bbfeced3b81392f86142148ae9aebff34eb0e2ec3fc72f5"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/resultats-b0-b1-b2-b4.json",
+      "before": "a774aa485edd2830dce0792ba23bc996d764bf9eba2ef860a4869c6cf4f60633",
+      "after": "a774aa485edd2830dce0792ba23bc996d764bf9eba2ef860a4869c6cf4f60633"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/resum-cost-etapes.json",
+      "before": "3e4ce2039b5d30458a98ce3d4d1e80003ea3a78c04f243388ff98c47f430282b",
+      "after": "3e4ce2039b5d30458a98ce3d4d1e80003ea3a78c04f243388ff98c47f430282b"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/ruff-afectats.txt",
+      "before": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0",
+      "after": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/sensibilitat-sostre-atmosferic.png",
+      "before": "ba45e9cf433714d3cb66a3796d75ef531563b3f96947629370922689639fbe39",
+      "after": "ba45e9cf433714d3cb66a3796d75ef531563b3f96947629370922689639fbe39"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/teff-per-banda.json",
+      "before": "fbf5be23c51fa59b509117c9a37d09e1ead0a0bc06e3eb42d26397db52f86a6d",
+      "after": "fbf5be23c51fa59b509117c9a37d09e1ead0a0bc06e3eb42d26397db52f86a6d"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/validacio-espectral-i-gasos.md",
+      "before": "42d068ba9b1078535503f49d0605a2f585549d341012fd8ee12f3ed42ef3781b",
+      "after": "42d068ba9b1078535503f49d0605a2f585549d341012fd8ee12f3ed42ef3781b"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/verificacio-original-zenodo.json",
+      "before": "aa4d8db9abe1b5397908117551837d30c4c9666973cc8d5197516ce0ecf207dd",
+      "after": "aa4d8db9abe1b5397908117551837d30c4c9666973cc8d5197516ce0ecf207dd"
+    },
+    {
+      "path": "docs/evidencies/pas7.10/versions-entorn.json",
+      "before": "171141cef8fd7b1e8bea1d0c526bf065aa7fa7ac519357db04256b35ba7d5b20",
+      "after": "171141cef8fd7b1e8bea1d0c526bf065aa7fa7ac519357db04256b35ba7d5b20"
+    },
+    {
+      "path": "docs/evidencies/pas7.2/validacio-adaptador.md",
+      "before": "e41d7098e71350313ca88fd7ad37b12dc7b5ad6efc92dedebe01f4bbfecc756e",
+      "after": "e41d7098e71350313ca88fd7ad37b12dc7b5ad6efc92dedebe01f4bbfecc756e"
+    },
+    {
+      "path": "docs/evidencies/pas7.3/contrast-granuls-black-marble-c2.md",
+      "before": "ec8dd1725d0de94f606c964b20fd503ce7c3384ffe2580ea4ecd66d141c24b93",
+      "after": "ec8dd1725d0de94f606c964b20fd503ce7c3384ffe2580ea4ecd66d141c24b93"
+    },
+    {
+      "path": "docs/evidencies/pas7.3/recerca-rsr-2026.md",
+      "before": "11c19fcdb8d0513fbb1c649cb3d38de14f4a47b0b277f1b7ccac5e0f01ecafd0",
+      "after": "11c19fcdb8d0513fbb1c649cb3d38de14f4a47b0b277f1b7ccac5e0f01ecafd0"
+    },
+    {
+      "path": "docs/evidencies/pas7.3/revisio-multisatel-lit.md",
+      "before": "79f7db434e9b8de43ff2ce188191db8d38a456fbd025163efb8e2d5a130af07f",
+      "after": "79f7db434e9b8de43ff2ce188191db8d38a456fbd025163efb8e2d5a130af07f"
+    },
+    {
+      "path": "docs/evidencies/pas7.3/validacio-model-dnb.md",
+      "before": "22a957e7ec51550f4d7f1a478fb8f37c2f6db3cbbfbad20a6b6ddc3b27dc0e36",
+      "after": "22a957e7ec51550f4d7f1a478fb8f37c2f6db3cbbfbad20a6b6ddc3b27dc0e36"
+    },
+    {
+      "path": "docs/evidencies/pas7.4/analisi-oracle-i-bloqueig.md",
+      "before": "581f467cdc9ac2bcaa948cfb377b22e3ddbb865a5e8e7a5943e69c0cce1225c4",
+      "after": "581f467cdc9ac2bcaa948cfb377b22e3ddbb865a5e8e7a5943e69c0cce1225c4"
+    },
+    {
+      "path": "docs/evidencies/pas7.4/avaluacio-bandset-v1.json",
+      "before": "6d2b0d8865865cafbf42540733919132636de0e01850b9d90096390853fb0922",
+      "after": "6d2b0d8865865cafbf42540733919132636de0e01850b9d90096390853fb0922"
+    },
+    {
+      "path": "docs/evidencies/pas7.4/cie-asset-manifest.json",
+      "before": "dd95309bdd34fa6742f63ecbe3af7122781239e5f22a6ea97489524dd06a9e2f",
+      "after": "dd95309bdd34fa6742f63ecbe3af7122781239e5f22a6ea97489524dd06a9e2f"
+    },
+    {
+      "path": "docs/evidencies/pas7.4/criteri-preregistrat-v1.json",
+      "before": "0e6bcee3e33a66b2fcbf8adc0dcce67abbd995dff89c7674d5c9a4c2f2cd3c6a",
+      "after": "0e6bcee3e33a66b2fcbf8adc0dcce67abbd995dff89c7674d5c9a4c2f2cd3c6a"
+    },
+    {
+      "path": "docs/evidencies/pas7.4/diagnostic-oracle-cie-rsr.json",
+      "before": "362b997ca99a7c5b793bcb6fb62bc6c872a2a632e407853a9003e68c987069d4",
+      "after": "362b997ca99a7c5b793bcb6fb62bc6c872a2a632e407853a9003e68c987069d4"
+    },
+    {
+      "path": "docs/evidencies/pas7.4/homologacio-bandset-v1.md",
+      "before": "63bd45363ef1c64e66261b574bc9c74f0929345fed4d2960b36a8b336b6dbd65",
+      "after": "63bd45363ef1c64e66261b574bc9c74f0929345fed4d2960b36a8b336b6dbd65"
+    },
+    {
+      "path": "docs/evidencies/pas7.5/auditoria-rsr-2026.json",
+      "before": "cc4dea4aa51df9e7f42c7902762cf58d17c9d95cb58c002b02952fa2c272b6cd",
+      "after": "cc4dea4aa51df9e7f42c7902762cf58d17c9d95cb58c002b02952fa2c272b6cd"
+    },
+    {
+      "path": "docs/evidencies/pas7.5/estat-inferencia-font-2026.md",
+      "before": "b96e944ba32e421dc7d072a491df465b0bc46bed8e9bb18a0c6c6bfb998ceab2",
+      "after": "b96e944ba32e421dc7d072a491df465b0bc46bed8e9bb18a0c6c6bfb998ceab2"
+    },
+    {
+      "path": "docs/evidencies/pas7.5/validacio-source-model-s-v1.json",
+      "before": "65d603d31f098a36c198b659be3ac471aa6152b928898a066bd0cbc5a4362db8",
+      "after": "65d603d31f098a36c198b659be3ac471aa6152b928898a066bd0cbc5a4362db8"
+    },
+    {
+      "path": "docs/evidencies/pas7.5/validacio-source-model-s-v1.md",
+      "before": "3a76873dc5b9a8432405d85d2b38cf0fedabdb16cf8019b298d56204139cd830",
+      "after": "3a76873dc5b9a8432405d85d2b38cf0fedabdb16cf8019b298d56204139cd830"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/auditoria-documental.txt",
+      "before": "93075c4d2ce86622d213d070f20f38f5617c671b3c52e2c0f20c32a9281b4e3a",
+      "after": "93075c4d2ce86622d213d070f20f38f5617c671b3c52e2c0f20c32a9281b4e3a"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/barcelona-kelvin-3000.json",
+      "before": "c609688474bade3ac2fc45cfd3fda4235e36ac6b2a66fb8c913b1567bdef8916",
+      "after": "c609688474bade3ac2fc45cfd3fda4235e36ac6b2a66fb8c913b1567bdef8916"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/barcelona-realista.json",
+      "before": "612443f94be673cd19ab8a23d3078f5076ae5a97f264dad428feb7b9a58bd8df",
+      "after": "612443f94be673cd19ab8a23d3078f5076ae5a97f264dad428feb7b9a58bd8df"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/biblioteca-espectral.json",
+      "before": "490aa2cb2d788a1372cea104178b931eb79c7c9c779199016963632987f374ea",
+      "after": "490aa2cb2d788a1372cea104178b931eb79c7c9c779199016963632987f374ea"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/control-kelvins.png",
+      "before": "bc289ae7044ea9cedfc6e43cc645c2293430a117630e1c5d7cbbd925e4db97fc",
+      "after": "bc289ae7044ea9cedfc6e43cc645c2293430a117630e1c5d7cbbd925e4db97fc"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/pyright-base.json",
+      "before": "a8ed1b7389dfb3c5164733dd7c5b28311d0e4df21ed63c635612305e587f6e78",
+      "after": "a8ed1b7389dfb3c5164733dd7c5b28311d0e4df21ed63c635612305e587f6e78"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/pyright-global-comparacio.json",
+      "before": "eb3be40420038f3c4b4360f7371795e0d60eb418626245f670054d1957990142",
+      "after": "eb3be40420038f3c4b4360f7371795e0d60eb418626245f670054d1957990142"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/ruff-entrypoint-comparacio.json",
+      "before": "acf129081b54cef804af4308f98f588b880cb9e208e85d220fd24a8e4cdabbcf",
+      "after": "acf129081b54cef804af4308f98f588b880cb9e208e85d220fd24a8e4cdabbcf"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/sensibilitat-escenaris.json",
+      "before": "9b1e5a58b1d41b9cd283d1d71996116d71ae69226c41e8524ba5c3d172fa88f7",
+      "after": "9b1e5a58b1d41b9cd283d1d71996116d71ae69226c41e8524ba5c3d172fa88f7"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/simulacio-realista.png",
+      "before": "68c4ef1806cff0a00154c2004c29b19ee2cca07b268fa1df8e085ad1ad677dac",
+      "after": "68c4ef1806cff0a00154c2004c29b19ee2cca07b268fa1df8e085ad1ad677dac"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/validacio-simulacio-condicionada.md",
+      "before": "76bfd2b0cfe2983ba80c1767ba01717f69d7b82efd70903f295376e951d01506",
+      "after": "76bfd2b0cfe2983ba80c1767ba01717f69d7b82efd70903f295376e951d01506"
+    },
+    {
+      "path": "docs/evidencies/pas7.5.1/verificacio-ui.json",
+      "before": "2ee1a191365847bd5df3d994c3cb903557de55eba239d4597fc3d6a71d7f4ad6",
+      "after": "2ee1a191365847bd5df3d994c3cb903557de55eba239d4597fc3d6a71d7f4ad6"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/auditoria-documental-resum.json",
+      "before": "ea7e5acdfb215eeea633f76c750ec2a770ac9f6b506c85810f91e2237b232933",
+      "after": "ea7e5acdfb215eeea633f76c750ec2a770ac9f6b506c85810f91e2237b232933"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/auditoria-documental.txt",
+      "before": "90c428a3c23827bcc3cfc7aca4858ea8b5d32f8760e106906fff9b508acc1e05",
+      "after": "90c428a3c23827bcc3cfc7aca4858ea8b5d32f8760e106906fff9b508acc1e05"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/comprovacions-codi.txt",
+      "before": "a58a0b8a8913b44835d77d7c1a92eb420ffc0ca547841d8e0f9422a5cceb20f7",
+      "after": "a58a0b8a8913b44835d77d7c1a92eb420ffc0ca547841d8e0f9422a5cceb20f7"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/convergencia-i-biaix-f5.png",
+      "before": "df6477a23dd7da513701e05d4101f5baeda13730815df5ae4e136e9ff33dfc5e",
+      "after": "df6477a23dd7da513701e05d4101f5baeda13730815df5ae4e136e9ff33dfc5e"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/criteri-oracle-v1.json",
+      "before": "444e19b2458c5714858a59b4753750bcf359724fce3a974d9fc66a77ffa636a9",
+      "after": "444e19b2458c5714858a59b4753750bcf359724fce3a974d9fc66a77ffa636a9"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/proves-backend.txt",
+      "before": "7e4317c34ee8d39cc537a17c5d17a3bce442fde2165fddfbf9419c8feb5785ba",
+      "after": "7e4317c34ee8d39cc537a17c5d17a3bce442fde2165fddfbf9419c8feb5785ba"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/pyright-backend-comparacio.json",
+      "before": "91269febd00d5cbaa7cd912966585723dcfceefc55441a326ee6e806e1c2ad5e",
+      "after": "91269febd00d5cbaa7cd912966585723dcfceefc55441a326ee6e806e1c2ad5e"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/resultats-sg-ref-v1.json",
+      "before": "cc14919bc63dbf07d76eaf5a1b7b21777a09a183fa7f3697f5e08b61fd8b6cac",
+      "after": "cc14919bc63dbf07d76eaf5a1b7b21777a09a183fa7f3697f5e08b61fd8b6cac"
+    },
+    {
+      "path": "docs/evidencies/pas7.6/validacio-sg-ref.md",
+      "before": "ece90ef62463dfff145a896c6d817a37a95d7ca4f445b0a32fb5440a1a6227a9",
+      "after": "ece90ef62463dfff145a896c6d817a37a95d7ca4f445b0a32fb5440a1a6227a9"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/auditoria-documental-resum.json",
+      "before": "2071691a727c564d1af65974ab52f581ee7eb1ed25b62a4dd654923e67ee1ff7",
+      "after": "2071691a727c564d1af65974ab52f581ee7eb1ed25b62a4dd654923e67ee1ff7"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/auditoria-documental.txt",
+      "before": "39537f5147fcabbdb51fde4b6a828ab8b03eee87d7d53596ec6b1c333ff8e8c5",
+      "after": "39537f5147fcabbdb51fde4b6a828ab8b03eee87d7d53596ec6b1c333ff8e8c5"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/comprovacions-codi.txt",
+      "before": "fd9b1e19d65a48b85433c6212e0f077ee96ca889aad6235882c165cc55c82b7e",
+      "after": "fd9b1e19d65a48b85433c6212e0f077ee96ca889aad6235882c165cc55c82b7e"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/escalat-i-latencia-b0.png",
+      "before": "77e0fd4f3c95988a2e7046212c97d5536ac8aa72c26823a36c05f0f96177c0e6",
+      "after": "77e0fd4f3c95988a2e7046212c97d5536ac8aa72c26823a36c05f0f96177c0e6"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/passades-b0-v1.csv",
+      "before": "938f27f33f4ced190b8016f68635ba3ed5b61484520b61037fa67cdf7a57b5ea",
+      "after": "938f27f33f4ced190b8016f68635ba3ed5b61484520b61037fa67cdf7a57b5ea"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/protocol-b0-v1.json",
+      "before": "c12361c2a64a393ed3b9fcf70dc164fba3f7f583edb020897fbecfaba71afb79",
+      "after": "c12361c2a64a393ed3b9fcf70dc164fba3f7f583edb020897fbecfaba71afb79"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/proves-backend.txt",
+      "before": "669d83e7b1efbfa031ab7a3cb68d6f224d3fb0c3ea449b94775a8f90f3f2973e",
+      "after": "669d83e7b1efbfa031ab7a3cb68d6f224d3fb0c3ea449b94775a8f90f3f2973e"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/pyright-backend-comparacio.json",
+      "before": "dbc7cb0f255f0bfc2d17ae9efc7488cd9ad8f0e2932cc739977e241d929af5b6",
+      "after": "dbc7cb0f255f0bfc2d17ae9efc7488cd9ad8f0e2932cc739977e241d929af5b6"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/reproducibilitat-b0.json",
+      "before": "5886fc7a542ce40018c52aa00a14d9d2a99d3468e03f35298af93a27bdb98790",
+      "after": "5886fc7a542ce40018c52aa00a14d9d2a99d3468e03f35298af93a27bdb98790"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/resultats-b0-v1.json",
+      "before": "8b9faced63e86850ad07e7cba215ba2463c0530ead6b1723fe0861afd6dc32ed",
+      "after": "8b9faced63e86850ad07e7cba215ba2463c0530ead6b1723fe0861afd6dc32ed"
+    },
+    {
+      "path": "docs/evidencies/pas7.7/validacio-b0.md",
+      "before": "dc5eabced2d2666b96898c442de4e5a2a1a59085941bf78694f7cb62f120269d",
+      "after": "dc5eabced2d2666b96898c442de4e5a2a1a59085941bf78694f7cb62f120269d"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/auditoria-documental-resum.json",
+      "before": "f10b3304e69d7c36be99cd7adbd3344c6ea641cec5b84f67ffd2aaf54fec4721",
+      "after": "f10b3304e69d7c36be99cd7adbd3344c6ea641cec5b84f67ffd2aaf54fec4721"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/auditoria-documental.txt",
+      "before": "15eaccf709bc2c88a8a898b8d403780e38b33aa87e6049dd0e6d33de788cb854",
+      "after": "15eaccf709bc2c88a8a898b8d403780e38b33aa87e6049dd0e6d33de788cb854"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/perfils-i-convergencia.png",
+      "before": "cc960227a4b436b15f59f45d1140a6cb8e4fb024ae6f6b9249a9db26db83c9e3",
+      "after": "cc960227a4b436b15f59f45d1140a6cb8e4fb024ae6f6b9249a9db26db83c9e3"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/protocol-optical-field-v1.json",
+      "before": "6e6ce4a7e0ab36c9523d965de393a39adc914d74e13b71a04711d4a95fec2465",
+      "after": "6e6ce4a7e0ab36c9523d965de393a39adc914d74e13b71a04711d4a95fec2465"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/proves-backend.txt",
+      "before": "b8bf9061d6c41f81089e797e4e0e958e62c5ec6671c23efce2168050bbab728e",
+      "after": "b8bf9061d6c41f81089e797e4e0e958e62c5ec6671c23efce2168050bbab728e"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/pyright-backend-comparacio.json",
+      "before": "d970232871dc60cb72f8f104a3de1c04c48eed4dc88e705983062ddba46d0020",
+      "after": "d970232871dc60cb72f8f104a3de1c04c48eed4dc88e705983062ddba46d0020"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/resultats-optical-field-v1.json",
+      "before": "50f049c9a0a132eab3fd72ced0c72e52f969bdf323a6e90422e7e26f7ee5617d",
+      "after": "50f049c9a0a132eab3fd72ced0c72e52f969bdf323a6e90422e7e26f7ee5617d"
+    },
+    {
+      "path": "docs/evidencies/pas7.8/validacio-optical-field.md",
+      "before": "2299d5120f4192604a5e3b9b0a36264512bf3727507958f8b2cc68f1398e9e96",
+      "after": "2299d5120f4192604a5e3b9b0a36264512bf3727507958f8b2cc68f1398e9e96"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/auditoria-documental-resum.json",
+      "before": "502e867389d001c830d8a05f7bb4ba27d60bb28bc8c84d06642a899c1670a6ae",
+      "after": "502e867389d001c830d8a05f7bb4ba27d60bb28bc8c84d06642a899c1670a6ae"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/auditoria-documental.txt",
+      "before": "0beb629c00a88b88c1c55f9c876eb6e495e3d3c08ecac71afb1bada3ece88366",
+      "after": "0beb629c00a88b88c1c55f9c876eb6e495e3d3c08ecac71afb1bada3ece88366"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/escalat-i-latencia-b1.png",
+      "before": "740263adf5c32b642b21f19acd51b62f68fa42bbff82538cb7d271c476a1d56e",
+      "after": "740263adf5c32b642b21f19acd51b62f68fa42bbff82538cb7d271c476a1d56e"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/fase-i-residuals-b1.png",
+      "before": "5d9cd406571cf2448fc4ce706b6d02dfc28c4f6e86c39499b61719b688f0b410",
+      "after": "5d9cd406571cf2448fc4ce706b6d02dfc28c4f6e86c39499b61719b688f0b410"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/passades-b1-v1.csv",
+      "before": "07fb2b67f9b76d4ec6c66ff6e05afb9ca15c523fdf15a8864d791af8d5c8c69f",
+      "after": "07fb2b67f9b76d4ec6c66ff6e05afb9ca15c523fdf15a8864d791af8d5c8c69f"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/protocol-b1-v1.json",
+      "before": "069b4d7a1118d2df91d0fc5ae78d6c751e7c4762c71159485adb193b68eed1ec",
+      "after": "069b4d7a1118d2df91d0fc5ae78d6c751e7c4762c71159485adb193b68eed1ec"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/proves-backend.txt",
+      "before": "ebe2d8e755e6ef6fd90868141cd5a2c73445218294cebfeec346038d9bb9905e",
+      "after": "ebe2d8e755e6ef6fd90868141cd5a2c73445218294cebfeec346038d9bb9905e"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/pyright-backend-comparacio.json",
+      "before": "cf5ba8fb77ed0516a96abbd158d11a1f46a6f7e7a9d1db80b77a8204583809da",
+      "after": "cf5ba8fb77ed0516a96abbd158d11a1f46a6f7e7a9d1db80b77a8204583809da"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/regressio-columnes.json",
+      "before": "162377aaa6b0205755984aa2851ca5e2d6e51a338003b7fb1d43d37e0047c68f",
+      "after": "162377aaa6b0205755984aa2851ca5e2d6e51a338003b7fb1d43d37e0047c68f"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/resultats-b1-v1.json",
+      "before": "5cb4bfdf646d76c884fbdfe237fc16ca408c462c0d43030791d7c156c0883468",
+      "after": "5cb4bfdf646d76c884fbdfe237fc16ca408c462c0d43030791d7c156c0883468"
+    },
+    {
+      "path": "docs/evidencies/pas7.9/validacio-b1.md",
+      "before": "71a162ccf6267abdb41870d811e880ea93e23857cb6e6dd5296f993e8b42ebac",
+      "after": "71a162ccf6267abdb41870d811e880ea93e23857cb6e6dd5296f993e8b42ebac"
+    }
+  ]
+}

@@ -2,6 +2,6 @@
 
 Aquest fitxer pertany a la descomposició executable anterior i **ja no és font de veritat**.
 
-Continua a: [Pas 7.11 — Terreny, curvatura i visibilitat física](pas7.11-terrain-curvature.md).
+Continua a: [Pas 7.11 — Terreny, curvatura i visibilitat física](../completat/pas7.11-terrain-curvature.md).
 
 El pla canònic és [docs/skyglow/19-pla-executable-codex.md](../../skyglow/19-pla-executable-codex.md).

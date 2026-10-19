@@ -182,7 +182,7 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.10-gas-spectral-kernel.md](../tasques/completat/pas7.10-gas-spectral-kernel.md)
 
-**Estat verificat de 7.10, 2026-10-19:** completat offline amb columnes compartides, O3 prescrit, SG-REF revalidat i pressupost 0,01 mag conservat: 111.168 casos espectrals i 326.040 T_eff il·luminats; 405 proves backend. B0/B1/B2/B4 i 48 sostres mesurats. [Resultats i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md). No és aire terrestre complet ni H; 7.11 no s'ha executat.
+**Estat verificat de 7.10, 2026-10-19:** completat offline amb columnes compartides, O3 prescrit, SG-REF revalidat i pressupost 0,01 mag conservat: 111.168 casos espectrals i 326.040 T_eff il·luminats; 405 proves backend. B0/B1/B2/B4 i 48 sostres mesurats. [Resultats i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md). No és aire terrestre complet ni H; en aquell tancament 7.11 encara no s'havia executat.
 
 ### 7.11 — Terreny, curvatura i visibilitat física
 
@@ -190,7 +190,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** Els casos sintètics de terreny/curvatura verifiquen topologia i oclusió, comparen diagnòsticament amb SG-REF i detecten els flips com a discontinuïtats. El PASS/FAIL numèric de transport és 7.12.
 
-**Fitxer executable:** [pas7.11-terrain-curvature.md](../tasques/pendent/pas7.11-terrain-curvature.md)
+**Fitxer executable:** [pas7.11-terrain-curvature.md](../tasques/completat/pas7.11-terrain-curvature.md)
+
+**Estat verificat, 2026-10-19:** completat offline. DEM/ECEF compartit, truncament i màscares binàries, àrea parcial per geometria, SG-REF independent i cost exclusiu d’oclusió; 427 proves backend. [Evidències i límits](../evidencies/pas7.11/validacio-terreny-i-visibilitat.md). Sostre 10 km insuficient en la fixture B4 zenital de 7.10 (22,45% omès respecte a 50 km); domini definitiu i gate 7.12 pendents, sense executar.
 
 ### 7.12 — Gate zenital de transport radiomètric
 
