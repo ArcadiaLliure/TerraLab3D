@@ -6,7 +6,7 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.13 — Camp angular i DomeProfile directe](tasques/pendent/pas7.13-dome-profile-direct.md), pendent i no iniciat.** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. [7.7 — Kernel B0](tasques/completat/pas7.7-kernel-geometry-b0.md) verifica ECEF/ENU esfèrics, GK7/15 i revisions. [7.8 — OpticalField](tasques/completat/pas7.8-optical-field-standard.md) ja verifica el camp estàndard P/T/n, travesses i dependències exactes. [7.9 — B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) ja calcula radiància espectral monocromàtica offline en medis prescrits amb dispersió simple. [7.10](tasques/completat/pas7.10-gas-spectral-kernel.md) verifica transport espectral directe S/C i O3 prescrit offline; l'aire terrestre complet, la radiància física connectada al producte i H continuen pendents.
+> **Punt de represa: [Pas 7.13 — Camp angular i DomeProfile directe](tasques/pendent/pas7.13-dome-profile-direct.md), pendent: candidat parcial, sortida bloquejada per FAIL angular.** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. [7.7 — Kernel B0](tasques/completat/pas7.7-kernel-geometry-b0.md) verifica ECEF/ENU esfèrics, GK7/15 i revisions. [7.8 — OpticalField](tasques/completat/pas7.8-optical-field-standard.md) ja verifica el camp estàndard P/T/n, travesses i dependències exactes. [7.9 — B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) ja calcula radiància espectral monocromàtica offline en medis prescrits amb dispersió simple. [7.10](tasques/completat/pas7.10-gas-spectral-kernel.md) verifica transport espectral directe S/C i O3 prescrit offline; l'aire terrestre complet, la radiància física connectada al producte i H continuen pendents.
 >
 > Els subpassos **7.1–7.50** pertanyen a contaminació lumínica artificial: VNP46, VJ146 i VJ246 són fonts Black Marble candidates amb models de mesura propis; cap skyglow físic de producte no està implementat. Els **7.51+** són del cel físic solar/lunar. El Pas 7 històric conserva la visualització actual. Les verticals pendents es documenten a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
@@ -43,7 +43,7 @@ La instrucció **«continua amb el pla de millores»** és suficient: Codex ha d
 **Auditoria de 7.11 (2026-10-19):** 387 incidències mecàniques heretades inicials i 375 finals, després de normalitzar 7.11 i les dependències de 7.12, sense executar aquest últim. Zero incidències noves i zero enllaços locals trencats; 133 evidències històriques preservades per hash. [Resum diferencial](evidencies/pas7.11/auditoria-documental-resum.json).
 
 
-**Estat verificat de7.12,2026-10-19:** [gate numèric](evidencies/pas7.12/validacio-gate-transport.md),9 fixtures S PASS,42 sostres,444 proves/17 noves. Cua positiva >75km ≤0,000472296mag sota hipòtesis explícites;0,01mag espectral preservat. Cost de fonts extenses documentat, sense acceleracions;163 evidències anteriors intactes.7.13 no iniciat.
+**Estat verificat de7.12,2026-10-19:** [gate numèric](evidencies/pas7.12/validacio-gate-transport.md),9 fixtures S PASS,42 sostres,444 proves/17 noves. Cua positiva >75km ≤0,000472296mag sota hipòtesis explícites;0,01mag espectral preservat. Cost de fonts extenses documentat, sense acceleracions;163 evidències anteriors intactes.7.13 encara no s’havia iniciat en aquell tancament.
 
 ## Protocol perquè Codex continuï el pla
 
@@ -115,7 +115,7 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.13 | [Camp angular i DomeProfile sobre ruta directa](tasques/pendent/pas7.13-dome-profile-direct.md) | `pendent` | 7.12 |
+| 7.13 | [Camp angular i DomeProfile sobre ruta directa](tasques/pendent/pas7.13-dome-profile-direct.md) | `pendent` (gate angular FAIL) | 7.12 |
 | 7.14 | [Projeccions fotomètriques i sensors SQM/TESS](tasques/pendent/pas7.14-photometric-projections.md) | `pendent` | 7.13, 7.4 (revalidació espectral), 7.5.1 |
 | 7.15 | [Atmosfera real ERA5/CAMS i composició de camps](tasques/pendent/pas7.15-atmos-era5-cams.md) | `pendent` | 7.14 |
 | 7.16 | [Incertesa quantitativa i provenance completa](tasques/pendent/pas7.16-uncertainty-provenance.md) | `pendent` | 7.3, 7.5, 7.15, 7.5.1 |
@@ -208,3 +208,7 @@ La pluja d'idees va aportar 25 propostes prou tancades per fusionar amb el pla i
 - [`reference-scenarios/`](reference-scenarios/) conté escenaris i captures de comparació visual.
 
 **Auditoria de 7.12 (2026-10-19):** 375 incidències mecàniques heretades inicials i 365 finals després de normalitzar 7.12. Cap incidència nova, cap del pas completat i zero enllaços locals trencats. 163 evidències històriques intactes per hash. [Resum diferencial](evidencies/pas7.12/auditoria-documental-resum.json).
+
+**Execució de7.13,2026-10-19:** [camp angular candidat](evidencies/pas7.13/validacio-camp-angular.md),952contrasts runtime/SG-REF PASS i474proves backend. Gate angular **FAIL**: PCHIP vertical0,02447mag i camp2,68861mag davant0,01mag. Mapa científic S/C realista/kelvins generat; malla COESA75km estimada70h no executada.202evidències històriques intactes. **Represa a7.13**, no avançar a7.14.
+
+**Auditoria de7.13:**365incidències heretades inicials →355finals en normalitzar el pas; zero incidències noves, zero enllaços trencats i cap incidència del pas executable. [Resum](evidencies/pas7.13/auditoria-documental-resum.json).

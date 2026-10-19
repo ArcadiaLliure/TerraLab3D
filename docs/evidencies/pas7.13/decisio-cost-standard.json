@@ -1,0 +1,10 @@
+{
+  "atUtc": "2026-10-19T16:08:21.199274+00:00",
+  "measuredCompletePilotCycles": 1,
+  "standardGridEstimateSeconds": 250854.4341960149,
+  "standardRuntimeOnlyEstimateSeconds": 231155.2594488042,
+  "standardCampaignLaunched": false,
+  "additionalPilotStopped": true,
+  "reason": "El primer pilot complet ja projecta molt més de7200s; cancel·lació de les dues mostres addicionals. No es redueix la precisió ni es retorna a10km. Estimació orientativa, no cota ni percentil.",
+  "concurrency": "Part final del pilot coincideix amb campanya de cambra; no és benchmark aïllat."
+}

@@ -1,0 +1,2616 @@
+{
+  "oracle": "SciPy PchipInterpolator, no implementació candidata",
+  "toleranceRelative": 2e-12,
+  "cases": [
+    {
+      "profile": {
+        "azimuthDeg": 0.0,
+        "elevationSamplesDeg": [
+          0.5,
+          2,
+          5,
+          10,
+          20,
+          30,
+          45,
+          60,
+          90
+        ],
+        "radianceSamples": [
+          9e-12,
+          7e-12,
+          4e-12,
+          2e-12,
+          1e-12,
+          2e-12,
+          3e-12,
+          2e-12,
+          1e-12
+        ],
+        "epsilonRadiance": 1e-27,
+        "blockedIntervals": []
+      },
+      "queries": [
+        {
+          "elevationDeg": 0.5,
+          "expected": 8.999999999999996e-12
+        },
+        {
+          "elevationDeg": 1.395,
+          "expected": 7.767172431463557e-12
+        },
+        {
+          "elevationDeg": 2.29,
+          "expected": 6.644462146600472e-12
+        },
+        {
+          "elevationDeg": 3.185,
+          "expected": 5.59813246775572e-12
+        },
+        {
+          "elevationDeg": 4.08,
+          "expected": 4.705780079368797e-12
+        },
+        {
+          "elevationDeg": 4.975,
+          "expected": 4.0161873127396e-12
+        },
+        {
+          "elevationDeg": 5.87,
+          "expected": 3.4800809667895454e-12
+        },
+        {
+          "elevationDeg": 6.765000000000001,
+          "expected": 3.0278923937719687e-12
+        },
+        {
+          "elevationDeg": 7.66,
+          "expected": 2.6544536094999996e-12
+        },
+        {
+          "elevationDeg": 8.555,
+          "expected": 2.352918299104586e-12
+        },
+        {
+          "elevationDeg": 9.45,
+          "expected": 2.1161621889657925e-12
+        },
+        {
+          "elevationDeg": 10.345,
+          "expected": 1.9345276726079465e-12
+        },
+        {
+          "elevationDeg": 11.24,
+          "expected": 1.7726806928161422e-12
+        },
+        {
+          "elevationDeg": 12.135,
+          "expected": 1.6243408985019204e-12
+        },
+        {
+          "elevationDeg": 13.030000000000001,
+          "expected": 1.4911172386381456e-12
+        },
+        {
+          "elevationDeg": 13.925,
+          "expected": 1.3738243198570108e-12
+        },
+        {
+          "elevationDeg": 14.82,
+          "expected": 1.2727182065568414e-12
+        },
+        {
+          "elevationDeg": 15.715,
+          "expected": 1.1877138247034668e-12
+        },
+        {
+          "elevationDeg": 16.61,
+          "expected": 1.1185791364403186e-12
+        },
+        {
+          "elevationDeg": 17.505,
+          "expected": 1.0651084164146765e-12
+        },
+        {
+          "elevationDeg": 18.4,
+          "expected": 1.027282683134408e-12
+        },
+        {
+          "elevationDeg": 19.295,
+          "expected": 1.0054304119486212e-12
+        },
+        {
+          "elevationDeg": 20.19,
+          "expected": 1.0005994574531735e-12
+        },
+        {
+          "elevationDeg": 21.085,
+          "expected": 1.0186763026647698e-12
+        },
+        {
+          "elevationDeg": 21.98,
+          "expected": 1.0598887074960885e-12
+        },
+        {
+          "elevationDeg": 22.875,
+          "expected": 1.122254033255871e-12
+        },
+        {
+          "elevationDeg": 23.77,
+          "expected": 1.204169601984952e-12
+        },
+        {
+          "elevationDeg": 24.665,
+          "expected": 1.3037924032638144e-12
+        },
+        {
+          "elevationDeg": 25.560000000000002,
+          "expected": 1.4184442178124685e-12
+        },
+        {
+          "elevationDeg": 26.455000000000002,
+          "expected": 1.544037456416284e-12
+        },
+        {
+          "elevationDeg": 27.35,
+          "expected": 1.674572226276322e-12
+        },
+        {
+          "elevationDeg": 28.245,
+          "expected": 1.8018106312881149e-12
+        },
+        {
+          "elevationDeg": 29.14,
+          "expected": 1.9152803006891817e-12
+        },
+        {
+          "elevationDeg": 30.035,
+          "expected": 2.0028067750981063e-12
+        },
+        {
+          "elevationDeg": 30.93,
+          "expected": 2.075940614129029e-12
+        },
+        {
+          "elevationDeg": 31.825,
+          "expected": 2.1513673951420515e-12
+        },
+        {
+          "elevationDeg": 32.72,
+          "expected": 2.228547119793804e-12
+        },
+        {
+          "elevationDeg": 33.615,
+          "expected": 2.3068557606492215e-12
+        },
+        {
+          "elevationDeg": 34.51,
+          "expected": 2.3855813966296203e-12
+        },
+        {
+          "elevationDeg": 35.405,
+          "expected": 2.463922347478037e-12
+        },
+        {
+          "elevationDeg": 36.3,
+          "expected": 2.5409877471638735e-12
+        },
+        {
+          "elevationDeg": 37.195,
+          "expected": 2.61580099756972e-12
+        },
+        {
+          "elevationDeg": 38.09,
+          "expected": 2.68730652108446e-12
+        },
+        {
+          "elevationDeg": 38.985,
+          "expected": 2.754380179172845e-12
+        },
+        {
+          "elevationDeg": 39.88,
+          "expected": 2.815843639618812e-12
+        },
+        {
+          "elevationDeg": 40.775,
+          "expected": 2.870482855222304e-12
+        },
+        {
+          "elevationDeg": 41.67,
+          "expected": 2.9170706604009563e-12
+        },
+        {
+          "elevationDeg": 42.565,
+          "expected": 2.954393300991174e-12
+        },
+        {
+          "elevationDeg": 43.46,
+          "expected": 2.9812804911475768e-12
+        },
+        {
+          "elevationDeg": 44.355000000000004,
+          "expected": 2.9966383476006547e-12
+        },
+        {
+          "elevationDeg": 45.25,
+          "expected": 2.9993066056918937e-12
+        },
+        {
+          "elevationDeg": 46.145,
+          "expected": 2.985939050365784e-12
+        },
+        {
+          "elevationDeg": 47.04,
+          "expected": 2.9570089409611906e-12
+        },
+        {
+          "elevationDeg": 47.935,
+          "expected": 2.9145811551728577e-12
+        },
+        {
+          "elevationDeg": 48.83,
+          "expected": 2.860827516725555e-12
+        },
+        {
+          "elevationDeg": 49.725,
+          "expected": 2.7979464247769437e-12
+        },
+        {
+          "elevationDeg": 50.620000000000005,
+          "expected": 2.7280950881733138e-12
+        },
+        {
+          "elevationDeg": 51.515,
+          "expected": 2.653335657846475e-12
+        },
+        {
+          "elevationDeg": 52.410000000000004,
+          "expected": 2.5755954847535058e-12
+        },
+        {
+          "elevationDeg": 53.305,
+          "expected": 2.4966408925859413e-12
+        },
+        {
+          "elevationDeg": 54.2,
+          "expected": 2.418063258562633e-12
+        },
+        {
+          "elevationDeg": 55.095,
+          "expected": 2.341275832023824e-12
+        },
+        {
+          "elevationDeg": 55.99,
+          "expected": 2.2675195626961046e-12
+        },
+        {
+          "elevationDeg": 56.885,
+          "expected": 2.197876222701642e-12
+        },
+        {
+          "elevationDeg": 57.78,
+          "expected": 2.1332872501986006e-12
+        },
+        {
+          "elevationDeg": 58.675000000000004,
+          "expected": 2.074576981722188e-12
+        },
+        {
+          "elevationDeg": 59.57,
+          "expected": 2.022479244263659e-12
+        },
+        {
+          "elevationDeg": 60.465,
+          "expected": 1.9767830681034715e-12
+        },
+        {
+          "elevationDeg": 61.36,
+          "expected": 1.9329682225397994e-12
+        },
+        {
+          "elevationDeg": 62.255,
+          "expected": 1.8902778254981666e-12
+        },
+        {
+          "elevationDeg": 63.15,
+          "expected": 1.848685402148501e-12
+        },
+        {
+          "elevationDeg": 64.045,
+          "expected": 1.8081649824312936e-12
+        },
+        {
+          "elevationDeg": 64.94,
+          "expected": 1.7686910993220126e-12
+        },
+        {
+          "elevationDeg": 65.83500000000001,
+          "expected": 1.7302387866329118e-12
+        },
+        {
+          "elevationDeg": 66.73,
+          "expected": 1.6927835763821124e-12
+        },
+        {
+          "elevationDeg": 67.625,
+          "expected": 1.6563014957589638e-12
+        },
+        {
+          "elevationDeg": 68.52,
+          "expected": 1.6207690637134534e-12
+        },
+        {
+          "elevationDeg": 69.415,
+          "expected": 1.5861632871964565e-12
+        },
+        {
+          "elevationDeg": 70.31,
+          "expected": 1.5524616570767038e-12
+        },
+        {
+          "elevationDeg": 71.205,
+          "expected": 1.5196421437591125e-12
+        },
+        {
+          "elevationDeg": 72.1,
+          "expected": 1.4876831925283485e-12
+        },
+        {
+          "elevationDeg": 72.995,
+          "expected": 1.4565637186404421e-12
+        },
+        {
+          "elevationDeg": 73.89,
+          "expected": 1.4262631021841567e-12
+        },
+        {
+          "elevationDeg": 74.785,
+          "expected": 1.3967611827332535e-12
+        },
+        {
+          "elevationDeg": 75.68,
+          "expected": 1.368038253809465e-12
+        },
+        {
+          "elevationDeg": 76.575,
+          "expected": 1.3400750571753817e-12
+        },
+        {
+          "elevationDeg": 77.47,
+          "expected": 1.312852776975556e-12
+        },
+        {
+          "elevationDeg": 78.365,
+          "expected": 1.2863530337430571e-12
+        },
+        {
+          "elevationDeg": 79.26,
+          "expected": 1.2605578782882217e-12
+        },
+        {
+          "elevationDeg": 80.155,
+          "expected": 1.2354497854853716e-12
+        },
+        {
+          "elevationDeg": 81.05,
+          "expected": 1.2110116479723457e-12
+        },
+        {
+          "elevationDeg": 81.94500000000001,
+          "expected": 1.1872267697773686e-12
+        },
+        {
+          "elevationDeg": 82.84,
+          "expected": 1.1640788598865248e-12
+        },
+        {
+          "elevationDeg": 83.735,
+          "expected": 1.141552025764917e-12
+        },
+        {
+          "elevationDeg": 84.63,
+          "expected": 1.1196307668434702e-12
+        },
+        {
+          "elevationDeg": 85.525,
+          "expected": 1.0982999679830144e-12
+        },
+        {
+          "elevationDeg": 86.42,
+          "expected": 1.0775448929264578e-12
+        },
+        {
+          "elevationDeg": 87.315,
+          "expected": 1.057351177749342e-12
+        },
+        {
+          "elevationDeg": 88.21000000000001,
+          "expected": 1.0377048243184883e-12
+        },
+        {
+          "elevationDeg": 89.105,
+          "expected": 1.0185921937678228e-12
+        },
+        {
+          "elevationDeg": 90.0,
+          "expected": 9.999999999999963e-13
+        }
+      ]
+    },
+    {
+      "profile": {
+        "azimuthDeg": 0.0,
+        "elevationSamplesDeg": [
+          0.5,
+          2,
+          5,
+          10,
+          20,
+          30,
+          45,
+          60,
+          90
+        ],
+        "radianceSamples": [
+          1e-12,
+          2e-12,
+          3e-12,
+          4e-12,
+          5e-12,
+          6e-12,
+          7e-12,
+          8e-12,
+          9e-12
+        ],
+        "epsilonRadiance": 1e-27,
+        "blockedIntervals": []
+      },
+      "queries": [
+        {
+          "elevationDeg": 0.5,
+          "expected": 1e-12
+        },
+        {
+          "elevationDeg": 1.395,
+          "expected": 1.617709916740699e-12
+        },
+        {
+          "elevationDeg": 2.29,
+          "expected": 2.126257002934364e-12
+        },
+        {
+          "elevationDeg": 3.185,
+          "expected": 2.4741438148234344e-12
+        },
+        {
+          "elevationDeg": 4.08,
+          "expected": 2.757236858163224e-12
+        },
+        {
+          "elevationDeg": 4.975,
+          "expected": 2.9937328049006485e-12
+        },
+        {
+          "elevationDeg": 5.87,
+          "expected": 3.2125219831707435e-12
+        },
+        {
+          "elevationDeg": 6.765000000000001,
+          "expected": 3.417542454305712e-12
+        },
+        {
+          "elevationDeg": 7.66,
+          "expected": 3.6056627842806125e-12
+        },
+        {
+          "elevationDeg": 8.555,
+          "expected": 3.774230309466624e-12
+        },
+        {
+          "elevationDeg": 9.45,
+          "expected": 3.92114148100517e-12
+        },
+        {
+          "elevationDeg": 10.345,
+          "expected": 4.045953035599417e-12
+        },
+        {
+          "elevationDeg": 11.24,
+          "expected": 4.158729626570954e-12
+        },
+        {
+          "elevationDeg": 12.135,
+          "expected": 4.262811028768776e-12
+        },
+        {
+          "elevationDeg": 13.030000000000001,
+          "expected": 4.359130665330052e-12
+        },
+        {
+          "elevationDeg": 13.925,
+          "expected": 4.448821413950437e-12
+        },
+        {
+          "elevationDeg": 14.82,
+          "expected": 4.5331929347777895e-12
+        },
+        {
+          "elevationDeg": 15.715,
+          "expected": 4.6137116263714455e-12
+        },
+        {
+          "elevationDeg": 16.61,
+          "expected": 4.691984488525538e-12
+        },
+        {
+          "elevationDeg": 17.505,
+          "expected": 4.769748002325239e-12
+        },
+        {
+          "elevationDeg": 18.4,
+          "expected": 4.8488630035215366e-12
+        },
+        {
+          "elevationDeg": 19.295,
+          "expected": 4.931316442433454e-12
+        },
+        {
+          "elevationDeg": 20.19,
+          "expected": 5.0191208791761665e-12
+        },
+        {
+          "elevationDeg": 21.085,
+          "expected": 5.110567712077585e-12
+        },
+        {
+          "elevationDeg": 21.98,
+          "expected": 5.2038389756556545e-12
+        },
+        {
+          "elevationDeg": 22.875,
+          "expected": 5.298289260537626e-12
+        },
+        {
+          "elevationDeg": 23.77,
+          "expected": 5.393224446830805e-12
+        },
+        {
+          "elevationDeg": 24.665,
+          "expected": 5.487900637490408e-12
+        },
+        {
+          "elevationDeg": 25.560000000000002,
+          "expected": 5.581524066638582e-12
+        },
+        {
+          "elevationDeg": 26.455000000000002,
+          "expected": 5.6732520973265255e-12
+        },
+        {
+          "elevationDeg": 27.35,
+          "expected": 5.7621954212101e-12
+        },
+        {
+          "elevationDeg": 28.245,
+          "expected": 5.847421565997685e-12
+        },
+        {
+          "elevationDeg": 29.14,
+          "expected": 5.927959804769119e-12
+        },
+        {
+          "elevationDeg": 30.035,
+          "expected": 6.002810625610802e-12
+        },
+        {
+          "elevationDeg": 30.93,
+          "expected": 6.073330079190448e-12
+        },
+        {
+          "elevationDeg": 31.825,
+          "expected": 6.141361753677385e-12
+        },
+        {
+          "elevationDeg": 32.72,
+          "expected": 6.2070863954641764e-12
+        },
+        {
+          "elevationDeg": 33.615,
+          "expected": 6.2706993558337215e-12
+        },
+        {
+          "elevationDeg": 34.51,
+          "expected": 6.3324097717681835e-12
+        },
+        {
+          "elevationDeg": 35.405,
+          "expected": 6.392439799468067e-12
+        },
+        {
+          "elevationDeg": 36.3,
+          "expected": 6.451023912292453e-12
+        },
+        {
+          "elevationDeg": 37.195,
+          "expected": 6.50840827406247e-12
+        },
+        {
+          "elevationDeg": 38.09,
+          "expected": 6.564850197952263e-12
+        },
+        {
+          "elevationDeg": 38.985,
+          "expected": 6.620617700539715e-12
+        },
+        {
+          "elevationDeg": 39.88,
+          "expected": 6.675989160025748e-12
+        },
+        {
+          "elevationDeg": 40.775,
+          "expected": 6.731253087172627e-12
+        },
+        {
+          "elevationDeg": 41.67,
+          "expected": 6.7867080171729985e-12
+        },
+        {
+          "elevationDeg": 42.565,
+          "expected": 6.8426625304597245e-12
+        },
+        {
+          "elevationDeg": 43.46,
+          "expected": 6.8994354104170664e-12
+        },
+        {
+          "elevationDeg": 44.355000000000004,
+          "expected": 6.95735594606804e-12
+        },
+        {
+          "elevationDeg": 45.25,
+          "expected": 7.016770390357525e-12
+        },
+        {
+          "elevationDeg": 46.145,
+          "expected": 7.0779568620867216e-12
+        },
+        {
+          "elevationDeg": 47.04,
+          "expected": 7.140701136587063e-12
+        },
+        {
+          "elevationDeg": 47.935,
+          "expected": 7.2046811661089064e-12
+        },
+        {
+          "elevationDeg": 48.83,
+          "expected": 7.2695630202644444e-12
+        },
+        {
+          "elevationDeg": 49.725,
+          "expected": 7.33500037047814e-12
+        },
+        {
+          "elevationDeg": 50.620000000000005,
+          "expected": 7.400634134885343e-12
+        },
+        {
+          "elevationDeg": 51.515,
+          "expected": 7.466092294358062e-12
+        },
+        {
+          "elevationDeg": 52.410000000000004,
+          "expected": 7.530989890703975e-12
+        },
+        {
+          "elevationDeg": 53.305,
+          "expected": 7.594929218211021e-12
+        },
+        {
+          "elevationDeg": 54.2,
+          "expected": 7.657500219568787e-12
+        },
+        {
+          "elevationDeg": 55.095,
+          "expected": 7.718281096770779e-12
+        },
+        {
+          "elevationDeg": 55.99,
+          "expected": 7.776839146866907e-12
+        },
+        {
+          "elevationDeg": 56.885,
+          "expected": 7.832731831371342e-12
+        },
+        {
+          "elevationDeg": 57.78,
+          "expected": 7.885508086725232e-12
+        },
+        {
+          "elevationDeg": 58.675000000000004,
+          "expected": 7.934709881447845e-12
+        },
+        {
+          "elevationDeg": 59.57,
+          "expected": 7.979874023480358e-12
+        },
+        {
+          "elevationDeg": 60.465,
+          "expected": 8.021197330075503e-12
+        },
+        {
+          "elevationDeg": 61.36,
+          "expected": 8.062052133048237e-12
+        },
+        {
+          "elevationDeg": 62.255,
+          "expected": 8.102928948606762e-12
+        },
+        {
+          "elevationDeg": 63.15,
+          "expected": 8.143765715307969e-12
+        },
+        {
+          "elevationDeg": 64.045,
+          "expected": 8.184499152411455e-12
+        },
+        {
+          "elevationDeg": 64.94,
+          "expected": 8.225064765586076e-12
+        },
+        {
+          "elevationDeg": 65.83500000000001,
+          "expected": 8.265396857617222e-12
+        },
+        {
+          "elevationDeg": 66.73,
+          "expected": 8.305428544269833e-12
+        },
+        {
+          "elevationDeg": 67.625,
+          "expected": 8.345091775461536e-12
+        },
+        {
+          "elevationDeg": 68.52,
+          "expected": 8.384317361896094e-12
+        },
+        {
+          "elevationDeg": 69.415,
+          "expected": 8.423035007300479e-12
+        },
+        {
+          "elevationDeg": 70.31,
+          "expected": 8.46117334640431e-12
+        },
+        {
+          "elevationDeg": 71.205,
+          "expected": 8.498659988791273e-12
+        },
+        {
+          "elevationDeg": 72.1,
+          "expected": 8.535421568743525e-12
+        },
+        {
+          "elevationDeg": 72.995,
+          "expected": 8.571383801188894e-12
+        },
+        {
+          "elevationDeg": 73.89,
+          "expected": 8.606471543850153e-12
+        },
+        {
+          "elevationDeg": 74.785,
+          "expected": 8.640608865680856e-12
+        },
+        {
+          "elevationDeg": 75.68,
+          "expected": 8.673719121657898e-12
+        },
+        {
+          "elevationDeg": 76.575,
+          "expected": 8.705725033986088e-12
+        },
+        {
+          "elevationDeg": 77.47,
+          "expected": 8.736548779749738e-12
+        },
+        {
+          "elevationDeg": 78.365,
+          "expected": 8.766112085030272e-12
+        },
+        {
+          "elevationDeg": 79.26,
+          "expected": 8.794336325485487e-12
+        },
+        {
+          "elevationDeg": 80.155,
+          "expected": 8.821142633366933e-12
+        },
+        {
+          "elevationDeg": 81.05,
+          "expected": 8.846452010925776e-12
+        },
+        {
+          "elevationDeg": 81.94500000000001,
+          "expected": 8.87018545013556e-12
+        },
+        {
+          "elevationDeg": 82.84,
+          "expected": 8.89226405863213e-12
+        },
+        {
+          "elevationDeg": 83.735,
+          "expected": 8.912609191745363e-12
+        },
+        {
+          "elevationDeg": 84.63,
+          "expected": 8.931142590467791e-12
+        },
+        {
+          "elevationDeg": 85.525,
+          "expected": 8.947786525176945e-12
+        },
+        {
+          "elevationDeg": 86.42,
+          "expected": 8.962463944896804e-12
+        },
+        {
+          "elevationDeg": 87.315,
+          "expected": 8.975098631852605e-12
+        },
+        {
+          "elevationDeg": 88.21000000000001,
+          "expected": 8.985615361042359e-12
+        },
+        {
+          "elevationDeg": 89.105,
+          "expected": 8.993940064513146e-12
+        },
+        {
+          "elevationDeg": 90.0,
+          "expected": 9.000000000000029e-12
+        }
+      ]
+    },
+    {
+      "profile": {
+        "azimuthDeg": 0.0,
+        "elevationSamplesDeg": [
+          0.5,
+          2,
+          5,
+          10,
+          20,
+          30,
+          45,
+          60,
+          90
+        ],
+        "radianceSamples": [
+          9.0,
+          7.0,
+          4.0,
+          2.0,
+          1.0,
+          2.0,
+          3.0,
+          2.0,
+          1.0
+        ],
+        "epsilonRadiance": 1e-15,
+        "blockedIntervals": []
+      },
+      "queries": [
+        {
+          "elevationDeg": 0.5,
+          "expected": 9.0
+        },
+        {
+          "elevationDeg": 1.395,
+          "expected": 7.767172431463575
+        },
+        {
+          "elevationDeg": 2.29,
+          "expected": 6.644462146600496
+        },
+        {
+          "elevationDeg": 3.185,
+          "expected": 5.598132467755718
+        },
+        {
+          "elevationDeg": 4.08,
+          "expected": 4.70578007936879
+        },
+        {
+          "elevationDeg": 4.975,
+          "expected": 4.016187312739591
+        },
+        {
+          "elevationDeg": 5.87,
+          "expected": 3.480080966789541
+        },
+        {
+          "elevationDeg": 6.765000000000001,
+          "expected": 3.02789239377197
+        },
+        {
+          "elevationDeg": 7.66,
+          "expected": 2.6544536095000004
+        },
+        {
+          "elevationDeg": 8.555,
+          "expected": 2.3529182991045836
+        },
+        {
+          "elevationDeg": 9.45,
+          "expected": 2.1161621889658018
+        },
+        {
+          "elevationDeg": 10.345,
+          "expected": 1.9345276726079486
+        },
+        {
+          "elevationDeg": 11.24,
+          "expected": 1.7726806928161414
+        },
+        {
+          "elevationDeg": 12.135,
+          "expected": 1.6243408985019263
+        },
+        {
+          "elevationDeg": 13.030000000000001,
+          "expected": 1.4911172386381462
+        },
+        {
+          "elevationDeg": 13.925,
+          "expected": 1.3738243198570081
+        },
+        {
+          "elevationDeg": 14.82,
+          "expected": 1.272718206556843
+        },
+        {
+          "elevationDeg": 15.715,
+          "expected": 1.1877138247034669
+        },
+        {
+          "elevationDeg": 16.61,
+          "expected": 1.1185791364403177
+        },
+        {
+          "elevationDeg": 17.505,
+          "expected": 1.0651084164146762
+        },
+        {
+          "elevationDeg": 18.4,
+          "expected": 1.0272826831344035
+        },
+        {
+          "elevationDeg": 19.295,
+          "expected": 1.0054304119486233
+        },
+        {
+          "elevationDeg": 20.19,
+          "expected": 1.0005994574531734
+        },
+        {
+          "elevationDeg": 21.085,
+          "expected": 1.018676302664769
+        },
+        {
+          "elevationDeg": 21.98,
+          "expected": 1.0598887074960903
+        },
+        {
+          "elevationDeg": 22.875,
+          "expected": 1.1222540332558713
+        },
+        {
+          "elevationDeg": 23.77,
+          "expected": 1.2041696019849546
+        },
+        {
+          "elevationDeg": 24.665,
+          "expected": 1.3037924032638155
+        },
+        {
+          "elevationDeg": 25.560000000000002,
+          "expected": 1.4184442178124683
+        },
+        {
+          "elevationDeg": 26.455000000000002,
+          "expected": 1.5440374564162882
+        },
+        {
+          "elevationDeg": 27.35,
+          "expected": 1.6745722262763203
+        },
+        {
+          "elevationDeg": 28.245,
+          "expected": 1.801810631288114
+        },
+        {
+          "elevationDeg": 29.14,
+          "expected": 1.9152803006891834
+        },
+        {
+          "elevationDeg": 30.035,
+          "expected": 2.00280677509811
+        },
+        {
+          "elevationDeg": 30.93,
+          "expected": 2.07594061412903
+        },
+        {
+          "elevationDeg": 31.825,
+          "expected": 2.1513673951420476
+        },
+        {
+          "elevationDeg": 32.72,
+          "expected": 2.228547119793806
+        },
+        {
+          "elevationDeg": 33.615,
+          "expected": 2.306855760649226
+        },
+        {
+          "elevationDeg": 34.51,
+          "expected": 2.385581396629622
+        },
+        {
+          "elevationDeg": 35.405,
+          "expected": 2.4639223474780314
+        },
+        {
+          "elevationDeg": 36.3,
+          "expected": 2.540987747163873
+        },
+        {
+          "elevationDeg": 37.195,
+          "expected": 2.6158009975697265
+        },
+        {
+          "elevationDeg": 38.09,
+          "expected": 2.687306521084459
+        },
+        {
+          "elevationDeg": 38.985,
+          "expected": 2.7543801791728577
+        },
+        {
+          "elevationDeg": 39.88,
+          "expected": 2.8158436396188113
+        },
+        {
+          "elevationDeg": 40.775,
+          "expected": 2.8704828552223014
+        },
+        {
+          "elevationDeg": 41.67,
+          "expected": 2.917070660400963
+        },
+        {
+          "elevationDeg": 42.565,
+          "expected": 2.954393300991182
+        },
+        {
+          "elevationDeg": 43.46,
+          "expected": 2.9812804911475865
+        },
+        {
+          "elevationDeg": 44.355000000000004,
+          "expected": 2.9966383476006557
+        },
+        {
+          "elevationDeg": 45.25,
+          "expected": 2.999306605691895
+        },
+        {
+          "elevationDeg": 46.145,
+          "expected": 2.9859390503657917
+        },
+        {
+          "elevationDeg": 47.04,
+          "expected": 2.957008940961197
+        },
+        {
+          "elevationDeg": 47.935,
+          "expected": 2.914581155172867
+        },
+        {
+          "elevationDeg": 48.83,
+          "expected": 2.860827516725553
+        },
+        {
+          "elevationDeg": 49.725,
+          "expected": 2.7979464247769474
+        },
+        {
+          "elevationDeg": 50.620000000000005,
+          "expected": 2.7280950881733115
+        },
+        {
+          "elevationDeg": 51.515,
+          "expected": 2.6533356578464793
+        },
+        {
+          "elevationDeg": 52.410000000000004,
+          "expected": 2.575595484753509
+        },
+        {
+          "elevationDeg": 53.305,
+          "expected": 2.4966408925859396
+        },
+        {
+          "elevationDeg": 54.2,
+          "expected": 2.41806325856264
+        },
+        {
+          "elevationDeg": 55.095,
+          "expected": 2.3412758320238303
+        },
+        {
+          "elevationDeg": 55.99,
+          "expected": 2.2675195626961093
+        },
+        {
+          "elevationDeg": 56.885,
+          "expected": 2.1978762227016477
+        },
+        {
+          "elevationDeg": 57.78,
+          "expected": 2.133287250198602
+        },
+        {
+          "elevationDeg": 58.675000000000004,
+          "expected": 2.074576981722189
+        },
+        {
+          "elevationDeg": 59.57,
+          "expected": 2.0224792442636588
+        },
+        {
+          "elevationDeg": 60.465,
+          "expected": 1.9767830681034781
+        },
+        {
+          "elevationDeg": 61.36,
+          "expected": 1.9329682225398024
+        },
+        {
+          "elevationDeg": 62.255,
+          "expected": 1.8902778254981665
+        },
+        {
+          "elevationDeg": 63.15,
+          "expected": 1.848685402148502
+        },
+        {
+          "elevationDeg": 64.045,
+          "expected": 1.8081649824312949
+        },
+        {
+          "elevationDeg": 64.94,
+          "expected": 1.7686910993220173
+        },
+        {
+          "elevationDeg": 65.83500000000001,
+          "expected": 1.7302387866329123
+        },
+        {
+          "elevationDeg": 66.73,
+          "expected": 1.6927835763821115
+        },
+        {
+          "elevationDeg": 67.625,
+          "expected": 1.6563014957589666
+        },
+        {
+          "elevationDeg": 68.52,
+          "expected": 1.6207690637134549
+        },
+        {
+          "elevationDeg": 69.415,
+          "expected": 1.58616328719646
+        },
+        {
+          "elevationDeg": 70.31,
+          "expected": 1.5524616570767051
+        },
+        {
+          "elevationDeg": 71.205,
+          "expected": 1.5196421437591094
+        },
+        {
+          "elevationDeg": 72.1,
+          "expected": 1.4876831925283518
+        },
+        {
+          "elevationDeg": 72.995,
+          "expected": 1.4565637186404432
+        },
+        {
+          "elevationDeg": 73.89,
+          "expected": 1.4262631021841605
+        },
+        {
+          "elevationDeg": 74.785,
+          "expected": 1.396761182733257
+        },
+        {
+          "elevationDeg": 75.68,
+          "expected": 1.368038253809462
+        },
+        {
+          "elevationDeg": 76.575,
+          "expected": 1.3400750571753834
+        },
+        {
+          "elevationDeg": 77.47,
+          "expected": 1.3128527769755565
+        },
+        {
+          "elevationDeg": 78.365,
+          "expected": 1.2863530337430524
+        },
+        {
+          "elevationDeg": 79.26,
+          "expected": 1.2605578782882232
+        },
+        {
+          "elevationDeg": 80.155,
+          "expected": 1.2354497854853708
+        },
+        {
+          "elevationDeg": 81.05,
+          "expected": 1.2110116479723494
+        },
+        {
+          "elevationDeg": 81.94500000000001,
+          "expected": 1.187226769777367
+        },
+        {
+          "elevationDeg": 82.84,
+          "expected": 1.1640788598865246
+        },
+        {
+          "elevationDeg": 83.735,
+          "expected": 1.1415520257649177
+        },
+        {
+          "elevationDeg": 84.63,
+          "expected": 1.1196307668434726
+        },
+        {
+          "elevationDeg": 85.525,
+          "expected": 1.098299967983017
+        },
+        {
+          "elevationDeg": 86.42,
+          "expected": 1.077544892926458
+        },
+        {
+          "elevationDeg": 87.315,
+          "expected": 1.057351177749342
+        },
+        {
+          "elevationDeg": 88.21000000000001,
+          "expected": 1.037704824318488
+        },
+        {
+          "elevationDeg": 89.105,
+          "expected": 1.018592193767821
+        },
+        {
+          "elevationDeg": 90.0,
+          "expected": 1.0
+        }
+      ]
+    },
+    {
+      "profile": {
+        "azimuthDeg": 0.0,
+        "elevationSamplesDeg": [
+          0.5,
+          2,
+          5,
+          10,
+          20,
+          30,
+          45,
+          60,
+          90
+        ],
+        "radianceSamples": [
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0,
+          7.0,
+          8.0,
+          9.0
+        ],
+        "epsilonRadiance": 1e-15,
+        "blockedIntervals": []
+      },
+      "queries": [
+        {
+          "elevationDeg": 0.5,
+          "expected": 1.0
+        },
+        {
+          "elevationDeg": 1.395,
+          "expected": 1.617709916740699
+        },
+        {
+          "elevationDeg": 2.29,
+          "expected": 2.1262570029343735
+        },
+        {
+          "elevationDeg": 3.185,
+          "expected": 2.4741438148234365
+        },
+        {
+          "elevationDeg": 4.08,
+          "expected": 2.757236858163226
+        },
+        {
+          "elevationDeg": 4.975,
+          "expected": 2.9937328049006435
+        },
+        {
+          "elevationDeg": 5.87,
+          "expected": 3.212521983170759
+        },
+        {
+          "elevationDeg": 6.765000000000001,
+          "expected": 3.4175424543057096
+        },
+        {
+          "elevationDeg": 7.66,
+          "expected": 3.6056627842806157
+        },
+        {
+          "elevationDeg": 8.555,
+          "expected": 3.7742303094666267
+        },
+        {
+          "elevationDeg": 9.45,
+          "expected": 3.9211414810051717
+        },
+        {
+          "elevationDeg": 10.345,
+          "expected": 4.045953035599402
+        },
+        {
+          "elevationDeg": 11.24,
+          "expected": 4.158729626570951
+        },
+        {
+          "elevationDeg": 12.135,
+          "expected": 4.262811028768769
+        },
+        {
+          "elevationDeg": 13.030000000000001,
+          "expected": 4.359130665330045
+        },
+        {
+          "elevationDeg": 13.925,
+          "expected": 4.448821413950445
+        },
+        {
+          "elevationDeg": 14.82,
+          "expected": 4.533192934777795
+        },
+        {
+          "elevationDeg": 15.715,
+          "expected": 4.6137116263714315
+        },
+        {
+          "elevationDeg": 16.61,
+          "expected": 4.691984488525534
+        },
+        {
+          "elevationDeg": 17.505,
+          "expected": 4.769748002325243
+        },
+        {
+          "elevationDeg": 18.4,
+          "expected": 4.848863003521543
+        },
+        {
+          "elevationDeg": 19.295,
+          "expected": 4.93131644243344
+        },
+        {
+          "elevationDeg": 20.19,
+          "expected": 5.019120879176171
+        },
+        {
+          "elevationDeg": 21.085,
+          "expected": 5.110567712077573
+        },
+        {
+          "elevationDeg": 21.98,
+          "expected": 5.2038389756556525
+        },
+        {
+          "elevationDeg": 22.875,
+          "expected": 5.2982892605376115
+        },
+        {
+          "elevationDeg": 23.77,
+          "expected": 5.3932244468308035
+        },
+        {
+          "elevationDeg": 24.665,
+          "expected": 5.487900637490411
+        },
+        {
+          "elevationDeg": 25.560000000000002,
+          "expected": 5.581524066638596
+        },
+        {
+          "elevationDeg": 26.455000000000002,
+          "expected": 5.6732520973265395
+        },
+        {
+          "elevationDeg": 27.35,
+          "expected": 5.7621954212100945
+        },
+        {
+          "elevationDeg": 28.245,
+          "expected": 5.847421565997691
+        },
+        {
+          "elevationDeg": 29.14,
+          "expected": 5.927959804769112
+        },
+        {
+          "elevationDeg": 30.035,
+          "expected": 6.002810625610782
+        },
+        {
+          "elevationDeg": 30.93,
+          "expected": 6.073330079190441
+        },
+        {
+          "elevationDeg": 31.825,
+          "expected": 6.141361753677397
+        },
+        {
+          "elevationDeg": 32.72,
+          "expected": 6.207086395464184
+        },
+        {
+          "elevationDeg": 33.615,
+          "expected": 6.270699355833736
+        },
+        {
+          "elevationDeg": 34.51,
+          "expected": 6.3324097717681775
+        },
+        {
+          "elevationDeg": 35.405,
+          "expected": 6.392439799468076
+        },
+        {
+          "elevationDeg": 36.3,
+          "expected": 6.45102391229245
+        },
+        {
+          "elevationDeg": 37.195,
+          "expected": 6.508408274062466
+        },
+        {
+          "elevationDeg": 38.09,
+          "expected": 6.56485019795228
+        },
+        {
+          "elevationDeg": 38.985,
+          "expected": 6.620617700539718
+        },
+        {
+          "elevationDeg": 39.88,
+          "expected": 6.6759891600257335
+        },
+        {
+          "elevationDeg": 40.775,
+          "expected": 6.731253087172628
+        },
+        {
+          "elevationDeg": 41.67,
+          "expected": 6.78670801717299
+        },
+        {
+          "elevationDeg": 42.565,
+          "expected": 6.8426625304597195
+        },
+        {
+          "elevationDeg": 43.46,
+          "expected": 6.8994354104170865
+        },
+        {
+          "elevationDeg": 44.355000000000004,
+          "expected": 6.957355946068047
+        },
+        {
+          "elevationDeg": 45.25,
+          "expected": 7.016770390357536
+        },
+        {
+          "elevationDeg": 46.145,
+          "expected": 7.077956862086704
+        },
+        {
+          "elevationDeg": 47.04,
+          "expected": 7.140701136587057
+        },
+        {
+          "elevationDeg": 47.935,
+          "expected": 7.204681166108919
+        },
+        {
+          "elevationDeg": 48.83,
+          "expected": 7.26956302026447
+        },
+        {
+          "elevationDeg": 49.725,
+          "expected": 7.335000370478142
+        },
+        {
+          "elevationDeg": 50.620000000000005,
+          "expected": 7.4006341348853475
+        },
+        {
+          "elevationDeg": 51.515,
+          "expected": 7.4660922943580665
+        },
+        {
+          "elevationDeg": 52.410000000000004,
+          "expected": 7.530989890703984
+        },
+        {
+          "elevationDeg": 53.305,
+          "expected": 7.594929218211038
+        },
+        {
+          "elevationDeg": 54.2,
+          "expected": 7.657500219568776
+        },
+        {
+          "elevationDeg": 55.095,
+          "expected": 7.718281096770776
+        },
+        {
+          "elevationDeg": 55.99,
+          "expected": 7.776839146866911
+        },
+        {
+          "elevationDeg": 56.885,
+          "expected": 7.832731831371373
+        },
+        {
+          "elevationDeg": 57.78,
+          "expected": 7.88550808672524
+        },
+        {
+          "elevationDeg": 58.675000000000004,
+          "expected": 7.934709881447852
+        },
+        {
+          "elevationDeg": 59.57,
+          "expected": 7.979874023480344
+        },
+        {
+          "elevationDeg": 60.465,
+          "expected": 8.021197330075507
+        },
+        {
+          "elevationDeg": 61.36,
+          "expected": 8.06205213304823
+        },
+        {
+          "elevationDeg": 62.255,
+          "expected": 8.102928948606747
+        },
+        {
+          "elevationDeg": 63.15,
+          "expected": 8.143765715308016
+        },
+        {
+          "elevationDeg": 64.045,
+          "expected": 8.184499152411451
+        },
+        {
+          "elevationDeg": 64.94,
+          "expected": 8.225064765586067
+        },
+        {
+          "elevationDeg": 65.83500000000001,
+          "expected": 8.265396857617231
+        },
+        {
+          "elevationDeg": 66.73,
+          "expected": 8.305428544269821
+        },
+        {
+          "elevationDeg": 67.625,
+          "expected": 8.345091775461558
+        },
+        {
+          "elevationDeg": 68.52,
+          "expected": 8.384317361896121
+        },
+        {
+          "elevationDeg": 69.415,
+          "expected": 8.423035007300486
+        },
+        {
+          "elevationDeg": 70.31,
+          "expected": 8.461173346404301
+        },
+        {
+          "elevationDeg": 71.205,
+          "expected": 8.498659988791294
+        },
+        {
+          "elevationDeg": 72.1,
+          "expected": 8.535421568743528
+        },
+        {
+          "elevationDeg": 72.995,
+          "expected": 8.571383801188897
+        },
+        {
+          "elevationDeg": 73.89,
+          "expected": 8.606471543850182
+        },
+        {
+          "elevationDeg": 74.785,
+          "expected": 8.640608865680836
+        },
+        {
+          "elevationDeg": 75.68,
+          "expected": 8.673719121657898
+        },
+        {
+          "elevationDeg": 76.575,
+          "expected": 8.705725033986075
+        },
+        {
+          "elevationDeg": 77.47,
+          "expected": 8.736548779749757
+        },
+        {
+          "elevationDeg": 78.365,
+          "expected": 8.766112085030269
+        },
+        {
+          "elevationDeg": 79.26,
+          "expected": 8.794336325485503
+        },
+        {
+          "elevationDeg": 80.155,
+          "expected": 8.821142633366925
+        },
+        {
+          "elevationDeg": 81.05,
+          "expected": 8.846452010925766
+        },
+        {
+          "elevationDeg": 81.94500000000001,
+          "expected": 8.870185450135548
+        },
+        {
+          "elevationDeg": 82.84,
+          "expected": 8.892264058632136
+        },
+        {
+          "elevationDeg": 83.735,
+          "expected": 8.912609191745366
+        },
+        {
+          "elevationDeg": 84.63,
+          "expected": 8.931142590467799
+        },
+        {
+          "elevationDeg": 85.525,
+          "expected": 8.947786525176966
+        },
+        {
+          "elevationDeg": 86.42,
+          "expected": 8.96246394489678
+        },
+        {
+          "elevationDeg": 87.315,
+          "expected": 8.97509863185262
+        },
+        {
+          "elevationDeg": 88.21000000000001,
+          "expected": 8.985615361042377
+        },
+        {
+          "elevationDeg": 89.105,
+          "expected": 8.993940064513161
+        },
+        {
+          "elevationDeg": 90.0,
+          "expected": 9.0
+        }
+      ]
+    },
+    {
+      "profile": {
+        "azimuthDeg": 0.0,
+        "elevationSamplesDeg": [
+          0.5,
+          2,
+          5,
+          10,
+          20,
+          30,
+          45,
+          60,
+          90
+        ],
+        "radianceSamples": [
+          90000000000.0,
+          70000000000.0,
+          40000000000.0,
+          20000000000.0,
+          10000000000.0,
+          20000000000.0,
+          30000000000.0,
+          20000000000.0,
+          10000000000.0
+        ],
+        "epsilonRadiance": 1e-05,
+        "blockedIntervals": []
+      },
+      "queries": [
+        {
+          "elevationDeg": 0.5,
+          "expected": 89999999999.99992
+        },
+        {
+          "elevationDeg": 1.395,
+          "expected": 77671724314.63553
+        },
+        {
+          "elevationDeg": 2.29,
+          "expected": 66444621466.00468
+        },
+        {
+          "elevationDeg": 3.185,
+          "expected": 55981324677.557175
+        },
+        {
+          "elevationDeg": 4.08,
+          "expected": 47057800793.68794
+        },
+        {
+          "elevationDeg": 4.975,
+          "expected": 40161873127.39598
+        },
+        {
+          "elevationDeg": 5.87,
+          "expected": 34800809667.89543
+        },
+        {
+          "elevationDeg": 6.765000000000001,
+          "expected": 30278923937.719666
+        },
+        {
+          "elevationDeg": 7.66,
+          "expected": 26544536094.999977
+        },
+        {
+          "elevationDeg": 8.555,
+          "expected": 23529182991.04593
+        },
+        {
+          "elevationDeg": 9.45,
+          "expected": 21161621889.658062
+        },
+        {
+          "elevationDeg": 10.345,
+          "expected": 19345276726.07952
+        },
+        {
+          "elevationDeg": 11.24,
+          "expected": 17726806928.161476
+        },
+        {
+          "elevationDeg": 12.135,
+          "expected": 16243408985.019312
+        },
+        {
+          "elevationDeg": 13.030000000000001,
+          "expected": 14911172386.381502
+        },
+        {
+          "elevationDeg": 13.925,
+          "expected": 13738243198.5701
+        },
+        {
+          "elevationDeg": 14.82,
+          "expected": 12727182065.568453
+        },
+        {
+          "elevationDeg": 15.715,
+          "expected": 11877138247.034704
+        },
+        {
+          "elevationDeg": 16.61,
+          "expected": 11185791364.40322
+        },
+        {
+          "elevationDeg": 17.505,
+          "expected": 10651084164.146759
+        },
+        {
+          "elevationDeg": 18.4,
+          "expected": 10272826831.344038
+        },
+        {
+          "elevationDeg": 19.295,
+          "expected": 10054304119.486208
+        },
+        {
+          "elevationDeg": 20.19,
+          "expected": 10005994574.531729
+        },
+        {
+          "elevationDeg": 21.085,
+          "expected": 10186763026.647692
+        },
+        {
+          "elevationDeg": 21.98,
+          "expected": 10598887074.96088
+        },
+        {
+          "elevationDeg": 22.875,
+          "expected": 11222540332.558704
+        },
+        {
+          "elevationDeg": 23.77,
+          "expected": 12041696019.849514
+        },
+        {
+          "elevationDeg": 24.665,
+          "expected": 13037924032.638184
+        },
+        {
+          "elevationDeg": 25.560000000000002,
+          "expected": 14184442178.124727
+        },
+        {
+          "elevationDeg": 26.455000000000002,
+          "expected": 15440374564.162943
+        },
+        {
+          "elevationDeg": 27.35,
+          "expected": 16745722262.76321
+        },
+        {
+          "elevationDeg": 28.245,
+          "expected": 18018106312.881203
+        },
+        {
+          "elevationDeg": 29.14,
+          "expected": 19152803006.891872
+        },
+        {
+          "elevationDeg": 30.035,
+          "expected": 20028067750.98112
+        },
+        {
+          "elevationDeg": 30.93,
+          "expected": 20759406141.290344
+        },
+        {
+          "elevationDeg": 31.825,
+          "expected": 21513673951.420574
+        },
+        {
+          "elevationDeg": 32.72,
+          "expected": 22285471197.938107
+        },
+        {
+          "elevationDeg": 33.615,
+          "expected": 23068557606.49228
+        },
+        {
+          "elevationDeg": 34.51,
+          "expected": 23855813966.296272
+        },
+        {
+          "elevationDeg": 35.405,
+          "expected": 24639223474.78044
+        },
+        {
+          "elevationDeg": 36.3,
+          "expected": 25409877471.63881
+        },
+        {
+          "elevationDeg": 37.195,
+          "expected": 26158009975.697365
+        },
+        {
+          "elevationDeg": 38.09,
+          "expected": 26873065210.844677
+        },
+        {
+          "elevationDeg": 38.985,
+          "expected": 27543801791.72853
+        },
+        {
+          "elevationDeg": 39.88,
+          "expected": 28158436396.1882
+        },
+        {
+          "elevationDeg": 40.775,
+          "expected": 28704828552.223125
+        },
+        {
+          "elevationDeg": 41.67,
+          "expected": 29170706604.009644
+        },
+        {
+          "elevationDeg": 42.565,
+          "expected": 29543933009.911827
+        },
+        {
+          "elevationDeg": 43.46,
+          "expected": 29812804911.47596
+        },
+        {
+          "elevationDeg": 44.355000000000004,
+          "expected": 29966383476.006527
+        },
+        {
+          "elevationDeg": 45.25,
+          "expected": 29993066056.919025
+        },
+        {
+          "elevationDeg": 46.145,
+          "expected": 29859390503.657925
+        },
+        {
+          "elevationDeg": 47.04,
+          "expected": 29570089409.61199
+        },
+        {
+          "elevationDeg": 47.935,
+          "expected": 29145811551.72866
+        },
+        {
+          "elevationDeg": 48.83,
+          "expected": 28608275167.255634
+        },
+        {
+          "elevationDeg": 49.725,
+          "expected": 27979464247.76952
+        },
+        {
+          "elevationDeg": 50.620000000000005,
+          "expected": 27280950881.733215
+        },
+        {
+          "elevationDeg": 51.515,
+          "expected": 26533356578.464825
+        },
+        {
+          "elevationDeg": 52.410000000000004,
+          "expected": 25755954847.535133
+        },
+        {
+          "elevationDeg": 53.305,
+          "expected": 24966408925.859486
+        },
+        {
+          "elevationDeg": 54.2,
+          "expected": 24180632585.6264
+        },
+        {
+          "elevationDeg": 55.095,
+          "expected": 23412758320.238308
+        },
+        {
+          "elevationDeg": 55.99,
+          "expected": 22675195626.961113
+        },
+        {
+          "elevationDeg": 56.885,
+          "expected": 21978762227.016483
+        },
+        {
+          "elevationDeg": 57.78,
+          "expected": 21332872501.98599
+        },
+        {
+          "elevationDeg": 58.675000000000004,
+          "expected": 20745769817.221863
+        },
+        {
+          "elevationDeg": 59.57,
+          "expected": 20224792442.636646
+        },
+        {
+          "elevationDeg": 60.465,
+          "expected": 19767830681.03477
+        },
+        {
+          "elevationDeg": 61.36,
+          "expected": 19329682225.39805
+        },
+        {
+          "elevationDeg": 62.255,
+          "expected": 18902778254.98172
+        },
+        {
+          "elevationDeg": 63.15,
+          "expected": 18486854021.485065
+        },
+        {
+          "elevationDeg": 64.045,
+          "expected": 18081649824.31299
+        },
+        {
+          "elevationDeg": 64.94,
+          "expected": 17686910993.220177
+        },
+        {
+          "elevationDeg": 65.83500000000001,
+          "expected": 17302387866.329166
+        },
+        {
+          "elevationDeg": 66.73,
+          "expected": 16927835763.821115
+        },
+        {
+          "elevationDeg": 67.625,
+          "expected": 16563014957.589687
+        },
+        {
+          "elevationDeg": 68.52,
+          "expected": 16207690637.134583
+        },
+        {
+          "elevationDeg": 69.415,
+          "expected": 15861632871.964613
+        },
+        {
+          "elevationDeg": 70.31,
+          "expected": 15524616570.767086
+        },
+        {
+          "elevationDeg": 71.205,
+          "expected": 15196421437.591116
+        },
+        {
+          "elevationDeg": 72.1,
+          "expected": 14876831925.28353
+        },
+        {
+          "elevationDeg": 72.995,
+          "expected": 14565637186.404467
+        },
+        {
+          "elevationDeg": 73.89,
+          "expected": 14262631021.84161
+        },
+        {
+          "elevationDeg": 74.785,
+          "expected": 13967611827.332577
+        },
+        {
+          "elevationDeg": 75.68,
+          "expected": 13680382538.094645
+        },
+        {
+          "elevationDeg": 76.575,
+          "expected": 13400750571.753857
+        },
+        {
+          "elevationDeg": 77.47,
+          "expected": 13128527769.7556
+        },
+        {
+          "elevationDeg": 78.365,
+          "expected": 12863530337.430565
+        },
+        {
+          "elevationDeg": 79.26,
+          "expected": 12605578782.882256
+        },
+        {
+          "elevationDeg": 80.155,
+          "expected": 12354497854.853708
+        },
+        {
+          "elevationDeg": 81.05,
+          "expected": 12110116479.723494
+        },
+        {
+          "elevationDeg": 81.94500000000001,
+          "expected": 11872267697.773722
+        },
+        {
+          "elevationDeg": 82.84,
+          "expected": 11640788598.865242
+        },
+        {
+          "elevationDeg": 83.735,
+          "expected": 11415520257.649164
+        },
+        {
+          "elevationDeg": 84.63,
+          "expected": 11196307668.434698
+        },
+        {
+          "elevationDeg": 85.525,
+          "expected": 10982999679.830177
+        },
+        {
+          "elevationDeg": 86.42,
+          "expected": 10775448929.264572
+        },
+        {
+          "elevationDeg": 87.315,
+          "expected": 10573511777.493416
+        },
+        {
+          "elevationDeg": 88.21000000000001,
+          "expected": 10377048243.184877
+        },
+        {
+          "elevationDeg": 89.105,
+          "expected": 10185921937.678188
+        },
+        {
+          "elevationDeg": 90.0,
+          "expected": 9999999999.999994
+        }
+      ]
+    },
+    {
+      "profile": {
+        "azimuthDeg": 0.0,
+        "elevationSamplesDeg": [
+          0.5,
+          2,
+          5,
+          10,
+          20,
+          30,
+          45,
+          60,
+          90
+        ],
+        "radianceSamples": [
+          10000000000.0,
+          20000000000.0,
+          30000000000.0,
+          40000000000.0,
+          50000000000.0,
+          60000000000.0,
+          70000000000.0,
+          80000000000.0,
+          90000000000.0
+        ],
+        "epsilonRadiance": 1e-05,
+        "blockedIntervals": []
+      },
+      "queries": [
+        {
+          "elevationDeg": 0.5,
+          "expected": 9999999999.999994
+        },
+        {
+          "elevationDeg": 1.395,
+          "expected": 16177099167.40704
+        },
+        {
+          "elevationDeg": 2.29,
+          "expected": 21262570029.3437
+        },
+        {
+          "elevationDeg": 3.185,
+          "expected": 24741438148.234413
+        },
+        {
+          "elevationDeg": 4.08,
+          "expected": 27572368581.632317
+        },
+        {
+          "elevationDeg": 4.975,
+          "expected": 29937328049.00657
+        },
+        {
+          "elevationDeg": 5.87,
+          "expected": 32125219831.70753
+        },
+        {
+          "elevationDeg": 6.765000000000001,
+          "expected": 34175424543.05722
+        },
+        {
+          "elevationDeg": 7.66,
+          "expected": 36056627842.80611
+        },
+        {
+          "elevationDeg": 8.555,
+          "expected": 37742303094.66635
+        },
+        {
+          "elevationDeg": 9.45,
+          "expected": 39211414810.05181
+        },
+        {
+          "elevationDeg": 10.345,
+          "expected": 40459530355.99415
+        },
+        {
+          "elevationDeg": 11.24,
+          "expected": 41587296265.709526
+        },
+        {
+          "elevationDeg": 12.135,
+          "expected": 42628110287.68774
+        },
+        {
+          "elevationDeg": 13.030000000000001,
+          "expected": 43591306653.3005
+        },
+        {
+          "elevationDeg": 13.925,
+          "expected": 44488214139.50435
+        },
+        {
+          "elevationDeg": 14.82,
+          "expected": 45331929347.77803
+        },
+        {
+          "elevationDeg": 15.715,
+          "expected": 46137116263.714264
+        },
+        {
+          "elevationDeg": 16.61,
+          "expected": 46919844885.255356
+        },
+        {
+          "elevationDeg": 17.505,
+          "expected": 47697480023.25253
+        },
+        {
+          "elevationDeg": 18.4,
+          "expected": 48488630035.21551
+        },
+        {
+          "elevationDeg": 19.295,
+          "expected": 49313164424.33434
+        },
+        {
+          "elevationDeg": 20.19,
+          "expected": 50191208791.76164
+        },
+        {
+          "elevationDeg": 21.085,
+          "expected": 51105677120.775826
+        },
+        {
+          "elevationDeg": 21.98,
+          "expected": 52038389756.55652
+        },
+        {
+          "elevationDeg": 22.875,
+          "expected": 52982892605.37623
+        },
+        {
+          "elevationDeg": 23.77,
+          "expected": 53932244468.30802
+        },
+        {
+          "elevationDeg": 24.665,
+          "expected": 54879006374.90405
+        },
+        {
+          "elevationDeg": 25.560000000000002,
+          "expected": 55815240666.385796
+        },
+        {
+          "elevationDeg": 26.455000000000002,
+          "expected": 56732520973.26523
+        },
+        {
+          "elevationDeg": 27.35,
+          "expected": 57621954212.100975
+        },
+        {
+          "elevationDeg": 28.245,
+          "expected": 58474215659.97682
+        },
+        {
+          "elevationDeg": 29.14,
+          "expected": 59279598047.691154
+        },
+        {
+          "elevationDeg": 30.035,
+          "expected": 60028106256.10798
+        },
+        {
+          "elevationDeg": 30.93,
+          "expected": 60733300791.90445
+        },
+        {
+          "elevationDeg": 31.825,
+          "expected": 61413617536.77381
+        },
+        {
+          "elevationDeg": 32.72,
+          "expected": 62070863954.64173
+        },
+        {
+          "elevationDeg": 33.615,
+          "expected": 62706993558.33718
+        },
+        {
+          "elevationDeg": 34.51,
+          "expected": 63324097717.6818
+        },
+        {
+          "elevationDeg": 35.405,
+          "expected": 63924397994.68063
+        },
+        {
+          "elevationDeg": 36.3,
+          "expected": 64510239122.92449
+        },
+        {
+          "elevationDeg": 37.195,
+          "expected": 65084082740.624664
+        },
+        {
+          "elevationDeg": 38.09,
+          "expected": 65648501979.52259
+        },
+        {
+          "elevationDeg": 38.985,
+          "expected": 66206177005.39712
+        },
+        {
+          "elevationDeg": 39.88,
+          "expected": 66759891600.25744
+        },
+        {
+          "elevationDeg": 40.775,
+          "expected": 67312530871.72623
+        },
+        {
+          "elevationDeg": 41.67,
+          "expected": 67867080171.72994
+        },
+        {
+          "elevationDeg": 42.565,
+          "expected": 68426625304.597206
+        },
+        {
+          "elevationDeg": 43.46,
+          "expected": 68994354104.17062
+        },
+        {
+          "elevationDeg": 44.355000000000004,
+          "expected": 69573559460.68034
+        },
+        {
+          "elevationDeg": 45.25,
+          "expected": 70167703903.57521
+        },
+        {
+          "elevationDeg": 46.145,
+          "expected": 70779568620.86717
+        },
+        {
+          "elevationDeg": 47.04,
+          "expected": 71407011365.87057
+        },
+        {
+          "elevationDeg": 47.935,
+          "expected": 72046811661.08902
+        },
+        {
+          "elevationDeg": 48.83,
+          "expected": 72695630202.6444
+        },
+        {
+          "elevationDeg": 49.725,
+          "expected": 73350003704.78136
+        },
+        {
+          "elevationDeg": 50.620000000000005,
+          "expected": 74006341348.8534
+        },
+        {
+          "elevationDeg": 51.515,
+          "expected": 74660922943.58058
+        },
+        {
+          "elevationDeg": 52.410000000000004,
+          "expected": 75309898907.0397
+        },
+        {
+          "elevationDeg": 53.305,
+          "expected": 75949292182.11017
+        },
+        {
+          "elevationDeg": 54.2,
+          "expected": 76575002195.68782
+        },
+        {
+          "elevationDeg": 55.095,
+          "expected": 77182810967.70775
+        },
+        {
+          "elevationDeg": 55.99,
+          "expected": 77768391468.66904
+        },
+        {
+          "elevationDeg": 56.885,
+          "expected": 78327318313.71338
+        },
+        {
+          "elevationDeg": 57.78,
+          "expected": 78855080867.25229
+        },
+        {
+          "elevationDeg": 58.675000000000004,
+          "expected": 79347098814.47841
+        },
+        {
+          "elevationDeg": 59.57,
+          "expected": 79798740234.80353
+        },
+        {
+          "elevationDeg": 60.465,
+          "expected": 80211973300.75499
+        },
+        {
+          "elevationDeg": 61.36,
+          "expected": 80620521330.48233
+        },
+        {
+          "elevationDeg": 62.255,
+          "expected": 81029289486.06758
+        },
+        {
+          "elevationDeg": 63.15,
+          "expected": 81437657153.07965
+        },
+        {
+          "elevationDeg": 64.045,
+          "expected": 81844991524.1145
+        },
+        {
+          "elevationDeg": 64.94,
+          "expected": 82250647655.86072
+        },
+        {
+          "elevationDeg": 65.83500000000001,
+          "expected": 82653968576.17218
+        },
+        {
+          "elevationDeg": 66.73,
+          "expected": 83054285442.69829
+        },
+        {
+          "elevationDeg": 67.625,
+          "expected": 83450917754.61531
+        },
+        {
+          "elevationDeg": 68.52,
+          "expected": 83843173618.96089
+        },
+        {
+          "elevationDeg": 69.415,
+          "expected": 84230350073.00475
+        },
+        {
+          "elevationDeg": 70.31,
+          "expected": 84611733464.04305
+        },
+        {
+          "elevationDeg": 71.205,
+          "expected": 84986599887.91267
+        },
+        {
+          "elevationDeg": 72.1,
+          "expected": 85354215687.43521
+        },
+        {
+          "elevationDeg": 72.995,
+          "expected": 85713838011.88889
+        },
+        {
+          "elevationDeg": 73.89,
+          "expected": 86064715438.50148
+        },
+        {
+          "elevationDeg": 74.785,
+          "expected": 86406088656.8085
+        },
+        {
+          "elevationDeg": 75.68,
+          "expected": 86737191216.57893
+        },
+        {
+          "elevationDeg": 76.575,
+          "expected": 87057250339.86082
+        },
+        {
+          "elevationDeg": 77.47,
+          "expected": 87365487797.49733
+        },
+        {
+          "elevationDeg": 78.365,
+          "expected": 87661120850.30267
+        },
+        {
+          "elevationDeg": 79.26,
+          "expected": 87943363254.85483
+        },
+        {
+          "elevationDeg": 80.155,
+          "expected": 88211426333.6693
+        },
+        {
+          "elevationDeg": 81.05,
+          "expected": 88464520109.2577
+        },
+        {
+          "elevationDeg": 81.94500000000001,
+          "expected": 88701854501.35556
+        },
+        {
+          "elevationDeg": 82.84,
+          "expected": 88922640586.32126
+        },
+        {
+          "elevationDeg": 83.735,
+          "expected": 89126091917.45357
+        },
+        {
+          "elevationDeg": 84.63,
+          "expected": 89311425904.67786
+        },
+        {
+          "elevationDeg": 85.525,
+          "expected": 89477865251.76941
+        },
+        {
+          "elevationDeg": 86.42,
+          "expected": 89624639448.968
+        },
+        {
+          "elevationDeg": 87.315,
+          "expected": 89750986318.52599
+        },
+        {
+          "elevationDeg": 88.21000000000001,
+          "expected": 89856153610.42354
+        },
+        {
+          "elevationDeg": 89.105,
+          "expected": 89939400645.13142
+        },
+        {
+          "elevationDeg": 90.0,
+          "expected": 90000000000.00023
+        }
+      ]
+    }
+  ]
+}

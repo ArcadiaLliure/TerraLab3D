@@ -1,0 +1,13 @@
+[
+  {
+    "fixture": "S_B4_standard_point_5km",
+    "azimuthDeg": 90,
+    "elevationDeg": 0.5,
+    "runtimeSeconds": 181.7258329000033,
+    "referenceSeconds": [
+      4.432811800012132,
+      5.397271699999692,
+      5.6566890999965835
+    ]
+  }
+]

@@ -1,0 +1,7 @@
+{
+  "atUtc": "2026-10-19T16:11:11.325196+00:00",
+  "exitCode": 1,
+  "completedCases": 3,
+  "terrainCase": "No iniciat: azimut0 elevació0,5 fora de cobertura del DEM±20km. Error propagat, sense transparència.",
+  "candidateRunnerSha256": "2d41bb71a90576b2b43d42c1b467f198fa67048e701d7697acff2ef790287595"
+}

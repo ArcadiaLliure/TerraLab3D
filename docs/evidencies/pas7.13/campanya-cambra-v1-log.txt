@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "F:\Python\TerraLab3D\tools\validate_angular_step7_13.py", line 259, in <module>
+    run()
+    ~~~^^
+  File "F:\Python\TerraLab3D\tools\validate_angular_step7_13.py", line 110, in run
+    run_result = measured(req)
+  File "F:\Python\TerraLab3D\tools\validate_transport_gate_step7_12.py", line 133, in measured
+    result = PropagationKernel().evaluate(req, profiler=profiler)
+  File "F:\Python\TerraLab3D\backend\src\terralab3d\domain\light_pollution\propagation_kernel.py", line 389, in evaluate
+    length = visibility.clip_observer(ray)
+  File "F:\Python\TerraLab3D\backend\src\terralab3d\domain\light_pollution\terrain_visibility.py", line 284, in clip_observer
+    self.coverage(ray.origin_ecef_m, ray.point(first))
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Python\TerraLab3D\backend\src\terralab3d\domain\light_pollution\terrain_visibility.py", line 193, in coverage
+    raise TerrainCoverageError(
+        "Trajecte potencialment terrestre fora de cobertura DEM"
+    )
+terralab3d.domain.light_pollution.terrain_visibility.TerrainCoverageError: Trajecte potencialment terrestre fora de cobertura DEM

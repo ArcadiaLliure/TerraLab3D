@@ -1,0 +1,24 @@
+{
+  "pyrightSummary": {
+    "filesAnalyzed": 318,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 16.394
+  },
+  "pyrightExactDiagnosticMultisetVs7_12": true,
+  "columnCasesExact": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "b0Regression": {
+    "expectedSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "actualSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "identical": true,
+    "scope": "900_LOS_values_counters_and_serialization;not_new_timing_campaign"
+  },
+  "exploratoryPyright": "La passada backend/ inclou tests:229errors/6avisos, domini diferent; no comparable amb baseline src/. El control src/ manté exactament67/3.",
+  "notes": "Sense nova campanya de timing B0–B4; mesures històriques protegides per hashes, kernel anterior intacte."
+}

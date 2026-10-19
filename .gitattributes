@@ -9,3 +9,10 @@
 /backend/src/terralab3d/infrastructure/adapters/atmosphere/standard_optics.py text eol=lf
 /backend/tests/test_transport_gate_step7_12.py text eol=lf
 /tools/*step7_12.py text eol=lf
+/docs/evidencies/pas7.13/** -text
+/backend/src/terralab3d/domain/light_pollution/dome_profile.py text eol=lf
+/backend/src/terralab3d/application/dome_sampling.py text eol=lf
+/backend/tests/test_dome_profile_step7_13.py text eol=lf
+/tools/*step7_13.py text eol=lf
+/frontend/src/domain/skyglow/domeProfile.ts text eol=lf
+/frontend/src/tests/dome_profile_step7_13.test.ts text eol=lf

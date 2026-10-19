@@ -1,0 +1,84 @@
+[
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 0.5,
+    "runtime": {
+      "value": 3.1648728711718637e-09,
+      "wallSeconds": 193.86848699999973,
+      "cpuSeconds": 190.234375,
+      "inputSignature": "0a84085cf15163d9293595ae9ccc4348e2383ae35178e90e86f8cf8e416b9391",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 84,
+        "quadrature_node_count": 1590,
+        "gk_subdivision_count": 11,
+        "leaf_interval_count": 95
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 7765.7592,
+          "occlusion": 0.0,
+          "atmospheric_sampling": 136468.0787,
+          "transmissions": 8531.7361,
+          "quadrature": 41033.295,
+          "spectral_integration": 50.1228
+        },
+        "calls": {
+          "geometry": 1877733,
+          "occlusion": 0,
+          "atmospheric_sampling": 1872961,
+          "transmissions": 126348,
+          "quadrature": 124759,
+          "spectral_integration": 1591
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 3.164872871168957e-09,
+        "los_error_estimate": 1.0569350673760446e-19,
+        "evaluations": 2583,
+        "path_order": 4,
+        "area_order": 2,
+        "revision": "sg-ref-variable-spectral-GL-v1"
+      },
+      {
+        "value": 3.1648728711708128e-09,
+        "los_error_estimate": 8.526075000209256e-22,
+        "evaluations": 2625,
+        "path_order": 8,
+        "area_order": 4,
+        "revision": "sg-ref-variable-spectral-GL-v1"
+      },
+      {
+        "value": 3.1648728711708115e-09,
+        "los_error_estimate": 8.525550749752442e-22,
+        "evaluations": 2625,
+        "path_order": 16,
+        "area_order": 8,
+        "revision": "sg-ref-variable-spectral-GL-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 3.1648728711718637e-09,
+      "reference": 3.1648728711708115e-09,
+      "reference_uncertainty": 1.0928215956738387e-19,
+      "absolute_error": 1.0521737391674512e-21,
+      "guarded_relative_error": 3.486216912900337e-11,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    },
+    "conditionalTail": {
+      "upper_radiance": 1.9464270316281251e-19,
+      "molecular_weighted_column": 51455625554678.51,
+      "aerosol_weighted_length_m": 6.682277189586696e-36,
+      "geometry_envelope": 62.800996854856905,
+      "radial_jacobian": 6.568356750770689,
+      "pressure_at_top_pa": 2.3881429078441494,
+      "top_m": 75000.0,
+      "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+    },
+    "tailMagnitudeUpper": 6.677389109196249e-11
+  }
+]

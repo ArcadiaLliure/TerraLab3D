@@ -1,0 +1,4 @@
+
+> @terralab3d/frontend@0.1.0 build
+> esbuild src/main.ts --bundle --format=esm --outfile=dist/bundle.js --sourcemap
+

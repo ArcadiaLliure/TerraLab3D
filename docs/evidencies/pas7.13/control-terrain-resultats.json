@@ -1,0 +1,3623 @@
+[
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 0.5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.0683790999755729,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "7d1886af117004b3457130df3683347faeb7fd594f4dc53f33cc86f14cfb6c6e",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.0307,
+          "occlusion": 2.9497,
+          "atmospheric_sampling": 2.5527,
+          "transmissions": 0.3972,
+          "quadrature": 1.5368,
+          "spectral_integration": 36.9674
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 2,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.0643199999758508,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "bd018d688dc3f23b0e9674778dd1c8d4f7ebd1b24c781e51d8988c929513e4f3",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.9307,
+          "occlusion": 2.7537,
+          "atmospheric_sampling": 2.6057,
+          "transmissions": 0.3886,
+          "quadrature": 1.6043,
+          "spectral_integration": 35.3355
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06378560001030564,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "65530af703716fef358a7de9b01fe04276206afe8374a85e01a72507d8b36e45",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.2953,
+          "occlusion": 2.6975,
+          "atmospheric_sampling": 2.7256,
+          "transmissions": 0.3877,
+          "quadrature": 1.634,
+          "spectral_integration": 35.3289
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 10,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06274789999588393,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "8975cc5f99346e22eaffedccb778cce89ffda26c6e33677a814ebfa8f51cf5f4",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.998,
+          "occlusion": 2.6918,
+          "atmospheric_sampling": 2.6759,
+          "transmissions": 0.3953,
+          "quadrature": 1.5953,
+          "spectral_integration": 34.5606
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 20,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06594840000616387,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "7fcedfb05ac647f219e8d6595f38793987fe46696f737cf0207ea76b7d54835c",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 5,
+        "quadrature_node_count": 75,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 5
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.6395,
+          "occlusion": 2.9385,
+          "atmospheric_sampling": 3.2573,
+          "transmissions": 0.4399,
+          "quadrature": 1.9665,
+          "spectral_integration": 34.5149
+        },
+        "calls": {
+          "geometry": 153,
+          "occlusion": 77,
+          "atmospheric_sampling": 77,
+          "transmissions": 76,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 22,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06607639999128878,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "67f557db89f90dc2b280602454ff298f13ca32e14b5c89e11933d7aa0330288a",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 5,
+        "quadrature_node_count": 75,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 5
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.6603,
+          "occlusion": 2.7605,
+          "atmospheric_sampling": 3.2637,
+          "transmissions": 0.4929,
+          "quadrature": 1.9415,
+          "spectral_integration": 36.2373
+        },
+        "calls": {
+          "geometry": 153,
+          "occlusion": 77,
+          "atmospheric_sampling": 77,
+          "transmissions": 76,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 23,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06805400000303052,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "ae6acef92e147c684c6d4431f2b13ffa35142d1ad0d10b011328146ba65fdb7e",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 6,
+        "quadrature_node_count": 90,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 4.3834,
+          "occlusion": 2.9624,
+          "atmospheric_sampling": 3.7384,
+          "transmissions": 0.519,
+          "quadrature": 2.239,
+          "spectral_integration": 36.1982
+        },
+        "calls": {
+          "geometry": 183,
+          "occlusion": 92,
+          "atmospheric_sampling": 92,
+          "transmissions": 91,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 23.5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.07398889999603853,
+      "cpuSeconds": 0.078125,
+      "inputSignature": "10b67d9b9c823dfb012a077638e417ed83126030868c9f4d09fb9fb6d0540c3c",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 5,
+        "quadrature_node_count": 75,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 5
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.7786,
+          "occlusion": 2.8415,
+          "atmospheric_sampling": 3.369,
+          "transmissions": 0.6492,
+          "quadrature": 2.1628,
+          "spectral_integration": 40.8698
+        },
+        "calls": {
+          "geometry": 153,
+          "occlusion": 77,
+          "atmospheric_sampling": 77,
+          "transmissions": 76,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 23.7,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.07063399997423403,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "d7105f02affa8a84c35a478e9d7f5b233a96620cb5a25d3a8b5169ca6b851b26",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 6,
+        "quadrature_node_count": 90,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 4.9881,
+          "occlusion": 3.757,
+          "atmospheric_sampling": 4.3304,
+          "transmissions": 0.5753,
+          "quadrature": 2.5741,
+          "spectral_integration": 36.7071
+        },
+        "calls": {
+          "geometry": 183,
+          "occlusion": 92,
+          "atmospheric_sampling": 92,
+          "transmissions": 91,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 23.8,
+    "runtime": {
+      "value": 6.997152113155452e-11,
+      "wallSeconds": 0.1903531000134535,
+      "cpuSeconds": 0.1875,
+      "inputSignature": "a7139566448d3482edcb638862dca049aad7634d0b8442ab7aef976b13db001d",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 53.5436,
+          "occlusion": 11.2175,
+          "atmospheric_sampling": 23.9477,
+          "transmissions": 18.8481,
+          "quadrature": 24.2792,
+          "spectral_integration": 40.5587
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.997152113143842e-11,
+        "los_error_estimate": 7.950268046394924e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.997152113148345e-11,
+        "los_error_estimate": 7.950380130366941e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.997152113148345e-11,
+        "los_error_estimate": 7.951216668053121e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.997152113155452e-11,
+      "reference": 6.997152113148345e-11,
+      "reference_uncertainty": 6.970869005322346e-23,
+      "absolute_error": 7.107290919420467e-23,
+      "guarded_relative_error": 2.0119842611808526e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 24,
+    "runtime": {
+      "value": 6.919791765971746e-11,
+      "wallSeconds": 0.19142349998583086,
+      "cpuSeconds": 0.1875,
+      "inputSignature": "186bf0839e703e1674ad1e277d31ab69d3ecddf2777a4086ab1ae59cbb207497",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 54.9541,
+          "occlusion": 12.4476,
+          "atmospheric_sampling": 24.2764,
+          "transmissions": 19.0552,
+          "quadrature": 24.9353,
+          "spectral_integration": 36.7162
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.919791765960399e-11,
+        "los_error_estimate": 6.20602936184467e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.919791765964848e-11,
+        "los_error_estimate": 6.209251153319901e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.919791765964848e-11,
+        "los_error_estimate": 6.209227483929774e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.919791765971746e-11,
+      "reference": 6.919791765964848e-11,
+      "reference_uncertainty": 6.39384959305149e-23,
+      "absolute_error": 6.897910826867982e-23,
+      "guarded_relative_error": 1.9208324281223744e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 24.5,
+    "runtime": {
+      "value": 6.732335487518915e-11,
+      "wallSeconds": 0.19823089998681098,
+      "cpuSeconds": 0.1875,
+      "inputSignature": "a76518e0c3a7e02fdf65f2a8a8f904dda995ca85c433d3db4b3c85cbbdaff7d2",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 56.1437,
+          "occlusion": 13.8654,
+          "atmospheric_sampling": 25.0446,
+          "transmissions": 19.6785,
+          "quadrature": 25.7417,
+          "spectral_integration": 37.4009
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.732335487508396e-11,
+        "los_error_estimate": 3.8522578429440694e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.732335487512717e-11,
+        "los_error_estimate": 3.854504137210266e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.732335487512717e-11,
+        "los_error_estimate": 3.854428948905237e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.732335487518915e-11,
+      "reference": 6.732335487512717e-11,
+      "reference_uncertainty": 5.559563385043716e-23,
+      "absolute_error": 6.197392245612137e-23,
+      "guarded_relative_error": 1.7463413183230265e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 25,
+    "runtime": {
+      "value": 6.552965596944067e-11,
+      "wallSeconds": 0.1977541999949608,
+      "cpuSeconds": 0.203125,
+      "inputSignature": "4befefaefa6130077a9017efa53021da2914982858667c3aac40239c572520bb",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 56.4011,
+          "occlusion": 12.6597,
+          "atmospheric_sampling": 24.7298,
+          "transmissions": 19.2171,
+          "quadrature": 25.9878,
+          "spectral_integration": 39.5821
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.552965596933396e-11,
+        "los_error_estimate": 2.8862560026376197e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.552965596937595e-11,
+        "los_error_estimate": 2.885946548190405e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.552965596937595e-11,
+        "los_error_estimate": 2.885946548190405e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.552965596944067e-11,
+      "reference": 6.552965596937595e-11,
+      "reference_uncertainty": 5.147767049570875e-23,
+      "absolute_error": 6.471395823520327e-23,
+      "guarded_relative_error": 1.7731151951295457e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 30,
+    "runtime": {
+      "value": 5.1149406534406754e-11,
+      "wallSeconds": 0.1985329000162892,
+      "cpuSeconds": 0.1875,
+      "inputSignature": "e82eed46c3689380fba37db53251fa3c20109ce396e4694823f3a67479bbd933",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 465,
+        "gk_subdivision_count": 4,
+        "leaf_interval_count": 27
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 55.0232,
+          "occlusion": 13.311,
+          "atmospheric_sampling": 24.4532,
+          "transmissions": 20.1197,
+          "quadrature": 26.0066,
+          "spectral_integration": 40.3757
+        },
+        "calls": {
+          "geometry": 1773,
+          "occlusion": 467,
+          "atmospheric_sampling": 467,
+          "transmissions": 1306,
+          "quadrature": 1,
+          "spectral_integration": 421
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 5.114940653432747e-11,
+        "los_error_estimate": 3.295883071060868e-24,
+        "evaluations": 651,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 5.114940653435957e-11,
+        "los_error_estimate": 3.2965950774433748e-24,
+        "evaluations": 651,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 5.114940653435957e-11,
+        "los_error_estimate": 3.2966322524172368e-24,
+        "evaluations": 651,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 5.1149406534406754e-11,
+      "reference": 5.114940653435957e-11,
+      "reference_uncertainty": 4.240764823191238e-23,
+      "absolute_error": 4.718160665820043e-23,
+      "guarded_relative_error": 1.751520906306729e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 45,
+    "runtime": {
+      "value": 2.8924384815450454e-11,
+      "wallSeconds": 0.17675439998856746,
+      "cpuSeconds": 0.171875,
+      "inputSignature": "f39577e2bf64b3c1b085ba4efc2f8f2e3d0ec48cb25c611a95772e795da4f84f",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 22,
+        "quadrature_node_count": 390,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 24
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 44.8326,
+          "occlusion": 13.5353,
+          "atmospheric_sampling": 19.5923,
+          "transmissions": 16.0357,
+          "quadrature": 21.0084,
+          "spectral_integration": 40.5357
+        },
+        "calls": {
+          "geometry": 1503,
+          "occlusion": 392,
+          "atmospheric_sampling": 392,
+          "transmissions": 1111,
+          "quadrature": 1,
+          "spectral_integration": 361
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 2.892438481540766e-11,
+        "los_error_estimate": 1.2209068471308314e-22,
+        "evaluations": 546,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 2.892438481542463e-11,
+        "los_error_estimate": 1.220907462095672e-22,
+        "evaluations": 546,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 2.892438481542457e-11,
+        "los_error_estimate": 7.656674472091409e-25,
+        "evaluations": 588,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 2.8924384815450454e-11,
+      "reference": 2.892438481542457e-11,
+      "reference_uncertainty": 2.6218541308849386e-22,
+      "absolute_error": 2.5884937059227753e-23,
+      "guarded_relative_error": 9.95942876524384e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 60,
+    "runtime": {
+      "value": 1.9277682694988068e-11,
+      "wallSeconds": 0.21669260002090596,
+      "cpuSeconds": 0.21875,
+      "inputSignature": "b46eea3712401b7d8a2c01ba21ada53e8075a1cd2e0bca49dfdd22b65ed36093",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 22,
+        "quadrature_node_count": 330,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 22
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 49.3373,
+          "occlusion": 16.8288,
+          "atmospheric_sampling": 21.4478,
+          "transmissions": 17.2679,
+          "quadrature": 22.816,
+          "spectral_integration": 60.6826
+        },
+        "calls": {
+          "geometry": 1263,
+          "occlusion": 332,
+          "atmospheric_sampling": 332,
+          "transmissions": 931,
+          "quadrature": 1,
+          "spectral_integration": 301
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 1.9277682694961685e-11,
+        "los_error_estimate": 4.583114878707054e-25,
+        "evaluations": 504,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.927768269497226e-11,
+        "los_error_estimate": 4.5831192246993785e-25,
+        "evaluations": 504,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.927768269497226e-11,
+        "los_error_estimate": 4.583119224699378e-25,
+        "evaluations": 504,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 1.9277682694988068e-11,
+      "reference": 1.927768269497226e-11,
+      "reference_uncertainty": 1.2157363864410009e-23,
+      "absolute_error": 1.5806904518005513e-23,
+      "guarded_relative_error": 1.4506032091558792e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 89,
+    "elevationDeg": 90,
+    "runtime": {
+      "value": 1.1083762397086684e-11,
+      "wallSeconds": 0.09748400002717972,
+      "cpuSeconds": 0.109375,
+      "inputSignature": "422311401958106149db133ba178a5828f73b6a1e39ef384da47e421b8a03b0d",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 8,
+        "quadrature_node_count": 150,
+        "gk_subdivision_count": 1,
+        "leaf_interval_count": 9
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 15.1518,
+          "occlusion": 5.3397,
+          "atmospheric_sampling": 6.9086,
+          "transmissions": 5.1171,
+          "quadrature": 6.7807,
+          "spectral_integration": 36.8913
+        },
+        "calls": {
+          "geometry": 543,
+          "occlusion": 152,
+          "atmospheric_sampling": 152,
+          "transmissions": 391,
+          "quadrature": 1,
+          "spectral_integration": 121
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 1.1083762397073234e-11,
+        "los_error_estimate": 8.268220686035157e-23,
+        "evaluations": 210,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.1083762397078544e-11,
+        "los_error_estimate": 8.268224817231931e-23,
+        "evaluations": 210,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.1083762397078517e-11,
+        "los_error_estimate": 2.9662365578813704e-25,
+        "evaluations": 252,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 1.1083762397086684e-11,
+      "reference": 1.1083762397078517e-11,
+      "reference_uncertainty": 1.711023761554094e-22,
+      "absolute_error": 8.166792961827256e-24,
+      "guarded_relative_error": 1.617403573758391e-11,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 0.5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.062082900025416166,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "5be369d8ac8f059c7421b12cadf49caf127104f0c65936d08899c6351a47ac5b",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.3406,
+          "occlusion": 2.4296,
+          "atmospheric_sampling": 2.0687,
+          "transmissions": 0.2967,
+          "quadrature": 1.2323,
+          "spectral_integration": 34.8868
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 2,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.05890139998518862,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "d9b862d4b3837c7991ea1e87b3a1a60575b38d15ed6e031d9c3ef5bdc8f92a07",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 2,
+        "quadrature_node_count": 30,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 2
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1.5547,
+          "occlusion": 2.3217,
+          "atmospheric_sampling": 1.3614,
+          "transmissions": 0.2344,
+          "quadrature": 0.8258,
+          "spectral_integration": 33.9944
+        },
+        "calls": {
+          "geometry": 63,
+          "occlusion": 32,
+          "atmospheric_sampling": 32,
+          "transmissions": 31,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06215929999598302,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "e68a7d553c7e46182c217e6a0a5ea362afa723cfc2068d0171fe2d3aaa5b838d",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 2,
+        "quadrature_node_count": 30,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 2
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1.4975,
+          "occlusion": 2.0969,
+          "atmospheric_sampling": 1.2511,
+          "transmissions": 0.2088,
+          "quadrature": 0.7713,
+          "spectral_integration": 38.1444
+        },
+        "calls": {
+          "geometry": 63,
+          "occlusion": 32,
+          "atmospheric_sampling": 32,
+          "transmissions": 31,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 10,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06093579999287613,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "feac9622c4a8890474676fbf9115f03827f2270dbc05fb7229d3a192db32bf51",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 2,
+        "quadrature_node_count": 30,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 2
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 1.5317,
+          "occlusion": 2.3079,
+          "atmospheric_sampling": 1.3175,
+          "transmissions": 0.2183,
+          "quadrature": 0.7789,
+          "spectral_integration": 35.3447
+        },
+        "calls": {
+          "geometry": 63,
+          "occlusion": 32,
+          "atmospheric_sampling": 32,
+          "transmissions": 31,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 84,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 20,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06302480000886135,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "bdae39d0bfac4b1b03d9f370666c487f3f292a9df1b59af615be7fb58ca167f3",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.7948,
+          "occlusion": 2.5388,
+          "atmospheric_sampling": 2.3871,
+          "transmissions": 0.4063,
+          "quadrature": 1.5417,
+          "spectral_integration": 34.006
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 22,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.0633901999972295,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "b141fd3e540c647d4c85b6e17a00638f8f385baa32b87f61d1900461b580eb0b",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.405,
+          "occlusion": 2.2624,
+          "atmospheric_sampling": 2.0968,
+          "transmissions": 0.3143,
+          "quadrature": 1.277,
+          "spectral_integration": 34.5734
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 23,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06693579998682253,
+      "cpuSeconds": 0.078125,
+      "inputSignature": "83ac8600510f30f8f075ff45b8bc71360e6fe48a7a9e397bd77b29a32150996c",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.6028,
+          "occlusion": 3.3674,
+          "atmospheric_sampling": 3.1723,
+          "transmissions": 0.4835,
+          "quadrature": 1.9269,
+          "spectral_integration": 35.2814
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 23.5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06012830001418479,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "02c2843d2b76c5e29eb73e5ad3c84e2d6c56bfc7b2899a0426f3be53849a3e6f",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.2391,
+          "occlusion": 2.1885,
+          "atmospheric_sampling": 1.9406,
+          "transmissions": 0.3139,
+          "quadrature": 1.1794,
+          "spectral_integration": 34.1999
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 23.7,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.0671141000057105,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "a2268751f1a7d8893ca9834b99ed076886b14051717f31c347aedb371beb6ee2",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 5,
+        "quadrature_node_count": 75,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 5
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.7956,
+          "occlusion": 2.8376,
+          "atmospheric_sampling": 3.26,
+          "transmissions": 0.458,
+          "quadrature": 2.0203,
+          "spectral_integration": 36.3727
+        },
+        "calls": {
+          "geometry": 153,
+          "occlusion": 77,
+          "atmospheric_sampling": 77,
+          "transmissions": 76,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 23.8,
+    "runtime": {
+      "value": 7.006014193663661e-11,
+      "wallSeconds": 0.16040829999838024,
+      "cpuSeconds": 0.171875,
+      "inputSignature": "da16af4b554cf5c5196412685a2a744a1a72ef47eaafb7b9f522d294b6f50825",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 16,
+        "quadrature_node_count": 390,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 21
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 42.895,
+          "occlusion": 7.2201,
+          "atmospheric_sampling": 19.3886,
+          "transmissions": 15.5389,
+          "quadrature": 19.4976,
+          "spectral_integration": 37.2401
+        },
+        "calls": {
+          "geometry": 1503,
+          "occlusion": 392,
+          "atmospheric_sampling": 392,
+          "transmissions": 1111,
+          "quadrature": 1,
+          "spectral_integration": 361
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 7.006014193652578e-11,
+        "los_error_estimate": 8.66717916951989e-24,
+        "evaluations": 546,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 7.006014193657087e-11,
+        "los_error_estimate": 8.661624299121493e-24,
+        "evaluations": 546,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 7.006014193657089e-11,
+        "los_error_estimate": 8.66168424980584e-24,
+        "evaluations": 546,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 7.006014193663661e-11,
+      "reference": 7.006014193657089e-11,
+      "reference_uncertainty": 7.192486110928254e-23,
+      "absolute_error": 6.572208460675228e-23,
+      "guarded_relative_error": 1.964696929113472e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 24,
+    "runtime": {
+      "value": 6.928410042412878e-11,
+      "wallSeconds": 0.16750569999567233,
+      "cpuSeconds": 0.171875,
+      "inputSignature": "6d2bebb69bc5b361eba35ff2d8939b98591d5ca32b3358a32af356bbb6c7255b",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 18,
+        "quadrature_node_count": 420,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 23
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 45.4756,
+          "occlusion": 8.2232,
+          "atmospheric_sampling": 20.6744,
+          "transmissions": 15.7652,
+          "quadrature": 21.1967,
+          "spectral_integration": 36.8281
+        },
+        "calls": {
+          "geometry": 1563,
+          "occlusion": 422,
+          "atmospheric_sampling": 422,
+          "transmissions": 1141,
+          "quadrature": 1,
+          "spectral_integration": 361
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.928410042401531e-11,
+        "los_error_estimate": 6.71632866377518e-24,
+        "evaluations": 567,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.928410042405987e-11,
+        "los_error_estimate": 6.720520118005106e-24,
+        "evaluations": 567,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.928410042405987e-11,
+        "los_error_estimate": 6.720520118005106e-24,
+        "evaluations": 567,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.928410042412878e-11,
+      "reference": 6.928410042405987e-11,
+      "reference_uncertainty": 6.554890501363279e-23,
+      "absolute_error": 6.890156008625298e-23,
+      "guarded_relative_error": 1.9405673780415566e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 24.5,
+    "runtime": {
+      "value": 6.740379616259897e-11,
+      "wallSeconds": 0.17595109998364933,
+      "cpuSeconds": 0.171875,
+      "inputSignature": "973988002c762d60b2034cb3c9220a01584a41ff9946fdabe7da122f6d8724f4",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 17,
+        "quadrature_node_count": 405,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 22
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 48.5438,
+          "occlusion": 7.9158,
+          "atmospheric_sampling": 21.0326,
+          "transmissions": 17.3888,
+          "quadrature": 23.1286,
+          "spectral_integration": 39.2879
+        },
+        "calls": {
+          "geometry": 1533,
+          "occlusion": 407,
+          "atmospheric_sampling": 407,
+          "transmissions": 1126,
+          "quadrature": 1,
+          "spectral_integration": 361
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.740379616248953e-11,
+        "los_error_estimate": 4.056152813059732e-24,
+        "evaluations": 546,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.740379616253278e-11,
+        "los_error_estimate": 4.0529289960500254e-24,
+        "evaluations": 546,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.740379616253281e-11,
+        "los_error_estimate": 4.0505056153491865e-24,
+        "evaluations": 546,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.740379616259897e-11,
+      "reference": 6.740379616253281e-11,
+      "reference_uncertainty": 5.627157852826337e-23,
+      "absolute_error": 6.616152430717107e-23,
+      "guarded_relative_error": 1.8164125732652773e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 25,
+    "runtime": {
+      "value": 6.56048211466903e-11,
+      "wallSeconds": 0.18211730002076365,
+      "cpuSeconds": 0.171875,
+      "inputSignature": "163788f37dc6a5eb695067609485307e16240af696d779e35b2a1f70ce420d59",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 18,
+        "quadrature_node_count": 420,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 23
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 50.9302,
+          "occlusion": 8.5649,
+          "atmospheric_sampling": 21.7616,
+          "transmissions": 17.9266,
+          "quadrature": 23.4107,
+          "spectral_integration": 39.3537
+        },
+        "calls": {
+          "geometry": 1623,
+          "occlusion": 422,
+          "atmospheric_sampling": 422,
+          "transmissions": 1201,
+          "quadrature": 1,
+          "spectral_integration": 391
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.56048211465819e-11,
+        "los_error_estimate": 2.9695841868535683e-24,
+        "evaluations": 546,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.560482114662392e-11,
+        "los_error_estimate": 2.9735892668595822e-24,
+        "evaluations": 546,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.560482114662392e-11,
+        "los_error_estimate": 2.9735394667438685e-24,
+        "evaluations": 546,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.56048211466903e-11,
+      "reference": 6.560482114662392e-11,
+      "reference_uncertainty": 5.1775008408360765e-23,
+      "absolute_error": 6.638124415738047e-23,
+      "guarded_relative_error": 1.80103002341348e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 30,
+    "runtime": {
+      "value": 5.118957927036531e-11,
+      "wallSeconds": 0.15251149999676272,
+      "cpuSeconds": 0.15625,
+      "inputSignature": "8b1e8282967978c5ad9a980a83fa42c2ad9f80168cce5eacf17380d624eeec66",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 16,
+        "quadrature_node_count": 360,
+        "gk_subdivision_count": 4,
+        "leaf_interval_count": 20
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 40.2754,
+          "occlusion": 7.4195,
+          "atmospheric_sampling": 17.917,
+          "transmissions": 13.8283,
+          "quadrature": 18.2195,
+          "spectral_integration": 36.2003
+        },
+        "calls": {
+          "geometry": 1353,
+          "occlusion": 362,
+          "atmospheric_sampling": 362,
+          "transmissions": 991,
+          "quadrature": 1,
+          "spectral_integration": 316
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 5.1189579270287316e-11,
+        "los_error_estimate": 2.8486641954347322e-24,
+        "evaluations": 483,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 5.118957927031945e-11,
+        "los_error_estimate": 2.848887407538112e-24,
+        "evaluations": 483,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 5.118957927031945e-11,
+        "los_error_estimate": 2.8491398430277828e-24,
+        "evaluations": 483,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 5.118957927036531e-11,
+      "reference": 5.118957927031945e-11,
+      "reference_uncertainty": 4.109107867113381e-23,
+      "absolute_error": 4.586328755694404e-23,
+      "guarded_relative_error": 1.698673196138094e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 45,
+    "runtime": {
+      "value": 2.8933141018194178e-11,
+      "wallSeconds": 0.14286120000178926,
+      "cpuSeconds": 0.140625,
+      "inputSignature": "2776e0d32179c2fa91b4de6ac781a6c1dbf4cfc5facfe93c1836d14566444620",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 18,
+        "quadrature_node_count": 330,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 20
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 35.596,
+          "occlusion": 8.5947,
+          "atmospheric_sampling": 15.6394,
+          "transmissions": 12.7927,
+          "quadrature": 16.0675,
+          "spectral_integration": 35.9469
+        },
+        "calls": {
+          "geometry": 1263,
+          "occlusion": 332,
+          "atmospheric_sampling": 332,
+          "transmissions": 931,
+          "quadrature": 1,
+          "spectral_integration": 301
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 2.8933141018150984e-11,
+        "los_error_estimate": 1.3334884115529838e-22,
+        "evaluations": 420,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 2.8933141018167973e-11,
+        "los_error_estimate": 1.3334884116955045e-22,
+        "evaluations": 420,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 2.8933141018168028e-11,
+        "los_error_estimate": 7.671187140049932e-25,
+        "evaluations": 462,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 2.8933141018194178e-11,
+      "reference": 2.8933141018168028e-11,
+      "reference_uncertainty": 2.8471604045455934e-22,
+      "absolute_error": 2.6149893349186144e-23,
+      "guarded_relative_error": 1.0744285717494101e-11,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 60,
+    "runtime": {
+      "value": 1.928008305659848e-11,
+      "wallSeconds": 0.11689840001054108,
+      "cpuSeconds": 0.109375,
+      "inputSignature": "4906766915c51cd99cfb7fe468f95c7eb164cbabd20ef6805dc5bac687245cfc",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 15,
+        "quadrature_node_count": 225,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 15
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 24.9235,
+          "occlusion": 7.3538,
+          "atmospheric_sampling": 10.7813,
+          "transmissions": 8.7985,
+          "quadrature": 11.2441,
+          "spectral_integration": 35.8694
+        },
+        "calls": {
+          "geometry": 873,
+          "occlusion": 227,
+          "atmospheric_sampling": 227,
+          "transmissions": 646,
+          "quadrature": 1,
+          "spectral_integration": 211
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 1.9280083056571354e-11,
+        "los_error_estimate": 4.626872515862628e-25,
+        "evaluations": 378,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.928008305658193e-11,
+        "los_error_estimate": 4.626867444381012e-25,
+        "evaluations": 378,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.928008305658193e-11,
+        "los_error_estimate": 4.62687251586505e-25,
+        "evaluations": 378,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 1.928008305659848e-11,
+      "reference": 1.928008305658193e-11,
+      "reference_uncertainty": 1.2170489779210297e-23,
+      "absolute_error": 1.6550074599596124e-23,
+      "guarded_relative_error": 1.489649411494711e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 90,
+    "elevationDeg": 90,
+    "runtime": {
+      "value": 1.1083762397086684e-11,
+      "wallSeconds": 0.09202050001476891,
+      "cpuSeconds": 0.09375,
+      "inputSignature": "52464489d6f1fa7fe6edffa487c6b7f76e76ac0c6023dd0beb8e3d7136eaeb7a",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 8,
+        "quadrature_node_count": 150,
+        "gk_subdivision_count": 1,
+        "leaf_interval_count": 9
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 14.9522,
+          "occlusion": 4.5828,
+          "atmospheric_sampling": 7.1328,
+          "transmissions": 5.1108,
+          "quadrature": 6.7901,
+          "spectral_integration": 34.6029
+        },
+        "calls": {
+          "geometry": 543,
+          "occlusion": 152,
+          "atmospheric_sampling": 152,
+          "transmissions": 391,
+          "quadrature": 1,
+          "spectral_integration": 121
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 1.1083762397073234e-11,
+        "los_error_estimate": 8.268220686035157e-23,
+        "evaluations": 210,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.1083762397078544e-11,
+        "los_error_estimate": 8.268224817231931e-23,
+        "evaluations": 210,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.1083762397078517e-11,
+        "los_error_estimate": 2.9662365578813704e-25,
+        "evaluations": 252,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 1.1083762397086684e-11,
+      "reference": 1.1083762397078517e-11,
+      "reference_uncertainty": 1.711023761554094e-22,
+      "absolute_error": 8.166792961827256e-24,
+      "guarded_relative_error": 1.617403573758391e-11,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 0.5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.0631240000075195,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "9c06068081c81c65aaf6c1c517eea530278ba342d48402fd8257170bb7b89571",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.3683,
+          "occlusion": 2.4155,
+          "atmospheric_sampling": 1.9347,
+          "transmissions": 0.2881,
+          "quadrature": 1.1767,
+          "spectral_integration": 35.1607
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 2,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06620079997810535,
+      "cpuSeconds": 0.078125,
+      "inputSignature": "e88f0cdefcf2446adb5a8123dfa27d4a795582019a99813b9d2ba0219537d935",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.3693,
+          "occlusion": 2.4284,
+          "atmospheric_sampling": 2.0927,
+          "transmissions": 0.3127,
+          "quadrature": 1.2897,
+          "spectral_integration": 39.024
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.061442700010957196,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "a3446d84ea66c6349a06fe9ddab8a5f78df5c9378c3b1c5aa9e643917ddc8273",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.5606,
+          "occlusion": 2.4216,
+          "atmospheric_sampling": 2.3043,
+          "transmissions": 0.3225,
+          "quadrature": 1.3286,
+          "spectral_integration": 34.767
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 10,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.07156350000877865,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "5c7ec35a70b7a628b062810b24220d8f2ad5cecd6bc12f9190ca80501896f17c",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 3,
+        "quadrature_node_count": 45,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 3
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2.6417,
+          "occlusion": 2.7004,
+          "atmospheric_sampling": 2.2354,
+          "transmissions": 0.3226,
+          "quadrature": 1.331,
+          "spectral_integration": 38.2403
+        },
+        "calls": {
+          "geometry": 93,
+          "occlusion": 47,
+          "atmospheric_sampling": 47,
+          "transmissions": 46,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 105,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 20,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06338000000687316,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "a32a75605c0c27d225d04123a9c34754355eaa8a9909a5725a5c73396df44f87",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.0742,
+          "occlusion": 3.0823,
+          "atmospheric_sampling": 2.5611,
+          "transmissions": 0.3679,
+          "quadrature": 1.5811,
+          "spectral_integration": 35.0796
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 22,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06217550000292249,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "70ee7466f2de9533246007c73204545dcbfb3157e4496abc1705a9f4e93db980",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.161,
+          "occlusion": 2.4884,
+          "atmospheric_sampling": 2.6845,
+          "transmissions": 0.3914,
+          "quadrature": 1.6764,
+          "spectral_integration": 34.0797
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 23,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06623230001423508,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "bf5883d52371f02669a7fb2586c9ac2a193eeab155a5949fd6980d66c82cb43e",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 5,
+        "quadrature_node_count": 75,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 5
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.9218,
+          "occlusion": 2.7684,
+          "atmospheric_sampling": 3.4476,
+          "transmissions": 0.5079,
+          "quadrature": 2.0965,
+          "spectral_integration": 35.1055
+        },
+        "calls": {
+          "geometry": 153,
+          "occlusion": 77,
+          "atmospheric_sampling": 77,
+          "transmissions": 76,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 147,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 23.5,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.06463320000329986,
+      "cpuSeconds": 0.0625,
+      "inputSignature": "534fd48f2e3bf03deab820eb4a6b61e91e59aba8f1e6c1b07b740c192ef38dd3",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 4,
+        "quadrature_node_count": 60,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 4
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 3.1227,
+          "occlusion": 3.7266,
+          "atmospheric_sampling": 2.5125,
+          "transmissions": 0.366,
+          "quadrature": 1.4944,
+          "spectral_integration": 35.3838
+        },
+        "calls": {
+          "geometry": 123,
+          "occlusion": 62,
+          "atmospheric_sampling": 62,
+          "transmissions": 61,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 126,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 23.7,
+    "runtime": {
+      "value": 0.0,
+      "wallSeconds": 0.0676505999872461,
+      "cpuSeconds": 0.078125,
+      "inputSignature": "2e9fbb7315f2ac42c359e2bf507ea6957345cf214276ecb019da67ecee8cea6e",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 6,
+        "quadrature_node_count": 90,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 6
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 4.7122,
+          "occlusion": 3.4346,
+          "atmospheric_sampling": 4.1559,
+          "transmissions": 0.5561,
+          "quadrature": 2.4752,
+          "spectral_integration": 34.373
+        },
+        "calls": {
+          "geometry": 183,
+          "occlusion": 92,
+          "atmospheric_sampling": 92,
+          "transmissions": 91,
+          "quadrature": 1,
+          "spectral_integration": 1
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 0.0,
+        "los_error_estimate": 0.0,
+        "evaluations": 168,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 23.8,
+    "runtime": {
+      "value": 6.997152113155193e-11,
+      "wallSeconds": 0.19181389998993836,
+      "cpuSeconds": 0.1875,
+      "inputSignature": "f8fe9321e7ce1bd2eadfc446e9138d16455a02a754726541ad2e9c259a52c699",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 54.4355,
+          "occlusion": 10.7886,
+          "atmospheric_sampling": 24.2669,
+          "transmissions": 20.1876,
+          "quadrature": 25.1879,
+          "spectral_integration": 37.8859
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.997152113144072e-11,
+        "los_error_estimate": 7.95026804639495e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.997152113148575e-11,
+        "los_error_estimate": 7.950380130366966e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.997152113148575e-11,
+        "los_error_estimate": 7.951216668053146e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.997152113155193e-11,
+      "reference": 6.997152113148575e-11,
+      "reference_uncertainty": 6.970869005322353e-23,
+      "absolute_error": 6.618737370131336e-23,
+      "guarded_relative_error": 1.942162490639159e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 24,
+    "runtime": {
+      "value": 6.919791765971916e-11,
+      "wallSeconds": 0.20377980000921525,
+      "cpuSeconds": 0.203125,
+      "inputSignature": "27a355ed083b746ac73f6738123c3d315d681c73de890b066434afdf9c11d1f7",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 59.5548,
+          "occlusion": 11.8191,
+          "atmospheric_sampling": 26.338,
+          "transmissions": 21.3027,
+          "quadrature": 26.5559,
+          "spectral_integration": 38.9851
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.919791765960585e-11,
+        "los_error_estimate": 6.20602936184469e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.919791765965034e-11,
+        "los_error_estimate": 6.209251153319922e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.919791765965034e-11,
+        "los_error_estimate": 6.209227483929795e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.919791765971916e-11,
+      "reference": 6.919791765965034e-11,
+      "reference_uncertainty": 6.393849593051495e-23,
+      "absolute_error": 6.882401190382613e-23,
+      "guarded_relative_error": 1.918591083727879e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 24.5,
+    "runtime": {
+      "value": 6.732335487519148e-11,
+      "wallSeconds": 0.2264050999947358,
+      "cpuSeconds": 0.21875,
+      "inputSignature": "64888d01118d028f947e19f7075dd180cbeb9f122150b6e61e0154ef3887e737",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 66.6628,
+          "occlusion": 11.0737,
+          "atmospheric_sampling": 29.1319,
+          "transmissions": 24.2265,
+          "quadrature": 31.6378,
+          "spectral_integration": 42.6864
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.732335487508482e-11,
+        "los_error_estimate": 3.850238359026713e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.732335487512802e-11,
+        "los_error_estimate": 3.85454178335688e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.732335487512802e-11,
+        "los_error_estimate": 3.854504679552148e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.732335487519148e-11,
+      "reference": 6.732335487512802e-11,
+      "reference_uncertainty": 5.559372774331332e-23,
+      "absolute_error": 6.346026261930259e-23,
+      "guarded_relative_error": 1.768390636257482e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 25,
+    "runtime": {
+      "value": 6.552965596944162e-11,
+      "wallSeconds": 0.2055908000038471,
+      "cpuSeconds": 0.203125,
+      "inputSignature": "c6d5764345db4cfbb4a34dd321eb952b06ddd2324bd550e3f3435c33bd0186f5",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 495,
+        "gk_subdivision_count": 5,
+        "leaf_interval_count": 28
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 60.6324,
+          "occlusion": 10.6297,
+          "atmospheric_sampling": 26.9165,
+          "transmissions": 22.3728,
+          "quadrature": 28.6253,
+          "spectral_integration": 38.4202
+        },
+        "calls": {
+          "geometry": 1893,
+          "occlusion": 497,
+          "atmospheric_sampling": 497,
+          "transmissions": 1396,
+          "quadrature": 1,
+          "spectral_integration": 451
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 6.552965596933594e-11,
+        "los_error_estimate": 2.8862560197994827e-24,
+        "evaluations": 693,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.552965596937792e-11,
+        "los_error_estimate": 2.8859742379894054e-24,
+        "evaluations": 693,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 6.55296559693779e-11,
+        "los_error_estimate": 2.885969406216361e-24,
+        "evaluations": 693,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 6.552965596944162e-11,
+      "reference": 6.55296559693779e-11,
+      "reference_uncertainty": 5.147772106069557e-23,
+      "absolute_error": 6.371875656072541e-23,
+      "guarded_relative_error": 1.7579289241996393e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 30,
+    "runtime": {
+      "value": 5.114940653440724e-11,
+      "wallSeconds": 0.18372999998973683,
+      "cpuSeconds": 0.171875,
+      "inputSignature": "c1315ddbc8f9836c3f01702e6239f758f2bccdb2061c2d344f465f1786b98958",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 23,
+        "quadrature_node_count": 465,
+        "gk_subdivision_count": 4,
+        "leaf_interval_count": 27
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 50.9907,
+          "occlusion": 10.8237,
+          "atmospheric_sampling": 23.1792,
+          "transmissions": 18.3412,
+          "quadrature": 23.0814,
+          "spectral_integration": 38.639
+        },
+        "calls": {
+          "geometry": 1773,
+          "occlusion": 467,
+          "atmospheric_sampling": 467,
+          "transmissions": 1306,
+          "quadrature": 1,
+          "spectral_integration": 421
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 5.114940653432676e-11,
+        "los_error_estimate": 3.295883009912584e-24,
+        "evaluations": 651,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 5.114940653435887e-11,
+        "los_error_estimate": 3.2966287027357486e-24,
+        "evaluations": 651,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 5.114940653435886e-11,
+        "los_error_estimate": 3.2966658779022036e-24,
+        "evaluations": 651,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 5.114940653440724e-11,
+      "reference": 5.114940653435886e-11,
+      "reference_uncertainty": 4.242064011861258e-23,
+      "absolute_error": 4.837714113728098e-23,
+      "guarded_relative_error": 1.7751482843677077e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 45,
+    "runtime": {
+      "value": 2.8924384815450193e-11,
+      "wallSeconds": 0.16247440001461655,
+      "cpuSeconds": 0.15625,
+      "inputSignature": "cb99658cb6a17a30553d11a261e82b293ce7b7215caed2d6d3468aeffe78b5f3",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 22,
+        "quadrature_node_count": 390,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 24
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 41.8732,
+          "occlusion": 10.0042,
+          "atmospheric_sampling": 18.3195,
+          "transmissions": 14.9326,
+          "quadrature": 18.9218,
+          "spectral_integration": 36.5305
+        },
+        "calls": {
+          "geometry": 1503,
+          "occlusion": 392,
+          "atmospheric_sampling": 392,
+          "transmissions": 1111,
+          "quadrature": 1,
+          "spectral_integration": 361
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 2.8924384815408468e-11,
+        "los_error_estimate": 1.2209067564118273e-22,
+        "evaluations": 546,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 2.892438481542544e-11,
+        "los_error_estimate": 1.2209073664462872e-22,
+        "evaluations": 546,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 2.8924384815425377e-11,
+        "los_error_estimate": 7.656578822706741e-25,
+        "evaluations": 588,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 2.8924384815450193e-11,
+      "reference": 2.8924384815425377e-11,
+      "reference_uncertainty": 2.621853848867165e-22,
+      "absolute_error": 2.481541837659083e-23,
+      "guarded_relative_error": 9.922451422726535e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 60,
+    "runtime": {
+      "value": 1.9277682694988e-11,
+      "wallSeconds": 0.15362820000154898,
+      "cpuSeconds": 0.15625,
+      "inputSignature": "026bcea259fa40b87cc70235139fe505a08ae1a779e72016a7c14ff3b59a2fc8",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 22,
+        "quadrature_node_count": 330,
+        "gk_subdivision_count": 0,
+        "leaf_interval_count": 22
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 37.4411,
+          "occlusion": 12.6673,
+          "atmospheric_sampling": 16.4805,
+          "transmissions": 13.4716,
+          "quadrature": 17.1138,
+          "spectral_integration": 37.4425
+        },
+        "calls": {
+          "geometry": 1263,
+          "occlusion": 332,
+          "atmospheric_sampling": 332,
+          "transmissions": 931,
+          "quadrature": 1,
+          "spectral_integration": 301
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 1.927768269496151e-11,
+        "los_error_estimate": 4.583113562888894e-25,
+        "evaluations": 504,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.9277682694972083e-11,
+        "los_error_estimate": 4.583117791747367e-25,
+        "evaluations": 504,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.9277682694972083e-11,
+        "los_error_estimate": 4.583117791747367e-25,
+        "evaluations": 504,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 1.9277682694988e-11,
+      "reference": 1.9277682694972083e-11,
+      "reference_uncertainty": 1.2154132271970004e-23,
+      "absolute_error": 1.5916764443110212e-23,
+      "guarded_relative_error": 1.456134389140119e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  },
+  {
+    "azimuthDeg": 91,
+    "elevationDeg": 90,
+    "runtime": {
+      "value": 1.1083762397086684e-11,
+      "wallSeconds": 0.0929556000046432,
+      "cpuSeconds": 0.09375,
+      "inputSignature": "475e60bc992a0b4e7c91e14deb167a7ac95da8b528ee63fb8079643a2d15417b",
+      "unit": "W m^-2 sr^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 8,
+        "quadrature_node_count": 150,
+        "gk_subdivision_count": 1,
+        "leaf_interval_count": 9
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 14.9054,
+          "occlusion": 4.7521,
+          "atmospheric_sampling": 7.0301,
+          "transmissions": 5.0376,
+          "quadrature": 6.9761,
+          "spectral_integration": 35.8526
+        },
+        "calls": {
+          "geometry": 543,
+          "occlusion": 152,
+          "atmospheric_sampling": 152,
+          "transmissions": 391,
+          "quadrature": 1,
+          "spectral_integration": 121
+        }
+      }
+    },
+    "references": [
+      {
+        "value": 1.1083762397073234e-11,
+        "los_error_estimate": 8.268220686035157e-23,
+        "evaluations": 210,
+        "path_order": 2,
+        "area_order": 2,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.1083762397078544e-11,
+        "los_error_estimate": 8.268224817231931e-23,
+        "evaluations": 210,
+        "path_order": 4,
+        "area_order": 4,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      },
+      {
+        "value": 1.1083762397078517e-11,
+        "los_error_estimate": 2.9662365578813704e-25,
+        "evaluations": 252,
+        "path_order": 8,
+        "area_order": 8,
+        "revision": "sg-ref-homogeneous-spectral-v1"
+      }
+    ],
+    "transportDecision": {
+      "status": "PASS",
+      "candidate": 1.1083762397086684e-11,
+      "reference": 1.1083762397078517e-11,
+      "reference_uncertainty": 1.711023761554094e-22,
+      "absolute_error": 8.166792961827256e-24,
+      "guarded_relative_error": 1.617403573758391e-11,
+      "reason": "error del candidat més incertesa estimada de SG-REF"
+    }
+  }
+]

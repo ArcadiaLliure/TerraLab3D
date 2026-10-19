@@ -1,0 +1,59 @@
+{
+  "status": "FAIL_ANGULAR_AND_INCOMPLETE_STANDARD_DOMAIN",
+  "stepCompleted": false,
+  "criterion": "criteri-angular-preregistrat-v1.json",
+  "angularBudgetMag": 0.01,
+  "cases": [
+    {
+      "name": "S_B4_chamber_point_5km",
+      "points": 300,
+      "maximumGuardedTransportError": 1.2457850391424488e-10,
+      "maximumVerticalCompressionMag": 0.024466754124203682,
+      "maximumAngularCompressionMag": 2.681713238156971,
+      "maximumReconstructionVsSGREFMag": 2.681713238157874,
+      "profileJsonUtf8Bytes": 3368,
+      "reconstruction10000QueriesSeconds": 0.2782039000012446,
+      "status": "FAIL_ANGULAR"
+    },
+    {
+      "name": "C_realista_chamber_point_5km",
+      "points": 300,
+      "maximumGuardedTransportError": 1.2240623195250349e-10,
+      "maximumVerticalCompressionMag": 0.02446982004978312,
+      "maximumAngularCompressionMag": 2.688607255619268,
+      "maximumReconstructionVsSGREFMag": 2.688607255619929,
+      "profileJsonUtf8Bytes": 3278,
+      "reconstruction10000QueriesSeconds": 0.2627397999749519,
+      "status": "FAIL_ANGULAR"
+    },
+    {
+      "name": "C_kelvins3000_chamber_point_5km",
+      "points": 300,
+      "maximumGuardedTransportError": 1.2324297915179987e-10,
+      "maximumVerticalCompressionMag": 0.024468705966775826,
+      "maximumAngularCompressionMag": 2.6861156914966684,
+      "maximumReconstructionVsSGREFMag": 2.6861156914974855,
+      "profileJsonUtf8Bytes": 3280,
+      "reconstruction10000QueriesSeconds": 0.27293889998691157,
+      "status": "FAIL_ANGULAR"
+    }
+  ],
+  "transportDecisionCounts": {
+    "PASS": 952
+  },
+  "terrainExactZeros": 27,
+  "terrainPoints": 51,
+  "standardPoints": 1,
+  "conditionalStandardTailMagnitudeUpper": 6.677389109196249e-11,
+  "historicalEvidenceCount": 202,
+  "historicalDifferences": [],
+  "previousKernelCodeChanged": [],
+  "reasons": [
+    "Les9elevacions fallen el pressupost vertical0,01mag.",
+    "L’azimut lineal cada45° falla fins a2,689mag.",
+    "La malla COESA75km completa no s’ha executat per cost estimat70h.",
+    "El DEM±20km no cobreix totes les LOS0,5°; dades absents no són transparència."
+  ],
+  "nextStep": "7.13_refinement_and_explicit_domain;7.14_not_started",
+  "observationallyValidated": false
+}

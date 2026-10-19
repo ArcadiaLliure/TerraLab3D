@@ -212,6 +212,8 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.13-dome-profile-direct.md](../tasques/pendent/pas7.13-dome-profile-direct.md)
 
+**Resultat de7.13,2026-10-19:** candidat offline implementat, criteri de sortida bloquejat per **FAIL angular**: vertical0,02447mag/camp2,68861mag davant0,01mag preregistrat.952contrasts de transport PASS,474proves backend i mapes científics S/C, amb domini COESA angular incomplet per cost. [Evidències i represa](../evidencies/pas7.13/validacio-camp-angular.md). El pas continua pendent i7.14 no iniciat.
+
 ### 7.14 — Projeccions fotomètriques i sensors SQM/TESS
 
 **Finalitat.** Projectar radiància espectral física a magnituds/instruments sense retroalimentar el kernel.

@@ -647,7 +647,7 @@ python -X utf8 tools/audit_transport_gate_step7_12.py --root .runtime-gate-local
 
 La reproducció completa requereix temps: fonts extenses amb terreny i columnes variables són especialment costoses. `gate` i `ceiling` reprenen les files ja persistides només si el codi coincideix amb la vinculació. El criteri congelat es llegeix del repositori; no s'edita segons el residual obtingut. Els JSON guarden PASS/FAIL per cas i no acrediten peticions arbitràries del kernel. Els resultats crus anteriors conserven els esquemes i marcadors històrics de compatibilitat; el veredicte nou pertany a l'informe de validació.
 
-L'ampliació COESA fins a75km és optativa. La contribució superior s'acota positivament sota les hipòtesis d'aire sec hidrostàtic i aerosol prescrit, sense posar-la a zero ni exigir P(infinit)=0. [Domini i derivació](evidencies/pas7.12/domini-i-cota-exterior.md). Les incerteses de composició real, dispersió múltiple, inferència urbana i datum DEM continuen separades. 7.13 no s'ha iniciat.
+L'ampliació COESA fins a75km és optativa. La contribució superior s'acota positivament sota les hipòtesis d'aire sec hidrostàtic i aerosol prescrit, sense posar-la a zero ni exigir P(infinit)=0. [Domini i derivació](evidencies/pas7.12/domini-i-cota-exterior.md). Les incerteses de composició real, dispersió múltiple, inferència urbana i datum DEM continuen separades. En aquell tancament7.13 encara no s'havia iniciat.
 
 [Resultat verificat de7.12](evidencies/pas7.12/validacio-gate-transport.md):9 fixtures S PASS,42 sostres i444 proves. La cota exterior màxima és0,000472296mag; validesa condicionada al model prescrit, sense homologació observacional.
 
@@ -655,4 +655,16 @@ L'ampliació COESA fins a75km és optativa. La contribució superior s'acota pos
 
 ![Cost actual del transport i l'oclusió](evidencies/pas7.12/cost-transport-i-oclusio.png)
 
-L'auditoria final de la campanya arxivada s'executa amb python tools/audit_transport_gate_step7_12.py --root docs/evidencies/pas7.12 --part final. Una campanya nova necessita també regenerar les regressions i els seus manifests; el CLI final retorna error si falten fitxers o falla el criteri. Les primeres/repeticions de rendiment s'obtenen amb diagnose_transport_gate_step7_12.py --part benchmark; els estimadors complets, amb --part diagnostics, i els controls separats d'oracle, amb --part oracle-controls (sempre amb --output). No s'extrapola una font extensa a900LOS ni es declara SLO. 7.13 no iniciat.
+L'auditoria final de la campanya arxivada s'executa amb python tools/audit_transport_gate_step7_12.py --root docs/evidencies/pas7.12 --part final. Una campanya nova necessita també regenerar les regressions i els seus manifests; el CLI final retorna error si falten fitxers o falla el criteri. Les primeres/repeticions de rendiment s'obtenen amb diagnose_transport_gate_step7_12.py --part benchmark; els estimadors complets, amb --part diagnostics, i els controls separats d'oracle, amb --part oracle-controls (sempre amb --output). No s'extrapola una font extensa a900LOS ni es declara SLO. En aquell tancament7.13 encara no s’havia iniciat.
+
+### Diagnòstic científic angular — Pas7.13 parcial
+
+La[capacitat offline](tasques/pendent/pas7.13-dome-profile-direct.md) genera mapes azimut/elevació amb escala logarítmica i unitats. Les dues modalitats C comparteixen escala relativa i conserven la normalització del model; no comparis aquestes unitats amb watts de S ni amb mesura urbana real. S és una font d'1W definida. Les coordenades i l'atmosfera de la figura són fixtures prescrites, no una reconstrucció observada de Barcelona.
+
+![Mapa diagnòstic S/C realista i kelvins](evidencies/pas7.13/mapa-calor-azimut-elevacio.png)
+
+El rètol FAIL avisa que el mapa és una reconstrucció candidata que no supera0,01mag. Es pot inspeccionar, però no és un perfil homologat ni el cel renderitzat de l'aplicació. Gris significa zero o necessitat de càlcul directe, segons les dades; no és transparència. L'error màxim és2,68861mag i el vertical0,02447mag. Les[figures d'error i oclusió](evidencies/pas7.13/validacio-camp-angular.md) mostren el límit preregistrat i les mostres independents de terreny.
+
+Des de l'arrel, `python tools/plot_dome_step7_13.py` regenera les figures a partir de mesures guardades. `python tools/audit_angular_step7_13.py --strict` retorna1 pel FAIL científic registrat. El mostreig genèric és `terralab3d.application.dome_sampling.sample_dome(request, azimuths_deg)`: el sostre és el de la petició, que ha de ser explícitament75km per al domini COESA d'aquest pas. B0 es rebutja com a radiància; cancel·lació i revisió es conserven.
+
+La LOS COESA a0,5° costa aproximadament182–194s; no generis una malla densa assumint que cada raig costa com el control homogeni. Entre nusos de terreny i transicions de zero el consumidor ha de calcular la LOS directa o mostrar dada no disponible.7.13 continua pendent;7.14 i la integració definitiva amb Three.js no estan iniciats.

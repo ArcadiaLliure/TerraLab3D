@@ -317,7 +317,7 @@
     "above50kmContribution": "measured_to75km;above75_conditionally_bounded_nonzero;not_general_thermosphere",
     "runtimeGate": "verified_registered_S_domain_only_step7.12",
     "evidenceRef": "../evidencies/pas7.10/validacio-espectral-i-gasos.md",
-    "nextStep": "7.13_pending_not_started",
+    "nextStep": "7.13_partial_angular_gate_FAIL",
     "backendTestsPassed": 405,
     "newTests": 21,
     "historicalVerificationStep": "7.10"
@@ -341,5 +341,22 @@
     "observationalValidation": false,
     "scope": "Fixtures registrades, camp/font/malla prescrits; cua condicionada d'aire sec. No prova uniforme de tota l'atmosfera o de tota ciutat.",
     "evidenceRef": "../evidencies/pas7.12/validacio-gate-transport.md"
+  },
+  "angularReconstruction": {
+    "ownerStep": "7.13",
+    "status": "FAIL_ANGULAR_AND_INCOMPLETE_STANDARD_DOMAIN",
+    "functionalState": "partial_offline",
+    "criterionRef": "../evidencies/pas7.13/criteri-angular-preregistrat-v1.json",
+    "evidenceRef": "../evidencies/pas7.13/validacio-camp-angular.md",
+    "angularMaximumInclusiveMag": 0.01,
+    "maximumObservedVerticalMag": 0.02446982004978312,
+    "maximumObservedAngularMag": 2.688607255619268,
+    "transportControlsPassed": 952,
+    "backendTestsPassed": 474,
+    "newTests": 30,
+    "coesaTopM": 75000,
+    "coesaAngularMeshValidated": false,
+    "conditionalCAbsoluteCalibration": false,
+    "nextStep": "7.13_remains_pending;7.14_not_started"
   }
 }
