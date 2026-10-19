@@ -1,0 +1,11 @@
+# El preregistre i les mesures conserven bytes/checksums, també a Windows.
+/.gitattributes text eol=lf
+/docs/evidencies/pas7.12/** -text
+/docs/skyglow/skyglow-v2-profile.json text eol=lf
+# Fitxers nous/modificats vinculats al candidat: Ruff els escriu amb LF.
+/backend/src/terralab3d/domain/light_pollution/atmospheric_tail.py text eol=lf
+/backend/src/terralab3d/domain/light_pollution/radiometric_gate.py text eol=lf
+/backend/src/terralab3d/domain/light_pollution/reference_variable_spectral.py text eol=lf
+/backend/src/terralab3d/infrastructure/adapters/atmosphere/standard_optics.py text eol=lf
+/backend/tests/test_transport_gate_step7_12.py text eol=lf
+/tools/*step7_12.py text eol=lf

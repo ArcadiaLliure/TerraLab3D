@@ -1,0 +1,10 @@
+{
+  "policySha256": "6cfa6601f02dabeb1a3462638e980959c11a12164433738689efb31e92cdb442",
+  "bindingSha256": "d6ddff5512686abcf5001d4e85382619a6824930174d09cc4347efcfdda5311e",
+  "startedAtUtc": "2026-10-19T14:56:58.506219+00:00",
+  "cases": [
+    "S_B1_std_far_horizon_200km",
+    "S_B4_homog_realDEM_snapshot"
+  ],
+  "purpose": "Execució concurrent de fixtures independents, amb el mateix operador/configuració i sense acceleració del kernel; mesures de gate no aïllades"
+}

@@ -6,11 +6,11 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.12 — Gate zenital de transport radiomètric](tasques/pendent/pas7.12-zenith-transport-gate.md), pendent i no executat.** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. [7.7 — Kernel B0](tasques/completat/pas7.7-kernel-geometry-b0.md) verifica ECEF/ENU esfèrics, GK7/15 i revisions. [7.8 — OpticalField](tasques/completat/pas7.8-optical-field-standard.md) ja verifica el camp estàndard P/T/n, travesses i dependències exactes. [7.9 — B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) ja calcula radiància espectral monocromàtica offline en medis prescrits amb dispersió simple. [7.10](tasques/completat/pas7.10-gas-spectral-kernel.md) verifica transport espectral directe S/C i O3 prescrit offline; l'aire terrestre complet, la radiància física connectada al producte i H continuen pendents.
+> **Punt de represa: [Pas 7.13 — Camp angular i DomeProfile directe](tasques/pendent/pas7.13-dome-profile-direct.md), pendent i no iniciat.** [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. [7.7 — Kernel B0](tasques/completat/pas7.7-kernel-geometry-b0.md) verifica ECEF/ENU esfèrics, GK7/15 i revisions. [7.8 — OpticalField](tasques/completat/pas7.8-optical-field-standard.md) ja verifica el camp estàndard P/T/n, travesses i dependències exactes. [7.9 — B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) ja calcula radiància espectral monocromàtica offline en medis prescrits amb dispersió simple. [7.10](tasques/completat/pas7.10-gas-spectral-kernel.md) verifica transport espectral directe S/C i O3 prescrit offline; l'aire terrestre complet, la radiància física connectada al producte i H continuen pendents.
 >
 > Els subpassos **7.1–7.50** pertanyen a contaminació lumínica artificial: VNP46, VJ146 i VJ246 són fonts Black Marble candidates amb models de mesura propis; cap skyglow físic de producte no està implementat. Els **7.51+** són del cel físic solar/lunar. El Pas 7 històric conserva la visualització actual. Les verticals pendents es documenten a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
-**Estat verificat de 7.11, 2026-10-19:** [terreny i visibilitat física](evidencies/pas7.11/validacio-terreny-i-visibilitat.md), 427 proves backend (22 noves), DEM/ECEF compartit, fonts parcials per retall d'àrea, SG-REF independent i cost d'oclusió B0/B1/B2/B4. Es preserva el 22,45% omès al zenit B4 amb sostre 10 km; domini definitiu pendent de 7.12, no executat.
+**Estat verificat de 7.11, 2026-10-19:** [terreny i visibilitat física](evidencies/pas7.11/validacio-terreny-i-visibilitat.md), 427 proves backend (22 noves), DEM/ECEF compartit, fonts parcials per retall d'àrea, SG-REF independent i cost d'oclusió B0/B1/B2/B4. Es preserva el 22,45% omès al zenit B4 amb sostre 10 km; en aquell tancament el domini definitiu restava pendent de7.12, ara verificat en domini condicionat.
 
 **Estat verificat de 7.10, 2026-10-19:** [transport espectral i O3](evidencies/pas7.10/validacio-espectral-i-gasos.md), 111.168 casos espectrals i 326.040 T_eff il·luminats dins de 0,01 mag; 405 proves backend, 21 noves. Comparació B0/B1/B2/B4, cost exclusiu per etapa i sostres 10/20/30/50 km. A B4 estàndard zenital, 10 km dona 22,45% menys que 50 km; cua superior desconeguda. Cap H ni SLO; 7.11 encara no s'havia executat en aquell tancament.
 
@@ -41,6 +41,9 @@ Auditoria documental del 2026-10-17: els passos 7.1–7.3 no generaven incidènc
 La instrucció **«continua amb el pla de millores»** és suficient: Codex ha de començar en aquest README i executar **exactament un pas cada vegada**. Per a la vertical 7.1–7.28, l’ordre és una linealització científica deliberada: cap optimització pot precedir el seu baseline directe/oracle i cap decisió bloquejant es pot resoldre amb una constant implícita.
 
 **Auditoria de 7.11 (2026-10-19):** 387 incidències mecàniques heretades inicials i 375 finals, després de normalitzar 7.11 i les dependències de 7.12, sense executar aquest últim. Zero incidències noves i zero enllaços locals trencats; 133 evidències històriques preservades per hash. [Resum diferencial](evidencies/pas7.11/auditoria-documental-resum.json).
+
+
+**Estat verificat de7.12,2026-10-19:** [gate numèric](evidencies/pas7.12/validacio-gate-transport.md),9 fixtures S PASS,42 sostres,444 proves/17 noves. Cua positiva >75km ≤0,000472296mag sota hipòtesis explícites;0,01mag espectral preservat. Cost de fonts extenses documentat, sense acceleracions;163 evidències anteriors intactes.7.13 no iniciat.
 
 ## Protocol perquè Codex continuï el pla
 
@@ -77,13 +80,14 @@ Estats admesos:
 | 7.3 | [Model de mesura DNB multisatèl·lit](tasques/completat/pas7.3-dnb-rsr-measurement.md) | `completat` (contractes TOA i Black Marble L3; fonts físiques 2026 no homologades) |
 | 7.4 | [Oracle espectral fi i SpectralBandSet tabulat v1](tasques/completat/pas7.4-spectral-bandset-validation.md) | `completat` (domini numèric acotat; 238/238 PASS) |
 | 7.5 | [SourceModel físic S independent de VIIRS](tasques/completat/pas7.5-source-model-v1.md) | `completat` (fonts definides; C/H sense homologar) |
-| 7.5.1 | [Black Marble NOAA-20, biblioteca espectral, modalitats realista/K i controls científics](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) | `completat` en escala condicionada relativa; transport pendent |
+| 7.5.1 | [Black Marble NOAA-20, biblioteca espectral, modalitats realista/K i controls científics](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) | `completat` en escala condicionada relativa; transport de producte pendent |
 | 7.6 | [SG-REF independent, àrea/raster i contrast F5](tasques/completat/pas7.6-sg-ref-reference-solver.md) | `completat` offline en domini pla homogeni S/C |
 | 7.7 | [PropagationKernel ECEF/ENU, GK7/15 i benchmark B0](tasques/completat/pas7.7-kernel-geometry-b0.md) | `completat` geomètricament, sense radiància |
 | 7.8 | [OpticalField estàndard, interpolació i dependències multi-tile](tasques/completat/pas7.8-optical-field-standard.md) | `completat` per a P/T/n i columnes, sense radiància |
 | 7.9 | [Rayleigh, aerosol de referència i benchmark B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) | `completat` monocromàtic offline; sense gasos/gate H |
 | 7.10 | [Kernel espectral directe i O3 prescrit, B2/B4 i revalidació 0,01 mag](tasques/completat/pas7.10-gas-spectral-kernel.md) | `completat` offline en domini declarat; producte/H pendents |
-| 7.11 | [Terreny, curvatura i visibilitat física](tasques/completat/pas7.11-terrain-curvature.md) | `completat` offline, amb DEM opac i SG-REF; gate 7.12 pendent |
+| 7.11 | [Terreny, curvatura i visibilitat física](tasques/completat/pas7.11-terrain-curvature.md) | `completat` offline, amb DEM opac i SG-REF |
+| 7.12 | [Gate zenital de transport radiomètric](tasques/completat/pas7.12-zenith-transport-gate.md) | `completat` numèricament en domini condicionat; H/producte pendents |
 | 8 | [Sol, Lluna i planetes amb posicions i aparença reals](tasques/completat/pas8.md) | `completat` |
 | 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](tasques/completat/pas8.5.md) | `completat` |
 | 8.6 | [Planetes, anells i satèl·lits naturals](tasques/completat/pas8.6.md) | `completat` |
@@ -111,7 +115,6 @@ Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.12 | [Gate zenital de transport radiomètric](tasques/pendent/pas7.12-zenith-transport-gate.md) | `pendent` | 7.11 |
 | 7.13 | [Camp angular i DomeProfile sobre ruta directa](tasques/pendent/pas7.13-dome-profile-direct.md) | `pendent` | 7.12 |
 | 7.14 | [Projeccions fotomètriques i sensors SQM/TESS](tasques/pendent/pas7.14-photometric-projections.md) | `pendent` | 7.13, 7.4 (revalidació espectral), 7.5.1 |
 | 7.15 | [Atmosfera real ERA5/CAMS i composició de camps](tasques/pendent/pas7.15-atmos-era5-cams.md) | `pendent` | 7.14 |
@@ -203,3 +206,5 @@ La pluja d'idees va aportar 25 propostes prou tancades per fusionar amb el pla i
 
 - [`manifests/`](manifests/) conté manifests reproduïbles de recursos científics.
 - [`reference-scenarios/`](reference-scenarios/) conté escenaris i captures de comparació visual.
+
+**Auditoria de 7.12 (2026-10-19):** 375 incidències mecàniques heretades inicials i 365 finals després de normalitzar 7.12. Cap incidència nova, cap del pas completat i zero enllaços locals trencats. 163 evidències històriques intactes per hash. [Resum diferencial](evidencies/pas7.12/auditoria-documental-resum.json).

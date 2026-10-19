@@ -9,7 +9,7 @@ Estendre el mateix operador homologat del zenit a direccions arbitràries sense 
 ## Dependències
 
 **Depèn de:**
-7.12
+- [7.12 — Gate numèric en domini condicionat](../completat/pas7.12-zenith-transport-gate.md).
 
 **En depenen:**
 - [Pas següent](pas7.14-photometric-projections.md)
@@ -45,3 +45,5 @@ Estendre el mateix operador homologat del zenit a direccions arbitràries sense 
 Encara no facis watershed/quadtree. El baseline angular ha de néixer de fonts directes.
 
 Quan el criteri de sortida no es pugui demostrar, **no continuïs al pas següent**. Corregeix aquest pas o marca’l `bloquejat` amb la causa i l’evidència.
+
+**Represa després de7.12:** pendent i no iniciat. Consumir el criteri només dins del domini/camp acreditat;10km històrics no hereten la justificació75km/cua condicionada. Les noves direccions, reconstrucció i compressió requereixen les seves evidències abans del PASS/FAIL.

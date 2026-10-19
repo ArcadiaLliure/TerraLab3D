@@ -1,0 +1,15 @@
+........................................................................ [ 16%]
+........................................................................ [ 32%]
+........................................................................ [ 48%]
+........................................................................ [ 65%]
+........................................................................ [ 81%]
+........................................................................ [ 97%]
+.........                                                                [100%]
+============================== warnings summary ===============================
+tests/test_transport_gate_step7_12.py::test_variable_gas_columns_against_scalar_high_precision_quad
+  F:\Python\TerraLab3D\backend\tests\test_transport_gate_step7_12.py:227: IntegrationWarning: Extremely bad integrand behavior occurs at some points of the
+    integration interval.
+    quad(extinction, a, b, epsabs=1e-14, epsrel=1e-11)[0]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+441 passed, 1 warning in 46.58s

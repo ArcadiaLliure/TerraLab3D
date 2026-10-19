@@ -106,3 +106,7 @@ Els set diagnòstics revaliden la referència per Rayleigh, HG explícit de fall
 ## Estat verificat de 7.10 (2026-10-19)
 
 Campanya 7.10: B0/B1/B2/B4, 100 punts/900 LOS, 5 escalfaments i 10 mesures per configuració segons excepció >600 s. p50 0,391/21,003/27,155/29,493 s. Temps exclusius per etapa, CPU global i RSS raw. SPD B1 històrica i B2/B4 LED-B3 declarades; 400/800 intervals derivats dels nusos, sense sweep de N. La passada final després de la partició T és diagnòstica d'una sola mesura; els perfils variables 0–50 km es documenten separadament i no són SLO. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).
+
+## Resultat del checkpoint7.12
+
+[Gate verificat](../evidencies/pas7.12/validacio-gate-transport.md) en domini registrat:9 S PASS,6 contrasts addicionals al sostre75km i42 passades verticals. Cua superior positiva condicionada, sense factor de calibratge ni branca zenital. Les dues passades actuals per mode900LOS i les àrees d'1LOS no substitueixen els percentils històrics ni fixen SLO; els temps de gate amb concurrència s'etiqueten separadament.7.13 pendent/no iniciat.

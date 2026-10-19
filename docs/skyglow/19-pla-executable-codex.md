@@ -192,7 +192,7 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.11-terrain-curvature.md](../tasques/completat/pas7.11-terrain-curvature.md)
 
-**Estat verificat, 2026-10-19:** completat offline. DEM/ECEF compartit, truncament i màscares binàries, àrea parcial per geometria, SG-REF independent i cost exclusiu d’oclusió; 427 proves backend. [Evidències i límits](../evidencies/pas7.11/validacio-terreny-i-visibilitat.md). Sostre 10 km insuficient en la fixture B4 zenital de 7.10 (22,45% omès respecte a 50 km); domini definitiu i gate 7.12 pendents, sense executar.
+**Estat verificat, 2026-10-19:** completat offline. DEM/ECEF compartit, truncament i màscares binàries, àrea parcial per geometria, SG-REF independent i cost exclusiu d’oclusió; 427 proves backend. [Evidències i límits](../evidencies/pas7.11/validacio-terreny-i-visibilitat.md). Sostre 10 km insuficient en la fixture B4 zenital de 7.10 (22,45% omès respecte a 50 km); en aquell tancament, domini definitiu i gate7.12 encara pendents; resultat posterior a la secció següent.
 
 ### 7.12 — Gate zenital de transport radiomètric
 
@@ -200,7 +200,9 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Gate de sortida.** Abans de comparar el candidat, es preregistra la tolerància runtime↔SG-REF amb origen justificat, que pot usar la convergència/incertesa de SG-REF demostrades a 7.6 però mai els residuals del runtime candidat. Sense tolerància justificada, 7.12 es bloqueja. El mateix `PropagationKernel` supera el gate al zenit sense calibratge arbitrari; el PASS valida transport donat un SourceModel, no la inferència d'emissió.
 
-**Fitxer executable:** [pas7.12-zenith-transport-gate.md](../tasques/pendent/pas7.12-zenith-transport-gate.md)
+**Fitxer executable:** [pas7.12-zenith-transport-gate.md](../tasques/completat/pas7.12-zenith-transport-gate.md)
+
+**Estat verificat,2026-10-19:** completat numèricament en domini condicionat:9 S PASS,42 sostres, cua >75km acotada positivament ≤0,000472296mag,444 proves. [Evidències i errors separats](../evidencies/pas7.12/validacio-gate-transport.md).7.13 no iniciat.
 
 ### 7.13 — Camp angular i DomeProfile sobre ruta directa
 

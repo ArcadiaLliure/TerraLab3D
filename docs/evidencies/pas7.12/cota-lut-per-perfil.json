@@ -1,0 +1,34 @@
+[
+  {
+    "stepM": 5000,
+    "upperColumnM2": 7.302353817358258e+24,
+    "maxDeltaSigmaM2": 1.663636000007426e-27,
+    "magnitudeBound": 0.013190021437548957,
+    "budgetMag": 0.01,
+    "domain": "COESA0–75km, q O3 prescrit, observador100m, fonts0..100m, offsets<=500m, cames ascendents + prefix tangent; cua/física separades"
+  },
+  {
+    "stepM": 2500,
+    "upperColumnM2": 5.308950058050663e+24,
+    "maxDeltaSigmaM2": 1.663636000007426e-27,
+    "magnitudeBound": 0.009589396354653456,
+    "budgetMag": 0.01,
+    "domain": "COESA0–75km, q O3 prescrit, observador100m, fonts0..100m, offsets<=500m, cames ascendents + prefix tangent; cua/física separades"
+  },
+  {
+    "stepM": 1000,
+    "upperColumnM2": 4.3324084767338595e+24,
+    "maxDeltaSigmaM2": 1.663636000007426e-27,
+    "magnitudeBound": 0.007825498751991638,
+    "budgetMag": 0.01,
+    "domain": "COESA0–75km, q O3 prescrit, observador100m, fonts0..100m, offsets<=500m, cames ascendents + prefix tangent; cua/física separades"
+  },
+  {
+    "stepM": 500,
+    "upperColumnM2": 4.012053267545368e+24,
+    "maxDeltaSigmaM2": 1.663636000007426e-27,
+    "magnitudeBound": 0.007246850800589672,
+    "budgetMag": 0.01,
+    "domain": "COESA0–75km, q O3 prescrit, observador100m, fonts0..100m, offsets<=500m, cames ascendents + prefix tangent; cua/física separades"
+  }
+]

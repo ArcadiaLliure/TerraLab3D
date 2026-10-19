@@ -1,0 +1,217 @@
+{
+  "criterionId": "TL3D-SKY-ZENITH-TRANSPORT-001",
+  "version": 1,
+  "status": "frozen_before_step7.12_candidate_evaluation",
+  "frozenAtUtc": "2026-10-19T14:18:47.645731+00:00",
+  "baselineCommit": "7b827df070025d3b043a4ddda2ca3d8616f045bf",
+  "originCategory": "numerical_error_and_convergence",
+  "justification": {
+    "oracle": "7.6: tolerancia espacial1e-6, refinaments consecutius i contrasts E1/GL independents; la referencia nova ha de demostrar de nou aquesta resolucio en el seu domini",
+    "runtime": "1e-4 relatiu reserva dos ordres de magnitud respecte de la resolucio exigida a SG-REF; equival a0.0001086mag, molt inferior al pressupost espectral0.01mag aprovat7.4. Eleccio prospectiva de jerarquia numerica, no deduida dels residuals del candidat",
+    "tail": "0.001mag, assignacio prospectiva deu vegades inferior al pressupost espectral0.01mag. Només cota condicionada de la dispersio simple exterior; no precisio observacional",
+    "sources": [
+      "../pas7.6/criteri-oracle-v1.json",
+      "../pas7.6/validacio-sg-ref.md",
+      "../pas7.4/criteri-preregistrat-v1.json",
+      "../../skyglow/08-validacio-cientifica.md",
+      "https://ntrs.nasa.gov/api/citations/19760017709/downloads/19760017709.pdf"
+    ]
+  },
+  "metric": {
+    "formula": "(abs(I_runtime-I_ref_fine)+u_ref)/I_ref_fine <=1e-4",
+    "maximumInclusive": 0.0001,
+    "aggregation": "every_primary_S_case; no mean",
+    "units": [
+      "W m^-2 sr^-1 nm^-1",
+      "W m^-2 sr^-1"
+    ],
+    "referenceUncertaintyMaximumRelative": 1e-06,
+    "referenceUncertainty": "sum(abs(R2-R1),abs(R1-R0),eLOS0,eLOS1,eLOS2)+64ulp(max(abs(Ri))); estimated_not_rigorous",
+    "nearZero": "if I_ref <= u_ref/1e-4: abs(I_runtime-I_ref)<=u_ref; exact geometric dark cases require both zero; no arbitrary radiance floor"
+  },
+  "referenceRefinements": [
+    {
+      "spectralGL": 2,
+      "pathGL": 4,
+      "areaGL": 2,
+      "losEpsrel": 1e-09
+    },
+    {
+      "spectralGL": 4,
+      "pathGL": 8,
+      "areaGL": 4,
+      "losEpsrel": 1e-10
+    },
+    {
+      "spectralGL": 8,
+      "pathGL": 16,
+      "areaGL": 8,
+      "losEpsrel": 1e-11
+    }
+  ],
+  "runtime": {
+    "radianceRelativeTolerance": 1e-07,
+    "radianceAbsoluteTolerance": 1e-30,
+    "pathRelativeTolerance": 1e-08,
+    "pathAbsoluteTolerance": 1e-12,
+    "areaOrder": 2,
+    "transportOperator": "unchanged_direct_B0_B1_B2_B4; no zenith branch; no calibration factor",
+    "spectralStrategy": "unchanged_transport_knot_union_Simpson_v1"
+  },
+  "domain": {
+    "geometry": "sphereECEF_ENU6371008.8m; source heights0..100m; observer100m; opaque triangulated DEM prescribed; elevations0.5..90deg",
+    "spectrum": "380..780nm; CIELED_B3 primary; relative C realistic/K compatibility only",
+    "medium": "dry COESA below75000m, sampled logP/linearT; prescribed aerosol exponential H1200m, HG0.65; prescribed O3 q profile, T within203..293K",
+    "scope": "registered immutable fixtures; numerical validation given field/source/mesh, not uniform proof for every atmospheric/urban configuration",
+    "excludedPhysicalUncertainty": [
+      "source inference C/H",
+      "multiple scattering",
+      "unknown aerosol/Mie/meteorology",
+      "other absorbers",
+      "geoid/datum unverified",
+      "terrain detail missing from DEM"
+    ]
+  },
+  "primaryCases": [
+    {
+      "id": "S_B1_std_point_zenith_5km",
+      "mode": "B1",
+      "standard": true,
+      "stepM": 1000,
+      "topM": 75000,
+      "area": false,
+      "distanceM": 5000,
+      "elevationDeg": 90,
+      "terrain": "none"
+    },
+    {
+      "id": "S_B4_std_point_zenith_5km",
+      "mode": "B4",
+      "standard": true,
+      "stepM": 1000,
+      "topM": 75000,
+      "area": false,
+      "distanceM": 5000,
+      "elevationDeg": 90,
+      "terrain": "flat"
+    },
+    {
+      "id": "S_B4_std_area_zenith_5km",
+      "mode": "B4",
+      "standard": true,
+      "stepM": 5000,
+      "topM": 75000,
+      "area": true,
+      "distanceM": 5000,
+      "elevationDeg": 90,
+      "terrain": "flat",
+      "note": "perfil COESA discret explicit; error d interpolacio contrastat separadament, no confos amb error del kernel"
+    },
+    {
+      "id": "S_B1_std_point_far_zenith_200km",
+      "mode": "B1",
+      "standard": true,
+      "stepM": 1000,
+      "topM": 75000,
+      "area": false,
+      "distanceM": 200000,
+      "elevationDeg": 90,
+      "terrain": "none"
+    },
+    {
+      "id": "S_B1_homog_area_mountain_zenith",
+      "mode": "B1",
+      "standard": false,
+      "topM": 10000,
+      "area": true,
+      "distanceM": 5000,
+      "elevationDeg": 90,
+      "terrain": "mountain"
+    },
+    {
+      "id": "S_B4_homog_area_mountain_zenith",
+      "mode": "B4",
+      "standard": false,
+      "topM": 10000,
+      "area": true,
+      "distanceM": 5000,
+      "elevationDeg": 90,
+      "terrain": "mountain"
+    },
+    {
+      "id": "S_B4_homog_point_mountain_dark_5deg",
+      "mode": "B4",
+      "standard": false,
+      "topM": 10000,
+      "area": false,
+      "distanceM": 5000,
+      "elevationDeg": 5,
+      "terrain": "mountain"
+    },
+    {
+      "id": "S_B1_std_far_horizon_200km",
+      "mode": "B1",
+      "standard": true,
+      "stepM": 1000,
+      "topM": 75000,
+      "area": false,
+      "distanceM": 200000,
+      "elevationDeg": 0.5,
+      "terrain": "none"
+    },
+    {
+      "id": "S_B4_homog_realDEM_snapshot",
+      "mode": "B4",
+      "standard": false,
+      "topM": 10000,
+      "area": false,
+      "elevationDeg": 90,
+      "terrain": "pas7.11_snapshot"
+    }
+  ],
+  "verticalStudy": {
+    "topsM": [
+      10000,
+      20000,
+      30000,
+      50000,
+      60000,
+      70000,
+      75000
+    ],
+    "stepM": 1000,
+    "modes": [
+      "B1",
+      "B4"
+    ],
+    "fixtures": [
+      "pas7.10_original_B4_standard",
+      "S_near5km",
+      "S_far200km"
+    ],
+    "tailTopM": 75000,
+    "tailMaximumMagnitude": 0.001,
+    "tailHypotheses": [
+      "single scattering scalar",
+      "dry air scattering coefficients envelope",
+      "hydrostatic exterior: dP/dh=-m*n*g0*(Re/(Re+h))^2; m=28.9644e-3/N_A kg",
+      "nonnegative monotonically decreasing pressure; no assumption P(infinity)=0",
+      "aerosol exterior bounded by same prescribed exponential profile",
+      "transmission<=1 and visibility<=1; source intensity bounded over angular/spectral support"
+    ],
+    "tailFormula": "integrate weighted hydrostatic pressure drop with geometric dilution and ds/dh envelope; upper-tail radiance is bounded nonzero, never assumed zero",
+    "tailNotClaimed": "not a bound for arbitrary real thermospheric composition or nonhydrostatic air"
+  },
+  "errorLedger": [
+    "LOS/path quadrature",
+    "source area quadrature",
+    "spectral Simpson and gas LUT",
+    "OpticalField vertical interpolation",
+    "DEM discretization/datum",
+    "finite atmospheric ceiling and conditional exterior tail",
+    "physical/source structural uncertainty"
+  ],
+  "failPolicy": "No retrospective threshold change. Preserve failed observations; correct implementation or explicitly delimit unsupported domain. No opaque calibration. Do not start7.13.",
+  "performance": "preserve historical B0-B4 and source-area occlusion evidence; measure current cold/warm/stages/counters without acceleration or changing spectral N for speed",
+  "notStarted": "step7.13"
+}

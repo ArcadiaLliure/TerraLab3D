@@ -1,0 +1,65 @@
+[
+  {
+    "case": "S_B4_std_area_zenith_5km",
+    "control": "area",
+    "settings": {
+      "spectralGL": 8,
+      "pathGL": 16,
+      "areaGL": 2,
+      "losEpsrel": 1e-11
+    },
+    "reference": {
+      "value": 9.3836839730282e-12,
+      "los_error_estimate": 2.312011797591755e-25,
+      "evaluations": 1050,
+      "path_order": 16,
+      "area_order": 2,
+      "revision": "sg-ref-variable-spectral-GL-v1"
+    },
+    "fineReference": 9.383689967202339e-12,
+    "relativeChange": -6.387864645018837e-07,
+    "meaning": "Diagnòstic d'un ordre cada vegada, mateix camp/DEM; no altera el criteri ni substitueix la incertesa conjunta preregistrada"
+  },
+  {
+    "case": "S_B4_std_area_zenith_5km",
+    "control": "path",
+    "settings": {
+      "spectralGL": 8,
+      "pathGL": 4,
+      "areaGL": 8,
+      "losEpsrel": 1e-11
+    },
+    "reference": {
+      "value": 9.383689967502912e-12,
+      "los_error_estimate": 2.3120133917848284e-25,
+      "evaluations": 1050,
+      "path_order": 4,
+      "area_order": 8,
+      "revision": "sg-ref-variable-spectral-GL-v1"
+    },
+    "fineReference": 9.383689967202339e-12,
+    "relativeChange": 3.203148857267024e-11,
+    "meaning": "Diagnòstic d'un ordre cada vegada, mateix camp/DEM; no altera el criteri ni substitueix la incertesa conjunta preregistrada"
+  },
+  {
+    "case": "S_B4_std_area_zenith_5km",
+    "control": "spectral",
+    "settings": {
+      "spectralGL": 2,
+      "pathGL": 16,
+      "areaGL": 8,
+      "losEpsrel": 1e-11
+    },
+    "reference": {
+      "value": 9.383689967193941e-12,
+      "los_error_estimate": 2.3120133917144126e-25,
+      "evaluations": 1050,
+      "path_order": 16,
+      "area_order": 8,
+      "revision": "sg-ref-variable-spectral-GL-v1"
+    },
+    "fineReference": 9.383689967202339e-12,
+    "relativeChange": -8.949507801503387e-13,
+    "meaning": "Diagnòstic d'un ordre cada vegada, mateix camp/DEM; no altera el criteri ni substitueix la incertesa conjunta preregistrada"
+  }
+]

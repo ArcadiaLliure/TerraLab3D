@@ -1,0 +1,466 @@
+[
+  {
+    "mode": "B0",
+    "iteration": 0,
+    "temperatureLabel": "primera passada",
+    "wallSeconds": 0.4675409000192303,
+    "cpuSeconds": 0.421875,
+    "memory": [
+      80011264,
+      80011264,
+      34279714816
+    ],
+    "inputSignature": "60bafde02c58524e134dbf86070c51312ec8e92fd2cd174644fc79b5480c964f",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 6638,
+      "quadrature_node_count": 99570,
+      "gk_subdivision_count": 0,
+      "leaf_interval_count": 6638
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 140.6123,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 0.0,
+        "transmissions": 0.0,
+        "quadrature": 310.5339,
+        "spectral_integration": 0.0
+      },
+      "calls": {
+        "geometry": 101370,
+        "occlusion": 0,
+        "atmospheric_sampling": 0,
+        "transmissions": 0,
+        "quadrature": 900,
+        "spectral_integration": 0
+      }
+    }
+  },
+  {
+    "mode": "B0",
+    "iteration": 1,
+    "temperatureLabel": "repetició en procés",
+    "wallSeconds": 0.3957409999857191,
+    "cpuSeconds": 0.390625,
+    "memory": [
+      80969728,
+      80969728,
+      34279714816
+    ],
+    "inputSignature": "60bafde02c58524e134dbf86070c51312ec8e92fd2cd174644fc79b5480c964f",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 6638,
+      "quadrature_node_count": 99570,
+      "gk_subdivision_count": 0,
+      "leaf_interval_count": 6638
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 115.6504,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 0.0,
+        "transmissions": 0.0,
+        "quadrature": 265.8508,
+        "spectral_integration": 0.0
+      },
+      "calls": {
+        "geometry": 101370,
+        "occlusion": 0,
+        "atmospheric_sampling": 0,
+        "transmissions": 0,
+        "quadrature": 900,
+        "spectral_integration": 0
+      }
+    }
+  },
+  {
+    "mode": "B1",
+    "iteration": 0,
+    "temperatureLabel": "primera passada",
+    "wallSeconds": 20.845979200006695,
+    "cpuSeconds": 20.578125,
+    "memory": [
+      81342464,
+      81342464,
+      34279714816
+    ],
+    "inputSignature": "6e91533281e1ed52d716be045694315b5ff6519f7e2b50080bb524d114e1fce9",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 2833,
+      "quadrature_node_count": 120765,
+      "gk_subdivision_count": 2609,
+      "leaf_interval_count": 5442
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 11200.0087,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 4769.1599,
+        "transmissions": 3540.0339,
+        "quadrature": 1292.2471,
+        "spectral_integration": 0.0
+      },
+      "calls": {
+        "geometry": 356265,
+        "occlusion": 0,
+        "atmospheric_sampling": 120765,
+        "transmissions": 120765,
+        "quadrature": 900,
+        "spectral_integration": 0
+      }
+    }
+  },
+  {
+    "mode": "B1",
+    "iteration": 1,
+    "temperatureLabel": "repetició en procés",
+    "wallSeconds": 20.867566700006137,
+    "cpuSeconds": 20.640625,
+    "memory": [
+      81555456,
+      81555456,
+      34279714816
+    ],
+    "inputSignature": "6e91533281e1ed52d716be045694315b5ff6519f7e2b50080bb524d114e1fce9",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 2833,
+      "quadrature_node_count": 120765,
+      "gk_subdivision_count": 2609,
+      "leaf_interval_count": 5442
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 11215.3086,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 4767.2539,
+        "transmissions": 3545.7969,
+        "quadrature": 1293.4524,
+        "spectral_integration": 0.0
+      },
+      "calls": {
+        "geometry": 356265,
+        "occlusion": 0,
+        "atmospheric_sampling": 120765,
+        "transmissions": 120765,
+        "quadrature": 900,
+        "spectral_integration": 0
+      }
+    }
+  },
+  {
+    "mode": "B2",
+    "iteration": 0,
+    "temperatureLabel": "primera passada",
+    "wallSeconds": 26.350628899992444,
+    "cpuSeconds": 26.125,
+    "memory": [
+      82530304,
+      85164032,
+      34279714816
+    ],
+    "inputSignature": "82e11b56b3b815378568d606882ca1e86566fccf7941d525e7ae209cffb46872",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 2833,
+      "quadrature_node_count": 120615,
+      "gk_subdivision_count": 2604,
+      "leaf_interval_count": 5437
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 12563.7635,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 5173.2471,
+        "transmissions": 3221.6842,
+        "quadrature": 4833.146,
+        "spectral_integration": 482.0258
+      },
+      "calls": {
+        "geometry": 477330,
+        "occlusion": 0,
+        "atmospheric_sampling": 121515,
+        "transmissions": 362895,
+        "quadrature": 900,
+        "spectral_integration": 112885
+      }
+    }
+  },
+  {
+    "mode": "B2",
+    "iteration": 1,
+    "temperatureLabel": "repetició en procés",
+    "wallSeconds": 26.622899400012102,
+    "cpuSeconds": 26.40625,
+    "memory": [
+      84271104,
+      86556672,
+      34279714816
+    ],
+    "inputSignature": "82e11b56b3b815378568d606882ca1e86566fccf7941d525e7ae209cffb46872",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 2833,
+      "quadrature_node_count": 120615,
+      "gk_subdivision_count": 2604,
+      "leaf_interval_count": 5437
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 12723.2989,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 5236.3144,
+        "transmissions": 3220.3486,
+        "quadrature": 4876.2653,
+        "spectral_integration": 481.9709
+      },
+      "calls": {
+        "geometry": 477330,
+        "occlusion": 0,
+        "atmospheric_sampling": 121515,
+        "transmissions": 362895,
+        "quadrature": 900,
+        "spectral_integration": 112885
+      }
+    }
+  },
+  {
+    "mode": "B4",
+    "iteration": 0,
+    "temperatureLabel": "primera passada",
+    "wallSeconds": 28.769318299979204,
+    "cpuSeconds": 28.4375,
+    "memory": [
+      85409792,
+      87695360,
+      34279714816
+    ],
+    "inputSignature": "b7452f86c31ba5ba6b28a3f77a61f1dbbd9207e861c65e37d5bf278f4059b3be",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 2833,
+      "quadrature_node_count": 120615,
+      "gk_subdivision_count": 2604,
+      "leaf_interval_count": 5437
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 12829.7523,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 5347.5225,
+        "transmissions": 4473.93,
+        "quadrature": 5440.8564,
+        "spectral_integration": 580.5104
+      },
+      "calls": {
+        "geometry": 477330,
+        "occlusion": 0,
+        "atmospheric_sampling": 122415,
+        "transmissions": 362895,
+        "quadrature": 900,
+        "spectral_integration": 112885
+      }
+    }
+  },
+  {
+    "mode": "B4",
+    "iteration": 1,
+    "temperatureLabel": "repetició en procés",
+    "wallSeconds": 31.376127600000473,
+    "cpuSeconds": 30.359375,
+    "memory": [
+      84008960,
+      88477696,
+      34279714816
+    ],
+    "inputSignature": "b7452f86c31ba5ba6b28a3f77a61f1dbbd9207e861c65e37d5bf278f4059b3be",
+    "counters": {
+      "los_count": 900,
+      "segment_count": 2833,
+      "quadrature_node_count": 120615,
+      "gk_subdivision_count": 2604,
+      "leaf_interval_count": 5437
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 13905.5993,
+        "occlusion": 0.0,
+        "atmospheric_sampling": 5820.5177,
+        "transmissions": 4890.2417,
+        "quadrature": 6016.4347,
+        "spectral_integration": 637.4744
+      },
+      "calls": {
+        "geometry": 477330,
+        "occlusion": 0,
+        "atmospheric_sampling": 122415,
+        "transmissions": 362895,
+        "quadrature": 900,
+        "spectral_integration": 112885
+      }
+    }
+  },
+  {
+    "value": 6.077438295832351e-14,
+    "wallSeconds": 11.549188100005267,
+    "cpuSeconds": 11.40625,
+    "inputSignature": "e3e202f8307a10f1d618a33d7eb9f7231ea4a640d8b5c2c196ded5adbe2e797b",
+    "unit": "W m^-2 sr^-1 nm^-1",
+    "counters": {
+      "los_count": 1,
+      "segment_count": 32,
+      "quadrature_node_count": 480,
+      "gk_subdivision_count": 0,
+      "leaf_interval_count": 32
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 1246.0566,
+        "occlusion": 9655.1539,
+        "atmospheric_sampling": 28.8849,
+        "transmissions": 606.0948,
+        "quadrature": 8.7925,
+        "spectral_integration": 0.0
+      },
+      "calls": {
+        "geometry": 25410,
+        "occlusion": 482,
+        "atmospheric_sampling": 480,
+        "transmissions": 480,
+        "quadrature": 1,
+        "spectral_integration": 0
+      }
+    },
+    "fixture": "area_mountain",
+    "mode": "B1",
+    "iteration": 0,
+    "memory": [
+      84156416,
+      88477696,
+      34279714816
+    ]
+  },
+  {
+    "value": 6.077438295832351e-14,
+    "wallSeconds": 11.229721000010613,
+    "cpuSeconds": 11.09375,
+    "inputSignature": "e3e202f8307a10f1d618a33d7eb9f7231ea4a640d8b5c2c196ded5adbe2e797b",
+    "unit": "W m^-2 sr^-1 nm^-1",
+    "counters": {
+      "los_count": 1,
+      "segment_count": 32,
+      "quadrature_node_count": 480,
+      "gk_subdivision_count": 0,
+      "leaf_interval_count": 32
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 1220.5715,
+        "occlusion": 9380.0425,
+        "atmospheric_sampling": 26.5095,
+        "transmissions": 593.4596,
+        "quadrature": 8.145,
+        "spectral_integration": 0.0
+      },
+      "calls": {
+        "geometry": 25410,
+        "occlusion": 482,
+        "atmospheric_sampling": 480,
+        "transmissions": 480,
+        "quadrature": 1,
+        "spectral_integration": 0
+      }
+    },
+    "fixture": "area_mountain",
+    "mode": "B1",
+    "iteration": 1,
+    "memory": [
+      84172800,
+      88477696,
+      34279714816
+    ]
+  },
+  {
+    "value": 7.962371622097224e-12,
+    "wallSeconds": 12.698196600016672,
+    "cpuSeconds": 12.453125,
+    "inputSignature": "c6684618ae4b79b84a6174f8919ede2a889ad08b3576d0b2d864853a0575c209",
+    "unit": "W m^-2 sr^-1",
+    "counters": {
+      "los_count": 1,
+      "segment_count": 32,
+      "quadrature_node_count": 480,
+      "gk_subdivision_count": 0,
+      "leaf_interval_count": 32
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 1609.811,
+        "occlusion": 9520.532,
+        "atmospheric_sampling": 27.0446,
+        "transmissions": 824.4079,
+        "quadrature": 552.9887,
+        "spectral_integration": 145.4038
+      },
+      "calls": {
+        "geometry": 49859,
+        "occlusion": 482,
+        "atmospheric_sampling": 482,
+        "transmissions": 49377,
+        "quadrature": 1,
+        "spectral_integration": 24449
+      }
+    },
+    "fixture": "area_mountain",
+    "mode": "B4",
+    "iteration": 0,
+    "memory": [
+      85204992,
+      88477696,
+      34279714816
+    ]
+  },
+  {
+    "value": 7.962371622097224e-12,
+    "wallSeconds": 12.345202700002119,
+    "cpuSeconds": 12.1875,
+    "inputSignature": "c6684618ae4b79b84a6174f8919ede2a889ad08b3576d0b2d864853a0575c209",
+    "unit": "W m^-2 sr^-1",
+    "counters": {
+      "los_count": 1,
+      "segment_count": 32,
+      "quadrature_node_count": 480,
+      "gk_subdivision_count": 0,
+      "leaf_interval_count": 32
+    },
+    "profiling": {
+      "exclusiveMs": {
+        "geometry": 1597.248,
+        "occlusion": 9179.6039,
+        "atmospheric_sampling": 26.5348,
+        "transmissions": 827.9881,
+        "quadrature": 550.4483,
+        "spectral_integration": 144.9716
+      },
+      "calls": {
+        "geometry": 49859,
+        "occlusion": 482,
+        "atmospheric_sampling": 482,
+        "transmissions": 49377,
+        "quadrature": 1,
+        "spectral_integration": 24449
+      }
+    },
+    "fixture": "area_mountain",
+    "mode": "B4",
+    "iteration": 1,
+    "memory": [
+      85348352,
+      88477696,
+      34279714816
+    ]
+  }
+]

@@ -1,0 +1,61 @@
+{
+  "rows": [
+    {
+      "maximumTwoLegOzoneColumnM2": 3.820416856218798e+24,
+      "maximumLutMagnitudeError": 0.006900703731188037,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "envolupant de capes 50m sobre el mateix logP/T/q interpolat; no és remostreig COESA ni quadratura del transport",
+      "subshellM": 50.0,
+      "case": "S_B4_std_point_zenith_5km",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.007009282780706724,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 3.820098306375375e+24,
+      "maximumLutMagnitudeError": 0.006900128344214361,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "envolupant de capes 50m sobre el mateix logP/T/q interpolat; no és remostreig COESA ni quadratura del transport",
+      "subshellM": 50.0,
+      "case": "S_B4_std_area_zenith_5km",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.007008707393733047,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 2.5554431291554934e+22,
+      "maximumLutMagnitudeError": 4.615819843716084e-05,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "triangle de distàncies, n/q constants; LOS completa fins al sostre, sense aprofitar ombres",
+      "subshellM": 50.0,
+      "case": "S_B4_homog_area_mountain_zenith",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.0001547372479558468,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 2.1689305684073646e+23,
+      "maximumLutMagnitudeError": 0.0003917673863712874,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "triangle de distàncies, n/q constants; LOS completa fins al sostre, sense aprofitar ombres",
+      "subshellM": 50.0,
+      "case": "S_B4_homog_point_mountain_dark_5deg",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.0005003464358899734,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 2.0506945153293886e+22,
+      "maximumLutMagnitudeError": 3.704107647422102e-05,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "triangle de distàncies, n/q constants; LOS completa fins al sostre, sense aprofitar ombres",
+      "subshellM": 50.0,
+      "case": "S_B4_homog_realDEM_snapshot",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.00014562012599290698,
+      "spectralBudgetMag": 0.01
+    }
+  ],
+  "proof": "La pressió log-lineal decreix; T i q són lineals dins cada subcapa. maxP/minT*maxq limita n*q sense quadrar. La suma de longituds màximes de closques i el prefix tangent són conservadors. |delta tau|<=Nmax*max|delta sigma| implica la mateixa cota multiplicativa de qualsevol integral positiva. No s'han canviat llindars ni el camp.",
+  "separatedErrors": "P/T interpolació, DEM, cua, física i dades experimentals no formen part d'aquesta cota"
+}

@@ -1,0 +1,143 @@
+{
+  "case": {
+    "id": "S_B1_std_far_horizon_200km",
+    "mode": "B1",
+    "standard": true,
+    "stepM": 1000,
+    "topM": 75000,
+    "area": false,
+    "distanceM": 200000,
+    "elevationDeg": 0.5,
+    "terrain": "none"
+  },
+  "policySha256": "6cfa6601f02dabeb1a3462638e980959c11a12164433738689efb31e92cdb442",
+  "runtime": [
+    {
+      "value": 1.4705062116511528e-14,
+      "wallSeconds": 80.82684629998403,
+      "cpuSeconds": 79.25,
+      "inputSignature": "12197826b3daf71e0d94df49c63a507884490dc915039c5d7ffc2a45903a4296",
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 85,
+        "quadrature_node_count": 1335,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 87
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2971.406,
+          "occlusion": 0.0,
+          "atmospheric_sampling": 66196.9887,
+          "transmissions": 627.5389,
+          "quadrature": 11029.6591,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 3977,
+          "occlusion": 0,
+          "atmospheric_sampling": 1513110,
+          "transmissions": 1335,
+          "quadrature": 100786,
+          "spectral_integration": 0
+        }
+      }
+    },
+    {
+      "value": 1.4705062116511528e-14,
+      "wallSeconds": 80.22469839997939,
+      "cpuSeconds": 78.8125,
+      "inputSignature": "12197826b3daf71e0d94df49c63a507884490dc915039c5d7ffc2a45903a4296",
+      "unit": "W m^-2 sr^-1 nm^-1",
+      "counters": {
+        "los_count": 1,
+        "segment_count": 85,
+        "quadrature_node_count": 1335,
+        "gk_subdivision_count": 2,
+        "leaf_interval_count": 87
+      },
+      "profiling": {
+        "exclusiveMs": {
+          "geometry": 2956.45,
+          "occlusion": 0.0,
+          "atmospheric_sampling": 65703.5409,
+          "transmissions": 610.9471,
+          "quadrature": 10952.7278,
+          "spectral_integration": 0.0
+        },
+        "calls": {
+          "geometry": 3977,
+          "occlusion": 0,
+          "atmospheric_sampling": 1513110,
+          "transmissions": 1335,
+          "quadrature": 100786,
+          "spectral_integration": 0
+        }
+      }
+    }
+  ],
+  "references": [
+    {
+      "settings": {
+        "spectralGL": 2,
+        "pathGL": 4,
+        "areaGL": 2,
+        "losEpsrel": 1e-09
+      },
+      "result": {
+        "value": 1.4705062067064625e-14,
+        "los_error_estimate": 8.139989144662779e-25,
+        "evaluations": 1848,
+        "path_order": 4,
+        "area_order": 2,
+        "revision": "sg-ref-spherical-monochromatic-v1"
+      },
+      "wallSeconds": 23.932592700002715
+    },
+    {
+      "settings": {
+        "spectralGL": 4,
+        "pathGL": 8,
+        "areaGL": 4,
+        "losEpsrel": 1e-10
+      },
+      "result": {
+        "value": 1.4705062116511285e-14,
+        "los_error_estimate": 3.9996958996880185e-28,
+        "evaluations": 1890,
+        "path_order": 8,
+        "area_order": 4,
+        "revision": "sg-ref-spherical-monochromatic-v1"
+      },
+      "wallSeconds": 40.06714609998744
+    },
+    {
+      "settings": {
+        "spectralGL": 8,
+        "pathGL": 16,
+        "areaGL": 8,
+        "losEpsrel": 1e-11
+      },
+      "result": {
+        "value": 1.470506211651205e-14,
+        "los_error_estimate": 3.9996958996872217e-28,
+        "evaluations": 1890,
+        "path_order": 16,
+        "area_order": 8,
+        "revision": "sg-ref-spherical-monochromatic-v1"
+      },
+      "wallSeconds": 73.50740740000037
+    }
+  ],
+  "decision": {
+    "status": "PASS",
+    "candidate": 1.4705062116511528e-14,
+    "reference": 1.470506211651205e-14,
+    "reference_uncertainty": 5.026242423931211e-23,
+    "absolute_error": 5.206481974458678e-28,
+    "guarded_relative_error": 3.4180708989369177e-09,
+    "reason": "error del candidat més incertesa estimada de SG-REF"
+  },
+  "repeatExact": true
+}

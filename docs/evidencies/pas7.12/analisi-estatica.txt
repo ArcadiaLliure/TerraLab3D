@@ -1,0 +1,11 @@
+python -m ruff check tools\audit_transport_gate_step7_12.py tools\bound_lut_transport_gate_step7_12.py tools\diagnose_transport_gate_step7_12.py tools\plot_transport_gate_step7_12.py tools\transport_gate_fixtures_step7_12.py tools\validate_transport_gate_step7_12.py backend/src/terralab3d/domain/light_pollution/atmospheric_tail.py backend/src/terralab3d/domain/light_pollution/radiometric_gate.py backend/src/terralab3d/domain/light_pollution/reference_variable_spectral.py backend/src/terralab3d/infrastructure/adapters/atmosphere/standard_optics.py backend/tests/test_transport_gate_step7_12.py
+All checks passed!
+
+python -m ruff format --check tools\audit_transport_gate_step7_12.py tools\bound_lut_transport_gate_step7_12.py tools\diagnose_transport_gate_step7_12.py tools\plot_transport_gate_step7_12.py tools\transport_gate_fixtures_step7_12.py tools\validate_transport_gate_step7_12.py backend/src/terralab3d/domain/light_pollution/atmospheric_tail.py backend/src/terralab3d/domain/light_pollution/radiometric_gate.py backend/src/terralab3d/domain/light_pollution/reference_variable_spectral.py backend/src/terralab3d/infrastructure/adapters/atmosphere/standard_optics.py backend/tests/test_transport_gate_step7_12.py
+11 files already formatted
+
+python -m pyright tools\audit_transport_gate_step7_12.py tools\bound_lut_transport_gate_step7_12.py tools\diagnose_transport_gate_step7_12.py tools\plot_transport_gate_step7_12.py tools\transport_gate_fixtures_step7_12.py tools\validate_transport_gate_step7_12.py backend/src/terralab3d/domain/light_pollution/atmospheric_tail.py backend/src/terralab3d/domain/light_pollution/radiometric_gate.py backend/src/terralab3d/domain/light_pollution/reference_variable_spectral.py backend/src/terralab3d/infrastructure/adapters/atmosphere/standard_optics.py
+0 errors, 0 warnings, 0 informations
+WARNING: there is a new pyright version available (v1.1.411 -> v1.1.414).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+

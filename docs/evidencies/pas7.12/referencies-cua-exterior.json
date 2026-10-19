@@ -1,0 +1,326 @@
+[
+  {
+    "fixture": "pas7.10_original_B4_standard",
+    "mode": "B1",
+    "references": [
+      {
+        "settings": {
+          "spectralGL": 2,
+          "pathGL": 4,
+          "areaGL": 2,
+          "losEpsrel": 1e-09
+        },
+        "result": {
+          "value": 5.962542043466404e-15,
+          "los_error_estimate": 1.4014798753273916e-28,
+          "evaluations": 1764,
+          "path_order": 4,
+          "area_order": 2,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 4,
+          "pathGL": 8,
+          "areaGL": 4,
+          "losEpsrel": 1e-10
+        },
+        "result": {
+          "value": 5.9625420434389055e-15,
+          "los_error_estimate": 1.4014798753212952e-28,
+          "evaluations": 1764,
+          "path_order": 8,
+          "area_order": 4,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 8,
+          "pathGL": 16,
+          "areaGL": 8,
+          "losEpsrel": 1e-11
+        },
+        "result": {
+          "value": 5.96254204343891e-15,
+          "los_error_estimate": 1.4014798753212972e-28,
+          "evaluations": 1764,
+          "path_order": 16,
+          "area_order": 8,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      }
+    ]
+  },
+  {
+    "fixture": "pas7.10_original_B4_standard",
+    "mode": "B4",
+    "references": [
+      {
+        "settings": {
+          "spectralGL": 2,
+          "pathGL": 4,
+          "areaGL": 2,
+          "losEpsrel": 1e-09
+        },
+        "result": {
+          "value": 7.736464825333336e-13,
+          "los_error_estimate": 1.813987335153141e-26,
+          "evaluations": 2142,
+          "path_order": 4,
+          "area_order": 2,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 4,
+          "pathGL": 8,
+          "areaGL": 4,
+          "losEpsrel": 1e-10
+        },
+        "result": {
+          "value": 7.736464825324651e-13,
+          "los_error_estimate": 1.8139873351512e-26,
+          "evaluations": 2142,
+          "path_order": 8,
+          "area_order": 4,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 8,
+          "pathGL": 16,
+          "areaGL": 8,
+          "losEpsrel": 1e-11
+        },
+        "result": {
+          "value": 7.736464825324662e-13,
+          "los_error_estimate": 1.8139873351512024e-26,
+          "evaluations": 2142,
+          "path_order": 16,
+          "area_order": 8,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      }
+    ]
+  },
+  {
+    "fixture": "S_near5km",
+    "mode": "B1",
+    "references": [
+      {
+        "settings": {
+          "spectralGL": 2,
+          "pathGL": 4,
+          "areaGL": 2,
+          "losEpsrel": 1e-09
+        },
+        "result": {
+          "value": 7.206559647559629e-14,
+          "los_error_estimate": 1.752955789949727e-27,
+          "evaluations": 1764,
+          "path_order": 4,
+          "area_order": 2,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 4,
+          "pathGL": 8,
+          "areaGL": 4,
+          "losEpsrel": 1e-10
+        },
+        "result": {
+          "value": 7.206559647541453e-14,
+          "los_error_estimate": 1.7529557899456264e-27,
+          "evaluations": 1764,
+          "path_order": 8,
+          "area_order": 4,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 8,
+          "pathGL": 16,
+          "areaGL": 8,
+          "losEpsrel": 1e-11
+        },
+        "result": {
+          "value": 7.206559647541452e-14,
+          "los_error_estimate": 1.752955789945627e-27,
+          "evaluations": 1764,
+          "path_order": 16,
+          "area_order": 8,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      }
+    ]
+  },
+  {
+    "fixture": "S_near5km",
+    "mode": "B4",
+    "references": [
+      {
+        "settings": {
+          "spectralGL": 2,
+          "pathGL": 4,
+          "areaGL": 2,
+          "losEpsrel": 1e-09
+        },
+        "result": {
+          "value": 9.425988988137278e-12,
+          "los_error_estimate": 2.2717352319181293e-25,
+          "evaluations": 2142,
+          "path_order": 4,
+          "area_order": 2,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 4,
+          "pathGL": 8,
+          "areaGL": 4,
+          "losEpsrel": 1e-10
+        },
+        "result": {
+          "value": 9.4259889881372e-12,
+          "los_error_estimate": 2.2717352319181877e-25,
+          "evaluations": 2142,
+          "path_order": 8,
+          "area_order": 4,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 8,
+          "pathGL": 16,
+          "areaGL": 8,
+          "losEpsrel": 1e-11
+        },
+        "result": {
+          "value": 9.425988988137196e-12,
+          "los_error_estimate": 2.2717352319181863e-25,
+          "evaluations": 2142,
+          "path_order": 16,
+          "area_order": 8,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      }
+    ]
+  },
+  {
+    "fixture": "S_far200km",
+    "mode": "B1",
+    "references": [
+      {
+        "settings": {
+          "spectralGL": 2,
+          "pathGL": 4,
+          "areaGL": 2,
+          "losEpsrel": 1e-09
+        },
+        "result": {
+          "value": 7.792791138652526e-18,
+          "los_error_estimate": 1.7824349145096837e-31,
+          "evaluations": 1764,
+          "path_order": 4,
+          "area_order": 2,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 4,
+          "pathGL": 8,
+          "areaGL": 4,
+          "losEpsrel": 1e-10
+        },
+        "result": {
+          "value": 7.792791163683118e-18,
+          "los_error_estimate": 1.7824349200663197e-31,
+          "evaluations": 1764,
+          "path_order": 8,
+          "area_order": 4,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 8,
+          "pathGL": 16,
+          "areaGL": 8,
+          "losEpsrel": 1e-11
+        },
+        "result": {
+          "value": 7.792791163683101e-18,
+          "los_error_estimate": 1.7824349200663162e-31,
+          "evaluations": 1764,
+          "path_order": 16,
+          "area_order": 8,
+          "revision": "sg-ref-spherical-monochromatic-v1"
+        }
+      }
+    ]
+  },
+  {
+    "fixture": "S_far200km",
+    "mode": "B4",
+    "references": [
+      {
+        "settings": {
+          "spectralGL": 2,
+          "pathGL": 4,
+          "areaGL": 2,
+          "losEpsrel": 1e-09
+        },
+        "result": {
+          "value": 9.776757218216072e-16,
+          "los_error_estimate": 2.241529028498421e-29,
+          "evaluations": 2142,
+          "path_order": 4,
+          "area_order": 2,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 4,
+          "pathGL": 8,
+          "areaGL": 4,
+          "losEpsrel": 1e-10
+        },
+        "result": {
+          "value": 9.776757224695694e-16,
+          "los_error_estimate": 2.241529029936337e-29,
+          "evaluations": 2142,
+          "path_order": 8,
+          "area_order": 4,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      },
+      {
+        "settings": {
+          "spectralGL": 8,
+          "pathGL": 16,
+          "areaGL": 8,
+          "losEpsrel": 1e-11
+        },
+        "result": {
+          "value": 9.77675722469572e-16,
+          "los_error_estimate": 2.241529029936341e-29,
+          "evaluations": 2142,
+          "path_order": 16,
+          "area_order": 8,
+          "revision": "sg-ref-variable-spectral-GL-v1"
+        }
+      }
+    ]
+  }
+]

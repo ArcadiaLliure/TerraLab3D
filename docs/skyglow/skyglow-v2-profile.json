@@ -2,7 +2,7 @@
   "profileId": "skyglow-v2-multisat-policy",
   "schemaVersion": 2,
   "decisionDate": "2026-10-18",
-  "status": "sources_reference_geometry_and_prescribed_spectral_transport_verified_offline;product_runtime_pending",
+  "status": "numerical_transport_gate_verified_registered_conditional_domain;product_and_H_pending",
   "owner": "TerraLab3D",
   "migration": {
     "preserves": "skyglow-v1-profile.json",
@@ -91,7 +91,10 @@
     "inheritedPolicyRef": "skyglow-v1-profile.json#acceptanceProfile",
     "revisionRule": "new_sensor_and_domain_require_prospective_gate_records_before_candidate_evaluation",
     "numericThresholds": {
-      "step7_4_spectral_discretization_max_equivalent_magnitude": 0.01
+      "step7_4_spectral_discretization_max_equivalent_magnitude": 0.01,
+      "step7_12_max_guarded_relative_error": 0.0001,
+      "step7_12_max_reference_relative_uncertainty": 1e-06,
+      "step7_12_max_conditional_tail_mag": 0.001
     },
     "step7_4_scope": "verified_piecewise_linear_tabulated_domain_only; historical_DNB_RSR_diagnostic_only",
     "step7_4_criterionRef": "../evidencies/pas7.4/criteri-preregistrat-v1.json",
@@ -101,7 +104,6 @@
       "7.14"
     ],
     "pendingNumericGateLocations": [
-      "7.12",
       "7.17",
       "7.22"
     ],
@@ -111,7 +113,15 @@
       "7.17",
       "7.22"
     ],
-    "homologationConsumesOnly": "7.28"
+    "homologationConsumesOnly": "7.28",
+    "step7_12": {
+      "status": "PASS_NUMERIC_CONDITIONAL_DOMAIN",
+      "criterionRef": "../evidencies/pas7.12/criteri-transport-preregistrat-v1.json",
+      "criterionSha256": "6cfa6601f02dabeb1a3462638e980959c11a12164433738689efb31e92cdb442",
+      "evaluationRef": "../evidencies/pas7.12/resultat-gate-transport.json",
+      "scope": "Fixtures registrades, camp/font/malla prescrits; cua condicionada d'aire sec. No prova uniforme de tota l'atmosfera o de tota ciutat.",
+      "historicalPolicyNote": "El perfil v1 conserva el registre anterior a 7.12; aquesta entrada v2 referencia els valors prospectius vigents, sense canviar les regles heretades."
+    }
   },
   "resourceManagement": {
     "ownerStep": "24",
@@ -125,7 +135,7 @@
     "credentialsOutsideManifests": true
   },
   "planningRevision": {
-    "revisionDate": "2026-10-18",
+    "revisionDate": "2026-10-19",
     "policyRef": "20-politica-rsr-i-validacio-per-dominis.md",
     "historicalV1Unchanged": true,
     "step7_4EvidenceUnchanged": true,
@@ -202,9 +212,14 @@
     "evidenceRef": "../evidencies/pas7.6/validacio-sg-ref.md",
     "criterionRef": "../evidencies/pas7.6/criteri-oracle-v1.json",
     "runtimeGateOwnerStep": "7.12",
-    "runtimeGateStatus": "not_evaluated",
+    "runtimeGateStatus": "verified_registered_S_domain_only_step7.12",
     "newDomainRule": "extend_and_revalidate_reference_when_introducing_variable_atmosphere_terrain_or_curvature_before_gates",
-    "empiricalValidation": "not_evaluated;H_not_homologated"
+    "empiricalValidation": "not_evaluated;H_not_homologated",
+    "extendedReference": {
+      "revision": "sg-ref-variable-spectral-GL-v1",
+      "status": "verified_registered_variable_spectral_and_terrain_fixtures",
+      "evidenceRef": "../evidencies/pas7.12/validacio-gate-transport.md"
+    }
   },
   "geometryKernel": {
     "modelVersion": "propagation-geometry-b0-v1",
@@ -218,7 +233,7 @@
     "benchmarkRef": "../evidencies/pas7.7/validacio-b0.md",
     "protocolRef": "../evidencies/pas7.7/protocol-b0-v1.json",
     "physicalTransportStatus": "spectral_single_scattering_prescribed_O3_verified_step_7.10;product_and_H_pending",
-    "radiometricGate": "not_evaluated_step_7.12",
+    "radiometricGate": "S_transport_registered_domain_only;B0_remains_geometry_not_radiance",
     "productSLOGate": "not_evaluated_step_7.22"
   },
   "opticalField": {
@@ -235,8 +250,14 @@
     "radiativeCoefficients": "base_field_PTn;monochromatic_Rayleigh_aerosol_in_ScatteringConfiguration_step_7.9;gas_pending",
     "evidenceRef": "../evidencies/pas7.8/validacio-optical-field.md",
     "protocolRef": "../evidencies/pas7.8/protocol-optical-field-v1.json",
-    "radiometricGate": "not_evaluated_step_7.12",
-    "empiricalValidation": "not_evaluated;H_not_homologated"
+    "radiometricGate": "field_alone_not_radiance;see_radiometricTransportGate",
+    "empiricalValidation": "not_evaluated;H_not_homologated",
+    "optionalExtendedProvider": {
+      "revision": "coesa1975-nasa-tr459-dry-0-75km-v1",
+      "topM": 75000,
+      "defaultProviderUnchanged": true,
+      "exterior": "conditional_positive_hydrostatic_tail;not_general_thermosphere"
+    }
   },
   "singleScattering": {
     "revision": "single-scattering-monochromatic-v1",
@@ -255,9 +276,9 @@
     "transmission": "two_leg_segmented_GK7_15;analytic_constant_medium",
     "dependencies": "LOS_and_both_transmission_legs;used_atmosphere_and_aerosol_versions",
     "unit": "W_or_relative_m^-2_sr^-1_nm^-1",
-    "gasAbsorption": "not_computed_step_7.10",
-    "terrainVisibility": "not_computed_step_7.11",
-    "runtimeGate": "not_evaluated_step_7.12",
+    "gasAbsorption": "disabled_explicit_B1_diagnostic",
+    "terrainVisibility": "verified_opaque_triangle_model_step7.11",
+    "runtimeGate": "verified_registered_S_domain_only_step7.12",
     "empiricalValidation": "not_evaluated;H_pending",
     "evidenceRef": "../evidencies/pas7.9/validacio-b1.md",
     "protocolRef": "../evidencies/pas7.9/protocol-b1-v1.json"
@@ -288,13 +309,37 @@
       10,
       20,
       30,
-      50
+      50,
+      60,
+      70,
+      75
     ],
-    "above50kmContribution": "unknown_not_zero",
-    "runtimeGate": "pending_step_7.12",
+    "above50kmContribution": "measured_to75km;above75_conditionally_bounded_nonzero;not_general_thermosphere",
+    "runtimeGate": "verified_registered_S_domain_only_step7.12",
     "evidenceRef": "../evidencies/pas7.10/validacio-espectral-i-gasos.md",
-    "nextStep": "7.11_pending_not_executed",
+    "nextStep": "7.13_pending_not_started",
     "backendTestsPassed": 405,
-    "newTests": 21
+    "newTests": 21,
+    "historicalVerificationStep": "7.10"
+  },
+  "terrainVisibility": {
+    "status": "verified_step7.11_prescribed_opaque_triangles",
+    "coordinateModel": "shared_spherical_ECEF_ENU",
+    "areaVisibility": "direct_visible_area_integration;no_transparency",
+    "demDatum": "explicit_radial_interpretation;not_geoid_certified",
+    "evidenceRef": "../evidencies/pas7.11/validacio-terreny-i-visibilitat.md"
+  },
+  "radiometricTransportGate": {
+    "status": "PASS_NUMERIC_CONDITIONAL_DOMAIN",
+    "ownerStep": "7.12",
+    "primaryCases": 9,
+    "verticalCases": 42,
+    "backendTestsPassed": 444,
+    "newTests": 17,
+    "maximumGuardedRelativeError": 6.894967559802688e-07,
+    "maximumConditionalTailMag": 0.00047229612270819086,
+    "observationalValidation": false,
+    "scope": "Fixtures registrades, camp/font/malla prescrits; cua condicionada d'aire sec. No prova uniforme de tota l'atmosfera o de tota ciutat.",
+    "evidenceRef": "../evidencies/pas7.12/validacio-gate-transport.md"
   }
 }

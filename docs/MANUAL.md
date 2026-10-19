@@ -605,7 +605,7 @@ La LUT empaquetada només acredita O3 entre 380–780 nm i 203–293 K. La compo
 
 ![Efecte del sostre 10–50 km segons medi i elevació](evidencies/pas7.10/sensibilitat-sostre-atmosferic.png)
 
-Al zenit de la fixture B4 estàndard, un sostre de 10 km dona 22,45% menys radiància que 50 km. La cua superior a 50 km continua desconeguda: el control del sostre no és una estimació de l'error espectral ni una qualificació física universal. Els temps de perfils variables es documenten separadament de la fixture homogènia de 900 LOS. [Resultats, procedència i límits](evidencies/pas7.10/validacio-espectral-i-gasos.md). L'ampliació de terreny de 7.11 es descriu a continuació; 7.12 continua pendent.
+Al zenit de la fixture B4 estàndard, un sostre de 10 km dona 22,45% menys radiància que 50 km. A7.10, la cua superior a50km restava desconeguda: el control del sostre no és una estimació de l'error espectral ni una qualificació física universal. Els temps de perfils variables es documenten separadament de la fixture homogènia de 900 LOS. [Resultats, procedència i límits](evidencies/pas7.10/validacio-espectral-i-gasos.md). L'ampliació de terreny de 7.11 es descriu a continuació; el gate posterior7.12 es descriu a continuació.
 
 ### Terreny opac del transport offline — Pas 7.11
 
@@ -626,4 +626,33 @@ El constructor consumeix l'adaptador DEM existent, exigeix convenció/conversió
 
 ![Cost d'oclusió mesurat, sense acceleracions posteriors](evidencies/pas7.11/cost-oclusio.png)
 
-Les fonts extenses amb retall directe són costoses; els ordres alts són eines de diagnòstic. Els resultats de 90 LOS no s'extrapolen a la campanya històrica de 900 LOS. **El sostre de 10 km continua ometent 22,45% respecte a 50 km en el zenit B4 de 7.10**; la cua superior és desconeguda. [Informe i límits](evidencies/pas7.11/validacio-terreny-i-visibilitat.md). El punt de represa és 7.12 pendent i no executat.
+Les fonts extenses amb retall directe són costoses; els ordres alts són eines de diagnòstic. Els resultats de 90 LOS no s'extrapolen a la campanya històrica de 900 LOS. **El sostre de 10 km continua ometent 22,45% respecte a 50 km en el zenit B4 de 7.10**; en aquell tancament, la cua superior encara era desconeguda. [Informe i límits](evidencies/pas7.11/validacio-terreny-i-visibilitat.md). El gate posterior7.12 es descriu a continuació.
+
+
+### Gate radiomètric offline — Pas 7.12
+
+El gate separa el transport donat un camp discret de la credibilitat física d'aquest camp. Les fixtures S defineixen potència d'1W; B1 conserva l'espectre pla històric a550nm i B4 usa LED-B3 integrada amb resposta CIE V. Les fonts C realista/K conserven escala relativa i no es converteixen en observacions validades. La instantània DEM arxivada es reprodueix sense accés al raster original; la seva convenció d'altura continua sent explícita.
+
+Per reproduir la campanya, escolliu una carpeta nova i preserveu els resultats:
+
+```powershell
+python -X utf8 tools/validate_transport_gate_step7_12.py --output .runtime-gate-local/campanya-v1 --part bind
+python -X utf8 tools/validate_transport_gate_step7_12.py --output .runtime-gate-local/campanya-v1 --part gate
+python -X utf8 tools/validate_transport_gate_step7_12.py --output .runtime-gate-local/campanya-v1 --part ceiling
+python -X utf8 tools/diagnose_transport_gate_step7_12.py --output .runtime-gate-local --part errors
+python -X utf8 tools/diagnose_transport_gate_step7_12.py --output .runtime-gate-local --part compatibility
+python -X utf8 tools/bound_lut_transport_gate_step7_12.py --output .runtime-gate-local/cota-lut-refinada-i-pressupost.json
+python -X utf8 tools/audit_transport_gate_step7_12.py --root .runtime-gate-local --part tail
+```
+
+La reproducció completa requereix temps: fonts extenses amb terreny i columnes variables són especialment costoses. `gate` i `ceiling` reprenen les files ja persistides només si el codi coincideix amb la vinculació. El criteri congelat es llegeix del repositori; no s'edita segons el residual obtingut. Els JSON guarden PASS/FAIL per cas i no acrediten peticions arbitràries del kernel. Els resultats crus anteriors conserven els esquemes i marcadors històrics de compatibilitat; el veredicte nou pertany a l'informe de validació.
+
+L'ampliació COESA fins a75km és optativa. La contribució superior s'acota positivament sota les hipòtesis d'aire sec hidrostàtic i aerosol prescrit, sense posar-la a zero ni exigir P(infinit)=0. [Domini i derivació](evidencies/pas7.12/domini-i-cota-exterior.md). Les incerteses de composició real, dispersió múltiple, inferència urbana i datum DEM continuen separades. 7.13 no s'ha iniciat.
+
+[Resultat verificat de7.12](evidencies/pas7.12/validacio-gate-transport.md):9 fixtures S PASS,42 sostres i444 proves. La cota exterior màxima és0,000472296mag; validesa condicionada al model prescrit, sense homologació observacional.
+
+![Gate numèric i domini vertical](evidencies/pas7.12/gate-i-convergencia-vertical.png)
+
+![Cost actual del transport i l'oclusió](evidencies/pas7.12/cost-transport-i-oclusio.png)
+
+L'auditoria final de la campanya arxivada s'executa amb python tools/audit_transport_gate_step7_12.py --root docs/evidencies/pas7.12 --part final. Una campanya nova necessita també regenerar les regressions i els seus manifests; el CLI final retorna error si falten fitxers o falla el criteri. Les primeres/repeticions de rendiment s'obtenen amb diagnose_transport_gate_step7_12.py --part benchmark; els estimadors complets, amb --part diagnostics, i els controls separats d'oracle, amb --part oracle-controls (sempre amb --output). No s'extrapola una font extensa a900LOS ni es declara SLO. 7.13 no iniciat.

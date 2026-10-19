@@ -1,0 +1,136 @@
+[
+  {
+    "name": "S_near5km",
+    "mode": "B1",
+    "bound": {
+      "upper_radiance": 2.634529946616963e-20,
+      "molecular_weighted_column": 917562401059919.1,
+      "aerosol_weighted_length_m": 1.5269343181140492e-34,
+      "geometry_envelope": 7355.734022326309,
+      "radial_jacobian": 1.0,
+      "pressure_at_top_pa": 2.3881429078441494,
+      "top_m": 75000.0,
+      "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+    },
+    "sourceAngular": {
+      "kind": "axial",
+      "profileId": "b0-uniform",
+      "evidenceReference": "Perfil definit, no avaluat radiomètricament a B0",
+      "zenithDeg": [
+        0.0,
+        90.0
+      ],
+      "relativeIntensity": [
+        1.0,
+        1.0
+      ],
+      "normalization": "hemisphere_integral_one",
+      "densityUnit": "sr^-1"
+    }
+  },
+  {
+    "name": "S_near5km",
+    "mode": "B4",
+    "bound": {
+      "upper_radiance": 3.4708901920370255e-18,
+      "molecular_weighted_column": 917562401059919.1,
+      "aerosol_weighted_length_m": 1.5269343181140492e-34,
+      "geometry_envelope": 7355.734022326309,
+      "radial_jacobian": 1.0,
+      "pressure_at_top_pa": 2.3881429078441494,
+      "top_m": 75000.0,
+      "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+    },
+    "sourceAngular": {
+      "kind": "axial",
+      "profileId": "b0-uniform",
+      "evidenceReference": "Perfil definit, no avaluat radiomètricament a B0",
+      "zenithDeg": [
+        0.0,
+        90.0
+      ],
+      "relativeIntensity": [
+        1.0,
+        1.0
+      ],
+      "normalization": "hemisphere_integral_one",
+      "densityUnit": "sr^-1"
+    },
+    "reference": {
+      "value": 9.425988988137278e-12,
+      "los_error_estimate": 2.2717352319181293e-25,
+      "evaluations": 2142,
+      "path_order": 4,
+      "area_order": 2,
+      "revision": "sg-ref-variable-spectral-GL-v1"
+    },
+    "tailMag": 3.997957619495959e-07
+  },
+  {
+    "name": "S_far200km",
+    "mode": "B1",
+    "bound": {
+      "upper_radiance": 3.228803527208911e-21,
+      "molecular_weighted_column": 112453787848602.64,
+      "aerosol_weighted_length_m": 1.8713664342566604e-35,
+      "geometry_envelope": 901.4974374079811,
+      "radial_jacobian": 1.0,
+      "pressure_at_top_pa": 2.3881429078441494,
+      "top_m": 75000.0,
+      "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+    },
+    "sourceAngular": {
+      "kind": "axial",
+      "profileId": "b0-uniform",
+      "evidenceReference": "Perfil definit, no avaluat radiomètricament a B0",
+      "zenithDeg": [
+        0.0,
+        90.0
+      ],
+      "relativeIntensity": [
+        1.0,
+        1.0
+      ],
+      "normalization": "hemisphere_integral_one",
+      "densityUnit": "sr^-1"
+    }
+  },
+  {
+    "name": "S_far200km",
+    "mode": "B4",
+    "bound": {
+      "upper_radiance": 4.2538223978037526e-19,
+      "molecular_weighted_column": 112453787848602.64,
+      "aerosol_weighted_length_m": 1.8713664342566604e-35,
+      "geometry_envelope": 901.4974374079811,
+      "radial_jacobian": 1.0,
+      "pressure_at_top_pa": 2.3881429078441494,
+      "top_m": 75000.0,
+      "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+    },
+    "sourceAngular": {
+      "kind": "axial",
+      "profileId": "b0-uniform",
+      "evidenceReference": "Perfil definit, no avaluat radiomètricament a B0",
+      "zenithDeg": [
+        0.0,
+        90.0
+      ],
+      "relativeIntensity": [
+        1.0,
+        1.0
+      ],
+      "normalization": "hemisphere_integral_one",
+      "densityUnit": "sr^-1"
+    },
+    "reference": {
+      "value": 9.776757218216072e-16,
+      "los_error_estimate": 2.241529028498421e-29,
+      "evaluations": 2142,
+      "path_order": 4,
+      "area_order": 2,
+      "revision": "sg-ref-variable-spectral-GL-v1"
+    },
+    "tailMag": 0.00047229612270819086
+  }
+]

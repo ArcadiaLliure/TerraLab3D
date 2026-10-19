@@ -1,0 +1,362 @@
+{
+  "status": "PASS_NUMERIC_CONDITIONAL_DOMAIN",
+  "policySha256": "6cfa6601f02dabeb1a3462638e980959c11a12164433738689efb31e92cdb442",
+  "checks": {
+    "primaryTransport": true,
+    "positiveConditionalTail": true,
+    "finiteVerticalReferences": true,
+    "spectralBudget": true,
+    "historicalEvidenceExact": true,
+    "b0Exact": true,
+    "columnsExact": true,
+    "pyrightNoNewDiagnostics": true
+  },
+  "cases": [
+    {
+      "case": "S_B1_std_point_zenith_5km",
+      "status": "PASS",
+      "candidate": 7.206559647541461e-14,
+      "reference": 7.206559647541452e-14,
+      "reference_uncertainty": 1.8783283527419196e-25,
+      "absolute_error": 8.835242138475332e-29,
+      "guarded_relative_error": 2.6076407729406196e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B4_std_point_zenith_5km",
+      "status": "PASS",
+      "candidate": 9.425988988162318e-12,
+      "reference": 9.425988988137196e-12,
+      "reference_uncertainty": 8.67313089973103e-25,
+      "absolute_error": 2.512237993203043e-23,
+      "guarded_relative_error": 2.757237787431335e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B4_std_area_zenith_5km",
+      "status": "PASS",
+      "candidate": 9.383689491061318e-12,
+      "reference": 9.383689967202339e-12,
+      "reference_uncertainty": 5.993882770706192e-18,
+      "absolute_error": 4.761410208044162e-19,
+      "guarded_relative_error": 6.894967559802688e-07,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B1_std_point_far_zenith_200km",
+      "status": "PASS",
+      "candidate": 7.792791163683079e-18,
+      "reference": 7.792791163683101e-18,
+      "reference_uncertainty": 2.5031242246045808e-26,
+      "absolute_error": 2.1570415377137042e-32,
+      "guarded_relative_error": 3.212105045636906e-09,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B1_homog_area_mountain_zenith",
+      "status": "PASS",
+      "candidate": 6.077438295832351e-14,
+      "reference": 6.077439781412494e-14,
+      "reference_uncertainty": 9.321143978910416e-21,
+      "absolute_error": 1.4855801430306955e-20,
+      "guarded_relative_error": 3.978146436458522e-07,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B4_homog_area_mountain_zenith",
+      "status": "PASS",
+      "candidate": 7.962371622097224e-12,
+      "reference": 7.962373567673653e-12,
+      "reference_uncertainty": 1.2208090787885868e-18,
+      "absolute_error": 1.9455764298490154e-18,
+      "guarded_relative_error": 3.9766854465266154e-07,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B4_homog_point_mountain_dark_5deg",
+      "status": "PASS",
+      "candidate": 0.0,
+      "reference": 0.0,
+      "reference_uncertainty": 0.0,
+      "absolute_error": 0.0,
+      "guarded_relative_error": null,
+      "reason": "cas fosc geomètric; zero exacte obligatori",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B1_std_far_horizon_200km",
+      "status": "PASS",
+      "candidate": 1.4705062116511528e-14,
+      "reference": 1.470506211651205e-14,
+      "reference_uncertainty": 5.026242423931211e-23,
+      "absolute_error": 5.206481974458678e-28,
+      "guarded_relative_error": 3.4180708989369177e-09,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    },
+    {
+      "case": "S_B4_homog_realDEM_snapshot",
+      "status": "PASS",
+      "candidate": 2.494722421074893e-10,
+      "reference": 2.494722421068321e-10,
+      "reference_uncertainty": 1.0473138693888923e-21,
+      "absolute_error": 6.571949966733805e-22,
+      "guarded_relative_error": 6.832459000919016e-12,
+      "reason": "error del candidat més incertesa estimada de SG-REF",
+      "repeatExact": true
+    }
+  ],
+  "verticalCaseCount": 42,
+  "tails": [
+    {
+      "fixture": "pas7.10_original_B4_standard",
+      "mode": "B1",
+      "upperTailRadiance": 2.4768596927296954e-20,
+      "lowerFiniteReference": 5.962542043410936e-15,
+      "tailMagnitudeUpper": 4.510174749967577e-06,
+      "tailBudgetPass": true,
+      "finiteTransportDecision": {
+        "status": "PASS",
+        "candidate": 5.962542043438868e-15,
+        "reference": 5.96254204343891e-15,
+        "reference_uncertainty": 2.797456652106172e-26,
+        "absolute_error": 4.259848888193464e-29,
+        "guarded_relative_error": 4.698862466013688e-12,
+        "reason": "error del candidat més incertesa estimada de SG-REF"
+      }
+    },
+    {
+      "fixture": "pas7.10_original_B4_standard",
+      "mode": "B4",
+      "upperTailRadiance": 3.2631657975976894e-18,
+      "lowerFiniteReference": 7.736464825315357e-13,
+      "tailMagnitudeUpper": 4.579520306399618e-06,
+      "tailBudgetPass": true,
+      "finiteTransportDecision": {
+        "status": "PASS",
+        "candidate": 7.736464825351022e-13,
+        "reference": 7.736464825324662e-13,
+        "reference_uncertainty": 9.304717434078353e-25,
+        "absolute_error": 2.6359313831416977e-24,
+        "guarded_relative_error": 4.609861489805026e-12,
+        "reason": "error del candidat més incertesa estimada de SG-REF"
+      }
+    },
+    {
+      "fixture": "S_near5km",
+      "mode": "B1",
+      "upperTailRadiance": 2.634529946616963e-20,
+      "lowerFiniteReference": 7.206559647522668e-14,
+      "tailMagnitudeUpper": 3.9691672068303016e-07,
+      "tailBudgetPass": true,
+      "finiteTransportDecision": {
+        "status": "PASS",
+        "candidate": 7.206559647541461e-14,
+        "reference": 7.206559647541452e-14,
+        "reference_uncertainty": 1.8783283527419196e-25,
+        "absolute_error": 8.835242138475332e-29,
+        "guarded_relative_error": 2.6076407729406196e-12,
+        "reason": "error del candidat més incertesa estimada de SG-REF"
+      }
+    },
+    {
+      "fixture": "S_near5km",
+      "mode": "B4",
+      "upperTailRadiance": 3.4708901920370255e-18,
+      "lowerFiniteReference": 9.425988988136328e-12,
+      "tailMagnitudeUpper": 3.997957619495959e-07,
+      "tailBudgetPass": true,
+      "finiteTransportDecision": {
+        "status": "PASS",
+        "candidate": 9.425988988162318e-12,
+        "reference": 9.425988988137196e-12,
+        "reference_uncertainty": 8.67313089973103e-25,
+        "absolute_error": 2.512237993203043e-23,
+        "guarded_relative_error": 2.757237787431335e-12,
+        "reason": "error del candidat més incertesa estimada de SG-REF"
+      }
+    },
+    {
+      "fixture": "S_far200km",
+      "mode": "B1",
+      "upperTailRadiance": 3.228803527208911e-21,
+      "lowerFiniteReference": 7.792791138651859e-18,
+      "tailMagnitudeUpper": 0.0004497621941141372,
+      "tailBudgetPass": true,
+      "finiteTransportDecision": {
+        "status": "PASS",
+        "candidate": 7.792791163683079e-18,
+        "reference": 7.792791163683101e-18,
+        "reference_uncertainty": 2.5031242246045808e-26,
+        "absolute_error": 2.1570415377137042e-32,
+        "guarded_relative_error": 3.212105045636906e-09,
+        "reason": "error del candidat més incertesa estimada de SG-REF"
+      }
+    },
+    {
+      "fixture": "S_far200km",
+      "mode": "B4",
+      "upperTailRadiance": 4.2538223978037526e-19,
+      "lowerFiniteReference": 9.776757218215273e-16,
+      "tailMagnitudeUpper": 0.00047229612270819086,
+      "tailBudgetPass": true,
+      "finiteTransportDecision": {
+        "status": "PASS",
+        "candidate": 9.776757224646584e-16,
+        "reference": 9.77675722469572e-16,
+        "reference_uncertainty": 6.480446931675698e-25,
+        "absolute_error": 4.913617363395377e-27,
+        "guarded_relative_error": 6.678679806854742e-10,
+        "reason": "error del candidat més incertesa estimada de SG-REF"
+      }
+    }
+  ],
+  "primaryConditionalTails": [
+    {
+      "case": "S_B1_std_point_zenith_5km",
+      "bound": {
+        "upper_radiance": 2.634529946616963e-20,
+        "molecular_weighted_column": 917562401059919.1,
+        "aerosol_weighted_length_m": 1.5269343181140492e-34,
+        "geometry_envelope": 7355.734022326309,
+        "radial_jacobian": 1.0,
+        "pressure_at_top_pa": 2.3881429078441494,
+        "top_m": 75000.0,
+        "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+      },
+      "lowerFiniteReference": 7.206559647522668e-14,
+      "tailMagnitudeUpper": 3.9691672068303016e-07,
+      "tailBudgetPass": true
+    },
+    {
+      "case": "S_B4_std_point_zenith_5km",
+      "bound": {
+        "upper_radiance": 3.4708901920370255e-18,
+        "molecular_weighted_column": 917562401059919.1,
+        "aerosol_weighted_length_m": 1.5269343181140492e-34,
+        "geometry_envelope": 7355.734022326309,
+        "radial_jacobian": 1.0,
+        "pressure_at_top_pa": 2.3881429078441494,
+        "top_m": 75000.0,
+        "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+      },
+      "lowerFiniteReference": 9.425988988136328e-12,
+      "tailMagnitudeUpper": 3.997957619495959e-07,
+      "tailBudgetPass": true
+    },
+    {
+      "case": "S_B4_std_area_zenith_5km",
+      "bound": {
+        "upper_radiance": 3.49716230089775e-18,
+        "molecular_weighted_column": 924507679634982.9,
+        "aerosol_weighted_length_m": 1.5384920979368458e-34,
+        "geometry_envelope": 7411.411567363155,
+        "radial_jacobian": 1.0,
+        "pressure_at_top_pa": 2.3881429078441494,
+        "top_m": 75000.0,
+        "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+      },
+      "lowerFiniteReference": 9.383683973319569e-12,
+      "tailMagnitudeUpper": 4.046379894961714e-07,
+      "tailBudgetPass": true
+    },
+    {
+      "case": "S_B1_std_point_far_zenith_200km",
+      "bound": {
+        "upper_radiance": 3.228803527208911e-21,
+        "molecular_weighted_column": 112453787848602.64,
+        "aerosol_weighted_length_m": 1.8713664342566604e-35,
+        "geometry_envelope": 901.4974374079811,
+        "radial_jacobian": 1.0,
+        "pressure_at_top_pa": 2.3881429078441494,
+        "top_m": 75000.0,
+        "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+      },
+      "lowerFiniteReference": 7.792791138651859e-18,
+      "tailMagnitudeUpper": 0.0004497621941141372,
+      "tailBudgetPass": true
+    },
+    {
+      "case": "S_B1_std_far_horizon_200km",
+      "bound": {
+        "upper_radiance": 2.37739911236789e-21,
+        "molecular_weighted_column": 82800806292719.64,
+        "aerosol_weighted_length_m": 1.0752914442392182e-35,
+        "geometry_envelope": 101.05742801713744,
+        "radial_jacobian": 6.568356750770689,
+        "pressure_at_top_pa": 2.3881429078441494,
+        "top_m": 75000.0,
+        "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+      },
+      "lowerFiniteReference": 1.4705062066249625e-14,
+      "tailMagnitudeUpper": 1.7553330068490734e-07,
+      "tailBudgetPass": true
+    }
+  ],
+  "spectralCases": [
+    {
+      "maximumTwoLegOzoneColumnM2": 3.820416856218798e+24,
+      "maximumLutMagnitudeError": 0.006900703731188037,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "envolupant de capes 50m sobre el mateix logP/T/q interpolat; no és remostreig COESA ni quadratura del transport",
+      "subshellM": 50.0,
+      "case": "S_B4_std_point_zenith_5km",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.007009282780706724,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 3.820098306375375e+24,
+      "maximumLutMagnitudeError": 0.006900128344214361,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "envolupant de capes 50m sobre el mateix logP/T/q interpolat; no és remostreig COESA ni quadratura del transport",
+      "subshellM": 50.0,
+      "case": "S_B4_std_area_zenith_5km",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.007008707393733047,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 2.5554431291554934e+22,
+      "maximumLutMagnitudeError": 4.615819843716084e-05,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "triangle de distàncies, n/q constants; LOS completa fins al sostre, sense aprofitar ombres",
+      "subshellM": 50.0,
+      "case": "S_B4_homog_area_mountain_zenith",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.0001547372479558468,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 2.1689305684073646e+23,
+      "maximumLutMagnitudeError": 0.0003917673863712874,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "triangle de distàncies, n/q constants; LOS completa fins al sostre, sense aprofitar ombres",
+      "subshellM": 50.0,
+      "case": "S_B4_homog_point_mountain_dark_5deg",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.0005003464358899734,
+      "spectralBudgetMag": 0.01
+    },
+    {
+      "maximumTwoLegOzoneColumnM2": 2.0506945153293886e+22,
+      "maximumLutMagnitudeError": 3.704107647422102e-05,
+      "maximumCrossSectionDifferenceM2": 1.663636000007426e-27,
+      "method": "triangle de distàncies, n/q constants; LOS completa fins al sostre, sense aprofitar ombres",
+      "subshellM": 50.0,
+      "case": "S_B4_homog_realDEM_snapshot",
+      "transportMagnitudeAllowance": 0.00010857904951868596,
+      "combinedNumericalMagnitudeBound": 0.00014562012599290698,
+      "spectralBudgetMag": 0.01
+    }
+  ],
+  "observationalValidation": false,
+  "nextStepStarted": false,
+  "scope": "Fixtures registrades, camp/font/malla prescrits; cua condicionada d'aire sec. No prova uniforme de tota l'atmosfera o de tota ciutat."
+}

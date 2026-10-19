@@ -1,0 +1,83 @@
+{
+  "lutBound75km": {
+    "upperColumnM2": 4.3324084767338595e+24,
+    "maxDeltaSigmaM2": 1.663636000007426e-27,
+    "magnitudeBound": 0.007825498751991638,
+    "budgetMag": 0.01,
+    "domain": "COESA0–75km, q O3 prescrit, observador100m, fonts0..100m, offsets<=500m, cames ascendents + prefix tangent; cua/física separades"
+  },
+  "verticalInterpolation": [
+    {
+      "stepM": 5000,
+      "reference": {
+        "value": 9.378210445898034e-12,
+        "los_error_estimate": 2.3535360107318024e-25,
+        "evaluations": 882,
+        "path_order": 16,
+        "area_order": 8,
+        "revision": "sg-ref-variable-spectral-GL-v1"
+      },
+      "seconds": 1.127502400020603,
+      "fieldSignature": "1834ca058587b9fb2568fa49221ac42873f32e0b03dec60b235e46ff4b398c0b"
+    },
+    {
+      "stepM": 2500,
+      "reference": {
+        "value": 9.415656863387513e-12,
+        "los_error_estimate": 2.36315084410532e-25,
+        "evaluations": 1197,
+        "path_order": 16,
+        "area_order": 8,
+        "revision": "sg-ref-variable-spectral-GL-v1"
+      },
+      "seconds": 1.6803314999851864,
+      "fieldSignature": "0ad102fe12d10dc30a9bde9b518b9171394ec51763cfbc1cc7a137b331506fe3"
+    },
+    {
+      "stepM": 1000,
+      "reference": {
+        "value": 9.425988988137196e-12,
+        "los_error_estimate": 2.2717352319181863e-25,
+        "evaluations": 2142,
+        "path_order": 16,
+        "area_order": 8,
+        "revision": "sg-ref-variable-spectral-GL-v1"
+      },
+      "seconds": 4.299793500016676,
+      "fieldSignature": "6bf4a6c496edc726c93f2d3d94dc645138c138bea7bbc1f2122e1304a132357f"
+    },
+    {
+      "stepM": 500,
+      "reference": {
+        "value": 9.427499291434239e-12,
+        "los_error_estimate": 2.1890583106385e-25,
+        "evaluations": 3717,
+        "path_order": 16,
+        "area_order": 8,
+        "revision": "sg-ref-variable-spectral-GL-v1"
+      },
+      "seconds": 10.763130699982867,
+      "fieldSignature": "8a2b4d463b1bf45224e38499cee38d641dd86ee1d971b072e22803c13df5c23d"
+    }
+  ],
+  "spectrum75km": {
+    "coarseLut": {
+      "value": 9.425988988137196e-12,
+      "los_error_estimate": 2.2717352319181863e-25,
+      "evaluations": 2142,
+      "path_order": 16,
+      "area_order": 8,
+      "revision": "sg-ref-variable-spectral-GL-v1"
+    },
+    "rawData": {
+      "value": 9.425988873748803e-12,
+      "los_error_estimate": 2.271735204861593e-25,
+      "evaluations": 2142,
+      "path_order": 16,
+      "area_order": 8,
+      "revision": "sg-ref-variable-spectral-GL-v1"
+    },
+    "lutMagnitudeDifference": 1.3175871526705323e-08,
+    "rawLutStepNm": 0.01
+  }
+}

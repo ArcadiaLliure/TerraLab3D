@@ -51,11 +51,18 @@ def standard_pressure_temperature(height_m: float) -> tuple[float, float]:
 class StandardAtmosphericOpticsProvider:
     """Materialitza perfils tabulats; sense xarxa, cache radiativa ni serveis."""
 
+    top_limit_m = 50000.0
+    model_revision = MODEL_REVISION
+    base_heights_m = _BASES
+    pressure_temperature = staticmethod(standard_pressure_temperature)
+
     def resolve(self, request: OpticalFieldRequest) -> OpticalField:
-        if request.top_m > 50000:
-            raise ValueError("El provider estàndard no extrapola per damunt de 50 km")
+        if request.top_m > self.top_limit_m:
+            raise ValueError(
+                "El provider estàndard no extrapola fora del domini declarat"
+            )
         count = math.ceil(request.top_m / request.vertical_step_m)
-        if count + len(_BASES) + 1 > 4096:
+        if count + len(self.base_heights_m) + 1 > 4096:
             raise ValueError(
                 "El perfil sol·licitat excedeix el pressupost de 4.096 nusos"
             )
@@ -64,15 +71,15 @@ class StandardAtmosphericOpticsProvider:
             request.top_m,
             *(i * request.vertical_step_m for i in range(1, count)),
         }
-        for h in _BASES[1:]:
+        for h in self.base_heights_m[1:]:
             z = GEOPOTENTIAL_RADIUS_M * h / (GEOPOTENTIAL_RADIUS_M - h)
             if z < request.top_m:
                 knots.add(z)
         heights = tuple(sorted(knots))
-        values = [standard_pressure_temperature(z) for z in heights]
+        values = [self.pressure_temperature(z) for z in heights]
         provenance = tuple(
             FieldProvenance(
-                name, "standard_coesa", MODEL_REVISION, reference, interpretation
+                name, "standard_coesa", self.model_revision, reference, interpretation
             )
             for name, reference, interpretation in (
                 (
@@ -101,7 +108,7 @@ class StandardAtmosphericOpticsProvider:
             heights,
             tuple(p for p, _ in values),
             tuple(t for _, t in values),
-            MODEL_REVISION,
+            self.model_revision,
             provenance,
         )
         return OpticalField(
@@ -113,3 +120,40 @@ class StandardAtmosphericOpticsProvider:
             request.time_utc,
             request.radius_m,
         )
+
+
+def extended_standard_pressure_temperature(height_m: float) -> tuple[float, float]:
+    """COESA fins a 75 km: taula 3, sense extrapolar ni congelar T a la LUT.
+
+    Per sota de 50 km delega exactament a la implementació històrica.
+    No defineix l'exosfera ni declara nul·la la contribució superior.
+    """
+    if not math.isfinite(height_m) or not 0 <= height_m <= 75000:
+        raise ValueError("COESA ampliat admet només 0–75.000 m geomètrics")
+    if height_m <= 50000:
+        return standard_pressure_temperature(height_m)
+    bases = (*_BASES, 71000.0, 84852.0)
+    lapses = (*_LAPSES, -0.0028, -0.002)
+    h = GEOPOTENTIAL_RADIUS_M * height_m / (GEOPOTENTIAL_RADIUS_M + height_m)
+    layer = min(bisect_right(bases, h) - 1, len(lapses) - 1)
+    pressure, temperature = 101325.0, 288.15
+    coefficient = _GRAVITY_M_S2 * _MOLAR_MASS_KG_MOL / _GAS_CONSTANT_J_MOL_K
+    for i in range(layer + 1):
+        dz = (h if i == layer else bases[i + 1]) - bases[i]
+        target = temperature + lapses[i] * dz
+        pressure *= (
+            math.exp(-coefficient * dz / temperature)
+            if lapses[i] == 0
+            else (temperature / target) ** (coefficient / lapses[i])
+        )
+        temperature = target
+    return pressure, temperature
+
+
+class ExtendedStandardAtmosphericOpticsProvider(StandardAtmosphericOpticsProvider):
+    """Ampliació optativa; el provider 0–50 km i les seves identitats es conserven."""
+
+    top_limit_m = 75000.0
+    model_revision = "coesa1975-nasa-tr459-dry-0-75km-v1"
+    base_heights_m = (*_BASES, 71000.0, 84852.0)
+    pressure_temperature = staticmethod(extended_standard_pressure_temperature)

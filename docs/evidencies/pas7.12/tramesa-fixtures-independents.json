@@ -1,0 +1,14 @@
+[
+  {
+    "case": "S_B1_std_far_horizon_200km",
+    "sha256": "b699e0e5eb672e5914ab1e1b817c29c30310fe61f049825a0a9d0fba75c879d3",
+    "copiedAtUtc": "2026-10-19T15:04:31.308256+00:00",
+    "mainFirstIncompleteIndex": 3
+  },
+  {
+    "case": "S_B4_homog_realDEM_snapshot",
+    "sha256": "043cecd609a5f9eb43c96fe0d1265163e46173f03975b293f6033574ba813849",
+    "copiedAtUtc": "2026-10-19T15:04:31.310164+00:00",
+    "mainFirstIncompleteIndex": 3
+  }
+]

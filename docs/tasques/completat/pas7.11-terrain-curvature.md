@@ -22,7 +22,7 @@ Verificar muntanya, font parcial, font llunyana i discontinuïtats amb SG-REF in
 - [7.10 — Transport espectral](../completat/pas7.10-gas-spectral-kernel.md).
 
 **En depenen:**
-- [7.12 — Gate zenital](../pendent/pas7.12-zenith-transport-gate.md), pendent, no s’executa aquí.
+- [7.12 — Gate zenital](pas7.12-zenith-transport-gate.md), completat posteriorment en el seu domini registrat.
 
 ## Codi existent a reutilitzar
 

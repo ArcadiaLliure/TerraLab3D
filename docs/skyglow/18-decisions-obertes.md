@@ -31,3 +31,5 @@ Aquest registre conserva la traçabilitat històrica, però els bloquejos nous s
 - Quadtree, Legendre, AD, cache i LUT/FFT són acceleracions posteriors al baseline directe.
 
 Decisions tancades a 7.5.1: rang K 2.800–6.500, família estable CIE B1–B5, CCT efectiva resolta en uv, quatre normalitzacions, ensemble determinista de pesos radiants explícits, RSR MGS/LGS com a aproximació. Pendents: dades locals de tecnologies, SPD verificades de mercuri/LPS/ambre, escala absoluta, mapping HGS/L3, propagació i validació empírica.
+
+**Actualització7.12,2026-10-19:** V1 té [criteri de transport congelat i verificat](../evidencies/pas7.12/validacio-gate-transport.md) només per al domini registrat. S1 s'amplia amb SG-REF espectral variable i terreny independents. La cota exterior és condicionada, no observacional. Els valors empírics7.17 i SLO7.22 continuen pendents; no es relaxa cap llindar retrospectivament.

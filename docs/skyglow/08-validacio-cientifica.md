@@ -82,4 +82,8 @@ Els benchmarks F5 mesuren biaix dins els seus escenaris definits; no fixen una c
 
 ## Estat verificat de 7.11 (2026-10-19)
 
-Topologia sintètica, DEM configurat i fonts S/C realista/K verificats offline; 427 proves. Cap tolerància runtime↔SG-REF triada a partir dels residuals: 7.12 continua pendent. [Informe i incerteses](../evidencies/pas7.11/validacio-terreny-i-visibilitat.md). Els errors de malla, àrea, espectre i sostre es documenten separadament; no s’ha declarat suficient el domini atmosfèric de 10 km.
+Topologia sintètica, DEM configurat i fonts S/C realista/K verificats offline; 427 proves. Cap tolerància runtime↔SG-REF triada a partir dels residuals: en aquell tancament7.12 continuava pendent. [Informe i incerteses](../evidencies/pas7.11/validacio-terreny-i-visibilitat.md). Els errors de malla, àrea, espectre i sostre es documenten separadament; no s’ha declarat suficient el domini atmosfèric de 10 km.
+
+## Estat verificat de7.12 (2026-10-19)
+
+[Gate prospectiu](../evidencies/pas7.12/validacio-gate-transport.md):10⁻⁴ relatiu protegit amb u_ref/R≤10⁻⁶,9 fixtures S PASS,42 sostres i444 proves. Cota exterior >75km positiva i condicionada ≤0,000472296mag, sense exigir P(infinit)=0;0,01mag espectral mantingut. Els controls independents separen àrea/trajectes/espectre; DEM/P/T i física no s'absorbeixen dins el residual. El perfil v2 referencia el nou registre; el v1 històric no es reescriu. C realista/K continua relatiu, sense homologació observacional.7.13 no iniciat.
