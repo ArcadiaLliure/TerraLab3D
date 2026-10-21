@@ -22,3 +22,16 @@
 /tools/*step7_13_v2.py text eol=lf
 /frontend/src/domain/skyglow/adaptiveDome.ts text eol=lf
 /frontend/src/tests/adaptive_dome_step7_13_v2.test.ts text eol=lf
+/docs/evidencies/pas7.14/** -text
+/backend/src/terralab3d/domain/photometric_projection.py text eol=lf
+/backend/src/terralab3d/application/photometric_projections.py text eol=lf
+/backend/tests/test_photometric_projection_step7_14.py text eol=lf
+/tools/*step7_14.py text eol=lf
+/tools/project_skyglow_photometry.py text eol=lf
+/backend/src/terralab3d/domain/wavelength_coordinates.py text eol=lf
+/backend/src/terralab3d/domain/instrument_qualification.py text eol=lf
+/backend/src/terralab3d/application/coordinate_photometry.py text eol=lf
+/backend/tests/test_photometric_coordinates_step7_14_v2.py text eol=lf
+/tools/*step7_14_v2.py text eol=lf
+/tools/audit_photometry_resume.py text eol=lf
+/tools/plot_photometry_resume.py text eol=lf

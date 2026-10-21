@@ -1,0 +1,24 @@
+{
+  "case": "S-COESA75km-52.19",
+  "topM": 75000.0,
+  "responseEnvelope": "0<=V_air(lambda_vac/n)<=1; resposta plana1 domina també la V corregida",
+  "tail": {
+    "upper_radiance": 6.471301782971458e-18,
+    "molecular_weighted_column": 686860598084892.5,
+    "aerosol_weighted_length_m": 1.1361080748725573e-34,
+    "geometry_envelope": 4380.387075473179,
+    "radial_jacobian": 1.2570325474764807,
+    "pressure_at_top_pa": 2.3881429078441494,
+    "top_m": 75000.0,
+    "hypothesis": "aire sec hidrostàtic exterior, aerosol exponencial prescrit, dispersió simple; no validació observacional"
+  },
+  "coordinateCieSignal": 9.13986668850522e-12,
+  "protectedSignalLower": 9.055166370395205e-12,
+  "conditionalTailMagnitudeUpper": 7.759243551878844e-07,
+  "maximumInclusiveMagnitude": 0.001,
+  "passCriterion": true,
+  "inheritedPolicySha256": "6cfa6601f02dabeb1a3462638e980959c11a12164433738689efb31e92cdb442",
+  "newPhysicalLos": 0,
+  "measuredCalculationWallSeconds": 0.3862813000000642,
+  "scope": "Mateixes hipòtesis seques hidrostàtiques de7.12; cota positiva fins a infinit, no atmosfera observacional general."
+}

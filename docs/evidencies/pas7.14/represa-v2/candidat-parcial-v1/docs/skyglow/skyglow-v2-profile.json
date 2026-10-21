@@ -1,0 +1,422 @@
+{
+  "profileId": "skyglow-v2-multisat-policy",
+  "schemaVersion": 2,
+  "decisionDate": "2026-10-19",
+  "status": "numerical_transport_and_angular_gates_verified_registered_domains;product_and_H_pending",
+  "owner": "TerraLab3D",
+  "migration": {
+    "preserves": "skyglow-v1-profile.json",
+    "legacyReader": "Vnp46Policy.from_profile continues to consume v1 without reinterpretation",
+    "newContract": "source identity is platform + instrument + product + collection + acquisition day + processing lineage",
+    "historicalEvidence": "steps 7.1 and 7.2 remain valid only for VNP46A2.002"
+  },
+  "sources": [
+    {
+      "platform": "Suomi-NPP",
+      "instrument": "VIIRS DNB",
+      "productId": "VNP46A2",
+      "collection": "002",
+      "archiveSet": "5200",
+      "sourceContractRef": "skyglow-v1-profile.json#operationalSource",
+      "observationAdapterStatus": "verified_with_real_granule_step_7.2",
+      "spectralModelStatus": "unverified_for_2026_nighttime_L3",
+      "automaticSelectionStatus": "inadmissible_until_sensor_product_domain_verified",
+      "historicalUse": "preserved",
+      "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A2"
+    },
+    {
+      "platform": "NOAA-20",
+      "instrument": "VIIRS DNB",
+      "productId": "VJ146A2",
+      "collection": "002",
+      "archiveSet": "5200",
+      "primaryLayerCandidate": "DNB_BRDF-Corrected_NTL",
+      "gapFilledLayerIsPrimary": false,
+      "observationAdapterStatus": "verified_with_real_urban_granule_step_7.5.1",
+      "spectralModelStatus": "public_reference_MGS_LGS_conditional_only",
+      "automaticSelectionStatus": "conditional_explicit_local_selection_only;not_observation_validated",
+      "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ146A2",
+      "fileSpecificationUrl": "https://ladsweb.modaps.eosdis.nasa.gov/filespec/VIIRS/2/VJ146A2_v2.0",
+      "doi": "10.5067/VIIRS/VJ146A2.002"
+    },
+    {
+      "platform": "NOAA-21",
+      "instrument": "VIIRS DNB",
+      "productId": "VJ246A2",
+      "collection": "002",
+      "archiveSet": "5200",
+      "primaryLayerCandidate": null,
+      "observationAdapterStatus": "product_catalog_only_file_spec_and_real_granule_pending",
+      "spectralModelStatus": "official_at_launch_LGS_MGS_HGS_proxy_diagnostic_only",
+      "automaticSelectionStatus": "inadmissible_until_sensor_product_domain_verified",
+      "sourceUrl": "https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VJ246A2",
+      "fileSpecificationUrl": null,
+      "doi": null
+    }
+  ],
+  "temporalPolicy": {
+    "selection": "exact_acquisition_day",
+    "missingDay": "unavailable",
+    "interpolation": "forbidden",
+    "gapFilling": "forbidden_in_primary_observation",
+    "crossSensorSubstitution": "explicit_and_provenance_preserving_only"
+  },
+  "selectionPolicy": {
+    "automatic": "only_among_verified_admissible_candidates_for_same_day_and_AOI",
+    "priority": "not_frozen_without_black_marble_availability_quality_and_calibration_evidence",
+    "manual": "advanced_selection_must_report_capability_and_uncertainty",
+    "ambiguousCandidate": "unavailable_with_reason_until_priority_justified",
+    "noData": "distinct_from_low_quality_and_unverified_spectral_model",
+    "overlap": "retain_separate_observations_and_discrepancy; no_radiance_summation",
+    "crossSensorHarmonization": "none_without_domain_specific_validated_SBAF"
+  },
+  "measurementModel": {
+    "measurementOperatorId": "BAND_INTEGRATED",
+    "physicalStage": "at_sensor_toa",
+    "l3CorrectionOperator": "NASA_Black_Marble_C2_User_Guide_section_2.2_equation_1_documented; no_per_pixel_reconstruction_claimed",
+    "l3CorrectedLayerMeaning": "DNB_BRDF-Corrected_NTL is corrected upward nighttime surface band radiance for VNP46A2 and VJ146A2 according to User Guide C2 section 5.2",
+    "l3CorrectionEvidence": "https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf",
+    "sourceSpectrumIdentifiability": "not_unique_from_one_panchromatic_band",
+    "sourceInferenceOwnerStep": "7.5.1_conditional_C;7.5_defined_S;7.16_uncertainty",
+    "sourceInferenceStatus": "defined_S_and_conditional_relative_C_verified;H_pending",
+    "sourceInferenceEvidence": "../evidencies/pas7.5/estat-inferencia-font-2026.md",
+    "definedSourceEvidence": "../evidencies/pas7.5/validacio-source-model-s-v1.md",
+    "spectralAndStructuralUncertaintyOwnerStep": "7.16",
+    "empiricalValidationOwnerStep": "7.17",
+    "spectralUncertainty": "quantify_when_supported;unquantified_explicitly_allowed_for_conditional_C;validated_H_requires_evidence",
+    "unverifiedModelAction": "allow_explicit_conditional_reference;exclude_unjustified_absolute_inference"
+  },
+  "acceptanceProfile": {
+    "status": "policy_preregistered",
+    "inheritedPolicyRef": "skyglow-v1-profile.json#acceptanceProfile",
+    "revisionRule": "new_sensor_and_domain_require_prospective_gate_records_before_candidate_evaluation",
+    "numericThresholds": {
+      "step7_4_spectral_discretization_max_equivalent_magnitude": 0.01,
+      "step7_12_max_guarded_relative_error": 0.0001,
+      "step7_12_max_reference_relative_uncertainty": 1e-06,
+      "step7_12_max_conditional_tail_mag": 0.001,
+      "step7_13_angular_max_equivalent_magnitude": 0.01
+    },
+    "step7_4_scope": "verified_piecewise_linear_tabulated_domain_only; historical_DNB_RSR_diagnostic_only",
+    "step7_4_criterionRef": "../evidencies/pas7.4/criteri-preregistrat-v1.json",
+    "step7_4_verificationRef": "../evidencies/pas7.4/homologacio-bandset-v1.md",
+    "newDomainRevalidationSteps": [
+      "7.10",
+      "7.14"
+    ],
+    "pendingNumericGateLocations": [
+      "7.17",
+      "7.22"
+    ],
+    "gateLocations": [
+      "7.4",
+      "7.12",
+      "7.17",
+      "7.22"
+    ],
+    "homologationConsumesOnly": "7.28",
+    "step7_12": {
+      "status": "PASS_NUMERIC_CONDITIONAL_DOMAIN",
+      "criterionRef": "../evidencies/pas7.12/criteri-transport-preregistrat-v1.json",
+      "criterionSha256": "6cfa6601f02dabeb1a3462638e980959c11a12164433738689efb31e92cdb442",
+      "evaluationRef": "../evidencies/pas7.12/resultat-gate-transport.json",
+      "scope": "Fixtures registrades, camp/font/malla prescrits; cua condicionada d'aire sec. No prova uniforme de tota l'atmosfera o de tota ciutat.",
+      "historicalPolicyNote": "El perfil v1 conserva el registre anterior a 7.12; aquesta entrada v2 referencia els valors prospectius vigents, sense canviar les regles heretades."
+    }
+  },
+  "resourceManagement": {
+    "ownerStep": "24",
+    "provider": "LAADS/Earthdata",
+    "products": [
+      "VNP46A2.002",
+      "VJ146A2.002",
+      "VJ246A2.002"
+    ],
+    "sourceChecksumSeparateFromLocalSha256": true,
+    "credentialsOutsideManifests": true
+  },
+  "planningRevision": {
+    "revisionDate": "2026-10-19",
+    "policyRef": "20-politica-rsr-i-validacio-per-dominis.md",
+    "historicalV1Unchanged": true,
+    "step7_4EvidenceUnchanged": true,
+    "documentationOnly": false
+  },
+  "sourceModelStrategy": {
+    "domains": [
+      {
+        "id": "S",
+        "status": "verified_defined_tabulated_point_and_uniform_rectangle_v1",
+        "requiresVIIRS": false,
+        "requiresRSR": false
+      },
+      {
+        "id": "C",
+        "status": "verified_conditional_relative_noaa20_step_7.5.1",
+        "rsrReferenceHypothesisAllowed": true,
+        "noAutomaticAbsoluteCalibration": true
+      },
+      {
+        "id": "H",
+        "status": "not_homologated",
+        "requiresIndependentValidation": true,
+        "requiresUncertaintyEvidence": true
+      }
+    ],
+    "noGlobal2026RsrBlocker": true,
+    "definedSourceSchemaVersion": 1,
+    "definedSourceEvidenceRef": "../evidencies/pas7.5/validacio-source-model-s-v1.md",
+    "definedSourceDoesNotAssertMeasuredCity": true,
+    "firstExperimentalPair": {
+      "platform": "NOAA-20",
+      "productId": "VJ146A2",
+      "collection": "002",
+      "rsr": "J1_DAWG_at_launch_V2.1:MGS_reference;LGS_sensitivity",
+      "status": "executable_conditional_relative;not_operational_2026_certified"
+    }
+  },
+  "simulationConfiguration": {
+    "revision": "black-marble-conditional-v1",
+    "modes": [
+      "realistic",
+      "kelvin"
+    ],
+    "kelvinRange": [
+      2800,
+      6500
+    ],
+    "spectralFamily": "CIE_LED_B1_B5",
+    "normalizations": [
+      "constant_photopic_flux",
+      "constant_radiant_power",
+      "constant_dnb_reference",
+      "conditional_relative"
+    ],
+    "mixtureBasis": "radiant_flux",
+    "probabilisticWeights": false,
+    "transportStatus": "offline_spectral_single_scattering_prescribed_O3_verified;product_runtime_pending",
+    "evidenceRef": "../evidencies/pas7.5.1/validacio-simulacio-condicionada.md"
+  },
+  "transportReference": {
+    "revision": "sg-ref-flat-homogeneous-v1",
+    "status": "verified_step_7.6",
+    "domain": "flat_tangent_homogeneous_spectral_slab;non_singular_points_and_rectangles;S_and_relative_C",
+    "deterministic": "scipy_GK21_LOS_and_direct_GL_area;two_consecutive_spatial_refinements",
+    "fineSpectralNodes": 401,
+    "referencePhaseSamples": [
+      4097,
+      8193,
+      16385
+    ],
+    "multipleScatteringReference": "independent_backward_Monte_Carlo;bounded_surface_rectangle;albedo_less_than_one",
+    "f5Scope": "nine_defined_benchmarks_only;not_universal_urban_bound",
+    "evidenceRef": "../evidencies/pas7.6/validacio-sg-ref.md",
+    "criterionRef": "../evidencies/pas7.6/criteri-oracle-v1.json",
+    "runtimeGateOwnerStep": "7.12",
+    "runtimeGateStatus": "verified_registered_S_domain_only_step7.12",
+    "newDomainRule": "extend_and_revalidate_reference_when_introducing_variable_atmosphere_terrain_or_curvature_before_gates",
+    "empiricalValidation": "not_evaluated;H_not_homologated",
+    "extendedReference": {
+      "revision": "sg-ref-variable-spectral-GL-v1",
+      "status": "verified_registered_variable_spectral_and_terrain_fixtures",
+      "evidenceRef": "../evidencies/pas7.12/validacio-gate-transport.md"
+    }
+  },
+  "geometryKernel": {
+    "modelVersion": "propagation-geometry-b0-v1",
+    "status": "verified_step_7.7_geometry_only",
+    "coordinateModel": "sphere_geocentric_ENU",
+    "earthRadiusM": 6371008.8,
+    "quadrature": "independent_GK7_15",
+    "integrand": "unit;integral_in_metres;not_radiance",
+    "partition": "observer_ENU_cells_and_spherical_heights;not_OpticalField",
+    "revisionGuard": "cooperative_cancel_and_stale_publication_check;not_scheduler",
+    "benchmarkRef": "../evidencies/pas7.7/validacio-b0.md",
+    "protocolRef": "../evidencies/pas7.7/protocol-b0-v1.json",
+    "physicalTransportStatus": "spectral_single_scattering_prescribed_O3_verified_step_7.10;product_and_H_pending",
+    "radiometricGate": "S_transport_registered_domain_only;B0_remains_geometry_not_radiance",
+    "productSLOGate": "not_evaluated_step_7.22"
+  },
+  "opticalField": {
+    "revision": "optical-field-tabulated-v1",
+    "status": "verified_step_7.8_pressure_temperature_number_density_and_dependencies",
+    "providerRevision": "coesa1975-nasa-tr459-dry-0-50km-v1",
+    "domain": "dry_standard_0_50km_geometric;not_observed_weather",
+    "coordinateModel": "fixed_field_ENU_prisms_and_spherical_height",
+    "defaultVerticalStepM": 100,
+    "interpolation": "log_pressure_linear_temperature;number_density_from_modern_exact_SI_Boltzmann",
+    "dependencyIdentity": "tile_id_version_layer_index_two_knot_data_hash;frame_time_revision",
+    "columnReference": "sg-ref-optical-column-gk21-v1",
+    "columnUnit": "m^-2",
+    "radiativeCoefficients": "base_field_PTn;monochromatic_Rayleigh_aerosol_in_ScatteringConfiguration_step_7.9;gas_pending",
+    "evidenceRef": "../evidencies/pas7.8/validacio-optical-field.md",
+    "protocolRef": "../evidencies/pas7.8/protocol-optical-field-v1.json",
+    "radiometricGate": "field_alone_not_radiance;see_radiometricTransportGate",
+    "empiricalValidation": "not_evaluated;H_not_homologated",
+    "optionalExtendedProvider": {
+      "revision": "coesa1975-nasa-tr459-dry-0-75km-v1",
+      "topM": 75000,
+      "defaultProviderUnchanged": true,
+      "exterior": "conditional_positive_hydrostatic_tail;not_general_thermosphere"
+    }
+  },
+  "singleScattering": {
+    "revision": "single-scattering-monochromatic-v1",
+    "status": "verified_step_7.9_offline_prescribed_medium",
+    "referenceRevision": "sg-ref-spherical-monochromatic-v1",
+    "wavelengthNm": 550,
+    "rayleighModel": "Chance_Spurr_1997_equations_2_7;quasi_elastic_scalar_200_1000nm",
+    "phaseKinds": [
+      "isotropic",
+      "rayleigh",
+      "hg_fallback",
+      "tabulated"
+    ],
+    "normalization": "integral_4pi_one;sr^-1",
+    "sourceGeometry": "point_and_direct_GL_uniform_rectangle;S_and_relative_C",
+    "transmission": "two_leg_segmented_GK7_15;analytic_constant_medium",
+    "dependencies": "LOS_and_both_transmission_legs;used_atmosphere_and_aerosol_versions",
+    "unit": "W_or_relative_m^-2_sr^-1_nm^-1",
+    "gasAbsorption": "disabled_explicit_B1_diagnostic",
+    "terrainVisibility": "verified_opaque_triangle_model_step7.11",
+    "runtimeGate": "verified_registered_S_domain_only_step7.12",
+    "empiricalValidation": "not_evaluated;H_pending",
+    "evidenceRef": "../evidencies/pas7.9/validacio-b1.md",
+    "protocolRef": "../evidencies/pas7.9/protocol-b1-v1.json"
+  },
+  "spectralTransport": {
+    "revision": "single-scattering-spectral-direct-v1",
+    "status": "verified_offline_step_7.10_prescribed_domain",
+    "bandStrategy": "tl3d-sky-v1-transport-knot-union-simpson-1",
+    "domainNm": [
+      380,
+      780
+    ],
+    "gasCatalogSpecies": [
+      "O3"
+    ],
+    "gasTemperatureK": [
+      203,
+      293
+    ],
+    "otherGasAbsorption": "unavailable_not_zero",
+    "fullTerrestrialAir": "not_validated",
+    "spectralMaximumInclusiveMag": 0.01,
+    "wholeSpectrumCases": 111168,
+    "maximumObservedWholeSpectrumErrorMag": 0.00011521027790642806,
+    "litBandTeffCases": 326040,
+    "maximumObservedTeffErrorMag": 0.00033307265484480995,
+    "topSensitivityKm": [
+      10,
+      20,
+      30,
+      50,
+      60,
+      70,
+      75
+    ],
+    "above50kmContribution": "measured_to75km;above75_conditionally_bounded_nonzero;not_general_thermosphere",
+    "runtimeGate": "verified_registered_S_domain_only_step7.12",
+    "evidenceRef": "../evidencies/pas7.10/validacio-espectral-i-gasos.md",
+    "nextStep": "7.14_pending_not_started",
+    "backendTestsPassed": 405,
+    "newTests": 21,
+    "historicalVerificationStep": "7.10"
+  },
+  "terrainVisibility": {
+    "status": "verified_step7.11_prescribed_opaque_triangles",
+    "coordinateModel": "shared_spherical_ECEF_ENU",
+    "areaVisibility": "direct_visible_area_integration;no_transparency",
+    "demDatum": "explicit_radial_interpretation;not_geoid_certified",
+    "evidenceRef": "../evidencies/pas7.11/validacio-terreny-i-visibilitat.md"
+  },
+  "radiometricTransportGate": {
+    "status": "PASS_NUMERIC_CONDITIONAL_DOMAIN",
+    "ownerStep": "7.12",
+    "primaryCases": 9,
+    "verticalCases": 42,
+    "backendTestsPassed": 444,
+    "newTests": 17,
+    "maximumGuardedRelativeError": 6.894967559802688e-07,
+    "maximumConditionalTailMag": 0.00047229612270819086,
+    "observationalValidation": false,
+    "scope": "Fixtures registrades, camp/font/malla prescrits; cua condicionada d'aire sec. No prova uniforme de tota l'atmosfera o de tota ciutat.",
+    "evidenceRef": "../evidencies/pas7.12/validacio-gate-transport.md"
+  },
+  "angularReconstruction": {
+    "ownerStep": "7.13",
+    "status": "PASS_REGISTERED_ANGULAR_DOMAIN",
+    "functionalState": "observable_offline_registered_domain",
+    "criterionRef": "../evidencies/pas7.13/adaptatiu-v2/criteri-adaptatiu-preregistrat-v2.json",
+    "criterionSha256": "1b75bda8a311b65eecaecfb3f47ebdef51406f690935e2c12f836040b8f42b3f",
+    "evidenceRef": "../evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md",
+    "evaluationRef": "../evidencies/pas7.13/adaptatiu-v2/gate-adaptatiu-v2.json",
+    "angularMaximumInclusiveMag": 0.01,
+    "maximumGuardedChamberAngularMag": 0.0018942969838857892,
+    "maximumGuardedCoesaProfileMag": 0.004964470727028981,
+    "independentChamberPoints": 900,
+    "independentCoesaProfilePoints": 3,
+    "transportControlsPassed": 921,
+    "backendTestsPassed": 495,
+    "newTests": 21,
+    "coesaTopM": 75000,
+    "coesaProfileDomain": "Perfil vertical COESA a azimut fix, només contrast registrat45–60°. No valida compressió azimutal COESA ni una semiesfera general.",
+    "coesaAngularMeshValidated": false,
+    "demAngularInterpolationValidated": false,
+    "areaAngularCompressionValidated": false,
+    "fallback": "direct_transport_or_explicit_unavailable",
+    "conditionalCAbsoluteCalibration": false,
+    "observationalValidation": false,
+    "measuredScientificWallSeconds": 4581.238829000009,
+    "nextStep": "7.14_pending_blocked_sensor_profiles",
+    "historicalCandidateV1": {
+      "ownerStep": "7.13",
+      "status": "FAIL_ANGULAR_AND_INCOMPLETE_STANDARD_DOMAIN",
+      "functionalState": "partial_offline",
+      "criterionRef": "../evidencies/pas7.13/criteri-angular-preregistrat-v1.json",
+      "evidenceRef": "../evidencies/pas7.13/validacio-camp-angular.md",
+      "angularMaximumInclusiveMag": 0.01,
+      "maximumObservedVerticalMag": 0.02446982004978312,
+      "maximumObservedAngularMag": 2.688607255619268,
+      "transportControlsPassed": 952,
+      "backendTestsPassed": 474,
+      "newTests": 30,
+      "coesaTopM": 75000,
+      "coesaAngularMeshValidated": false,
+      "conditionalCAbsoluteCalibration": false,
+      "nextStep": "7.13_remains_pending;7.14_not_started"
+    }
+  },
+  "photometricProjections": {
+    "ownerStep": "7.14",
+    "status": "BLOCKED_SENSOR_PROFILES",
+    "functionalState": "partial_offline",
+    "numericStatus": "PASS",
+    "scientificExitPassed": false,
+    "criterionRef": "../evidencies/pas7.14/criteri-projeccions-preregistrat-v1.json",
+    "spectralCriterionRef": "../evidencies/pas7.14/criteri-espectral-sensors-preregistrat-v1.json",
+    "evidenceRef": "../evidencies/pas7.14/validacio-projeccions.md",
+    "evaluationRef": "../evidencies/pas7.14/gate-projeccions-v1.json",
+    "spectralMagnitudeMaximum": 0.01,
+    "maximumKnownWindowSpectralErrorMag": 0.00011519668386126202,
+    "knownWindowSpectralComparisonsPassed": 10624,
+    "transportComparisonsPassed": 39,
+    "analyticFovCasesPassed": 6,
+    "backendTestsPassed": 514,
+    "newTests": 19,
+    "historicalEvidencePreserved": 319,
+    "scientificWallSecondsIncludingFailedSetup": 272.717883299978,
+    "physicalTransportEvaluationsPerPostProjection": 0,
+    "nativeSQMValidated": false,
+    "nativeTESSWValidated": false,
+    "cAbsoluteCalibration": false,
+    "observationalValidation": false,
+    "additionalCoesaDemOrAreaAngularHomologation": false,
+    "blockingReasons": [
+      "incomplete_response_dark_FOV_and_native_calibration_profiles",
+      "wavelength_air_vacuum_qualification",
+      "complete_spectral_angular_FOV_coverage"
+    ],
+    "nextStep": "7.14_pending_blocked;7.15_not_started"
+  }
+}

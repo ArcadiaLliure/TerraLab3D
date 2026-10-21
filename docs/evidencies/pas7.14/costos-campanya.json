@@ -1,0 +1,60 @@
+[
+  {
+    "part": "espectral",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_sensor_spectral_budget_step7_14.py"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 32.30943369999295,
+    "blasThreads": 1,
+    "serial": true
+  },
+  {
+    "part": "transport",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14.py",
+      "--part",
+      "transport"
+    ],
+    "exitCode": 1,
+    "wallSeconds": 1.249953499995172,
+    "blasThreads": 1,
+    "serial": true
+  },
+  {
+    "part": "transport-v3",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14.py",
+      "--part",
+      "transport"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 236.25817039998947,
+    "blasThreads": 1,
+    "serial": true
+  },
+  {
+    "part": "fov",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14.py",
+      "--part",
+      "fov"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 2.900325700000394,
+    "blasThreads": 1,
+    "serial": true
+  }
+]

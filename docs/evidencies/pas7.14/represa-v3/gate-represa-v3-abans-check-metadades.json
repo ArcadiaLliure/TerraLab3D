@@ -1,0 +1,191 @@
+{
+  "ownerStep": "7.14",
+  "numericStatus": "PASS",
+  "scientificExitPassed": false,
+  "status": "BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE",
+  "policySha256": "09a7333914203de2a4ffb810215f89f6879cedcaf65c324f2226a1f466acb2e6",
+  "checks": {
+    "previous576EvidencePreserved": true,
+    "previous99SourcesUnchanged": true,
+    "originalDocumentsArchived": true,
+    "historicalV1NumericGate": true,
+    "historicalV2NumericGate": true,
+    "projectionOraclesAndExactFrozenValues": true,
+    "inheritedBudgetsIntact": true,
+    "noNewPhysicalLos": true,
+    "costBounded": true,
+    "noRuntimeOptimization": true,
+    "regressionsPass": true,
+    "backend540Pass": true,
+    "b0Exact": true,
+    "fourColumnsExact": true,
+    "nominalDoesNotRequireDeviceCalibration": true,
+    "relativeCNotPromoted": true,
+    "noUnknownCoverageAsZero": true,
+    "protectedPlanningUnchanged": true
+  },
+  "qualifications": [
+    {
+      "model": "SQM-L clàssic, lent Golden Dragon i CM500; no model ...2",
+      "nominal": {
+        "profileId": "sqm-l-legacy-gd-cm500",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "unihedron-2007; sqm-color-2017; unihedron-optica-2018"
+      },
+      "relativeC": {
+        "profileId": "sqm-l-legacy-gd-cm500",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Escala C relativa: cap lectura absoluta",
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "unihedron-2007; sqm-color-2017; unihedron-optica-2018"
+      },
+      "requiredData": [
+        "Taula numèrica de resposta conjunta normalitzada d’energia, amb identificació del model òptic o definició d’un nominal representatiu de la família.",
+        "Convenció de longitud d’ona i calibratge del monocromador.",
+        "Soroll/fosc/llum paràsita de l’assaig, límits superiors de resposta no detectada i cobertura UV/IR.",
+        "FOV nominal complet amb pes en angle sòlid i cotes de les zones no caracteritzades; acoblament espectral/angular o justificació de separabilitat."
+      ]
+    },
+    {
+      "model": "SQM-LE2 / SQM-LU-DL-V, BK7 half-ball + UVIR650; comparador, no substitut SQM-L",
+      "nominal": {
+        "profileId": "sqm-le2-comparator",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "unihedron-optica-2018"
+      },
+      "relativeC": {
+        "profileId": "sqm-le2-comparator",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Escala C relativa: cap lectura absoluta",
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "unihedron-optica-2018"
+      },
+      "requiredData": [
+        "Model nominal concret d’aquesta família i taules radiomètriques netes de fons, no només gràfics de magnitud en l’assaig.",
+        "Convenció de λ, cues amb límits de detecció i funció angular completa."
+      ]
+    },
+    {
+      "model": "TESS-W de l’assaig2019: stars3 o stars222, alternatives separades",
+      "nominal": {
+        "profileId": "tess-w-2019-stars3-or-stars222",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "calibration-2019"
+      },
+      "relativeC": {
+        "profileId": "tess-w-2019-stars3-or-stars222",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Escala C relativa: cap lectura absoluta",
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "calibration-2019"
+      },
+      "requiredData": [
+        "Taula de resposta conjunta i definició de quin model/família pot representar; no mitjana improvisada de les dues unitats.",
+        "Convenció de λ; suport i límits de detecció fora350–1000nm.",
+        "FOV suficient i incertesa/valida separabilitat espectral-angular per al model nominal seleccionat."
+      ]
+    },
+    {
+      "model": "TESS-W stars618 de l’assaig2026, sense empalmar stars1277 ni altres lots",
+      "nominal": {
+        "profileId": "tess-w-2026-stars618",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "licaplot-2026; tess-zenodo-2026"
+      },
+      "relativeC": {
+        "profileId": "tess-w-2026-stars618",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Escala C relativa: cap lectura absoluta",
+          "Forma espectral no acreditada",
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Model angular no identificat",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "licaplot-2026; tess-zenodo-2026"
+      },
+      "requiredData": [
+        "Resposta conjunta neta fora350–900nm, incloses cotes UV/IR i incertesa del banc.",
+        "Metadades de λ i confirmació de la finestra/col·lector/filtre durant l’assaig conjunt, inclòs el tractament de fons.",
+        "Model angular coherent del mateix disseny/lot o nominal definit; els talls stars237/630 no es traslladen automàticament a stars618."
+      ]
+    }
+  ],
+  "newSpectralInstrumentHomologation": null,
+  "totalNominalNumericalErrorBoundMag": null,
+  "spectralNumericalMaximumMag": 0.01,
+  "scientificCostSeconds": 14.625167899999724,
+  "physicalTransportEvaluations": 0,
+  "nextStep": "7.14_pending_partial_blocked;7.15_not_started"
+}

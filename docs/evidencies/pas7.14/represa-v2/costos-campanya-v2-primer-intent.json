@@ -1,0 +1,18 @@
+[
+  {
+    "part": "controls",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14_v2.py",
+      "--part",
+      "controls"
+    ],
+    "exitCode": 4294967295,
+    "wallSeconds": 108.36332100000004,
+    "newPhysicalLos": 0,
+    "serial": true,
+    "blasThreads": 1
+  }
+]

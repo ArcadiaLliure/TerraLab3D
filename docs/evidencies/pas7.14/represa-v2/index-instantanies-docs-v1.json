@@ -1,0 +1,132 @@
+{
+  "archive": "instantanies-docs-candidat-parcial-v1.zip",
+  "archiveSha256": "c2be1432115bb408baf058e7ac393fca1ddeea6d4e6e91f0ce7db8ebf606340b",
+  "entries": {
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/inventari-funcional.md": {
+      "member": "docs/inventari-funcional.md",
+      "sha256": "4555864908e27e85a7ff14866906542ffdba943ca53cec1f2957c484baab22ed"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/MANUAL.md": {
+      "member": "docs/MANUAL.md",
+      "sha256": "4c36880e22dac1c9114b95fd7feca01d83f63b004ff2b6e11b17a40d47073c78"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/normes-arquitectura.md": {
+      "member": "docs/normes-arquitectura.md",
+      "sha256": "85594c9e1622206d9f7121be267fba8a89d19dddc97ee6f1adc0bed86e446d0b"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/README.md": {
+      "member": "docs/README.md",
+      "sha256": "efaa473ce151e4b75a43fb63070a90d67ecf307b7218e896ed08ca552319a766"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/06-contractes-dades.md": {
+      "member": "docs/skyglow/06-contractes-dades.md",
+      "sha256": "c84ad5e5c33860fbbd0c543febb889300e08f1cc3a571254c29ae6753cef57e3"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/08-validacio-cientifica.md": {
+      "member": "docs/skyglow/08-validacio-cientifica.md",
+      "sha256": "eb95ef017e2c718a181d5d2771e5f42575476807e1da2992521cbbabaa97a4a9"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/19-pla-executable-codex.md": {
+      "member": "docs/skyglow/19-pla-executable-codex.md",
+      "sha256": "0dfa88394dd96826fe97215ef8d996239ad90d527a0ce44c8688c4e26173cda3"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/21-estrategia-rendiment-interactiu.md": {
+      "member": "docs/skyglow/21-estrategia-rendiment-interactiu.md",
+      "sha256": "7dbbace1ac554c024809307b819444cff278f05ace07f64d0a7d502654214257"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/README.md": {
+      "member": "docs/skyglow/README.md",
+      "sha256": "ea92d5aa38abef8df014874c980b5f765f05a2d08fed99922f151e8db83c76eb"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/skyglow-v2-profile.json": {
+      "member": "docs/skyglow/skyglow-v2-profile.json",
+      "sha256": "8e8a620cef22d15fb324c7075647dc99a4f3b8a234405669b3f107bb6172fb93"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.14-photometric-projections.md": {
+      "member": "docs/tasques/pendent/pas7.14-photometric-projections.md",
+      "sha256": "6448deb94cda953ce52ac7d463db3ef0bcdeb76fc6de523aa4449286941498ba"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.15-atmos-era5-cams.md": {
+      "member": "docs/tasques/pendent/pas7.15-atmos-era5-cams.md",
+      "sha256": "454860397542a6d6e24c083d9e50b714a0b53b1dca2fade2363e1f7a3b48c750"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.15-atmos-provider-standard.md": {
+      "member": "docs/tasques/pendent/pas7.15-atmos-provider-standard.md",
+      "sha256": "12aa68128a918a4dc8330c0f607bb520494ca02eeba96b3cf968837d2d05cb38"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.18-cache-error-based.md": {
+      "member": "docs/tasques/pendent/pas7.18-cache-error-based.md",
+      "sha256": "717a92f4386f03f4d235e09b7914741c9cb8942b119424f97be4122a31c7ef03"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.18-source-spatial-acceleration.md": {
+      "member": "docs/tasques/pendent/pas7.18-source-spatial-acceleration.md",
+      "sha256": "f6900981de180e2bc728bbc7588a36b8a6e413772ea7755bacbf4226f06a1e15"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.19-phase-acceleration-b3.md": {
+      "member": "docs/tasques/pendent/pas7.19-phase-acceleration-b3.md",
+      "sha256": "de2f37de3c530bd982a2642ce5f9dd430498e1194e3f517ce2d815b2386628cb"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.19-uncertainty-registry.md": {
+      "member": "docs/tasques/pendent/pas7.19-uncertainty-registry.md",
+      "sha256": "8b557ceec3220b20fc4354450af07951fcd6452cb95c64d38668e78417f154dd"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.20-ad-error-budget.md": {
+      "member": "docs/tasques/pendent/pas7.20-ad-error-budget.md",
+      "sha256": "476e4da6f607edfd191f256265c4dbdff35d6a58a30277d18f0e092e92e45d49"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.20-zenith-absolute-gate.md": {
+      "member": "docs/tasques/pendent/pas7.20-zenith-absolute-gate.md",
+      "sha256": "e015b299de1963b289b06c5e036e39a57e9fc8905b81043a30089f8ac40129b2"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.21-cache-scheduler.md": {
+      "member": "docs/tasques/pendent/pas7.21-cache-scheduler.md",
+      "sha256": "22c33d90ada33a090c6bc7e5d252551f8f9563bdf7eba16810515ab08c590dba"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.21-dome-profile-pchip.md": {
+      "member": "docs/tasques/pendent/pas7.21-dome-profile-pchip.md",
+      "sha256": "daf4d44ec6c9ce9a0ef77749cc14c1f683eaaa2de7d7ec1774644f160e0b4fd2"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.22-optional-runtime-acceleration.md": {
+      "member": "docs/tasques/pendent/pas7.22-optional-runtime-acceleration.md",
+      "sha256": "fa6d25037bb1ce59111a82230721017bb92cd2d2e4656d658b65046d69b3821d"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.22-photometric-projections.md": {
+      "member": "docs/tasques/pendent/pas7.22-photometric-projections.md",
+      "sha256": "32948463096a5c8861bccbb6a253984c247f1f5317b73bd36d5100f54ac5177d"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/THIRD-PARTY.md": {
+      "member": "THIRD-PARTY.md",
+      "sha256": "d244a387d898a72639405fb36c73cf429ea069d6828fb4b7957279ab456e37f6"
+    },
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/.gitattributes": {
+      "member": ".gitattributes",
+      "sha256": "71af63dd5b181981ed58244866383bbdd3919750a89d96591748a75dbe29c285"
+    }
+  },
+  "plainMarkdownCopiesArchived": [
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/inventari-funcional.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/MANUAL.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/normes-arquitectura.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/README.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/06-contractes-dades.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/08-validacio-cientifica.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/19-pla-executable-codex.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/21-estrategia-rendiment-interactiu.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/skyglow/README.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.14-photometric-projections.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.15-atmos-era5-cams.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.15-atmos-provider-standard.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.18-cache-error-based.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.18-source-spatial-acceleration.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.19-phase-acceleration-b3.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.19-uncertainty-registry.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.20-ad-error-budget.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.20-zenith-absolute-gate.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.21-cache-scheduler.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.21-dome-profile-pchip.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.22-optional-runtime-acceleration.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/docs/tasques/pendent/pas7.22-photometric-projections.md",
+    "docs/evidencies/pas7.14/represa-v2/candidat-parcial-v1/THIRD-PARTY.md"
+  ],
+  "reason": "Instantànies binàries exactes, no documentació navegable amb enllaços relatius vius. Es preserva el registre inicial immutable i totes les entrades byte per byte dins ZIP. Cap evidència anterior a la represa s’ha modificat o eliminat."
+}

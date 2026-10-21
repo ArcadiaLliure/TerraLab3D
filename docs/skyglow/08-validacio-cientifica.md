@@ -87,3 +87,19 @@ Topologia sintètica, DEM configurat i fonts S/C realista/K verificats offline; 
 ## Estat verificat de7.12 (2026-10-19)
 
 [Gate prospectiu](../evidencies/pas7.12/validacio-gate-transport.md):10⁻⁴ relatiu protegit amb u_ref/R≤10⁻⁶,9 fixtures S PASS,42 sostres i444 proves. Cota exterior >75km positiva i condicionada ≤0,000472296mag, sense exigir P(infinit)=0;0,01mag espectral mantingut. Els controls independents separen àrea/trajectes/espectre; DEM/P/T i física no s'absorbeixen dins el residual. El perfil v2 referencia el nou registre; el v1 històric no es reescriu. C realista/K continua relatiu, sense homologació observacional.7.13 no iniciat.
+
+## Estat parcial de 7.14 (2026-10-19)
+
+Dos [preregistres](../evidencies/pas7.14/validacio-projeccions.md) preserven 0,01 mag espectral, 10⁻¹⁰ relatiu per panells/AB, 0,0001 mag per FOV nominal i el gate de transport heretat. 10.624 contrasts de finestres conegudes PASS (màxim 0,000115197 mag), 39 contrasts SG-REF i sis FOV analítics PASS. Estimació LOS, discretització, cua superior positiva, DEM i incerteses físiques/instrumentals es mantenen separats. No es declaren nous dominis angulars COESA, DEM o àrea.
+
+El [gate complet](../evidencies/pas7.14/gate-projeccions-v1.json) segueix `BLOCKED_SENSOR_PROFILES`: cap taula truncada, FOV nominal o referència AB acredita SQM/TESS natiu. També manca qualificar la convenció aire/buit i la cobertura espectral/angular completa del FOV. 514 proves backend i regressions PASS no resolen aquestes absències científiques. C continua relatiu i sense homologació observacional; 7.15 no iniciat.
+
+## Represa de7.14 (2026-10-20)
+
+[Preregistre i oracles v2](../evidencies/pas7.14/represa-v2/validacio-represa-v2.md):21.184 contrasts espectrals PASS dins0,01mag,55 controls conservatius de flux i13 postprojeccions PASS amb oracles independents. Ciddor/NIST resol prospectivament CIE2019 aire450ppm/buit, sense requalificar fonts o dades anteriors.540 proves backend i regressions PASS;449 evidències anteriors intactes.
+
+La sortida completa continua bloquejada per resposta nominal o cobertura insuficients. La manca de calibratge individual no és una condició general de bloqueig per definir AB nominal; el fosc/guany/zero point específics corresponen a prediccions natives. La incertesa física/observacional no s’absorbeix dins0,01mag numèric. Les dues hipòtesis de coordenada sobre dades amb nm sense convenció no acrediten la seva convenció real. El diagnòstic de cues de components conserva explícitament cota desconeguda fora la taula del xip; cap cota parcial es presenta com a validació del fotòmetre complet. No s’ha començat7.15.
+
+## Qualificació nominal i cost de 7.14 (2026-10-21)
+
+[Represa v3](../evidencies/pas7.14/represa-v3/validacio-represa-v3.md): PASS numèric repetit sobre els candidats v1/v2 intactes, 13 projeccions exactes i 540 proves backend PASS. No s’ha repetit la campanya espectral ni homologat cap banda SQM/TESS nova. La recerca diferencia famílies SQM-L i lots TESS-W, documenta fuites IR, variació angular i taules/cotes/metadades absents. Les gaussianes analítiques continuen com a controls matemàtics; no acrediten cues instrumentals. 0,01 mag i tots els preregistres intactes; el pressupost nominal total segueix sense demostrar. Perfilatge de 14,625 s amb zero LOS noves, sense optimitzar. 576 evidències anteriors intactes. Gate científic `BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`; no iniciar 7.15.

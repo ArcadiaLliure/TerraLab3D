@@ -1,0 +1,17 @@
+{
+  "id": "sensor-reference-bands-spectral-v1",
+  "registeredAtUtc": "2026-10-19T20:09:56.943689+00:00",
+  "magnitudeMaximum": 0.01,
+  "inheritedCriterion": "7.4/7.10, sense relaxació",
+  "responseModels": "CIE V, SQM SVO CM500 i TESS stars1277; finestra de suport conegut explícita, no sensors complets",
+  "spectra": "Tots els 55 espectres de la campanya7.10:42 CIE,5K,4mescles,4triangles subnm; més cas nul exacte",
+  "operators": 64,
+  "selection": "4modes ×2T ×2mu(-1,+1) ×2alpha(0,2) ×2columnesO3(0,1e24); aire5e29, aerosol20000m, igual que7.10",
+  "fineOracle": "Harness7.10 original: GL8/16/32 a40.001nusos O3 originals, GL32 LUT; mateixes fórmules independents, unitats i regla absoluta prop de zero",
+  "oracleRelativeResolutionMaximum": 1e-06,
+  "domain": "Finestres espectrals conegudes i operadors prescrits; no omple cues SQM/TESS desconegudes amb zero físic, ni valida fosc, FOV o calibratge natiu.",
+  "costEstimateSeconds": 120,
+  "maximumScientificWallSeconds": 900,
+  "threads": "1 fil per BLAS/OMP; sense cap nova vectorització o paral·lelisme; harness existent sense canvis",
+  "exitRule": "PASS numèric només si error<=0,01mag i oracle resolt; cap canvi retrospectiu. La disponibilitat dels sensors complets es decideix separadament."
+}

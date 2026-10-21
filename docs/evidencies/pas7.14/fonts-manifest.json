@@ -1,0 +1,32 @@
+[
+  {
+    "file": "sqm-cm500-svo.xml",
+    "url": "https://svo2.cab.inta-csic.es/theory/fps/fps.php?ID=Cameras/SQM.CM500",
+    "sha256": "ef9dc6624f6779aa2ad2ee77315ed947784900b35c98a6b3c371640990ad9ead"
+  },
+  {
+    "file": "stars1277-frequencies.csv",
+    "url": "https://raw.githubusercontent.com/guaix-ucm/licaplot/0f55129d6a27ccfe489558f1f46d441e278626f6/data/tessw/stars1277-frequencies.csv",
+    "sha256": "cb757bed7f7a99b1d1642498a49617c96ba3d1831da496df3c8b3a03bc225fd0"
+  },
+  {
+    "file": "stars1277-photodiode.csv",
+    "url": "https://raw.githubusercontent.com/guaix-ucm/licaplot/0f55129d6a27ccfe489558f1f46d441e278626f6/data/tessw/stars1277-photodiode.csv",
+    "sha256": "8e8c3edf88cc45d73cbe8bad7f129b25471a361e8ece47027059f7ec199463a8"
+  },
+  {
+    "file": "pin10d-responsivity.ecsv",
+    "url": "https://raw.githubusercontent.com/guaix-ucm/lica/a70ee75f24ef3c9766673a8dbb449147f90a1352/src/lica/lab/photodiode/PIN-10D-Responsivity-Cross-Calibrated@1nm.ecsv",
+    "sha256": "2c61b7bee44738d8c366d45db9653265bbb845a2d9b64019f738918d902989e8"
+  },
+  {
+    "file": "licaplot-gpl3-license.txt",
+    "url": "https://raw.githubusercontent.com/guaix-ucm/licaplot/0f55129d6a27ccfe489558f1f46d441e278626f6/LICENSE",
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  {
+    "file": "lica-license.txt",
+    "url": "https://raw.githubusercontent.com/guaix-ucm/lica/a70ee75f24ef3c9766673a8dbb449147f90a1352/LICENSE",
+    "sha256": "e996752b18d34a17e494ed838b41e4cbafc8b16e8a4f5827e51f31d9208faf5a"
+  }
+]

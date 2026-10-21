@@ -1,0 +1,151 @@
+[
+  {
+    "name": "ruff-format-final",
+    "command": [
+      "ruff",
+      "format",
+      "--check",
+      "backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+      "backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+      "backend/src/terralab3d/domain/photometric_projection.py",
+      "backend/src/terralab3d/application/photometric_projections.py",
+      "backend/tests/test_photometric_projection_step7_14.py",
+      "tools/project_skyglow_photometry.py",
+      "tools/audit_photometry_step7_14.py",
+      "tools/photometry_fixtures_step7_14.py",
+      "tools/plot_photometry_step7_14.py",
+      "tools/prepare_photometry_sources_step7_14.py",
+      "tools/validate_photometry_step7_14.py",
+      "tools/validate_sensor_spectral_budget_step7_14.py"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 0.05106800000066869
+  },
+  {
+    "name": "ruff-check-final",
+    "command": [
+      "ruff",
+      "check",
+      "backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+      "backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+      "backend/src/terralab3d/domain/photometric_projection.py",
+      "backend/src/terralab3d/application/photometric_projections.py",
+      "backend/tests/test_photometric_projection_step7_14.py",
+      "tools/project_skyglow_photometry.py",
+      "tools/audit_photometry_step7_14.py",
+      "tools/photometry_fixtures_step7_14.py",
+      "tools/plot_photometry_step7_14.py",
+      "tools/prepare_photometry_sources_step7_14.py",
+      "tools/validate_photometry_step7_14.py",
+      "tools/validate_sensor_spectral_budget_step7_14.py"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 0.040221799979917705,
+    "firstAttemptLog": "ruff-check-final-primer-intent.txt",
+    "correction": "Import numpy sense ?s retirat de la nova eina de figures; cap canvi al runtime ni a les dades."
+  },
+  {
+    "name": "pyright-afectats-final",
+    "command": [
+      "pyright",
+      "--project",
+      "F:\\Python\\TerraLab3D\\.runtime-photometry\\pyright-config-relative.json"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 4.254276399995433
+  },
+  {
+    "name": "pytest-fotometria-final",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "-m",
+      "pytest",
+      "backend/tests/test_photometric_projection_step7_14.py",
+      "-q",
+      "-W",
+      "error",
+      "--basetemp",
+      ".runtime-photometry/pytest-tipatge-final"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 3.0793954999826383
+  },
+  {
+    "name": "gate-complet",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_step7_14.py"
+    ],
+    "expectedExitCode": 1,
+    "exitCode": 1,
+    "wallSeconds": 1.703303499991307
+  },
+  {
+    "name": "gate-numeric",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_step7_14.py",
+      "--numeric-only"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 1.5901694999774918
+  },
+  {
+    "name": "grafics",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/plot_photometry_step7_14.py"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 1.8195958999858703
+  },
+  {
+    "name": "auditoria-documental",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_docs.py"
+    ],
+    "expectedExitCode": 1,
+    "exitCode": 1,
+    "wallSeconds": 0.8481971000146586
+  },
+  {
+    "name": "enllacos-documentals",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/check_doc_links.py"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 0.40477270001429133
+  },
+  {
+    "name": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "expectedExitCode": 0,
+    "exitCode": 0,
+    "wallSeconds": 0.053566599992336705
+  }
+]

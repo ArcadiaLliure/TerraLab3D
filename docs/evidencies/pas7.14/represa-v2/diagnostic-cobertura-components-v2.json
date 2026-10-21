@@ -1,0 +1,141 @@
+{
+  "policySha256": "39016a8e31a36773d5d122c668e904fb7780ea463e7fd9fe5e7a07446da139c7",
+  "rows": [
+    {
+      "file": "fonts-primaries/report/filters/20260615_124720_stars618.ecsv",
+      "filterRangeNm": [
+        350.0,
+        1048.0
+      ],
+      "filterSamples": 350,
+      "chipRangeNm": [
+        301.898,
+        1092.408
+      ],
+      "knownABWeightIgnoringCommonConstant": 0.0009393320167703209,
+      "missingUvWeightUpperWithinChip": 9.303028853044674e-05,
+      "missingIrWeightUpperWithinChip": 7.993238774836933e-07,
+      "conditionalReferenceMagnitudeUpperWithinChip": 0.10337285772838206,
+      "oracleRelativeError": 1.1102230246251565e-16,
+      "oraclePass": true,
+      "partialBoundWithinBudget": false,
+      "fullPhysicalBoundMag": null,
+      "outsideChipResponse": "UNKNOWN",
+      "interpretation": "Model de components condicionat; no cota total de l’instrument ni error real mesurat."
+    },
+    {
+      "file": "fonts-primaries/report/filters/20260615_130127_stars13xx.ecsv",
+      "filterRangeNm": [
+        350.0,
+        1048.0
+      ],
+      "filterSamples": 350,
+      "chipRangeNm": [
+        301.898,
+        1092.408
+      ],
+      "knownABWeightIgnoringCommonConstant": 0.000980266464177962,
+      "missingUvWeightUpperWithinChip": 9.303028853044674e-05,
+      "missingIrWeightUpperWithinChip": 7.993238774836933e-07,
+      "conditionalReferenceMagnitudeUpperWithinChip": 0.0992474623429628,
+      "oracleRelativeError": 1.1102230246251565e-16,
+      "oraclePass": true,
+      "partialBoundWithinBudget": false,
+      "fullPhysicalBoundMag": null,
+      "outsideChipResponse": "UNKNOWN",
+      "interpretation": "Model de components condicionat; no cota total de l’instrument ni error real mesurat."
+    },
+    {
+      "file": "fonts-primaries/report/filters/20260615_132917_stars15xx.ecsv",
+      "filterRangeNm": [
+        350.0,
+        1048.0
+      ],
+      "filterSamples": 350,
+      "chipRangeNm": [
+        301.898,
+        1092.408
+      ],
+      "knownABWeightIgnoringCommonConstant": 0.0008503134862034084,
+      "missingUvWeightUpperWithinChip": 9.303028853044674e-05,
+      "missingIrWeightUpperWithinChip": 7.993238774836933e-07,
+      "conditionalReferenceMagnitudeUpperWithinChip": 0.11364688942221196,
+      "oracleRelativeError": 2.220446049250313e-16,
+      "oraclePass": true,
+      "partialBoundWithinBudget": false,
+      "fullPhysicalBoundMag": null,
+      "outsideChipResponse": "UNKNOWN",
+      "interpretation": "Model de components condicionat; no cota total de l’instrument ni error real mesurat."
+    },
+    {
+      "file": "fonts-primaries/report/filters/20260615_134342_sp740.ecsv",
+      "filterRangeNm": [
+        350.0,
+        1048.0
+      ],
+      "filterSamples": 350,
+      "chipRangeNm": [
+        301.898,
+        1092.408
+      ],
+      "knownABWeightIgnoringCommonConstant": 0.0008613111135347175,
+      "missingUvWeightUpperWithinChip": 9.303028853044674e-05,
+      "missingIrWeightUpperWithinChip": 7.993238774836933e-07,
+      "conditionalReferenceMagnitudeUpperWithinChip": 0.11226828057903467,
+      "oracleRelativeError": 1.1102230246251565e-16,
+      "oraclePass": true,
+      "partialBoundWithinBudget": false,
+      "fullPhysicalBoundMag": null,
+      "outsideChipResponse": "UNKNOWN",
+      "interpretation": "Model de components condicionat; no cota total de l’instrument ni error real mesurat."
+    },
+    {
+      "file": "fonts-primaries/report/filters/20260615_141128_stars2xx.ecsv",
+      "filterRangeNm": [
+        350.0,
+        1048.0
+      ],
+      "filterSamples": 350,
+      "chipRangeNm": [
+        301.898,
+        1092.408
+      ],
+      "knownABWeightIgnoringCommonConstant": 0.0009317096723655276,
+      "missingUvWeightUpperWithinChip": 9.303028853044674e-05,
+      "missingIrWeightUpperWithinChip": 7.993238774836933e-07,
+      "conditionalReferenceMagnitudeUpperWithinChip": 0.1041792431182735,
+      "oracleRelativeError": 1.1102230246251565e-16,
+      "oraclePass": true,
+      "partialBoundWithinBudget": false,
+      "fullPhysicalBoundMag": null,
+      "outsideChipResponse": "UNKNOWN",
+      "interpretation": "Model de components condicionat; no cota total de l’instrument ni error real mesurat."
+    },
+    {
+      "file": "fonts-primaries/report/filters/20260615_142514_stars0xx.ecsv",
+      "filterRangeNm": [
+        350.0,
+        1048.0
+      ],
+      "filterSamples": 350,
+      "chipRangeNm": [
+        301.898,
+        1092.408
+      ],
+      "knownABWeightIgnoringCommonConstant": 0.0009351398761799964,
+      "missingUvWeightUpperWithinChip": 9.303028853044674e-05,
+      "missingIrWeightUpperWithinChip": 7.993238774836933e-07,
+      "conditionalReferenceMagnitudeUpperWithinChip": 0.1038148013238577,
+      "oracleRelativeError": 1.1102230246251565e-16,
+      "oraclePass": true,
+      "partialBoundWithinBudget": false,
+      "fullPhysicalBoundMag": null,
+      "outsideChipResponse": "UNKNOWN",
+      "interpretation": "Model de components condicionat; no cota total de l’instrument ni error real mesurat."
+    }
+  ],
+  "measuredWallSeconds": 0.2153926999999385,
+  "newPhysicalLos": 0,
+  "physicalStatus": "BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE",
+  "scope": "Resposta d’energia TSL237 normalitzada×T_filtre de cada lot, en una hipòtesi explícita de coordenada en buit. No s’identifica com resposta total del fotòmetre."
+}

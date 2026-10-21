@@ -1,0 +1,46 @@
+[
+  {
+    "name": "auditoria-documental-postdoc",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_docs.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1
+  },
+  {
+    "name": "enllacos-postdoc",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/check_doc_links.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0
+  },
+  {
+    "name": "diff-check-postdoc",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0
+  },
+  {
+    "name": "gate-numeric-postdoc",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_nominal_step7_14_v3.py",
+      "--numeric-only"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0
+  }
+]

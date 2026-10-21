@@ -1,0 +1,10 @@
+Ignoring path "F:\Python\TerraLab3D\backend\src\terralab3d\domain\light_pollution\propagation_kernel.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\backend\src\terralab3d\domain\light_pollution\spectral_transport.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\backend\src\terralab3d\domain\photometric_projection.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\backend\src\terralab3d\application\photometric_projections.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\backend\tests\test_photometric_projection_step7_14.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\project_skyglow_photometry.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\photometry_fixtures_step7_14.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\prepare_photometry_sources_step7_14.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\validate_photometry_step7_14.py" in "include" array because it is not relative.
+Ignoring path "F:\Python\TerraLab3D\tools\validate_sensor_spectral_budget_step7_14.py" in "include" array because it is not relative.

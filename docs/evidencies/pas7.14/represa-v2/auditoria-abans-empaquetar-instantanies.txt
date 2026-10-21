@@ -1,0 +1,767 @@
+S'han trobat 766 incidències documentals:
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:9 -> ../backend/src/terralab3d/domain/
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:17 -> tasques/completat/pas7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:19 -> tasques/completat/pas9.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:21 -> tasques/completat/pas14.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:23 -> ../frontend/src/application/ObservationModeController.ts
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:23 -> ../backend/src/terralab3d/application/observation_coordinator.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:23 -> tasques/completat/pas19-modes-optics.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:24 -> tasques/completat/pas21-eines-mesura.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:25 -> tasques/completat/pas22-trajectories-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:26 -> tasques/completat/pas23-constellacions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:32 -> ../backend/src/terralab3d/application/land_cover_coordinator.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:32 -> ../frontend/src/view/three/terrain/LandCoverTextureManager.ts
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:32 -> tasques/completat/pas17-superficie-progressiva.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:32 -> tasques/pendent/pas29-superficie-semantica.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:33 -> tasques/pendent/pas24-cataleg-recursos-descarregues.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:34 -> tasques/pendent/pas26-recursos-sistema-solar.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:35 -> tasques/pendent/pas27-recursos-espai-profund.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:36 -> tasques/pendent/pas28-dem-multiproveidor.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:37 -> tasques/pendent/pas29-superficie-semantica.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:38 -> tasques/pendent/pas32-motor-efemerides.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:39 -> tasques/pendent/pas33-cercador-objectes-efemerides.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:40 -> tasques/pendent/pas35-pestanya-eclipsis.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:41 -> tasques/pendent/pas36-esdeveniments-objectes.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.3-dnb-rsr-measurement.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> evidencies/pas7.3/contrast-granuls-black-marble-c2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.4-spectral-bandset-validation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> evidencies/pas7.4/homologacio-bandset-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.5-source-model-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.1-contracte-cientific-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.2-vnp46-observation-adapter.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.3-dnb-rsr-measurement.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.4-spectral-bandset-validation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.5-source-model-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.9-rayleigh-aerosol-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.10-gas-spectral-kernel.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.11-terrain-curvature.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.12-zenith-transport-gate.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:47 -> tasques/completat/pas7.13-dome-profile-direct.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:48 -> cel-fisic/README.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:48 -> tasques/pendent/pas7.51-llicencies-i-recursos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:48 -> tasques/pendent/pas7.68-homologacio-cel-fisic.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:49 -> tasques/pendent/pas25-gestor-capes.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:50 -> tasques/pendent/pas30-plate-solving.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:51 -> tasques/pendent/pas31-millor-nit-planificador.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:52 -> tasques/pendent/pas34-previsualitzacions-efemerides.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:53 -> tasques/pendent/pas37-geonames-empaquetat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:54 -> tasques/pendent/pas38-homologacio-final.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:58 -> tasques/completat/pas7.4-spectral-bandset-validation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:58 -> evidencies/pas7.4/homologacio-bandset-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:60 -> tasques/completat/pas7.5-source-model-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:60 -> evidencies/pas7.5/validacio-source-model-s-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:60 -> evidencies/pas7.5/estat-inferencia-font-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:67 -> tasques/completat/pas7.5.1-black-marble-spectral-simulation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:67 -> evidencies/pas7.5.1/validacio-simulacio-condicionada.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:68 -> tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:68 -> evidencies/pas7.6/validacio-sg-ref.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:69 -> tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:69 -> evidencies/pas7.7/validacio-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:73 -> evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:77 -> evidencies/pas7.11/validacio-terreny-i-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:81 -> evidencies/pas7.12/validacio-gate-transport.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:85 -> evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:87 -> evidencies/pas7.13/validacio-camp-angular.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\inventari-funcional.md:91 -> evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:60 -> tasques/completat/pas1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:60 -> tasques/completat/pas4.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:94 -> tasques/completat/pas1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:94 -> tasques/completat/pas3.5.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:94 -> tasques/completat/pas4.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:94 -> tasques/completat/pas12.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:139 -> tasques/completat/pas2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:139 -> tasques/completat/pas3.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:139 -> tasques/completat/pas4.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:177 -> tasques/completat/pas7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:177 -> tasques/completat/pas8.7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:220 -> tasques/completat/pas5.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:220 -> tasques/completat/pas6.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:220 -> tasques/completat/pas13.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:257 -> tasques/completat/pas8.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:257 -> tasques/completat/pas8.5.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:257 -> tasques/completat/pas8.6.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:257 -> tasques/completat/pas9.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:280 -> tasques/completat/pas10.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:280 -> tasques/completat/pas11.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:280 -> tasques/completat/pas12.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:318 -> tasques/completat/pas9.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:318 -> tasques/completat/pas15.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:318 -> tasques/completat/pas22-trajectories-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:340 -> tasques/completat/pas14.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:363 -> tasques/completat/pas15.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:363 -> tasques/completat/pas16.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:363 -> tasques/completat/pas17-superficie-progressiva.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:390 -> tasques/completat/pas19-modes-optics.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:419 -> tasques/completat/pas21-eines-mesura.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:446 -> tasques/completat/pas23-constellacions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:504 -> tasques/completat/pas7.5.1-black-marble-spectral-simulation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:520 -> tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:528 -> evidencies/pas7.6/validacio-sg-ref.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:532 -> evidencies/pas7.6/resultats-sg-ref-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:538 -> tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:548 -> evidencies/pas7.7/validacio-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:554 -> tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:563 -> evidencies/pas7.8/validacio-optical-field.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:569 -> tasques/completat/pas7.9-rayleigh-aerosol-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:584 -> evidencies/pas7.9/validacio-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:588 -> tasques/completat/pas7.10-gas-spectral-kernel.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:608 -> evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:612 -> tasques/completat/pas7.11-terrain-curvature.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:629 -> evidencies/pas7.11/validacio-terreny-i-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:650 -> evidencies/pas7.12/domini-i-cota-exterior.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:652 -> evidencies/pas7.12/validacio-gate-transport.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:662 -> tasques/completat/pas7.13-dome-profile-direct.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:662 -> evidencies/pas7.13/validacio-camp-angular.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:672 -> evidencies/pas7.13/adaptatiu-v2/gate-adaptatiu-v2.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:694 -> evidencies/pas7.14/demostracio-cli-s.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\MANUAL.md:698 -> evidencies/pas7.14/gate-projeccions-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:48 -> ../backend/pyproject.toml
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:48 -> ../package.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:142 -> ../backend/src/terralab3d/
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:142 -> ../frontend/src/
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:320 -> tasques/pendent/pas38-homologacio-final.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:330 -> tasques/pendent/pas24-cataleg-recursos-descarregues.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:333 -> tasques/pendent/pas37-geonames-empaquetat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:338 -> skyglow/adrs/README.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:342 -> cel-fisic/README.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:347 -> skyglow/20-politica-rsr-i-validacio-per-dominis.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:351 -> tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:355 -> tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:359 -> tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:359 -> evidencies/pas7.8/validacio-optical-field.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:363 -> tasques/completat/pas7.9-rayleigh-aerosol-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:363 -> evidencies/pas7.9/validacio-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:367 -> evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:373 -> evidencies/pas7.11/validacio-terreny-i-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:377 -> evidencies/pas7.12/criteri-transport-preregistrat-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:379 -> evidencies/pas7.12/validacio-gate-transport.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:383 -> evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\normes-arquitectura.md:387 -> evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.13-dome-profile-direct.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.5-source-model-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.5.1-black-marble-spectral-simulation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.9-rayleigh-aerosol-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:9 -> tasques/completat/pas7.10-gas-spectral-kernel.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:11 -> cel-fisic/README.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:13 -> evidencies/pas7.11/validacio-terreny-i-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:15 -> evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:17 -> evidencies/pas7.9/validacio-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:19 -> evidencies/pas7.8/validacio-optical-field.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:21 -> evidencies/pas7.7/validacio-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:23 -> evidencies/pas7.6/validacio-sg-ref.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:25 -> evidencies/pas7.5.1/validacio-simulacio-condicionada.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:27 -> evidencies/pas7.3/validacio-model-dnb.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:27 -> evidencies/pas7.1/validacio-contracte.txt
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:27 -> evidencies/pas7.2/validacio-adaptador.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:27 -> evidencies/pas7.3/recerca-rsr-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:27 -> evidencies/pas7.3/contrast-granuls-black-marble-c2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:27 -> evidencies/pas7.5/estat-inferencia-font-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:27 -> evidencies/pas7.5/validacio-source-model-s-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:29 -> evidencies/pas7.5.1/auditoria-documental.txt
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:31 -> evidencies/pas7.6/auditoria-documental.txt
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:33 -> evidencies/pas7.7/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:35 -> evidencies/pas7.8/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:37 -> evidencies/pas7.9/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:39 -> evidencies/pas7.10/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:43 -> evidencies/pas7.11/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:46 -> evidencies/pas7.12/validacio-gate-transport.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:62 -> tasques/idees-per-madurar/README.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:76 -> tasques/completat/pas1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:77 -> tasques/completat/pas2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:78 -> tasques/completat/pas3.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:79 -> tasques/completat/pas3.5.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:80 -> tasques/completat/pas4.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:81 -> tasques/completat/pas5.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:82 -> tasques/completat/pas6.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:83 -> tasques/completat/pas7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:84 -> tasques/completat/pas7.1-contracte-cientific-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:85 -> tasques/completat/pas7.2-vnp46-observation-adapter.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:86 -> tasques/completat/pas7.3-dnb-rsr-measurement.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:87 -> tasques/completat/pas7.4-spectral-bandset-validation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:88 -> tasques/completat/pas7.5-source-model-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:89 -> tasques/completat/pas7.5.1-black-marble-spectral-simulation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:90 -> tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:91 -> tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:92 -> tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:93 -> tasques/completat/pas7.9-rayleigh-aerosol-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:94 -> tasques/completat/pas7.10-gas-spectral-kernel.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:95 -> tasques/completat/pas7.11-terrain-curvature.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:96 -> tasques/completat/pas7.12-zenith-transport-gate.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:97 -> tasques/completat/pas7.13-dome-profile-direct.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:98 -> tasques/completat/pas8.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:99 -> tasques/completat/pas8.5.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:100 -> tasques/completat/pas8.6.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:101 -> tasques/completat/pas8.7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:102 -> tasques/completat/pas9.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:103 -> tasques/completat/pas10.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:104 -> tasques/completat/pas11.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:105 -> tasques/completat/pas12.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:106 -> tasques/completat/pas13.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:107 -> tasques/completat/pas14.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:108 -> tasques/completat/pas15.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:109 -> tasques/completat/pas16.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:110 -> tasques/completat/pas17-superficie-progressiva.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:111 -> tasques/completat/pas19-modes-optics.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:112 -> tasques/completat/pas21-eines-mesura.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:113 -> tasques/completat/pas22-trajectories-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:114 -> tasques/completat/pas22.5-normalitzacio-documental.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:115 -> tasques/completat/pas23-constellacions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:119 -> tasques/idees-per-madurar/meteorologia.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:127 -> tasques/pendent/pas7.16-uncertainty-provenance.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:128 -> tasques/pendent/pas7.17-clear-sky-ground-truth.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:134 -> tasques/pendent/pas7.23-clouds-b6.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:135 -> tasques/pendent/pas7.24-full-ground-truth.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:136 -> tasques/pendent/pas7.25-bridge-runtime.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:137 -> tasques/pendent/pas7.26-three-renderer-debug.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:138 -> tasques/pendent/pas7.27-sky-composition.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:139 -> tasques/pendent/pas7.28-b7-homologacio-skyglow.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:140 -> tasques/pendent/pas7.51-llicencies-i-recursos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:141 -> tasques/pendent/pas7.52-selector-cel-simulat-real.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:142 -> tasques/pendent/pas7.53-optica-observador-altura.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:143 -> tasques/pendent/pas7.54-font-solar-espectral.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:144 -> tasques/pendent/pas7.55-font-lunar-espectral.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:145 -> tasques/pendent/pas7.56-transport-atmosferic-hillaire.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:146 -> tasques/pendent/pas7.57-skyview-lut-colorimetria.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:147 -> tasques/pendent/pas7.58-limbe-terrestre-altura.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:148 -> tasques/pendent/pas7.59-illuminacio-terreny-eclipsis.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:149 -> tasques/pendent/pas7.60-integracio-three-bridge.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:150 -> tasques/pendent/pas7.61-natural-night-sky.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:151 -> tasques/pendent/pas7.62-radiative-error-budget.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:152 -> tasques/pendent/pas7.63-clouds-horizon-terminator.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:153 -> tasques/pendent/pas7.64-scheduler-cache-cel-fisic.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:154 -> tasques/pendent/pas7.65-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:155 -> tasques/pendent/pas7.66-validacio-cel-fisic.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:156 -> tasques/pendent/pas7.67-slo-rendiment-cel-fisic.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:157 -> tasques/pendent/pas7.68-homologacio-cel-fisic.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:158 -> tasques/pendent/pas24-cataleg-recursos-descarregues.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:159 -> tasques/pendent/pas25-gestor-capes.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:160 -> tasques/pendent/pas26-recursos-sistema-solar.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:161 -> tasques/pendent/pas27-recursos-espai-profund.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:162 -> tasques/pendent/pas28-dem-multiproveidor.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:163 -> tasques/pendent/pas29-superficie-semantica.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:164 -> tasques/pendent/pas30-plate-solving.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:165 -> tasques/pendent/pas31-millor-nit-planificador.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:166 -> tasques/pendent/pas32-motor-efemerides.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:167 -> tasques/pendent/pas33-cercador-objectes-efemerides.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:168 -> tasques/pendent/pas34-previsualitzacions-efemerides.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:169 -> tasques/pendent/pas35-pestanya-eclipsis.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:170 -> tasques/pendent/pas36-esdeveniments-objectes.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:171 -> tasques/pendent/pas37-geonames-empaquetat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:172 -> tasques/pendent/pas38-homologacio-final.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:176 -> tasques/idees-per-madurar/README.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:185 -> tasques/idees-per-madurar/meteorologia.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:213 -> manifests/
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:214 -> reference-scenarios/
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:216 -> evidencies/pas7.12/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:218 -> evidencies/pas7.13/validacio-camp-angular.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:220 -> evidencies/pas7.13/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:222 -> evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:222 -> evidencies/pas7.13/adaptatiu-v2/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:224 -> evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:224 -> evidencies/pas7.14/gate-projeccions-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\README.md:224 -> evidencies/pas7.14/auditoria-documental-resum.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:15 -> ../tasques/pendent/pas24-cataleg-recursos-descarregues.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:46 -> ../tasques/completat/pas7.4-spectral-bandset-validation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:50 -> ../../backend/src/terralab3d/domain/light_pollution/source_model.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:50 -> 20-politica-rsr-i-validacio-per-dominis.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:50 -> ../evidencies/pas7.5/validacio-source-model-s-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:54 -> ../evidencies/pas7.3/contrast-granuls-black-marble-c2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:60 -> ../../backend/src/terralab3d/infrastructure/adapters/light_pollution/vnp46.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:60 -> ../evidencies/pas7.2/validacio-adaptador.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:66 -> ../evidencies/pas7.3/revisio-multisatel-lit.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:68 -> ../../backend/src/terralab3d/domain/light_pollution/source_model.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:68 -> ../evidencies/pas7.5/estat-inferencia-font-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:68 -> ../evidencies/pas7.5/validacio-source-model-s-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:70 -> ../../backend/src/terralab3d/domain/light_pollution/dnb_measurement.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:70 -> ../evidencies/pas7.3/recerca-rsr-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:70 -> ../evidencies/pas7.3/revisio-multisatel-lit.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:155 -> ../cel-fisic/04-contractes-validacio.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:160 -> skyglow-v1-profile.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:180 -> ../tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:186 -> ../tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:196 -> ../tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:206 -> ../evidencies/pas7.9/validacio-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:210 -> ../evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\06-contractes-dades.md:216 -> ../evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:21 -> ../evidencies/pas7.4/criteri-preregistrat-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:21 -> ../evidencies/pas7.4/homologacio-bandset-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:23 -> ../evidencies/pas7.3/contrast-granuls-black-marble-c2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:23 -> ../evidencies/pas7.3/recerca-rsr-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:23 -> ../evidencies/pas7.3/revisio-multisatel-lit.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:23 -> ../evidencies/pas7.5/validacio-source-model-s-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:65 -> skyglow-v1-profile.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:75 -> ../evidencies/pas7.6/validacio-sg-ref.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:75 -> ../evidencies/pas7.6/criteri-oracle-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:77 -> ../evidencies/pas7.8/validacio-optical-field.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:77 -> ../evidencies/pas7.9/validacio-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:81 -> ../evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:85 -> ../evidencies/pas7.11/validacio-terreny-i-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:89 -> ../evidencies/pas7.12/validacio-gate-transport.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:93 -> ../evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\08-validacio-cientifica.md:95 -> ../evidencies/pas7.14/gate-projeccions-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:17 -> skyglow-v1-profile.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:21 -> ../evidencies/pas7.4/criteri-preregistrat-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:21 -> ../evidencies/pas7.4/homologacio-bandset-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:29 -> skyglow-v1-profile.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:29 -> ../evidencies/pas7.3/contrast-granuls-black-marble-c2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:31 -> ../tasques/pendent/pas24-cataleg-recursos-descarregues.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:35 -> 20-politica-rsr-i-validacio-per-dominis.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:95 -> ../tasques/completat/pas7.1-contracte-cientific-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:103 -> ../tasques/completat/pas7.2-vnp46-observation-adapter.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:111 -> ../evidencies/pas7.3/contrast-granuls-black-marble-c2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:113 -> ../tasques/completat/pas7.3-dnb-rsr-measurement.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:119 -> ../evidencies/pas7.4/criteri-preregistrat-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:119 -> ../evidencies/pas7.4/homologacio-bandset-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:121 -> ../tasques/completat/pas7.4-spectral-bandset-validation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:127 -> ../evidencies/pas7.5/validacio-source-model-s-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:129 -> ../tasques/completat/pas7.5-source-model-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:139 -> ../tasques/completat/pas7.5.1-black-marble-spectral-simulation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:147 -> ../evidencies/pas7.6/validacio-sg-ref.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:149 -> ../tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:157 -> ../evidencies/pas7.7/validacio-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:159 -> ../tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:167 -> ../evidencies/pas7.8/validacio-optical-field.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:169 -> ../tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:177 -> ../evidencies/pas7.9/validacio-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:179 -> ../tasques/completat/pas7.9-rayleigh-aerosol-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:187 -> ../tasques/completat/pas7.10-gas-spectral-kernel.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:189 -> ../evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:197 -> ../tasques/completat/pas7.11-terrain-curvature.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:199 -> ../evidencies/pas7.11/validacio-terreny-i-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:207 -> ../tasques/completat/pas7.12-zenith-transport-gate.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:209 -> ../evidencies/pas7.12/validacio-gate-transport.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:217 -> ../tasques/completat/pas7.13-dome-profile-direct.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:219 -> ../evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:219 -> ../evidencies/pas7.13/validacio-camp-angular.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:227 -> ../evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:245 -> ../tasques/pendent/pas7.16-uncertainty-provenance.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:253 -> ../tasques/pendent/pas7.17-clear-sky-ground-truth.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:301 -> ../tasques/pendent/pas7.23-clouds-b6.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:309 -> ../tasques/pendent/pas7.24-full-ground-truth.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:317 -> ../tasques/pendent/pas7.25-bridge-runtime.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:325 -> ../tasques/pendent/pas7.26-three-renderer-debug.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:333 -> ../tasques/pendent/pas7.27-sky-composition.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\19-pla-executable-codex.md:343 -> ../tasques/pendent/pas7.28-b7-homologacio-skyglow.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\21-estrategia-rendiment-interactiu.md:3 -> 07-benchmark-b0-b7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:5 -> ../evidencies/pas7.2/validacio-adaptador.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:5 -> ../evidencies/pas7.3/contrast-granuls-black-marble-c2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:5 -> ../evidencies/pas7.3/recerca-rsr-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:5 -> ../evidencies/pas7.3/revisio-multisatel-lit.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:8 -> 20-politica-rsr-i-validacio-per-dominis.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:8 -> ../evidencies/pas7.5/validacio-source-model-s-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:8 -> ../tasques/completat/pas7.5.1-black-marble-spectral-simulation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> skyglow-v1-profile.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../evidencies/pas7.4/homologacio-bandset-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../tasques/completat/pas7.3-dnb-rsr-measurement.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../tasques/completat/pas7.5-source-model-v1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../tasques/completat/pas7.6-sg-ref-reference-solver.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../tasques/completat/pas7.7-kernel-geometry-b0.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../tasques/completat/pas7.8-optical-field-standard.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../tasques/completat/pas7.9-rayleigh-aerosol-b1.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../evidencies/pas7.10/validacio-espectral-i-gasos.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:20 -> ../evidencies/pas7.5/estat-inferencia-font-2026.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:79 -> 18-decisions-obertes.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:95 -> ../evidencies/pas7.11/validacio-terreny-i-visibilitat.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:97 -> ../evidencies/pas7.12/validacio-gate-transport.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:99 -> ../evidencies/pas7.13/validacio-camp-angular.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:99 -> ../evidencies/pas7.13/adaptatiu-v2/validacio-adaptativa-v2.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:101 -> ../evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\skyglow\README.md:101 -> ../evidencies/pas7.14/gate-projeccions-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:7 -> ../../evidencies/pas7.14/gate-projeccions-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:14 -> ../../evidencies/pas7.14/fonts-i-models-instrumentals.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:26 -> ../completat/pas7.13-dome-profile-direct.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:27 -> ../completat/pas7.4-spectral-bandset-validation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:28 -> ../completat/pas7.5.1-black-marble-spectral-simulation.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:36 -> ../../../backend/src/terralab3d/domain/light_pollution/propagation_kernel.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:36 -> ../../../backend/src/terralab3d/domain/light_pollution/spectral_transport.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:36 -> ../../../backend/src/terralab3d/domain/light_pollution/adaptive_dome.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:37 -> ../../../backend/src/terralab3d/domain/photometric_projection.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:37 -> ../../../backend/src/terralab3d/application/photometric_projections.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:37 -> ../../../tools/project_skyglow_photometry.py
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:58 -> ../../evidencies/pas7.4/criteri-preregistrat-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:77 -> ../../evidencies/pas7.14/validacio-projeccions.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:77 -> ../../evidencies/pas7.14/gate-projeccions-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:77 -> ../../evidencies/pas7.14/criteri-projeccions-preregistrat-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.14-photometric-projections.md:77 -> ../../evidencies/pas7.14/criteri-espectral-sensors-preregistrat-v1.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.15-atmos-era5-cams.md:15 -> pas7.16-uncertainty-provenance.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.15-atmos-era5-cams.md:19 -> ../../skyglow/02-arquitectura-integracio.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.15-atmos-era5-cams.md:20 -> ../../skyglow/09-incertesa-proveniencia.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.15-atmos-era5-cams.md:21 -> ../../skyglow/10-datasets-llicencies.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.18-source-spatial-acceleration.md:17 -> ../../skyglow/01-especificacio-algorismes.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.18-source-spatial-acceleration.md:18 -> ../../skyglow/07-benchmark-b0-b7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.19-phase-acceleration-b3.md:15 -> ../../skyglow/01-especificacio-algorismes.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.19-phase-acceleration-b3.md:16 -> ../../skyglow/07-benchmark-b0-b7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.20-ad-error-budget.md:15 -> ../../skyglow/09-incertesa-proveniencia.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.20-ad-error-budget.md:16 -> ../../skyglow/07-benchmark-b0-b7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.21-cache-scheduler.md:15 -> ../../skyglow/02-arquitectura-integracio.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.21-cache-scheduler.md:16 -> ../../skyglow/03-pipeline-python-typescript-threejs.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.21-cache-scheduler.md:17 -> ../../skyglow/07-benchmark-b0-b7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md:15 -> ../../skyglow/02-arquitectura-integracio.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md:16 -> ../../skyglow/03-pipeline-python-typescript-threejs.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md:17 -> ../../skyglow/07-benchmark-b0-b7.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\THIRD-PARTY.md:29 -> docs/evidencies/pas7.14/fonts-i-models-instrumentals.md
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\THIRD-PARTY.md:29 -> docs/evidencies/pas7.14/fonts-manifest.json
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\THIRD-PARTY.md:32 -> docs/evidencies/pas7.14/fonts/licaplot-gpl3-license.txt
+  - Enllaç trencat a docs\evidencies\pas7.14\represa-v2\candidat-parcial-v1\THIRD-PARTY.md:33 -> docs/evidencies/pas7.14/fonts/lica-license.txt
+  - docs\tasques\completat\pas7.3-dnb-rsr-measurement.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\completat\pas7.4-spectral-bandset-validation.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.10-radiance-patch-quadtree.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.11-optical-field.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.12-phase-aerosol-library.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.13-legendre-b3.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.14-gas-b4.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.15-atmos-era5-cams.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.15-atmos-provider-standard.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.16-atmos-provider-era5-cams.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.17-terrain-curvature.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.18-cache-error-based.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: La secció ## Dependències no té '**Depèn de:**'
+  - docs\tasques\pendent\pas7.18-source-spatial-acceleration.md: La secció ## Dependències no té '**En depenen:**'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: La secció ## Dependències no té '**Depèn de:**'
+  - docs\tasques\pendent\pas7.19-phase-acceleration-b3.md: La secció ## Dependències no té '**En depenen:**'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.19-uncertainty-registry.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: La secció ## Dependències no té '**Depèn de:**'
+  - docs\tasques\pendent\pas7.20-ad-error-budget.md: La secció ## Dependències no té '**En depenen:**'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.20-zenith-absolute-gate.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: La secció ## Dependències no té '**Depèn de:**'
+  - docs\tasques\pendent\pas7.21-cache-scheduler.md: La secció ## Dependències no té '**En depenen:**'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.21-dome-profile-pchip.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: La secció ## Dependències no té '**Depèn de:**'
+  - docs\tasques\pendent\pas7.22-optional-runtime-acceleration.md: La secció ## Dependències no té '**En depenen:**'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.22-photometric-projections.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.23-clouds-b6.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.23-sky-radiance-composition.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.24-three-renderer.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.25-debug-modes.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.26-ground-truth-validation.md: Falta la secció obligatòria '## Treball pendent'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta o és invàlid el títol H1 (# Pas X — Títol)
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la capçalera de metadades (> **Estat:** ...)
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Descripció funcional'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Fonts a consultar'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Objectiu'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Dependències'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Codi existent a reutilitzar'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Flux tècnic'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Errors, cancel·lació i recursos'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Tasques'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Criteri de sortida'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Proves i evidències obligatòries'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Fora d'abast'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Instrucció per a Codex'
+  - docs\tasques\pendent\pas7.27-clouds-b6.md: Falta la secció obligatòria '## Treball pendent'
+  - Dependència asimètrica: docs\tasques\completat\pas7.3-dnb-rsr-measurement.md depèn de Pas 7.1, però docs\tasques\completat\pas7.1-contracte-cientific-v1.md no té Pas 7.3 a '**En depenen:**'
+  - Dependència asimètrica: docs\tasques\pendent\pas7.62-radiative-error-budget.md depèn de Pas 7.20, però docs\tasques\pendent\pas7.20-ad-error-budget.md no té Pas 7.62 a '**En depenen:**'
+  - Dependència asimètrica: docs\tasques\pendent\pas7.63-clouds-horizon-terminator.md depèn de Pas 7.23, però docs\tasques\pendent\pas7.23-clouds-b6.md no té Pas 7.63 a '**En depenen:**'

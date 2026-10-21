@@ -673,8 +673,54 @@ El [gate](evidencies/pas7.13/adaptatiu-v2/gate-adaptatiu-v2.json) verifica 900 h
 
 ![Control de reconstrucció COESA i llindar](evidencies/pas7.13/adaptatiu-v2/perfil-coesa-i-error.png)
 
-Des de l’arrel, `python -X utf8 tools/audit_adaptive_dome_step7_13_v2.py` reprodueix l’auditoria del candidat arxivat i `python -X utf8 tools/plot_adaptive_dome_step7_13_v2.py` regenera les sis figures sense executar noves integrals. `tools/audit_regressions_step7_13_v2.py` compara B0, les quatre columnes i els baselines. El CLI v1 `audit_angular_step7_13.py --strict` continua retornant 1 pel FAIL històric.
+Amb el checkout i les representacions binàries del candidat original, `python -X utf8 tools/audit_adaptive_dome_step7_13_v2.py` reprodueix l’auditoria arxivada; els seus hashes estrictes no corresponen al kernel ampliat de 7.14. Des de l’arrel, l’auditoria actual és `python -X utf8 tools/audit_photometry_step7_14.py --numeric-only` i `python -X utf8 tools/plot_adaptive_dome_step7_13_v2.py` regenera les sis figures sense executar noves integrals. `tools/audit_regressions_step7_13_v2.py` compara B0, les quatre columnes i els baselines. El CLI v1 `audit_angular_step7_13.py --strict` continua retornant 1 pel FAIL històric.
 
 El nou cas d’ús és `terralab3d.application.adaptive_dome_sampling.sample_adaptive_dome(request)`: rep sostre i precisions de la petició i retorna un camp cru amb procedència/revisió; no concedeix PASS a entrades arbitràries. Rebutja DEM i àrees sense domini angular acreditat. Per a aquestes geometries, barreres i zeros sense garanties, executa LOS directes amb el kernel existent o mostra dada no disponible. `None/null` no significa zero ni transparència; cobertura absent és error. En camps amb barreres azimutals, l’ús acreditat és `directOnly=true`.
 
-La campanya ha costat 76,35 min. Cada camp ha necessitat 7.736 LOS i conserva 54 perfils/717 nusos. Els controls COESA nous costen uns 173–179 s per LOS de kernel; es preserven els aproximadament 609 s/LOS extensa de 7.12. Abans d’ampliar la campanya, estima el cost i preregistra el domini. No hi ha cache entre peticions, acceleració espacial, vectorització addicional o multicore. 7.14 i Three.js definitiu no s’han iniciat.
+La campanya ha costat 76,35 min. Cada camp ha necessitat 7.736 LOS i conserva 54 perfils/717 nusos. Els controls COESA nous costen uns 173–179 s per LOS de kernel; es preserven els aproximadament 609 s/LOS extensa de 7.12. Abans d’ampliar la campanya, estima el cost i preregistra el domini. No hi ha cache entre peticions, acceleració espacial, vectorització addicional o multicore. En aquell tancament 7.14 i Three.js definitiu encara no s’havien iniciat.
+
+### Projeccions fotomètriques offline — Pas 7.14 parcial
+
+La [capacitat verificada](tasques/pendent/pas7.14-photometric-projections.md) projecta dades espectrals retingudes, amb zero avaluacions noves de transport. La lectura CIE de S és luminància modelada del component artificial en cd/m²; C continua relatiu. Les bandes SQM/TESS de referència no són lectures d’un instrument calibrat i la sortida nativa indica `unavailable` amb la causa. Bortle no es dedueix d’aquests resultats.
+
+![Suport de les respostes fotomètriques](evidencies/pas7.14/respostes-i-suport.png)
+
+Des de l’arrel, per inspeccionar el cas S arxivat sense executar transport:
+
+```powershell
+python -X utf8 tools/project_skyglow_photometry.py --input docs/evidencies/pas7.14/transport-i-projeccions.json --case S_B4_chamber_point_5km-0 --reference-bands --output .runtime-photometry/projeccio-usuari.json
+```
+
+La sortida ha de ser nova. Conté senyals de banda, unitats, escala, resposta, revisió i motiu d’indisponibilitat. `--reference-bands` afegeix diagnòstics AB direccionals condicionats, sense aplicar un FOV ni un zero point natiu. [Exemple executat](evidencies/pas7.14/demostracio-cli-s.json). Les magnituds C absolutes continuen indisponibles.
+
+![Luminància S, contrast C i cost](evidencies/pas7.14/escenaris-i-costos.png)
+
+El [gate numèric](evidencies/pas7.14/gate-projeccions-v1.json) es reprodueix amb `python -X utf8 tools/audit_photometry_step7_14.py --numeric-only`; sense l’opció retorna 1 perquè el pas científic complet està bloquejat. `python -X utf8 tools/plot_photometry_step7_14.py` regenera les tres figures amb les dades arxivades. No genera una malla nova.
+
+La projecció de les bandes costa 3,06–5,11 ms/LOS; la captura COESA registrada costa 183,393 s. No és una acceleració del transport. L’espectral passa 10.624 contrasts amb màxim 0,000115197 mag davant 0,01, dins finestres conegudes. Una lectura nativa necessita resposta/fosc/FOV/calibratge coherents. Un model nominal AB no exigeix calibratge individual, però necessita resposta i cobertura suficients. El DomeProfile CIE i el domini angular de 7.13 no cobreixen aquests requisits: no s’extrapola COESA, DEM o fonts extenses ni es renormalitza una regió parcial. La contribució superior a 75 km es conserva com a cota positiva condicionada; 10 km continua insuficient a la fixture històrica B4. El punt de represa segueix a 7.14; 7.15 no iniciat.
+
+### CIE amb aire/buit explícit i perfils nominals — represa7.14
+
+La [represa](evidencies/pas7.14/represa-v2/validacio-represa-v2.md) incorpora una projecció CIE2019 versionada: V està en aire estàndard450ppm i les dades retingudes es declaren en buit. El canvi conserva flux quan es converteix una densitat; no canvia la SPD d’un transport anterior ni el seu resultat històric. Aquesta operació és un postprocessament independent, sense noves LOS.
+
+```powershell
+python -X utf8 tools/project_coordinate_photometry_step7_14_v2.py --input docs/evidencies/pas7.14/transport-i-projeccions.json --case S_B4_chamber_point_5km-0 --input-radiance-basis vacuum_nm --output .runtime-photometry-v2/projeccio-usuari.json
+```
+
+La sortida ha de ser nova. Mostra senyal de banda, luminància S en cd/m² o senyal C relatiu, coordenades i refinament numèric. [Exemple executat](evidencies/pas7.14/represa-v2/demostracio-cli-cie-v2.json). No produeix lectura SQM/TESS nativa ni Bortle. El postprocessament exacte de coordenades costa0,787–0,888s/LOS en la campanya; no se li atribueixen els3–5ms del projector lineal anterior.
+
+![Canvi explícit de coordenada en les ponderacions S/C](evidencies/pas7.14/represa-v2/canvi-coordenades-cie-v2.png)
+
+Un model nominal verificable pot definir una banda AB sense conèixer el fosc o el guany d’un dispositiu concret. Per comparar amb Hz o magnituds natives calen aquelles dades addicionals. Les [fonts primàries i límits](evidencies/pas7.14/represa-v2/fonts-i-qualificacio-v2.md) distingeixen SQM ample de SQM-L i lots TESS-W; no hi ha un perfil genèric acreditat només pel nom comercial. La cobertura espectral/angular completa o les cotes pertinents continuen pendents.
+
+`python -X utf8 tools/audit_photometry_resume.py --numeric-only` reprodueix el PASS numèric. Sense l’opció retorna1 pel gate científic bloquejat. `python -X utf8 tools/plot_photometry_resume.py` regenera les tres figures sense repetir transport.21.184 contrasts espectrals i540 proves backend PASS no impliquen homologació física completa. El punt de represa continua a7.14;7.15 no iniciat.
+
+### Diagnòstic de qualificació i cost — represa 7.14 del 2026-10-21
+
+L’[informe vigent](evidencies/pas7.14/represa-v3/validacio-represa-v3.md) i el [registre de mancances](evidencies/pas7.14/represa-v3/fonts-mancances-i-vies-v3.md) identifiquen les dades necessàries per al nominal SQM-L/TESS-W. Cap lectura nova s’ha habilitat. Els perfils antics i nous de lent/filtre es mantenen separats; el FWHM no delimita totes les cues.
+
+`python -X utf8 tools/audit_photometry_nominal_step7_14_v3.py --numeric-only` retorna 0. El mateix auditor sense l’opció retorna 1 pel bloqueig científic; `--verify-manifest` comprova el candidat vigent sense escriure. El perfilador es pot executar amb `python -X utf8 tools/profile_photometry_step7_14_v3.py --output .runtime-photometry-v3/nova-mesura`, amb directori nou i fils BLAS/OMP a 1 com indica l’informe. Utilitza 13 espectres existents i zero LOS noves. El cost de 0,8 s prové sobretot de reconstruir regles de quadratura per panell; el runtime continua intacte.
+
+![Temps de projecció i funcions perfilades, amb procedència i unitats](evidencies/pas7.14/represa-v3/cost-projeccio-v3.png)
+
+El pas continua bloquejat. No es converteix la incertesa instrumental en error numèric, ni s’exigeix calibratge individual a una predicció nominal AB. No començar 7.15.

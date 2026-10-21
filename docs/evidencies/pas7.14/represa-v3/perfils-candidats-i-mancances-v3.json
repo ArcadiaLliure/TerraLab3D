@@ -1,0 +1,106 @@
+{
+  "ownerStep": "7.14",
+  "scope": "Candidats investigats, cap perfil nou adoptat. Els flags indiquen suficiència per al gate, no absència de tota informació.",
+  "candidates": [
+    {
+      "id": "sqm-l-legacy-gd-cm500",
+      "model": "SQM-L clàssic, lent Golden Dragon i CM500; no model ...2",
+      "sourceIds": [
+        "unihedron-2007",
+        "sqm-color-2017",
+        "unihedron-optica-2018"
+      ],
+      "known": "Família òptica identificada; mesures conjuntes publicades com a figures. La via de fuga IR impedeix donar per complet el producte ideal detector×filtre.",
+      "missing": [
+        "Taula numèrica de resposta conjunta normalitzada d’energia, amb identificació del model òptic o definició d’un nominal representatiu de la família.",
+        "Convenció de longitud d’ona i calibratge del monocromador.",
+        "Soroll/fosc/llum paràsita de l’assaig, límits superiors de resposta no detectada i cobertura UV/IR.",
+        "FOV nominal complet amb pes en angle sòlid i cotes de les zones no caracteritzades; acoblament espectral/angular o justificació de separabilitat."
+      ],
+      "route": "Unihedron i LICA: taules originals de components i sistema de la mateixa configuració, inclosa la via no filtrada; no copiar el perfil ...2.",
+      "spectral_response_known": false,
+      "wavelength_basis_known": false,
+      "spectral_coverage_bounded": false,
+      "angular_model_known": false,
+      "angular_coverage_bounded": false,
+      "nominalAbQualified": false,
+      "individualCalibrationIsNominalPrerequisite": false
+    },
+    {
+      "id": "sqm-le2-comparator",
+      "model": "SQM-LE2 / SQM-LU-DL-V, BK7 half-ball + UVIR650; comparador, no substitut SQM-L",
+      "sourceIds": [
+        "unihedron-optica-2018"
+      ],
+      "known": "El fabricant documenta una òptica diferent i perfils preliminars; el mateix calibratge de lectura no identifica la mateixa banda.",
+      "missing": [
+        "Model nominal concret d’aquesta família i taules radiomètriques netes de fons, no només gràfics de magnitud en l’assaig.",
+        "Convenció de λ, cues amb límits de detecció i funció angular completa."
+      ],
+      "route": "Unihedron/SUPSI: dades subjacents a la comparació; només adoptar en una versió explícita, sense barrejar amb CM500.",
+      "spectral_response_known": false,
+      "wavelength_basis_known": false,
+      "spectral_coverage_bounded": false,
+      "angular_model_known": false,
+      "angular_coverage_bounded": false,
+      "nominalAbQualified": false,
+      "individualCalibrationIsNominalPrerequisite": false
+    },
+    {
+      "id": "tess-w-2019-stars3-or-stars222",
+      "model": "TESS-W de l’assaig2019: stars3 o stars222, alternatives separades",
+      "sourceIds": [
+        "calibration-2019"
+      ],
+      "known": "Mesura de sistema i formulació AB publicades; no s’exigeix traslladar els guanys o zero points d’aquests dispositius per definir un nominal.",
+      "missing": [
+        "Taula de resposta conjunta i definició de quin model/família pot representar; no mitjana improvisada de les dues unitats.",
+        "Convenció de λ; suport i límits de detecció fora350–1000nm.",
+        "FOV suficient i incertesa/valida separabilitat espectral-angular per al model nominal seleccionat."
+      ],
+      "route": "Autors LICA de l’article2019: dades subjacents a les figures1/2 i metadades del banc.",
+      "spectral_response_known": false,
+      "wavelength_basis_known": false,
+      "spectral_coverage_bounded": false,
+      "angular_model_known": false,
+      "angular_coverage_bounded": false,
+      "nominalAbQualified": false,
+      "individualCalibrationIsNominalPrerequisite": false
+    },
+    {
+      "id": "tess-w-2026-stars618",
+      "model": "TESS-W stars618 de l’assaig2026, sense empalmar stars1277 ni altres lots",
+      "sourceIds": [
+        "licaplot-2026",
+        "tess-zenodo-2026"
+      ],
+      "known": "Filtre stars618350–1048nm i fotòmetre/fotodíode stars618350–900nm arxivats a v2. El repositori no té commits nous respecte del fixat.",
+      "missing": [
+        "Resposta conjunta neta fora350–900nm, incloses cotes UV/IR i incertesa del banc.",
+        "Metadades de λ i confirmació de la finestra/col·lector/filtre durant l’assaig conjunt, inclòs el tractament de fons.",
+        "Model angular coherent del mateix disseny/lot o nominal definit; els talls stars237/630 no es traslladen automàticament a stars618."
+      ],
+      "route": "LICA/GUAIX: completar la mateixa configuració stars618, o publicar un nominal de lot amb les incerteses. El filtre sol no substitueix el sistema.",
+      "spectral_response_known": false,
+      "wavelength_basis_known": false,
+      "spectral_coverage_bounded": false,
+      "angular_model_known": false,
+      "angular_coverage_bounded": false,
+      "nominalAbQualified": false,
+      "individualCalibrationIsNominalPrerequisite": false
+    }
+  ],
+  "coverage": {
+    "requiredMissingToKnownRatioMaximum": 0.0009214583192958761,
+    "budgetMag": 0.001,
+    "totalBudgetMag": 0.01,
+    "knownAngularDomains": [
+      "Cambra homogènia: camp escalar CIE, elevació≥0.5°, no camp espectral SQM/TESS.",
+      "COESA: perfil a azimut270.7° i elevacions45–60°; aquesta línia no cobreix una regió de FOV amb angle sòlid positiu."
+    ],
+    "unknownRegionRadianceIsZero": false,
+    "fullSceneContributionBound": null,
+    "directTransportWouldNeed": "Resposta nominal seleccionada i nusos espectrals abans de les LOS; quadratura angular amb estimació de cost i controls independents. No reutilitzar el CIE escalar com si fos un espectre."
+  },
+  "reopenRule": "Reobrir les cerques tancades només amb dades noves, un annex identificat o resposta del fabricant/laboratori; cap nova campanya de transport fins a seleccionar el perfil."
+}

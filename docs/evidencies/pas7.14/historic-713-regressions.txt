@@ -1,0 +1,34 @@
+{
+  "status": "PASS",
+  "checks": {
+    "samePyrightDiagnosticMultiset": true,
+    "sameFourColumns": true,
+    "sameB0": true,
+    "previousScientificCodeUnchanged": true,
+    "previousEvidenceUnchanged": true
+  },
+  "pyrightSummary": {
+    "filesAnalyzed": 320,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 12.075
+  },
+  "exactColumns": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "b0Regression": {
+    "expectedSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "actualSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "identical": true,
+    "scope": "900_LOS_values_counters_and_serialization;not_new_timing_campaign"
+  },
+  "previousScientificCodeCount": 36,
+  "previousScientificCodeDifferences": [],
+  "historicalEvidenceCount": 247,
+  "historicalEvidenceDifferences": [],
+  "timing": "Benchmarks B0–B4 històrics preservats; sense nova campanya ni inferència de speedup."
+}

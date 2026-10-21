@@ -10,7 +10,15 @@ from contextlib import nullcontext
 from dataclasses import asdict, dataclass, replace
 from typing import Callable, Literal
 
-from .gauss_kronrod import QuadratureSettings, integrate_gk15
+import numpy as np
+
+from .gauss_kronrod import (
+    QuadratureConvergenceError,
+    QuadratureResult,
+    QuadratureSettings,
+    integrate_gk15,
+)
+from .vector_quadrature import integrate_vector_gk15
 from .geometric_transport import (
     GeometricPartition,
     SphericalFrame,
@@ -37,6 +45,7 @@ from .spectral_transport import (
     SpectralOperator,
     SpectralScatteringTransport,
     SpectralTransportConfiguration,
+    SpectralRaySamples,
     SPECTRAL_TRANSPORT_REVISION,
 )
 from .transport_profiling import TransportProfiler
@@ -212,9 +221,12 @@ class PropagationResult:
     spectral_metadata: dict[str, object] | None = None
 
     terrain_metadata: dict[str, object] | None = None
+    spectral_samples: tuple[SpectralRaySamples, ...] = ()
 
     def to_dict(self) -> dict[str, object]:
         values = asdict(self)
+        if not self.spectral_samples:
+            values.pop("spectral_samples")
         if self.terrain_metadata is None:
             values.pop("terrain_metadata")
         if self.spectral_metadata is None:
@@ -231,7 +243,9 @@ class PropagationResult:
             ):
                 values.pop(key)
         return {
-            "schemaVersion": 5
+            "schemaVersion": 6
+            if self.spectral_samples
+            else 5
             if self.terrain_metadata is not None
             else 4
             if self.spectral_metadata is not None
@@ -300,7 +314,12 @@ class PropagationKernel:
         cancelled: Callable[[], bool] | None = None,
         is_current: Callable[[], bool] | None = None,
         profiler: TransportProfiler | None = None,
+        capture_spectral_density: bool = False,
     ) -> PropagationResult:
+        if type(capture_spectral_density) is not bool or (
+            capture_spectral_density and request.spectral is None
+        ):
+            raise ValueError("La retenció espectral requereix transport espectral")
         if not integrand_id or not integral_unit:
             raise ValueError("Cal identitat i unitat de l'integrand de diagnòstic")
         if request.scattering is not None:
@@ -330,6 +349,7 @@ class PropagationKernel:
         frame = SphericalFrame(request.observer, request.options.earth_radius_m)
         origin = frame.position_ecef(request.observer)
         rows = []
+        spectral_samples: list[SpectralRaySamples] = []
         traces: list[OpticalRayTrace] = []
         field = request.optical_field
         diagnostics: list[TransportDiagnostics] = []
@@ -353,6 +373,8 @@ class PropagationKernel:
                         operator = SpectralOperator(source, request.spectral)
                         operators[source.spectrum] = operator
                     spectral_sets[source.source_model_id] = asdict(operator.band_set)
+                    if capture_spectral_density:
+                        operator.enable_capture()
             geometry = source.geometry
             anchor = frame.position_ecef(
                 geometry.position
@@ -397,6 +419,20 @@ class PropagationKernel:
                     )
                     ray = replace(ray, length_m=length)
                 if ray.length_m == 0:
+                    if capture_spectral_density and operator is not None:
+                        zeros = (0.0,) * len(operator.wavelengths)
+                        spectral_samples.append(
+                            SpectralRaySamples(
+                                source.source_model_id,
+                                view.direction_id,
+                                operator.band_set.knots_nm,
+                                zeros,
+                                zeros,
+                                f"{source.amplitude.unit} m^-2 sr^-1 nm^-1",
+                                source.amplitude.parameter_name or "SI_W",
+                                operator.band_set.band_set_id,
+                            )
+                        )
                     counters = KernelCounters(1, 0, 0, 0, 0)
                     rows.append(
                         GeometricRayResult(
@@ -460,6 +496,7 @@ class PropagationKernel:
                         profiler,
                         operator,
                     )
+                    transport.capture_density = capture_spectral_density
                 if transport is not None and visibility is not None:
                     with measure("occlusion"):
                         transport.attach_terrain(visibility)
@@ -495,16 +532,77 @@ class PropagationKernel:
                     return integrand(sample, source)
 
                 with measure("quadrature"):
-                    q = integrate_gk15(
-                        function,
-                        intervals,
-                        request.spectral.monochromatic().radiance_quadrature
-                        if request.spectral is not None
-                        else request.scattering.radiance_quadrature
-                        if request.scattering is not None
-                        else request.options.quadrature,
-                        checkpoint=checkpoint,
-                    )
+                    if capture_spectral_density:
+                        assert isinstance(transport, SpectralScatteringTransport)
+                        assert operator is not None and request.spectral is not None
+                        assert operator.capture_response_weights is not None
+
+                        def density_function(s: float) -> np.ndarray:
+                            function(s)
+                            assert isinstance(transport, SpectralScatteringTransport)
+                            assert transport.last_density is not None
+                            return transport.last_density
+
+                        settings = request.spectral.monochromatic().radiance_quadrature
+                        parts = []
+                        leaves = 0
+                        for index, (a, b) in enumerate(intervals):
+                            remaining = (
+                                settings.max_intervals
+                                - leaves
+                                - (len(intervals) - index - 1)
+                            )
+                            if remaining < 1:
+                                raise QuadratureConvergenceError(
+                                    "Pressupost LOS espectral esgotat"
+                                )
+                            local_settings = replace(
+                                settings,
+                                absolute_tolerance=settings.absolute_tolerance
+                                / len(intervals),
+                                max_intervals=remaining,
+                            )
+                            part = integrate_vector_gk15(
+                                density_function, a, b, local_settings, checkpoint
+                            )
+                            parts.append(part)
+                            leaves += 1 + (part.evaluations - 15) // 30
+                        values = np.sum([part.value for part in parts], axis=0)
+                        errors = np.sum(
+                            [part.estimated_error for part in parts], axis=0
+                        )
+                        evaluations = sum(part.evaluations for part in parts)
+                        subdivisions = (evaluations - 15 * len(parts)) // 30
+                        q = QuadratureResult(
+                            float(np.dot(operator.capture_response_weights, values)),
+                            float(np.dot(operator.capture_response_weights, errors)),
+                            evaluations,
+                            subdivisions,
+                            len(parts) + subdivisions,
+                        )
+                        spectral_samples.append(
+                            SpectralRaySamples(
+                                source.source_model_id,
+                                view.direction_id,
+                                operator.band_set.knots_nm,
+                                tuple(float(v) for v in values),
+                                tuple(float(v) for v in errors),
+                                f"{source.amplitude.unit} m^-2 sr^-1 nm^-1",
+                                source.amplitude.parameter_name or "SI_W",
+                                operator.band_set.band_set_id,
+                            )
+                        )
+                    else:
+                        q = integrate_gk15(
+                            function,
+                            intervals,
+                            request.spectral.monochromatic().radiance_quadrature
+                            if request.spectral is not None
+                            else request.scattering.radiance_quadrature
+                            if request.scattering is not None
+                            else request.options.quadrature,
+                            checkpoint=checkpoint,
+                        )
                 counters = KernelCounters(
                     1, len(intervals), q.evaluations, q.subdivisions, q.leaf_intervals
                 )
@@ -567,6 +665,11 @@ class PropagationKernel:
                     **(
                         {"spectral": request.spectral.signature}
                         if request.spectral is not None
+                        else {}
+                    ),
+                    **(
+                        {"spectralCapture": "per-panel-density-v1"}
+                        if capture_spectral_density
                         else {}
                     ),
                 },
@@ -635,6 +738,7 @@ class PropagationKernel:
             }
             if request.terrain is not None and visibility is not None
             else None,
+            spectral_samples=tuple(spectral_samples),
             spectral_metadata={
                 "configurationSignature": request.spectral.signature,
                 "bandSets": spectral_sets,

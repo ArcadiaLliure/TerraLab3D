@@ -1,0 +1,22 @@
+{
+  "pythonVersion": "3.13",
+  "pythonPlatform": "Windows",
+  "extraPaths": [
+    "../backend/src",
+    "../tools"
+  ],
+  "include": [
+    "../backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+    "../backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+    "../backend/src/terralab3d/domain/photometric_projection.py",
+    "../backend/src/terralab3d/application/photometric_projections.py",
+    "../backend/tests/test_photometric_projection_step7_14.py",
+    "../tools/project_skyglow_photometry.py",
+    "../tools/audit_photometry_step7_14.py",
+    "../tools/photometry_fixtures_step7_14.py",
+    "../tools/plot_photometry_step7_14.py",
+    "../tools/prepare_photometry_sources_step7_14.py",
+    "../tools/validate_photometry_step7_14.py",
+    "../tools/validate_sensor_spectral_budget_step7_14.py"
+  ]
+}

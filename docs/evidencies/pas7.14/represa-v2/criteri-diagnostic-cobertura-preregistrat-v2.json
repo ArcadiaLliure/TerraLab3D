@@ -1,0 +1,14 @@
+{
+  "id": "component-coverage-diagnostic-v2",
+  "registeredAtUtc": "2026-10-19T23:22:35.413247+00:00",
+  "parentPolicySha256": "babc518000b27dae4ffd0909bb13e1282d7b86894b5ee70678cb848c35b4d780",
+  "coverageMagnitudeMaximum": 0.001,
+  "oracleRelativeMaximum": 1e-10,
+  "model": "Resposta d’energia TSL237 normalitzada×T_filtre de cada lot, en una hipòtesi explícita de coordenada en buit. No s’identifica com resposta total del fotòmetre.",
+  "bounds": "Dins el suport tabulat del chip, T desconeguda del filtre entre0i1 per passivitat; integrar separadament UV/IR no mesurats. Fora del suport del chip, cota desconeguda: mai zero.",
+  "knownData": "Conservar mesures de T, també valors>1 deguts a soroll/normalització; no retallar-los. No cobreix incertesa de mesura, col·lector o finestra.",
+  "oracle": "GL8 per intervals comuns contra SciPyQUADPACK independent; la divergència no modifica llindars.",
+  "costEstimateSeconds": 10,
+  "maximumNewPhysicalLos": 0,
+  "exitRule": "Una cota parcial superior al pressupost impedeix certificar precisió amb aquesta informació; no prova l’error real de l’instrument. L’exterior del suport del chip roman desconegut. No homologar ni inventar un tall."
+}

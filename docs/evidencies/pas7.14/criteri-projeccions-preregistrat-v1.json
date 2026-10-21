@@ -1,0 +1,73 @@
+{
+  "id": "photometric-projections-v1",
+  "registeredAtUtc": "2026-10-19T19:58:12.878879+00:00",
+  "inheritedSpectralMagnitudeMaximum": 0.01,
+  "tableProjectionRelativeMaximum": 1e-10,
+  "tableProjectionOrigin": "Simpson exacte pour radiància quadràtica per panell i resposta lineal; marge de punt flotant molt inferior a 0,01 mag. Oracle GL8/16 i Decimal50 independent.",
+  "abReferenceRelativeMaximum": 1e-10,
+  "angularMagnitudeMaximum": 0.0001,
+  "angularOrigin": "Assignació numèrica de projecció de FOV dues dècades inferior a 0,01 mag; no cobreix incertesa del FOV real.",
+  "transportRelativeMaximum": 0.0001,
+  "referenceRelativeMaximum": 1e-06,
+  "referenceLevels": [
+    {
+      "spectralGL": 2,
+      "pathGL": 4,
+      "areaGL": 2,
+      "losEpsrel": 1e-09
+    },
+    {
+      "spectralGL": 4,
+      "pathGL": 8,
+      "areaGL": 4,
+      "losEpsrel": 1e-10
+    },
+    {
+      "spectralGL": 8,
+      "pathGL": 16,
+      "areaGL": 8,
+      "losEpsrel": 1e-11
+    }
+  ],
+  "capture": "Opt-in espectre per panells al mateix kernel; mateixa geometria/oclusió/columnes/fases. GK vectorial ja existent, control per λ, sense nova acceleració o multicore. Ruta escalar preexistent preservada.",
+  "bandStrategy": "Unió de nusos existent i Simpson; nodes de totes les respostes explícites inclosos abans del transport. Cap reponderació d’un únic escalar CIE com si fos un espectre.",
+  "spectralDomainNm": [
+    380,
+    780
+  ],
+  "atmosphericTopM": 75000,
+  "sourceScale": "S W preservats; C relatiu, sense magnitud AB absoluta o luminància cd/m². Contrast relatiu només entre escales compatibles.",
+  "profiles": [
+    "CIE_V_packaged",
+    "SQM_CM500_Cinzano2005_SVO_truncated_reference",
+    "TESSW_stars1277_LICA2024_reference_dark_unresolved"
+  ],
+  "instrumentalCaveat": "Els perfils SQM/TESS de referència no són calibratges natius homologats. Sense suport/resposta/FOV/calibratge identificats i coherents, la projecció instrument real és unavailable; no zero ni offset arbitrari.",
+  "angular": "FOV gaussià nominal prescrit de 20°/17°, hemisferi frontal normalitzat, model aproximat publicat per SQM-L/TESS-W2019. Validació amb camps analítics complets, sense homologar un aparell concret. DomeProfile7.13 conserva el seu domini; manca de dades en qualsevol regió de pes positiu exigeix unavailable, sense renormalització parcial.",
+  "chamberFixtures": [
+    "S_B4_chamber_point_5km",
+    "C_realista_chamber_point_5km",
+    "C_kelvins3000_chamber_point_5km"
+  ],
+  "angularIndicesFromFrozenHoldout": [
+    0,
+    160,
+    220
+  ],
+  "extraCases": [
+    "S mountain az90.2/el23.61",
+    "S mountain az90.2/el23.89",
+    "S area400m az270.7/el47.3"
+  ],
+  "coesaControl": "S standard point5km az270.7/el52.19, mateix perfil1km/sostre75km de7.13, amb cota exterior positiva per resposta. Estimar després del pilot abans de qualsevol ampliació.",
+  "cost": {
+    "maximumScientificWallSeconds": 900,
+    "maximumRuntimeLos": 20,
+    "estimatedChamberAndReferencesSeconds": 40,
+    "estimatedCoesaCaptureSeconds": 400,
+    "estimatedCoesaReferencesSeconds": 55,
+    "serial": true,
+    "denseAngularMesh": false
+  },
+  "exitRule": "Proves numèriques PASS per a corbes i dominis registrats; tancar7.14 només si CIE/SQM/TESS disposen de resposta, FOV i calibratge suficients per al seu abast. Si els perfils reals continuen incomplets, documentar BLOCKED_SENSOR_PROFILES encara que passin les projeccions condicionades. No relaxar llindars ni començar7.15."
+}

@@ -1,0 +1,130 @@
+[
+  {
+    "name": "ruff-format-final-v2",
+    "command": [
+      "ruff",
+      "format",
+      "--check",
+      "backend/src/terralab3d/domain/wavelength_coordinates.py",
+      "backend/src/terralab3d/domain/instrument_qualification.py",
+      "backend/src/terralab3d/application/coordinate_photometry.py",
+      "backend/tests/test_photometric_coordinates_step7_14_v2.py",
+      "tools/audit_photometry_resume.py",
+      "tools/plot_photometry_resume.py",
+      "tools/diagnose_instrument_coverage.py",
+      "tools/diagnose_cie_coordinate_tail.py",
+      "tools/diagnose_coordinate_hypotheses.py",
+      "tools/photometry_coordinates_step7_14_v2.py",
+      "tools/project_coordinate_photometry_step7_14_v2.py",
+      "tools/validate_photometry_step7_14_v2.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.026696300000367046
+  },
+  {
+    "name": "ruff-check-final-v2",
+    "command": [
+      "ruff",
+      "check",
+      "backend/src/terralab3d/domain/wavelength_coordinates.py",
+      "backend/src/terralab3d/domain/instrument_qualification.py",
+      "backend/src/terralab3d/application/coordinate_photometry.py",
+      "backend/tests/test_photometric_coordinates_step7_14_v2.py",
+      "tools/audit_photometry_resume.py",
+      "tools/plot_photometry_resume.py",
+      "tools/diagnose_instrument_coverage.py",
+      "tools/diagnose_cie_coordinate_tail.py",
+      "tools/diagnose_coordinate_hypotheses.py",
+      "tools/photometry_coordinates_step7_14_v2.py",
+      "tools/project_coordinate_photometry_step7_14_v2.py",
+      "tools/validate_photometry_step7_14_v2.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.028109200000017154
+  },
+  {
+    "name": "pyright-afectats-final-v2",
+    "command": [
+      "pyright",
+      "--project",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\represa-v2\\pyright-scope-v2.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 2.82345770000029
+  },
+  {
+    "name": "gate-numeric-final-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_resume.py",
+      "--numeric-only"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.0202432999999473
+  },
+  {
+    "name": "gate-complet-final-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_resume.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 0.9599803999999494
+  },
+  {
+    "name": "figures-finals-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/plot_photometry_resume.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.568537600000127
+  },
+  {
+    "name": "auditoria-documental-final-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_docs.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 0.41995170000018334
+  },
+  {
+    "name": "enllacos-documentals-final-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/check_doc_links.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.4156857999996646
+  },
+  {
+    "name": "diff-check-final-v2",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.043746700000156125
+  }
+]

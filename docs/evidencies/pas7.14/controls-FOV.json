@@ -1,0 +1,84 @@
+{
+  "rows": [
+    {
+      "fov": "nominal-Gaussian-17deg",
+      "azimuthDeg": 0.0,
+      "elevationDeg": 90.0,
+      "values": [
+        1.4845364166553534,
+        1.484536416655353,
+        1.484536416655356
+      ],
+      "oracle": 1.4845364166553534,
+      "errorMagnitude": 1.9286549331065723e-15,
+      "passCriterion": true
+    },
+    {
+      "fov": "nominal-Gaussian-17deg",
+      "azimuthDeg": 89.3,
+      "elevationDeg": 60.0,
+      "values": [
+        1.3659177291866755,
+        1.365917729186675,
+        1.3659177291866773
+      ],
+      "oracle": 1.3659177291866755,
+      "errorMagnitude": 1.4464911998299298e-15,
+      "passCriterion": true
+    },
+    {
+      "fov": "nominal-Gaussian-17deg",
+      "azimuthDeg": 275.1,
+      "elevationDeg": 32.0,
+      "values": [
+        1.129480547692498,
+        1.1294805476924983,
+        1.129480547692498
+      ],
+      "oracle": 1.129480547692498,
+      "errorMagnitude": 0.0,
+      "passCriterion": true
+    },
+    {
+      "fov": "nominal-Gaussian-20deg",
+      "azimuthDeg": 0.0,
+      "elevationDeg": 90.0,
+      "values": [
+        1.47881065735548,
+        1.4788106573554791,
+        1.4788106573554824
+      ],
+      "oracle": 1.4788106573554796,
+      "errorMagnitude": 2.1697367997448936e-15,
+      "passCriterion": true
+    },
+    {
+      "fov": "nominal-Gaussian-20deg",
+      "azimuthDeg": 89.3,
+      "elevationDeg": 60.0,
+      "values": [
+        1.362328637666409,
+        1.3623286376664085,
+        1.3623286376664105
+      ],
+      "oracle": 1.362328637666409,
+      "errorMagnitude": 1.2054093331916083e-15,
+      "passCriterion": true
+    },
+    {
+      "fov": "nominal-Gaussian-20deg",
+      "azimuthDeg": 275.1,
+      "elevationDeg": 32.0,
+      "values": [
+        1.1301503779187156,
+        1.1301503779187154,
+        1.1301503779187152
+      ],
+      "oracle": 1.1301503779187154,
+      "errorMagnitude": 2.410818666383218e-16,
+      "passCriterion": true
+    }
+  ],
+  "wallSeconds": 1.4639484000217635,
+  "scope": "Camps analítics complets; cap homologació angular física addicional"
+}

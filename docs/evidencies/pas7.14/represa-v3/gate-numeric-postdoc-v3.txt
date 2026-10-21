@@ -1,0 +1,25 @@
+{
+  "status": "BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE",
+  "numericStatus": "PASS",
+  "checks": {
+    "previous576EvidencePreserved": true,
+    "previous99SourcesUnchanged": true,
+    "originalDocumentsArchived": true,
+    "consultationMetadataPreserved": true,
+    "historicalV1NumericGate": true,
+    "historicalV2NumericGate": true,
+    "projectionOraclesAndExactFrozenValues": true,
+    "inheritedBudgetsIntact": true,
+    "noNewPhysicalLos": true,
+    "costBounded": true,
+    "noRuntimeOptimization": true,
+    "regressionsPass": true,
+    "backend540Pass": true,
+    "b0Exact": true,
+    "fourColumnsExact": true,
+    "nominalDoesNotRequireDeviceCalibration": true,
+    "relativeCNotPromoted": true,
+    "noUnknownCoverageAsZero": true,
+    "protectedPlanningUnchanged": true
+  }
+}

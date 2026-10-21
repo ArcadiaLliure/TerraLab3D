@@ -1,0 +1,234 @@
+{
+  "instruments": [
+    {
+      "profile": {
+        "profile_id": "SQM-CM500-nominal-components",
+        "provenance": "Cinzano2005 + fabricant TSL237/CM500; diferenciar SQM ample de SQM-L",
+        "spectral_response_known": true,
+        "wavelength_basis_known": false,
+        "spectral_coverage_bounded": false,
+        "angular_model_known": true,
+        "angular_coverage_bounded": false,
+        "device_id": null,
+        "dark_calibration_known": false,
+        "native_gain_known": false,
+        "native_zero_point_known": false
+      },
+      "nominal": {
+        "profileId": "SQM-CM500-nominal-components",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "Cinzano2005 + fabricant TSL237/CM500; diferenciar SQM ample de SQM-L"
+      },
+      "native": {
+        "profileId": "SQM-CM500-nominal-components",
+        "target": "native_magnitude",
+        "status": "unavailable",
+        "missing": [
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Cobertura angular sense cota",
+          "Dispositiu/calibratge natiu no identificat",
+          "Fosc i domini tèrmic no acreditats",
+          "Guany natiu no acreditat",
+          "Zero point natiu no acreditat"
+        ],
+        "individualCalibrationRequired": true,
+        "observationalValidation": false,
+        "provenance": "Cinzano2005 + fabricant TSL237/CM500; diferenciar SQM ample de SQM-L"
+      }
+    },
+    {
+      "profile": {
+        "profile_id": "TESS-W-batch-specific-optics",
+        "provenance": "LICA2026; respostes/filtres i FOV disponibles, però sense cota exterior ni convenció espectral explícita",
+        "spectral_response_known": true,
+        "wavelength_basis_known": false,
+        "spectral_coverage_bounded": false,
+        "angular_model_known": true,
+        "angular_coverage_bounded": false,
+        "device_id": null,
+        "dark_calibration_known": false,
+        "native_gain_known": false,
+        "native_zero_point_known": false
+      },
+      "nominal": {
+        "profileId": "TESS-W-batch-specific-optics",
+        "target": "nominal_ab",
+        "status": "unavailable",
+        "missing": [
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Cobertura angular sense cota"
+        ],
+        "individualCalibrationRequired": false,
+        "observationalValidation": false,
+        "provenance": "LICA2026; respostes/filtres i FOV disponibles, però sense cota exterior ni convenció espectral explícita"
+      },
+      "native": {
+        "profileId": "TESS-W-batch-specific-optics",
+        "target": "native_magnitude",
+        "status": "unavailable",
+        "missing": [
+          "Convenció espectral no identificada",
+          "Suport/cues espectrals sense cota",
+          "Cobertura angular sense cota",
+          "Dispositiu/calibratge natiu no identificat",
+          "Fosc i domini tèrmic no acreditats",
+          "Guany natiu no acreditat",
+          "Zero point natiu no acreditat"
+        ],
+        "individualCalibrationRequired": true,
+        "observationalValidation": false,
+        "provenance": "LICA2026; respostes/filtres i FOV disponibles, però sense cota exterior ni convenció espectral explícita"
+      }
+    }
+  ],
+  "gaussianCoverageDiagnostics": [
+    {
+      "nominalGaussianFwhmDeg": 17.0,
+      "scope": "Prescripció nominal exacta al zenit, no ajust ni mesura de les ales reals",
+      "missingWeightFractionBelowElevation05deg": 1.5638184570207559e-34,
+      "noRadianceBound": {
+        "status": "UNAVAILABLE",
+        "upperMissingSignal": null,
+        "upperErrorMag": null,
+        "reason": "Manca cota de radiància; no es pressuposa nul·la"
+      },
+      "exampleWithExplicitBound": {
+        "status": "PASS",
+        "upperMissingSignal": 1.5638184570207559e-34,
+        "upperErrorMag": 1.6978943164564295e-34
+      }
+    },
+    {
+      "nominalGaussianFwhmDeg": 20.0,
+      "scope": "Prescripció nominal exacta al zenit, no ajust ni mesura de les ales reals",
+      "missingWeightFractionBelowElevation05deg": 2.295531503793234e-25,
+      "noRadianceBound": {
+        "status": "UNAVAILABLE",
+        "upperMissingSignal": null,
+        "upperErrorMag": null,
+        "reason": "Manca cota de radiància; no es pressuposa nul·la"
+      },
+      "exampleWithExplicitBound": {
+        "status": "PASS",
+        "upperMissingSignal": 2.295531503793234e-25,
+        "upperErrorMag": 2.492341662831188e-25
+      }
+    },
+    {
+      "nominalGaussianFwhmDeg": 84.0,
+      "scope": "Prescripció nominal exacta al zenit, no ajust ni mesura de les ales reals",
+      "missingWeightFractionBelowElevation05deg": 0.0011079380953082148,
+      "noRadianceBound": {
+        "status": "UNAVAILABLE",
+        "upperMissingSignal": null,
+        "upperErrorMag": null,
+        "reason": "Manca cota de radiància; no es pressuposa nul·la"
+      },
+      "exampleWithExplicitBound": {
+        "status": "FAIL",
+        "upperMissingSignal": 0.0011079380953082148,
+        "upperErrorMag": 0.0012022626093502117
+      }
+    }
+  ],
+  "primarySpectralData": [
+    {
+      "file": "fonts-primaries/report/tessw/stars1654.csv",
+      "samples": 276,
+      "wavelengthRangeNm": [
+        350.0,
+        900.0
+      ],
+      "frequencyAtEndpointsHz": [
+        0.05,
+        0.0
+      ],
+      "meaning": "Freqüència i dispersió mesurades; no són per si soles responsivitat radiomètrica corregida pel fosc i il·luminació."
+    },
+    {
+      "file": "fonts-primaries/report/tessw/stars470.csv",
+      "samples": 276,
+      "wavelengthRangeNm": [
+        350.0,
+        900.0
+      ],
+      "frequencyAtEndpointsHz": [
+        0.0,
+        0.0
+      ],
+      "meaning": "Freqüència i dispersió mesurades; no són per si soles responsivitat radiomètrica corregida pel fosc i il·luminació."
+    },
+    {
+      "file": "fonts-primaries/report/tessw/stars618.csv",
+      "samples": 276,
+      "wavelengthRangeNm": [
+        350.0,
+        900.0
+      ],
+      "frequencyAtEndpointsHz": [
+        0.0,
+        0.0
+      ],
+      "meaning": "Freqüència i dispersió mesurades; no són per si soles responsivitat radiomètrica corregida pel fosc i il·luminació."
+    }
+  ],
+  "primaryAngularData": [
+    {
+      "file": "fonts-primaries/report/fov/stars237.csv",
+      "ranges": {
+        "Angle [up] (º)": [
+          20.0,
+          100.0
+        ],
+        "Dark [up] (Hz)": [
+          0.09,
+          0.17
+        ],
+        "Angle [side] (º)": [
+          20.0,
+          100.0
+        ],
+        "Dark [side] (Hz)": [
+          0.11,
+          0.46
+        ]
+      },
+      "meaning": "Dos talls angulars i controls amb font apagada; no funció hemisfèrica completa ni fosc transferible a altres assaigs."
+    },
+    {
+      "file": "fonts-primaries/report/fov/stars630.csv",
+      "ranges": {
+        "Angle [up] (º)": [
+          20.0,
+          100.0
+        ],
+        "Dark [up] (Hz)": [
+          0.1,
+          0.411
+        ],
+        "Angle [side] (º)": [
+          20.0,
+          100.0
+        ],
+        "Dark [side] (Hz)": [
+          0.08,
+          0.13
+        ]
+      },
+      "meaning": "Dos talls angulars i controls amb font apagada; no funció hemisfèrica completa ni fosc transferible a altres assaigs."
+    }
+  ],
+  "status": "BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE",
+  "individualCalibrationIsGlobalPrerequisite": false,
+  "newPhysicalLos": 0
+}

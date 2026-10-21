@@ -1,0 +1,38 @@
+{
+  "case": "S_B4_chamber_point_5km-0",
+  "inputSha256": "7a9e8933cfd0f6402061c9e5449cc28225a1b36e2307b1a769e3515a70d1f42a",
+  "responseBasis": "standard_air_450ppm_nm",
+  "physicalTransportEvaluations": 0,
+  "postProjectionWallSeconds": 0.817617299999938,
+  "rows": [
+    {
+      "sourceId": "b1-point-000",
+      "directionId": "registered-0",
+      "band": {
+        "signal": {
+          "value": 1.267113621743669e-11,
+          "los_error_estimate": 2.246496746595576e-20,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "registered-0"
+        },
+        "refinement_error": 1.6155871338926322e-27,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "cieSignal": 8.654386036509259e-09,
+      "cieUnit": "cd m^-2",
+      "qualification": "Model CIE amb resposta en aire estàndard450ppm i entrada explícita en buit; cap calibratge SQM/TESS o observacional"
+    }
+  ],
+  "scope": "La SPD original no canvia; la seva correspondència amb un catàleg físic en aire s’ha de declarar separadament."
+}

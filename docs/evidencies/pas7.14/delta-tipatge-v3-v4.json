@@ -1,0 +1,18 @@
+{
+  "measuredCandidate": "v3",
+  "currentCandidate": "v4",
+  "differences": [
+    "backend/tests/test_photometric_projection_step7_14.py",
+    "tools/validate_photometry_step7_14.py",
+    "tools/prepare_photometry_sources_step7_14.py"
+  ],
+  "originalSnapshotsMatchMeasuredHashes": {
+    "backend/tests/test_photometric_projection_step7_14.py": true,
+    "tools/validate_photometry_step7_14.py": true,
+    "tools/prepare_photometry_sources_step7_14.py": true
+  },
+  "numericRuntimeUnchanged": true,
+  "sameInputs": true,
+  "sameResponseData": true,
+  "meaning": "Anotacions/narrowing de proves i eines i nom de vinculació; cap canvi al runtime numèric mesurat."
+}

@@ -1,0 +1,95 @@
+{
+  "status": "BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE",
+  "numericStatus": "PASS",
+  "scientificExitPassed": false,
+  "checks": {
+    "candidateBound": true,
+    "allHistoricalEvidencePreserved": true,
+    "originalScientificSourcesPreserved": true,
+    "originalDocumentSnapshotsPreserved": true,
+    "interruptedCandidatePreserved": true,
+    "preregisteredLocalReuseOnly": true,
+    "primaryDataHashes": true,
+    "all55FluxControls": true,
+    "all13PolynomialProjections": true,
+    "spectralBudget": true,
+    "spectralOracleResolved": true,
+    "noNewPhysicalLos": true,
+    "scientificCostBounded": true,
+    "completedPhasesPass": true,
+    "nominalDoesNotRequireIndividualCalibration": true,
+    "unknownCoverageNotZero": true,
+    "b0Exact": true,
+    "fourColumnsExact": true,
+    "samePyrightDiagnostics": true
+  },
+  "metrics": {
+    "spectral": {
+      "caseCount": 21184,
+      "passed": 21184,
+      "failed": 0,
+      "maximumErrorMag": 0.00011519668386126202,
+      "maximumLutErrorMag": 0.0001151966838519794,
+      "maximumSimpsonErrorMag": 6.431557929799992e-11,
+      "maximumOracleRelativeRefinement": 9.01019762895415e-09,
+      "durationSeconds": 39.3183683000002
+    },
+    "maximumFluxRelativeError": 3.473465959302757e-11,
+    "maximumProjectionRelativeError": 2.220446049250313e-16,
+    "maximumCoordinateConventionChangeMag": 0.001151419515503603,
+    "postProjectionWallSeconds": [
+      0.807150399999955,
+      0.8131290999999692,
+      0.799712799999952,
+      0.887544200000093,
+      0.8501240999999027,
+      0.8156023999999888,
+      0.7960771000000477,
+      0.810053200000084,
+      0.827632900000026,
+      0.8102140000000873,
+      0.8166859000000386,
+      0.7950433000000885,
+      0.7873780999998417
+    ],
+    "scientificWallSecondsIncludingInterruptedAttempt": 179.8504607000002,
+    "historicalEvidenceCount": 449,
+    "historicalEvidenceDifferences": [],
+    "sourceDifferences": [],
+    "pyrightSummary": {
+      "filesAnalyzed": 325,
+      "errorCount": 67,
+      "warningCount": 3,
+      "informationCount": 0,
+      "timeInSec": 13.066
+    }
+  },
+  "nominalMissing": [
+    [
+      "Convenció espectral no identificada",
+      "Suport/cues espectrals sense cota",
+      "Cobertura angular sense cota"
+    ],
+    [
+      "Convenció espectral no identificada",
+      "Suport/cues espectrals sense cota",
+      "Cobertura angular sense cota"
+    ]
+  ],
+  "individualCalibrationIsGlobalPrerequisite": false,
+  "totalNominalNumericalErrorBoundMag": null,
+  "blockingReasons": [
+    "Resposta nominal SQM/TESS amb suport/cues i convenció de λ encara sense acreditar en un perfil complet.",
+    "El camp CIE escalar i els dominis angulars7.13 no són un camp espectral complet per integrar SQM/TESS. Cal cobertura o cota suficient, sense exigir una nova homologació angular general."
+  ],
+  "resolved": [
+    "Conversió explícita aire/buit CIE2019 amb jacobià de densitats i referència AB coherent en buit.",
+    "Model nominal AB separat de calibratge individual, fosc/guany natius i observacions."
+  ],
+  "qualifications": [
+    "PASS sobre finestres conegudes i polinomis retinguts; hipòtesis de λ no identifiquen la convenció real del laboratori.",
+    "La correcció de V(λ) no reconverteix la SPD ni reescriu els resultats antics.",
+    "Cap calibratge C, Bortle, homologació observacional o ampliació COESA/DEM/àrea."
+  ],
+  "nextStep": "7.14_pending_partial_blocked;7.15_not_started"
+}

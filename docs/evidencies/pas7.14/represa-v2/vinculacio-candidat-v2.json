@@ -1,0 +1,16 @@
+{
+  "policySha256": "babc518000b27dae4ffd0909bb13e1282d7b86894b5ee70678cb848c35b4d780",
+  "hashes": {
+    "backend/src/terralab3d/domain/wavelength_coordinates.py": "8d8aa3e67dafdc375ddfcc4d7927e590ce8e5608afb3a0935fa703676b3c522b",
+    "backend/src/terralab3d/domain/instrument_qualification.py": "262257e6ace959fb998779daffab4fa1a2a620007a4f6be39c2ba5df64fa312e",
+    "backend/src/terralab3d/application/coordinate_photometry.py": "d38684bae14e269a5b1d75bbe91fe1efee38b3378f63d0612247c9d9176be161",
+    "backend/tests/test_photometric_coordinates_step7_14_v2.py": "c08ffbfc70f686815b1e7cd52e53ad4defd20fad0beb9676a6ca14a29b6b277b",
+    "tools/validate_spectral_transport_step7_10.py": "41a900f97a1fdba4255149ed85831f6a4b2361c301f20fd4222cd4200f09482c",
+    "tools/photometry_coordinates_step7_14_v2.py": "bc84ee8cfafc2c49eda85bba78c5d5d4180ea88e49996e78341e9058ab85232e",
+    "tools/project_coordinate_photometry_step7_14_v2.py": "673be6fd62dd1c6109a55e1eb035c6e7a0305568664ee97bac1bcf3150f78817",
+    "tools/validate_photometry_step7_14_v2.py": "5adc9dad8368846685273248749f64c8aef5a95bcd7e69c072b0ec402c68c580",
+    "docs/evidencies/pas7.14/transport-i-projeccions.json": "7a9e8933cfd0f6402061c9e5449cc28225a1b36e2307b1a769e3515a70d1f42a",
+    "docs/evidencies/pas7.14/models-resposta-referencia.json": "46c755d791cbc01dfebaf34e81ab2a4fdf2861ea8eda71d3a41319f66cdabc26",
+    "docs/evidencies/pas7.14/represa-v2/manifest-dades-laboratori-v2.json": "280a4f6eadfdb4ece81019ee3930f2c589bf46e39a3af2864c42bc8fe07585f7"
+  }
+}

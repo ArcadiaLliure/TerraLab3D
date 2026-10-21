@@ -1,0 +1,7 @@
+{
+  "spentSeconds": 33.55938719998812,
+  "estimateSeconds": 500,
+  "limitSeconds": 900,
+  "blasThreads": 1,
+  "serial": true
+}

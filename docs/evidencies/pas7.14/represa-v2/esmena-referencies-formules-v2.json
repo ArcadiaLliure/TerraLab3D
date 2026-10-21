@@ -1,0 +1,16 @@
+{
+  "recordedAtUtc": "2026-10-19T23:27:01.317251+00:00",
+  "kind": "correccio_bibliografica_sense_canvi_numeric",
+  "originalPolicySha256": "babc518000b27dae4ffd0909bb13e1282d7b86894b5ee70678cb848c35b4d780",
+  "originalCitation": "A21,A32,A34",
+  "correctCitation": "NIST A22 (k0,k1,k2,k3), A32 (r_as), A35 (correcció CO2)",
+  "reason": "Inspecció visual de les equacions originals NIST; A21 conté constants d’aigua i A34 la massa molar. El codi usa els coeficients correctes de l’aire sec, no aquestes dues expressions.",
+  "numericalCandidateChanged": false,
+  "criteriaChanged": false,
+  "reference": "https://emtoolbox.nist.gov/Wavelength/Documentation.asp",
+  "equationSourceHashes": {
+    "EquationA22.gif": "40f3f61e735e649b6e0085ee99681d3b20a56ef419b4e530355b4203d7c574b8",
+    "EquationA32.gif": "c98fe61aab323c3ff8aca756eff9baaf68f2fc2c886ea5fdc02ae55eba0a6205",
+    "EquationA35.gif": "596ec242c03151d57af2f43fcfc6e873bab14f86b8415ad46b1d251a16f7e0fc"
+  }
+}

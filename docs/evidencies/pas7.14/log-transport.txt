@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "F:\Python\TerraLab3D\tools\validate_photometry_step7_14.py", line 394, in <module>
+    transport()
+    ~~~~~~~~~^^
+  File "F:\Python\TerraLab3D\tools\validate_photometry_step7_14.py", line 170, in transport
+    bind()
+    ~~~~^^
+  File "F:\Python\TerraLab3D\tools\validate_photometry_step7_14.py", line 132, in bind
+    assert old == data, (
+           ^^^^^^^^^^^
+AssertionError: Candidat canviat: conservar la versió i preregistrar-ne una altra

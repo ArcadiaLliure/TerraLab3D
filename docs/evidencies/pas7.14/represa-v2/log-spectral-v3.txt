@@ -1,0 +1,5 @@
+Oracle raw 8 326880
+Oracle raw 16 653760
+Oracle raw 32 1307520
+Oracle lut 32 1307520
+{"caseCount": 21184, "passed": 21184, "failed": 0, "maximumErrorMag": 0.00011519668386126202, "maximumLutErrorMag": 0.0001151966838519794, "maximumSimpsonErrorMag": 6.431557929799992e-11, "durationSeconds": 39.3183683000002}

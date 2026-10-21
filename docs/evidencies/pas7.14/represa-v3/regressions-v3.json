@@ -1,0 +1,79 @@
+[
+  {
+    "name": "auditoria-documental-inicial",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_docs.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 2.2385174999999435
+  },
+  {
+    "name": "pytest-backend",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "-m",
+      "pytest",
+      "backend/tests",
+      "-q",
+      "-W",
+      "error",
+      "--basetemp",
+      ".runtime-photometry-v3/pytest"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 53.497806800000035
+  },
+  {
+    "name": "columnes-b0",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_optical_field_step7_8.py",
+      "--output",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\represa-v3\\columnes-b0-v3.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 2.1566855999990366
+  },
+  {
+    "name": "frontend-tests",
+    "command": [
+      "npm.cmd",
+      "test"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 6.598582399999941
+  },
+  {
+    "name": "frontend-typecheck",
+    "command": [
+      "npm.cmd",
+      "run",
+      "typecheck"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 5.502670199999557
+  },
+  {
+    "name": "frontend-build",
+    "command": [
+      "npm.cmd",
+      "run",
+      "build"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.5486259999997856
+  }
+]

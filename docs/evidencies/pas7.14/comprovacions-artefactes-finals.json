@@ -1,0 +1,118 @@
+[
+  {
+    "name": "ruff-format-verificat",
+    "command": [
+      "ruff",
+      "format",
+      "--check",
+      "backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+      "backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+      "backend/src/terralab3d/domain/photometric_projection.py",
+      "backend/src/terralab3d/application/photometric_projections.py",
+      "backend/tests/test_photometric_projection_step7_14.py",
+      "tools/project_skyglow_photometry.py",
+      "tools/audit_photometry_step7_14.py",
+      "tools/photometry_fixtures_step7_14.py",
+      "tools/plot_photometry_step7_14.py",
+      "tools/prepare_photometry_sources_step7_14.py",
+      "tools/validate_photometry_step7_14.py",
+      "tools/validate_sensor_spectral_budget_step7_14.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.04556990001583472
+  },
+  {
+    "name": "ruff-check-verificat",
+    "command": [
+      "ruff",
+      "check",
+      "backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+      "backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+      "backend/src/terralab3d/domain/photometric_projection.py",
+      "backend/src/terralab3d/application/photometric_projections.py",
+      "backend/tests/test_photometric_projection_step7_14.py",
+      "tools/project_skyglow_photometry.py",
+      "tools/audit_photometry_step7_14.py",
+      "tools/photometry_fixtures_step7_14.py",
+      "tools/plot_photometry_step7_14.py",
+      "tools/prepare_photometry_sources_step7_14.py",
+      "tools/validate_photometry_step7_14.py",
+      "tools/validate_sensor_spectral_budget_step7_14.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.03815420001046732
+  },
+  {
+    "name": "pyright-afectats-verificat",
+    "command": [
+      "pyright",
+      "--project",
+      "F:\\Python\\TerraLab3D\\.runtime-photometry\\pyright-config-relative.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 3.982342300005257
+  },
+  {
+    "name": "gate-complet-verificat",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_step7_14.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 1.7243908000236843
+  },
+  {
+    "name": "gate-numeric-verificat",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_step7_14.py",
+      "--numeric-only"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.730270300002303
+  },
+  {
+    "name": "auditoria-documental-verificada",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_docs.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 0.44655180000700057
+  },
+  {
+    "name": "enllacos-documentals-verificats",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/check_doc_links.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.4346145000017714
+  },
+  {
+    "name": "diff-check-verificat",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.07512179997866042
+  }
+]

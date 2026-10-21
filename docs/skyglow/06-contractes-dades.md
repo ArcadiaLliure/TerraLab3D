@@ -208,3 +208,17 @@ La implementació vigent és un subconjunt atmosfèric dels contractes objectiu 
 ## Estat verificat de 7.10 (2026-10-19)
 
 `SpectralTransportConfiguration` exigeix aerosols espectrals, 1–2 respostes positives, domini nm i estat gasós explícit. `GasCrossSectionLut` usa m²/molècula, nm de buit i K; `GasMixingProfile` fracció molar per tile/altura. El catàleg v1 només acredita O3 203–293 K; el GasState objectiu H2O/O3/O2 no s'interpreta com totalment disponible. Schema 4 inclou identitats/signatures i unitat integrada W m⁻² sr⁻¹ o relativa C; B0/B1 antics preservats. Una composició/λ/T desconeguda falla i no s'assumeix absorció zero. [Evidències i límits](../evidencies/pas7.10/validacio-espectral-i-gasos.md).
+
+## Retenció espectral i fotometria verificades parcialment (7.14)
+
+`capture_spectral_density=True` és optatiu i requereix transport espectral. `SpectralRaySamples` registra font/direcció, nusos de panell nm, tres densitats i estimacions LOS per panell, unitat per nm, escala i bandset. `PropagationResult` només publica esquema 6 quan hi ha dades retingudes; sense l’opció conserva l’esquema/signatura anteriors. És un DTO offline, sense ampliació del bridge de producte.
+
+`PhotometricResponse` identifica corba d’energia, procedència, FOV/zero point opcionals, completitud i limitacions. `BandSignal` és radiància ponderada de banda, no magnitud ni luminància; conserva escala, suport, resposta, font/direcció i estimació LOS. `project_retained` retorna `physicalTransportEvaluations=0` i aplica revisió/cancel·lació, sense suma de fonts incompatibles. S produeix CIE en cd/m²; C conserva senyal relatiu. Només un perfil i cobertura complets permeten una lectura instrumental; els perfils SQM/TESS actuals són indisponibles. La referència AB direccional optativa és explícitament condicionada. `bortleEquivalent`/`bortlePolicyId` nous són `None`. [Contracte executable, proves i límits](../evidencies/pas7.14/validacio-projeccions.md).
+
+## Coordenades i qualificació nominal explícites (represa7.14)
+
+`CoordinateCurve` declara `vacuum_nm`, `standard_air_450ppm_nm` o `standard_air_300ppm_nm`, i separa `response` de `density`. Resposta transformada només per composició; densitat per nm amb jacobià. La convenció CIE018:2019 és450ppm; una λ de laboratori sense metadades no s’identifica amb aquesta convenció. Cap canvi implícit del DTO/catàleg anterior.
+
+`CoordinateProjection` retorna `BandSignal`, error de refinament, coordenada d’entrada/resposta i `physical_transport_evaluations=0`. Requereix declarar la densitat retinguda en buit, cobreix només el seu suport i no transforma la SPD original. Un polinomi negatiu entre nodes és indisponible, sense sòl o suavitzat artificial. `InstrumentEvidence` separa objectius `nominal_ab`, `native_frequency` i `native_magnitude`: el primer no exigeix calibratge individual. La cobertura absent necessita cota adequada; incertesa desconeguda no es converteix en zero. [Contractes, resultats i límits](../evidencies/pas7.14/represa-v2/validacio-represa-v2.md).
+
+La [qualificació nominal v3](../evidencies/pas7.14/represa-v3/perfils-candidats-i-mancances-v3.json) és un registre d’evidència offline, no un nou DTO ni una resposta instrumental adoptada. Identifica famílies/configuracions i mancances sense omplir-les amb zero. La forma conjunta detector/òptica i la seva dependència angular han de ser coherents; no es pressuposa separabilitat si hi ha fuites desconegudes. Cap contracte o runtime v1/v2 ha canviat en aquesta represa.

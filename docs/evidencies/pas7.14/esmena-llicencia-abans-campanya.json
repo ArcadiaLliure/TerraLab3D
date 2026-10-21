@@ -1,0 +1,8 @@
+{
+  "reason": "Precisió de l’atribució: licaplot GPL3, lica MIT. Esmena anterior a la campanya decisòria, sense canvis de dades numèriques o criteris.",
+  "previousSha256": "0187eb8ee21cd34af25a8fe40c3c3d3f4e5e9f2658cd77d886e888aa6109247c",
+  "correctedSha256": "46c755d791cbc01dfebaf34e81ab2a4fdf2861ea8eda71d3a41319f66cdabc26",
+  "priorBindingPreserved": "vinculacio-candidat-v1.json",
+  "currentBinding": "vinculacio-candidat-v2.json",
+  "numericArraysUnchanged": true
+}

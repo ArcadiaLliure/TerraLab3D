@@ -38,6 +38,20 @@ TRANSPORT_BAND_STRATEGY = "tl3d-sky-v1-transport-knot-union-simpson-1"
 
 
 @dataclass(frozen=True, slots=True)
+class SpectralRaySamples:
+    """Densitats no ponderades als tres nodes interns de cada panell."""
+
+    source_id: str
+    direction_id: str
+    knots_nm: tuple[float, ...]
+    radiance_per_nm: tuple[float, ...]
+    los_error_per_nm: tuple[float, ...]
+    unit: str
+    scale_id: str
+    band_set_id: str
+
+
+@dataclass(frozen=True, slots=True)
 class SpectralAerosol:
     reference: AerosolReference
     angstrom_exponent: float
@@ -157,6 +171,10 @@ class SpectralOperator:
             RELATIVE_UNIT,
             "zero",
         )
+        self.source_curve = curve
+        self.config = config
+        self.capture_source_density: np.ndarray | None = None
+        self.capture_response_weights: np.ndarray | None = None
         base = build_spectral_band_set(
             curve,
             config.responses,
@@ -209,6 +227,22 @@ class SpectralOperator:
             g.matrix(self.wavelengths) for g in (config.gas.luts if config.gas else ())
         )
 
+    def enable_capture(self) -> None:
+        """Retenció optativa local; cap canvi de la ruta escalar històrica."""
+        if self.capture_source_density is not None:
+            return
+        x = np.array(self.band_set.knots_nm)
+        left, right = x[:-1], x[1:]
+        self.capture_source_density = np.column_stack(
+            _one_sided_endpoints(self.source_curve, left, right)
+        ).ravel()
+        response = np.ones((len(left), 3))
+        for curve in self.config.responses:
+            response *= np.column_stack(_one_sided_endpoints(curve, left, right))
+        self.capture_response_weights = (
+            response * (right - left)[:, None] * np.array([1.0, 4.0, 1.0]) / 6
+        ).ravel()
+
 
 class SpectralScatteringTransport(SingleScatteringTransport):
     def __init__(
@@ -234,6 +268,8 @@ class SpectralScatteringTransport(SingleScatteringTransport):
                 dependencies,
             )
         self.spectral_config, self.profiler, self.operator = config, profiler, operator
+        self.capture_density = False
+        self.last_density: np.ndarray | None = None
         self.column_paths = 0
         self.column_error_max = 0.0
         self.constant_extinction: dict[tuple[str, int], np.ndarray] = {}
@@ -247,11 +283,17 @@ class SpectralScatteringTransport(SingleScatteringTransport):
                 for tile in field.tiles:
                     heights = set()
                     profile = tile.profile
-                    for i, (a, b) in enumerate(zip(profile.temperature_k, profile.temperature_k[1:])):
+                    for i, (a, b) in enumerate(
+                        zip(profile.temperature_k, profile.temperature_k[1:])
+                    ):
                         for t in temperatures:
                             if min(a, b) < t < max(a, b):
                                 fraction = (t - a) / (b - a)
-                                heights.add(profile.heights_m[i] + fraction * (profile.heights_m[i + 1] - profile.heights_m[i]))
+                                heights.add(
+                                    profile.heights_m[i]
+                                    + fraction
+                                    * (profile.heights_m[i + 1] - profile.heights_m[i])
+                                )
                     if heights:
                         self.thermal_heights[tile.tile_id] = tuple(sorted(heights))
 
@@ -259,7 +301,14 @@ class SpectralScatteringTransport(SingleScatteringTransport):
         p, op, gas = self.profiler, self.operator, self.spectral_config.gas
         with p.measure("geometry"):
             if self.thermal_heights:
-                _, direction, segments = segment_path(self.field, start, end, self.max_segments, self.checkpoint, self.thermal_heights)
+                _, direction, segments = segment_path(
+                    self.field,
+                    start,
+                    end,
+                    self.max_segments,
+                    self.checkpoint,
+                    self.thermal_heights,
+                )
             else:
                 _, direction, segments = segment_path(
                     self.field, start, end, self.max_segments, self.checkpoint
@@ -358,10 +407,18 @@ class SpectralScatteringTransport(SingleScatteringTransport):
                 if gas:
                     for matrix in op.gas_matrices:
                         count = len(matrix)
-                        active = columns[cursor:cursor + count] != 0
-                        contribution += np.sum(columns[cursor:cursor + count][active, None] * matrix[active], axis=0)
-                        active_error = error[cursor:cursor + count] != 0
-                        error_tau += np.sum(error[cursor:cursor + count][active_error, None] * matrix[active_error], axis=0)
+                        active = columns[cursor : cursor + count] != 0
+                        contribution += np.sum(
+                            columns[cursor : cursor + count][active, None]
+                            * matrix[active],
+                            axis=0,
+                        )
+                        active_error = error[cursor : cursor + count] != 0
+                        error_tau += np.sum(
+                            error[cursor : cursor + count][active_error, None]
+                            * matrix[active_error],
+                            axis=0,
+                        )
                         cursor += count
                 tau += contribution
                 self.column_error_max = max(
@@ -374,6 +431,7 @@ class SpectralScatteringTransport(SingleScatteringTransport):
 
     def value(self, distance: float, point: Vector3, state: OpticalState) -> float:
         p, op = self.profiler, self.operator
+        density = np.zeros_like(op.wavelengths) if self.capture_density else None
         observer_tau = self._depth(self.ray.origin_ecef_m, point)
         result = 0.0
         for node, weight in self.emission_nodes(distance, point):
@@ -414,4 +472,15 @@ class SpectralScatteringTransport(SingleScatteringTransport):
                     / (radius * radius)
                     * float(np.dot(op.weights, gamma * transmission))
                 )
+                if density is not None:
+                    assert op.capture_source_density is not None
+                    density += (
+                        weight
+                        * self.source.amplitude.value
+                        * angular
+                        / (radius * radius)
+                        * op.capture_source_density
+                        * (gamma * transmission)
+                    )
+        self.last_density = density
         return result

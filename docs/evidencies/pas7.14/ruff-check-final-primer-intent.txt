@@ -1,0 +1,14 @@
+F401 [*] `numpy` imported but unused
+  --> tools\plot_photometry_step7_14.py:9:17
+   |
+ 7 | matplotlib.use("Agg")
+ 8 | import matplotlib.pyplot as plt
+ 9 | import numpy as np
+   |                 ^^
+10 |
+11 | from photometry_fixtures_step7_14 import OUT, profiles
+   |
+help: Remove unused import: `numpy`
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.

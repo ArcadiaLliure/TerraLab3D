@@ -1,0 +1,32 @@
+[
+  {
+    "file": "licatools-pypi.json",
+    "url": "https://pypi.org/pypi/licatools/json",
+    "bytes": 55860
+  },
+  {
+    "file": "stars4all-repos.json",
+    "url": "https://api.github.com/orgs/STARS4ALL/repos?per_page=100",
+    "bytes": 224081
+  },
+  {
+    "file": "guaix-repos.json",
+    "url": "https://api.github.com/orgs/guaix-ucm/repos?per_page=100",
+    "bytes": 211194
+  },
+  {
+    "file": "sqm-cm500.xml",
+    "url": "https://svo2.cab.inta-csic.es/theory/fps/fps.php?ID=Cameras/SQM.CM500",
+    "bytes": 24878
+  },
+  {
+    "file": "sqm-cm500-fil.xml",
+    "url": "https://svo2.cab.inta-csic.es/theory/fps/fps.php?ID=Cameras/SQM.CM500_fil",
+    "bytes": 24885
+  },
+  {
+    "file": "calibration.pdf",
+    "url": "https://mdpi-res.com/d_attachment/sensors/sensors-19-01336/article_deploy/sensors-19-01336.pdf",
+    "bytes": 1103661
+  }
+]

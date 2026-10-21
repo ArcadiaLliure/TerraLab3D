@@ -1,0 +1,149 @@
+[
+  {
+    "name": "pytest-backend",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "-m",
+      "pytest",
+      "backend/tests",
+      "-q",
+      "-W",
+      "error",
+      "--basetemp",
+      ".runtime-photometry/pytest-final"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 44.42049629997928
+  },
+  {
+    "name": "tests-frontend",
+    "command": [
+      "npm.cmd",
+      "test"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D\\frontend",
+    "exitCode": 0,
+    "wallSeconds": 4.122576599998865
+  },
+  {
+    "name": "typecheck-frontend",
+    "command": [
+      "npm.cmd",
+      "run",
+      "typecheck"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D\\frontend",
+    "exitCode": 0,
+    "wallSeconds": 4.558343600016087
+  },
+  {
+    "name": "build-frontend",
+    "command": [
+      "npm.cmd",
+      "run",
+      "build"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D\\frontend",
+    "exitCode": 0,
+    "wallSeconds": 0.7120320000103675
+  },
+  {
+    "name": "ruff-format",
+    "command": [
+      "ruff",
+      "format",
+      "--check",
+      "backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+      "backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+      "backend/src/terralab3d/domain/photometric_projection.py",
+      "backend/src/terralab3d/application/photometric_projections.py",
+      "backend/tests/test_photometric_projection_step7_14.py",
+      "tools/project_skyglow_photometry.py",
+      "tools/photometry_fixtures_step7_14.py",
+      "tools/prepare_photometry_sources_step7_14.py",
+      "tools/validate_photometry_step7_14.py",
+      "tools/validate_sensor_spectral_budget_step7_14.py"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 0.044890600023791194
+  },
+  {
+    "name": "ruff-check",
+    "command": [
+      "ruff",
+      "check",
+      "backend/src/terralab3d/domain/light_pollution/propagation_kernel.py",
+      "backend/src/terralab3d/domain/light_pollution/spectral_transport.py",
+      "backend/src/terralab3d/domain/photometric_projection.py",
+      "backend/src/terralab3d/application/photometric_projections.py",
+      "backend/tests/test_photometric_projection_step7_14.py",
+      "tools/project_skyglow_photometry.py",
+      "tools/photometry_fixtures_step7_14.py",
+      "tools/prepare_photometry_sources_step7_14.py",
+      "tools/validate_photometry_step7_14.py",
+      "tools/validate_sensor_spectral_budget_step7_14.py"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 0.03378800000064075
+  },
+  {
+    "name": "pyright-afectats",
+    "command": [
+      "pyright",
+      "--project",
+      "F:\\Python\\TerraLab3D\\.runtime-photometry\\pyright-config.json"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D",
+    "exitCode": 1,
+    "wallSeconds": 4.352251899981638
+  },
+  {
+    "name": "pyright-global",
+    "command": [
+      "pyright",
+      "src",
+      "--outputjson"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D\\backend",
+    "exitCode": 1,
+    "wallSeconds": 16.036181600007694
+  },
+  {
+    "name": "columnes-b0",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_optical_field_step7_8.py",
+      "--output",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\columnes-b0.json"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 2.3103782999969553
+  },
+  {
+    "name": "demo-cli",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/project_skyglow_photometry.py",
+      "--input",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\transport-i-projeccions.json",
+      "--case",
+      "S_B4_chamber_point_5km-0",
+      "--reference-bands",
+      "--output",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\demostracio-cli-s.json"
+    ],
+    "cwd": "F:\\Python\\TerraLab3D",
+    "exitCode": 0,
+    "wallSeconds": 0.4481458000082057
+  }
+]

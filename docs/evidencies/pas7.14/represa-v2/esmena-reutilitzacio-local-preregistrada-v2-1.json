@@ -1,0 +1,20 @@
+{
+  "registeredAtUtc": "2026-10-19T23:15:27.342474+00:00",
+  "id": "v2.1-reutilitzacio-local-abans-repeticio",
+  "previousBinding": "vinculacio-candidat-v2.json",
+  "candidateSnapshots": {
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/backend/src/terralab3d/domain/wavelength_coordinates.py": "8d8aa3e67dafdc375ddfcc4d7927e590ce8e5608afb3a0935fa703676b3c522b",
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/backend/src/terralab3d/domain/instrument_qualification.py": "262257e6ace959fb998779daffab4fa1a2a620007a4f6be39c2ba5df64fa312e",
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/backend/src/terralab3d/application/coordinate_photometry.py": "d38684bae14e269a5b1d75bbe91fe1efee38b3378f63d0612247c9d9176be161",
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/backend/tests/test_photometric_coordinates_step7_14_v2.py": "c08ffbfc70f686815b1e7cd52e53ad4defd20fad0beb9676a6ca14a29b6b277b",
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/tools/validate_spectral_transport_step7_10.py": "41a900f97a1fdba4255149ed85831f6a4b2361c301f20fd4222cd4200f09482c",
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/tools/photometry_coordinates_step7_14_v2.py": "bc84ee8cfafc2c49eda85bba78c5d5d4180ea88e49996e78341e9058ab85232e",
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/tools/project_coordinate_photometry_step7_14_v2.py": "673be6fd62dd1c6109a55e1eb035c6e7a0305568664ee97bac1bcf3150f78817",
+    "docs/evidencies/pas7.14/represa-v2/candidat-v2-abans-reutilitzacio/tools/validate_photometry_step7_14_v2.py": "5adc9dad8368846685273248749f64c8aef5a95bcd7e69c072b0ec402c68c580"
+  },
+  "firstAttemptWallSeconds": 108.36332100000004,
+  "reason": "Control aturat explícitament per cost: transformava reiteradament tots els nusos per cada panell. No s’ha completat cap comparació decisòria agregada ni executat cap LOS.",
+  "change": "Calcular els nusos transformats una vegada dins de cada projecció i compartir-los amb els panells/ordres. Mateixes funcions, nodes i llindars; no cache entre peticions ni vectorització o multicore.",
+  "policySha256": "babc518000b27dae4ffd0909bb13e1282d7b86894b5ee70678cb848c35b4d780",
+  "newBinding": "vinculacio-candidat-v3.json"
+}

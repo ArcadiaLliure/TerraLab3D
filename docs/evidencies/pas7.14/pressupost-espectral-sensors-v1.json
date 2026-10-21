@@ -1,0 +1,15 @@
+{
+  "campaignId": "sensor-reference-bands-spectral-v1",
+  "harnessProtocolId": "TL3D-SKY-7.10-v2",
+  "caseCount": 10624,
+  "passed": 10624,
+  "failed": 0,
+  "maximumErrorMag": 0.00011519668386126202,
+  "maximumLutErrorMag": 0.0001151966838519794,
+  "maximumSimpsonErrorMag": 9.607112385494619e-12,
+  "maximumOracleRelativeRefinement": 8.858043043443176e-09,
+  "wallSeconds": 28.675004999997327,
+  "fullSQMorTESSInstrumentValidated": false,
+  "domain": "Finestres espectrals conegudes i operadors prescrits; no omple cues SQM/TESS desconegudes amb zero físic, ni valida fosc, FOV o calibratge natiu.",
+  "thresholdMagnitude": 0.01
+}

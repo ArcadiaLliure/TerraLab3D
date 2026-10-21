@@ -1,0 +1,43 @@
+         1150732 function calls (1148796 primitive calls) in 1.150 seconds
+
+   Ordered by: cumulative time
+   List reduced from 85 to 35 due to restriction <35>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    1.150    1.150 F:\Python\TerraLab3D\tools\profile_photometry_step7_14_v3.py:92(project)
+        1    0.005    0.005    1.150    1.150 F:\Python\TerraLab3D\backend\src\terralab3d\application\coordinate_photometry.py:70(project_coordinate_band)
+     2904    0.113    0.000    1.136    0.000 F:\Python\TerraLab3D\backend\src\terralab3d\application\coordinate_photometry.py:41(_integrate_response_prepared)
+     2904    0.050    0.000    0.779    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\polynomial\legendre.py:1472(leggauss)
+ 2906/970    0.002    0.000    0.726    0.001 {built-in method math.fsum}
+        3    0.000    0.000    0.726    0.242 F:\Python\TerraLab3D\backend\src\terralab3d\application\coordinate_photometry.py:123(<genexpr>)
+        2    0.000    0.000    0.726    0.363 F:\Python\TerraLab3D\backend\src\terralab3d\application\coordinate_photometry.py:115(value)
+     1938    0.002    0.000    0.725    0.000 F:\Python\TerraLab3D\backend\src\terralab3d\application\coordinate_photometry.py:116(<genexpr>)
+     8712    0.432    0.000    0.449    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\polynomial\legendre.py:830(legval)
+    54720    0.077    0.000    0.165    0.000 F:\Python\TerraLab3D\backend\src\terralab3d\domain\wavelength_coordinates.py:100(at_vacuum)
+     2904    0.037    0.000    0.103    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\polynomial\legendre.py:614(legder)
+     2904    0.049    0.000    0.085    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\polynomial\legendre.py:1373(legcompanion)
+    32832    0.040    0.000    0.066    0.000 F:\Python\TerraLab3D\backend\src\terralab3d\application\coordinate_photometry.py:105(density)
+     2904    0.038    0.000    0.062    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\linalg\_linalg.py:1286(eigvalsh)
+     5808    0.015    0.000    0.056    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\_core\numeric.py:1482(moveaxis)
+    55662    0.014    0.000    0.054    0.000 F:\Python\TerraLab3D\backend\src\terralab3d\domain\wavelength_coordinates.py:32(air_from_vacuum)
+    57075    0.036    0.000    0.041    0.000 F:\Python\TerraLab3D\backend\src\terralab3d\domain\wavelength_coordinates.py:22(standard_air_index)
+    11616    0.023    0.000    0.034    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\_core\numeric.py:1420(normalize_axis_tuple)
+    88520    0.031    0.000    0.031    0.000 {built-in method _bisect.bisect_right}
+     2904    0.009    0.000    0.024    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\polynomial\polyutils.py:65(as_series)
+   172741    0.018    0.000    0.018    0.000 {built-in method builtins.len}
+     5808    0.003    0.000    0.017    0.000 {method 'max' of 'numpy.ndarray' objects}
+     8718    0.017    0.000    0.017    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+     5808    0.002    0.000    0.014    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\_core\_methods.py:41(_amax)
+    20328    0.014    0.000    0.014    0.000 {built-in method numpy.array}
+   118074    0.011    0.000    0.011    0.000 {built-in method math.isfinite}
+    91372    0.010    0.000    0.010    0.000 {built-in method builtins.min}
+    11616    0.008    0.000    0.008    0.000 {method 'astype' of 'numpy.ndarray' objects}
+    55689    0.008    0.000    0.008    0.000 {method 'append' of 'list' objects}
+     2904    0.004    0.000    0.007    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\lib\_type_check_impl.py:646(common_type)
+    14522    0.007    0.000    0.007    0.000 {method 'reshape' of 'numpy.ndarray' objects}
+     2904    0.001    0.000    0.007    0.000 {method 'sum' of 'numpy.ndarray' objects}
+     2904    0.003    0.000    0.007    0.000 C:\Users\Manel\AppData\Local\Programs\Python\Python313\Lib\site-packages\numpy\linalg\_linalg.py:207(_commonType)
+     5808    0.006    0.000    0.006    0.000 {built-in method numpy.arange}
+    55191    0.006    0.000    0.006    0.000 F:\Python\TerraLab3D\backend\src\terralab3d\domain\wavelength_coordinates.py:88(co2_ppm)
+
+

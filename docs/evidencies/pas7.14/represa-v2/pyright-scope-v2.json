@@ -1,0 +1,22 @@
+{
+  "pythonVersion": "3.13",
+  "pythonPlatform": "Windows",
+  "extraPaths": [
+    "../../../../backend/src",
+    "../../../../tools"
+  ],
+  "include": [
+    "../../../../backend/src/terralab3d/domain/wavelength_coordinates.py",
+    "../../../../backend/src/terralab3d/domain/instrument_qualification.py",
+    "../../../../backend/src/terralab3d/application/coordinate_photometry.py",
+    "../../../../backend/tests/test_photometric_coordinates_step7_14_v2.py",
+    "../../../../tools/audit_photometry_resume.py",
+    "../../../../tools/plot_photometry_resume.py",
+    "../../../../tools/diagnose_instrument_coverage.py",
+    "../../../../tools/diagnose_cie_coordinate_tail.py",
+    "../../../../tools/diagnose_coordinate_hypotheses.py",
+    "../../../../tools/photometry_coordinates_step7_14_v2.py",
+    "../../../../tools/project_coordinate_photometry_step7_14_v2.py",
+    "../../../../tools/validate_photometry_step7_14_v2.py"
+  ]
+}

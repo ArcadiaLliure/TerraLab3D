@@ -1,0 +1,45 @@
+{
+  "dateUtc": "2026-10-19T19:50:25.218212+00:00",
+  "results": [
+    {
+      "file": "sqm-a.xml",
+      "url": "https://svo2.cab.inta-csic.es/theory/fps/fps.php?ID=Cameras/SQM.a",
+      "status": 200,
+      "bytes": 272,
+      "sha256": "9ba4e583746195a4161911919f41f46ace97ae377ecbcbedb1ecefa21778ada5"
+    },
+    {
+      "file": "sqm-b.xml",
+      "url": "https://svo2.cab.inta-csic.es/theory/fps/fps.php?ID=Cameras/SQM.b",
+      "status": 200,
+      "bytes": 24940,
+      "sha256": "1e303185ed67bf5681e790466a6cb31e22809d65d75eff59e1f2b2bc8cc5b628"
+    },
+    {
+      "file": "svo-sqm.html",
+      "url": "https://svo2.cab.inta-csic.es/svo/theory/fps/index.php?gname=Cameras&gname2=SQM&mode=browse",
+      "status": 200,
+      "bytes": 112128,
+      "sha256": "5ccbd708d2c3967f662340417e644cad7448f68897d5260eef04bca306bfec3f"
+    },
+    {
+      "file": "tess-batches.json",
+      "url": "https://zenodo.org/api/records/22873442",
+      "status": 200,
+      "bytes": 6235,
+      "sha256": "112ef4b688ce5a1dee86de47f2bc14b037dfb308fad47e259b36abed0e143229"
+    },
+    {
+      "file": "calibration.xml",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6470928/fullTextXML",
+      "status": 200,
+      "bytes": 139353,
+      "sha256": "d3c407a3858a0019dcfc49d1415a4764ea228e024e7d972ce3a2d1bf06158b6a"
+    },
+    {
+      "file": "lica-tree.json",
+      "url": "https://api.github.com/repos/guaix-ucm/licatools/git/trees/main?recursive=1",
+      "error": "HTTP Error 404: Not Found"
+    }
+  ]
+}

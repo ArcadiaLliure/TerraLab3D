@@ -1,0 +1,118 @@
+{
+  "consultedAtUtc": "2026-10-19T23:06:54.907331+00:00",
+  "sources": [
+    {
+      "file": "nist-documentacio.html",
+      "url": "https://emtoolbox.nist.gov/Wavelength/Documentation.asp",
+      "sha256": "8cfaf0a22137d2c54cb6b55109d7ac96a3dbca1b5459f5cc3cd1b5f9201da88f",
+      "bytes": 123280,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "nist-a21.gif",
+      "url": "https://emtoolbox.nist.gov/Wavelength/EquationA21.gif",
+      "sha256": "0f399790da85fa84b8fab52896d72ad2b5421d2a4466a0f4489f81b45db48d8e",
+      "bytes": 1450,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "nist-a32.gif",
+      "url": "https://emtoolbox.nist.gov/Wavelength/EquationA32.gif",
+      "sha256": "c98fe61aab323c3ff8aca756eff9baaf68f2fc2c886ea5fdc02ae55eba0a6205",
+      "bytes": 1318,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "nist-a34.gif",
+      "url": "https://emtoolbox.nist.gov/Wavelength/EquationA34.gif",
+      "sha256": "1146b03aeb813205d521e796b552e426d718585888a4373c32bfeb4d2cde6c6b",
+      "bytes": 1348,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "cie-iso-2022-mostra.pdf",
+      "url": "https://cdn.standards.iteh.ai/samples/77215/7c13ff8454764de2985cc77163df13ee/ISO-CIE-11664-2-2022.pdf",
+      "sha256": "8dd04375112cde3035c77c87b851db2a9eac8d2e389e8d7f782dd5b3101929d2",
+      "bytes": 1008800,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "tsl237-datasheet.pdf",
+      "url": "https://look.ams-osram.com/m/7de13fb52f0fa149/original/TSL237-DS000156.pdf",
+      "sha256": "7a911b3129d301ad75da2be5f85bf432433f626bb0dd24a299909dccf642e5ee",
+      "bytes": 668508,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "cm500-fabricant.pdf",
+      "url": "https://unihedron.com/projects/darksky/hcm500_files/CM500.pdf",
+      "sha256": "15c0e1a3b489a635a2a9f80e3543a7961f1107e7f3523444759c3c4c3165cddb",
+      "bytes": 632396,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "sqm-faq.html",
+      "url": "https://www.unihedron.com/projects/darksky/faqsqm.php",
+      "sha256": "bb0359daa19b84c90bdd1f3f0d7dd8858ce5b196d3b6422dd431c9eed1d42312",
+      "bytes": 18271,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "sqm-fov.jpg",
+      "url": "https://www.unihedron.com/projects/darksky/fovcurves.jpg",
+      "sha256": "e8429bc457dd5143c2bc702b86d6942a69b1b3d3db70e8b1ecbb77a4ceedf635",
+      "bytes": 99869,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "sqm-informe-2005.pdf",
+      "url": "https://unihedron.com/projects/darksky/sqmreport_v1p4.pdf",
+      "sha256": "560628879fd6392dccda20c629dbb4ecb46351fe713a391bb86d667b0d566757",
+      "bytes": 470075,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "sqm-lr-manual-2025.pdf",
+      "url": "https://www.unihedron.com/projects/darksky/cd/SQM-LR/SQM-LR_Users_manual.pdf",
+      "sha256": "458748012dabb043b16057c2add1223872d6c28f0063af8d8f76a09e6c8dc978",
+      "bytes": 3612623,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "tess-informe-2017.pdf",
+      "url": "https://zenodo.org/records/2546631/files/21-Manuscript-74-1-10-20170622.pdf?download=1",
+      "sha256": "f6207d3830f026bc1ce61afea0974795ce8f2eb18000dbfd384447c80d299653",
+      "bytes": 909123,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "tess-filtres-2026.pdf",
+      "url": "https://zenodo.org/records/22873442/files/LICA%20Report_%20TESS-W%20filter%20impact%20on%20NSB.pdf?download=1",
+      "sha256": "292ffc6743463c338cf51bbbf9ed9389da2c8d1564afdf4ebb6e308c4d3c680e",
+      "bytes": 6890879,
+      "status": "consultat",
+      "localResearchOnly": true
+    },
+    {
+      "file": "tess-models.html",
+      "url": "https://guaix.fis.ucm.es/tess/models",
+      "sha256": "d1c2bca64e4a411d3d1bf2330050a1b4904f423270f75098f3c8770aca379b9d",
+      "bytes": 10872,
+      "status": "consultat",
+      "localResearchOnly": true
+    }
+  ],
+  "redistribution": "Només metadades i fets derivats; PDFs de consulta fora de les evidències publicades."
+}

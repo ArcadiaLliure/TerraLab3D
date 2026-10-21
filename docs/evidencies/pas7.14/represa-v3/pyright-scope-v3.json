@@ -1,0 +1,13 @@
+{
+  "pythonVersion": "3.13",
+  "pythonPlatform": "Windows",
+  "extraPaths": [
+    "../../../../backend/src",
+    "../../../../tools"
+  ],
+  "include": [
+    "../../../../tools/profile_photometry_step7_14_v3.py",
+    "../../../../tools/audit_photometry_nominal_step7_14_v3.py",
+    "../../../../tools/plot_photometry_nominal_v3.py"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "archive": "metadades-consulta-v3.zip",
+  "sha256": "db0e711c4ae384cb34853660bbeae88dc576674b06e05b4226486739454464a4",
+  "members": {
+    "licaplot-head.json": "b028e30232e18fbc547760f3f8f9f6bee41a5c5a44e686eff955ae8b462733f4",
+    "tess-zenodo-api.json": "08e8202fd9ff93c4e0c7c3f12dcd0ba330f3f2c3725d4a74ef1660c8f23dbf2d",
+    "sqm-color-zenodo-api.json": "26549ea598f0928ac45957480206154a5510c041da6d547f014d1e2367e41cf0"
+  },
+  "note": "Metadades factuals d’API. HTML i PDF només consultats a scratch, amb hashes al registre; cap resposta instrumental o codi extern afegit al runtime."
+}

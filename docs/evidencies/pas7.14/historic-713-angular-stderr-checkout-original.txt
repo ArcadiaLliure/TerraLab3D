@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "F:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\tools\audit_adaptive_dome_step7_13_v2.py", line 256, in <module>
+    raise SystemExit(0 if audit() else 1)
+                          ~~~~~^^
+  File "F:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\tools\audit_adaptive_dome_step7_13_v2.py", line 25, in audit
+    binding()
+    ~~~~~~~^^
+  File "F:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\tools\validate_adaptive_dome_step7_13_v2.py", line 58, in binding
+    assert data["codeHashes"] == current, (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Candidat canviat: cal versió de campanya nova

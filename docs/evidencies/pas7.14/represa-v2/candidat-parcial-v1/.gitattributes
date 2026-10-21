@@ -1,0 +1,30 @@
+# El preregistre i les mesures conserven bytes/checksums, també a Windows.
+/.gitattributes text eol=lf
+/docs/evidencies/pas7.12/** -text
+/docs/skyglow/skyglow-v2-profile.json text eol=lf
+# Fitxers nous/modificats vinculats al candidat: Ruff els escriu amb LF.
+/backend/src/terralab3d/domain/light_pollution/atmospheric_tail.py text eol=lf
+/backend/src/terralab3d/domain/light_pollution/radiometric_gate.py text eol=lf
+/backend/src/terralab3d/domain/light_pollution/reference_variable_spectral.py text eol=lf
+/backend/src/terralab3d/infrastructure/adapters/atmosphere/standard_optics.py text eol=lf
+/backend/tests/test_transport_gate_step7_12.py text eol=lf
+/tools/*step7_12.py text eol=lf
+/docs/evidencies/pas7.13/** -text
+/backend/src/terralab3d/domain/light_pollution/dome_profile.py text eol=lf
+/backend/src/terralab3d/application/dome_sampling.py text eol=lf
+/backend/tests/test_dome_profile_step7_13.py text eol=lf
+/tools/*step7_13.py text eol=lf
+/frontend/src/domain/skyglow/domeProfile.ts text eol=lf
+/frontend/src/tests/dome_profile_step7_13.test.ts text eol=lf
+/backend/src/terralab3d/domain/light_pollution/adaptive_dome.py text eol=lf
+/backend/src/terralab3d/application/adaptive_dome_sampling.py text eol=lf
+/backend/tests/test_adaptive_dome_step7_13_v2.py text eol=lf
+/tools/*step7_13_v2.py text eol=lf
+/frontend/src/domain/skyglow/adaptiveDome.ts text eol=lf
+/frontend/src/tests/adaptive_dome_step7_13_v2.test.ts text eol=lf
+/docs/evidencies/pas7.14/** -text
+/backend/src/terralab3d/domain/photometric_projection.py text eol=lf
+/backend/src/terralab3d/application/photometric_projections.py text eol=lf
+/backend/tests/test_photometric_projection_step7_14.py text eol=lf
+/tools/*step7_14.py text eol=lf
+/tools/project_skyglow_photometry.py text eol=lf

@@ -1,0 +1,16 @@
+f:\Python\TerraLab3D\.runtime-photometry\diagnosticar-vinculacio.py
+  f:\Python\TerraLab3D\.runtime-photometry\diagnosticar-vinculacio.py:8:13 - error: "tb_next" is not a known attribute of "None" (reportOptionalMemberAccess)
+  f:\Python\TerraLab3D\.runtime-photometry\diagnosticar-vinculacio.py:8:25 - error: "tb_next" is not a known attribute of "None" (reportOptionalMemberAccess)
+  f:\Python\TerraLab3D\.runtime-photometry\diagnosticar-vinculacio.py:9:9 - error: "tb_frame" is not a known attribute of "None" (reportOptionalMemberAccess)
+f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__init__.py
+  f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__init__.py:3:12 - warning: "application" is specified in __all__ but is not present in module (reportUnsupportedDunderAll)
+  f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__init__.py:3:27 - warning: "domain" is specified in __all__ but is not present in module (reportUnsupportedDunderAll)
+  f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__init__.py:3:37 - warning: "scene" is specified in __all__ but is not present in module (reportUnsupportedDunderAll)
+f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__main__.py
+  f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__main__.py:1125:58 - error: "diagonal_deg" is not a known attribute of "None" (reportOptionalMemberAccess)
+  f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__main__.py:1125:94 - error: "width_deg" is not a known attribute of "None" (reportOptionalMemberAccess)
+  f:\Python\TerraLab3D\.runtime-photometry\historic713-verificacio\backend\src\terralab3d\__main__.py:1126:74 - error: "estimated_limit_magnitude" is not a known attribute of "None" (reportOptionalMemberAccess)
+6 errors, 3 warnings, 0 informations
+WARNING: there is a new pyright version available (v1.1.411 -> v1.1.414).
+Please install the new version or set PYRIGHT_PYTHON_FORCE_VERSION to `latest`
+

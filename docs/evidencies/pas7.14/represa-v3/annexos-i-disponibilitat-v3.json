@@ -1,0 +1,75 @@
+[
+  {
+    "name": "sqm-color-2017-src.tar",
+    "url": "https://arxiv.org/src/1701.05019",
+    "consultedAtUtc": "2026-10-21T21:08:34.237620+00:00",
+    "status": 200,
+    "resolvedUrl": "https://arxiv.org/src/1701.05019",
+    "bytes": 2071322,
+    "sha256": "f7c88b2a4fa2c332b0620b7f358abec9d60ad58bcc3ca67dd393ff0cc8226d68",
+    "members": [
+      "colores_espectros_SQM_BVj3k.png",
+      "colores_espectros_SQM_BVj60k.png",
+      "colores_espectros_SQM_G_BGj.png",
+      "colores_espectros_SQM_G_BG.png",
+      "colores_espectros_SQM_G_GR.png",
+      "colores_espectros_SQM_SC_BGj_3k.png",
+      "colores_espectros_SQM_SC_BGjA.png",
+      "colores_espectros_SQM_SC_BGj.png",
+      "colores_espectros_SQMSC_BGj.png",
+      "colores_espectros_SQM_SQMA_BGjAsum_F0_05_AOD_0_1_Hc0_5km.png",
+      "colores_espectros_SQM_SQMA_wavesum_F0_05_AOD_0_1_Hc0_5km.png",
+      "colores_espectros_SQM_Vj_BGj2.png",
+      "colores_espectros_SQM_Vj_BGj_3k.png",
+      "colores_espectros_SQM_Vj_BGjA_sum_F0.05_AOD_0.1_Hc0.5km.png",
+      "colores_espectros_SQM_Vj_BGj.png",
+      "colores_espectros_SQMVl_BGj.png",
+      "colores_espectros_SQM_Vl_BVj3k.png",
+      "colores_espectros_SQM_Vl_BVjA.png",
+      "colores_espectros_SQM_Vl_BVj.png",
+      "figures-martin-1.png",
+      "figures-martin-2.png",
+      "figures-martin-3.png",
+      "figures-martin-4.png",
+      "figures-martin-5.png",
+      "FWHM_SQM_DL_LU_intensidad.png",
+      "FWHM_SQM_DL_LU_magnitud.png",
+      "lspddbw.png",
+      "mn2e.bst",
+      "mn2e_clean-R2.bbl",
+      "mn2e_clean-R2.tex",
+      "mn2e.cls",
+      "mn2e.log",
+      "SQM_comparison_final_3.png",
+      "SQM_DL_Response_new_3.png"
+    ],
+    "numericTableMembers": [],
+    "texMentions": [
+      "The Lamp Spectral Power Distribution Database (LSPDD) is available online (www.lspdd.com) and is maintained by the Light Pollution Group of C\\'egep de Sherbrooke. This dataset aims to provide independent information about the spectral characteristics of commercial lamp products. Each lamp has its associated datasheet providing the lamp's characteristics, like the spectral power distribution (SPD), correlated color temperature, percentage of blue light, and the impact indices introduced in \\cite{aube2013evaluating}. The LSPDD distributes SPDs in ASCII text format (273 nm to 900 nm every 0.5 nm), allowing any other researcher to easily use the data for their own research. The LSPDD is released under the Creative Commons BY-NC-ND license. The data file is available in each lamp datasheet. All the SPD data are measured with the same spectrometer model (the Black Comet model from Stellarnet Inc.) factory calibrated according to NIST standards.    "
+    ]
+  },
+  {
+    "name": "sqm-color-zenodo-api.json",
+    "url": "https://zenodo.org/api/records/2548628",
+    "consultedAtUtc": "2026-10-21T21:08:35.719979+00:00",
+    "status": 200,
+    "resolvedUrl": "https://zenodo.org/api/records/2548628",
+    "bytes": 5509,
+    "sha256": "26549ea598f0928ac45957480206154a5510c041da6d547f014d1e2367e41cf0",
+    "publishedFiles": [
+      {
+        "name": "sky_quality_meter_Sanchez.pdf",
+        "checksum": "md5:3db45afab5226900382babfe92f10569"
+      }
+    ]
+  },
+  {
+    "name": "sqm-angular-2021-availability",
+    "url": "https://doi.org/10.3390/s21227544",
+    "finding": "Les dades es declaren disponibles a petició; repositori encara en desenvolupament al text publicat.",
+    "paragraphSha256": "ce68a3a6d799713fd0931954745d5087203f9ba6ccf9538bbc8fac43e4630ece",
+    "correspondingAuthor": "Mirco Bartolomei",
+    "contact": "mirco.bartolomei@unipd.it",
+    "supplementaryMaterialCount": 0
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "baselineMechanicalIssues": 280,
+  "finalMechanicalIssues": 280,
+  "newIssues": [],
+  "brokenLiveLocalLinks": 0,
+  "preexistingDeletedTaskPaths": [
+    "docs/tasques/pendent/pas7.10-radiance-patch-quadtree.md",
+    "docs/tasques/pendent/pas7.11-optical-field.md",
+    "docs/tasques/pendent/pas7.12-phase-aerosol-library.md",
+    "docs/tasques/pendent/pas7.13-legendre-b3.md",
+    "docs/tasques/pendent/pas7.14-gas-b4.md"
+  ],
+  "newDeletedPaths": [],
+  "globalPyrightSameDiagnostics": true,
+  "globalPyrightSummary": {
+    "filesAnalyzed": 325,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 12.533
+  },
+  "scopePyright": "0 errors;0 warnings",
+  "futureStepsProtected": true,
+  "stepState": "7.14_pending_partial_blocked;7.15_not_started"
+}

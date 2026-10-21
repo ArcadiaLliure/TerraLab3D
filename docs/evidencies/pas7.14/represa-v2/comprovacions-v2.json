@@ -1,0 +1,198 @@
+[
+  {
+    "name": "pytest-backend-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "-m",
+      "pytest",
+      "backend/tests",
+      "-q",
+      "-W",
+      "error",
+      "--basetemp",
+      ".runtime-photometry-v2/pytest-final"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 45.10775239999998
+  },
+  {
+    "name": "frontend-tests-v2",
+    "command": [
+      "npm.cmd",
+      "test"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 6.876458499999899
+  },
+  {
+    "name": "frontend-typecheck-v2",
+    "command": [
+      "npm.cmd",
+      "run",
+      "typecheck"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 4.613752900000009
+  },
+  {
+    "name": "frontend-build-v2",
+    "command": [
+      "npm.cmd",
+      "run",
+      "build"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.6151535999999851
+  },
+  {
+    "name": "ruff-format-v2",
+    "command": [
+      "ruff",
+      "format",
+      "--check",
+      "backend/src/terralab3d/domain/wavelength_coordinates.py",
+      "backend/src/terralab3d/domain/instrument_qualification.py",
+      "backend/src/terralab3d/application/coordinate_photometry.py",
+      "backend/tests/test_photometric_coordinates_step7_14_v2.py",
+      "tools/audit_photometry_resume.py",
+      "tools/plot_photometry_resume.py",
+      "tools/photometry_coordinates_step7_14_v2.py",
+      "tools/project_coordinate_photometry_step7_14_v2.py",
+      "tools/validate_photometry_step7_14_v2.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.0357870999998795
+  },
+  {
+    "name": "ruff-check-v2",
+    "command": [
+      "ruff",
+      "check",
+      "backend/src/terralab3d/domain/wavelength_coordinates.py",
+      "backend/src/terralab3d/domain/instrument_qualification.py",
+      "backend/src/terralab3d/application/coordinate_photometry.py",
+      "backend/tests/test_photometric_coordinates_step7_14_v2.py",
+      "tools/audit_photometry_resume.py",
+      "tools/plot_photometry_resume.py",
+      "tools/photometry_coordinates_step7_14_v2.py",
+      "tools/project_coordinate_photometry_step7_14_v2.py",
+      "tools/validate_photometry_step7_14_v2.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.04340430000002016
+  },
+  {
+    "name": "pyright-afectats-v2",
+    "command": [
+      "pyright",
+      "--project",
+      "F:\\Python\\TerraLab3D\\.runtime-photometry-v2\\pyright-v2.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 2.991389200000185
+  },
+  {
+    "name": "pyright-global-v2",
+    "command": [
+      "pyright",
+      "src",
+      "--outputjson"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 13.696316600000046
+  },
+  {
+    "name": "columnes-b0-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_optical_field_step7_8.py",
+      "--output",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\represa-v2\\columnes-b0-v2.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.967457100000047
+  },
+  {
+    "name": "gate-v1-numeric",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_step7_14.py",
+      "--numeric-only"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.4934244999999464
+  },
+  {
+    "name": "gate-represa-complet-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_resume.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 0.9862350999999308
+  },
+  {
+    "name": "gate-represa-numeric-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_resume.py",
+      "--numeric-only"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.9113104000000476
+  },
+  {
+    "name": "demo-cli-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/project_coordinate_photometry_step7_14_v2.py",
+      "--input",
+      "docs/evidencies/pas7.14/transport-i-projeccions.json",
+      "--case",
+      "S_B4_chamber_point_5km-0",
+      "--input-radiance-basis",
+      "vacuum_nm",
+      "--output",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\represa-v2\\demostracio-cli-cie-v2.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.20580219999988
+  },
+  {
+    "name": "figures-v2",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/plot_photometry_resume.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 2.009755099999893
+  }
+]

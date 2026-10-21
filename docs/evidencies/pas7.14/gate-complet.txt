@@ -1,0 +1,80 @@
+{
+  "status": "BLOCKED_SENSOR_PROFILES",
+  "numericStatus": "PASS",
+  "scientificExitPassed": false,
+  "checks": {
+    "unchangedProjectionPolicy": true,
+    "unchangedSpectralPolicy": true,
+    "sameMeasuredRuntime": true,
+    "spectralCount": true,
+    "spectralBudget": true,
+    "spectralOracleResolved": true,
+    "allRegisteredTransport": true,
+    "tableProjection": true,
+    "physicalZeros": true,
+    "analyticFov": true,
+    "positiveConditionalTail": true,
+    "noAdditionalTransport": true,
+    "cNeverAbsolute": true,
+    "noPrematureNativeSensor": true,
+    "sameFourColumns": true,
+    "sameB0": true,
+    "samePyrightDiagnosticMultiset": true,
+    "allHistoricalEvidencePreserved": true,
+    "archived713AuditsPass": true,
+    "boundedCampaign": true
+  },
+  "metrics": {
+    "transportCases": 13,
+    "transportComparisons": 39,
+    "maximumGuardedTransportRelative": 9.88956685956925e-07,
+    "maximumTransportErrorMag": 5.368221765427769e-07,
+    "maximumTableRelativeError": 1.756553173831367e-16,
+    "maximumHistoricalCieRelativeChange": 2.0272672429655358e-13,
+    "maximumFovErrorMag": 2.1697367997448936e-15,
+    "spectral": {
+      "campaignId": "sensor-reference-bands-spectral-v1",
+      "harnessProtocolId": "TL3D-SKY-7.10-v2",
+      "caseCount": 10624,
+      "passed": 10624,
+      "failed": 0,
+      "maximumErrorMag": 0.00011519668386126202,
+      "maximumLutErrorMag": 0.0001151966838519794,
+      "maximumSimpsonErrorMag": 9.607112385494619e-12,
+      "maximumOracleRelativeRefinement": 8.858043043443176e-09,
+      "wallSeconds": 28.675004999997327,
+      "fullSQMorTESSInstrumentValidated": false,
+      "domain": "Finestres espectrals conegudes i operadors prescrits; no omple cues SQM/TESS desconegudes amb zero físic, ni valida fosc, FOV o calibratge natiu.",
+      "thresholdMagnitude": 0.01
+    },
+    "coesaTailMagnitudeUpper": [
+      3.0860082126098616e-07,
+      3.2641469896022335e-07,
+      3.202355112256615e-07
+    ],
+    "coesaKernelWallSeconds": 183.3926621999999,
+    "postProjectionWallSeconds": {
+      "minimum": 0.0030611999973189086,
+      "maximum": 0.005112600018037483,
+      "mean": 0.003836761535449813
+    },
+    "scientificWallSecondsIncludingFailedSetup": 272.717883299978,
+    "historicalEvidenceCount": 319,
+    "historicalEvidenceDifferences": [],
+    "pyrightSummary": {
+      "filesAnalyzed": 322,
+      "errorCount": 67,
+      "warningCount": 3,
+      "informationCount": 0,
+      "timeInSec": 15.388
+    }
+  },
+  "blockingReasons": [
+    "SQM: suport finit acabat en resposta no nul·la; cua i calibratge/FOV emparellats no acreditats.",
+    "TESS-W: fosc, FOV emparellat, resposta exterior i calibratge conjunt no acreditats.",
+    "DomeProfile CIE escalar i cobertura angular7.13 insuficients per al FOV espectral complet; cap renormalització parcial.",
+    "Convenció aire/buit heretada pendent de qualificació física versionada."
+  ],
+  "scope": "PASS de problemes tabulats/fixtures registrades; cap homologació instrumental, observacional, angular COESA general, DEM o fonts extenses addicional.",
+  "nextStep": "7.14_pending_blocked;7.15_not_started"
+}

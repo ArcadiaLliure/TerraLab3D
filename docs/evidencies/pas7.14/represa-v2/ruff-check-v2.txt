@@ -1,0 +1,12 @@
+E741 Ambiguous variable name: `l`
+  --> tools\plot_photometry_resume.py:53:19
+   |
+51 |     for file in sorted((OUT / "fonts-primaries/report/filters").glob("*.ecsv")):
+52 |         lines = [
+53 |             l for l in file.read_text("utf8").splitlines() if not l.startswith("#")
+   |                   ^
+54 |         ]
+55 |         rows = list(csv.DictReader(lines))
+   |
+
+Found 1 error.

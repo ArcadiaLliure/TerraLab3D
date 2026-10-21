@@ -1,0 +1,18 @@
+{
+  "commit": "7ccd688811c8452a49a78ef7e884c89a4c6a528c",
+  "isolatedBackendModule": "F:\\Python\\TerraLab3D\\.runtime-photometry\\historic713-verificacio\\backend\\src\\terralab3d\\__init__.py",
+  "audits": [
+    {
+      "tool": "audit_adaptive_dome_step7_13_v2.py",
+      "exitCode": 1
+    },
+    {
+      "tool": "audit_regressions_step7_13_v2.py",
+      "exitCode": 1
+    }
+  ],
+  "temporaryWorktreeRemoved": true,
+  "temporaryStatusBeforeRemoval": " M docs/evidencies/pas7.13/adaptatiu-v2/regressions-i-preservacio-v2.json\n",
+  "wallSeconds": 16.00667689999682,
+  "meaning": "PASS dels candidats històrics amb el codi congelat; no substitueix les regressions del codi actual"
+}

@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "ownerStep": "7.14",
+  "policySha256": "09a7333914203de2a4ffb810215f89f6879cedcaf65c324f2226a1f466acb2e6",
+  "candidateBindingSha256": "b217eb6e11b788ba7bf5e6012980f714a037df39ac1e2664733ccb973b6b4661",
+  "python": "3.13.7 (tags/v3.13.7:bcee1c3, Aug 14 2025, 14:15:11) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "threadEnvironment": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "retainedDecodeSeconds": 0.0009284000007028226,
+  "responsePreparationSeconds": 0.03737179999916407,
+  "cases": [
+    {
+      "caseId": "S_B4_chamber_point_5km-0",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.820631599999615,
+      "signal": 1.267113621743669e-11,
+      "losError": 2.246496746595576e-20,
+      "refinementError": 1.6155871338926322e-27,
+      "independentOracle": 1.2671136217436691e-11,
+      "relativeError": 1.1102230246251565e-16,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "S_B4_chamber_point_5km-160",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8700759999992442,
+      "signal": 2.9435443486640953e-10,
+      "losError": 2.1683945834794097e-19,
+      "refinementError": 0.0,
+      "independentOracle": 2.9435443486640953e-10,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "S_B4_chamber_point_5km-220",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8180976999992708,
+      "signal": 2.0398714826365843e-09,
+      "losError": 1.4255612247438715e-17,
+      "refinementError": 0.0,
+      "independentOracle": 2.0398714826365843e-09,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "C_realista_chamber_point_5km-0",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8306979000008141,
+      "signal": 0.002354712444003233,
+      "losError": 4.056911606967834e-12,
+      "refinementError": 0.0,
+      "independentOracle": 0.002354712444003233,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "C_realista_chamber_point_5km-160",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8344254000003275,
+      "signal": 0.05530172741544614,
+      "losError": 3.995695127068173e-11,
+      "refinementError": 0.0,
+      "independentOracle": 0.05530172741544614,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "C_realista_chamber_point_5km-220",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8095182999986719,
+      "signal": 0.384449073341926,
+      "losError": 2.626218072601737e-09,
+      "refinementError": 0.0,
+      "independentOracle": 0.384449073341926,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "C_kelvins3000_chamber_point_5km-0",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8368695000008302,
+      "signal": 0.002400285210180906,
+      "losError": 4.158475552902772e-12,
+      "refinementError": 0.0,
+      "independentOracle": 0.002400285210180906,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "C_kelvins3000_chamber_point_5km-160",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8407924000002822,
+      "signal": 0.05614964333847899,
+      "losError": 4.066179305423775e-11,
+      "refinementError": 6.938893903907228e-18,
+      "independentOracle": 0.056149643338478994,
+      "relativeError": 1.1102230246251565e-16,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "C_kelvins3000_chamber_point_5km-220",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8392211999998835,
+      "signal": 0.38990062195659747,
+      "losError": 2.672781563039572e-09,
+      "refinementError": 0.0,
+      "independentOracle": 0.38990062195659747,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "S-mountain-23.61",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.9069056000007549,
+      "signal": 0.0,
+      "losError": 0.0,
+      "refinementError": 0.0,
+      "independentOracle": 0.0,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "S-mountain-23.89",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8348427999990236,
+      "signal": 6.970634224294123e-11,
+      "losError": 5.547709072873541e-19,
+      "refinementError": 1.2924697071141057e-26,
+      "independentOracle": 6.970634224294125e-11,
+      "relativeError": 2.220446049250313e-16,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "S-area400m",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8204176999988704,
+      "signal": 1.2746006942191085e-11,
+      "losError": 1.5343086847474432e-21,
+      "refinementError": 1.6155871338926322e-27,
+      "independentOracle": 1.2746006942191087e-11,
+      "relativeError": 1.1102230246251565e-16,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    },
+    {
+      "caseId": "S-COESA75km-52.19",
+      "panels": 968,
+      "responseKnots": 471,
+      "wallSeconds": 0.8200695999985328,
+      "signal": 9.13986668850522e-12,
+      "losError": 1.8867878445632456e-22,
+      "refinementError": 0.0,
+      "independentOracle": 9.13986668850522e-12,
+      "relativeError": 0.0,
+      "exactlyMatchesFrozenResult": true,
+      "passCriterion": true
+    }
+  ],
+  "repeatedUnprofiledSeconds": [
+    0.8176160999992135,
+    0.817004900000029,
+    0.8050868000009359
+  ],
+  "profiledSeconds": 1.1502614000000904,
+  "profiledFunctions": [
+    {
+      "function": "leggauss",
+      "line": 1472,
+      "primitiveCalls": 2904,
+      "calls": 2904,
+      "exclusiveSeconds": 0.049531900000000004,
+      "cumulativeSeconds": 0.778984
+    },
+    {
+      "function": "at_vacuum",
+      "line": 100,
+      "primitiveCalls": 54720,
+      "calls": 54720,
+      "exclusiveSeconds": 0.07677400000000001,
+      "cumulativeSeconds": 0.16451010000000002
+    },
+    {
+      "function": "_integrate_response_prepared",
+      "line": 41,
+      "primitiveCalls": 2904,
+      "calls": 2904,
+      "exclusiveSeconds": 0.1129484,
+      "cumulativeSeconds": 1.1359853
+    },
+    {
+      "function": "vacuum_knots",
+      "line": 92,
+      "primitiveCalls": 1,
+      "calls": 1,
+      "exclusiveSeconds": 5.6800000000000005e-05,
+      "cumulativeSeconds": 0.0034328
+    },
+    {
+      "function": "density",
+      "line": 105,
+      "primitiveCalls": 32832,
+      "calls": 32832,
+      "exclusiveSeconds": 0.040305400000000005,
+      "cumulativeSeconds": 0.0664551
+    },
+    {
+      "function": "air_from_vacuum",
+      "line": 32,
+      "primitiveCalls": 55662,
+      "calls": 55662,
+      "exclusiveSeconds": 0.014497300000000001,
+      "cumulativeSeconds": 0.0544842
+    }
+  ],
+  "calculationWallSeconds": 14.625167899999724,
+  "physicalTransportEvaluations": 0,
+  "runtimeChanged": false,
+  "interpretation": "Temps profilats instrumentats; no sumar temps inclusius. Repeticions de paret sense profiler separades. Cap SLO ni acceleració acreditada."
+}

@@ -1,0 +1,111 @@
+[
+  {
+    "name": "ruff-format-final",
+    "command": [
+      "ruff",
+      "format",
+      "--check",
+      "tools/profile_photometry_step7_14_v3.py",
+      "tools/audit_photometry_nominal_step7_14_v3.py",
+      "tools/plot_photometry_nominal_v3.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.02533870000115712
+  },
+  {
+    "name": "ruff-check-final",
+    "command": [
+      "ruff",
+      "check",
+      "tools/profile_photometry_step7_14_v3.py",
+      "tools/audit_photometry_nominal_step7_14_v3.py",
+      "tools/plot_photometry_nominal_v3.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.02651309999964724
+  },
+  {
+    "name": "pyright-afectats",
+    "command": [
+      "pyright",
+      "--project",
+      "F:\\Python\\TerraLab3D\\docs\\evidencies\\pas7.14\\represa-v3\\pyright-scope-v3.json"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.6829567999993742
+  },
+  {
+    "name": "pyright-global",
+    "command": [
+      "pyright",
+      "src",
+      "--outputjson"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 13.100138699999661
+  },
+  {
+    "name": "gate-numeric",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_nominal_step7_14_v3.py",
+      "--numeric-only"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 1.8191114000001107
+  },
+  {
+    "name": "gate-complet",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/audit_photometry_nominal_step7_14_v3.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 1.824551399999109
+  },
+  {
+    "name": "auditoria-documental-final",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_docs.py"
+    ],
+    "exitCode": 1,
+    "expectedExitCode": 1,
+    "wallSeconds": 0.3967138999996678
+  },
+  {
+    "name": "enllacos-documentals",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/check_doc_links.py"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.37439069999891217
+  },
+  {
+    "name": "diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exitCode": 0,
+    "expectedExitCode": 0,
+    "wallSeconds": 0.04456459999892104
+  }
+]

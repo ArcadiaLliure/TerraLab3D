@@ -1,0 +1,406 @@
+[
+  {
+    "name": "sqm-l-2007.pdf",
+    "url": "https://unihedron.com/projects/sqm-l/sqmreport2.pdf",
+    "consultedAtUtc": "2026-10-21T21:06:53.913123+00:00",
+    "status": 200,
+    "resolvedUrl": "https://unihedron.com/projects/sqm-l/sqmreport2.pdf",
+    "contentType": "application/pdf",
+    "bytes": 489508,
+    "sha256": "7c7d16b35506fae18eea10d7a5afd71f2128a9aae1862cb09843632647707748",
+    "scratchPath": ".runtime-photometry-v3/fonts/sqm-l-2007.pdf",
+    "pages": 5
+  },
+  {
+    "name": "sqm-angular-2021.xml",
+    "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8618241/fullTextXML",
+    "consultedAtUtc": "2026-10-21T21:06:55.180972+00:00",
+    "status": 200,
+    "resolvedUrl": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8618241/fullTextXML",
+    "contentType": "application/xml",
+    "bytes": 79308,
+    "sha256": "9669b5f6f8ef9851368a502db28417381a17f0a2d69d5386ecf9ff3ebb00c163",
+    "scratchPath": ".runtime-photometry-v3/fonts/sqm-angular-2021.xml",
+    "supplementaryMaterialCount": 0,
+    "dataAvailability": []
+  },
+  {
+    "name": "sqm-color-2017.pdf",
+    "url": "https://arxiv.org/pdf/1701.05019",
+    "consultedAtUtc": "2026-10-21T21:06:55.587581+00:00",
+    "status": 200,
+    "resolvedUrl": "https://arxiv.org/pdf/1701.05019",
+    "contentType": "application/pdf",
+    "bytes": 2475668,
+    "sha256": "399a94d3626b307e88bd4161ff3a259856b61e944112b7b08836b068b74d5a20",
+    "scratchPath": ".runtime-photometry-v3/fonts/sqm-color-2017.pdf",
+    "pages": 15
+  },
+  {
+    "name": "sqm-color-2017.html",
+    "url": "https://academic.oup.com/mnras/article/467/3/2966/3061573?login=false",
+    "consultedAtUtc": "2026-10-21T21:06:56.261664+00:00",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "name": "sqm-l-producte.html",
+    "url": "https://unihedron.com/projects/sqm-l/",
+    "consultedAtUtc": "2026-10-21T21:06:56.345443+00:00",
+    "status": 200,
+    "resolvedUrl": "https://unihedron.com/projects/sqm-l/",
+    "contentType": "text/html; charset=UTF-8",
+    "bytes": 35311,
+    "sha256": "f3c03a4827483bbfdde784639a3d260f3ec100dc4492854b2ca901d3d480a0f4",
+    "scratchPath": ".runtime-photometry-v3/fonts/sqm-l-producte.html"
+  },
+  {
+    "name": "licaplot-head.json",
+    "url": "https://api.github.com/repos/guaix-ucm/licaplot/commits?per_page=1",
+    "consultedAtUtc": "2026-10-21T21:06:56.857149+00:00",
+    "status": 200,
+    "resolvedUrl": "https://api.github.com/repos/guaix-ucm/licaplot/commits?per_page=1",
+    "contentType": "application/json; charset=utf-8",
+    "bytes": 3356,
+    "sha256": "b028e30232e18fbc547760f3f8f9f6bee41a5c5a44e686eff955ae8b462733f4",
+    "scratchPath": ".runtime-photometry-v3/fonts/licaplot-head.json",
+    "latestCommit": "0f55129d6a27ccfe489558f1f46d441e278626f6",
+    "committedAt": "2026-09-21T10:34:15Z"
+  },
+  {
+    "name": "tess-zenodo-api.json",
+    "url": "https://zenodo.org/api/records/22873442",
+    "consultedAtUtc": "2026-10-21T21:06:57.289588+00:00",
+    "status": 200,
+    "resolvedUrl": "https://zenodo.org/api/records/22873442",
+    "contentType": "application/json",
+    "bytes": 6235,
+    "sha256": "08e8202fd9ff93c4e0c7c3f12dcd0ba330f3f2c3725d4a74ef1660c8f23dbf2d",
+    "scratchPath": ".runtime-photometry-v3/fonts/tess-zenodo-api.json",
+    "publishedFiles": [
+      {
+        "name": "LICA Report_ TESS-W filter impact on NSB.pdf",
+        "checksum": "md5:f99f39e3825635c985f57dd9d29a2b4b"
+      }
+    ]
+  },
+  {
+    "name": "tess-portal.html",
+    "url": "https://tess.stars4all.eu/",
+    "consultedAtUtc": "2026-10-21T21:06:57.509771+00:00",
+    "status": 200,
+    "resolvedUrl": "https://guaix.fis.ucm.es/tess/",
+    "contentType": "text/html; charset=utf-8",
+    "bytes": 15916,
+    "sha256": "0c89719ea2ebdaccb712dd9d37473c9cb8a750f05216c7cffb2dc982ee43e203",
+    "scratchPath": ".runtime-photometry-v3/fonts/tess-portal.html"
+  },
+  {
+    "name": "calibration-2019.xml",
+    "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6470928/fullTextXML",
+    "action": "XML existent reutilitzat; cerca d’annexos i enllaços, sense repetir la descàrrega",
+    "sha256": "d3c407a3858a0019dcfc49d1415a4764ea228e024e7d972ce3a2d1bf06158b6a",
+    "supplementaryMaterialCount": 0,
+    "externalLinks": [
+      {
+        "{http://www.w3.org/1999/xlink}href": "http://creativecommons.org/licenses/by/4.0/",
+        "ext-link-type": "uri"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1126/sciadv.1600377"
+      },
+      {
+        "ext-link-type": "pmcid",
+        "{http://www.w3.org/1999/xlink}href": "PMC4928945"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "27386582"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Sci. Adv.&title=The new world atlas of artificial night sky brightness&author=F. Falchi&author=P. Cinzano&author=D. Duriscoe&author=C.C.M. Kyba&author=C.D. Elvidge&volume=2&publication_year=2016&pages=e1600377&pmid=27386582&doi=10.1126/sciadv.1600377&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1038/srep08409"
+      },
+      {
+        "ext-link-type": "pmcid",
+        "{http://www.w3.org/1999/xlink}href": "PMC5389131"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "25673335"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Sci. Rep.&title=Worldwide variations in artificial skyglow&author=C.C. Kyba&author=K.P. Tong&author=J. Bennie&author=I. Birriel&author=J.J. Birriel&volume=5&publication_year=2015&pages=8409&pmid=25673335&doi=10.1038/srep08409&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1016/j.jqsrt.2015.11.003"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=J. Quant. Spectrosc. Radiat. Transf.&title=A review of the theoretical and numerical approaches to modeling skyglow: Iterative approach to RTE, MSOS, and two-stream approximation&author=M. Kocifaj&volume=181&publication_year=2016&pages=2-10&doi=10.1016/j.jqsrt.2015.11.003&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1086/128945"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Publ. Astron. Soc. Pac.&title=The California Site Survey&author=M.F. Walker&volume=82&publication_year=1970&pages=672-698&doi=10.1086/128945&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1111/j.1365-2966.2012.20664.x"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Mon. Not. R. Astron. Soc.&title=Using two light-pollution models to investigate artificial sky radiances at Canary Islands observatories&author=M. Aubé&author=M. Kocifaj&volume=422&publication_year=2012&pages=819-830&doi=10.1111/j.1365-2966.2012.20664.x&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1007/s00442-014-3088-2"
+      },
+      {
+        "ext-link-type": "pmcid",
+        "{http://www.w3.org/1999/xlink}href": "PMC4226844"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "25239105"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Oecologia&title=Human alteration of natural light cycles: Causes and ecological consequences&author=K.J. Gaston&author=J.P. Duffy&author=S. Gaston&author=J. Bennie&author=T.W. Davies&volume=176&publication_year=2014&pages=917-931&pmid=25239105&doi=10.1007/s00442-014-3088-2&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1016/j.tree.2010.09.007"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "21035893"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Trends Ecol. Evol.&title=Light pollution as a biodiversity threat&author=F. Hölker&author=C. Wolter&author=E.K. Perkin&author=K. Tockner&volume=25&publication_year=2010&pages=681-682&pmid=21035893&doi=10.1016/j.tree.2010.09.007&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1890/1540-9295(2004)002[0191:ELP]2.0.CO;2"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Front. Ecol. Environ.&title=Ecological light pollution&author=T. Longcore&author=C. Rich&volume=2&publication_year=2004&pages=191-198&doi=10.1890/1540-9295(2004)002[0191:ELP]2.0.CO;2&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1364/AO.53.002677"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "24787595"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Appl. Opt.&title=Zernike analysis of all-sky night brightness maps&author=S. Bará&author=M. Nievas&author=A. Sánchez de Miguel&author=J. Zamorano&volume=53&publication_year=2014&pages=2677-2686&pmid=24787595&doi=10.1364/AO.53.002677&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1364/AO.54.004120"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Appl. Opt.&title=Zernike power spectra of clear and cloudy light-polluted urban night skies&author=S. Bará&author=V. Tilve&author=M. Nievas&author=A. Sánchez de Miguel&author=J. Zamorano&volume=54&publication_year=2015&pages=4120-4129&doi=10.1364/AO.54.004120&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1016/j.ecolecon.2009.10.003"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Ecol. Econ.&title=The economics of global light pollution&author=T. Gallaway&author=R.N. Olsen&author=D.M. Mitchell&volume=69&publication_year=2010&pages=658-665&doi=10.1016/j.ecolecon.2009.10.003&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1039/C4EE00566J"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Energy Environ. Sci.&title=Redefining efficiency for outdoor lighting&author=C.C.M. Kyba&author=A. Hänel&author=F. Hölker&volume=7&publication_year=2014&pages=1806-1809&doi=10.1039/C4EE00566J&"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "title=StarLight: A Common Heritage&author=C. Marín&author=J. Jafari&publication_year=2008&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1080/01431161.2017.1342050"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Int. J. Remote Sens.&title=VIIRS night-time lights&author=C.D. Elvidge&author=K. Baugh&author=M. Zhizhin&author=F.C. Hsu&author=T. Ghosh&volume=38&publication_year=2017&pages=5860-5879&doi=10.1080/01431161.2017.1342050&"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "title=Handbook of Satellite Applications&author=W.L. Stefanov&author=C.A. Evans&author=S.K. Runco&author=M.J. Wilkinson&author=M.D. Higgins&publication_year=2017&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.3390/rs70100001"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Remote Sens.&title=High-Resolution Imagery of Earth at Night: New Sources, Opportunities and Challenges&author=C.C.M. Kyba&author=S. Garz&author=H. Kuechly&author=A. Sánchez de Miguel&author=J. Zamorano&volume=7&publication_year=2015&pages=1-23&doi=10.3390/rs70100001&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1016/j.rse.2018.06.016"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Remote Sens. Environ.&title=A new source of multi-spectral high spatial resolution night-time light imagery—JL1-3B&author=Q. Zheng&author=Q. Weng&author=L. Huang&author=K. Wang&author=J. Deng&volume=215&publication_year=2018&pages=300-312&doi=10.1016/j.rse.2018.06.016&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.3390/s18092900"
+      },
+      {
+        "ext-link-type": "pmcid",
+        "{http://www.w3.org/1999/xlink}href": "PMC6165281"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "30200485"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Sensors&title=Potentiality of Using Luojia 1-01 Nighttime Light Imagery to Investigate Artificial Light Pollution&author=W. Jiang&author=G. He&author=T. Long&author=H. Guo&author=R. Yin&volume=18&publication_year=2018&pages=2900&pmid=30200485&doi=10.3390/s18092900&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1016/j.jqsrt.2017.09.008"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=J. Quant. Spectrosc. Radiat. Transf.&title=Measuring night sky brightness: Methods and challenges&author=A. Hänel&author=T. Posch&author=S.J. Ribas&author=M. Aubé&author=D. Duriscoe&volume=205&publication_year=2018&pages=278-290&doi=10.1016/j.jqsrt.2017.09.008&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1038/srep01835"
+      },
+      {
+        "ext-link-type": "pmcid",
+        "{http://www.w3.org/1999/xlink}href": "PMC3655480"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "23677222"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Sci. Rep.&title=Citizen Science Provides Valuable Data for Monitoring GlobalNight Sky Luminance&author=C.C.M. Kyba&author=J.M. Wagner&author=H.U. Kuechly&author=C.E. Walker&author=C.D. Elvidge&volume=3&publication_year=2013&pages=1835&pmid=23677222&doi=10.1038/srep01835&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1016/j.jqsrt.2016.03.015"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=J. Quant. Spectrosc. Radiat. Transf.&title=Indoor calibration of Sky Quality Meters: Linearity, spectral responsivity and uncertainty analysis&author=M. Pravettoni&author=D. Strepparava&author=N. Cereghetti&author=S. Klett&author=M. Andretta&volume=181&publication_year=2016&pages=74-86&doi=10.1016/j.jqsrt.2016.03.015&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.26607/ijsl.v18i0.21"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Int. J. Sustain. Light.&title=STARS4ALL Night Sky Brightness Photometer&author=J. Zamorano&author=C. García&author=R. González&author=C. Tapia&author=A. Sánchez de Miguel&volume=35&publication_year=2016&pages=49-54&doi=10.26607/ijsl.v18i0.21&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1016/j.jqsrt.2018.03.010"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=J. Quant. Spectrosc. Radiat. Transf.&title=Systematic measurements of the night sky brightness at 26 locations in Eastern Austria&author=T. Posch&author=F. Binder&author=J. Puschnig&volume=211&publication_year=2018&pages=144-165&doi=10.1016/j.jqsrt.2018.03.010&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1007/s10661-011-2136-1"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "21713499"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Environ. Monit. Assess.&title=Night-sky brightness monitoring in Hong Kong&author=C.S.J. Pun&author=C.W. So&volume=184&publication_year=2012&pages=2537-2557&pmid=21713499&doi=10.1007/s10661-011-2136-1&"
+      },
+      {
+        "{http://www.w3.org/1999/xlink}href": "https://www.noao.edu/education/files/Zamorano_IAU2015_REECL-SQM.pdf",
+        "ext-link-type": "uri"
+      },
+      {
+        "{http://www.w3.org/1999/xlink}href": "http://tess.stars4all.eu/plots/",
+        "ext-link-type": "uri"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1098/rsos.160541"
+      },
+      {
+        "ext-link-type": "pmcid",
+        "{http://www.w3.org/1999/xlink}href": "PMC5098997"
+      },
+      {
+        "ext-link-type": "pmid",
+        "{http://www.w3.org/1999/xlink}href": "27853572"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=R. Soc. Open Sci.&title=Anthropogenic disruption of the night sky darkness in urban and rural areas&author=S. Bará&volume=3&publication_year=2016&pages=160541&pmid=27853572&doi=10.1098/rsos.160541&"
+      },
+      {
+        "{http://www.w3.org/1999/xlink}href": "https://ams.com/light-sensors",
+        "ext-link-type": "uri"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1146/annurev.astro.41.082801.100251"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Annu. Rev. Astron. Astrophys.&title=Standard Photometric Systems&author=M.S. Bessell&volume=43&publication_year=2005&pages=293-336&doi=10.1146/annurev.astro.41.082801.100251&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1086/160817"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Astrophys. J.&title=Secondary standard stars for absolute spectrophotometry&author=J.B. Oke&author=J.E. Gunn&volume=266&publication_year=1983&pages=713-717&doi=10.1086/160817&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.1093/mnras/stx145"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Mon. Not. R. Astron. Soc.&title=Sky Quality Meter measurements in a colour-changing world&author=A. Sánchez de Miguel&author=M. Aubé&author=J. Zamorano&author=M. Kocifaj&author=J. Roby&volume=467&publication_year=2017&pages=2966-2979&doi=10.1093/mnras/stx145&"
+      },
+      {
+        "ext-link-type": "doi",
+        "{http://www.w3.org/1999/xlink}href": "10.26607/ijsl.v19i2.77"
+      },
+      {
+        "ext-link-type": "google-scholar",
+        "{http://www.w3.org/1999/xlink}href": "journal=Int. J. Sustain. Light.&title=Variations on a classical theme: On the formal relationship between magnitudes per square arcsecond and luminance&author=S. Bará&volume=19&publication_year=2017&pages=104-111&doi=10.26607/ijsl.v19i2.77&"
+      }
+    ]
+  }
+]

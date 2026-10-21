@@ -1,0 +1,5 @@
+1 tiles, contrast=False: diferència columna 0.000e+00
+2 tiles, contrast=False: diferència columna 2.220e-16
+2 tiles, contrast=True: diferència columna 5.551e-16
+8 tiles, contrast=False: diferència columna 0.000e+00
+Evidència de camp òptic escrita: F:\Python\TerraLab3D\docs\evidencies\pas7.14\represa-v2\columnes-b0-v2.json

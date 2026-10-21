@@ -1,0 +1,349 @@
+
+> @terralab3d/frontend@0.1.0 test
+> npm run test:build && node .test-dist/grid.test.js && node .test-dist/navigation.test.js && node .test-dist/terrain_goto.test.js && node .test-dist/solar_system.test.js && node .test-dist/solar_system_step8_6.test.js && node .test-dist/lighting_step8_7.test.js && node .test-dist/astronomical_events_step9.test.js && node .test-dist/trajectory_visibility_step22.test.js && node .test-dist/constellation_step23.test.js && node .test-dist/galactic_step10.test.js && node .test-dist/tracking_resolver.test.js && node .test-dist/tracking_precision.test.js && node .test-dist/star_trails.test.js && node .test-dist/star_visuals.test.js && node .test-dist/horizon_step15.test.js && node .test-dist/dem_terrain_layer.test.js && node .test-dist/land_cover_texture.test.js && node .test-dist/frontend_hot_path.test.js && node .test-dist/temporal_scene.test.js && node .test-dist/observation_step19.test.js && node .test-dist/measurement_step21.test.js && node .test-dist/dome_profile_step7_13.test.js && node .test-dist/adaptive_dome_step7_13_v2.test.js
+
+
+> @terralab3d/frontend@0.1.0 test:build
+> esbuild src/tests/grid.test.ts src/tests/navigation.test.ts src/tests/terrain_goto.test.ts src/tests/solar_system.test.ts src/tests/solar_system_step8_6.test.ts src/tests/lighting_step8_7.test.ts src/tests/astronomical_events_step9.test.ts src/tests/trajectory_visibility_step22.test.ts src/tests/constellation_step23.test.ts src/tests/galactic_step10.test.ts src/tests/tracking_resolver.test.ts src/tests/tracking_precision.test.ts src/tests/star_trails.test.ts src/tests/star_visuals.test.ts src/tests/horizon_step15.test.ts src/tests/dem_terrain_layer.test.ts src/tests/land_cover_texture.test.ts src/tests/frontend_hot_path.test.ts src/tests/temporal_scene.test.ts src/tests/observation_step19.test.ts src/tests/measurement_step21.test.ts src/tests/dome_profile_step7_13.test.ts src/tests/adaptive_dome_step7_13_v2.test.ts --bundle --platform=node --format=esm --outdir=.test-dist
+
+=== TerraLab3D Phase 4 Grid & Overlay Tests ===
+
+1. ENU Convention — Cardinal Directions
+  ✓ North X = 0 (0.0000 ~ 0.0000)
+  ✓ North Y = 0 (0.0000 ~ 0.0000)
+  ✓ North Z = -1 (Three.js -Z) (-1.0000 ~ -1.0000)
+  ✓ East X = +1 (1.0000 ~ 1.0000)
+  ✓ East Y = 0 (0.0000 ~ 0.0000)
+  ✓ East Z = 0 (-0.0000 ~ 0.0000)
+  ✓ South X = 0 (0.0000 ~ 0.0000)
+  ✓ South Y = 0 (0.0000 ~ 0.0000)
+  ✓ South Z = +1 (1.0000 ~ 1.0000)
+  ✓ West X = -1 (-1.0000 ~ -1.0000)
+  ✓ West Y = 0 (0.0000 ~ 0.0000)
+  ✓ West Z = 0 (0.0000 ~ 0.0000)
+
+2. Zenith and Horizon
+  ✓ Zenith X = 0 (0.0000 ~ 0.0000)
+  ✓ Zenith Y = +1 (up) (1.0000 ~ 1.0000)
+  ✓ Zenith Z = 0 (-0.0000 ~ 0.0000)
+  ✓ Horizon Y = 0 (0.0000 ~ 0.0000)
+  ✓ Nadir X = 0 (0.0000 ~ 0.0000)
+  ✓ Nadir Y = -1 (down) (-1.0000 ~ -1.0000)
+  ✓ Nadir Z = 0 (-0.0000 ~ 0.0000)
+
+3. Azimuth Normalisation
+  ✓ 0° → 0° (0.0000 ~ 0.0000)
+  ✓ 360° → 0° (0.0000 ~ 0.0000)
+  ✓ 720° → 0° (0.0000 ~ 0.0000)
+  ✓ -90° → 270° (270.0000 ~ 270.0000)
+  ✓ -360° → 0° (0.0000 ~ 0.0000)
+  ✓ 45° → 45° (45.0000 ~ 45.0000)
+  ✓ 359.9° → 359.9° (359.9000 ~ 359.9000)
+
+4. Degenerate Azimuth at Zenith/Nadir
+  ✓ Azimuth at zenith (alt=90°) is null
+  ✓ Azimuth at nadir (alt=-90°) is null
+  ✓ Azimuth near zenith (alt=89.5°) is null
+  ✓ Azimuth near nadir (alt=-89.5°) is null
+  ✓ Azimuth at alt=85° is NOT null
+  ✓ Azimuth at horizon is NOT null
+  ✓ Azimuth at alt=20° is NOT null
+  ✓ Azimuth at alt=20° equals 45° (45.0000 ~ 45.0000)
+
+5. No NaN / Infinity in conversions
+  ✓ No NaN for (az=0, alt=0)
+  ✓ No Infinity for (az=0, alt=0)
+  ✓ No NaN for (az=0, alt=90)
+  ✓ No Infinity for (az=0, alt=90)
+  ✓ No NaN for (az=0, alt=-90)
+  ✓ No Infinity for (az=0, alt=-90)
+  ✓ No NaN for (az=180, alt=45)
+  ✓ No Infinity for (az=180, alt=45)
+  ✓ No NaN for (az=359.999, alt=0)
+  ✓ No Infinity for (az=359.999, alt=0)
+  ✓ No NaN for (az=0.001, alt=89.999)
+  ✓ No Infinity for (az=0.001, alt=89.999)
+  ✓ No NaN for (az=270, alt=-89.999)
+  ✓ No Infinity for (az=270, alt=-89.999)
+
+6. FOV-to-LOD Mapping with Hysteresis
+  ✓ FOV=60 stays medium
+  ✓ FOV=25 → fine
+  ✓ FOV=32 stays fine (hysteresis, exit=35)
+  ✓ FOV=36 → medium (above exit=35)
+  ✓ FOV=85 → coarse
+  ✓ FOV=77 stays coarse (hysteresis, exit=75)
+  ✓ FOV=74 → medium (below exit=75)
+
+7. Cardinal Direction Mapping
+  ✓ 0° = N
+  ✓ 45° = NE
+  ✓ 90° = E
+  ✓ 135° = SE
+  ✓ 180° = S
+  ✓ 225° = SO
+  ✓ 270° = O
+  ✓ 315° = NO
+  ✓ 359° = N
+  ✓ 22° = N (boundary)
+  ✓ 23° = NE (boundary)
+
+8. Grid Build Count Stability Concept
+  ✓ LOD switches with hysteresis = 2 (expected 2)
+
+9. Altitude Circle Position Correctness
+  ✓ Alt 30° Y = sin(30°) = 0.5000 (0.5000 ~ 0.5000)
+  ✓ Alt 30° horizontal radius = cos(30°) = 0.8660 (0.8660 ~ 0.8660)
+
+10. Grid Composition Behind Celestial Content
+MGP: [HorizontalGrid] [constructor] [Geometria construïda: 3 builds, 241488 bytes]
+  ✓ horizontal grid exposes persistent line primitives
+  ✓ grid lines do not occlude stars or trails in the depth buffer
+  ✓ grid lines render before stellar content
+MGP: [HorizontalGrid] [dispose] [Recursos de grid alliberats]
+
+=== Test Results: 72 passed, 0 failed ===
+=== TerraLab3D Phase 3.5 Navigation Tests ===
+
+1. GroundFollower — Flat Grounding
+  ✓ Move on flat terrain should not be blocked
+  ✓ Actor should be grounded
+  ✓ Height must equal exactly groundHeight + eyeHeight (10 + 1.7) (11.7000 ~ 11.7000)
+  ✓ East position should match proposed (5.0000 ~ 5.0000)
+
+2. GroundFollower — Slope Following (Uphill & Downhill)
+  ✓ Gentle 10° slope should be walkable
+  ✓ Height follows slope exactly (1.76 + 1.7) (3.4600 ~ 3.4600)
+
+3. GroundFollower — Steep Slope Rejection (>45°)
+  ✓ Uphill movement on 60° slope must be BLOCKED
+  ✓ Reason must be slope_exceeded
+
+4. GroundFollower — Step Height Rejection
+  ✓ Step of 2.0m must be BLOCKED
+  ✓ Reason must be step_exceeded
+
+5. GroundFollower — Fallback on Invalid Sample
+  ✓ Out-of-bounds movement must be BLOCKED
+  ✓ Pose must fall back to last safe grounded pose (9.0000 ~ 9.0000)
+
+6. CameraVisualSmoother — Visual Isolation
+  ✓ First frame snaps to physical pose (1.7000 ~ 1.7000)
+  ✓ Smoothed visual height moves towards target
+  ✓ Smoothed visual height lags behind physical jump (visual smoothing)
+  ✓ Physical pose remains EXACT (3.7m) (3.7000 ~ 3.7000)
+
+7. Architecture — TerrainSampler Interface Decoupling
+  ✓ GroundFollower works with custom DEM TerrainSampler without changes
+  ✓ Height resolves to DEM height + eyeHeight (42 + 1.7) (43.7000 ~ 43.7000)
+
+8. Flight â€” DEM clearance and speed limit
+MGP: [CameraRigImpl] [setTerrainDependencies] [Dependències de terreny connectades]
+MGP: [CameraRigImpl] [setNavigationMode] [Mode canviat walk → flight]
+  ✓ Flight is lifted to real DEM height plus minimum clearance (102.0000 ~ 102.0000)
+  ✓ Flight boost is capped at 250 m/s
+MGP: [CameraRigImpl] [setNavigationMode] [Mode canviat flight → walk]
+  ✓ Landing preserves flight east coordinate (245.0000 ~ 245.0000)
+  ✓ Landing preserves flight north coordinate (-180.0000 ~ -180.0000)
+  ✓ Landing projects onto DEM at the current coordinate (101.7000 ~ 101.7000)
+
+=== Test Results: 23 passed, 0 failed ===
+MGP: [CameraRigImpl] [setTerrainDependencies] [Dependències de terreny connectades]
+MGP: [CameraRigImpl] [setNavigationMode] [Mode canviat walk → flight]
+MGP: [CameraRigImpl] [gotoFlightTo] [Destino DEM east_m=100.0 north_m=0.0 duration_s=10 speed_mps=14.0]
+MGP: [CameraRigImpl] [finishGotoFlight] [Trajecte Goto finalitzat amb Ã¨xit]
+MGP: [CameraRigImpl] [gotoFlightTo] [Destino DEM east_m=250.0 north_m=0.0 duration_s=10 speed_mps=15.0]
+MGP: [CameraRigImpl] [gotoFlightTo] [Destino DEM east_m=400.0 north_m=0.0 duration_s=10 speed_mps=28.5]
+MGP: [CameraRigImpl] [finishGotoFlight] [Trajecte Goto finalitzat amb Ã¨xit]
+MGP: [CameraRigImpl] [gotoFlightTo] [Destino DEM east_m=500.0 north_m=0.0 duration_s=10 speed_mps=10.0]
+MGP: [CameraRigImpl] [cancelGotoFlight] [Trajecte Goto cancelÂ·lat]
+Terrain Goto tests: 24 passed, 0 failed
+MGP: [StarSpatialIndex] [build] [Linear scan: 1 estrelles, 0.0 ms]
+MGP: [StarPickProvider] [buildIndex] [Índex construït: test-stars (1 estrelles)]
+MGP: [StarSpatialIndex] [dispose] [Índex alliberat]
+Solar system tests: 80 passed, 0 failed
+Solar system Step 8.6 tests: 29 passed, 0 failed
+MGP: [ShadowController] [setQuality] [Qualitat canviada previous=off current=medium]
+MGP: [SceneLightingController.ts] [constructor] [Llums persistents creades]
+MGP: [SceneLightingController.ts] [applySnapshot] [Primer snapshot generation=1]
+MGP: [ShadowController] [setQuality] [Qualitat canviada previous=medium current=off]
+MGP: [ShadowController] [setQuality] [Qualitat canviada previous=off current=medium]
+MGP: [ShadowController] [setQuality] [Qualitat canviada previous=medium current=high]
+MGP: [NavigationWorld] [prepare] [Construint terreny tècnic]
+MGP: [NavigationWorld] [prepare] [Zona navegable preparada generation=4]
+MGP: [NavigationWorld] [setTechnicalPresentationVisible] [Presentació tècnica oculta; perfil DEM actiu]
+MGP: [NavigationWorld] [setTechnicalPresentationVisible] [Presentació tècnica visible]
+MGP: [ShadowController.ts] [dispose] [Recursos d'ombres alliberats]
+MGP: [SceneLightingController.ts] [dispose] [Llums persistents retirades]
+Lighting Step 8.7 tests: 50 passed, 0 failed
+=== TerraLab3D Step 9 frontend tests ===
+Step 9 frontend tests: 40 passed, 0 failed
+=== TerraLab3D Step 22 frontend tests ===
+Step 22 frontend tests: 21 passed, 0 failed
+constellation_step23.test.ts: OK
+=== TerraLab3D Step 10 galactic tests ===
+Step 10 galactic tests: 31 passed, 0 failed
+Running TrackingTargetResolver tests...
+TrackingTargetResolver tests passed.
+=== TerraLab3D Tracking Precision & Float32 Emulation Tests ===
+Float32(view) * Float32(model) error: 0.00px, 3.58px
+Float32(modelView) error: 0.0006px, 0.0002px
+  ✓ Float32 jitter validation passed.
+  ✓ Wheel zoom tracking isolation passed.
+=== All Tracking Precision Tests Passed ===
+Star trail tests: 64 passed, 0 failed
+Star visual tests: 7 passed, 0 failed
+MGP: [StarSpatialIndex] [build] [Linear scan: 1 estrelles, 0.0 ms]
+MGP: [StarPickProvider] [buildIndex] [Índex construït: ridge-stars (1 estrelles)]
+MGP: [CelestialSelectionController] Selection changed: {
+  kind: 'star',
+  resourceId: 'ridge-stars',
+  resourceVersion: '1',
+  catalogIndex: 0
+} Source: pick
+Horizon frontend metrics: {"horizonUploadBytes":13824,"horizonTextureBuildCount":8,"activeTextureCount":1,"horizonLookupCpuP50":0.00010000000000331966,"horizonLookupCpuP95":0.00019999999999242846,"geometryBuildCount":6,"geometryUploadBytes":60624,"activeMeshCount":1}
+MGP: [StarSpatialIndex] [dispose] [Índex alliberat]
+Horizon Step 15 tests: 35 passed, 0 failed
+DEM terrain layer tests: 28 passed, 0 failed
+=== TerraLab3D Land Cover Banked Categorical Texture & WebGL Lifecycle Tests ===
+
+1. Creació inicial de la cobertura
+  ✓ No banks allocated initially
+  ✓ activeCoverageTexture is null initially
+  ✓ emptyCoverageTexture is a valid fallback DataArrayTexture
+  ✓ emptyCoverageTexture has width 1
+  ✓ emptyCoverageTexture has depth 1
+  ✓ emptyPaletteTexture is a valid DataTexture
+  ✓ paletteTexture defaults to emptyPaletteTexture
+
+2. Recepció de la primera tile (lazy allocation)
+MGP: LandCoverTextureManager.initGlobalBuffer [INICI]
+[LandCoverTextureManager] initGlobalBuffer: bounds=-20480,-20480,20480,20480, res=10, dimensions=4096x4096
+MGP: LandCoverTextureManager.initGlobalBuffer [FI]
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=landcover.0_0.g1, bounds=-20480,-20480,-10240,-10240, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] Allocated 1 texture bank(s) for totalDepth=16 (4x4 tiles). Total CPU Memory: 32.0MB
+[LandCoverTextureManager] layer 12 (bank 0, localLayer 12) update requested (col=0, row=3, tileKey=landcover.0_0.g1)
+MGP: LandCoverTextureManager.addTile [FI]
+  ✓ First tile accepted successfully
+  ✓ 1 bank allocated for 16 layers (<=256)
+  ✓ Bank 0 depth matches 16 layers
+  ✓ Array texture width matches tile width (1024)
+  ✓ Array texture height matches tile height (1024)
+  ✓ Texture format is RedIntegerFormat
+  ✓ Texture type is UnsignedShortType
+  ✓ Texture internalFormat is R16UI
+  ✓ Layer 12 update registered in Bank 0 layerUpdates set
+  ✓ Bank 0 texture version incremented for GPU upload
+
+3. Suport per radi complet de 150 km (900 rajoles en 4 bancs)
+MGP: LandCoverTextureManager.initGlobalBuffer [INICI]
+[LandCoverTextureManager] initGlobalBuffer: bounds=-153600,-153600,153600,153600, res=10, dimensions=30720x30720
+MGP: LandCoverTextureManager.initGlobalBuffer [FI]
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=tile.bank0, bounds=-153600,143360,-143360,153600, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] Allocated 4 texture bank(s) for totalDepth=900 (30x30 tiles). Total CPU Memory: 1800.0MB
+[LandCoverTextureManager] layer 0 (bank 0, localLayer 0) update requested (col=0, row=0, tileKey=tile.bank0)
+MGP: LandCoverTextureManager.addTile [FI]
+  ✓ 4 banks allocated for 900 layers (256, 256, 256, 132)
+  ✓ Bank 0 has depth 256
+  ✓ Bank 1 has depth 256
+  ✓ Bank 2 has depth 256
+  ✓ Bank 3 has depth 132
+  ✓ Total depth is exactly 900 layers for 150km coverage
+  ✓ Bank 0 received localLayer 0 update
+
+4. Actualització parcial de layers a bancs diferents
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=tile.bank1, bounds=-153600,40960,-143360,51200, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] layer 300 (bank 1, localLayer 44) update requested (col=0, row=10, tileKey=tile.bank1)
+MGP: LandCoverTextureManager.addTile [FI]
+  ✓ Bank 1 received localLayer 44 update for globalLayer 300
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=tile.bank3, bounds=-51200,-143360,-40960,-133120, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] layer 850 (bank 3, localLayer 82) update requested (col=10, row=28, tileKey=tile.bank3)
+MGP: LandCoverTextureManager.addTile [FI]
+  ✓ Bank 3 received localLayer 82 update for globalLayer 850
+
+5. Canvi de cobertura o regeneració de la textura
+MGP: LandCoverTextureManager.initGlobalBuffer [INICI]
+[LandCoverTextureManager] initGlobalBuffer: bounds=-10240,-10240,10240,10240, res=10, dimensions=2048x2048
+MGP: LandCoverTextureManager.initGlobalBuffer [FI]
+  ✓ Old banks are disposed upon buffer bounds re-initialization
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=landcover.new_0_0.g2, bounds=-10240,-10240,0,0, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] Allocated 1 texture bank(s) for totalDepth=4 (2x2 tiles). Total CPU Memory: 8.0MB
+[LandCoverTextureManager] layer 2 (bank 0, localLayer 2) update requested (col=0, row=1, tileKey=landcover.new_0_0.g2)
+MGP: LandCoverTextureManager.addTile [FI]
+  ✓ New single bank allocated for small 2x2 grid
+  ✓ New bank depth matches 4 layers
+
+6. dispose() i posterior recreació
+  ✓ All banks disposed on manager.dispose()
+MGP: LandCoverTextureManager.initGlobalBuffer [INICI]
+[LandCoverTextureManager] initGlobalBuffer: bounds=-10240,-10240,10240,10240, res=10, dimensions=2048x2048
+MGP: LandCoverTextureManager.initGlobalBuffer [FI]
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=landcover.recreated.g3, bounds=-10240,-10240,0,0, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] Allocated 1 texture bank(s) for totalDepth=4 (2x2 tiles). Total CPU Memory: 8.0MB
+[LandCoverTextureManager] layer 2 (bank 0, localLayer 2) update requested (col=0, row=1, tileKey=landcover.recreated.g3)
+MGP: LandCoverTextureManager.addTile [FI]
+  ✓ Manager recreates bank cleanly after dispose
+
+7. Recepció de tile abans/després de la llegenda
+MGP: LandCoverTextureManager.updateLegend [INICI]
+MGP: LandCoverTextureManager.updateLegend [FI]
+  ✓ paletteTexture updated with custom legend
+  ✓ LUT palette texture is 256x256
+  ✓ LUT palette texture height is 256
+  ✓ Class 62 Red channel matched in LUT
+  ✓ Class 62 Green channel matched in LUT
+  ✓ Class 62 Blue channel matched in LUT
+  ✓ Class 62 Alpha channel matched in LUT
+
+8. Identificació correcta de tileKey / resourceId
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=landcover_s2glc.0_0.g1, bounds=-10240,-10240,0,0, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] layer 2 (bank 0, localLayer 2) update requested (col=0, row=1, tileKey=landcover_s2glc.0_0.g1)
+MGP: LandCoverTextureManager.addTile [FI]
+  ✓ Tile with resourceId only (no tileKey) is accepted without being undefined
+
+9. Absència de regressions en el renderitzat DEM sense cobertura categòrica
+  ✓ hasLandCover uniform is 0 initially (no land cover)
+  ✓ landCoverTex0 uses fallback empty coverage texture
+  ✓ landCoverLUT uses fallback empty palette texture
+MGP: LandCoverTextureManager.initGlobalBuffer [INICI]
+[LandCoverTextureManager] initGlobalBuffer: bounds=-20480,-20480,20480,20480, res=10, dimensions=4096x4096
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [INICI]
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [FI]
+MGP: LandCoverTextureManager.initGlobalBuffer [FI]
+MGP: LandCoverTextureManager.addTile [INICI]
+[LandCoverTextureManager] addTile rebut: tileKey=landcover.0_0.g1, bounds=-20480,-20480,-10240,-10240, size=1024x1024, dataLen=1048576
+[LandCoverTextureManager] Allocated 1 texture bank(s) for totalDepth=16 (4x4 tiles). Total CPU Memory: 32.0MB
+[LandCoverTextureManager] layer 12 (bank 0, localLayer 12) update requested (col=0, row=3, tileKey=landcover.0_0.g1)
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [INICI]
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [FI]
+MGP: LandCoverTextureManager.addTile [FI]
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [INICI]
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [FI]
+  ✓ hasLandCover uniform becomes 1 once categorical coverage is active
+  ✓ landCoverTex0 binds active Bank 0 texture
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [INICI]
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [FI]
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [INICI]
+MGP: DemTerrainLayerRenderer.updateShaderUniforms [FI]
+  ✓ hasLandCover uniform returns to 0 on clear()
+  ✓ landCoverTex0 safely falls back to emptyCoverageTexture
+
+10. Verificació de no regressió a la Lluna
+  ✓ First configureResource loads albedo and normal textures
+  ✓ Second configureResource with same descriptor is idempotent (no reload)
+  ✓ Moon surfaceStatus remains ready (no flickering)
+
+=== Land Cover Test Results: 49 passed, 0 failed ===
+Frontend hot-path tests: 18 passed, 0 failed
+Temporal scene tests: 7 passed, 0 failed
+Paso 19 observation tests passed
+Paso 21 measurement tests passed
+DomeProfile 7.13: 621 comprovacions superades
+DomeProfile adaptatiu v2: 768 comprovacions superades

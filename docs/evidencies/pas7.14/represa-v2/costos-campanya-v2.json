@@ -1,0 +1,66 @@
+[
+  {
+    "part": "controls",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14_v2.py",
+      "--part",
+      "controls"
+    ],
+    "exitCode": 4294967295,
+    "wallSeconds": 108.36332100000004,
+    "newPhysicalLos": 0,
+    "serial": true,
+    "blasThreads": 1
+  },
+  {
+    "part": "controls-v3",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14_v2.py",
+      "--part",
+      "controls"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 27.728644499999973,
+    "newPhysicalLos": 0,
+    "serial": true,
+    "blasThreads": 1
+  },
+  {
+    "part": "spectral-v3",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14_v2.py",
+      "--part",
+      "spectral"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 42.871200400000134,
+    "newPhysicalLos": 0,
+    "serial": true,
+    "blasThreads": 1
+  },
+  {
+    "part": "qualification-v3",
+    "command": [
+      "C:\\Users\\Manel\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "-X",
+      "utf8",
+      "tools/validate_photometry_step7_14_v2.py",
+      "--part",
+      "qualification"
+    ],
+    "exitCode": 0,
+    "wallSeconds": 0.8872948000000633,
+    "newPhysicalLos": 0,
+    "serial": true,
+    "blasThreads": 1
+  }
+]

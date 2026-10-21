@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "ownerStep": "7.14",
+  "recordedAtUtc": "2026-10-20T00:03:20.284869+00:00",
+  "purpose": "Investigació de noves pistes primàries i diagnòstic de cost, sense canviar el runtime científic.",
+  "inheritedCriteria": {
+    "spectralMaximumMag": 0.01,
+    "projectionRelativeMaximum": 1e-10,
+    "coverageAllocationMag": 0.001,
+    "combinedMaximumMag": 0.01,
+    "fovQuadratureMaximumMag": 0.0001
+  },
+  "campaign": {
+    "newPhysicalLos": 0,
+    "retainedCases": 13,
+    "profilingCase": "S_B4_chamber_point_5km-0",
+    "timedRepeats": 3,
+    "estimatedScientificSeconds": 40,
+    "maximumScientificSeconds": 180,
+    "serial": true
+  },
+  "decisions": {
+    "runtimeMutation": false,
+    "unknownTailsAreZero": false,
+    "individualCalibrationRequiredForNominalAB": false,
+    "nativeAndObservationAreSeparate": true,
+    "nominalGaussianIsInstrumentalEnvelope": false
+  },
+  "sourceRule": "Només dades conjuntes o components d’una mateixa configuració acreditada. No digitalitzar figures ni empalmar lots per fingir cobertura. L’absència d’un annex a l’XML consultat no prova que les dades no existeixin.",
+  "exitRule": "Gate científic només amb SQM-L i TESS-W nominals, coordenada, suport/cues i cobertura suficients acreditats. Altrament mantenir bloqueig; no7.15 ni7.18–7.22."
+}

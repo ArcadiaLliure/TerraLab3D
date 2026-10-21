@@ -1,0 +1,12 @@
+
+  .test-dist\solar_system.test.js               837.6kb
+  .test-dist\astronomical_events_step9.test.js  787.5kb
+  .test-dist\lighting_step8_7.test.js           718.9kb
+  .test-dist\galactic_step10.test.js            683.8kb
+  .test-dist\constellation_step23.test.js       674.6kb
+  ...and 18 more output files...
+
+Done in 804ms
+MGP: [GroundFollower] [resolve] [Pendent rebutjada slope_deg=60.0 limit_deg=45]
+MGP: [GroundFollower] [resolve] [Step rebutjat step_m=2.00 limit_m=0.5]
+MGP: [GroundFollower] [resolve] [Mostra invàlida; es conserva lastSafeGroundedPose]

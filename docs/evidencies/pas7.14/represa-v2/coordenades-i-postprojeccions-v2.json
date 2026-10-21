@@ -1,0 +1,949 @@
+{
+  "fluxControls": [
+    {
+      "spectrumId": "LED-B1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 442,
+      "nativeIntegral": 3206.775189872811,
+      "vacuumIntegral": 3206.7751898393276,
+      "relativeError": 1.0441536524297135e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-B2",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 473,
+      "nativeIntegral": 3185.419567701828,
+      "vacuumIntegral": 3185.419567679678,
+      "relativeError": 6.9535488478322804e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-B3",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 535,
+      "nativeIntegral": 3155.0463216816793,
+      "vacuumIntegral": 3155.046321684166,
+      "relativeError": 7.880363028789361e-13,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-B4",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 550,
+      "nativeIntegral": 3131.5527751653317,
+      "vacuumIntegral": 3131.5527751795335,
+      "relativeError": 4.5350390109888394e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-B5",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 527,
+      "nativeIntegral": 3275.4934797887026,
+      "vacuumIntegral": 3275.493479782739,
+      "relativeError": 1.8206547380827942e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-BH1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 463,
+      "nativeIntegral": 2895.886737715752,
+      "vacuumIntegral": 2895.886737661219,
+      "relativeError": 1.8831269876784518e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-RGB1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 451,
+      "nativeIntegral": 3431.4459825918807,
+      "vacuumIntegral": 3431.445982558307,
+      "relativeError": 9.784062449114117e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-V1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 512,
+      "nativeIntegral": 4245.125607886877,
+      "vacuumIntegral": 4245.125607844009,
+      "relativeError": 1.0098144542780574e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-V2",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 553,
+      "nativeIntegral": 4058.082563577493,
+      "vacuumIntegral": 4058.0825635873175,
+      "relativeError": 2.4209523274976164e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "HP1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 81,
+      "vacuumKnots": 354,
+      "nativeIntegral": 12652.175000000001,
+      "vacuumIntegral": 12652.175000305997,
+      "relativeError": 2.4185320413039335e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "HP2",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 81,
+      "vacuumKnots": 433,
+      "nativeIntegral": 24478.85,
+      "vacuumIntegral": 24478.850000111375,
+      "relativeError": 4.5499159995188165e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "HP3",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 81,
+      "vacuumKnots": 445,
+      "nativeIntegral": 16604.15,
+      "vacuumIntegral": 16604.15000056826,
+      "relativeError": 3.42239570017e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "HP4",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 81,
+      "vacuumKnots": 524,
+      "nativeIntegral": 17900.375,
+      "vacuumIntegral": 17900.37500041604,
+      "relativeError": 2.3241852886712877e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "HP5",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 81,
+      "vacuumKnots": 544,
+      "nativeIntegral": 19385.775,
+      "vacuumIntegral": 19385.775000334124,
+      "relativeError": 1.723554632349078e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "S_L41(lambda)",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 471,
+      "vacuumKnots": 605,
+      "nativeIntegral": 3162.4502815,
+      "vacuumIntegral": 3162.4502815028136,
+      "relativeError": 8.897327319346005e-13,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 494,
+      "nativeIntegral": 3415.163109567895,
+      "vacuumIntegral": 3415.1631095160187,
+      "relativeError": 1.518996040061893e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL2",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 494,
+      "nativeIntegral": 2968.1862936450016,
+      "vacuumIntegral": 2968.1862936042553,
+      "relativeError": 1.3727685654885136e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 494,
+      "nativeIntegral": 2777.6705912360703,
+      "vacuumIntegral": 2777.6705912015163,
+      "relativeError": 1.2439937968622417e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL4",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 494,
+      "nativeIntegral": 2698.2097221717636,
+      "vacuumIntegral": 2698.2097221398203,
+      "relativeError": 1.1838641178485432e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL5",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 494,
+      "nativeIntegral": 3315.3953631311915,
+      "vacuumIntegral": 3315.3953630803476,
+      "relativeError": 1.5335732683752212e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL6",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 494,
+      "nativeIntegral": 2825.132214982577,
+      "vacuumIntegral": 2825.1322149432203,
+      "relativeError": 1.393085646839154e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL7",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 497,
+      "nativeIntegral": 3935.4362454691736,
+      "vacuumIntegral": 3935.436245403629,
+      "relativeError": 1.6655010703914286e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL8",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 499,
+      "nativeIntegral": 3940.214484408418,
+      "vacuumIntegral": 3940.2144843413753,
+      "relativeError": 1.701494500849776e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL9",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 499,
+      "nativeIntegral": 3711.6318305320337,
+      "vacuumIntegral": 3711.6318304708225,
+      "relativeError": 1.6491696896991925e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL10",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 573,
+      "nativeIntegral": 3074.7568582281624,
+      "vacuumIntegral": 3074.7568582586177,
+      "relativeError": 9.904965736495797e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL11",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 566,
+      "nativeIntegral": 2967.81936534208,
+      "vacuumIntegral": 2967.8193654228844,
+      "relativeError": 2.7226887411302414e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL12",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 555,
+      "nativeIntegral": 2831.740578809529,
+      "vacuumIntegral": 2831.7405788507376,
+      "relativeError": 1.4552359317576702e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 482,
+      "nativeIntegral": 13518.111451067596,
+      "vacuumIntegral": 13518.111450975623,
+      "relativeError": 6.803779761810347e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.2",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 482,
+      "nativeIntegral": 16140.215524091402,
+      "vacuumIntegral": 16140.215523949479,
+      "relativeError": 8.793077377333702e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.3",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 482,
+      "nativeIntegral": 16685.31123970591,
+      "vacuumIntegral": 16685.311239529594,
+      "relativeError": 1.056710274838224e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.4",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 476,
+      "nativeIntegral": 19431.857621664567,
+      "vacuumIntegral": 19431.857621457817,
+      "relativeError": 1.0639711334192725e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.5",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 474,
+      "nativeIntegral": 19780.0877737328,
+      "vacuumIntegral": 19780.08777344215,
+      "relativeError": 1.4694245820123797e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.6",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 474,
+      "nativeIntegral": 19600.043229645762,
+      "vacuumIntegral": 19600.043229340758,
+      "relativeError": 1.5561441024658507e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.7",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 572,
+      "nativeIntegral": 14109.344447202524,
+      "vacuumIntegral": 14109.344447689848,
+      "relativeError": 3.453903829608862e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.8",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 558,
+      "nativeIntegral": 14648.972488197918,
+      "vacuumIntegral": 14648.972488706744,
+      "relativeError": 3.473465959302757e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.9",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 548,
+      "nativeIntegral": 15321.31196320407,
+      "vacuumIntegral": 15321.311963645765,
+      "relativeError": 2.882871719123159e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.10",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 554,
+      "nativeIntegral": 4050.775118698783,
+      "vacuumIntegral": 4050.7751187572962,
+      "relativeError": 1.4444889728792987e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.11",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 538,
+      "nativeIntegral": 15872.161973901508,
+      "vacuumIntegral": 15872.161973837998,
+      "relativeError": 4.001354803051527e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.12",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 504,
+      "nativeIntegral": 17105.288998355194,
+      "vacuumIntegral": 17105.28899816647,
+      "relativeError": 1.1033063351817418e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.13",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 484,
+      "nativeIntegral": 17590.404240656648,
+      "vacuumIntegral": 17590.404240459447,
+      "relativeError": 1.1210699035757443e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.14",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 481,
+      "nativeIntegral": 18407.23998027053,
+      "vacuumIntegral": 18407.239979939568,
+      "relativeError": 1.7979950861501948e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "FL3.15",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 536,
+      "nativeIntegral": 144331.1923753144,
+      "vacuumIntegral": 144331.1923772042,
+      "relativeError": 1.3093526263219246e-11,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "CIE_LED_B1_B5:2800K:cie-tables-2026-10-18-v1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 453,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 0.9999999999908104,
+      "relativeError": 9.189649041729808e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "CIE_LED_B1_B5:3000K:cie-tables-2026-10-18-v1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 473,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 0.9999999999930526,
+      "relativeError": 6.947442621196842e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "CIE_LED_B1_B5:4000K:cie-tables-2026-10-18-v1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 535,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 1.0000000000004923,
+      "relativeError": 4.922728891187944e-13,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "CIE_LED_B1_B5:5000K:cie-tables-2026-10-18-v1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 547,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 1.00000000000331,
+      "relativeError": 3.3100189256174417e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "CIE_LED_B1_B5:6500K:cie-tables-2026-10-18-v1",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 527,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 0.9999999999979807,
+      "relativeError": 2.0192736371882347e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-B1-HP1-radiant_flux",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 529,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 0.9999999999912282,
+      "relativeError": 8.7717610952609e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-B1-HP1-photopic_flux",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 529,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 0.9999999999911734,
+      "relativeError": 8.826606112677382e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-RGB1-HP1-radiant_flux",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 561,
+      "nativeIntegral": 1.0,
+      "vacuumIntegral": 1.0000000000077063,
+      "relativeError": 7.706280058528137e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "LED-RGB1-HP1-photopic_flux",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 401,
+      "vacuumKnots": 563,
+      "nativeIntegral": 0.9999999999999999,
+      "vacuumIntegral": 1.000000000009935,
+      "relativeError": 9.935163802765601e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "triangle-435.25",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 5,
+      "vacuumKnots": 35,
+      "nativeIntegral": 0.5,
+      "vacuumIntegral": 0.4999999999999774,
+      "relativeError": 4.518607710224387e-14,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "triangle-500.005",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 5,
+      "vacuumKnots": 5,
+      "nativeIntegral": 0.0049999999999954525,
+      "vacuumIntegral": 0.005000000000002679,
+      "relativeError": 1.4452883334570288e-12,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "triangle-589.02",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 5,
+      "vacuumKnots": 7,
+      "nativeIntegral": 0.049999999999954525,
+      "vacuumIntegral": 0.04999999999998052,
+      "relativeError": 5.198064201294983e-13,
+      "passCriterion": true
+    },
+    {
+      "spectrumId": "triangle-700.005",
+      "scenarioBasis": "standard_air_450ppm_nm explicit; no requalifica el catàleg heretat",
+      "originalKnots": 5,
+      "vacuumKnots": 5,
+      "nativeIntegral": 0.0049999999999954525,
+      "vacuumIntegral": 0.005000000000036136,
+      "relativeError": 8.136824547477772e-12,
+      "passCriterion": true
+    }
+  ],
+  "postProjections": [
+    {
+      "name": "S_B4_chamber_point_5km-0",
+      "coordinateProjection": {
+        "signal": {
+          "value": 1.267113621743669e-11,
+          "los_error_estimate": 2.246496746595576e-20,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "registered-0"
+        },
+        "refinement_error": 1.6155871338926322e-27,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 1.2671136217436691e-11,
+      "relativeError": 1.1102230246251565e-16,
+      "passCriterion": true,
+      "legacyCie": 1.2671231440869424e-11,
+      "coordinateChangeMag": 8.159263558539535e-06,
+      "postWallSeconds": 0.807150399999955
+    },
+    {
+      "name": "S_B4_chamber_point_5km-160",
+      "coordinateProjection": {
+        "signal": {
+          "value": 2.9435443486640953e-10,
+          "los_error_estimate": 2.1683945834794097e-19,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "registered-160"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 2.9435443486640953e-10,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 2.9431951764830216e-10,
+      "coordinateChangeMag": -0.00012880096953878992,
+      "postWallSeconds": 0.8131290999999692
+    },
+    {
+      "name": "S_B4_chamber_point_5km-220",
+      "coordinateProjection": {
+        "signal": {
+          "value": 2.0398714826365843e-09,
+          "los_error_estimate": 1.4255612247438715e-17,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "registered-220"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 2.0398714826365843e-09,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 2.0395547341450598e-09,
+      "coordinateChangeMag": -0.0001686047436412138,
+      "postWallSeconds": 0.799712799999952
+    },
+    {
+      "name": "C_realista_chamber_point_5km-0",
+      "coordinateProjection": {
+        "signal": {
+          "value": 0.002354712444003233,
+          "los_error_estimate": 4.056911606967834e-12,
+          "unit": "relative m^-2 sr^-1",
+          "scale_id": "unknown_L3_to_upward_flux_scale",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "C:led_dominant:uniform_upward:963ce893260d209d",
+          "direction_id": "registered-0"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 0.002354712444003233,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 0.0023525621392949977,
+      "coordinateChangeMag": -0.0009919386660249435,
+      "postWallSeconds": 0.887544200000093
+    },
+    {
+      "name": "C_realista_chamber_point_5km-160",
+      "coordinateProjection": {
+        "signal": {
+          "value": 0.05530172741544614,
+          "los_error_estimate": 3.995695127068173e-11,
+          "unit": "relative m^-2 sr^-1",
+          "scale_id": "unknown_L3_to_upward_flux_scale",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "C:led_dominant:uniform_upward:963ce893260d209d",
+          "direction_id": "registered-160"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 0.05530172741544614,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 0.05524489653401618,
+      "coordinateChangeMag": -0.001116331711420689,
+      "postWallSeconds": 0.8501240999999027
+    },
+    {
+      "name": "C_realista_chamber_point_5km-220",
+      "coordinateProjection": {
+        "signal": {
+          "value": 0.384449073341926,
+          "los_error_estimate": 2.626218072601737e-09,
+          "unit": "relative m^-2 sr^-1",
+          "scale_id": "unknown_L3_to_upward_flux_scale",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "C:led_dominant:uniform_upward:963ce893260d209d",
+          "direction_id": "registered-220"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 0.384449073341926,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 0.3840415825297722,
+      "coordinateChangeMag": -0.001151419515503603,
+      "postWallSeconds": 0.8156023999999888
+    },
+    {
+      "name": "C_kelvins3000_chamber_point_5km-0",
+      "coordinateProjection": {
+        "signal": {
+          "value": 0.002400285210180906,
+          "los_error_estimate": 4.158475552902772e-12,
+          "unit": "relative m^-2 sr^-1",
+          "scale_id": "unknown_L3_to_upward_flux_scale",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "C:led_dominant:uniform_upward:46611fa0a8429e28",
+          "direction_id": "registered-0"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 0.002400285210180906,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 0.002398837015451484,
+      "coordinateChangeMag": -0.0006552687858632744,
+      "postWallSeconds": 0.7960771000000477
+    },
+    {
+      "name": "C_kelvins3000_chamber_point_5km-160",
+      "coordinateProjection": {
+        "signal": {
+          "value": 0.05614964333847899,
+          "los_error_estimate": 4.066179305423775e-11,
+          "unit": "relative m^-2 sr^-1",
+          "scale_id": "unknown_L3_to_upward_flux_scale",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "C:led_dominant:uniform_upward:46611fa0a8429e28",
+          "direction_id": "registered-160"
+        },
+        "refinement_error": 6.938893903907228e-18,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 0.056149643338478994,
+      "relativeError": 1.1102230246251565e-16,
+      "passCriterion": true,
+      "legacyCie": 0.056108671410919735,
+      "coordinateChangeMag": -0.0007925418656850042,
+      "postWallSeconds": 0.810053200000084
+    },
+    {
+      "name": "C_kelvins3000_chamber_point_5km-220",
+      "coordinateProjection": {
+        "signal": {
+          "value": 0.38990062195659747,
+          "los_error_estimate": 2.672781563039572e-09,
+          "unit": "relative m^-2 sr^-1",
+          "scale_id": "unknown_L3_to_upward_flux_scale",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "C:led_dominant:uniform_upward:46611fa0a8429e28",
+          "direction_id": "registered-220"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 0.38990062195659747,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 0.3896021551922826,
+      "coordinateChangeMag": -0.0008314433181503656,
+      "postWallSeconds": 0.827632900000026
+    },
+    {
+      "name": "S-mountain-23.61",
+      "coordinateProjection": {
+        "signal": {
+          "value": 0.0,
+          "los_error_estimate": 0.0,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "terrain"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 0.0,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 0.0,
+      "coordinateChangeMag": null,
+      "postWallSeconds": 0.8102140000000873
+    },
+    {
+      "name": "S-mountain-23.89",
+      "coordinateProjection": {
+        "signal": {
+          "value": 6.970634224294123e-11,
+          "los_error_estimate": 5.547709072873541e-19,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "terrain"
+        },
+        "refinement_error": 1.2924697071141057e-26,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 6.970634224294125e-11,
+      "relativeError": 2.220446049250313e-16,
+      "passCriterion": true,
+      "legacyCie": 6.970588672377389e-11,
+      "coordinateChangeMag": -7.095125809607909e-06,
+      "postWallSeconds": 0.8166859000000386
+    },
+    {
+      "name": "S-area400m",
+      "coordinateProjection": {
+        "signal": {
+          "value": 1.2746006942191085e-11,
+          "los_error_estimate": 1.5343086847474432e-21,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "area"
+        },
+        "refinement_error": 1.6155871338926322e-27,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 1.2746006942191087e-11,
+      "relativeError": 1.1102230246251565e-16,
+      "passCriterion": true,
+      "legacyCie": 1.2746080123611078e-11,
+      "coordinateChangeMag": 6.23375536068506e-06,
+      "postWallSeconds": 0.7950433000000885
+    },
+    {
+      "name": "S-COESA75km-52.19",
+      "coordinateProjection": {
+        "signal": {
+          "value": 9.13986668850522e-12,
+          "los_error_estimate": 1.8867878445632456e-22,
+          "unit": "W m^-2 sr^-1",
+          "scale_id": "SI_W",
+          "response_id": "CIE-sle-photopic:standard_air_450ppm_nm:coordinate-v2",
+          "domain_nm": [
+            380.0,
+            780.0
+          ],
+          "band_set_id": "tl3d-sky-v1-transport-knot-union-simpson-1:44f124e3807ba939b8b90fa919e8b00ab242f33523d14bc970e9d0ffdb4a51db",
+          "source_id": "b1-point-000",
+          "direction_id": "coesa"
+        },
+        "refinement_error": 0.0,
+        "input_radiance_basis": "vacuum_nm",
+        "response_basis": "standard_air_450ppm_nm",
+        "scope": "Polinomi retingut declarat en buit; no transforma la SPD original ni acredita el sensor complet",
+        "physical_transport_evaluations": 0
+      },
+      "oracle": 9.13986668850522e-12,
+      "relativeError": 0.0,
+      "passCriterion": true,
+      "legacyCie": 9.141154503298658e-12,
+      "coordinateChangeMag": 0.00015297035476330635,
+      "postWallSeconds": 0.7873780999998417
+    }
+  ],
+  "wallSeconds": 26.881593900000098,
+  "newPhysicalLos": 0,
+  "scope": "Conservació del canvi de variable i projecció del polinomi existent; no nou transport ni nova homologació angular."
+}

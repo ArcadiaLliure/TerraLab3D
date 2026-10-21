@@ -1,0 +1,70 @@
+{
+  "status": "FAIL",
+  "checks": {
+    "samePyrightDiagnosticMultiset": true,
+    "sameFourColumns": true,
+    "sameB0": true,
+    "previousScientificCodeUnchanged": false,
+    "previousEvidenceUnchanged": false
+  },
+  "pyrightSummary": {
+    "filesAnalyzed": 320,
+    "errorCount": 67,
+    "warningCount": 3,
+    "informationCount": 0,
+    "timeInSec": 12.075
+  },
+  "exactColumns": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "b0Regression": {
+    "expectedSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "actualSignature": "21d3453df822b95d56aa508fee6bd9c76e712b27c63f3f03a3222e86e075b53e",
+    "identical": true,
+    "scope": "900_LOS_values_counters_and_serialization;not_new_timing_campaign"
+  },
+  "previousScientificCodeCount": 36,
+  "previousScientificCodeDifferences": [
+    "backend/src/terralab3d/domain/light_pollution/__init__.py",
+    "backend/src/terralab3d/domain/light_pollution/gas_absorption.py",
+    "backend/src/terralab3d/domain/light_pollution/gauss_kronrod.py",
+    "backend/src/terralab3d/domain/light_pollution/geometric_transport.py",
+    "backend/src/terralab3d/domain/light_pollution/optical_field.py",
+    "backend/src/terralab3d/domain/light_pollution/optical_paths.py",
+    "backend/src/terralab3d/domain/light_pollution/ports.py",
+    "backend/src/terralab3d/domain/light_pollution/reference_optical_column.py",
+    "backend/src/terralab3d/domain/light_pollution/scattering.py",
+    "backend/src/terralab3d/domain/light_pollution/services.py",
+    "backend/src/terralab3d/domain/light_pollution/simulation.py",
+    "backend/src/terralab3d/domain/light_pollution/spectral_bandset.py",
+    "backend/src/terralab3d/domain/light_pollution/spectral_oracle.py",
+    "backend/src/terralab3d/domain/light_pollution/vector_quadrature.py"
+  ],
+  "historicalEvidenceCount": 247,
+  "historicalEvidenceDifferences": [
+    "docs/evidencies/pas23/runtime-i-persistencia.txt",
+    "docs/evidencies/pas23/validacio-cataleg.txt",
+    "docs/evidencies/pas7.1/auditoria-fonts.md",
+    "docs/evidencies/pas7.1/validacio-contracte.txt",
+    "docs/evidencies/pas7.11/pytest-backend-final.txt",
+    "docs/evidencies/pas7.2/validacio-adaptador.md",
+    "docs/evidencies/pas7.3/contrast-granuls-black-marble-c2.md",
+    "docs/evidencies/pas7.3/recerca-rsr-2026.md",
+    "docs/evidencies/pas7.3/revisio-multisatel-lit.md",
+    "docs/evidencies/pas7.3/validacio-model-dnb.md",
+    "docs/evidencies/pas7.4/analisi-oracle-i-bloqueig.md",
+    "docs/evidencies/pas7.4/cie-asset-manifest.json",
+    "docs/evidencies/pas7.4/criteri-preregistrat-v1.json",
+    "docs/evidencies/pas7.4/homologacio-bandset-v1.md",
+    "docs/evidencies/pas7.5/estat-inferencia-font-2026.md",
+    "docs/evidencies/pas7.5/validacio-source-model-s-v1.md",
+    "docs/evidencies/pas7.5.1/verificacio-ui.json",
+    "docs/evidencies/pas7.7/protocol-b0-v1.json",
+    "docs/evidencies/pas7.8/protocol-optical-field-v1.json",
+    "docs/evidencies/pas7.8/validacio-optical-field.md"
+  ],
+  "timing": "Benchmarks B0–B4 històrics preservats; sense nova campanya ni inferència de speedup."
+}

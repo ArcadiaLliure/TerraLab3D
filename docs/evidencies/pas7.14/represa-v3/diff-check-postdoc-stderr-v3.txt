@@ -1,0 +1,9 @@
+warning: in the working copy of 'docs/MANUAL.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/inventari-funcional.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/normes-arquitectura.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/skyglow/06-contractes-dades.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/skyglow/08-validacio-cientifica.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/skyglow/19-pla-executable-codex.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/skyglow/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/tasques/pendent/pas7.14-photometric-projections.md', LF will be replaced by CRLF the next time Git touches it

@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "baselineMechanicalIssueCount": 355,
+  "finalMechanicalIssueCount": 355,
+  "newIssues": [],
+  "resolvedIssues": [],
+  "brokenLiveLocalLinks": 0,
+  "imagesChecked": 36,
+  "snapshotArchive": "instantanies-docs-candidat-parcial-v1.zip",
+  "snapshotMeaning": "Registre inicial immutable; índex original→membreZIP i hashes verificats per l’auditor. Cap byte anterior perdut.",
+  "protectedFuturePlanningUnchanged": [
+    "docs/skyglow/21-estrategia-rendiment-interactiu.md",
+    "docs/tasques/pendent/pas7.15-atmos-era5-cams.md",
+    "docs/tasques/pendent/pas7.15-atmos-provider-standard.md",
+    "docs/tasques/pendent/pas7.18-cache-error-based.md",
+    "docs/tasques/pendent/pas7.18-source-spatial-acceleration.md",
+    "docs/tasques/pendent/pas7.19-phase-acceleration-b3.md",
+    "docs/tasques/pendent/pas7.19-uncertainty-registry.md",
+    "docs/tasques/pendent/pas7.20-ad-error-budget.md",
+    "docs/tasques/pendent/pas7.20-zenith-absolute-gate.md",
+    "docs/tasques/pendent/pas7.21-cache-scheduler.md",
+    "docs/tasques/pendent/pas7.21-dome-profile-pchip.md",
+    "docs/tasques/pendent/pas7.22-optional-runtime-acceleration.md",
+    "docs/tasques/pendent/pas7.22-photometric-projections.md"
+  ],
+  "stepState": "7.14_pending_partial_blocked;7.15_not_started"
+}

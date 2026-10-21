@@ -1,0 +1,45 @@
+{
+  "summary": [
+    {
+      "response": "CIE-sle-photopic",
+      "comparisons": 3520,
+      "maximumAbsoluteDifferenceMag": 0.014099434126479887,
+      "medianAbsoluteDifferenceMag": 0.0006733509486663521,
+      "worst": {
+        "spd": "triangle-700.005",
+        "operator": "rayleigh_only-T223.0-mu-1.0-a0.0-N0",
+        "response": "CIE-sle-photopic",
+        "magnitudeDifference": -0.014099434126479887
+      }
+    },
+    {
+      "response": "SQM-CM500-Cinzano2005-SVO-reference-v1",
+      "comparisons": 3520,
+      "maximumAbsoluteDifferenceMag": 0.01157585620706993,
+      "medianAbsoluteDifferenceMag": 0.0006105585352429943,
+      "worst": {
+        "spd": "triangle-700.005",
+        "operator": "combined-T288.15-mu1.0-a0.0-N1e+24",
+        "response": "SQM-CM500-Cinzano2005-SVO-reference-v1",
+        "magnitudeDifference": -0.01157585620706993
+      }
+    },
+    {
+      "response": "TESSW-stars1277-LICA2024-reference-v1",
+      "comparisons": 3520,
+      "maximumAbsoluteDifferenceMag": 0.000767368263652282,
+      "medianAbsoluteDifferenceMag": 0.0002905264950065163,
+      "worst": {
+        "spd": "HP2",
+        "operator": "combined-T288.15-mu1.0-a0.0-N1e+24",
+        "response": "TESSW-stars1277-LICA2024-reference-v1",
+        "magnitudeDifference": -0.000767368263652282
+      }
+    }
+  ],
+  "comparisonCount": 10560,
+  "measuredCalculationWallSeconds": 0.1259890000001178,
+  "newPhysicalLos": 0,
+  "decision": "DESCRIPTIVE_ONLY",
+  "scope": "Dues hipòtesis i finestres desplaçades explícites; la diferència no és error de discretització ni identifica la coordenada real del laboratori."
+}

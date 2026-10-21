@@ -1,0 +1,48 @@
+{
+  "id": "photometric-coordinate-and-nominal-qualification-v2",
+  "registeredAtUtc": "2026-10-19T23:06:33.278624+00:00",
+  "inheritedSpectralMagnitudeMaximum": 0.01,
+  "inheritedTableProjectionRelativeMaximum": 1e-10,
+  "inheritedAbReferenceRelativeMaximum": 1e-10,
+  "inheritedAngularMagnitudeMaximum": 0.0001,
+  "coordinateRoundTripMaximumNm": 2e-10,
+  "coordinateJacobianRelativeMaximum": 1e-08,
+  "coordinateFluxRelativeMaximum": 1e-10,
+  "linearizedCurveAbsoluteMaximumFractionOfPeak": 1e-10,
+  "coverageMagnitudeMaximum": 0.001,
+  "totalNumericalMagnitudeMaximum": 0.01,
+  "origins": {
+    "coordinate": "Toleràncies prospectives de representació i aritmètica, molt inferiors al pressupost0,01mag; no exactitud física del gas.",
+    "coverage": "Assignació prospectiva 0,001mag, una dècada per sota de0,01mag. Sense cota de radiància/resposta en una regió absent, no hi ha PASS.",
+    "total": "Conservar el pressupost0,01mag; no sumar assignacions per autoritzar un llindar superior."
+  },
+  "coordinateModel": {
+    "formula": "NIST/Ciddor1996 A21,A32,A34",
+    "temperatureK": 288.15,
+    "pressurePa": 101325,
+    "relativeHumidity": 0,
+    "co2Ppm": 450,
+    "reference": "CIE018:2019 segons ISO/CIE11664-2:2022§3.5; concentració300ppm només com a convenció històrica explícita.",
+    "vacuumDomainNm": [
+      300,
+      1700
+    ],
+    "densityRule": "L_vac=L_air*d(lambda_air)/d(lambda_vac)",
+    "responseRule": "T_vac(lambda_vac)=T_air(lambda_air), sense jacobià"
+  },
+  "qualification": {
+    "nominalAb": "Model nominal verificable de resposta/convenció/FOV amb cobertura acotada; cap requisit general de número de sèrie, fosc o guany individual per definir banda AB.",
+    "nativeObservation": "Fosc, guany/zero point, temperatura i calibratge coherents només quan es prediuen Hz o magnituds natives d’un dispositiu.",
+    "unknown": "Cues desconegudes no són zero; forma nominal no implica precisió observacional."
+  },
+  "campaign": {
+    "retainedCases": "13 casos v3 existents; postprocessament del polinomi retingut, no canvi de SPD o nova homologació angular.",
+    "spectral": "55 SPD heretades,64operadors,3finestres de resposta×2hipòtesis explícites de coordenada; no sensors complets.",
+    "fineOracle": "Harness7.10 sense modificar per al problema tabulat exportat; oracle addicional SciPyQUADPACK/Decimal60 per al canvi exacte de coordenades.",
+    "costEstimateSeconds": 120,
+    "maximumScientificWallSeconds": 900,
+    "maximumNewPhysicalLos": 0,
+    "serial": true
+  },
+  "exitRule": "No relaxar criteris. Un model nominal suficient pot superar el gate sense calibratge individual, però cobertura espectral/angular i coherència de coordenades han d’estar demostrades. Si no, BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE; no executar7.15."
+}
