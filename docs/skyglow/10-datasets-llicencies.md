@@ -50,6 +50,14 @@ Font ECMWF/CAMS: anàlisi/forecast de composició, aerosols i gasos. Llicència 
 
 Reutilitzar la política multiproveïdor de TerraLab3D/Pas 28. El kernel no pot assumir que tot DEM té la mateixa llicència. `TerrainRevision` ha d'incloure provider/product/version/checksum.
 
+## World Atlas de Falchi — referència històrica opcional
+
+- **Identitat:** Falchi et al. (2016), GFZ Data Services, [DOI 10.5880/GFZ.1.4.2016.001](https://doi.org/10.5880/GFZ.1.4.2016.001), [metadades GFZ](https://dataservices.gfz-potsdam.de/contact/showshort.php?id=escidoc%3A1541893), versió 1.1: GeoTIFF de **2,9 GB** aproximadament, graella de **30 segons d'arc**, brillantor **artificial cenital** simulada en **mcd/m²** (sense cel natural). No és radiància VIIRS DNB crua ni lectura nativa SQM.
+- **Model:** l'[article original](https://doi.org/10.1126/sciadv.1600377) usa banda Johnson-Cousins V, dades VIIRS principalment de 2014, atmosfera US62 prescrita, elevació i curvatura, però **no ombra de muntanyes**; l'emissió/calibratge deriva en part de mesures SQM. Per tant, és **comparació històrica entre models**, no ground truth independent.
+- **Drets:** GFZ descriu el canvi de llicència el **2019-11-13** a [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) per a aquesta edició; atribució i restricció d'ús comercial. Verificar versió/termes locals, no redistribuir comercialment, empaquetar, pujar ni fer derivats redistribuïbles sense autorització adequada.
+- **Condició d'ús en 7.17:** primer identificar amb `gdalinfo` el ràster d'uns 2 GB que l'usuari té localment — **no s'ha comprovat que sigui el mateix** —, banda, unitats, NoData, CRS, geotransformació, data i checksum. Comparar només els dominis temporals/espectrals equivalents i separar residuals del canvi 2014→2026. [Tasques 7.17](../tasques/pendent/pas7.17-clear-sky-ground-truth.md).
+
+
 ## TESS-W / SQM
 
 Les dades de xarxes reals depenen del proveïdor. La resposta espectral/calibratge publicada a Bará et al. 2019 és CC BY 4.0. Les observacions individuals necessiten termes de la xarxa concreta i metadata d'instrument.

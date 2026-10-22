@@ -38,6 +38,11 @@ La [nova política RSR/dominis](20-politica-rsr-i-validacio-per-dominis.md) elim
 
 L'objectiu de producte és un cel físic actualitzable en directe, no executar 60 integrals radiatives per segon. [Estratègia de rendiment interactiu](21-estrategia-rendiment-interactiu.md) explicita les mesures i responsabilitats: **7.18** audita vectorització/compilació i paral·lelisme multicore amb B5; **7.19** caracteritza el cost de fases; **7.20** valida els pressupostos d'error sota particions; **7.21** integra workers persistents, cues, cache i cancel·lació; **7.22** aprova SLO abans de decidir GPU/LUT/FFT o altres backends opcionals. Comparar 1/2/4/6 nuclis quan l'entorn ho permeti, així com els escenaris Kelvin, moviment i canvis atmosfèrics. Les metes orientatives **60 FPS de renderització, 1–3 s primera resposta i 10–30 s refinament** no són SLO aprovats ni resultats de benchmark. No reobrir l'ordre de 7.13–7.17 ni canviar els pressupostos científics per velocitat.
 
+## Revisió prospectiva 7.14A/7.14B (2026-10-22)
+
+[Decisió i cadena científica](22-revisio-dependencies-7.14-7.15.md). **7.14 original continua `BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`, sense requalificació de preregistres ni evidències.** La branca **7.14A** conserva el domini CIE/AB ja validat, **7.14B** manté pendent la qualificació SQM/TESS, i **7.15 depèn només de 7.14A** per a simulació S/C. 7.16/7.17/7.24/7.28 han d'assenyalar prediccions SQM/TESS `unavailable/not_evaluated` si 7.14B no està homologat. No canvien l'ordre d'acceleracions 7.18–7.22 ni els pressupostos científics. El contrast amb el raster Falchi és opcional a 7.17 i és model contra model.
+
+
 ## Ordre lineal
 
 | Pas | Capacitat | Dependència |
@@ -56,8 +61,10 @@ L'objectiu de producte és un cel físic actualitzable en directe, no executar 6
 | 7.11 | Terreny, curvatura i visibilitat física | 7.10 |
 | 7.12 | Gate zenital de transport radiomètric | 7.11 |
 | 7.13 | Camp angular i DomeProfile sobre ruta directa | 7.12 |
-| 7.14 | Projeccions fotomètriques i sensors SQM/TESS; revalidació de bandes | 7.13, 7.4, 7.5.1 |
-| 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14 |
+| 7.14 (original) | Gate SQM/TESS+CIE històric bloquejat | 7.13, 7.4, 7.5.1 |
+| 7.14A | Projeccions CIE i AB de referència, domini acreditat | 7.13, 7.4, 7.5.1 |
+| 7.14B | Qualificació nominal SQM/TESS, pendent de dades | 7.14A i dades instrumentals |
+| 7.15 | Atmosfera real ERA5/CAMS i composició de camps | 7.14A (7.14B no bloquejant S/C) |
 | 7.16 | Incertesa S/C i propagació de sensibilitat espectral/angular | 7.3, 7.5, 7.5.1, 7.15 |
 | 7.17 | Gate de transport S; validació empírica C/H separada | 7.3, 7.5(S), 7.16, 7.5.1 |
 | 7.18 | Watershed/EmissionRegion/quadtree B5; auditoria vectorització i CPU multicore | 7.17 |
@@ -70,7 +77,7 @@ L'objectiu de producte és un cel físic actualitzable en directe, no executar 6
 | 7.25 | Bridge Python→TypeScript i SkyglowRuntime | 7.24, 7.5.1 |
 | 7.26 | Renderer Three.js lineal i modes diagnòstics | 7.25, 7.5.1 |
 | 7.27 | Composició lineal del cel i estats reference/instantaneous | 7.26, 7.5.1 |
-| 7.28 | B7 FULL, SLO i homologació del skyglow artificial | 7.1–7.27, 7.5.1 |
+| 7.28 | B7 FULL, SLO i homologació del skyglow artificial per domini | 7.1–7.27 (7.14B exclòs del camí S/C si segueix pendent), 7.5.1 |
 
 ## Fases
 
@@ -232,11 +239,26 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 
 **Fitxer executable:** [pas7.14-photometric-projections.md](../tasques/pendent/pas7.14-photometric-projections.md)
 
+### 7.14A — Projeccions CIE/AB ja acreditades
+
+**Estat:** completat en domini físic/numèric delimitat per les evidències v1–v3. No concedeix PASS al gate instrumental de 7.14 original, ni acredita camps espectrals SQM/TESS de FOV complet.
+
+**Fitxer:** [7.14A](../tasques/completat/pas7.14a-projeccions-cie-ab.md).
+
+### 7.14B — Instrumentació SQM/TESS pendent
+
+**Estat:** `BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`. Sense dades primàries coherents de resposta, cues i FOV no hi ha lectura instrumental acreditada. No bloqueja el desenvolupament físic S/C del 7.15.
+
+**Fitxer:** [7.14B](../tasques/pendent/pas7.14b-perfils-instrumentals-sqm-tess.md).
+
+
 ### 7.15 — Atmosfera real ERA5/CAMS i composició de camps
 
 **Finalitat.** Substituir el provider estàndard per dades reals sense canviar la física del kernel.
 
 **Gate de sortida.** El mateix kernel pot executar atmosfera estàndard o real amb contracte idèntic i provenance completa; fixtures reanàlisi són reproduïbles.
+
+**Dependència vigent:** 7.14A (CIE/AB acreditats), no el gate bloquejat 7.14/7.14B. Cap lectura SQM/TESS està autoritzada per aquest canvi.
 
 **Fitxer executable:** [pas7.15-atmos-era5-cams.md](../tasques/pendent/pas7.15-atmos-era5-cams.md)
 
@@ -253,6 +275,8 @@ La verificació científica amb un grànul J1/J2 real pot emprar una fixture loc
 **Finalitat.** Verificar transport de fonts S/C contra SG-REF i altres oracles independents abans d'accelerar; si hi ha dades adequades, validar empíricament C/H per separat.
 
 **Gate de sortida.** Criteri numèric S científicament justificat i preregistrat, sense ajustar-lo als residuals del candidat; superar-lo habilita acceleracions dels dominis de transport S/C verificats. El gate observacional de C/H exigeix `held-out`, criteris preregistrats, incerteses i observacions independents; si no existeixen, `not_evaluated`, mai PASS empíric. La manca de RSR exacta 2026 no bloqueja les acceleracions dels dominis de transport S/C verificats.
+
+**Contrast opcional:** Falchi 2016 es pot comparar històricament al zenit després d'identificar el GeoTIFF, amb banda, unitats, dates i llicència, però només com a sortida d'un segon model.
 
 **Fitxer executable:** [pas7.17-clear-sky-ground-truth.md](../tasques/pendent/pas7.17-clear-sky-ground-truth.md)
 

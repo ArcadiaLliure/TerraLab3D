@@ -1,6 +1,10 @@
 # Pas 7.14 — Skyglow físic — Projeccions fotomètriques i sensors SQM/TESS
 
-> **Estat:** pendent, bloquejat científicament (`BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`). **Estat funcional:** parcial, observable offline. **Origen:** planificat. **Abast vigent:** retenció espectral al mateix kernel, CIE, bandes de referència i integració de FOV nominal verificats numèricament. Coordenades CIE aire/buit resoltes explícitament; perfils nominals SQM/TESS i cobertura suficient encara sense acreditar. Calibratge individual només per a prediccions natives, no com a prerequisit general nominal. **Punt de represa: aquest pas; no executar 7.15.**
+> **Estat històric del gate original:** BLOQUEJAT científicament (`BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`); **sense PASS retroactiu**. Revisió prospectiva 2026-10-22: [7.14A acreditat](../completat/pas7.14a-projeccions-cie-ab.md), [7.14B pendent](pas7.14b-perfils-instrumentals-sqm-tess.md); **represa general: [7.15](pas7.15-atmos-era5-cams.md)** només per domini S/C i CIE/AB. Les instruccions antigues d'aturada de 7.15 reflecteixen el contracte abans d'aquesta revisió.
+
+## Prevalença prospectiva
+
+El criteri del gate original i totes les evidències v1–v3 resten vigents com a registre **bloquejat**. La [revisió formal de dependències](../../skyglow/22-revisio-dependencies-7.14-7.15.md) permet executar 7.15 **només** amb la projecció CIE/AB acreditada, sense considerar SQM/TESS homologats. No relaxar llindars ni reescriure el gate.
 
 ## Descripció funcional
 

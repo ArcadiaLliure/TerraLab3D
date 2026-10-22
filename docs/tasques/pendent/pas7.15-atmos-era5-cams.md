@@ -9,7 +9,10 @@ Substituir el provider estàndard per dades reals sense canviar la física del k
 ## Dependències
 
 **Depèn de:**
-7.14
+- [7.14A — projeccions CIE/AB acreditades](../completat/pas7.14a-projeccions-cie-ab.md).
+- Del kernel físic ja validat (7.8/7.12) i els seus contractes.
+
+**No depèn de:** [7.14B — SQM/TESS](pas7.14b-perfils-instrumentals-sqm-tess.md); el [7.14 original](pas7.14-photometric-projections.md) conserva el gate bloquejat sense afectar el domini físic S/C.
 
 **En depenen:**
 - [Pas següent](pas7.16-uncertainty-provenance.md)
@@ -19,6 +22,10 @@ Substituir el provider estàndard per dades reals sense canviar la física del k
 - [02-arquitectura-integracio.md](../../skyglow/02-arquitectura-integracio.md)
 - [09-incertesa-proveniencia.md](../../skyglow/09-incertesa-proveniencia.md)
 - [10-datasets-llicencies.md](../../skyglow/10-datasets-llicencies.md)
+
+## Abast després de la revisió de dependències
+
+Aquest pas només pot reutilitzar projeccions CIE/AB de referència dins del seu suport declarat. No publicar magnituds nadiues SQM/TESS ni validació H; conservar `unavailable` en absència de 7.14B. Respectar el mateix kernel, el sostre/cua física condicionada i els fallbacks per variable amb procedència. [Decisió](../../skyglow/22-revisio-dependencies-7.14-7.15.md).
 
 ## Tasques
 

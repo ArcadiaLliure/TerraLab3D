@@ -43,6 +43,13 @@ Configuració versionada + SourceModel S/C + procedència → component del pas 
 
 Previst: rebutjar entrades no finites, unitats i revisions incompatibles; cancel·lació cooperativa, latest-wins i descart de resultats antics. Recursos grans persistents fora del JSON de cada frame; alliberament explícit pel propietari. RSR de referència C no es promou a H; incertesa desconeguda no es converteix en sigma.
 
+## Referència històrica opcional: Falchi 2016
+
+El GeoTIFF local aproximat de 2 GB **no ha estat identificat ni llegit**. Abans de fer-lo servir, exigir `gdalinfo`, checksum, bandes, NoData, CRS, unitat, versió, dates, cobertura i llicència. L'[Atlas GFZ](../../skyglow/10-datasets-llicencies.md#world-atlas-de-falchi--referència-històrica-opcional) és un **model VIIRS + propagació calibrat amb SQM**, no una observació independent. Classificar `MODEL_COMPARISON_HISTORICAL`, no `held-out` observacional.
+
+Comparar només **brillantor artificial cenital** en unitats, passband (Johnson-Cousins V), atmosfèra, emissió, geometria i època justificades. Els productes Black Marble de 2026 no són contemporanis amb els VIIRS del model de 2014. La versió GFZ 1.1 és **CC BY-NC 4.0**: cap distribució comercial ni empaquetat silenciós. El contrast és opcional i no bloqueja gate S. Tampoc substitueix [7.14B SQM/TESS](pas7.14b-perfils-instrumentals-sqm-tess.md) ni acredita H.
+
+
 ## Tasques
 
 **Gate S obligatori per autoritzar acceleracions:**

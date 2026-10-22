@@ -39,6 +39,10 @@ Configuració versionada + SourceModel S/C + procedència → component del pas 
 
 Previst: rebutjar entrades no finites, unitats i revisions incompatibles; cancel·lació cooperativa, latest-wins i descart de resultats antics. Recursos grans persistents fora del JSON de cada frame; alliberament explícit pel propietari. RSR de referència C no es promou a H; incertesa desconeguda no es converteix en sigma.
 
+## Sensors després de 7.14A/7.14B
+
+El gate original 7.14 continua `BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`. [7.14A](../completat/pas7.14a-projeccions-cie-ab.md) només és CIE/AB de referència; [7.14B](pas7.14b-perfils-instrumentals-sqm-tess.md) no homologat. Les afirmacions empíriques que necessitin SQM/TESS han de quedar `not_evaluated` si falta el seu perfil; no bloquejar el gate físic S.
+
 ## Tasques
 
 - [ ] Reexecutar clear-sky per demostrar que acceleracions 7.18–7.22 no han degradat la validesa.

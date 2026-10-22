@@ -1,6 +1,6 @@
 # Estratègia de rendiment interactiu del skyglow físic
 
-> **Decisió prospectiva (2026-10-19), encara no implementada ni homologada.** Complementa el [pla executable](19-pla-executable-codex.md), els [benchmarks](07-benchmark-b0-b7.md) i els passos [7.18](../tasques/pendent/pas7.18-source-spatial-acceleration.md)–[7.22](../tasques/pendent/pas7.22-optional-runtime-acceleration.md). **No modifica el punt de represa 7.13**, el seu FAIL angular, els gates científics ni els resultats històrics.
+> **Decisió prospectiva (2026-10-19), encara no implementada ni homologada.** Complementa el [pla executable](19-pla-executable-codex.md), els [benchmarks](07-benchmark-b0-b7.md) i els passos [7.18](../tasques/pendent/pas7.18-source-spatial-acceleration.md)–[7.22](../tasques/pendent/pas7.22-optional-runtime-acceleration.md). **A la data original de 2026-10-19 no modificava el punt de represa 7.13**. La [revisió posterior 7.14A/7.14B](22-revisio-dependencies-7.14-7.15.md) actualitza la represa a 7.15, sense modificar gates científics ni els resultats històrics.
 
 ## Objectiu de producte i naturalesa dels temps
 

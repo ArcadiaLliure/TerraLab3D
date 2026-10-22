@@ -6,7 +6,7 @@ Consulta també les [normes d'arquitectura i execució](normes-arquitectura.md) 
 
 ## Punt de represa
 
-> **Punt de represa: [Pas 7.14 — Projeccions fotomètriques i sensors SQM/TESS](tasques/pendent/pas7.14-photometric-projections.md), pendent, parcial i bloquejat científicament (`BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`).** [Represa vigent de 7.14](evidencies/pas7.14/represa-v3/validacio-represa-v3.md), 2026-10-21: recerca específica de famílies òptiques, cues i FOV; dades mancants i vies primàries identificades. CIE aire/buit i PASS numèric v1/v2 preservats; perfil nominal SQM-L/TESS-W i cobertura suficient pendents. Cost de 0,8 s explicat per perfilatge, sense modificar el runtime. No començar 7.15. [7.13](tasques/completat/pas7.13-dome-profile-direct.md) completat en domini numèric registrat: reconstrucció adaptativa ≤0,004965 mag davant 0,01 mag, amb ruta directa fora de garanties. [7.5 S](tasques/completat/pas7.5-source-model-v1.md) conserva el seu domini original. [7.5.1 — Black Marble i simulació espectral](tasques/completat/pas7.5.1-black-marble-spectral-simulation.md) incorpora 42 SPD CIE, modalitats realista/K, normalitzacions explícites, fonts C relatives NOAA-20 reals i controls connectats a Python. RSR pública de referència del mateix sensor, sense exigir certificació anual exacta. [7.6 — SG-REF](tasques/completat/pas7.6-sg-ref-reference-solver.md) ja propaga S/C offline en el domini pla homogeni verificat, amb àrea directa i contrast F5 independent. [7.7 — Kernel B0](tasques/completat/pas7.7-kernel-geometry-b0.md) verifica ECEF/ENU esfèrics, GK7/15 i revisions. [7.8 — OpticalField](tasques/completat/pas7.8-optical-field-standard.md) ja verifica el camp estàndard P/T/n, travesses i dependències exactes. [7.9 — B1](tasques/completat/pas7.9-rayleigh-aerosol-b1.md) ja calcula radiància espectral monocromàtica offline en medis prescrits amb dispersió simple. [7.10](tasques/completat/pas7.10-gas-spectral-kernel.md) verifica transport espectral directe S/C i O3 prescrit offline; l'aire terrestre complet, la radiància física connectada al producte i H continuen pendents.
+> **Punt de represa: [Pas 7.15 — Atmòsfera real ERA5/CAMS](tasques/pendent/pas7.15-atmos-era5-cams.md), pendent i no iniciat.** Revisió prospectiva de 2026-10-22: [7.14A CIE/AB](tasques/completat/pas7.14a-projeccions-cie-ab.md) queda completat únicament en el domini ja acreditat; [7.14B SQM/TESS](tasques/pendent/pas7.14b-perfils-instrumentals-sqm-tess.md) continua bloquejat. El [gate original 7.14](tasques/pendent/pas7.14-photometric-projections.md) i els preregistres v1–v3 no es requalifiquen: `BLOCKED_NOMINAL_RESPONSE_OR_COVERAGE`. El 7.15 pot consumir CIE/AB i S/C sense publicar lectures SQM/TESS ni homologació H. [Decisió documentada](skyglow/22-revisio-dependencies-7.14-7.15.md).
 >
 > Els subpassos **7.1–7.50** pertanyen a contaminació lumínica artificial: VNP46, VJ146 i VJ246 són fonts Black Marble candidates amb models de mesura propis; cap skyglow físic de producte no està implementat. Els **7.51+** són del cel físic solar/lunar. El Pas 7 històric conserva la visualització actual. Les verticals pendents es documenten a [`skyglow/`](skyglow/README.md) i [`cel-fisic/`](cel-fisic/README.md).
 
@@ -49,7 +49,7 @@ La instrucció **«continua amb el pla de millores»** és suficient: Codex ha d
 
 La simulació artificial de skyglow ha d'aspirar a respondre interactivament als canvis de **kelvins, fonts, observador i atmosfera**, sense calcular integrals radiatives per frame. Els passos **7.18–7.22** han d'avaluar vectorització/compilació, paral·lelisme CPU multicore, agrupació, cache i eventual GPU/LUT/FFT, sempre contra el baseline directe homologat. Els temps orientatius encara **no són SLO aprovats**; els SLO formals es congelen a 7.22. [Estratègia, matriu de benchmarks i límits](skyglow/21-estrategia-rendiment-interactiu.md).
 
-**7.13 v2 completat en domini registrat:** el FAIL v1 es preserva. Cap fita de rendiment no autoritza saltar 7.14 ni avançar les acceleracions abans dels gates de 7.17; 7.14 continua pendent pel seu gate instrumental.
+**7.13 v2 completat en domini registrat:** el FAIL v1 es preserva. La nova partició 7.14A/7.14B permet reprendre 7.15 sense alterar el gate instrumental original ni anticipar les acceleracions 7.18–7.22.
 
 ## Protocol perquè Codex continuï el pla
 
@@ -95,6 +95,7 @@ Estats admesos:
 | 7.11 | [Terreny, curvatura i visibilitat física](tasques/completat/pas7.11-terrain-curvature.md) | `completat` offline, amb DEM opac i SG-REF |
 | 7.12 | [Gate zenital de transport radiomètric](tasques/completat/pas7.12-zenith-transport-gate.md) | `completat` numèricament en domini condicionat; H/producte pendents |
 | 7.13 | [Camp angular i DomeProfile adaptatiu](tasques/completat/pas7.13-dome-profile-direct.md) | `completat` offline en domini registrat; COESA general/DEM/àrea per directe |
+| 7.14A | [Projeccions CIE/AB de referència](tasques/completat/pas7.14a-projeccions-cie-ab.md) | `completat per abast acreditat` (sense nou gate instrumental) |
 | 8 | [Sol, Lluna i planetes amb posicions i aparença reals](tasques/completat/pas8.md) | `completat` |
 | 8.5 | [Superfície lunar LRO/LOLA, orientació i libració](tasques/completat/pas8.5.md) | `completat` |
 | 8.6 | [Planetes, anells i satèl·lits naturals](tasques/completat/pas8.6.md) | `completat` |
@@ -118,12 +119,15 @@ La numeració dels passos completats i del backlog 24–38 es preserva. **Excepc
 
 Els números 18 i 20 queden reservats com a traça històrica: meteorologia s'ha retirat de l'ordre executable i ara és un [dossier per madurar](tasques/idees-per-madurar/meteorologia.md); l'antic Pas 20 (simulació fotogràfica) ha estat absorbit pel Pas 19 (modes d'observació instrumental). La resta de passos conserven la numeració existent.
 
+**Decisió 2026-10-22:** la partició del 7.14 és prospectiva, no una correcció del gate original. [Contracte i dependències](skyglow/22-revisio-dependencies-7.14-7.15.md).
+
 ## Passos pendents
 
 | Pas | Capacitat | Estat | Dependències |
 |---:|---|---|---|
-| 7.14 | [Projeccions fotomètriques i sensors SQM/TESS](tasques/pendent/pas7.14-photometric-projections.md) | `pendent`, parcial/bloquejat científicament | 7.13, 7.4 (revalidació espectral), 7.5.1 |
-| 7.15 | [Atmosfera real ERA5/CAMS i composició de camps](tasques/pendent/pas7.15-atmos-era5-cams.md) | `pendent` | 7.14 |
+| 7.14 (original) | [Gate SQM/TESS+CIE històric](tasques/pendent/pas7.14-photometric-projections.md) | `BLOCKED`, evidències intactes | 7.13, 7.4, 7.5.1 |
+| 7.14B | [Qualificació instrumental SQM/TESS](tasques/pendent/pas7.14b-perfils-instrumentals-sqm-tess.md) | `pendent/bloquejat`, no bloqueja S/C | 7.14A + dades primàries |
+| 7.15 | [Atmosfera real ERA5/CAMS i composició de camps](tasques/pendent/pas7.15-atmos-era5-cams.md) | `pendent`; punt de represa | 7.14A, no 7.14B |
 | 7.16 | [Incertesa quantitativa i provenance completa](tasques/pendent/pas7.16-uncertainty-provenance.md) | `pendent` | 7.3, 7.5, 7.15, 7.5.1 |
 | 7.17 | [Validació empírica clear-sky de SourceModel i transport](tasques/pendent/pas7.17-clear-sky-ground-truth.md) | `pendent` | 7.3, 7.5, 7.16, 7.5.1 |
 | 7.18 | [Watershed, EmissionRegion i quadtree com acceleració B5](tasques/pendent/pas7.18-source-spatial-acceleration.md) | `pendent` | 7.17 |

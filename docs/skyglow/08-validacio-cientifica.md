@@ -34,6 +34,10 @@ Construir `B_full(az,el)` amb solver de referència i `B_compressed` amb mostres
 
 Mètriques mínimes: MAE hemisferi ponderat per angle sòlid, MAE 0–20°, P95 `|Δm|`, relació d'energia `∫B_compressed dΩ/∫B_full dΩ`, `Δaz_peak`, `ΔB_peak`, `ΔW`. Escombrar si cal la mostra a 1° i el percentatge de `W_effective`.
 
+### Projeccions i sensors: revisió 2026-10-22
+
+[7.14A](../tasques/completat/pas7.14a-projeccions-cie-ab.md) és un subconjunt CIE/AB numèric acreditat; l'original 7.14 continua bloquejat i [7.14B SQM/TESS](../tasques/pendent/pas7.14b-perfils-instrumentals-sqm-tess.md) no aporta encara un perfil instrumental qualificat. Distingir sempre validació numèrica, comparació entre models i observació independent. 7.15 pot avançar en domini S/C sense sensor natiu; 7.17/7.24/7.28 no poden anunciar H ni SQM/TESS per aquesta excepció. [Decisió](22-revisio-dependencies-7.14-7.15.md).
+
 ## 5. Ground truth
 
 La comparació amb el reference solver valida implementació i aproximacions numèriques; no substitueix la validació física externa.

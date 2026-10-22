@@ -40,6 +40,10 @@ Configuració versionada + SourceModel S/C + procedència → component del pas 
 
 Previst: rebutjar entrades no finites, unitats i revisions incompatibles; cancel·lació cooperativa, latest-wins i descart de resultats antics. Recursos grans persistents fora del JSON de cada frame; alliberament explícit pel propietari. RSR de referència C no es promou a H; incertesa desconeguda no es converteix en sigma.
 
+## Abast instrumental final
+
+La [partició de 7.14](../../skyglow/22-revisio-dependencies-7.14-7.15.md) manté l'original bloquejat, [7.14A CIE/AB](../completat/pas7.14a-projeccions-cie-ab.md) limitada a fixtures i [7.14B SQM/TESS](pas7.14b-perfils-instrumentals-sqm-tess.md) pendent. Si 7.14B encara no ha superat un gate propi, **B7 no pot publicar lectures SQM/TESS com homologades**, i les ha d'etiquetar `unavailable/not_evaluated`. La comparació Falchi és model contra model, no H ni homologació instrumental.
+
 ## Tasques
 
 - [ ] Executar B7 amb AD OFF/ON, uncertainty OFF/ON, cold/warm/movement/prefetch/teleport/tile-change/occlusion-flip i backend 7.22 si existeix.
@@ -54,7 +58,7 @@ Previst: rebutjar entrades no finites, unitats i revisions incompatibles; cancel
 
 ## Criteri de sortida
 
-Els resultats es completen per domini: S pot ser simulació física verificada per B7; C es publica només com a condicionat; H exigeix incertesa/validació empírica i producte/release/període/QA comprovats. Sense H no es declara cap predicció Black Marble absoluta homologada. No crear o modificar llindars a 7.28.
+Els resultats es completen per domini: S pot ser simulació física verificada per B7; C es publica només com a condicionat; H exigeix incertesa/validació empírica i producte/release/període/QA comprovats. Sense H no es declara cap predicció Black Marble absoluta homologada. SQM/TESS només s'homologuen si 7.14B té evidència suficient; altrament, queden `unavailable/not_evaluated` sense impedir S/C acreditat. No crear o modificar llindars a 7.28.
 
 ## Proves i evidències obligatòries
 

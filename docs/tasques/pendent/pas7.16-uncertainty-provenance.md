@@ -43,6 +43,10 @@ Configuració versionada + SourceModel S/C + procedència → component del pas 
 
 Previst: rebutjar entrades no finites, unitats i revisions incompatibles; cancel·lació cooperativa, latest-wins i descart de resultats antics. Recursos grans persistents fora del JSON de cada frame; alliberament explícit pel propietari. RSR de referència C no es promou a H; incertesa desconeguda no es converteix en sigma.
 
+## Abast fotomètric vigent
+
+Les projeccions CIE/AB de referència del [7.14A](../completat/pas7.14a-projeccions-cie-ab.md) només poden propagar incertesa als dominis acreditats. Sense [7.14B](pas7.14b-perfils-instrumentals-sqm-tess.md), SQM/TESS continua `unavailable`; cap sigma inventada ni bloqueig del ledger S/C.
+
 ## Tasques
 
 **Obligatòries per al criteri de sortida S/C:**
